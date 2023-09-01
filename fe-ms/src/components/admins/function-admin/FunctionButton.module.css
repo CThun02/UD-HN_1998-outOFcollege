@@ -1,0 +1,55 @@
+.backgroundColor {
+  background-color: #f9fbf9;
+  background-position: -100%;
+  background-size: 200% auto;
+  transition: background-position 0.5s ease;
+}
+
+.link {
+  color: #000;
+  text-decoration: none;
+}
+
+.link:hover {
+  height: 100% !important;
+  color: #1450a3;
+}
+
+.link:active {
+  color: red;
+  background-color: red;
+  font-weight: bold;
+}
+
+.border {
+  border: 0 solid blue;
+  border-radius: 0 8px 8px 0;
+}
+
+.hover:hover {
+  cursor: pointer;
+  color: #1450a3;
+  background-position: 100%;
+  background-color: #e0e0e0;
+  border-left: 10px solid #325e9c;
+  font-weight: 600;
+}
+
+.hover:active {
+  cursor: pointer;
+  color: #1450a3;
+  background-position: 100%;
+  background-color: #e0e0e0;
+  border-left: 10px solid #325e9c;
+  font-weight: 600;
+}
+
+.lineHeight {
+  margin: 0;
+  line-height: 60px;
+}
+
+.icon {
+  margin-right: 20px;
+  margin-left: 70px;
+}

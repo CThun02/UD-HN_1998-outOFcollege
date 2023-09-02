@@ -1,0 +1,60 @@
+/* CSS */
+.full-screen-bg {
+  background-color: #f9fbf9;
+  height: auto;
+  padding: 100px;
+}
+
+.container-color {
+  padding: 30px;
+  background-color: #ffffff;
+  border-radius: 10px;
+}
+
+.mh-auto {
+  min-height: 300px;
+  height: auto;
+}
+
+.line {
+  width: 1250px;
+  height: 2px;
+  background-color: black;
+}
+.modal-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: auto;
+}
+
+.modal-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background-color: white;
+  width: 80%;
+  max-width: 1200px;
+  max-height: 80vh;
+  padding: 20px;
+  overflow: auto;
+  border-radius: 10px;
+}
+
+.modal-content h2 {
+  margin-top: 0;
+}
+
+.modal-content ul {
+  list-style-type: none;
+  padding: 0;
+}

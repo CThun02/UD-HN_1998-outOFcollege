@@ -1,0 +1,19 @@
+.sidebar {
+  background-color: #f9fbf9;
+  height: 746px;
+  width: 345px;
+  border-right: 2px solid #2e4f4f;
+  display: inline-block;
+}
+
+.logo {
+  padding-top: 10px;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 80px;
+}
+
+.logo img {
+  width: 170px;
+  height: 70px;
+}

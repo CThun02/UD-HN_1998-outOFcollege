@@ -1,12 +1,15 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEnvelope } from "@fortawesome/free-solid-svg-icons";
+import styles from "./FunctionButton.module.css";
 
-function FunctionButton({ text }) {
+function FunctionButton({ icon, textFunction }) {
   return (
-    <div>
-      <FontAwesomeIcon icon={faEnvelope} />
-
-      <button>{text}</button>
+    <div className={styles.hover}>
+      <a href="#" className={styles.link}>
+        <p className={styles.lineHeight}>
+          <FontAwesomeIcon icon={icon} className={styles.icon} />
+          {textFunction}
+        </p>
+      </a>
     </div>
   );
 }

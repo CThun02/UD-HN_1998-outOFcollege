@@ -1,0 +1,9 @@
+.ButtonCRUD {
+  border-radius: 50%;
+  border: #454545 1px solid;
+  background-color: white;
+}
+
+.ButtonCRUD:hover {
+  background-color: #e7e7e7;
+}

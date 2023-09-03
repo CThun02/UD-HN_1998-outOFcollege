@@ -10,13 +10,13 @@ function Nav() {
   return (
     <div className={styles.nav}>
       <div className={`row `}>
-        <div className={`col-6 `}>
+        <div className={`col-8 ${styles.padding}`}>
           <div className={styles.navLeft}>
             <input type="text" placeholder="Search...." />
           </div>
         </div>
 
-        <div className={`col-6 `}>
+        <div className={`col-4 ${styles.padding} ${styles.flexEnd}`}>
           <div className={styles.navRight}>
             <Link to="/">
               <FontAwesomeIcon

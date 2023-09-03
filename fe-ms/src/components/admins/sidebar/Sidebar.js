@@ -13,22 +13,47 @@ import styles from "./Sidebar.module.css";
 
 function Sidebar() {
   return (
-    <div className={styles.sidebar}>
+    <div className={`col-12 ${styles.sidebar}`}>
       <div className={styles.logo}>
         <img src="/image/logo/logo-men's-shopping.jpg" alt="Men's Shirt Shop" />
       </div>
 
-      <div className={styles.styleSidebar}>
-        <FunctionButton icon={faChartPie} textFunction={"Thống kê"} />
+      <div className={`row ${styles.styleSidebar}`}>
+        <FunctionButton
+          icon={faChartPie}
+          textFunction={"Thống kê"}
+          isOpen={false}
+        />
         <FunctionButton
           icon={faBasketShopping}
           textFunction={"Quản lý đơn hàng"}
+          isOpen={true}
         />
-        <FunctionButton icon={faStore} textFunction={"Bán hàng tại quầy"} />
-        <FunctionButton icon={faCoins} textFunction={"Quản lý thu chi"} />
-        <FunctionButton icon={faUserGear} textFunction={"Quản lý tài khoản"} />
-        <FunctionButton icon={faShirt} textFunction={"Quản lý sản phẩm"} />
-        <FunctionButton icon={faTicket} textFunction={"Khuyến mại"} />
+        <FunctionButton
+          icon={faStore}
+          textFunction={"Bán hàng tại quầy"}
+          isOpen={false}
+        />
+        <FunctionButton
+          icon={faCoins}
+          textFunction={"Quản lý thu chi"}
+          isOpen={false}
+        />
+        <FunctionButton
+          icon={faUserGear}
+          textFunction={"Quản lý tài khoản"}
+          isOpen={false}
+        />
+        <FunctionButton
+          icon={faShirt}
+          textFunction={"Quản lý sản phẩm"}
+          isOpen={false}
+        />
+        <FunctionButton
+          icon={faTicket}
+          textFunction={"Khuyến mại"}
+          isOpen={false}
+        />
       </div>
     </div>
   );

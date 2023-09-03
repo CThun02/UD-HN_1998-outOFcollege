@@ -101,7 +101,16 @@ function CreateBill() {
                     <div className="line mt-5"></div>
                     <div className='mt-5'>
                         <h1>THông tin khách hàng</h1>
+                        <div className='row'>
+                            <div className='col-6'></div>
+                            <div className='col-6'>
+                                <div className='bill-inf'>
+                                    <div className='bill-name'>
 
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

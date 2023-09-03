@@ -1,4 +1,4 @@
-import {} from "@fortawesome/free-solid-svg-icons";
+import { } from "@fortawesome/free-solid-svg-icons";
 import { faCircleUser, faBell } from "@fortawesome/free-regular-svg-icons";
 
 import styles from "./Nav.module.css";
@@ -23,6 +23,7 @@ function Nav() {
                 icon={faBell}
                 className={styles.iconNotification}
               />
+
             </Link>
             <Link to="/">
               <FontAwesomeIcon

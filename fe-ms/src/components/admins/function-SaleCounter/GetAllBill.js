@@ -1,5 +1,7 @@
 import React from 'react'
 import './css/style.css'
+import { Link } from "react-router-dom";
+
 const GetAllBill = () => {
 
     return (
@@ -11,7 +13,7 @@ const GetAllBill = () => {
                     </div>
                     <div className="col-6">
                         <div className="d-flex justify-content-end">
-                            <a href="/create-bill" className="btn btn-primary">Tạo hóa đơn</a>
+                            <Link to="/controller/v1/create-bill" className="btn btn-primary">Tạo hóa đơn</Link>
                         </div>
                     </div>
                 </div>

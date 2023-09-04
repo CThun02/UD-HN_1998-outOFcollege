@@ -2,6 +2,7 @@ import FunctionButton from "../function-admin/FunctionButton";
 import {
   faBasketShopping,
   faChartPie,
+  faChevronDown,
   faCoins,
   faShirt,
   faStore,
@@ -10,25 +11,71 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 import styles from "./Sidebar.module.css";
+import { useState } from "react";
 
 function Sidebar() {
+  const [isLoadingIcon, setIsLoadingIcon] = useState(false);
+
   return (
-    <div className={styles.sidebar}>
+    <div className={`col-12 ${styles.sidebar}`}>
       <div className={styles.logo}>
         <img src="/image/logo/logo-men's-shopping.jpg" alt="Men's Shirt Shop" />
       </div>
 
-      <div className={styles.styleSidebar}>
-        <FunctionButton icon={faChartPie} textFunction={"Thống kê"} />
+      <div className={`row ${styles.styleSidebar}`}>
         <FunctionButton
-          icon={faBasketShopping}
-          textFunction={"Quản lý đơn hàng"}
+          isLoadingIcon={isLoadingIcon}
+          setIsLoadingIcon={setIsLoadingIcon}
+          iconLeft={faChartPie}
+          textFunction={"Thống kê"}
+          isOpen={false}
         />
-        <FunctionButton icon={faStore} textFunction={"Bán hàng tại quầy"} />
-        <FunctionButton icon={faCoins} textFunction={"Quản lý thu chi"} />
-        <FunctionButton icon={faUserGear} textFunction={"Quản lý tài khoản"} />
-        <FunctionButton icon={faShirt} textFunction={"Quản lý sản phẩm"} />
-        <FunctionButton icon={faTicket} textFunction={"Khuyến mại"} />
+        <FunctionButton
+          isLoadingIcon={isLoadingIcon}
+          setIsLoadingIcon={setIsLoadingIcon}
+          iconLeft={faBasketShopping}
+          textFunction={"Quản lý đơn hàng"}
+          isOpen={true}
+        />
+        <FunctionButton
+          isLoadingIcon={isLoadingIcon}
+          setIsLoadingIcon={setIsLoadingIcon}
+          iconLeft={faStore}
+          textFunction={"Bán hàng tại quầy"}
+          isOpen={false}
+        />
+        <FunctionButton
+          isLoadingIcon={isLoadingIcon}
+          setIsLoadingIcon={setIsLoadingIcon}
+          iconLeft={faCoins}
+          textFunction={"Quản lý thu chi"}
+          isOpen={false}
+          iconRight={faChevronDown}
+        />
+        <FunctionButton
+          isLoadingIcon={isLoadingIcon}
+          setIsLoadingIcon={setIsLoadingIcon}
+          iconLeft={faUserGear}
+          textFunction={"Quản lý tài khoản"}
+          isOpen={false}
+          iconRight={faChevronDown}
+        />
+        <FunctionButton
+          isLoadingIcon={isLoadingIcon}
+          setIsLoadingIcon={setIsLoadingIcon}
+          iconLeft={faShirt}
+          textFunction={"Quản lý sản phẩm"}
+          isOpen={false}
+          iconRight={faChevronDown}
+        />
+        <FunctionButton
+          isLoadingIcon={isLoadingIcon}
+          setIsLoadingIcon={setIsLoadingIcon}
+          iconLeft={faTicket}
+          textFunction={"Khuyến mại"}
+          isOpen={false}
+          iconRight={faChevronDown}
+        />
       </div>
     </div>
   );

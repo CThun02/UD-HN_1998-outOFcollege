@@ -1,0 +1,10 @@
+.padding {
+  padding: 0px !important;
+  margin: 0 !important;
+}
+
+.main {
+  height: 100%;
+  width: 100%;
+  padding: 0;
+}

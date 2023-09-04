@@ -4,5 +4,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface AddressDetail extends JpaRepository<AddressDetail, Long> {
+public interface RoleRepository extends JpaRepository<RoleRepository, Long> {
 }

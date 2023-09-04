@@ -3,6 +3,9 @@
   background-color: #f9fbf9;
   height: 100%;
   border-right: 1px solid #2e4f4f;
+  width: 25%;
+  position: fixed;
+  z-index: 999;
 }
 
 .styleSidebar {

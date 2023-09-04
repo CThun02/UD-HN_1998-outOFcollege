@@ -8,6 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,9 +28,11 @@ import java.util.Date;
 public class Account {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
+    @Column(name = "username")
+    private String userName;
+
+    @Column(name = "full_name")
+    private String fullName;
 
     @Column(name = "dob")
     private Date dob;
@@ -70,4 +73,8 @@ public class Account {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id", referencedColumnName = "id")
     private Role role;
+
+    @OneToMany(fetch = FetchType.EAGER)
+    @JoinColumn(name = "account_id", referencedColumnName = "id")
+    private AddressDetail addressDetail;
 }

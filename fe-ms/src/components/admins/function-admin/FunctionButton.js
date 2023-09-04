@@ -2,8 +2,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCaretDown, faChevronUp } from "@fortawesome/free-solid-svg-icons";
 
 import styles from "./FunctionButton.module.css";
+import { Link } from "react-router-dom";
 
 function FunctionButton({
+  url,
   iconLeft,
   textFunction,
   isOpen,
@@ -13,7 +15,8 @@ function FunctionButton({
 }) {
   return (
     <div className={styles.hover}>
-      <a
+      <Link
+        to={url}
         href="#"
         className={`${styles.link} ${isOpen ? "open" : ""}`}
         onMouseEnter={() => setIsLoadingIcon(true)}
@@ -36,7 +39,7 @@ function FunctionButton({
             )
           ) : null}
         </p>
-      </a>
+      </Link>
     </div>
   );
 }

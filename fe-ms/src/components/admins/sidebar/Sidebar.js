@@ -13,6 +13,8 @@ import {
 import styles from "./Sidebar.module.css";
 import { useState } from "react";
 
+let urlBase = "/controller/v1/admin/";
+
 function Sidebar() {
   const [isLoadingIcon, setIsLoadingIcon] = useState(false);
 
@@ -24,6 +26,7 @@ function Sidebar() {
 
       <div className={`row ${styles.styleSidebar}`}>
         <FunctionButton
+          url={urlBase}
           isLoadingIcon={isLoadingIcon}
           setIsLoadingIcon={setIsLoadingIcon}
           iconLeft={faChartPie}
@@ -31,6 +34,7 @@ function Sidebar() {
           isOpen={false}
         />
         <FunctionButton
+          url={urlBase}
           isLoadingIcon={isLoadingIcon}
           setIsLoadingIcon={setIsLoadingIcon}
           iconLeft={faBasketShopping}
@@ -38,6 +42,7 @@ function Sidebar() {
           isOpen={true}
         />
         <FunctionButton
+          url={urlBase}
           isLoadingIcon={isLoadingIcon}
           setIsLoadingIcon={setIsLoadingIcon}
           iconLeft={faStore}
@@ -45,6 +50,7 @@ function Sidebar() {
           isOpen={false}
         />
         <FunctionButton
+          url={urlBase}
           isLoadingIcon={isLoadingIcon}
           setIsLoadingIcon={setIsLoadingIcon}
           iconLeft={faCoins}
@@ -53,6 +59,7 @@ function Sidebar() {
           iconRight={faChevronDown}
         />
         <FunctionButton
+          url={urlBase}
           isLoadingIcon={isLoadingIcon}
           setIsLoadingIcon={setIsLoadingIcon}
           iconLeft={faUserGear}
@@ -61,6 +68,7 @@ function Sidebar() {
           iconRight={faChevronDown}
         />
         <FunctionButton
+          url={urlBase + "product"}
           isLoadingIcon={isLoadingIcon}
           setIsLoadingIcon={setIsLoadingIcon}
           iconLeft={faShirt}
@@ -69,6 +77,7 @@ function Sidebar() {
           iconRight={faChevronDown}
         />
         <FunctionButton
+          url={urlBase}
           isLoadingIcon={isLoadingIcon}
           setIsLoadingIcon={setIsLoadingIcon}
           iconLeft={faTicket}

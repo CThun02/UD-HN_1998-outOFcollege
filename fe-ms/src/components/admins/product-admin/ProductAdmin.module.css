@@ -1,10 +1,10 @@
-body {
-  font-size: 16px;
-  line-height: 1.5;
+.product {
+  height: 100vh;
 }
 
 /* bo tròn góc của khung chứa */
 .radiusFrame {
+  margin-top: 120px;
   border-radius: 40px;
   border: 1px solid #d4d4d4;
 }

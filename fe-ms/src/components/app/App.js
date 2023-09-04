@@ -5,9 +5,11 @@ import ProductAdminIndex from "./components/admins/product-admin/ProductAdminInd
 import ProductAdminUpdate from "./components/admins/product-admin/ProductAdminUpdate";
 import ProductSizeColorAdminUpdate from "./components/admins/product-admin/ProductSizeColorAdminUpdate";
 
+import styles from "./App.module.css";
+
 function App() {
   return (
-    <div>
+    <div className={styles.app}>
       <BrowserRouter>
         <Routes>
           <Route path="/controller/v1/admin" element={<IndexAdmin />} />

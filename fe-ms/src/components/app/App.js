@@ -14,10 +14,13 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/controller/v1/admin" element={<IndexAdmin />}>
-            <Route path="bill" element={<GetAllBill />} />
-            <Route path="create-bill" element={<CreateBill />} />
             <Route />
           </Route>
+          <Route path="/controller/v1/admin/bill" element={<GetAllBill />} />
+          <Route
+            path="/controller/v1/admin/create-bill"
+            element={<CreateBill />}
+          />
           <Route
             path="/controller/v1/admin/product"
             element={<ProductAdminIndex />}

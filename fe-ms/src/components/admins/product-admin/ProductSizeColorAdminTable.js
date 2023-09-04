@@ -1,10 +1,13 @@
 import styles from "./ProductAdmin.module.css";
 import ButtonCRUD from "../button-crud/ButtonCRUD";
-import { faEye, faPencilAlt, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faEye, faPencilAlt } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
+import ProductSizeColorAdminUpdate from "./ProductSizeColorAdminUpdate";
 function ProductSizeColorAdminTable() {
+  // const display =
   return (
     <div className={`${styles.radiusFrame} mt-5 ms-5 mb-5 col-10`}>
+      <ProductSizeColorAdminUpdate></ProductSizeColorAdminUpdate>
       <h1 className="text-center p-5">Thêm màu sắc, kích cỡ và số lượng</h1>
       <div className="p-5">
         <table className="table text-center align-self-center">
@@ -41,9 +44,6 @@ function ProductSizeColorAdminTable() {
               </td>
               <td>
                 <Link to="/controller/v1/admin/product/update">
-                  <ButtonCRUD icon={faTrash} />
-                </Link>
-                <Link to="/controller/v1/admin/product/update">
                   <ButtonCRUD icon={faEye} />
                 </Link>
               </td>
@@ -70,9 +70,6 @@ function ProductSizeColorAdminTable() {
                 </button>
               </td>
               <td>
-                <Link to="/controller/v1/admin/product/update">
-                  <ButtonCRUD icon={faTrash} />
-                </Link>
                 <Link to="/controller/v1/admin/product/update">
                   <ButtonCRUD icon={faEye} />
                 </Link>

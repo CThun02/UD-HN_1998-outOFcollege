@@ -1,20 +1,26 @@
 import {
   faChevronDown,
-  faChevronRight,
   faClose,
   faMinus,
   faPlus,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
-import IndexAdmin from "../IndexAdmin";
 import styles from "./ProductAdmin.module.css";
 
 function ProductSizeColorAdminUpdate() {
+  function handleClick(event, idTable) {
+    const currentCheck = event.target;
+    if (currentCheck.checked) {
+      document.getElementById(idTable).classList.remove("d-none");
+    } else {
+      document.getElementById(idTable).classList.add("d-none");
+    }
+  }
+
   return (
-    <div className="">
-      <IndexAdmin></IndexAdmin>
-      <div className={styles.maxWH}>
+    <div id="sizeColorFrame" className="d-none">
+      <div className={`${styles.maxWH}`}>
         <div
           style={{ height: "100vh" }}
           className="d-flex align-items-center justify-content-center"
@@ -24,12 +30,11 @@ function ProductSizeColorAdminUpdate() {
           >
             <div className="p-5">
               <div className="text-end">
-                <Link to={"/controller/v1/admin/product/update"}>
-                  <FontAwesomeIcon
-                    className={`link-dark ${styles.btnClose}`}
-                    icon={faClose}
-                  ></FontAwesomeIcon>
-                </Link>
+                <FontAwesomeIcon
+                  className={`link-dark ${styles.btnClose}`}
+                  icon={faClose}
+                  cursor={PointerEvent}
+                ></FontAwesomeIcon>
               </div>
               <h3>Kích cỡ</h3>
               <div>
@@ -37,20 +42,21 @@ function ProductSizeColorAdminUpdate() {
                   <input
                     className="form-check-input"
                     type="checkbox"
-                    value=""
-                    id="flexCheckDefault"
+                    value={true}
+                    id="size1"
+                    onChange={(event) => handleClick(event, "idsize")}
                   />
-                  <label
-                    className="form-check-label me-5"
-                    for="flexCheckDefault"
-                  >
+                  <label className="form-check-label me-5" htmlFor="size1">
                     S
                   </label>
                   <FontAwesomeIcon
                     className="ms-5"
                     icon={faChevronDown}
                   ></FontAwesomeIcon>
-                  <table className="table text-center align-self-center">
+                  <table
+                    id="idsize"
+                    className={`table text-center align-self-center d-none ${styles.idsize}`}
+                  >
                     <thead>
                       <tr>
                         <th scope="col"></th>
@@ -65,7 +71,7 @@ function ProductSizeColorAdminUpdate() {
                           <input
                             className="form-check-input ms-3"
                             type="checkbox"
-                            value=""
+                            value="true"
                             id="flexCheckDefault"
                           />
                         </td>
@@ -76,7 +82,7 @@ function ProductSizeColorAdminUpdate() {
                           ></div>
                         </td>
                         <td>
-                          <ul className={`r p-0 ${styles.pagination}`}>
+                          <ul className={`p-0 ${styles.pagination}`}>
                             <li>
                               <FontAwesomeIcon
                                 icon={faMinus}
@@ -124,7 +130,7 @@ function ProductSizeColorAdminUpdate() {
                           ></div>
                         </td>
                         <td>
-                          <ul className={`r p-0 ${styles.pagination}`}>
+                          <ul className={`p-0 ${styles.pagination}`}>
                             <li>
                               <FontAwesomeIcon
                                 icon={faMinus}
@@ -158,24 +164,6 @@ function ProductSizeColorAdminUpdate() {
                       </tr>
                     </tbody>
                   </table>
-                </div>
-                <div className="form-check">
-                  <input
-                    className="form-check-input"
-                    type="checkbox"
-                    value=""
-                    id="flexCheckDefault"
-                  />
-                  <label
-                    className="form-check-label me-5"
-                    for="flexCheckDefault"
-                  >
-                    M
-                  </label>
-                  <FontAwesomeIcon
-                    className="ms-5"
-                    icon={faChevronRight}
-                  ></FontAwesomeIcon>
                 </div>
                 <div className="mt-5 text-center">
                   <Link

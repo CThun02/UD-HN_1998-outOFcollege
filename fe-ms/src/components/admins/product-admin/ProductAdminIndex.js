@@ -8,7 +8,7 @@ import ProductAdminTable from "./ProductAdminTable";
 
 const App = function () {
   return (
-    <div className={`mt-5 ms-5 mb-5 col-10 ${styles.radiusFrame}`}>
+    <div className={`mt-5 ms-5 mb-5 col-9 ${styles.radiusFrame}`}>
       <div className={`row`}>
         <div className="col-12">
           <div className="col-lg-3 offset-md-8 mt-3">

@@ -1,18 +1,15 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import IndexAdmin from "./components/admins/IndexAdmin";
-import ProductAdminCreate from "./components/admins/product-admin/ProductAdminCreate";
-import ProductAdminIndex from "./components/admins/product-admin/ProductAdminIndex";
-import ProductAdminUpdate from "./components/admins/product-admin/ProductAdminUpdate";
-import ProductSizeColorAdminUpdate from "./components/admins/product-admin/ProductSizeColorAdminUpdate";
-
 import styles from "./App.module.css";
+import ProductAdminIndex from "../admins/product-admin/ProductAdminIndex";
+import ProductAdminCreate from "../admins/product-admin/ProductAdminCreate";
+import ProductAdminUpdate from "../admins/product-admin/ProductAdminUpdate";
+import ProductSizeColorAdminUpdate from "../admins/product-admin/ProductSizeColorAdminUpdate";
 
 function App() {
   return (
     <div className={styles.app}>
       <BrowserRouter>
         <Routes>
-          <Route path="/controller/v1/admin" element={<IndexAdmin />} />
           <Route
             path="/controller/v1/admin/product"
             element={<ProductAdminIndex />}

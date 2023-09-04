@@ -9,7 +9,7 @@ import { Link } from "react-router-dom";
 function Nav() {
   return (
     <div className={styles.nav}>
-      <div className={`row `}>
+      <div className={`row ${styles.navMain}`}>
         <div className={`col-8 ${styles.padding}`}>
           <div className={styles.navLeft}>
             <input type="text" placeholder="Search...." />

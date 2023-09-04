@@ -11,7 +11,9 @@ function App() {
     <div className={styles.app}>
       <BrowserRouter>
         <Routes>
-          <Route path="/controller/v1/admin" element={<IndexAdmin />} />
+          <Route path="/controller/v1/admin" element={<IndexAdmin />}>
+            <Route />
+          </Route>
           <Route
             path="/controller/v1/admin/product"
             element={<ProductAdminIndex />}

@@ -40,21 +40,21 @@ const ProductModal = ({ showModal, handleCloseModal }) => {
                                     </select>
                                 </div>
                                 <div class="col-auto">
-                                    <select class="form-select">
+                                    <select class="form-select custom-select">
                                         <option>Option 1</option>
                                         <option>Option 2</option>
                                         <option>Option 3</option>
                                     </select>
                                 </div>
                                 <div class="col-auto">
-                                    <select class="form-select">
+                                    <select class="form-select custom-select">
                                         <option>Option 1</option>
                                         <option>Option 2</option>
                                         <option>Option 3</option>
                                     </select>
                                 </div>
                                 <div class="col-auto">
-                                    <select class="form-select">
+                                    <select class="form-select custom-select">
                                         <option>Option 1</option>
                                         <option>Option 2</option>
                                         <option>Option 3</option>

@@ -14,6 +14,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
@@ -34,9 +35,11 @@ public class AddressDetail {
     @Column(name = "status")
     private String status;
 
+    @DateTimeFormat(pattern = "dd-MM-yyyy")
     @Column(name = "created_at")
     private Date createAt;
 
+    @DateTimeFormat(pattern = "dd-MM-yyyy")
     @Column(name = "updated_at")
     private Date updayteAt;
 
@@ -47,6 +50,7 @@ public class AddressDetail {
     private String updateBy;
 
     @Column(name = "deleted_at")
+    @DateTimeFormat(pattern = "dd-MM-yyyy")
     private Date deleteAt;
 
     @ManyToOne(fetch = FetchType.EAGER)

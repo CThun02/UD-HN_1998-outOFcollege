@@ -1,4 +1,4 @@
-import { } from "@fortawesome/free-solid-svg-icons";
+import {} from "@fortawesome/free-solid-svg-icons";
 import { faCircleUser, faBell } from "@fortawesome/free-regular-svg-icons";
 
 import styles from "./Nav.module.css";
@@ -9,7 +9,7 @@ import { Link } from "react-router-dom";
 function Nav() {
   return (
     <div className={styles.nav}>
-      <div className={`row `}>
+      <div className={`row ${styles.navMain}`}>
         <div className={`col-8 ${styles.padding}`}>
           <div className={styles.navLeft}>
             <input type="text" placeholder="Search...." />
@@ -23,7 +23,6 @@ function Nav() {
                 icon={faBell}
                 className={styles.iconNotification}
               />
-
             </Link>
             <Link to="/">
               <FontAwesomeIcon

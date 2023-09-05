@@ -10,6 +10,7 @@ import CreateBill from "../admins/function-SaleCounter/CreateBill";
 import Sidebar from "../admins/sidebar/Sidebar";
 import Nav from "../admins/nav/Nav";
 import Statistics from "../admins/statistics/Statistics";
+import Promition from "../admins/promition/Promition";
 
 function App() {
   return (
@@ -21,7 +22,7 @@ function App() {
           </div>
           <div className={`col-9 ${styles.padding}`}>
             <Nav />
-            <div className={`row`}>
+            <div className={`row ${styles.main}`}>
               <Routes>
                 <Route
                   index
@@ -56,6 +57,15 @@ function App() {
                 <Route
                   path="/controller/v1/admin/product/updateSizeColor"
                   element={<ProductSizeColorAdminUpdate />}
+                />
+
+                <Route
+                  path="/controller/v1/admin/promition"
+                  element={<Promition />}
+                />
+                <Route
+                  path="/controller/v1/admin/voucher"
+                  element={<Promition />}
                 />
               </Routes>
             </div>

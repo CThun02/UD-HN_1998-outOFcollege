@@ -2,6 +2,10 @@
   height: 5rem;
   padding: 10px 0 10px 0;
   border-bottom: 1px solid #2e4f4f;
+  background-color: #f9fbf9;
+  width: 75%;
+  position: fixed;
+  z-index: 999;
 }
 
 .navLeft {

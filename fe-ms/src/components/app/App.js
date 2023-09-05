@@ -51,7 +51,7 @@ function App() {
                   element={<ProductAdminCreate />}
                 />
                 <Route
-                  path="/controller/v1/admin/product/update"
+                  path="/controller/v1/admin/product/update/:productDetailId"
                   element={<ProductAdminUpdate />}
                 />
                 <Route

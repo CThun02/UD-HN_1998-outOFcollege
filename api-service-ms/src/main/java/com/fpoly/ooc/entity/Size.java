@@ -17,7 +17,8 @@ import java.util.Date;
 public class Size {
     @Id
     @Column(name = "id")
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(name = "size_name")
     private String sizeName;

@@ -20,7 +20,7 @@ public class ShirtTailType {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "shirt_tail_type_name")
+    @Column(name = "shirt_tail_name")
     private String shirtTailTypeName;
 
     @Column(name = "status")

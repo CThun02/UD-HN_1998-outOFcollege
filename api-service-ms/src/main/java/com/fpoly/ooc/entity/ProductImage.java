@@ -1,7 +1,10 @@
 package com.fpoly.ooc.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.Date;
 
@@ -9,17 +12,20 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-@Table(name = "category")
+@Table(name = "product_image")
 @Entity
-public class Category {
+public class ProductImage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "category_name")
-    private String categoryName;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "product_detail_id")
+    private ProductDetail productDetail;
+
+    @Column(name = "path")
+    private String path;
 
     @Column(name = "status")
     private String status;

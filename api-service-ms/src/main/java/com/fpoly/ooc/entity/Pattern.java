@@ -21,7 +21,7 @@ public class Pattern {
     private Long id;
 
     @Column(name = "pattern_name")
-    private String brandName;
+    private String patternName;
 
     @Column(name = "status")
     private String status;

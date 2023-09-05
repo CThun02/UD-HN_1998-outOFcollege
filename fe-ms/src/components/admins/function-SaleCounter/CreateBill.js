@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './css/style.css';
 import ProductModal from './ProductModal';
+import { Link } from 'react-router-dom';
 
 function CreateBill() {
     const [showModal, setShowModal] = useState(false);
@@ -18,9 +19,9 @@ function CreateBill() {
             <div className="container">
                 <div className="row container-color mh-auto">
                     <div className="col-6">
-                        <a href="/create-bill" className="btn btn-primary">
+                        <Link to="/controller/v1/admin/bill" className="btn btn-primary">
                             Danh sách
-                        </a>
+                        </Link>
                     </div>
                     <div className="col-6">
                         <div className="d-flex justify-content-end">

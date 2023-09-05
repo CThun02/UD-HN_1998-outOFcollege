@@ -3,7 +3,7 @@ package com.fpoly.ooc.service.impl;
 import com.fpoly.ooc.entity.Account;
 import com.fpoly.ooc.entity.Address;
 import com.fpoly.ooc.entity.AddressDetail;
-import com.fpoly.ooc.repository.interfaces.AccountRepository;
+import com.fpoly.ooc.repository.AccountRepository;
 import com.fpoly.ooc.request.AccountRequest;
 import com.fpoly.ooc.responce.AccountResponce;
 import com.fpoly.ooc.service.AccountService;

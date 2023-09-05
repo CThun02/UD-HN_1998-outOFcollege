@@ -7,8 +7,12 @@ import org.springframework.data.domain.Page;
 
 public interface CartDetailService {
 
-    Page<CartResponse> getAll();
+    Page<CartResponse> getAll(Integer pageNo, Integer size);
 
     CartDetail createCartDetail(CartRequest request);
+
+    CartDetail updateCartDetail(Long id, CartRequest request);
+
+    void deleteCartDetail(Long id);
 
 }

@@ -63,9 +63,6 @@ public class ProductDetail {
     @JoinColumn(name = "shirt_tail_id")
     private ShirtTailType shirtTail;
 
-    @Column(name = "code")
-    private String code;
-
     @Column(name = "price")
     private BigDecimal price;
 

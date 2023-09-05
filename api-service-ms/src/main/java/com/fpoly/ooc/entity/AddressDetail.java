@@ -54,7 +54,7 @@ public class AddressDetail {
     private Address address;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "account_id", referencedColumnName = "id")
+    @JoinColumn(name = "account_id", referencedColumnName = "username")
     private Account account;
 
 }

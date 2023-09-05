@@ -79,8 +79,7 @@ const ProductModal = ({ showModal, handleCloseModal }) => {
                                     <td>số lượng</td>
                                     <td>Tổng tiền</td>
                                     <td>
-                                        <button className='btn btn-primary'>edit</button>
-                                        <button className='btn btn-warning'>delete</button>
+                                        <button className='btn btn-success'>Chọn</button>
                                     </td>
                                 </tr>
                             </tbody>

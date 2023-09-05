@@ -9,11 +9,11 @@ const GetAllBill = () => {
             <div className='mt-5 container-color'>
                 <div className="row mb-5">
                     <div className="col-6">
-                        <input placeholder='search' className='form-control w-50' />
+                        <input placeholder='search' className='form-control w-50' type='search' />
                     </div>
                     <div className="col-6">
                         <div className="d-flex justify-content-end">
-                            <Link to="/controller/v1/create-bill" className="btn btn-primary">Tạo hóa đơn</Link>
+                            <Link to="/controller/v1/admin/create-bill" className="btn btn-primary">Tạo hóa đơn</Link>
                         </div>
                     </div>
                 </div>

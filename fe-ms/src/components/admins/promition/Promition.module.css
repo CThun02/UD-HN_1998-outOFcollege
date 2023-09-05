@@ -1,12 +1,95 @@
-/* .promition {
+.promition {
+  /* position: relative; */
+  display: flex;
+  justify-content: center;
   width: 100%;
+  height: auto;
   margin: 0;
   padding: 0;
   background-color: #f9fbf9;
 }
 
 .main {
-  height: 100px;
-  width: 100px;
-  background-color: red;
-} */
+  /* position: absolute;
+  top: 10rem;
+  left: 3rem; */
+  margin-top: 8rem;
+  padding: 30px;
+  height: 80%;
+  width: 90%;
+  background-color: white;
+  border-radius: 15px;
+  /* border: 1px solid #2e4f4f; */
+  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.3);
+}
+
+.headerLeft {
+  margin-bottom: 10px;
+}
+
+.headerLeft button {
+  margin-left: 10px;
+}
+
+.headerRight {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 10px;
+}
+
+.status {
+  display: inline-block;
+}
+
+.type {
+  display: inline-block;
+}
+
+.reduce {
+  display: inline-block;
+}
+
+.editLabel {
+  margin-right: 1rem;
+}
+
+.content {
+  max-height: 400px;
+  max-width: 2000px;
+  overflow-y: scroll;
+}
+
+/*chieu rong*/
+.content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.content::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 6px;
+}
+
+.content::-webkit-scrollbar-thumb:hover {
+  background-color: #555;
+}
+
+/* Track */
+.content::-webkit-scrollbar-track {
+  background-color: #f1f1f1;
+  border-radius: 6px;
+}
+
+.content::-webkit-scrollbar-track:hover {
+  background-color: #ddd;
+}
+
+.footerRight {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.footerRight label {
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+}

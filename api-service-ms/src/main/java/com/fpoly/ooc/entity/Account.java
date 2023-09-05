@@ -46,6 +46,9 @@ public class Account {
     @Column(name = "email")
     private String email;
 
+    @Column(name = "id_no")
+    private String cccd;
+
     @Column(name = "avatar")
     private String avatar;
 

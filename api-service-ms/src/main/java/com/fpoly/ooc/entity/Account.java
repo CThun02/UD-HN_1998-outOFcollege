@@ -3,8 +3,6 @@ package com.fpoly.ooc.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -33,6 +31,7 @@ public class Account {
 
     @Column(name = "full_name")
     private String fullName;
+
 
     @Column(name = "dob")
     private Date dob;
@@ -70,11 +69,11 @@ public class Account {
     @Column(name = "deleted_at")
     private Date deleteAt;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id", referencedColumnName = "id")
     private Role role;
 
-    @OneToMany(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "account_id", referencedColumnName = "id")
     private AddressDetail addressDetail;
 }

@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 function ProductAdminImage() {
   return (
-    <div className={`${styles.radiusFrame} mt-5 ms-5 mb-5 col-10`}>
+    <div className={`${styles.radiusFrame} mt-5 col-lg-10 offset-md-1`}>
       <h1 className="text-center p-5">Thêm ảnh sản phẩm</h1>
       <div className="p-5">
         <div className="row">

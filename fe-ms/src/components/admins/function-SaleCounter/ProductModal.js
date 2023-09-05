@@ -40,21 +40,21 @@ const ProductModal = ({ showModal, handleCloseModal }) => {
                                     </select>
                                 </div>
                                 <div class="col-auto">
-                                    <select class="form-select">
+                                    <select class="form-select custom-select">
                                         <option>Option 1</option>
                                         <option>Option 2</option>
                                         <option>Option 3</option>
                                     </select>
                                 </div>
                                 <div class="col-auto">
-                                    <select class="form-select">
+                                    <select class="form-select custom-select">
                                         <option>Option 1</option>
                                         <option>Option 2</option>
                                         <option>Option 3</option>
                                     </select>
                                 </div>
                                 <div class="col-auto">
-                                    <select class="form-select">
+                                    <select class="form-select custom-select">
                                         <option>Option 1</option>
                                         <option>Option 2</option>
                                         <option>Option 3</option>
@@ -78,182 +78,10 @@ const ProductModal = ({ showModal, handleCloseModal }) => {
                                     <td>ảnh tên</td>
                                     <td>số lượng</td>
                                     <td>Tổng tiền</td>
-                                    <td>Thao tác</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">1</th>
-                                    <td>ảnh tên</td>
-                                    <td>số lượng</td>
-                                    <td>Tổng tiền</td>
-                                    <td>Thao tác</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">1</th>
-                                    <td>ảnh tên</td>
-                                    <td>số lượng</td>
-                                    <td>Tổng tiền</td>
-                                    <td>Thao tác</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">1</th>
-                                    <td>ảnh tên</td>
-                                    <td>số lượng</td>
-                                    <td>Tổng tiền</td>
-                                    <td>Thao tác</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">1</th>
-                                    <td>ảnh tên</td>
-                                    <td>số lượng</td>
-                                    <td>Tổng tiền</td>
-                                    <td>Thao tác</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">1</th>
-                                    <td>ảnh tên</td>
-                                    <td>số lượng</td>
-                                    <td>Tổng tiền</td>
-                                    <td>Thao tác</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">1</th>
-                                    <td>ảnh tên</td>
-                                    <td>số lượng</td>
-                                    <td>Tổng tiền</td>
-                                    <td>Thao tác</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">1</th>
-                                    <td>ảnh tên</td>
-                                    <td>số lượng</td>
-                                    <td>Tổng tiền</td>
-                                    <td>Thao tác</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">1</th>
-                                    <td>ảnh tên</td>
-                                    <td>số lượng</td>
-                                    <td>Tổng tiền</td>
-                                    <td>Thao tác</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">1</th>
-                                    <td>ảnh tên</td>
-                                    <td>số lượng</td>
-                                    <td>Tổng tiền</td>
-                                    <td>Thao tác</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">1</th>
-                                    <td>ảnh tên</td>
-                                    <td>số lượng</td>
-                                    <td>Tổng tiền</td>
-                                    <td>Thao tác</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">1</th>
-                                    <td>ảnh tên</td>
-                                    <td>số lượng</td>
-                                    <td>Tổng tiền</td>
-                                    <td>Thao tác</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">1</th>
-                                    <td>ảnh tên</td>
-                                    <td>số lượng</td>
-                                    <td>Tổng tiền</td>
-                                    <td>Thao tác</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">1</th>
-                                    <td>ảnh tên</td>
-                                    <td>số lượng</td>
-                                    <td>Tổng tiền</td>
-                                    <td>Thao tác</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">1</th>
-                                    <td>ảnh tên</td>
-                                    <td>số lượng</td>
-                                    <td>Tổng tiền</td>
-                                    <td>Thao tác</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">1</th>
-                                    <td>ảnh tên</td>
-                                    <td>số lượng</td>
-                                    <td>Tổng tiền</td>
-                                    <td>Thao tác</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">1</th>
-                                    <td>ảnh tên</td>
-                                    <td>số lượng</td>
-                                    <td>Tổng tiền</td>
-                                    <td>Thao tác</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">1</th>
-                                    <td>ảnh tên</td>
-                                    <td>số lượng</td>
-                                    <td>Tổng tiền</td>
-                                    <td>Thao tác</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">1</th>
-                                    <td>ảnh tên</td>
-                                    <td>số lượng</td>
-                                    <td>Tổng tiền</td>
-                                    <td>Thao tác</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">1</th>
-                                    <td>ảnh tên</td>
-                                    <td>số lượng</td>
-                                    <td>Tổng tiền</td>
-                                    <td>Thao tác</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">1</th>
-                                    <td>ảnh tên</td>
-                                    <td>số lượng</td>
-                                    <td>Tổng tiền</td>
-                                    <td>Thao tác</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">1</th>
-                                    <td>ảnh tên</td>
-                                    <td>số lượng</td>
-                                    <td>Tổng tiền</td>
-                                    <td>Thao tác</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">2</th>
-                                    <td>ảnh tên</td>
-                                    <td>số lượng</td>
-                                    <td>Tổng tiền</td>
-                                    <td>Thao tác</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">1</th>
-                                    <td>ảnh tên</td>
-                                    <td>số lượng</td>
-                                    <td>Tổng tiền</td>
-                                    <td>Thao tác</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">1</th>
-                                    <td>ảnh tên</td>
-                                    <td>số lượng</td>
-                                    <td>Tổng tiền</td>
-                                    <td>Thao tác</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">1</th>
-                                    <td>ảnh tên</td>
-                                    <td>số lượng</td>
-                                    <td>Tổng tiền</td>
-                                    <td>Thao tác</td>
+                                    <td>
+                                        <button className='btn btn-primary'>edit</button>
+                                        <button className='btn btn-warning'>delete</button>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>

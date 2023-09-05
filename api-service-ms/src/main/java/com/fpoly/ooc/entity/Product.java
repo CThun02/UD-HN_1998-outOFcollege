@@ -36,7 +36,7 @@ public class Product {
     private Date createAt;
 
     @Column(name = "updated_at")
-    private Date updayteAt;
+    private Date updateAt;
 
     @Column(name = "created_by")
     private String createBy;

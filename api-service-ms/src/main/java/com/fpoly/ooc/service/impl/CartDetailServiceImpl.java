@@ -27,7 +27,7 @@ public class CartDetailServiceImpl implements CartDetailService {
     public CartDetail createCartDetail(CartRequest request) {
         CartDetail cartDetail = CartDetail.builder()
                 .cart(Cart.builder()
-                        .account(Account.builder().username(request.getAccountId()).build())
+                        .account(Account.builder().userName(request.getAccountId()).build())
                         .status("active")
                         .build())
                 .productDetail(ProductDetail.builder().id(request.getProductDetailId()).build())

@@ -7,15 +7,19 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-@Table
-@Entity(name = "discount")
+@AllArgsConstructor
+@NoArgsConstructor
+@Table(name = "discount")
+@Entity
 public class Discount extends BaseEntity {
 
     @Id

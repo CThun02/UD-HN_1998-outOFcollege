@@ -1,9 +1,12 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import styles from "./ButtonCRUD.module.css";
 
-function ButtonCRUD({ icon, className }) {
+function ButtonCRUD({ icon, className, action }) {
   return (
-    <button className={`ms-1 me-1 ${className} ${styles.ButtonCRUD}`}>
+    <button
+      onClick={action}
+      className={`ms-1 me-1 ${className} ${styles.ButtonCRUD}`}
+    >
       <FontAwesomeIcon icon={icon}></FontAwesomeIcon>
     </button>
   );

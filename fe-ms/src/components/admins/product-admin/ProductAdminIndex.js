@@ -33,38 +33,6 @@ const App = function () {
           <div className="p-5">
             <ProductAdminFilter />
             <ProductAdminTable />
-            <div className="col-12">
-              <Link to="/controller/v1/admin/product/create">
-                <ButtonCRUD className={styles.btnCreate} icon={faPlus} />
-              </Link>
-              <div className="row">
-                <div className="col-12">
-                  <div className="d-flex justify-content-center">
-                    <ul className={`p-0 ${styles.pagination}`}>
-                      <li>
-                        <FontAwesomeIcon
-                          icon={faMinus}
-                          className="ps-2"
-                        ></FontAwesomeIcon>
-                      </li>
-                      <li className={styles.pageNumber}>
-                        <input
-                          type={"text"}
-                          className="text-center"
-                          value={1}
-                        />
-                      </li>
-                      <li>
-                        <FontAwesomeIcon
-                          icon={faPlus}
-                          className="pe-2"
-                        ></FontAwesomeIcon>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>

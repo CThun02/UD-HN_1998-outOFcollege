@@ -1,7 +1,7 @@
 package com.fpoly.ooc.controller;
 
-import com.fpoly.ooc.entity.SleeveType;
-import com.fpoly.ooc.service.interfaces.SleeveTypeServiceI;
+import com.fpoly.ooc.entity.Size;
+import com.fpoly.ooc.service.interfaces.SizeTypeServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,13 +12,13 @@ import java.util.List;
 
 @RestController
 @CrossOrigin("*")
-@RequestMapping("/admin/api/sleevetype")
-public class SleeveTypeController {
+@RequestMapping("/admin/api/size")
+public class SizeController {
     @Autowired
-    private SleeveTypeServiceI service;
+    private SizeTypeServiceI service;
 
     @GetMapping("/data")
-    public List<SleeveType> getBrands(){
+    public List<Size> getBrands(){
         return service.getAll();
     }
 }

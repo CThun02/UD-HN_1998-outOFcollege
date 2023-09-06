@@ -38,6 +38,6 @@ public abstract class BaseEntity implements Serializable {
     protected LocalDateTime deletedAt;
 
     @Column(name = "status")
-    protected String status;
+    protected String status = "ACTIVE";
 
 }

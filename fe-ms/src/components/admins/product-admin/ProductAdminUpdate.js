@@ -1,14 +1,12 @@
 import ProductAdminForm from "./ProductAdminForm";
 import ProductAdminImage from "./ProductAdminImage";
 import ProductSizeColorAdminTable from "./ProductSizeColorAdminTable";
+import styles from "./ProductAdmin.module.css";
 
 function ProductAdminUpdate() {
   return (
-    <div>
-      <ProductAdminForm
-        ModuleName={"Chỉnh sửa sản phẩm"}
-        ModuleActive={"/controller/v1/admin/product"}
-      ></ProductAdminForm>
+    <div className={styles.product}>
+      <ProductAdminForm ModuleName={"Chỉnh sửa sản phẩm"}></ProductAdminForm>
       <ProductSizeColorAdminTable></ProductSizeColorAdminTable>
       <ProductAdminImage></ProductAdminImage>
     </div>

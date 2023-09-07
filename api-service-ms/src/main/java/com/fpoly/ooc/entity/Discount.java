@@ -1,5 +1,6 @@
 package com.fpoly.ooc.entity;
 
+import com.fpoly.ooc.request.promotion.DiscountRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -8,8 +9,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -18,6 +21,8 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
+@ToString
 @Table(name = "discount")
 @Entity
 public class Discount extends BaseEntity {
@@ -38,6 +43,9 @@ public class Discount extends BaseEntity {
 
     @Column(name = "end_date")
     private LocalDateTime endDate;
+
+    @Column(name = "discount_value")
+    private BigDecimal discountValue;
 
     @Column(name = "discount_max_value")
     private BigDecimal discountMaxValue;

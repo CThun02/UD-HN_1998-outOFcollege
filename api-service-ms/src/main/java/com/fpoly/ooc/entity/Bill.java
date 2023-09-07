@@ -69,6 +69,4 @@ public class Bill {
     @JoinColumn(name = "account_id", referencedColumnName = "username")
     private Account account;
 
-
-
 }

@@ -1,16 +1,12 @@
 package com.fpoly.ooc.controller;
 
 import com.fpoly.ooc.entity.Color;
-import com.fpoly.ooc.entity.Product;
 import com.fpoly.ooc.entity.ProductDetail;
 import com.fpoly.ooc.entity.Size;
-import com.fpoly.ooc.request.ProductDetailColorSizeRequest;
-import com.fpoly.ooc.request.ProductDetailRequest;
-import com.fpoly.ooc.request.ProductRequest;
-import com.fpoly.ooc.responce.ProductDetailColorSizeResponse;
-import com.fpoly.ooc.responce.ProductDetailResponse;
-import com.fpoly.ooc.responce.ProductResponse;
-import com.fpoly.ooc.responce.ProductResponseEdit;
+import com.fpoly.ooc.request.Product.ProductDetailColorSizeRequest;
+import com.fpoly.ooc.request.Product.ProductDetailRequest;
+import com.fpoly.ooc.request.Product.ProductRequest;
+import com.fpoly.ooc.responce.Product.*;
 import com.fpoly.ooc.service.impl.ColorServiceImpl;
 import com.fpoly.ooc.service.impl.ProductDetailServiceImpl;
 import com.fpoly.ooc.service.impl.ProductServiceImpl;
@@ -58,9 +54,9 @@ public class ProductController {
     }
 
 
-    @GetMapping("/detailcolorsize/{id}")
-    public List<ProductDetailColorSizeResponse> getProductDetailColorSize(@PathVariable Long id){
-        return productDetailService.getProductDetailColorSizeByIdPD(id);
+    @GetMapping("/detailcolorsize")
+    public List<ProductDetailSizeResponse> getProductDetailColorSizeByIdPAndSizeId(@RequestParam Long productId){
+        return productDetailService.getProductDetailColorSizeByIdP(productId);
     }
 
     @GetMapping("/{id}")

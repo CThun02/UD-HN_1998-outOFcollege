@@ -1,9 +1,9 @@
-package com.fpoly.ooc.responce;
-
+package com.fpoly.ooc.responce.Product;
+import java.math.BigDecimal;
 public interface ProductDetailColorSizeResponse {
     public Long getProductDetailId() ;
     public Long getColorId() ;
-    public Long getSizeId();
     public Integer getQuantity() ;
-    public Integer getPrice() ;
+    public BigDecimal getPrice() ;
+
 }

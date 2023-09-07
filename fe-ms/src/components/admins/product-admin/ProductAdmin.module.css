@@ -86,7 +86,7 @@ tr td {
   font-size: 36px;
 }
 
-.btnRUD {
+.btnCRUD {
   height: 30px;
   width: 30px;
 }
@@ -138,7 +138,8 @@ tr td {
 }
 
 /* khung của màu sắc và kích cỡ */
-.sizeColorFrame {
+.sizeColorFrame,
+.sizeColorDetailFrame {
   background-color: white;
   height: 75%;
   overflow-x: hidden;

@@ -8,9 +8,8 @@ import lombok.Setter;
 import lombok.ToString;
 
 
-@Getter
 public class ExceptionResponse {
 
-    private final String VOUCHER_NOT_FOUND = "VOUCHER_NOT_FOUND";
+    public static final String EXCEPTION_NOT_FOUND = "NOT_FOUND_EXCEPTION";
 
 }

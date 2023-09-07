@@ -13,8 +13,6 @@ import java.math.BigDecimal;
 @Setter
 public class BillResponse {
 
-    private Long cartId;
-
     private Long cartDetailId;
 
     private Integer quantity;

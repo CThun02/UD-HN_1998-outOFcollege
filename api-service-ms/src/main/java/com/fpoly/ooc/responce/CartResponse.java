@@ -25,6 +25,4 @@ public class CartResponse {
 
     private BigDecimal price;
 
-    private String status;
-
 }

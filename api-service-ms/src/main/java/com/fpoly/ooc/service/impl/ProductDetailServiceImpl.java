@@ -2,7 +2,10 @@ package com.fpoly.ooc.service.impl;
 
 import com.fpoly.ooc.entity.ProductDetail;
 import com.fpoly.ooc.repository.ProductDetailDAORepositoryI;
+import com.fpoly.ooc.responce.ProductDetailColorSizeResponse;
+import com.fpoly.ooc.responce.ProductDetailResponse;
 import com.fpoly.ooc.service.interfaces.ProductDetailServiceI;
+import jakarta.persistence.GeneratedValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +17,16 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
 
     @Autowired
     private ProductDetailDAORepositoryI repo;
+
+    @Override
+    public ProductDetailResponse getProductDetail(Long id) {
+        return repo.getProductDetail(id);
+    }
+
+    @Override
+    public List<ProductDetailColorSizeResponse> getProductDetailColorSizeByIdPD(Long id) {
+        return repo.getProductDetailColorSizeByIdPD(id);
+    }
 
     @Override
     public ProductDetail create(ProductDetail productDetail) {

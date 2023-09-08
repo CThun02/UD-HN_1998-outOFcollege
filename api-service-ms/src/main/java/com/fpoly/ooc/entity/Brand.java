@@ -3,7 +3,6 @@ package com.fpoly.ooc.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Date;
 
 @Getter
 @Setter
@@ -12,7 +11,7 @@ import java.util.Date;
 @Builder
 @Table(name = "brand")
 @Entity
-public class Brand {
+public class Brand extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -23,19 +22,4 @@ public class Brand {
 
     @Column(name = "status")
     private String status;
-
-    @Column(name = "created_at")
-    private Date createAt;
-
-    @Column(name = "updated_at")
-    private Date updayteAt;
-
-    @Column(name = "created_by")
-    private String createBy;
-
-    @Column(name = "updated_by")
-    private String updateBy;
-
-    @Column(name = "deleted_at")
-    private Date deleteAt;
 }

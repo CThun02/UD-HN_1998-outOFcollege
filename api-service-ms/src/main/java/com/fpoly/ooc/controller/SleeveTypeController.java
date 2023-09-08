@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @CrossOrigin("*")
-@RequestMapping("/admin/api/pattern")
+@RequestMapping("/admin/api/sleevetype")
 public class SleeveTypeController {
     @Autowired
     private SleeveTypeServiceI service;

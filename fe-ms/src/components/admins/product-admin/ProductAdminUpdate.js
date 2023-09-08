@@ -8,7 +8,7 @@ function ProductAdminUpdate() {
     <div className={styles.product}>
       <ProductAdminForm ModuleName={"Chỉnh sửa sản phẩm"}></ProductAdminForm>
       <ProductSizeColorAdminTable></ProductSizeColorAdminTable>
-      <ProductAdminImage></ProductAdminImage>
+      {/* <ProductAdminImage></ProductAdminImage> */}
     </div>
   );
 }

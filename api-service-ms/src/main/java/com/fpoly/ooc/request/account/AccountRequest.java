@@ -1,4 +1,4 @@
-package com.fpoly.ooc.request;
+package com.fpoly.ooc.request.account;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

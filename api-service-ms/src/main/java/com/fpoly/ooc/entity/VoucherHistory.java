@@ -8,13 +8,17 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Data
-@Table
-@Entity(name = "voucher_history")
+@AllArgsConstructor
+@NoArgsConstructor
+@Table(name = "voucher_history")
+@Entity
 public class VoucherHistory extends BaseEntity{
 
     @Id

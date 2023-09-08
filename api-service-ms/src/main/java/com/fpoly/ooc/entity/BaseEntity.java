@@ -34,10 +34,10 @@ public abstract class BaseEntity implements Serializable {
     @LastModifiedBy
     protected String updatedBy;
 
-    @Column(name = "delete_at")
+    @Column(name = "deleted_at")
     protected LocalDateTime deletedAt;
 
     @Column(name = "status")
-    protected String status;
+    protected String status = "ACTIVE";
 
 }

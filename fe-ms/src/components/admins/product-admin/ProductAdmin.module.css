@@ -140,6 +140,9 @@ tr td {
 /* khung của màu sắc và kích cỡ */
 .sizeColorFrame {
   background-color: white;
+  height: 75%;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .idsize {

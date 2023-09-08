@@ -4,7 +4,12 @@ import { faEye, faPencilAlt } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 import ProductSizeColorAdminUpdate from "./ProductSizeColorAdminUpdate";
 function ProductSizeColorAdminTable() {
-  // const display =
+  //display sizecolor frame
+  const display = function () {
+    var dis = document.getElementById("sizeColorFrame");
+    dis.classList.remove("d-none");
+  };
+
   return (
     <div className={`${styles.radiusFrame} mt-5 col-lg-10 offset-md-1`}>
       <ProductSizeColorAdminUpdate></ProductSizeColorAdminUpdate>
@@ -78,9 +83,11 @@ function ProductSizeColorAdminTable() {
           </tbody>
         </table>
         <div className="text-center">
-          <Link to="/controller/v1/admin/product/updateSizeColor">
-            <ButtonCRUD className={styles.btnCreate} icon={faPencilAlt} />
-          </Link>
+          <ButtonCRUD
+            action={display}
+            className={styles.btnCreate}
+            icon={faPencilAlt}
+          />
         </div>
         <hr />
       </div>

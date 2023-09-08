@@ -3,6 +3,7 @@ package com.fpoly.ooc.service.impl;
 import com.fpoly.ooc.entity.Product;
 import com.fpoly.ooc.repository.ProductDAORepositoryI;
 import com.fpoly.ooc.responce.ProductResponse;
+import com.fpoly.ooc.responce.ProductResponseEdit;
 import com.fpoly.ooc.service.interfaces.ProductServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -59,5 +60,10 @@ public class ProductServiceImpl implements ProductServiceI {
     public Page<ProductResponse> pageIndex(int pageNumber) {
         Pageable pageable = PageRequest.of(pageNumber, 5);
         return repo.getProducts(pageable);
+    }
+
+    @Override
+    public ProductResponseEdit getProductEdit(Long id) {
+        return repo.getProduct(id);
     }
 }

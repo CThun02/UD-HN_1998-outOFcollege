@@ -47,7 +47,6 @@ function ProductAdminTable() {
       .catch((error) => {
         console.warn(error.message);
       });
-    console.log(page);
   }, [page]);
 
   return (
@@ -65,10 +64,10 @@ function ProductAdminTable() {
         </thead>
         <tbody>
           {products &&
-            products.map((item) => {
+            products.map((item, index) => {
               return (
-                <tr key={item.productName}>
-                  <th scope="row">1</th>
+                <tr key={item.id}>
+                  <th scope="row">{index + 1}</th>
                   <td>
                     <img
                       alt="Tạm thời chưa có gì"
@@ -93,19 +92,17 @@ function ProductAdminTable() {
                     </button>
                   </td>
                   <td>
-                    <Link
-                      to={`/controller/v1/admin/product/update/${item.productDetailId}`}
-                    >
+                    <Link to={`/controller/v1/admin/product/update/${item.id}`}>
                       <ButtonCRUD
                         icon={faPencilAlt}
-                        className={styles.btnRUD}
+                        className={styles.btnCRUD}
                       />
                     </Link>
                     <Link to="/controller/v1/admin/product/update">
-                      <ButtonCRUD icon={faTrash} className={styles.btnRUD} />
+                      <ButtonCRUD icon={faTrash} className={styles.btnCRUD} />
                     </Link>
                     <Link to="/controller/v1/admin/product/update">
-                      <ButtonCRUD icon={faEye} className={styles.btnRUD} />
+                      <ButtonCRUD icon={faEye} className={styles.btnCRUD} />
                     </Link>
                   </td>
                 </tr>

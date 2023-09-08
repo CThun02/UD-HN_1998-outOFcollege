@@ -1,4 +1,4 @@
-package com.fpoly.ooc.request;
+package com.fpoly.ooc.request.Product;
 
 import com.fpoly.ooc.entity.*;
 import lombok.AllArgsConstructor;

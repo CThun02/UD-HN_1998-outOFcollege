@@ -1,4 +1,4 @@
-package com.fpoly.ooc.responce;
+package com.fpoly.ooc.responce.Product;
 
 public interface ProductResponseEdit {
     Long getBrandId();

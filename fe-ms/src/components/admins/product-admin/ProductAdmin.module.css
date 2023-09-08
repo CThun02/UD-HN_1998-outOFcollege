@@ -96,6 +96,7 @@ tr td {
   border: #d4d4d4 1px solid;
   display: inline-block;
   border-radius: 16px;
+  margin: 0;
 }
 
 .pagination li {

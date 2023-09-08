@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 @RestController
-@CrossOrigin("*")
+@CrossOrigin(origins = "*")
 @RequestMapping("/admin/api/product")
 public class ProductController {
 
@@ -97,5 +97,10 @@ public class ProductController {
             productDetailService.create(productDetailCreate);
         }
         return ResponseEntity.ok("OK");
+    }
+
+    @PutMapping("/updateproductdetailcolorsize")
+    public ResponseEntity<?> updateProductDetailColorSize(@RequestBody ProductDetailRequest productDetail){
+        return ResponseEntity.ok(productDetailService.update(productDetail.dto()));
     }
 }

@@ -1,10 +1,9 @@
-import { faChevronDown, faClose } from "@fortawesome/free-solid-svg-icons";
+import { faClose } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import styles from "./ProductAdmin.module.css";
 
-function ProductSizeColorAdminCreate(productDetailColorSizeDetail) {
-  var detailcolorsize =
-    productDetailColorSizeDetail.productDetailColorSizeDetail;
+function ProductSizeColorAdminCreate(props) {
+  var detailcolorsize = props.productDetailColorSizeDetail;
   function closeTab() {
     document.getElementById("sizeColorDetailFrame").classList.add("d-none");
   }

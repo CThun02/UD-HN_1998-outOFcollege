@@ -6,11 +6,11 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import ProductSizeColorAdminCreate from "./ProductSizeColorAdminCreate";
 import ProductSizeColorAdminDetail from "./ProductSizeColorAdminDetail";
+import ProductSizeColorAdminUpdate from "./ProductColorSizeAdminUpdate";
 
 function ProductSizeColorAdminTable() {
   var list = [];
   const { productId } = useParams();
-  const [colorsize, setcolorsize] = useState(0);
   const api = "http://localhost:8080/admin/api/";
 
   //display sizecolor create  frame
@@ -19,10 +19,17 @@ function ProductSizeColorAdminTable() {
     dis.classList.remove("d-none");
   };
 
+  const displaySizeColorUpdate = function (index, event) {
+    productDetailColorSizeChange(
+      productDetailColorSizes[isNaN(index) === true ? 0 : false]
+    );
+    var dis = document.getElementById("sizeColorFrameUpdate");
+    dis.classList.remove("d-none");
+    productDetailColorSizeChange(productDetailColorSizes[index]);
+  };
+
   //display sizecolor detail frame
   const displaySizeColorDetail = function (index, event) {
-    console.log(index);
-    console.log(productDetailColorSizes[isNaN(index) === true ? 0 : false]);
     productDetailColorSizeChange(
       productDetailColorSizes[isNaN(index) === true ? 0 : false]
     );
@@ -65,7 +72,9 @@ function ProductSizeColorAdminTable() {
       ],
     }
   );
-  //lấy dữ liệu size và color được chọn
+  const [sizes, sizesChange] = useState(null);
+  const [colors, colorsChange] = useState(null);
+  //lấy dữ liệu size và color được chọn gửi về server
   function sizeChecked() {
     //Lấy ra ô check của size
     var sizes = document.getElementsByClassName("size_checked");
@@ -81,7 +90,7 @@ function ProductSizeColorAdminTable() {
             let colorId = colors[j].children[0].children[0].value;
             //lấy số lượng
             let quantity =
-              colors[j].children[2].children[0].children[1].children[0].value;
+              colors[j].children[2].children[0].children[0].children[0].value;
             //lấy giá
             let price = colors[j].children[3].children[0].value;
             list.push({
@@ -101,11 +110,18 @@ function ProductSizeColorAdminTable() {
       )
       .then((response) => {
         console.log(response);
+        axios
+          .get(api + "product/detailcolorsize?productId=" + productId)
+          .then((response) => {
+            productDetailColorSizesChange(response.data);
+          })
+          .catch((error) => {
+            console.log(error.message);
+          });
       })
       .catch((error) => {
         console.log(error);
       });
-    setcolorsize(colorsize + 1);
   }
 
   useEffect(() => {
@@ -125,7 +141,23 @@ function ProductSizeColorAdminTable() {
       .catch((error) => {
         console.log(error.message);
       });
-  }, [colorsize, productId]);
+    axios
+      .get(api + "color/data")
+      .then((response) => {
+        colorsChange(response.data);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+    axios
+      .get(api + "size/data")
+      .then((response) => {
+        sizesChange(response.data);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }, [productId]);
 
   return (
     <div className={`${styles.radiusFrame} mt-5 col-lg-10 offset-md-1`}>
@@ -133,7 +165,14 @@ function ProductSizeColorAdminTable() {
         productDetail={productDetail}
         productDetailColorSizes={productDetailColorSizes}
         addFucntion={sizeChecked}
+        sizes={sizes}
+        colors={colors}
       ></ProductSizeColorAdminCreate>
+      <ProductSizeColorAdminUpdate
+        productDetail={productDetail}
+        productDetailColorSizeDetail={productDetailColorSizeDetail}
+        colors={colors}
+      ></ProductSizeColorAdminUpdate>
       <ProductSizeColorAdminDetail
         productDetailColorSizeDetail={productDetailColorSizeDetail}
       ></ProductSizeColorAdminDetail>
@@ -155,13 +194,14 @@ function ProductSizeColorAdminTable() {
               productDetailColorSizes.map((item, index) => {
                 var totalQuantityProductDetail = 0;
                 return (
-                  <tr key={item.sizeId}>
+                  <tr key={index}>
                     <th scope="row">{index + 1}</th>
                     <th scope="row">{item.sizeName}</th>
                     <td>
-                      {item.listColor.map((item) => {
+                      {item.listColor.map((item, index) => {
                         return (
                           <div
+                            key={index}
                             className={`${styles.colorDisplay} d-inline-block me-2`}
                             style={{ backgroundColor: item.colorId }}
                           ></div>
@@ -197,6 +237,12 @@ function ProductSizeColorAdminTable() {
                       </Link>
                       <Link to="#">
                         <ButtonCRUD
+                          action={
+                            (index,
+                            (event) => {
+                              displaySizeColorUpdate(index, event);
+                            })
+                          }
                           className={styles.btnCRUD}
                           icon={faPencilAlt}
                         />

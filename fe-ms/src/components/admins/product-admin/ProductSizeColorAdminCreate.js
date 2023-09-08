@@ -1,14 +1,9 @@
-import {
-  faChevronDown,
-  faClose,
-  faMinus,
-  faPlus,
-} from "@fortawesome/free-solid-svg-icons";
+import { faChevronDown, faClose } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import axios from "axios";
-import { useEffect, useState } from "react";
 import styles from "./ProductAdmin.module.css";
-function ProductSizeColorAdminCreate(productDetail) {
+function ProductSizeColorAdminCreate(props) {
+  const sizes = props.sizes;
+  const colors = props.colors;
   function handleClick(event, idTable) {
     const currentCheck = event.target;
     if (currentCheck.checked) {
@@ -23,33 +18,9 @@ function ProductSizeColorAdminCreate(productDetail) {
   }
 
   function addcolorsize() {
-    productDetail.addFucntion();
+    props.addFucntion();
     closeTab();
   }
-
-  //get data size color
-  const api = "http://localhost:8080/admin/api/";
-  const [sizes, sizesChange] = useState(null);
-  const [colors, colorsChange] = useState(null);
-
-  useEffect(() => {
-    axios
-      .get(api + "color/data")
-      .then((response) => {
-        colorsChange(response.data);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-    axios
-      .get(api + "size/data")
-      .then((response) => {
-        sizesChange(response.data);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  }, []);
 
   return (
     <div id="sizeColorFrame" className="d-none">
@@ -71,15 +42,13 @@ function ProductSizeColorAdminCreate(productDetail) {
               </div>
               <h3>Kích cỡ</h3>
               {sizes &&
-                sizes.map((item) => {
+                sizes.map((item, index) => {
                   var check = false;
-                  productDetail.productDetailColorSizes.forEach(
-                    (itemDetail) => {
-                      if (itemDetail.sizeId === item.id) {
-                        check = true;
-                      }
+                  props.productDetailColorSizes.forEach((itemDetail) => {
+                    if (itemDetail.sizeId === item.id) {
+                      check = true;
                     }
-                  );
+                  });
                   if (check === false) {
                     return (
                       <div key={item.id} className="form-check">
@@ -140,24 +109,12 @@ function ProductSizeColorAdminCreate(productDetail) {
                                       <ul
                                         className={`p-0 ${styles.pagination}`}
                                       >
-                                        <li>
-                                          <FontAwesomeIcon
-                                            icon={faMinus}
-                                            className="ps-2"
-                                          ></FontAwesomeIcon>
-                                        </li>
                                         <li className={styles.pageNumber}>
                                           <input
                                             type={"text"}
                                             className="text-center"
                                             defaultValue={1}
                                           />
-                                        </li>
-                                        <li>
-                                          <FontAwesomeIcon
-                                            icon={faPlus}
-                                            className="pe-2"
-                                          ></FontAwesomeIcon>
                                         </li>
                                       </ul>
                                     </td>
@@ -167,9 +124,7 @@ function ProductSizeColorAdminCreate(productDetail) {
                                         className={`form-control ${styles.inputCommon} text-center`}
                                         id="ten"
                                         placeholder=""
-                                        defaultValue={
-                                          productDetail.productDetail.price
-                                        }
+                                        defaultValue={props.productDetail.price}
                                       />
                                     </td>
                                   </tr>
@@ -179,6 +134,8 @@ function ProductSizeColorAdminCreate(productDetail) {
                         </table>
                       </div>
                     );
+                  } else {
+                    return true;
                   }
                 })}
               <div>

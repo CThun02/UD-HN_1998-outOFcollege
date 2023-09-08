@@ -4,24 +4,50 @@ import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 
 function ProductAdminForm({ ModuleName }) {
-  const productDetailId = useParams();
+  const { productDetailId } = useParams();
+
   const navigate = useNavigate();
-  //product
-  const [productName, productNameChange] = useState("");
-  const [code, codeChange] = useState("");
-  const [description, descriptionChange] = useState("");
-  const [brandId, brandIdChange] = useState("");
-  const [categoryid, categoryIdChange] = useState("");
-  const [status, statusChange] = useState("");
-  //product detail
-  const [patternId, patternIdChange] = useState("");
-  const [buttonId, buttonTypeIdChange] = useState("");
-  const [materialId, materialIdChange] = useState("");
-  const [collartypeId, collartypeIdChange] = useState("");
-  const [sleeveId, sleeveIdChange] = useState("");
-  const [formId, formIdChange] = useState("");
-  const [shirtTailTypeId, shirtTailTypeIdChange] = useState("");
-  const [price, priceChange] = useState("");
+
+  const [product, productChange] = useState({
+    brandId: undefined,
+    categoryId: undefined,
+    productCode: "",
+    productName: "",
+    status: undefined,
+  });
+
+  const [productDetail, productDetailChange] = useState({
+    id: undefined,
+    productId: undefined,
+    patternId: undefined,
+    buttonId: undefined,
+    materialId: undefined,
+    collarId: undefined,
+    sleeveId: undefined,
+    colorId: undefined,
+    sizeId: undefined,
+    formId: undefined,
+    shirtTailId: undefined,
+    price: "",
+    descriptionDetail: "",
+    status: true,
+  });
+
+  const handleProductDetailChange = (event) => {
+    const { name, value } = event.target;
+    productDetailChange((prevProductDetail) => ({
+      ...prevProductDetail,
+      [name]: value,
+    }));
+  };
+
+  const handleProductChange = (event) => {
+    const { name, value } = event.target;
+    productChange((prevProductDetail) => ({
+      ...prevProductDetail,
+      [name]: value,
+    }));
+  };
 
   const api = "http://localhost:8080/admin/api/";
   const [brands, brandsChange] = useState(null);
@@ -32,40 +58,25 @@ function ProductAdminForm({ ModuleName }) {
   const [shirtTailTypes, shirtTailTypesChange] = useState(null);
   const [collarTypes, collarTypesChange] = useState(null);
   const [forms, formsChange] = useState(null);
-
-  var product = {
-    brandId: brandId,
-    categoryId: categoryid,
-    code: code,
-    productName: productName,
-    description: description,
-    status: status,
-  };
-  var productDetail = {
-    productId: null,
-    patternId: patternId,
-    buttonId: buttonId,
-    materialId: materialId,
-    collarId: collartypeId,
-    sleeve: "",
-  };
+  const [sleeveTypes, sleeveTypesChange] = useState(null);
 
   const action = function () {
-    if (Object.keys(productDetailId).length === 0) {
+    if (productDetailId === undefined) {
+      console.log(productDetail);
       axios
         .post(api + "product/create", product)
         .then((response) => {
-          product = response.data;
-          navigate("/controller/v1/admin/product/update/" + product.id);
-        })
-        .catch((err) => {
-          console.error(err);
-        });
-      axios
-        .post(api + "product/create", product)
-        .then((response) => {
-          product = response.data;
-          navigate("/controller/v1/admin/product/update/" + product.id);
+          productDetail.productId = response.data.id;
+          axios
+            .post(api + "product/createproductdetail", productDetail)
+            .then((response) => {
+              navigate(
+                "/controller/v1/admin/product/update/" + response.data.id
+              );
+            })
+            .catch((err) => {
+              console.error(err);
+            });
         })
         .catch((err) => {
           console.error(err);
@@ -73,8 +84,27 @@ function ProductAdminForm({ ModuleName }) {
     } else {
     }
   };
-
   useEffect(() => {
+    if (productDetailId !== undefined) {
+      axios
+        .get(api + "product/detail/" + productDetailId)
+        .then((response) => {
+          productDetailChange(response.data);
+        })
+        .catch((error) => {
+          console.log(error.message);
+        });
+      if (productDetail.productId !== null) {
+        axios
+          .get(api + "product/" + productDetail.productId)
+          .then((response) => {
+            productChange(response.data);
+          })
+          .catch((error) => {
+            console.log(error.message);
+          });
+      }
+    }
     axios
       .get(api + "brand/data")
       .then((response) => {
@@ -139,7 +169,15 @@ function ProductAdminForm({ ModuleName }) {
       .catch((error) => {
         console.warn(error.message);
       });
-  }, []);
+    axios
+      .get(api + "sleevetype/data")
+      .then((response) => {
+        sleeveTypesChange(response.data);
+      })
+      .catch((error) => {
+        console.warn(error.message);
+      });
+  }, [productDetail.id, product.productCode]);
 
   return (
     <div className={`col-10 offset-md-1 ${styles.radiusFrame}`}>
@@ -153,11 +191,10 @@ function ProductAdminForm({ ModuleName }) {
                   type="text"
                   className={`form-control ${styles.inputCommon}`}
                   id="ten"
-                  placeholder=""
-                  onChange={(e) => {
-                    productNameChange(e.target.value);
-                  }}
-                  value={productName}
+                  name="productName"
+                  placeholder={product.productName}
+                  onChange={handleProductChange}
+                  value={product.productName}
                 />
                 <label htmlFor="ten" className={styles.textGray}>
                   Tên sản phẩm
@@ -168,11 +205,10 @@ function ProductAdminForm({ ModuleName }) {
                   type="text"
                   className={`form-control ${styles.inputCommon}`}
                   id="ma"
-                  placeholder=""
-                  onChange={(e) => {
-                    codeChange(e.target.value);
-                  }}
-                  value={code}
+                  placeholder={product.productCode}
+                  name="productCode"
+                  onChange={handleProductChange}
+                  value={product.productCode}
                 />
                 <label htmlFor="ma" className={styles.textGray}>
                   Mã sản phẩm
@@ -183,7 +219,10 @@ function ProductAdminForm({ ModuleName }) {
                   type="text"
                   className={`form-control ${styles.inputCommon}`}
                   id="gia"
-                  placeholder=""
+                  placeholder={productDetail.price}
+                  name="price"
+                  onChange={handleProductDetailChange}
+                  value={productDetail.price}
                 />
                 <label htmlFor="gia" className={styles.textGray}>
                   Giá sản phẩm
@@ -193,17 +232,15 @@ function ProductAdminForm({ ModuleName }) {
                 <select
                   className={`form-select ${styles.inputCommon} ${styles.selectCommon} d-inline-block`}
                   aria-label="Default select example"
-                  onChange={(value) => brandIdChange(value.target.value)}
+                  name="brandId"
+                  onChange={handleProductChange}
+                  value={product.brandId}
                 >
                   <option value={null}>Thương hiệu</option>
                   {brands &&
                     brands.map((item) => {
                       return (
-                        <option
-                          selected={brandId === item.id}
-                          key={item.id}
-                          value={item.id}
-                        >
+                        <option key={item.id} value={item.id}>
                           {item.brandName}
                         </option>
                       );
@@ -214,17 +251,15 @@ function ProductAdminForm({ ModuleName }) {
                 <select
                   className={`form-select ${styles.inputCommon} ${styles.selectCommon} d-inline-block`}
                   aria-label="Default select example"
-                  onChange={(value) => categoryIdChange(value.target.value)}
+                  name="categoryId"
+                  onChange={handleProductChange}
+                  value={product.categoryId}
                 >
                   <option value={null}>Loại sản phẩm</option>
                   {categories &&
                     categories.map((item) => {
                       return (
-                        <option
-                          selected={categoryid === item.id}
-                          key={item.id}
-                          value={item.id}
-                        >
+                        <option key={item.id} value={item.id}>
                           {item.categoryName}
                         </option>
                       );
@@ -235,6 +270,9 @@ function ProductAdminForm({ ModuleName }) {
                 <select
                   className={`form-select ${styles.inputCommon} ${styles.selectCommon} d-inline-block`}
                   aria-label="Default select example"
+                  name="patternId"
+                  onChange={handleProductDetailChange}
+                  value={productDetail.patternId}
                 >
                   <option value={null}>Họa tiết</option>
                   {patterns &&
@@ -251,6 +289,9 @@ function ProductAdminForm({ ModuleName }) {
                 <select
                   className={`form-select ${styles.inputCommon} ${styles.selectCommon} d-inline-block`}
                   aria-label="Default select example"
+                  name="buttonId"
+                  onChange={handleProductDetailChange}
+                  value={productDetail.buttonId}
                 >
                   <option value={null}>Loại cúc áo</option>
                   {buttonTypes &&
@@ -267,6 +308,9 @@ function ProductAdminForm({ ModuleName }) {
                 <select
                   className={`form-select ${styles.inputCommon} ${styles.selectCommon} d-inline-block`}
                   aria-label="Default select example"
+                  name="materialId"
+                  onChange={handleProductDetailChange}
+                  value={productDetail.materialId}
                 >
                   <option value={null}>Chất liệu</option>
                   {materials &&
@@ -283,8 +327,11 @@ function ProductAdminForm({ ModuleName }) {
                 <select
                   className={`form-select ${styles.inputCommon} ${styles.selectCommon} d-inline-block`}
                   aria-label="Default select example"
+                  name="shirtTailId"
+                  onChange={handleProductDetailChange}
+                  value={productDetail.shirtTailId}
                 >
-                  <option value={1}>Đuôi áo</option>
+                  <option value={undefined}>Đuôi áo</option>
                   {shirtTailTypes &&
                     shirtTailTypes.map((item) => {
                       return (
@@ -299,8 +346,11 @@ function ProductAdminForm({ ModuleName }) {
                 <select
                   className={`form-select ${styles.inputCommon} ${styles.selectCommon} d-inline-block`}
                   aria-label="Default select example"
+                  name="collarId"
+                  onChange={handleProductDetailChange}
+                  value={productDetail.collarId}
                 >
-                  <option value={1}>Cổ áo</option>
+                  <option value={undefined}>Cổ áo</option>
                   {collarTypes &&
                     collarTypes.map((item) => {
                       return (
@@ -315,8 +365,11 @@ function ProductAdminForm({ ModuleName }) {
                 <select
                   className={`form-select ${styles.inputCommon} ${styles.selectCommon} d-inline-block`}
                   aria-label="Default select example"
+                  name="formId"
+                  onChange={handleProductDetailChange}
+                  value={productDetail.formId}
                 >
-                  <option value={1}>Dáng áo</option>
+                  <option value={null}>Dáng áo</option>
                   {forms &&
                     forms.map((item) => {
                       return (
@@ -331,17 +384,38 @@ function ProductAdminForm({ ModuleName }) {
                 <select
                   className={`form-select ${styles.inputCommon} ${styles.selectCommon} d-inline-block`}
                   aria-label="Default select example"
-                  onChange={(e) => {
-                    statusChange(e.target.value);
-                  }}
+                  name="sleeveId"
+                  onChange={handleProductDetailChange}
+                  value={productDetail.sleeveId}
                 >
-                  <option value={null}>Trạng thái</option>
-                  <option selected={status === true} value={true}>
-                    Kinh Doanh
-                  </option>
-                  <option selected={status === false} value={false}>
-                    Ngừng Kinh doanh
-                  </option>
+                  <option value={null}>Tay áo</option>
+                  {sleeveTypes &&
+                    sleeveTypes.map((item) => {
+                      return (
+                        <option key={item.id} value={item.id}>
+                          {item.sleeveName}
+                        </option>
+                      );
+                    })}
+                </select>
+              </div>
+              <div className="col-4 mb-5">
+                <select
+                  className={`form-select ${styles.inputCommon} ${styles.selectCommon} d-inline-block`}
+                  aria-label="Default select example"
+                  name="status"
+                  onChange={handleProductChange}
+                  value={
+                    product.status === "Active"
+                      ? true
+                      : product.status === "InActive"
+                      ? false
+                      : undefined
+                  }
+                >
+                  <option value={undefined}>Trạng thái</option>
+                  <option value={true}>Kinh Doanh</option>
+                  <option value={false}>Ngừng Kinh doanh</option>
                 </select>
               </div>
               <div className="form-floating col-12 mb-5 mt-5">
@@ -349,8 +423,9 @@ function ProductAdminForm({ ModuleName }) {
                   className={`form-control ${styles.inputCommon}`}
                   placeholder="Leave a comment here"
                   id="floatingTextarea2"
-                  onChange={(e) => descriptionChange(e.target.value)}
-                  value={description}
+                  name="descriptionDetail"
+                  onChange={handleProductDetailChange}
+                  value={productDetail.descriptionDetail}
                 ></textarea>
                 <label htmlFor="floatingTextarea2">Mô tả chi tiết</label>
               </div>

@@ -1,5 +1,4 @@
 import ProductAdminForm from "./ProductAdminForm";
-import ProductAdminImage from "./ProductAdminImage";
 import ProductSizeColorAdminTable from "./ProductSizeColorAdminTable";
 import styles from "./ProductAdmin.module.css";
 

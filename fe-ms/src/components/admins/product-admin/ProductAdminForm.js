@@ -4,7 +4,7 @@ import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 
 function ProductAdminForm({ ModuleName }) {
-  const { productDetailId } = useParams();
+  const { productId } = useParams();
 
   const navigate = useNavigate();
 
@@ -61,17 +61,17 @@ function ProductAdminForm({ ModuleName }) {
   const [sleeveTypes, sleeveTypesChange] = useState(null);
 
   const action = function () {
-    if (productDetailId === undefined) {
-      console.log(productDetail);
+    if (productId === undefined) {
       axios
         .post(api + "product/create", product)
         .then((response) => {
           productDetail.productId = response.data.id;
+          console.log(productDetail);
           axios
             .post(api + "product/createproductdetail", productDetail)
             .then((response) => {
               navigate(
-                "/controller/v1/admin/product/update/" + response.data.id
+                "/controller/v1/admin/product/update/" + productDetail.productId
               );
             })
             .catch((err) => {
@@ -85,9 +85,9 @@ function ProductAdminForm({ ModuleName }) {
     }
   };
   useEffect(() => {
-    if (productDetailId !== undefined) {
+    if (productId !== undefined) {
       axios
-        .get(api + "product/detail/" + productDetailId)
+        .get(api + "product/detail/" + productId)
         .then((response) => {
           productDetailChange(response.data);
         })
@@ -96,7 +96,7 @@ function ProductAdminForm({ ModuleName }) {
         });
       if (productDetail.productId !== null) {
         axios
-          .get(api + "product/" + productDetail.productId)
+          .get(api + "product/" + productId)
           .then((response) => {
             productChange(response.data);
           })
@@ -177,7 +177,7 @@ function ProductAdminForm({ ModuleName }) {
       .catch((error) => {
         console.warn(error.message);
       });
-  }, [productDetail.id, product.productCode]);
+  }, [product.id, productDetail.id, productId]);
 
   return (
     <div className={`col-10 offset-md-1 ${styles.radiusFrame}`}>

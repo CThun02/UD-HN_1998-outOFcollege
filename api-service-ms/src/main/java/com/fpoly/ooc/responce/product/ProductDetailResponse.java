@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProductDetailResponse {
+
     private Long id;
 
     private Product product;
@@ -62,3 +63,4 @@ public class ProductDetailResponse {
     private LocalDateTime deletedAt;
 
 }
+

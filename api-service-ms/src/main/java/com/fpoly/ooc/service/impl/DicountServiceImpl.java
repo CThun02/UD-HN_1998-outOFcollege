@@ -33,7 +33,7 @@ public class DicountServiceImpl implements DiscountService {
     }
 
     @Override
-    public DiscountRequest findDiscountById(Long id) {
+    public DiscountRequest findDiscountRequestById(Long id) {
 
         Optional<Discount> discountOptional = discountRepository.findById(id);
 
@@ -52,6 +52,18 @@ public class DicountServiceImpl implements DiscountService {
                 .endDate(discountOptional.get().getEndDate())
                 .discountCondition(discountOptional.get().getDiscountCondition())
                 .build();
+    }
+
+    @Override
+    public Discount findDiscountById(Long id) {
+
+        Optional<Discount> discountOptional = discountRepository.findById(id);
+
+        if(discountOptional.isEmpty()) {
+            throw new RuntimeException(ExceptionResponse.EXCEPTION_NOT_FOUND);
+        }
+
+        return discountOptional.get();
     }
 
     @Override

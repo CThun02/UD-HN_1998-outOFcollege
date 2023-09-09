@@ -1,4 +1,4 @@
-package com.fpoly.ooc.request;
+package com.fpoly.ooc.request.product;
 
 import lombok.Getter;
 

@@ -4,6 +4,7 @@ import styles from "./ProductAdmin.module.css";
 
 function ProductAdminFilter() {
   const api = "http://localhost:8080/admin/api/";
+
   const [brands, brandsChange] = useState(null);
   const [categories, categoriesChange] = useState(null);
   const [patterns, patternsChange] = useState(null);

@@ -13,9 +13,12 @@ import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 function ProductAdminTable() {
   const api = "http://localhost:8080/admin/api/product";
-  const [products, productsChange] = useState("");
+
+  const [products, productsChange] = useState(null);
   const [page, pageChange] = useState(0);
   const [pageNumberToTal, pageNumberToTalChange] = useState(0);
+
+  //fuction
   const next = function () {
     if (page >= pageNumberToTal - 1) {
       pageChange(0);
@@ -30,6 +33,7 @@ function ProductAdminTable() {
       pageChange(page - 1);
     }
   };
+
   useEffect(() => {
     axios
       .get(api + "/data?page=" + page)
@@ -47,7 +51,6 @@ function ProductAdminTable() {
       .catch((error) => {
         console.warn(error.message);
       });
-    console.log(page);
   }, [page]);
 
   return (
@@ -65,10 +68,10 @@ function ProductAdminTable() {
         </thead>
         <tbody>
           {products &&
-            products.map((item) => {
+            products.map((item, index) => {
               return (
-                <tr key={item.productName}>
-                  <th scope="row">1</th>
+                <tr key={item.id}>
+                  <th scope="row">{index + 1}</th>
                   <td>
                     <img
                       alt="Tạm thời chưa có gì"
@@ -93,19 +96,17 @@ function ProductAdminTable() {
                     </button>
                   </td>
                   <td>
-                    <Link
-                      to={`/controller/v1/admin/product/update/${item.productDetailId}`}
-                    >
+                    <Link to={`/controller/v1/admin/product/update/${item.id}`}>
                       <ButtonCRUD
                         icon={faPencilAlt}
-                        className={styles.btnRUD}
+                        className={styles.btnCRUD}
                       />
                     </Link>
                     <Link to="/controller/v1/admin/product/update">
-                      <ButtonCRUD icon={faTrash} className={styles.btnRUD} />
+                      <ButtonCRUD icon={faTrash} className={styles.btnCRUD} />
                     </Link>
                     <Link to="/controller/v1/admin/product/update">
-                      <ButtonCRUD icon={faEye} className={styles.btnRUD} />
+                      <ButtonCRUD icon={faEye} className={styles.btnCRUD} />
                     </Link>
                   </td>
                 </tr>

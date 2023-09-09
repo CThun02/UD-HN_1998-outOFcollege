@@ -4,6 +4,8 @@ import styles from "./ProductAdmin.module.css";
 function ProductSizeColorAdminCreate(props) {
   const sizes = props.sizes;
   const colors = props.colors;
+
+  //function
   function handleClick(event, idTable) {
     const currentCheck = event.target;
     if (currentCheck.checked) {

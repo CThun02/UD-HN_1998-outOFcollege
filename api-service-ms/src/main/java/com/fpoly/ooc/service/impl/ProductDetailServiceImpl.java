@@ -40,6 +40,14 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
     }
 
     @Override
+    public ProductDetailSizeResponse getProductDetailColorSizeByIdPNIdSize(Long id, Long idSize) {
+        List<ProductDetailColorResponse> productDetailColorResponse = repo.getProductDetailColorSizeByIdPAndSizeId(id, idSize);
+        ProductDetailSizeResponse productDetailSizeResponse = ProductDetailSizeResponse.builder().sizeId(idSize)
+                .listColor(productDetailColorResponse).build();
+        return productDetailSizeResponse;
+    }
+
+    @Override
     public ProductDetail create(ProductDetail productDetail) {
         return repo.save(productDetail);
     }
@@ -65,8 +73,8 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
     }
 
     @Override
-    public List<ProductDetail> getAll() {
-        return repo.findAll();
+    public List<ProductDetailResponse> getAll() {
+        return repo.getAllProductDetail();
     }
 
     @Override

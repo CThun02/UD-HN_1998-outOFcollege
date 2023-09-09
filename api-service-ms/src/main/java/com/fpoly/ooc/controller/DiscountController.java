@@ -34,7 +34,7 @@ public class DiscountController {
     @GetMapping("/{id}")
     public ResponseEntity<?> findDiscountById(@PathVariable("id") Long id) {
 
-        DiscountRequest discountRequest = discountService.findDiscountById(id);
+        DiscountRequest discountRequest = discountService.findDiscountRequestById(id);
 
         return ResponseEntity.ok(discountRequest);
     }
@@ -58,3 +58,4 @@ public class DiscountController {
     }
 
 }
+

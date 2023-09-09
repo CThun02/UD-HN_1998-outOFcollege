@@ -4,7 +4,7 @@ import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ExceptionResponse;
 import com.fpoly.ooc.entity.Discount;
 import com.fpoly.ooc.exception.CustomNotFoundException;
-import com.fpoly.ooc.repository.interfaces.DiscountRepository;
+import com.fpoly.ooc.repository.DiscountRepository;
 import com.fpoly.ooc.request.promotion.DiscountRequest;
 import com.fpoly.ooc.responce.promition.DiscountResponse;
 import com.fpoly.ooc.service.interfaces.DiscountService;
@@ -33,7 +33,7 @@ public class DicountServiceImpl implements DiscountService {
     }
 
     @Override
-    public DiscountRequest findDiscountById(Long id) {
+    public DiscountRequest findDiscountRequestById(Long id) {
 
         Optional<Discount> discountOptional = discountRepository.findById(id);
 
@@ -52,6 +52,18 @@ public class DicountServiceImpl implements DiscountService {
                 .endDate(discountOptional.get().getEndDate())
                 .discountCondition(discountOptional.get().getDiscountCondition())
                 .build();
+    }
+
+    @Override
+    public Discount findDiscountById(Long id) {
+
+        Optional<Discount> discountOptional = discountRepository.findById(id);
+
+        if(discountOptional.isEmpty()) {
+            throw new RuntimeException(ExceptionResponse.EXCEPTION_NOT_FOUND);
+        }
+
+        return discountOptional.get();
     }
 
     @Override
@@ -88,3 +100,4 @@ public class DicountServiceImpl implements DiscountService {
     }
 
 }
+

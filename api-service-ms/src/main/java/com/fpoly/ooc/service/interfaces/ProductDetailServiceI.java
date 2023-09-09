@@ -13,6 +13,7 @@ public interface ProductDetailServiceI {
     public List<ProductDetailResponse> getAllProductDetailResponse();
     public ProductDetail getOne(Long id);
     public ProductDetailResponse getProductDetail(Long id);
+    List<ProductDetailResponse> findProductDetailByIdDiscount(Long idDiscount);
     public List<ProductDetailSizeResponse> getProductDetailColorSizeByIdP(Long id);
     public ProductDetailSizeResponse getProductDetailColorSizeByIdPNIdSize(Long id, Long idSize);
     public List<ProductDetail> getProductDetailsByIdPro(Long id);

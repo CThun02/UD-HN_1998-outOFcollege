@@ -9,6 +9,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -74,4 +75,8 @@ public class ProductDetail extends BaseEntity{
 
     @Column(name = "status")
     private String status;
+
+    @OneToMany(mappedBy = "productDetailId")
+    private List<DiscountProduct> discountProductList;
+
 }

@@ -64,27 +64,7 @@ function CreateBill() {
                             </div>
                         </div>
                     </div>
-                    <div className="line mt-5"></div>
-                    <table className="table mt-5">
-                        <thead>
-                            <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">Sản phẩm</th>
-                                <th scope="col">Số lượng</th>
-                                <th scope="col">Tổng tiền</th>
-                                <th scope="col">Thao tác</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <th scope="row">1</th>
-                                <td>ảnh tên</td>
-                                <td>số lượng</td>
-                                <td>Tổng tiền</td>
-                                <td>Thao tác</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div className="line mt-5">Khách lẻ</div>
                 </div>
                 <div className="mt-5 container-color mh-auto">
                     <div className="row">

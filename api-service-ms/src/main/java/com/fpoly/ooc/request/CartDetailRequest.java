@@ -1,4 +1,4 @@
-package com.fpoly.ooc.responce;
+package com.fpoly.ooc.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -6,23 +6,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.math.BigDecimal;
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @Builder
-public class CartResponse {
+public class CartDetailRequest {
 
-    private Long cartId;
-
-    private Long cartDetailId;
+    private Long productDetailId;
 
     private Integer quantity;
-
-    private String productDetailName;
-
-    private BigDecimal price;
 
 }

@@ -28,3 +28,4 @@ public interface VoucherRepository extends JpaRepository<Voucher, Long> {
     Page<VoucherResponse> pageAllVoucher(Pageable pageable);
 
 }
+

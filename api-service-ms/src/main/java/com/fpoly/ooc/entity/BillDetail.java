@@ -63,4 +63,8 @@ public class BillDetail {
     @JoinColumn(name = "bill_id", referencedColumnName = "id")
     private Bill bill;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_detail_id", referencedColumnName = "id")
+    private ProductDetail productDetail;
+
 }

@@ -13,16 +13,16 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 @Builder
-public class CartResponse {
+public class ProductDetailResponse {
 
-    private Long cartId;
+    private Long productDetailId;
 
-    private Long cartDetailId;
+    private String productName;
 
-    private Integer quantity;
-
-    private String productDetailName;
+    private String imgDefault;
 
     private BigDecimal price;
+
+    private Integer quantity;
 
 }

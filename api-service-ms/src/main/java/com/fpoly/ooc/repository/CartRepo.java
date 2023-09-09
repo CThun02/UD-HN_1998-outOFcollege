@@ -1,4 +1,4 @@
-package com.fpoly.ooc.repository.interfaces;
+package com.fpoly.ooc.repository;
 
 import com.fpoly.ooc.entity.Cart;
 import com.fpoly.ooc.entity.CartDetail;

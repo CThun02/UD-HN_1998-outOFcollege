@@ -69,7 +69,6 @@ public class Account {
     @Column(name = "deleted_at")
     private Date deleteAt;
 
-<<<<<<< HEAD
 //    @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "role_id", referencedColumnName = "id")
 //    private Role role;
@@ -77,7 +76,6 @@ public class Account {
 //    @OneToMany(fetch = FetchType.EAGER)
 //    @JoinColumn(name = "account_id", referencedColumnName = "id")
 //    private AddressDetail addressDetail;
-=======
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id", referencedColumnName = "id")
     private Role role;
@@ -85,5 +83,4 @@ public class Account {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "account_id", referencedColumnName = "id")
     private AddressDetail addressDetail;
->>>>>>> 17f1ec6be5fd5f9c5f124d2222227992bb6172b0
 }

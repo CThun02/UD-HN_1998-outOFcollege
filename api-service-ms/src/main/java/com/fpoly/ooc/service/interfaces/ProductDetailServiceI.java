@@ -13,7 +13,13 @@ public interface ProductDetailServiceI {
     public List<ProductDetailResponse> getAllProductDetailResponse();
     public ProductDetail getOne(Long id);
     public ProductDetailResponse getProductDetail(Long id);
+<<<<<<< HEAD
+    public List<ProductDetailColorSizeResponse> getProductDetailColorSizeByIdPD(Long id);
+
+    List<com.fpoly.ooc.responce.product.ProductDetailResponse> findProductDetailByIdDiscount(Long idDiscount);
+=======
     public List<ProductDetailSizeResponse> getProductDetailColorSizeByIdP(Long id);
     public ProductDetailSizeResponse getProductDetailColorSizeByIdPNIdSize(Long id, Long idSize);
     public List<ProductDetail> getProductDetailsByIdPro(Long id);
+>>>>>>> test
 }

@@ -14,7 +14,9 @@ public interface DiscountService {
 
     Page<DiscountResponse> pageAllDiscount(Pageable pageable);
 
-    DiscountRequest findDiscountById(Long id);
+    DiscountRequest findDiscountRequestById(Long id);
+
+    Discount findDiscountById(Long id);
 
     Discount saveOrUpdate(DiscountRequest request);
 

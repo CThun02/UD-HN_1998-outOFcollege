@@ -25,6 +25,11 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
     }
 
     @Override
+    public List<ProductDetailColorSizeResponse> getProductDetailColorSizeByIdPD(Long id) {
+        return null;
+    }
+
+    @Override
     public List<ProductDetailSizeResponse> getProductDetailColorSizeByIdP(Long id) {
         List<Size> sizes = repo.getSizeIdByProductId(id);
         List<ProductDetailSizeResponse> productDetailSizeResponses = new ArrayList<>();
@@ -43,6 +48,11 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
         ProductDetailSizeResponse productDetailSizeResponse = ProductDetailSizeResponse.builder().sizeId(idSize)
                 .listColor(productDetailColorResponse).build();
         return productDetailSizeResponse;
+    }
+
+    @Override
+    public List<com.fpoly.ooc.responce.product.ProductDetailResponse> findProductDetailByIdDiscount(Long idDiscount) {
+        return repo.findProductDetailByIdDiscount(idDiscount);
     }
 
     @Override

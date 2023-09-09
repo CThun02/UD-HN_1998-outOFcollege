@@ -40,7 +40,16 @@ public class DiscountProductController {
     @PostMapping("/save")
     public ResponseEntity<?> save(@RequestBody DiscountProductRequest request) {
 
+        discountProductService.saveOrUpdate(request);
         return ResponseEntity.ok("DONE");
     }
+
+    @PostMapping("/update-product")
+    public ResponseEntity<?> updateStatus(@RequestBody DiscountProductRequest request) {
+
+        discountProductService.upateStatusDisountProduct(request);
+        return ResponseEntity.ok("DONE");
+    }
+
 
 }

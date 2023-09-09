@@ -15,7 +15,7 @@ import java.util.List;
 @Builder
 public class DiscountProductRequest {
 
-    private Long idDiscountProduct;
+    private List<Long> idDiscountProduct;
 
     private Long idDiscount;
 

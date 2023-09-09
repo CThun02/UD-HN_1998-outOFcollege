@@ -17,6 +17,6 @@ public interface DiscountProductService {
 
     void saveOrUpdate(DiscountProductRequest request);
 
-    void upateStatusDisountProduct(Long idDiscount, List<Long> idProduct);
+    void upateStatusDisountProduct(DiscountProductRequest request);
 
 }

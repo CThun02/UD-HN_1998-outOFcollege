@@ -1,5 +1,6 @@
 package com.fpoly.ooc.service.impl;
 
+import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ExceptionResponse;
 import com.fpoly.ooc.dto.PageDTO;
 import com.fpoly.ooc.entity.Discount;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -93,13 +95,12 @@ public class DiscountProductServiceImpl implements DiscountProductService {
 
     @Override
     public void saveOrUpdate(DiscountProductRequest request) {
-        List<DiscountProduct> discountProductList = null;
         Discount discount = discountService.findDiscountById(request.getIdDiscount());
 
         request.getIdProductDetail().forEach(e -> {
             DiscountProduct discountProduct = new DiscountProduct();
             discountProduct.setDiscountId(discount);
-            discountProduct.setId(request.getIdDiscountProduct());
+            discountProduct.setId(request.getIdDiscountProduct().isEmpty() ? null : request.getIdDiscountProduct().get(0));
 
             if (Objects.isNull(productDetailServiceI.getOne(e))) {
                 throw new CustomNotFoundException(ExceptionResponse.EXCEPTION_NOT_FOUND);
@@ -112,7 +113,18 @@ public class DiscountProductServiceImpl implements DiscountProductService {
     }
 
     @Override
-    public void upateStatusDisountProduct(Long idDiscount, List<Long> idProduct) {
-        
+    public void upateStatusDisountProduct(DiscountProductRequest request) {
+        request.getIdDiscountProduct().forEach(
+                d -> {
+                    Optional<DiscountProduct> discountProductOptional = discountProductRepository.findById(d);
+
+                    if(discountProductOptional.isEmpty()) {
+                        throw new CustomNotFoundException(ExceptionResponse.EXCEPTION_NOT_FOUND);
+                    } else {
+                        discountProductOptional.get().setStatus(Const.DISCOUNT_STATUS_INACTIVE);
+                        discountProductRepository.save(discountProductOptional.get());
+                    }
+                }
+        );
     }
 }

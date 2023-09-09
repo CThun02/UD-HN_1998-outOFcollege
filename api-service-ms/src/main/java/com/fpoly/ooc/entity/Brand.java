@@ -22,4 +22,6 @@ public class Brand extends BaseEntity{
 
     @Column(name = "status")
     private String status;
+
+
 }

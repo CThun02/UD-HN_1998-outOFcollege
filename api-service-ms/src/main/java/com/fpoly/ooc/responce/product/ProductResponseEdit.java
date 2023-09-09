@@ -1,9 +1,8 @@
-package com.fpoly.ooc.responce.Product;
+package com.fpoly.ooc.responce.product;
 
 public interface ProductResponseEdit {
     Long getBrandId();
     Long getCategoryId();
     String getProductCode();
     String getProductName();
-    String getStatus();
 }

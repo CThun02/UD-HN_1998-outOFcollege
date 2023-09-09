@@ -1,8 +1,8 @@
 package com.fpoly.ooc.service.interfaces;
 
 import com.fpoly.ooc.entity.Product;
-import com.fpoly.ooc.responce.Product.ProductResponse;
-import com.fpoly.ooc.responce.Product.ProductResponseEdit;
+import com.fpoly.ooc.responce.product.ProductResponse;
+import com.fpoly.ooc.responce.product.ProductResponseEdit;
 import org.springframework.data.domain.Page;
 
 import java.util.List;

@@ -4,7 +4,7 @@ import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ExceptionResponse;
 import com.fpoly.ooc.entity.Discount;
 import com.fpoly.ooc.exception.CustomNotFoundException;
-import com.fpoly.ooc.repository.interfaces.DiscountRepository;
+import com.fpoly.ooc.repository.DiscountRepository;
 import com.fpoly.ooc.request.promotion.DiscountRequest;
 import com.fpoly.ooc.responce.promition.DiscountResponse;
 import com.fpoly.ooc.service.interfaces.DiscountService;

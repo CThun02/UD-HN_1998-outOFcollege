@@ -7,7 +7,7 @@ import com.fpoly.ooc.entity.Discount;
 import com.fpoly.ooc.entity.DiscountProduct;
 import com.fpoly.ooc.entity.ProductDetail;
 import com.fpoly.ooc.exception.CustomNotFoundException;
-import com.fpoly.ooc.repository.interfaces.DiscountProductRepository;
+import com.fpoly.ooc.repository.DiscountProductRepository;
 import com.fpoly.ooc.request.promotion.DiscountProductRequest;
 import com.fpoly.ooc.responce.promition.DiscountProductResponse;
 import com.fpoly.ooc.service.interfaces.DiscountProductService;
@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Service

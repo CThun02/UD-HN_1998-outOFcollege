@@ -13,9 +13,12 @@ import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 function ProductAdminTable() {
   const api = "http://localhost:8080/admin/api/product";
-  const [products, productsChange] = useState("");
+
+  const [products, productsChange] = useState(null);
   const [page, pageChange] = useState(0);
   const [pageNumberToTal, pageNumberToTalChange] = useState(0);
+
+  //fuction
   const next = function () {
     if (page >= pageNumberToTal - 1) {
       pageChange(0);
@@ -30,6 +33,7 @@ function ProductAdminTable() {
       pageChange(page - 1);
     }
   };
+
   useEffect(() => {
     axios
       .get(api + "/data?page=" + page)

@@ -4,6 +4,8 @@ import styles from "./ProductAdmin.module.css";
 
 function ProductSizeColorAdminCreate(props) {
   var detailcolorsize = props.productDetailColorSizeDetail;
+
+  //funciotn
   function closeTab() {
     document.getElementById("sizeColorDetailFrame").classList.add("d-none");
   }

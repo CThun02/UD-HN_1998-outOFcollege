@@ -1,12 +1,10 @@
-import ButtonCRUD from "../button-crud/ButtonCRUD";
 import styles from "./ProductAdmin.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMinus, faPlus, faSearch } from "@fortawesome/free-solid-svg-icons";
-import { Link } from "react-router-dom";
+import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import ProductAdminFilter from "./ProductAdminFilter";
 import ProductAdminTable from "./ProductAdminTable";
 
-const App = function () {
+const ProductAdminIndex = function () {
   return (
     <div className={styles.product}>
       <div className={`col-10 offset-md-1 ${styles.radiusFrame}`}>
@@ -33,38 +31,6 @@ const App = function () {
           <div className="p-5">
             <ProductAdminFilter />
             <ProductAdminTable />
-            <div className="col-12">
-              <Link to="/controller/v1/admin/product/create">
-                <ButtonCRUD className={styles.btnCreate} icon={faPlus} />
-              </Link>
-              <div className="row">
-                <div className="col-12">
-                  <div className="d-flex justify-content-center">
-                    <ul className={`p-0 ${styles.pagination}`}>
-                      <li>
-                        <FontAwesomeIcon
-                          icon={faMinus}
-                          className="ps-2"
-                        ></FontAwesomeIcon>
-                      </li>
-                      <li className={styles.pageNumber}>
-                        <input
-                          type={"text"}
-                          className="text-center"
-                          value={1}
-                        />
-                      </li>
-                      <li>
-                        <FontAwesomeIcon
-                          icon={faPlus}
-                          className="pe-2"
-                        ></FontAwesomeIcon>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -72,4 +38,4 @@ const App = function () {
   );
 };
 
-export default App;
+export default ProductAdminIndex;

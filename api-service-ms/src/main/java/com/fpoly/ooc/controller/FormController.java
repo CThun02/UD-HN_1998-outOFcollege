@@ -1,8 +1,6 @@
 package com.fpoly.ooc.controller;
 
-import com.fpoly.ooc.entity.Brand;
 import com.fpoly.ooc.entity.Form;
-import com.fpoly.ooc.service.interfaces.BrandServiceI;
 import com.fpoly.ooc.service.interfaces.FormServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;

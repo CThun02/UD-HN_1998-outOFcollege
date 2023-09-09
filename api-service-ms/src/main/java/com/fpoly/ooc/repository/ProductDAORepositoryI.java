@@ -1,7 +1,8 @@
 package com.fpoly.ooc.repository;
 
 import com.fpoly.ooc.entity.Product;
-import com.fpoly.ooc.responce.ProductResponse;
+import com.fpoly.ooc.responce.Product.ProductResponse;
+import com.fpoly.ooc.responce.Product.ProductResponseEdit;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,8 +11,11 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ProductDAORepositoryI extends JpaRepository<Product, Long> {
-    @Query("Select od.id as productDetailId, o.productName as productName, o.status as status, sum(od.quantity) as " +
-            "quantity from Product o join ProductDetail od on od.product.id = o.id group by o.productName, " +
-            "o.status, od.id")
+    @Query("Select o.id as id, o.productName as productName, o.category.categoryName as categoryName, o.status as status from Product o")
     public Page<ProductResponse> getProducts(Pageable pageable);
+
+    @Query("Select o.brand.id as brandId, o.category.id as categoryId, o.productName as productName, o.productCode as productCode" +
+            ",o.status as status from Product o where o.id=?1 ")
+    public ProductResponseEdit getProduct(Long id);
+
 }

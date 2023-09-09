@@ -17,7 +17,7 @@ import java.util.Date;
 @Table(name = "product_detail")
 @Entity
 @Builder
-public class ProductDetail {
+public class ProductDetail extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -74,19 +74,4 @@ public class ProductDetail {
 
     @Column(name = "status")
     private String status;
-
-    @Column(name = "created_at")
-    private Date createAt;
-
-    @Column(name = "updated_at")
-    private Date updayteAt;
-
-    @Column(name = "created_by")
-    private String createBy;
-
-    @Column(name = "updated_by")
-    private String updateBy;
-
-    @Column(name = "deleted_at")
-    private Date deleteAt;
 }

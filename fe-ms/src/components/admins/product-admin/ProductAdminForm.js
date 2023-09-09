@@ -86,8 +86,7 @@ function ProductAdminForm({ ModuleName }) {
           console.error(err);
         });
     } else {
-      console.log(productId);
-      product.status = "Active" ? true : false;
+      console.log(productDetail);
       axios
         .put(api + "product/update?id=" + productId, product)
         .then((response) => {
@@ -114,6 +113,7 @@ function ProductAdminForm({ ModuleName }) {
       axios
         .get(api + "product/detail/" + productId)
         .then((response) => {
+          ProductDetailChange("id", response.data.id);
           ProductDetailChange("productId", response.data.product.id);
           ProductDetailChange("patternId", response.data.pattern.id);
           ProductDetailChange("buttonId", response.data.button.id);

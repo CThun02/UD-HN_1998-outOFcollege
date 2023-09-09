@@ -1,5 +1,4 @@
-package com.fpoly.ooc.responce.Product;
-import lombok.Builder;
+package com.fpoly.ooc.responce.product;
 
 import java.math.BigDecimal;
 

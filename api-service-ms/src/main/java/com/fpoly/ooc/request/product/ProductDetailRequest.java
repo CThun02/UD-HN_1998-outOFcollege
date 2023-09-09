@@ -1,4 +1,4 @@
-package com.fpoly.ooc.request.Product;
+package com.fpoly.ooc.request.product;
 
 import com.fpoly.ooc.entity.*;
 import lombok.AllArgsConstructor;
@@ -37,6 +37,6 @@ public class ProductDetailRequest {
                 ButtonType.builder().id(buttonId).build(), Material.builder().id(materialId).build(), CollarType.builder().id(collarId).build(),
                 SleeveType.builder().id(sleeveId).build(), size, color,
                 Form.builder().id(formId).build(), ShirtTailType.builder().id(shirtTailId).build(), price, quantity,
-                descriptionDetail, status==true?"Active":"InActive");
+                descriptionDetail, "Active");
     }
 }

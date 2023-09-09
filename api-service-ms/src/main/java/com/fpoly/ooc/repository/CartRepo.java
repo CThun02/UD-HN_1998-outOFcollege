@@ -18,5 +18,4 @@ public interface CartRepo extends JpaRepository<Cart, Long> {
             "JOIN cd.productDetail pd " +
             "JOIN pd.product p")
     List<CartResponse> getAll();
-
 }

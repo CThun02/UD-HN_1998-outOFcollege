@@ -41,6 +41,21 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
             "left join Size s on s.id = pd.size.id where pd.color is not null and pd.size is not null" )
     public List<ProductDetailResponse> getAllProductDetail();
 
+    @Query("select new com.fpoly.ooc.responce.product.ProductDetailResponse(" +
+            "pd.id, pd.product, pd.pattern, pd.button, pd.material, pd.collar, " +
+            "pd.sleeve, s, c, pd.form, pd.shirtTail, pd.price, " +
+            "pd.quantity, pd.descriptionDetail, pd.status, pd.createdAt, pd.createdBy, " +
+            "pd.updatedAt, pd.updatedBy, pd.deletedAt) " +
+            "from ProductDetail pd " +
+            "left join Color  c on pd.color.id = c.id " +
+            "left join Size s on s.id = pd.size.id " +
+            "inner join DiscountProduct  dp on dp.productDetailId.id = pd.id " +
+            "inner join Discount d on d.id = dp.discountId.id " +
+            "where pd.color is not null " +
+            "and pd.size is not null " +
+            "and d = :idDiscount" )
+    List<ProductDetailResponse> findProductDetailByIdDiscount(@Param("idDiscount") Long idDiscount);
+
     @Query("select od from ProductDetail od where od.product.id=?1")
     public List<ProductDetail> getProductDetailByIdPro(Long id);
 

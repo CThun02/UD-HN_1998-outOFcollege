@@ -2,6 +2,7 @@ package com.fpoly.ooc.service.impl;
 
 import com.fpoly.ooc.entity.Category;
 import com.fpoly.ooc.repository.CategoryDAORepositoryI;
+import com.fpoly.ooc.request.CategoryRequest;
 import com.fpoly.ooc.service.interfaces.CategoryServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

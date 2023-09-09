@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AccountRepository extends JpaRepository<Account, Long> {
 
-    @Query("SELECT new com.fpoly.ooc.responce.AccountResponce(acc.avatar,acc.fullName,acc.gender,acc.createAt,acc.status)" +
-            "FROM Account acc join acc.role r")
-    Page<AccountResponce> phanTrang(Pageable pageable);
+//    @Query("SELECT new com.fpoly.ooc.responce.AccountResponce(acc.avatar,acc.fullName,acc.gender,acc.createAt,acc.status)" +
+//            "FROM Account acc join acc.role r")
+//    Page<AccountResponce> phanTrang(Pageable pageable);
 }

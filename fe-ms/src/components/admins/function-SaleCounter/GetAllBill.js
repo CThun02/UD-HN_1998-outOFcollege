@@ -1,8 +1,20 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import './css/style.css'
 import { Link } from "react-router-dom";
+import { getAll, createCart } from './service';
 
 const GetAllBill = () => {
+    const [cartData, setCartData] = useState([]);
+
+    useEffect(() => {
+        getAll(0)
+            .then((response) => {
+                setCartData(response.data.content);
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    }, []);
 
     return (
         <section className="full-screen-bg">
@@ -21,9 +33,7 @@ const GetAllBill = () => {
                     <thead>
                         <tr>
                             <th scope="col">#</th>
-                            <th scope="col">Ảnh</th>
-                            <th scope="col">Tên</th>
-                            <th scope="col">Số lượng</th>
+                            <th scope="col">Số sản phẩm</th>
                             <th scope="col">Tổng tiền</th>
                             <th scope="col">Ngày tạo</th>
                             <th scope="col">Trạng thái</th>
@@ -31,16 +41,19 @@ const GetAllBill = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <th scope="row">1</th>
-                            <td>ảnh</td>
-                            <td>tên</td>
-                            <td>giá</td>
-                            <td>số lượng</td>
-                            <td>Tổng tiền</td>
-                            <td>Ngày tạo</td>
-                            <td>Thao tác</td>
-                        </tr>
+                        {cartData.map((item, index) => (
+                            <tr key={item.cartId}>
+                                <th scope="row">{index + 1}</th>
+                                <td>{item.quantity}</td>
+                                <td>{item.productDetailName}</td>
+                                <td>{item.price}</td>
+                                <td>{item.status}</td>
+                                <td>
+                                    <button className='btn btn-primary'>chỉnh sửa</button>|
+                                    <button className='btn btn-warning'>xóa</button>
+                                </td>
+                            </tr>
+                        ))}
                     </tbody>
                 </table>
             </div>
@@ -48,4 +61,4 @@ const GetAllBill = () => {
     )
 }
 
-export default GetAllBill
+export default GetAllBill;

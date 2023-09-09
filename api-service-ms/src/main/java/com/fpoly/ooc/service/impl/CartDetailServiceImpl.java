@@ -6,63 +6,55 @@ import com.fpoly.ooc.entity.CartDetail;
 import com.fpoly.ooc.entity.ProductDetail;
 import com.fpoly.ooc.repository.interfaces.CartDetailRepo;
 import com.fpoly.ooc.repository.interfaces.CartRepo;
+import com.fpoly.ooc.request.CartDetailRequest;
 import com.fpoly.ooc.request.CartRequest;
-import com.fpoly.ooc.responce.CartResponse;
 import com.fpoly.ooc.service.interfaces.CartDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class CartDetailServiceImpl implements CartDetailService {
 
     @Autowired
-    private CartDetailRepo cartDetailRepo;
-
-    @Autowired
     private CartRepo cartRepo;
 
+    @Autowired
+    private CartDetailRepo cartDetailRepo;
+
     @Override
-    public Page<CartResponse> getAll(Integer pageNo, Integer size) {
-        return cartDetailRepo.getAllCart(PageRequest.of(pageNo, size));
+    public List<Cart> getAll() {
+        return cartRepo.findAll();
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public CartDetail createCartDetail(CartRequest request) {
+    public Cart createCartDetail(CartRequest request) {
 
-        Account accountBuilder = null;
-
+        Cart cart = new Cart();
         if (request.getAccountId() != null) {
-            accountBuilder = Account.builder().username(request.getAccountId()).build();
+            cart.setAccount(Account.builder().username(request.getAccountId()).build());
         }
 
-        Cart cart = Cart.builder()
-                .account(accountBuilder)
-                .status("active")
-                .build();
+        for (CartDetailRequest cartDetailRequest : request.getLstCartDetail()) {
+            CartDetail cartDetail = CartDetail.builder()
+                    .productDetail(ProductDetail.builder()
+                            .id(cartDetailRequest.getProductDetailId())
+                            .build())
+                    .cart(cart)
+                    .quantity(cartDetailRequest.getQuantity())
+                    .build();
 
-        cartRepo.save(cart);
+            cartDetailRepo.save(cartDetail);
+        }
 
-        CartDetail cartDetail = CartDetail.builder()
-                .cart(cart)
-                .productDetail(ProductDetail.builder().id(request.getProductDetailId()).build())
-                .status("waiting")
-                .quantity(request.getQuantity())
-                .build();
-
-        return cartDetailRepo.save(cartDetail);
+        return cartRepo.save(cart);
     }
 
     @Override
     public CartDetail updateCartDetail(Long id, CartRequest request) {
-        CartDetail cartDetail = cartDetailRepo.findById(id).orElse(null);
-        if (cartDetail == null) {
-            throw new IllegalArgumentException("");
-        }
-
         return null;
     }
 
@@ -70,6 +62,4 @@ public class CartDetailServiceImpl implements CartDetailService {
     public void deleteCartDetail(Long id) {
 
     }
-
-
 }

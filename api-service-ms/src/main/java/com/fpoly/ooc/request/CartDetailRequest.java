@@ -6,17 +6,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @Builder
-public class CartRequest {
+public class CartDetailRequest {
 
-    private String accountId;
+    private Long productDetailId;
 
-    private List<CartDetailRequest> lstCartDetail;
+    private Integer quantity;
 
 }

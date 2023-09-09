@@ -1,6 +1,7 @@
 package com.fpoly.ooc.repository.interfaces;
 
 import com.fpoly.ooc.entity.Cart;
+import com.fpoly.ooc.entity.CartDetail;
 import com.fpoly.ooc.responce.CartResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -17,4 +18,5 @@ public interface CartRepo extends JpaRepository<Cart, Long> {
             "JOIN cd.productDetail pd " +
             "JOIN pd.product p")
     List<CartResponse> getAll();
+
 }

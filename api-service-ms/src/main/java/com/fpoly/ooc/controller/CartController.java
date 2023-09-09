@@ -21,8 +21,8 @@ public class CartController {
     private CartDetailService cartDetailService;
 
     @GetMapping("")
-    public ResponseEntity<?> getAll(@RequestParam(name = "page", defaultValue = "0") Integer page) {
-        return ResponseEntity.ok(cartDetailService.getAll(page, 5));
+    public ResponseEntity<?> getAll() {
+        return ResponseEntity.ok(cartDetailService.getAll());
     }
 
     @PostMapping("")

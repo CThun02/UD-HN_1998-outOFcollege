@@ -46,6 +46,11 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
     }
 
     @Override
+    public List<ProductDetailResponse> findProductDetailByIdDiscount(Long idDiscount) {
+        return repo.findProductDetailByIdDiscount(idDiscount);
+    }
+
+    @Override
     public ProductDetail create(ProductDetail productDetail) {
         return repo.save(productDetail);
     }

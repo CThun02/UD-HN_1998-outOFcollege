@@ -1,4 +1,4 @@
-package com.fpoly.ooc.repository.interfaces;
+package com.fpoly.ooc.repository;
 
 import com.fpoly.ooc.entity.Voucher;
 import com.fpoly.ooc.responce.voucher.VoucherResponse;
@@ -16,13 +16,16 @@ public interface VoucherRepository extends JpaRepository<Voucher, Long> {
     @Query("select new com.fpoly.ooc.responce.voucher.VoucherResponse(voucher.id, voucher.voucherCode, " +
             "voucher.voucherName, voucher.startDate, voucher.endDate, voucher.voucherValue, " +
             "voucher.voucherValueMax, voucher.voucherMethod, voucher.voucherCondition, " +
-            "voucher.limitQuantity, voucher.permission) from Voucher voucher ")
+            "voucher.limitQuantity, voucher.permission) from Voucher voucher " +
+            "where voucher.status = com.fpoly.ooc.constant.Const.VOUCHER_STATUS_ACTIVE")
     List<VoucherResponse> findAllVoucher();
 
     @Query("select new com.fpoly.ooc.responce.voucher.VoucherResponse(voucher.id, voucher.voucherCode, " +
             "voucher.voucherName, voucher.startDate, voucher.endDate, voucher.voucherValue, " +
             "voucher.voucherValueMax, voucher.voucherMethod, voucher.voucherCondition, " +
-            "voucher.limitQuantity, voucher.permission) from Voucher voucher ")
+            "voucher.limitQuantity, voucher.permission) from Voucher voucher " +
+            "where voucher.status = com.fpoly.ooc.constant.Const.VOUCHER_STATUS_ACTIVE")
     Page<VoucherResponse> pageAllVoucher(Pageable pageable);
 
 }
+

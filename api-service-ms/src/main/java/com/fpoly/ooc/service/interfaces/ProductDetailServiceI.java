@@ -10,8 +10,9 @@ public interface ProductDetailServiceI {
     public ProductDetail create(ProductDetail productDetail);
     public ProductDetail update(ProductDetail productDetail);
     public Boolean delete(Long id);
-    public List<ProductDetail> getAll();
+    public List<ProductDetailResponse> getAll();
     public ProductDetail getOne(Long id);
     public ProductDetailResponse getProductDetail(Long id);
     public List<ProductDetailSizeResponse> getProductDetailColorSizeByIdP(Long id);
+    public ProductDetailSizeResponse getProductDetailColorSizeByIdPNIdSize(Long id, Long idSize);
 }

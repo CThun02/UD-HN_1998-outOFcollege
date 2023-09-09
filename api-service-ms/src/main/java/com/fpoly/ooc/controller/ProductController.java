@@ -53,10 +53,19 @@ public class ProductController {
         return ResponseEntity.ok(productDetailService.getProductDetail(id));
     }
 
-
     @GetMapping("/detailcolorsize")
-    public List<ProductDetailSizeResponse> getProductDetailColorSizeByIdPAndSizeId(@RequestParam Long productId){
+    public List<ProductDetailSizeResponse> getProductDetailColorSizeByIdP(@RequestParam Long productId){
         return productDetailService.getProductDetailColorSizeByIdP(productId);
+    }
+
+    @GetMapping("/getallproductdetail")
+    public List<ProductDetailResponse> getAllProductDetail(){
+        return productDetailService.getAll();
+    }
+
+    @GetMapping("/detailcolorbyidsizenidpro")
+    public ProductDetailSizeResponse getProductDetailColorSizeByIdPAndSizeId(@RequestParam Long productId, @RequestParam Long sizeId){
+        return productDetailService.getProductDetailColorSizeByIdPNIdSize(productId, sizeId);
     }
 
     @GetMapping("/{id}")
@@ -72,7 +81,9 @@ public class ProductController {
     @PutMapping("/update")
     public ResponseEntity<?> updateproduct(@RequestParam(name = "id") Long id, @RequestBody ProductRequest request){
         request.setId(id);
-        return ResponseEntity.ok(service.update(request.dto()));
+        System.out.println(request);
+
+        return null;
     }
 
     @PostMapping("/createproductdetail")

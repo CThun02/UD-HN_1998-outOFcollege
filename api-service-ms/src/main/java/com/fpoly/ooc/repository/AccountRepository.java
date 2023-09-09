@@ -1,7 +1,7 @@
 package com.fpoly.ooc.repository;
 
 import com.fpoly.ooc.entity.Account;
-import com.fpoly.ooc.responce.account.AccountResponce;
+import com.fpoly.ooc.responce.AccountResponce;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,7 +15,7 @@ public interface AccountRepository extends JpaRepository<Account, String> {
             "FROM Account acc join acc.role r")
     Page<AccountResponce> phanTrang(Pageable pageable);
 
-//    @Query("SELECT new com.fpoly.ooc.responce.account.AccountResponce(acc.fullName,acc.cccd,acc.numberPhone,acc.email,acc.dob)" +
+//    @Query("SELECT new com.fpoly.ooc.responce.AccountResponce(acc.fullName,acc.cccd,acc.numberPhone,acc.email,acc.dob)" +
 //            "FROM Account acc")
 //    List<AccountResponce>seach(String usename);
 }

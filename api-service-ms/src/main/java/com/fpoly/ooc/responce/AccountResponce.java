@@ -1,4 +1,4 @@
-package com.fpoly.ooc.responce.account;
+package com.fpoly.ooc.responce;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

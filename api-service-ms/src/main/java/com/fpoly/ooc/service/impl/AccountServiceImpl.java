@@ -4,8 +4,8 @@ import com.fpoly.ooc.entity.Account;
 import com.fpoly.ooc.entity.Address;
 import com.fpoly.ooc.entity.AddressDetail;
 import com.fpoly.ooc.repository.AccountRepository;
-import com.fpoly.ooc.request.account.AccountRequest;
-import com.fpoly.ooc.responce.account.AccountResponce;
+import com.fpoly.ooc.request.AccountRequest;
+import com.fpoly.ooc.responce.AccountResponce;
 import com.fpoly.ooc.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -34,8 +34,9 @@ public class AccountServiceImpl implements AccountService {
                 .numberPhone(request.getNumberPhone())
                 .email(request.getEmail())
                 .dob(request.getDob())
+                .gender(request.getGender())
                 .addressDetail(AddressDetail.builder().address(Address.builder().city(request.getCity()).build()).build())
-                .addressDetail(AddressDetail.builder().address(Address.builder().distrit(request.getDistrit()).build()).build())
+                .addressDetail(AddressDetail.builder().address(Address.builder().distrit(request.getDistrict()).build()).build())
                 .addressDetail(AddressDetail.builder().address(Address.builder().ward(request.getWard()).build()).build())
                 .addressDetail(AddressDetail.builder().address(Address.builder().street(request.getStreet()).build()).build())
                 .addressDetail(AddressDetail.builder().address(Address.builder().descriptionDetail(request.getDescriptionDetail()).build()).build())
@@ -54,8 +55,9 @@ public class AccountServiceImpl implements AccountService {
             o.setNumberPhone(request.getNumberPhone());
             o.setEmail(request.getEmail());
             o.setDob(request.getDob());
+            o.setGender(request.getGender());
             o.setAddressDetail(AddressDetail.builder().address(Address.builder().city(request.getCity()).build()).build());
-            o.setAddressDetail(AddressDetail.builder().address(Address.builder().distrit(request.getDistrit()).build()).build());
+            o.setAddressDetail(AddressDetail.builder().address(Address.builder().distrit(request.getDistrict()).build()).build());
             o.setAddressDetail(AddressDetail.builder().address(Address.builder().ward(request.getWard()).build()).build());
             o.setAddressDetail(AddressDetail.builder().address(Address.builder().street(request.getStreet()).build()).build());
             o.setAddressDetail(AddressDetail.builder().address(Address.builder().descriptionDetail(request.getDescriptionDetail()).build()).build());

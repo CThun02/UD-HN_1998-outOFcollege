@@ -1,4 +1,4 @@
-package com.fpoly.ooc.request.account;
+package com.fpoly.ooc.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,9 +25,11 @@ public class AccountRequest {
 
     private Date dob;
 
+    private Integer gender;
+
     private String city;
 
-    private String distrit;
+    private String district;
 
     private String ward;
 

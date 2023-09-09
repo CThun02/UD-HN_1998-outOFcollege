@@ -14,4 +14,6 @@ public interface ProductDetailServiceI {
     public ProductDetail getOne(Long id);
     public ProductDetailResponse getProductDetail(Long id);
     public List<ProductDetailColorSizeResponse> getProductDetailColorSizeByIdPD(Long id);
+
+    List<com.fpoly.ooc.responce.product.ProductDetailResponse> findProductDetailByIdDiscount(Long idDiscount);
 }

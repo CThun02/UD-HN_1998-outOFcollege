@@ -6,6 +6,7 @@ import com.fpoly.ooc.responce.ProductDetailColorSizeResponse;
 import com.fpoly.ooc.responce.ProductDetailResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -20,4 +21,16 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
     @Query("select od.id as productDetailId, od.size.id as sizeId, od.color.id as colorId, od.quantity as quantity" +
             ", od.price as price from ProductDetail od where od.id = ?1")
     public List<ProductDetailColorSizeResponse> getProductDetailColorSizeByIdPD(Long id);
+
+    @Query("select new com.fpoly.ooc.responce.product.ProductDetailResponse(" +
+            "pd.id, pd.product, pd.pattern, pd.button, pd.material, pd.collar, " +
+            "pd.sleeve, pd.size, pd.color, pd.form, pd.shirtTail, pd.price, " +
+            "pd.quantity, pd.descriptionDetail, pd.status, pd.createdAt, pd.createdBy, " +
+            "pd.updatedAt, pd.updatedBy, pd.deletedAt) " +
+            "from ProductDetail pd " +
+            "join DiscountProduct dp on pd.id = dp.productDetailId.id " +
+            "join Discount d on dp.discountId.id = d.id " +
+            "where d.id = :idDiscount")
+    List<com.fpoly.ooc.responce.product.ProductDetailResponse> findProductDetailByIdDiscount(Long idDiscount);
+
 }

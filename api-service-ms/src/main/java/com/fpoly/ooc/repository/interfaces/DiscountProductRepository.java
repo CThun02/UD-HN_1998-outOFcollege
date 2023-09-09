@@ -15,22 +15,6 @@ import java.util.List;
 @Repository
 public interface DiscountProductRepository extends JpaRepository<DiscountProduct, Long> {
 
-    @Query("select new com.fpoly.ooc.responce.promition.DiscountProductResponse(" +
-            "dp.id, d.discountCode, d.discountName, d.startDate, d.endDate, d.discountValue, " +
-            "d.discountMaxValue, d.discountMethod, d.discountCondition, " +
-            "(select dp from ProductDetail pd join DiscountProduct dp on pd.id = dp.productDetailId.id " +
-            "where dp.discountId.id = :idDiscount)) " +
-            "from DiscountProduct dp " +
-            "join Discount  d on d.id = dp.discountId.id")
-    List<DiscountProductResponse> findAllDiscountProduct(@Param("idDiscount") Long idDiscount);
-
-    @Query("select new com.fpoly.ooc.responce.promition.DiscountProductResponse(" +
-            "dp.id, d.discountCode, d.discountName, d.startDate, d.endDate, d.discountValue, " +
-            "d.discountMaxValue, d.discountMethod, d.discountCondition, " +
-            "(select dp from ProductDetail pd join DiscountProduct dp on pd.id = dp.productDetailId.id " +
-            "where dp.discountId.id = :idDiscount)) " +
-            "from DiscountProduct dp " +
-            "join Discount  d on d.id = dp.discountId.id")
-    Page<DiscountProductResponse> pageAllDiscountProduct(@Param("idDiscount") Long idDiscount, Pageable pageable);
+    List<DiscountProduct> findDiscountProductByDiscountIdId(Long idDiscount);
 
 }

@@ -1,5 +1,6 @@
 package com.fpoly.ooc.responce.promition;
 
+import com.fpoly.ooc.entity.DiscountProduct;
 import com.fpoly.ooc.entity.ProductDetail;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,8 +31,8 @@ public class DiscountProductResponse {
 
     private String discountMethod;
 
-    private String discountCondition;
+    private BigDecimal discountCondition;
 
-    private List<ProductDetail> productDetailList;
+    private List<ProductDetail> discountProductList;
 
 }

@@ -29,6 +29,11 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
     }
 
     @Override
+    public List<com.fpoly.ooc.responce.product.ProductDetailResponse> findProductDetailByIdDiscount(Long idDiscount) {
+        return repo.findProductDetailByIdDiscount(idDiscount);
+    }
+
+    @Override
     public ProductDetail create(ProductDetail productDetail) {
         return repo.save(productDetail);
     }

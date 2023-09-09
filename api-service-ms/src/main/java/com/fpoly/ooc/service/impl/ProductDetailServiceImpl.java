@@ -1,12 +1,11 @@
 package com.fpoly.ooc.service.impl;
 
-import com.fpoly.ooc.entity.Color;
 import com.fpoly.ooc.entity.ProductDetail;
 import com.fpoly.ooc.entity.Size;
 import com.fpoly.ooc.repository.ProductDetailDAORepositoryI;
-import com.fpoly.ooc.responce.Product.ProductDetailColorResponse;
-import com.fpoly.ooc.responce.Product.ProductDetailResponse;
-import com.fpoly.ooc.responce.Product.ProductDetailSizeResponse;
+import com.fpoly.ooc.responce.product.ProductDetailColorResponse;
+import com.fpoly.ooc.responce.product.ProductDetailResponse;
+import com.fpoly.ooc.responce.product.ProductDetailSizeResponse;
 import com.fpoly.ooc.service.interfaces.ProductDetailServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,7 +16,6 @@ import java.util.Optional;
 
 @Service
 public class ProductDetailServiceImpl implements ProductDetailServiceI {
-
     @Autowired
     private ProductDetailDAORepositoryI repo;
 
@@ -48,6 +46,11 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
     }
 
     @Override
+    public List<ProductDetailResponse> findProductDetailByIdDiscount(Long idDiscount) {
+        return repo.findProductDetailByIdDiscount(idDiscount);
+    }
+
+    @Override
     public ProductDetail create(ProductDetail productDetail) {
         return repo.save(productDetail);
     }
@@ -73,7 +76,7 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
     }
 
     @Override
-    public List<ProductDetailResponse> getAll() {
+    public List<ProductDetailResponse> getAllProductDetailResponse() {
         return repo.getAllProductDetail();
     }
 
@@ -81,5 +84,10 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
     public ProductDetail getOne(Long id) {
         Optional<ProductDetail> productDetailOptional = repo.findById(id);
         return productDetailOptional.orElse(null);
+    }
+
+    @Override
+    public List<ProductDetail> getProductDetailsByIdPro(Long id) {
+        return repo.getProductDetailByIdPro(id);
     }
 }

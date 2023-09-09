@@ -1,4 +1,4 @@
-package com.fpoly.ooc.repository.interfaces;
+package com.fpoly.ooc.repository;
 
 import com.fpoly.ooc.entity.Discount;
 import com.fpoly.ooc.responce.promition.DiscountResponse;
@@ -26,3 +26,4 @@ public interface DiscountRepository extends JpaRepository<Discount, Long> {
     Page<DiscountResponse> pageAllDiscount(Pageable pageable);
 
 }
+

@@ -1,17 +1,12 @@
 package com.fpoly.ooc.controller;
 
-import com.fpoly.ooc.entity.Color;
-import com.fpoly.ooc.entity.ProductDetail;
-import com.fpoly.ooc.entity.Size;
-import com.fpoly.ooc.request.Product.ProductDetailColorSizeRequest;
-import com.fpoly.ooc.request.Product.ProductDetailRequest;
-import com.fpoly.ooc.request.Product.ProductRequest;
-import com.fpoly.ooc.responce.Product.*;
-import com.fpoly.ooc.service.impl.ColorServiceImpl;
+import com.fpoly.ooc.entity.*;
+import com.fpoly.ooc.request.product.ProductDetailColorSizeRequest;
+import com.fpoly.ooc.request.product.ProductDetailRequest;
+import com.fpoly.ooc.request.product.ProductRequest;
+import com.fpoly.ooc.responce.product.*;
 import com.fpoly.ooc.service.impl.ProductDetailServiceImpl;
 import com.fpoly.ooc.service.impl.ProductServiceImpl;
-import com.fpoly.ooc.service.impl.SizeServiceImpl;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -25,16 +20,11 @@ public class ProductController {
 
     private ProductServiceImpl service;
     private ProductDetailServiceImpl productDetailService;
-    private ColorServiceImpl colorService;
-    private SizeServiceImpl sizeService;
-    private HttpServletResponse response;
 
     @Autowired
-    public ProductController(ProductServiceImpl service, ProductDetailServiceImpl productDetailService, ColorServiceImpl colorService, SizeServiceImpl sizeService) {
+    public ProductController(ProductServiceImpl service, ProductDetailServiceImpl productDetailService) {
         this.service = service;
         this.productDetailService = productDetailService;
-        this.colorService = colorService;
-        this.sizeService = sizeService;
     }
 
     @GetMapping("/data")
@@ -60,7 +50,7 @@ public class ProductController {
 
     @GetMapping("/getallproductdetail")
     public List<ProductDetailResponse> getAllProductDetail(){
-        return productDetailService.getAll();
+        return productDetailService.getAllProductDetailResponse();
     }
 
     @GetMapping("/detailcolorbyidsizenidpro")
@@ -81,9 +71,25 @@ public class ProductController {
     @PutMapping("/update")
     public ResponseEntity<?> updateproduct(@RequestParam(name = "id") Long id, @RequestBody ProductRequest request){
         request.setId(id);
-        System.out.println(request);
+        return ResponseEntity.ok(service.update(request.dto()));
+    }
 
-        return null;
+    @PutMapping("/updateproductdetail")
+    public ResponseEntity<?> updateProductDetail( @RequestBody ProductDetailRequest request){
+        productDetailService.update(request.dto());
+        List<ProductDetail> productDetailListUpdate = productDetailService.getProductDetailsByIdPro(request.getProductId());
+        for (ProductDetail productDetail: productDetailListUpdate) {
+            productDetail.setPattern(Pattern.builder().id(request.getPatternId()).build());
+            productDetail.setButton(ButtonType.builder().id(request.getButtonId()).build());
+            productDetail.setMaterial((Material.builder().id(request.getMaterialId()).build()) );
+            productDetail.setShirtTail(ShirtTailType.builder().id(request.getShirtTailId()).build());
+            productDetail.setCollar(CollarType.builder().id(request.getCollarId()).build());
+            productDetail.setForm(Form.builder().id(request.getFormId()).build());
+            productDetail.setSleeve(SleeveType.builder().id(request.getSleeveId()).build());
+            productDetail.setDescriptionDetail(request.getDescriptionDetail());
+            productDetailService.update(productDetail);
+        }
+        return ResponseEntity.ok("ok");
     }
 
     @PostMapping("/createproductdetail")

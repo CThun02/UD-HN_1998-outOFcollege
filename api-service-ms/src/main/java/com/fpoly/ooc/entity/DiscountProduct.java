@@ -10,14 +10,22 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 
-@Data
+@EqualsAndHashCode(callSuper = true)
+@Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Table(name = "discount_product")
 @Entity
 public class DiscountProduct extends BaseEntity{

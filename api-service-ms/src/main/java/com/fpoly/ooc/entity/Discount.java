@@ -11,18 +11,22 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Data
+@EqualsAndHashCode(callSuper = true)
+@Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@ToString
 @Table(name = "discount")
 @Entity
 public class Discount extends BaseEntity {

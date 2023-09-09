@@ -1,4 +1,4 @@
-package com.fpoly.ooc.responce.Product;
+package com.fpoly.ooc.responce.product;
 import lombok.Builder;
 
 import java.util.List;

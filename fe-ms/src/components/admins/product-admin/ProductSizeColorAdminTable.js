@@ -9,35 +9,12 @@ import ProductSizeColorAdminDetail from "./ProductSizeColorAdminDetail";
 import ProductSizeColorAdminUpdate from "./ProductColorSizeAdminUpdate";
 
 function ProductSizeColorAdminTable() {
-  var list = [];
-  const { productId } = useParams();
   const api = "http://localhost:8080/admin/api/";
 
-  //display sizecolor create  frame
-  const displaySizeColorCreate = function () {
-    var dis = document.getElementById("sizeColorFrame");
-    dis.classList.remove("d-none");
-  };
-
-  const displaySizeColorUpdate = function (index, event) {
-    productDetailColorSizeChange(
-      productDetailColorSizes[isNaN(index) === true ? 0 : false]
-    );
-    var dis = document.getElementById("sizeColorFrameUpdate");
-    dis.classList.remove("d-none");
-    productDetailColorSizeChange(productDetailColorSizes[index]);
-  };
-
-  //display sizecolor detail frame
-  const displaySizeColorDetail = function (index, event) {
-    productDetailColorSizeChange(
-      productDetailColorSizes[isNaN(index) === true ? 0 : false]
-    );
-    var dis = document.getElementById("sizeColorDetailFrame");
-    dis.classList.remove("d-none");
-    productDetailColorSizeChange(productDetailColorSizes[index]);
-  };
-  const [productDetail, productDetailChange] = useState({
+  const { productId } = useParams();
+  const [count, setcount] = useState(0);
+  const [sizeIdUpdate, setSizeIdUpdate] = useState(null);
+  const [productDetail, setProductDetail] = useState({
     id: undefined,
     productId: undefined,
     patternId: undefined,
@@ -74,6 +51,41 @@ function ProductSizeColorAdminTable() {
   );
   const [sizes, sizesChange] = useState(null);
   const [colors, colorsChange] = useState(null);
+  var list = [];
+
+  //fucntion
+  //display sizecolor create  frame
+  const displaySizeColorCreate = function () {
+    var dis = document.getElementById("sizeColorFrame");
+    dis.classList.remove("d-none");
+  };
+
+  //display sizecolor update frame
+  const displaySizeColorUpdate = function (index, event, sizeId) {
+    setSizeIdUpdate(sizeId);
+    productDetailColorSizeChange(
+      productDetailColorSizes[isNaN(index) === true ? 0 : index]
+    );
+    var dis = document.getElementById("sizeColorFrameUpdate");
+    dis.classList.remove("d-none");
+  };
+
+  //display sizecolor detail frame
+  const displaySizeColorDetail = function (index, event) {
+    productDetailColorSizeChange(
+      productDetailColorSizes[isNaN(index) === true ? 0 : index]
+    );
+    var dis = document.getElementById("sizeColorDetailFrame");
+    dis.classList.remove("d-none");
+  };
+
+  const ProductDetailChange = (name, value) => {
+    setProductDetail((prevProductDetail) => ({
+      ...prevProductDetail,
+      [name]: value,
+    }));
+  };
+
   //lấy dữ liệu size và color được chọn gửi về server
   function sizeChecked() {
     //Lấy ra ô check của size
@@ -103,32 +115,47 @@ function ProductSizeColorAdminTable() {
         }
       }
     }
-    axios
-      .post(
-        api + "product/createproductdetail/colorsize/" + productDetail.id,
-        list
-      )
-      .then((response) => {
-        console.log(response);
-        axios
-          .get(api + "product/detailcolorsize?productId=" + productId)
-          .then((response) => {
-            productDetailColorSizesChange(response.data);
-          })
-          .catch((error) => {
-            console.log(error.message);
-          });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    if (list.length !== 0) {
+      axios
+        .post(
+          api + "product/createproductdetail/colorsize/" + productDetail.id,
+          list
+        )
+        .then((response) => {
+          console.log(response);
+          axios
+            .get(api + "product/detailcolorsize?productId=" + productId)
+            .then((response) => {
+              productDetailColorSizesChange(response.data);
+              setcount(count + 1);
+            })
+            .catch((error) => {
+              console.log(error.message);
+            });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
   }
 
   useEffect(() => {
     axios
       .get(api + "product/detail/" + productId)
       .then((response) => {
-        productDetailChange(response.data);
+        ProductDetailChange("productId", response.data.product.id);
+        ProductDetailChange("patternId", response.data.pattern.id);
+        ProductDetailChange("buttonId", response.data.button.id);
+        ProductDetailChange("materialId", response.data.material.id);
+        ProductDetailChange("collarId", response.data.collar.id);
+        ProductDetailChange("sleeveId", response.data.sleeve.id);
+        ProductDetailChange("formId", response.data.form.id);
+        ProductDetailChange("shirtTailId", response.data.shirtTail.id);
+        ProductDetailChange("price", response.data.price);
+        ProductDetailChange(
+          "descriptionDetail",
+          response.data.descriptionDetail
+        );
       })
       .catch((error) => {
         console.log(error.message);
@@ -157,7 +184,7 @@ function ProductSizeColorAdminTable() {
       .catch((err) => {
         console.error(err);
       });
-  }, [productId]);
+  }, [productId, count]);
 
   return (
     <div className={`${styles.radiusFrame} mt-5 col-lg-10 offset-md-1`}>
@@ -171,7 +198,9 @@ function ProductSizeColorAdminTable() {
       <ProductSizeColorAdminUpdate
         productDetail={productDetail}
         productDetailColorSizeDetail={productDetailColorSizeDetail}
+        effect={productDetailColorSizesChange}
         colors={colors}
+        sizeId={sizeIdUpdate}
       ></ProductSizeColorAdminUpdate>
       <ProductSizeColorAdminDetail
         productDetailColorSizeDetail={productDetailColorSizeDetail}
@@ -240,7 +269,7 @@ function ProductSizeColorAdminTable() {
                           action={
                             (index,
                             (event) => {
-                              displaySizeColorUpdate(index, event);
+                              displaySizeColorUpdate(index, event, item.sizeId);
                             })
                           }
                           className={styles.btnCRUD}

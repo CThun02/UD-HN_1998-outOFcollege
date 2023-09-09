@@ -1,6 +1,8 @@
 package com.fpoly.ooc.service.impl;
 
 import com.fpoly.ooc.entity.Account;
+import com.fpoly.ooc.entity.Address;
+import com.fpoly.ooc.entity.AddressDetail;
 import com.fpoly.ooc.repository.AccountRepository;
 import com.fpoly.ooc.request.AccountRequest;
 import com.fpoly.ooc.responce.AccountResponce;
@@ -8,7 +10,11 @@ import com.fpoly.ooc.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
+@Service
 public class AccountServiceImpl implements AccountService {
 
     @Autowired
@@ -26,16 +32,48 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Account save(AccountRequest request) {
-        return null;
+        Account account = Account.builder()
+                .userName(request.getUserName())
+                .fullName(request.getFullName())
+                .cccd(request.getIdNo())
+                .numberPhone(request.getNumberPhone())
+                .email(request.getEmail())
+                .dob(request.getDob())
+                .gender(request.getGender())
+                .addressDetail(AddressDetail.builder().address(Address.builder().city(request.getCity()).build()).build())
+                .addressDetail(AddressDetail.builder().address(Address.builder().distrit(request.getDistrict()).build()).build())
+                .addressDetail(AddressDetail.builder().address(Address.builder().ward(request.getWard()).build()).build())
+                .addressDetail(AddressDetail.builder().address(Address.builder().street(request.getStreet()).build()).build())
+                .addressDetail(AddressDetail.builder().address(Address.builder().descriptionDetail(request.getDescriptionDetail()).build()).build())
+                .avatar(request.getImage())
+                .build();
+
+        return account;
     }
 
     @Override
     public Account update(AccountRequest request, String userName) {
+        Optional<Account> account = accountRepository.findById(userName);
+        account.map(o -> {
+            o.setFullName(request.getFullName());
+            o.setCccd(request.getIdNo());
+            o.setNumberPhone(request.getNumberPhone());
+            o.setEmail(request.getEmail());
+            o.setDob(request.getDob());
+            o.setGender(request.getGender());
+            o.setAddressDetail(AddressDetail.builder().address(Address.builder().city(request.getCity()).build()).build());
+            o.setAddressDetail(AddressDetail.builder().address(Address.builder().distrit(request.getDistrict()).build()).build());
+            o.setAddressDetail(AddressDetail.builder().address(Address.builder().ward(request.getWard()).build()).build());
+            o.setAddressDetail(AddressDetail.builder().address(Address.builder().street(request.getStreet()).build()).build());
+            o.setAddressDetail(AddressDetail.builder().address(Address.builder().descriptionDetail(request.getDescriptionDetail()).build()).build());
+            o.setAvatar(request.getImage());
+            return accountRepository.save(o);
+        }).orElse(null);
         return null;
     }
 
     @Override
     public void remove(String userName) {
-
+        accountRepository.deleteById(userName);
     }
 }

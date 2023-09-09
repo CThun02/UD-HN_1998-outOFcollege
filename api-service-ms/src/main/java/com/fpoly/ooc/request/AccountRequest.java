@@ -1,6 +1,5 @@
 package com.fpoly.ooc.request;
 
-import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,9 +25,11 @@ public class AccountRequest {
 
     private Date dob;
 
+    private Integer gender;
+
     private String city;
 
-    private String distrit;
+    private String district;
 
     private String ward;
 

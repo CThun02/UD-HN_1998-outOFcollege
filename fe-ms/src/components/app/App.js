@@ -9,6 +9,7 @@ import Sidebar from "../admins/sidebar/Sidebar";
 import Nav from "../admins/nav/Nav";
 import Statistics from "../admins/statistics/Statistics";
 import Promition from "../admins/promition/Promition";
+import AccountAdminIndex from "../admins/account/AccountAdminIndex";
 
 function App() {
   return (
@@ -60,6 +61,14 @@ function App() {
                 <Route
                   path="/controller/v1/admin/voucher"
                   element={<Promition />}
+                />
+                <Route
+                  path="/controller/v1/admin/customer"
+                  element={<AccountAdminIndex />}
+                />
+                <Route
+                  path="/controller/v1/admin/staff"
+                  element={<AccountAdminIndex />}
                 />
               </Routes>
             </div>

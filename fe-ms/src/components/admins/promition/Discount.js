@@ -12,6 +12,7 @@ function Discount({ data }) {
     discountMethod,
     discountCondition,
     status,
+    applyFor,
   } = data;
 
   return (
@@ -19,12 +20,13 @@ function Discount({ data }) {
       <th scope="row">1</th>
       <td>{discountName}</td>
       <td>
-        {discountValue} {`${discountMethod === "Money" ? "vnd" : "%"}`}
+        {discountValue} {`${discountMethod === "MONEY" ? "vnd" : "%"}`}
       </td>
       <td>
-        {discountMaxValue} {`${discountMethod === "Money" ? "vnd" : "%"}`}
+        {discountMaxValue} {`${discountMethod === "MONEY" ? "vnd" : "%"}`}
       </td>
       <td>{discountCondition}</td>
+      <td>{`${applyFor === "HOA_DON" ? "Hóa đơn" : "Sản phẩm"}`}</td>
       <td>{discountMethod}</td>
       <td>
         {startDate} - {endDate}

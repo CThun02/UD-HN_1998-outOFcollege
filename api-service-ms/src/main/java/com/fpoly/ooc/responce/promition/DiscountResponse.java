@@ -32,6 +32,8 @@ public class DiscountResponse {
 
     private String discountMethod;
 
+    private String applyFor;
+
     private BigDecimal discountCondition;
 
     private String status;

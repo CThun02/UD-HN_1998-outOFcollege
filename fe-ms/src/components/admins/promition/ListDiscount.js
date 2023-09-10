@@ -10,6 +10,7 @@ function ListDiscount({ children }) {
           <th scope="col">Giá trị giảm</th>
           <th scope="col">Giảm tối đa</th>
           <th scope="col">Điều kiện</th>
+          <th scope="col">Áp dụng</th>
           <th scope="col">Hình thức</th>
           <th scope="col">Thời gian</th>
           <th scope="col">Trạng thái</th>

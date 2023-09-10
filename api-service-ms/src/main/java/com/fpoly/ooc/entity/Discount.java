@@ -60,6 +60,9 @@ public class Discount extends BaseEntity {
     @Column(name = "discount_condition")
     private BigDecimal discountCondition;
 
+    @Column(name = "apply_for")
+    private String applyFor;
+
     @OneToMany(mappedBy = "discountId")
     private List<DiscountProduct> discountProductList;
 

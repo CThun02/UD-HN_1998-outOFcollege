@@ -27,6 +27,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Account save(AccountRequest request) {
+        // fix conflict
         Account account = Account.builder()
                 .userName(request.getUserName())
                 .fullName(request.getFullName())

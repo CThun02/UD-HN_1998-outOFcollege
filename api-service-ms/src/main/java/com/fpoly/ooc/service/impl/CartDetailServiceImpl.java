@@ -8,6 +8,7 @@ import com.fpoly.ooc.repository.CartDetailRepo;
 import com.fpoly.ooc.repository.CartRepo;
 import com.fpoly.ooc.request.CartDetailRequest;
 import com.fpoly.ooc.request.CartRequest;
+import com.fpoly.ooc.responce.CartResponse;
 import com.fpoly.ooc.service.interfaces.CartDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,18 +26,14 @@ public class CartDetailServiceImpl implements CartDetailService {
     private CartDetailRepo cartDetailRepo;
 
     @Override
-    public List<Cart> getAll() {
-        return cartRepo.findAll();
+    public List<CartResponse> getAll() {
+        return cartDetailRepo.getAllCart();
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Cart createCartDetail(CartRequest request) {
-
         Cart cart = new Cart();
-        if (request.getAccountId() != null) {
-            cart.setAccount(Account.builder().username(request.getAccountId()).build());
-        }
 
         for (CartDetailRequest cartDetailRequest : request.getLstCartDetail()) {
             CartDetail cartDetail = CartDetail.builder()
@@ -60,6 +57,6 @@ public class CartDetailServiceImpl implements CartDetailService {
 
     @Override
     public void deleteCartDetail(Long id) {
-
+         cartDetailRepo.deleteById(id);
     }
 }

@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -13,21 +14,23 @@ import java.math.BigDecimal;
 @Setter
 public class BillRequest {
 
-    private Long billId;
-
-    private Long billDetailId;
-
+//    private Long billId;
+//
+//    private Long billDetailId;
+//
     private String accountId;
-
-    private Long productDetailId;
-
-    private BigDecimal price;
-
-    private Integer quantity;
-
-    private String note;
-
-    private String status;
+//
+//    private Date dateOfReceipt;
+//
+//    private Date completionDate;
+//
+//    private BigDecimal price;
+//
+//    private BigDecimal priceReduce;
+//
+//    private String billType;
+//
+//    private String status;
 
 
 }

@@ -8,6 +8,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -32,9 +34,11 @@ public class Bill {
     private Long id;
 
     @Column(name = "date_of_receipt")
+    @Temporal(TemporalType.TIMESTAMP)
     private Date dateOfReceipt;
 
     @Column(name = "completion_date")
+    @Temporal(TemporalType.TIMESTAMP)
     private Date completionDate;
 
     @Column(name = "price")

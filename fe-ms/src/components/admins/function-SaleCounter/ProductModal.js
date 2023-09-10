@@ -1,10 +1,23 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { getAllProduct } from './service';
 
 const ProductModal = ({ showModal, handleCloseModal }) => {
 
     const handleModalClick = (event) => {
         event.stopPropagation();
     };
+
+    const [data, setData] = useState([]);
+
+    useEffect(() => {
+        getAllProduct()
+            .then((response) => {
+                setData(response.data);
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    }, []);
 
     return (
         <div className="modal-wrapper">
@@ -68,20 +81,26 @@ const ProductModal = ({ showModal, handleCloseModal }) => {
                                     <th scope="col">#</th>
                                     <th scope="col">Sản phẩm</th>
                                     <th scope="col">Số lượng</th>
-                                    <th scope="col">Tổng tiền</th>
+                                    <th scope="col">kích cỡ</th>
+                                    <th scope="col">đơn giá</th>
+                                    <th scope="col">màu sắc</th>
                                     <th scope="col">Thao tác</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <th scope="row">1</th>
-                                    <td>ảnh tên</td>
-                                    <td>số lượng</td>
-                                    <td>Tổng tiền</td>
-                                    <td>
-                                        <button className='btn btn-success'>Chọn</button>
-                                    </td>
-                                </tr>
+                                {data.map((item, index) => (
+                                    <tr key={index}>
+                                        <th scope="row">{index + 1}</th>
+                                        <td>{item.product.productName}</td>
+                                        <td>{item.quantity}</td>
+                                        <td>{item.size.sizeName}</td>
+                                        <td>{item.price}</td>
+                                        <td>{item.color.colorName}</td>
+                                        <td>
+                                            <button className='btn btn-success' >Chọn</button>
+                                        </td>
+                                    </tr>
+                                ))}
                             </tbody>
                         </table>
                     </div>

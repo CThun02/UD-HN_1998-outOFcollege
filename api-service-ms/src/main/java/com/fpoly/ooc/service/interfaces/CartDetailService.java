@@ -3,12 +3,13 @@ package com.fpoly.ooc.service.interfaces;
 import com.fpoly.ooc.entity.Cart;
 import com.fpoly.ooc.entity.CartDetail;
 import com.fpoly.ooc.request.CartRequest;
+import com.fpoly.ooc.responce.CartResponse;
 
 import java.util.List;
 
 public interface CartDetailService {
 
-    List<Cart> getAll();
+    List<CartResponse> getAll();
 
     Cart createCartDetail(CartRequest request);
 

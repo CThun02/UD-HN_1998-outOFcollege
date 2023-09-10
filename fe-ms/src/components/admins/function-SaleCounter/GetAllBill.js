@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react'
 import './css/style.css'
 import { Link } from "react-router-dom";
-import { getAll, createCart } from './service';
+import { getAllBill } from './service';
 
 const GetAllBill = () => {
-    const [cartData, setCartData] = useState([]);
+    const [billData, setBillDate] = useState([]);
 
     useEffect(() => {
-        getAll(0)
+        getAllBill()
             .then((response) => {
-                setCartData(response.data.content);
+                setBillDate(response.data);
             })
             .catch((error) => {
                 console.error(error);
@@ -41,12 +41,12 @@ const GetAllBill = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {cartData.map((item, index) => (
-                            <tr key={item.cartId}>
+                        {billData.map((item, index) => (
+                            <tr key={index}>
                                 <th scope="row">{index + 1}</th>
-                                <td>{item.quantity}</td>
                                 <td>{item.productDetailName}</td>
                                 <td>{item.price}</td>
+                                <td>{item.createDate}</td>
                                 <td>{item.status}</td>
                                 <td>
                                     <button className='btn btn-primary'>chỉnh sửa</button>|

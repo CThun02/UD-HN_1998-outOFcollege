@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -13,7 +14,11 @@ import java.math.BigDecimal;
 @Setter
 public class BillResponse {
 
-    private Long cartDetailId;
+    private Long billId;
+
+    private Long billDetailId;
+
+    private Long productDetailId;
 
     private Integer quantity;
 
@@ -22,5 +27,7 @@ public class BillResponse {
     private BigDecimal price;
 
     private String status;
+
+    private Date createDate;
 
 }

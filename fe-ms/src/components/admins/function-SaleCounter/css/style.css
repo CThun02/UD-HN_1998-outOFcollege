@@ -29,8 +29,8 @@
 
 .modal-wrapper {
   display: flex;
-  justify-content: center;
-  align-items: center;
+  /* justify-content: center; */
+  /* align-items: center; */
 }
 
 .modal-background {
@@ -61,7 +61,8 @@
   background: #555;
 }
 .modal-content {
-  max-width: 1200px;
+  margin-left: 300px;
+  max-width: 1000px;
   max-height: 80vh;
   border-radius: 10px;
   overflow-y: auto;

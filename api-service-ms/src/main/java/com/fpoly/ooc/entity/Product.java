@@ -12,7 +12,7 @@ import java.util.Date;
 @Table(name = "product")
 @Entity
 @Builder
-public class Product extends BaseEntity{
+public class Product extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -36,5 +36,5 @@ public class Product extends BaseEntity{
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "brand_id")
-    private  Brand brand;
+    private Brand brand;
 }

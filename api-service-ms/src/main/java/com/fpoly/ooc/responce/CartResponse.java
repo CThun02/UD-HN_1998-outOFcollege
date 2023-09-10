@@ -19,9 +19,11 @@ public class CartResponse {
 
     private Long cartDetailId;
 
+    private String productName;
+
     private Integer quantity;
 
-    private String productDetailName;
+    private Long productDetailId;
 
     private BigDecimal price;
 

@@ -16,13 +16,17 @@ public interface DiscountRepository extends JpaRepository<Discount, Long> {
     @Query("select new com.fpoly.ooc.responce.promition.DiscountResponse(" +
             "discount.id, discount.discountCode, discount.discountName, discount.startDate, " +
             "discount.endDate, discount.discountValue, discount.discountMaxValue, discount.discountMethod, " +
-            "discount.discountCondition, discount.status) from Discount discount ")
+            "discount.applyFor, discount.discountCondition, discount.status) " +
+            "from Discount discount " +
+            "order by discount.createdAt desc ")
     List<DiscountResponse> findAllDiscount();
 
     @Query("select new com.fpoly.ooc.responce.promition.DiscountResponse(" +
             "discount.id, discount.discountCode, discount.discountName, discount.startDate, " +
             "discount.endDate, discount.discountValue, discount.discountMaxValue, discount.discountMethod, " +
-            "discount.discountCondition, discount.status) from Discount discount ")
+            "discount.applyFor, discount.discountCondition, discount.status) " +
+            "from Discount discount " +
+            "order by discount.createdAt desc ")
     Page<DiscountResponse> pageAllDiscount(Pageable pageable);
 
 }

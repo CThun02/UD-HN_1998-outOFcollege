@@ -56,6 +56,7 @@ public class DiscountController {
     @PostMapping("/save")
     public ResponseEntity<?> addDiscount(@RequestBody DiscountRequest request) {
 
+        System.out.println("req: " + request);
         return ResponseEntity.ok(discountService.saveOrUpdate(request));
     }
 

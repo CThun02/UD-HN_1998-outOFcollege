@@ -3,6 +3,7 @@ package com.fpoly.ooc.service.impl;
 import com.fpoly.ooc.entity.Account;
 import com.fpoly.ooc.entity.Address;
 import com.fpoly.ooc.entity.AddressDetail;
+import com.fpoly.ooc.entity.Role;
 import com.fpoly.ooc.repository.AccountRepository;
 import com.fpoly.ooc.request.AccountRequest;
 import com.fpoly.ooc.responce.AccountResponce;
@@ -20,15 +21,11 @@ public class AccountServiceImpl implements AccountService {
     @Autowired
     private AccountRepository accountRepository;
 
-//    @Override
-//    public Page<AccountResponce> phanTrang(Integer pageNo, Integer size) {
-//        return accountRepository.phanTrang(PageRequest.of(pageNo, 5));
-//    }
-
     @Override
     public Page<AccountResponce> phanTrang(Integer pageNo, Integer size) {
-        return null;
+        return accountRepository.phanTrang(PageRequest.of(pageNo, 5));
     }
+
 
     @Override
     public Account save(AccountRequest request) {
@@ -40,6 +37,7 @@ public class AccountServiceImpl implements AccountService {
                 .email(request.getEmail())
                 .dob(request.getDob())
                 .gender(request.getGender())
+                .role(Role.builder().id(request.getRole()).build())
                 .addressDetail(AddressDetail.builder().address(Address.builder().city(request.getCity()).build()).build())
                 .addressDetail(AddressDetail.builder().address(Address.builder().distrit(request.getDistrict()).build()).build())
                 .addressDetail(AddressDetail.builder().address(Address.builder().distrit(request.getDistrict()).build()).build())

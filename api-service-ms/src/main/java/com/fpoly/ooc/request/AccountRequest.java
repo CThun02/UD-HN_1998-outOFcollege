@@ -27,6 +27,8 @@ public class AccountRequest {
 
     private Integer gender;
 
+    private Integer role;
+
     private String city;
 
     private String district;

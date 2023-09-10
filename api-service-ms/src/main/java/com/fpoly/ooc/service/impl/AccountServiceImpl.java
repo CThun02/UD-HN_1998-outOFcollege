@@ -20,14 +20,9 @@ public class AccountServiceImpl implements AccountService {
     @Autowired
     private AccountRepository accountRepository;
 
-//    @Override
-//    public Page<AccountResponce> phanTrang(Integer pageNo, Integer size) {
-//        return accountRepository.phanTrang(PageRequest.of(pageNo, 5));
-//    }
-
     @Override
     public Page<AccountResponce> phanTrang(Integer pageNo, Integer size) {
-        return null;
+        return accountRepository.phanTrang(PageRequest.of(pageNo, 5));
     }
 
     @Override
@@ -71,7 +66,7 @@ public class AccountServiceImpl implements AccountService {
         }).orElse(null);
         return null;
     }
-
+    
     @Override
     public void remove(String userName) {
         accountRepository.deleteById(userName);

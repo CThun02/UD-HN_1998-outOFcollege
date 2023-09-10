@@ -34,4 +34,6 @@ public class DiscountResponse {
 
     private BigDecimal discountCondition;
 
+    private String status;
+
 }

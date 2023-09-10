@@ -1,12 +1,10 @@
-import ButtonCRUD from "../button-crud/ButtonCRUD";
 import styles from "./ProductAdmin.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMinus, faPlus, faSearch } from "@fortawesome/free-solid-svg-icons";
-import { Link } from "react-router-dom";
+import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import ProductAdminFilter from "./ProductAdminFilter";
 import ProductAdminTable from "./ProductAdminTable";
 
-const App = function () {
+const ProductAdminIndex = function () {
   return (
     <div className={styles.product}>
       <div className={`col-10 offset-md-1 ${styles.radiusFrame}`}>
@@ -40,4 +38,4 @@ const App = function () {
   );
 };
 
-export default App;
+export default ProductAdminIndex;

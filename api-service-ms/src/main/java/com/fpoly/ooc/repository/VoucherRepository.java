@@ -1,4 +1,4 @@
-package com.fpoly.ooc.repository.interfaces;
+package com.fpoly.ooc.repository;
 
 import com.fpoly.ooc.entity.Voucher;
 import com.fpoly.ooc.responce.voucher.VoucherResponse;
@@ -28,3 +28,4 @@ public interface VoucherRepository extends JpaRepository<Voucher, Long> {
     Page<VoucherResponse> pageAllVoucher(Pageable pageable);
 
 }
+

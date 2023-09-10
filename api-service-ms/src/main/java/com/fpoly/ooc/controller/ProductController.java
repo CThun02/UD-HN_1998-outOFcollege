@@ -1,21 +1,12 @@
 package com.fpoly.ooc.controller;
 
-import com.fpoly.ooc.entity.Color;
-import com.fpoly.ooc.entity.Product;
-import com.fpoly.ooc.entity.ProductDetail;
-import com.fpoly.ooc.entity.Size;
-import com.fpoly.ooc.request.ProductDetailColorSizeRequest;
-import com.fpoly.ooc.request.ProductDetailRequest;
-import com.fpoly.ooc.request.ProductRequest;
-import com.fpoly.ooc.responce.ProductDetailColorSizeResponse;
-import com.fpoly.ooc.responce.ProductDetailResponse;
-import com.fpoly.ooc.responce.ProductResponse;
-import com.fpoly.ooc.responce.ProductResponseEdit;
-import com.fpoly.ooc.service.impl.ColorServiceImpl;
+import com.fpoly.ooc.entity.*;
+import com.fpoly.ooc.request.product.ProductDetailColorSizeRequest;
+import com.fpoly.ooc.request.product.ProductDetailRequest;
+import com.fpoly.ooc.request.product.ProductRequest;
+import com.fpoly.ooc.responce.product.*;
 import com.fpoly.ooc.service.impl.ProductDetailServiceImpl;
 import com.fpoly.ooc.service.impl.ProductServiceImpl;
-import com.fpoly.ooc.service.impl.SizeServiceImpl;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -23,22 +14,17 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 @RestController
-@CrossOrigin("*")
+@CrossOrigin(origins = "*")
 @RequestMapping("/admin/api/product")
 public class ProductController {
 
     private ProductServiceImpl service;
     private ProductDetailServiceImpl productDetailService;
-    private ColorServiceImpl colorService;
-    private SizeServiceImpl sizeService;
-    private HttpServletResponse response;
 
     @Autowired
-    public ProductController(ProductServiceImpl service, ProductDetailServiceImpl productDetailService, ColorServiceImpl colorService, SizeServiceImpl sizeService) {
+    public ProductController(ProductServiceImpl service, ProductDetailServiceImpl productDetailService) {
         this.service = service;
         this.productDetailService = productDetailService;
-        this.colorService = colorService;
-        this.sizeService = sizeService;
     }
 
     @GetMapping("/data")
@@ -57,10 +43,19 @@ public class ProductController {
         return ResponseEntity.ok(productDetailService.getProductDetail(id));
     }
 
+    @GetMapping("/detailcolorsize")
+    public List<ProductDetailSizeResponse> getProductDetailColorSizeByIdP(@RequestParam Long productId){
+        return productDetailService.getProductDetailColorSizeByIdP(productId);
+    }
 
-    @GetMapping("/detailcolorsize/{id}")
-    public List<ProductDetailColorSizeResponse> getProductDetailColorSize(@PathVariable Long id){
-        return productDetailService.getProductDetailColorSizeByIdPD(id);
+    @GetMapping("/getallproductdetail")
+    public List<ProductDetailResponse> getAllProductDetail(){
+        return productDetailService.getAllProductDetailResponse();
+    }
+
+    @GetMapping("/detailcolorbyidsizenidpro")
+    public ProductDetailSizeResponse getProductDetailColorSizeByIdPAndSizeId(@RequestParam Long productId, @RequestParam Long sizeId){
+        return productDetailService.getProductDetailColorSizeByIdPNIdSize(productId, sizeId);
     }
 
     @GetMapping("/{id}")
@@ -77,6 +72,24 @@ public class ProductController {
     public ResponseEntity<?> updateproduct(@RequestParam(name = "id") Long id, @RequestBody ProductRequest request){
         request.setId(id);
         return ResponseEntity.ok(service.update(request.dto()));
+    }
+
+    @PutMapping("/updateproductdetail")
+    public ResponseEntity<?> updateProductDetail( @RequestBody ProductDetailRequest request){
+        productDetailService.update(request.dto());
+        List<ProductDetail> productDetailListUpdate = productDetailService.getProductDetailsByIdPro(request.getProductId());
+        for (ProductDetail productDetail: productDetailListUpdate) {
+            productDetail.setPattern(Pattern.builder().id(request.getPatternId()).build());
+            productDetail.setButton(ButtonType.builder().id(request.getButtonId()).build());
+            productDetail.setMaterial((Material.builder().id(request.getMaterialId()).build()) );
+            productDetail.setShirtTail(ShirtTailType.builder().id(request.getShirtTailId()).build());
+            productDetail.setCollar(CollarType.builder().id(request.getCollarId()).build());
+            productDetail.setForm(Form.builder().id(request.getFormId()).build());
+            productDetail.setSleeve(SleeveType.builder().id(request.getSleeveId()).build());
+            productDetail.setDescriptionDetail(request.getDescriptionDetail());
+            productDetailService.update(productDetail);
+        }
+        return ResponseEntity.ok("ok");
     }
 
     @PostMapping("/createproductdetail")
@@ -101,5 +114,10 @@ public class ProductController {
             productDetailService.create(productDetailCreate);
         }
         return ResponseEntity.ok("OK");
+    }
+
+    @PutMapping("/updateproductdetailcolorsize")
+    public ResponseEntity<?> updateProductDetailColorSize(@RequestBody ProductDetailRequest productDetail){
+        return ResponseEntity.ok(productDetailService.update(productDetail.dto()));
     }
 }

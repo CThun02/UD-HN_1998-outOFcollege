@@ -4,18 +4,27 @@ import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 
 function ProductAdminForm({ ModuleName }) {
-  const { productDetailId } = useParams();
+  const api = "http://localhost:8080/admin/api/";
+
+  const { productId } = useParams();
 
   const navigate = useNavigate();
 
+  const [brands, brandsChange] = useState(null);
+  const [categories, categoriesChange] = useState(null);
+  const [patterns, patternsChange] = useState(null);
+  const [buttonTypes, buttonTypesChange] = useState(null);
+  const [materials, materialsChange] = useState(null);
+  const [shirtTailTypes, shirtTailTypesChange] = useState(null);
+  const [collarTypes, collarTypesChange] = useState(null);
+  const [forms, formsChange] = useState(null);
+  const [sleeveTypes, sleeveTypesChange] = useState(null);
   const [product, productChange] = useState({
     brandId: undefined,
     categoryId: undefined,
     productCode: "",
     productName: "",
-    status: undefined,
   });
-
   const [productDetail, productDetailChange] = useState({
     id: undefined,
     productId: undefined,
@@ -30,11 +39,18 @@ function ProductAdminForm({ ModuleName }) {
     shirtTailId: undefined,
     price: "",
     descriptionDetail: "",
-    status: true,
   });
 
+  //function
   const handleProductDetailChange = (event) => {
     const { name, value } = event.target;
+    productDetailChange((prevProductDetail) => ({
+      ...prevProductDetail,
+      [name]: value,
+    }));
+  };
+
+  const ProductDetailChange = (name, value) => {
     productDetailChange((prevProductDetail) => ({
       ...prevProductDetail,
       [name]: value,
@@ -49,20 +65,8 @@ function ProductAdminForm({ ModuleName }) {
     }));
   };
 
-  const api = "http://localhost:8080/admin/api/";
-  const [brands, brandsChange] = useState(null);
-  const [categories, categoriesChange] = useState(null);
-  const [patterns, patternsChange] = useState(null);
-  const [buttonTypes, buttonTypesChange] = useState(null);
-  const [materials, materialsChange] = useState(null);
-  const [shirtTailTypes, shirtTailTypesChange] = useState(null);
-  const [collarTypes, collarTypesChange] = useState(null);
-  const [forms, formsChange] = useState(null);
-  const [sleeveTypes, sleeveTypesChange] = useState(null);
-
   const action = function () {
-    if (productDetailId === undefined) {
-      console.log(productDetail);
+    if (productId === undefined || productId === null) {
       axios
         .post(api + "product/create", product)
         .then((response) => {
@@ -71,7 +75,7 @@ function ProductAdminForm({ ModuleName }) {
             .post(api + "product/createproductdetail", productDetail)
             .then((response) => {
               navigate(
-                "/controller/v1/admin/product/update/" + response.data.id
+                "/controller/v1/admin/product/update/" + productDetail.productId
               );
             })
             .catch((err) => {
@@ -82,21 +86,54 @@ function ProductAdminForm({ ModuleName }) {
           console.error(err);
         });
     } else {
+      console.log(productDetail);
+      axios
+        .put(api + "product/update?id=" + productId, product)
+        .then((response) => {
+          productDetail.productId = productId;
+          axios
+            .put(api + "product/updateproductdetail", productDetail)
+            .then((response) => {
+              console.log(response.data);
+              navigate(
+                "/controller/v1/admin/product/update/" + productDetail.productId
+              );
+            })
+            .catch((err) => {
+              console.error(err);
+            });
+        })
+        .catch((err) => {
+          console.error(err);
+        });
     }
   };
   useEffect(() => {
-    if (productDetailId !== undefined) {
+    if (productId !== undefined) {
       axios
-        .get(api + "product/detail/" + productDetailId)
+        .get(api + "product/detail/" + productId)
         .then((response) => {
-          productDetailChange(response.data);
+          ProductDetailChange("id", response.data.id);
+          ProductDetailChange("productId", response.data.product.id);
+          ProductDetailChange("patternId", response.data.pattern.id);
+          ProductDetailChange("buttonId", response.data.button.id);
+          ProductDetailChange("materialId", response.data.material.id);
+          ProductDetailChange("collarId", response.data.collar.id);
+          ProductDetailChange("sleeveId", response.data.sleeve.id);
+          ProductDetailChange("formId", response.data.form.id);
+          ProductDetailChange("shirtTailId", response.data.shirtTail.id);
+          ProductDetailChange("price", response.data.price);
+          ProductDetailChange(
+            "descriptionDetail",
+            response.data.descriptionDetail
+          );
         })
         .catch((error) => {
           console.log(error.message);
         });
       if (productDetail.productId !== null) {
         axios
-          .get(api + "product/" + productDetail.productId)
+          .get(api + "product/" + productId)
           .then((response) => {
             productChange(response.data);
           })
@@ -177,7 +214,7 @@ function ProductAdminForm({ ModuleName }) {
       .catch((error) => {
         console.warn(error.message);
       });
-  }, [productDetail.id, product.productCode]);
+  }, [product.id, productDetail.id, productDetail.productId, productId]);
 
   return (
     <div className={`col-10 offset-md-1 ${styles.radiusFrame}`}>
@@ -397,25 +434,6 @@ function ProductAdminForm({ ModuleName }) {
                         </option>
                       );
                     })}
-                </select>
-              </div>
-              <div className="col-4 mb-5">
-                <select
-                  className={`form-select ${styles.inputCommon} ${styles.selectCommon} d-inline-block`}
-                  aria-label="Default select example"
-                  name="status"
-                  onChange={handleProductChange}
-                  value={
-                    product.status === "Active"
-                      ? true
-                      : product.status === "InActive"
-                      ? false
-                      : undefined
-                  }
-                >
-                  <option value={undefined}>Trạng thái</option>
-                  <option value={true}>Kinh Doanh</option>
-                  <option value={false}>Ngừng Kinh doanh</option>
                 </select>
               </div>
               <div className="form-floating col-12 mb-5 mt-5">

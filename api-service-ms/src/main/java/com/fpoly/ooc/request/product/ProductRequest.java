@@ -1,4 +1,4 @@
-package com.fpoly.ooc.request;
+package com.fpoly.ooc.request.product;
 
 import com.fpoly.ooc.entity.Brand;
 import com.fpoly.ooc.entity.Category;
@@ -21,10 +21,9 @@ public class ProductRequest {
     private String productCode;
     private String productName;
     private String description;
-    private Boolean status;
 
     public Product dto(){
-        return new Product(id, productCode, productName, description, status==true?"Active":"InActive",
+        return new Product(id, productCode, productName, description, "Active",
                 Category.builder().id(categoryId).build(), Brand.builder().id(brandId).build());
     }
 }

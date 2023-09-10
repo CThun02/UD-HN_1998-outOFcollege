@@ -41,4 +41,5 @@ public class AccountController {
     public ResponseEntity<?> update(@PathVariable String id, @RequestBody AccountRequest request) {
         return ResponseEntity.ok(accountService.update(request, id));
     }
+
 }

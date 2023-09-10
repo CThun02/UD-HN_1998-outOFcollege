@@ -1,30 +1,28 @@
 package com.fpoly.ooc.responce;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 
-public interface ProductDetailResponse {
-    public Long getProductId();
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+@Builder
+public class ProductDetailResponse {
 
-    public Long getId();
+    private Long productDetailId;
 
-    public Long getPatternId();
+    private String productName;
 
-    public Long getButtonId();
+    private String imgDefault;
 
-    public Long getMaterialId();
+    private BigDecimal price;
 
-    public Long getCollarId();
+    private Integer quantity;
 
-    public Long getFormId();
-
-    public Long getSleeveId();
-
-    public Long getShirtTailId();
-
-    public BigDecimal getPrice();
-
-    public String getDescriptionDetail();
-
-    public String getStatus();
 }

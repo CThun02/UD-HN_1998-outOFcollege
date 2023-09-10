@@ -7,4 +7,5 @@ public interface ProductDetailColorResponse {
     public String getColorId() ;
     public Integer getQuantity() ;
     public BigDecimal getPrice() ;
+    public String getStatus();
 }

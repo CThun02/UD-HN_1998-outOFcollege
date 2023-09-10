@@ -39,10 +39,14 @@ public class ProductController {
     }
 
     @GetMapping("/detail/{id}")
-    public ResponseEntity<ProductDetailResponse> getProductDetail(@PathVariable Long id){
+    public ResponseEntity<ProductDetailResponse> getProductDetailDefault(@PathVariable Long id){
         return ResponseEntity.ok(productDetailService.getProductDetail(id));
     }
 
+    @GetMapping("/detailStatus")
+    public ResponseEntity<ProductDetailResponse> getProductDetailByStatus(@RequestParam Long id, @RequestParam Boolean status){
+        return ResponseEntity.ok(productDetailService.getProductDetailByStatus(id, status==true?"Active":"InActive"));
+    }
     @GetMapping("/detailcolorsize")
     public List<ProductDetailSizeResponse> getProductDetailColorSizeByIdP(@RequestParam Long productId){
         return productDetailService.getProductDetailColorSizeByIdP(productId);
@@ -68,30 +72,6 @@ public class ProductController {
         return ResponseEntity.ok(service.create(request.dto()));
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<?> updateproduct(@RequestParam(name = "id") Long id, @RequestBody ProductRequest request){
-        request.setId(id);
-        return ResponseEntity.ok(service.update(request.dto()));
-    }
-
-    @PutMapping("/updateproductdetail")
-    public ResponseEntity<?> updateProductDetail( @RequestBody ProductDetailRequest request){
-        productDetailService.update(request.dto());
-        List<ProductDetail> productDetailListUpdate = productDetailService.getProductDetailsByIdPro(request.getProductId());
-        for (ProductDetail productDetail: productDetailListUpdate) {
-            productDetail.setPattern(Pattern.builder().id(request.getPatternId()).build());
-            productDetail.setButton(ButtonType.builder().id(request.getButtonId()).build());
-            productDetail.setMaterial((Material.builder().id(request.getMaterialId()).build()) );
-            productDetail.setShirtTail(ShirtTailType.builder().id(request.getShirtTailId()).build());
-            productDetail.setCollar(CollarType.builder().id(request.getCollarId()).build());
-            productDetail.setForm(Form.builder().id(request.getFormId()).build());
-            productDetail.setSleeve(SleeveType.builder().id(request.getSleeveId()).build());
-            productDetail.setDescriptionDetail(request.getDescriptionDetail());
-            productDetailService.update(productDetail);
-        }
-        return ResponseEntity.ok("ok");
-    }
-
     @PostMapping("/createproductdetail")
     public ResponseEntity<?> createproductDetail(@RequestBody ProductDetailRequest request){
         return ResponseEntity.ok(productDetailService.create(request.dto()));
@@ -106,7 +86,7 @@ public class ProductController {
                     .material(productDetail.getMaterial()).collar(productDetail.getCollar())
                     .sleeve(productDetail.getSleeve()).form(productDetail.getForm())
                     .shirtTail(productDetail.getShirtTail()).descriptionDetail(productDetail.getDescriptionDetail())
-                    .status(productDetail.getStatus()).build();
+                    .status("Active").build();
             productDetailCreate.setColor(Color.builder().id(item.getColorId()).build());
             productDetailCreate.setSize(Size.builder().id(item.getSizeId()).build());
             productDetailCreate.setQuantity(item.getQuantity());
@@ -116,8 +96,32 @@ public class ProductController {
         return ResponseEntity.ok("OK");
     }
 
-    @PutMapping("/updateproductdetailcolorsize")
+    @PutMapping("/updateproductdetail")
     public ResponseEntity<?> updateProductDetailColorSize(@RequestBody ProductDetailRequest productDetail){
         return ResponseEntity.ok(productDetailService.update(productDetail.dto()));
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<?> updateproduct(@RequestParam(name = "id") Long id, @RequestBody ProductRequest request){
+        request.setId(id);
+        return ResponseEntity.ok(service.update(request.dto()));
+    }
+
+    @PutMapping("/updateproductdetails")
+    public ResponseEntity<?> updateProductDetails( @RequestBody ProductDetailRequest request){
+        productDetailService.update(request.dto());
+        List<ProductDetail> productDetailListUpdate = productDetailService.getProductDetailsByIdPro(request.getProductId());
+        for (ProductDetail productDetail: productDetailListUpdate) {
+            productDetail.setPattern(Pattern.builder().id(request.getPatternId()).build());
+            productDetail.setButton(ButtonType.builder().id(request.getButtonId()).build());
+            productDetail.setMaterial((Material.builder().id(request.getMaterialId()).build()) );
+            productDetail.setShirtTail(ShirtTailType.builder().id(request.getShirtTailId()).build());
+            productDetail.setCollar(CollarType.builder().id(request.getCollarId()).build());
+            productDetail.setForm(Form.builder().id(request.getFormId()).build());
+            productDetail.setSleeve(SleeveType.builder().id(request.getSleeveId()).build());
+            productDetail.setDescriptionDetail(request.getDescriptionDetail());
+            productDetailService.update(productDetail);
+        }
+        return ResponseEntity.ok("ok");
     }
 }

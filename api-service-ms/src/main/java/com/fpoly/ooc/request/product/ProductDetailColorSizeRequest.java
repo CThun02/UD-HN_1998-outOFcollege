@@ -10,5 +10,4 @@ public class ProductDetailColorSizeRequest {
     private Long sizeId;
     private Integer quantity;
     private BigDecimal price;
-
 }

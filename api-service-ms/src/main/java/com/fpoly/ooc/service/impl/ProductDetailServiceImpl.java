@@ -90,4 +90,9 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
     public List<ProductDetail> getProductDetailsByIdPro(Long id) {
         return repo.getProductDetailByIdPro(id);
     }
+
+    @Override
+    public ProductDetailResponse getProductDetailByStatus(Long id, String status) {
+        return repo.getProductDetailByStatus(id, status);
+    }
 }

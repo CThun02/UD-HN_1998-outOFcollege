@@ -24,6 +24,7 @@ function ProductAdminForm({ ModuleName }) {
     categoryId: undefined,
     productCode: "",
     productName: "",
+    status: true,
   });
   const [productDetail, productDetailChange] = useState({
     id: undefined,
@@ -39,6 +40,7 @@ function ProductAdminForm({ ModuleName }) {
     shirtTailId: undefined,
     price: "",
     descriptionDetail: "",
+    status: true,
   });
 
   //function
@@ -92,7 +94,7 @@ function ProductAdminForm({ ModuleName }) {
         .then((response) => {
           productDetail.productId = productId;
           axios
-            .put(api + "product/updateproductdetail", productDetail)
+            .put(api + "product/updateproductdetails", productDetail)
             .then((response) => {
               console.log(response.data);
               navigate(

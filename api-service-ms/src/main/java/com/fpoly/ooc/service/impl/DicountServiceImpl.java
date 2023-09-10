@@ -79,6 +79,7 @@ public class DicountServiceImpl implements DiscountService {
                 .discountMaxValue(request.getDiscountMaxValue())
                 .discountCondition(request.getDiscountCondition())
                 .discountMethod(request.getDiscountMethod())
+                .applyFor(request.getApplyFor())
                 .build();
 
         return discountRepository.save(discount);

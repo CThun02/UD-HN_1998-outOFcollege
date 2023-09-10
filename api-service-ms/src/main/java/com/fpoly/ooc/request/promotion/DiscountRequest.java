@@ -32,6 +32,8 @@ public class DiscountRequest {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     private LocalDateTime endDate;
 
+    private String applyFor;
+
     private BigDecimal discountValue;
 
     private BigDecimal discountMaxValue;

@@ -17,4 +17,5 @@ public interface ProductDetailServiceI {
     public List<ProductDetailSizeResponse> getProductDetailColorSizeByIdP(Long id);
     public ProductDetailSizeResponse getProductDetailColorSizeByIdPNIdSize(Long id, Long idSize);
     public List<ProductDetail> getProductDetailsByIdPro(Long id);
+    public ProductDetailResponse getProductDetailByStatus(Long id, String status);
 }

@@ -33,7 +33,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public Account save(AccountRequest request) {
         Account account = Account.builder()
-                .userName(request.getUserName())
+                .username(request.getUserName())
                 .fullName(request.getFullName())
                 .cccd(request.getIdNo())
                 .numberPhone(request.getNumberPhone())
@@ -42,12 +42,12 @@ public class AccountServiceImpl implements AccountService {
                 .gender(request.getGender())
                 .addressDetail(AddressDetail.builder().address(Address.builder().city(request.getCity()).build()).build())
                 .addressDetail(AddressDetail.builder().address(Address.builder().distrit(request.getDistrict()).build()).build())
+                .addressDetail(AddressDetail.builder().address(Address.builder().distrit(request.getDistrict()).build()).build())
                 .addressDetail(AddressDetail.builder().address(Address.builder().ward(request.getWard()).build()).build())
                 .addressDetail(AddressDetail.builder().address(Address.builder().street(request.getStreet()).build()).build())
                 .addressDetail(AddressDetail.builder().address(Address.builder().descriptionDetail(request.getDescriptionDetail()).build()).build())
                 .avatar(request.getImage())
                 .build();
-
         return account;
     }
 

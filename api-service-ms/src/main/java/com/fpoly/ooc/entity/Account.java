@@ -72,13 +72,6 @@ public class Account {
     @Column(name = "deleted_at")
     private Date deleteAt;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "role_id", referencedColumnName = "id")
-//    private Role role;
-//
-//    @OneToMany(fetch = FetchType.EAGER)
-//    @JoinColumn(name = "account_id", referencedColumnName = "id")
-//    private AddressDetail addressDetail;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id", referencedColumnName = "id")
     private Role role;

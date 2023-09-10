@@ -21,9 +21,10 @@ public class ProductRequest {
     private String productCode;
     private String productName;
     private String description;
+    private Boolean status;
 
     public Product dto(){
-        return new Product(id, productCode, productName, description, "Active",
+        return new Product(id, productCode, productName, description, status==null?"Active":status==true?"Active":"InActive",
                 Category.builder().id(categoryId).build(), Brand.builder().id(brandId).build());
     }
 }

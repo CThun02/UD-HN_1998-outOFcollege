@@ -53,12 +53,13 @@ public class AddressDetail {
     @DateTimeFormat(pattern = "dd-MM-yyyy")
     private Date deleteAt;
 
-//    @ManyToOne(fetch = FetchType.EAGER)
-//    @JoinColumn(name = "address_id", referencedColumnName = "id")
-//    private Address address;
-//
-//    @ManyToOne(fetch = FetchType.EAGER)
-//    @JoinColumn(name = "account_id", referencedColumnName = "username")
-//    private Account account;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "address_id", referencedColumnName = "id")
+    private Address address;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "account_id", referencedColumnName = "username")
+    private Account account;
+
 
 }

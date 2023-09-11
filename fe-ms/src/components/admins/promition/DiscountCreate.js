@@ -248,6 +248,27 @@ function DiscountCreate({ setIsDisplay }) {
           </form>
         </div>
       ) : null}
+
+      {isDisplayProducts ? (
+        <div className={styles.createContent}>
+          <div className={`row ${styles.title} ${styles.spacing}`}>
+            <div className="col-8">
+              <h3>Thêm sản phẩm vào chương trình</h3>
+            </div>
+
+            <div className={`col-4 ${styles.iconClose}`}>
+              <label>
+                <FontAwesomeIcon
+                  icon={faXmark}
+                  onClick={() => setIsDisplay(false)}
+                />
+              </label>
+            </div>
+          </div>
+
+          <div className={`${styles.tableProducts}`}></div>
+        </div>
+      ) : null}
     </div>
   );
 }

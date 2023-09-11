@@ -6,8 +6,8 @@ function ListDiscount({ children }) {
       <thead>
         <tr>
           <th scope="col">STT</th>
-          <th scope="col">Tên chương trình</th>
-          <th scope="col">Giá trị giảm</th>
+          <th scope="col">Tên sản phẩm</th>
+          <th scope="col"></th>
           <th scope="col">Giảm tối đa</th>
           <th scope="col">Điều kiện</th>
           <th scope="col">Áp dụng</th>
@@ -17,7 +17,9 @@ function ListDiscount({ children }) {
           <th scope="col">Thao tác</th>
         </tr>
       </thead>
-      <tbody>{children}</tbody>
+      <tbody>
+        <tr></tr>
+      </tbody>
     </table>
   );
 }

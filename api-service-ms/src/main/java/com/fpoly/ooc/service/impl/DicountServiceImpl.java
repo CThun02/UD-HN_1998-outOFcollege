@@ -71,8 +71,7 @@ public class DicountServiceImpl implements DiscountService {
 
         Discount discount = Discount.builder()
                 .id(request.getId())
-                .discountCode("DISCOUNT_" + ((int) Math.random() * 99999))
-                .discountCode(request.getDiscountCode())
+                .discountCode("DISCOUNT_" + (int)( Math.random() * 99999 ))
                 .discountName(request.getDiscountName())
                 .startDate(request.getStartDate())
                 .endDate(request.getEndDate())

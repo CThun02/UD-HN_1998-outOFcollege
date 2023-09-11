@@ -22,9 +22,7 @@ function Discount({ data }) {
       <td>
         {discountValue} {`${discountMethod === "MONEY" ? "vnd" : "%"}`}
       </td>
-      <td>
-        {discountMaxValue} {`${discountMethod === "MONEY" ? "vnd" : "%"}`}
-      </td>
+      <td>{discountMaxValue}</td>
       <td>{discountCondition}</td>
       <td>{`${applyFor === "HOA_DON" ? "Hóa đơn" : "Sản phẩm"}`}</td>
       <td>{discountMethod}</td>

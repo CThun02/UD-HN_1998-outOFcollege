@@ -248,7 +248,7 @@ function DiscountCreate({ setIsDisplay }) {
           </form>
         </div>
       ) : null}
-
+      {/* 
       {isDisplayProducts ? (
         <div className={styles.createContent}>
           <div className={`row ${styles.title} ${styles.spacing}`}>
@@ -268,7 +268,7 @@ function DiscountCreate({ setIsDisplay }) {
 
           <div className={`${styles.tableProducts}`}></div>
         </div>
-      ) : null}
+      ) : null} */}
     </div>
   );
 }

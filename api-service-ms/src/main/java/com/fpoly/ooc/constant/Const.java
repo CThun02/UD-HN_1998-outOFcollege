@@ -1,7 +1,5 @@
 package com.fpoly.ooc.constant;
 
-import lombok.Data;
-import lombok.Getter;
 
 public class Const {
 

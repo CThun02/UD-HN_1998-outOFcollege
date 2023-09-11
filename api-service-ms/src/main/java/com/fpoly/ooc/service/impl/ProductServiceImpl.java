@@ -3,7 +3,6 @@ package com.fpoly.ooc.service.impl;
 import com.fpoly.ooc.entity.Product;
 import com.fpoly.ooc.repository.ProductDAORepositoryI;
 import com.fpoly.ooc.responce.product.ProductResponse;
-import com.fpoly.ooc.responce.product.ProductResponseEdit;
 import com.fpoly.ooc.service.interfaces.ProductServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -63,7 +62,7 @@ public class ProductServiceImpl implements ProductServiceI {
     }
 
     @Override
-    public ProductResponseEdit getProductEdit(Long id) {
+    public ProductResponse getProductEdit(Long id) {
         return repo.getProduct(id);
     }
 }

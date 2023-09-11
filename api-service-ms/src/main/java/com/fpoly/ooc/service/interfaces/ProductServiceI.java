@@ -2,7 +2,6 @@ package com.fpoly.ooc.service.interfaces;
 
 import com.fpoly.ooc.entity.Product;
 import com.fpoly.ooc.responce.product.ProductResponse;
-import com.fpoly.ooc.responce.product.ProductResponseEdit;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
@@ -14,5 +13,5 @@ public interface ProductServiceI {
     public List<Product> getAll();
     public Product getOne(Long id);
     public Page<ProductResponse> pageIndex(int pageNumber);
-    public ProductResponseEdit getProductEdit(Long id);
+    public ProductResponse getProductEdit(Long id);
 }

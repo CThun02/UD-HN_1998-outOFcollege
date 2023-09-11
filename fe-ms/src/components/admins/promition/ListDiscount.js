@@ -18,7 +18,7 @@ function ListDiscount({ children }) {
         </tr>
       </thead>
       <tbody>
-        <tr></tr>
+        <tr>{children}</tr>
       </tbody>
     </table>
   );

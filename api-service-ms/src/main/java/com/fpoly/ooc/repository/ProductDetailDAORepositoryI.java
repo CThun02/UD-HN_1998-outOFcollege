@@ -67,6 +67,6 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
     @Query("select od from ProductDetail od where od.product.id=?1 and od.size.id is not null and od.color.id is not null")
     public List<ProductDetail> getProductDetailByIdPro(Long id);
 
-    List<ProductDetailResponse> findAllProductDetail();
+//    List<ProductDetailResponse> findAllProductDetail();
 
 }

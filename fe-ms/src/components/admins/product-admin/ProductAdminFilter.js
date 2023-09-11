@@ -86,22 +86,6 @@ function ProductAdminFilter() {
         <div className="row">
           <div className="col-2 offset-md-5">
             <h5 className="text-center">Bộ lọc</h5>
-            <div>
-              <select
-                className={`form-select ${styles.inputCommon} ${styles.selectCommon} d-inline-block`}
-                aria-label="Default select example"
-              >
-                <option value={1}>Dáng áo</option>
-                {forms &&
-                  forms.map((item) => {
-                    return (
-                      <option key={item.id} value={item.id}>
-                        {item.formName}
-                      </option>
-                    );
-                  })}
-              </select>
-            </div>
           </div>
         </div>
       </div>

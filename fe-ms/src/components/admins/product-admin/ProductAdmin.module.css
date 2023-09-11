@@ -50,6 +50,7 @@
   background-color: #1677ff;
   color: white;
   font-weight: 500;
+  box-shadow: 3px 5px 5px #888888;
 }
 
 /* Nút hiển thị trong trạng thái tắt hoạt động */
@@ -59,9 +60,10 @@
   border-bottom: 3px solid #771e1e;
   border-right: 3px solid #771e1e;
   border-radius: 12px;
-  background-color: #e13131;
+  background-color: #ec4b4b;
   color: white;
   font-weight: 500;
+  box-shadow: 3px 5px 5px #888888;
 }
 
 .btnStatusActive:hover,
@@ -158,4 +160,21 @@ tr td {
   to {
     opacity: 1;
   }
+}
+
+.uploadLabel {
+  position: relative;
+  display: inline-block;
+}
+
+.inputFile {
+  display: none;
+}
+
+.btnUploadImg {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid black;
+  box-shadow: 3px 5px 5px #888888;
 }

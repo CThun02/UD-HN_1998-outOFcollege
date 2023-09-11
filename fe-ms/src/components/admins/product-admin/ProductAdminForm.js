@@ -25,6 +25,8 @@ function ProductAdminForm({ ModuleName }) {
     productCode: "",
     productName: "",
     status: true,
+    createdAt: undefined,
+    createdBy: undefined,
   });
   const [productDetail, productDetailChange] = useState({
     id: undefined,
@@ -41,6 +43,8 @@ function ProductAdminForm({ ModuleName }) {
     price: "",
     descriptionDetail: "",
     status: true,
+    createdAt: undefined,
+    createdBy: undefined,
   });
 
   //function
@@ -61,6 +65,13 @@ function ProductAdminForm({ ModuleName }) {
 
   const handleProductChange = (event) => {
     const { name, value } = event.target;
+    productChange((prevProductDetail) => ({
+      ...prevProductDetail,
+      [name]: value,
+    }));
+  };
+
+  const ProductChange = (name, value) => {
     productChange((prevProductDetail) => ({
       ...prevProductDetail,
       [name]: value,
@@ -88,22 +99,37 @@ function ProductAdminForm({ ModuleName }) {
           console.error(err);
         });
     } else {
-      console.log(productDetail);
       axios
         .put(api + "product/update?id=" + productId, product)
         .then((response) => {
-          productDetail.productId = productId;
-          axios
-            .put(api + "product/updateproductdetails", productDetail)
-            .then((response) => {
-              console.log(response.data);
-              navigate(
-                "/controller/v1/admin/product/update/" + productDetail.productId
-              );
-            })
-            .catch((err) => {
-              console.error(err);
-            });
+          ProductDetailChange("productId", productId);
+          ProductDetailChange("status", true);
+          if (productDetail.id === undefined || productDetail.id === null) {
+            axios
+              .post(api + "product/createproductdetail", productDetail)
+              .then((response) => {
+                navigate(
+                  "/controller/v1/admin/product/update/" +
+                    productDetail.productId
+                );
+              })
+              .catch((err) => {
+                console.error(err);
+              });
+          } else {
+            axios
+              .put(api + "product/updateproductdetails", productDetail)
+              .then((response) => {
+                console.log(response.data);
+                navigate(
+                  "/controller/v1/admin/product/update/" +
+                    productDetail.productId
+                );
+              })
+              .catch((err) => {
+                console.error(err);
+              });
+          }
         })
         .catch((err) => {
           console.error(err);
@@ -125,6 +151,8 @@ function ProductAdminForm({ ModuleName }) {
           ProductDetailChange("formId", response.data.form.id);
           ProductDetailChange("shirtTailId", response.data.shirtTail.id);
           ProductDetailChange("price", response.data.price);
+          ProductDetailChange("createdAt", response.data.createdAt);
+          ProductDetailChange("createdBy", response.data.createdBy);
           ProductDetailChange(
             "descriptionDetail",
             response.data.descriptionDetail
@@ -138,6 +166,7 @@ function ProductAdminForm({ ModuleName }) {
           .get(api + "product/" + productId)
           .then((response) => {
             productChange(response.data);
+            ProductChange("status", true);
           })
           .catch((error) => {
             console.log(error.message);

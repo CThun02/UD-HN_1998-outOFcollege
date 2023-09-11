@@ -17,7 +17,6 @@ function ProductSizeColorAdminUpdate(props) {
   const [productColors, setProductColors] = useState(
     props.productDetailColorSizeDetail
   );
-  console.log(productColors);
   const [count, setcount] = useState(0);
 
   const colors = props.colors;

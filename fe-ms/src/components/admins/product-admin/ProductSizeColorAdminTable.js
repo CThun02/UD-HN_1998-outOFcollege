@@ -36,7 +36,10 @@ function ProductSizeColorAdminTable() {
     price: "",
     descriptionDetail: "",
     status: true,
+    createdAt: undefined,
+    createdBy: undefined,
   });
+
   const [productDetailColorSizes, productDetailColorSizesChange] = useState([
     {
       sizeId: undefined,
@@ -200,6 +203,8 @@ function ProductSizeColorAdminTable() {
           "descriptionDetail",
           response.data.descriptionDetail
         );
+        ProductDetailChange("createdAt", response.data.createdAt);
+        ProductDetailChange("createdBy", response.data.createdBy);
       })
       .catch((error) => {
         console.log(error.message);
@@ -228,7 +233,7 @@ function ProductSizeColorAdminTable() {
       .catch((err) => {
         console.error(err);
       });
-  }, [productId, count]);
+  }, [productId, count, productDetail.id]);
 
   return (
     <div className={`${styles.radiusFrame} mt-5 col-lg-10 offset-md-1`}>
@@ -304,7 +309,9 @@ function ProductSizeColorAdminTable() {
                     </td>
                     <td>
                       {item.listColor.forEach((item) => {
-                        totalQuantityProductDetail += item.quantity;
+                        if (item.status === "Active") {
+                          totalQuantityProductDetail += item.quantity;
+                        }
                       })}
                       {totalQuantityProductDetail}
                     </td>

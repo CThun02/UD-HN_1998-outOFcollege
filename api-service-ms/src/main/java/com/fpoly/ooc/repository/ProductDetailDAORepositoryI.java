@@ -67,4 +67,6 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
     @Query("select od from ProductDetail od where od.product.id=?1")
     public List<ProductDetail> getProductDetailByIdPro(Long id);
 
+    List<ProductDetailResponse> findAllProductDetail();
+
 }

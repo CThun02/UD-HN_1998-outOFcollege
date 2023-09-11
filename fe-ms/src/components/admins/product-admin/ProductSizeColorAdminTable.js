@@ -1,12 +1,19 @@
 import styles from "./ProductAdmin.module.css";
 import ButtonCRUD from "../button-crud/ButtonCRUD";
-import { faEye, faPencilAlt, faPlus } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCheck,
+  faClose,
+  faEye,
+  faPencilAlt,
+  faPlus,
+} from "@fortawesome/free-solid-svg-icons";
 import { Link, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import ProductSizeColorAdminCreate from "./ProductSizeColorAdminCreate";
 import ProductSizeColorAdminDetail from "./ProductSizeColorAdminDetail";
 import ProductSizeColorAdminUpdate from "./ProductColorSizeAdminUpdate";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 function ProductSizeColorAdminTable() {
   const api = "http://localhost:8080/admin/api/";
@@ -45,7 +52,13 @@ function ProductSizeColorAdminTable() {
       sizeId: undefined,
       sizeName: "",
       listColor: [
-        { quantity: 0, price: 0, colorId: "", productDetailId: undefined },
+        {
+          quantity: 0,
+          price: 0,
+          colorId: "",
+          productDetailId: undefined,
+          status: "",
+        },
       ],
     }
   );
@@ -122,7 +135,6 @@ function ProductSizeColorAdminTable() {
           list
         )
         .then((response) => {
-          console.log(response);
           axios
             .get(api + "product/detailcolorsize?productId=" + productId)
             .then((response) => {
@@ -139,10 +151,42 @@ function ProductSizeColorAdminTable() {
     }
   }
 
+  function deleteAllColorSize(kichHoat, list) {
+    let listColor = list.listColor;
+    for (let i = 0; i < listColor.length; i++) {
+      axios
+        .get(
+          api +
+            "product/detailStatus?id=" +
+            listColor[i].productDetailId +
+            "&status=" +
+            (listColor[i].status === "Active")
+        )
+        .then((response) => {
+          let productDetailUpdate = productDetail;
+          productDetailUpdate.id = response.data.id;
+          productDetailUpdate.status = !kichHoat;
+          productDetailUpdate.colorId = response.data.color.id;
+          productDetailUpdate.sizeId = response.data.size.id;
+          productDetailUpdate.quantity = response.data.quantity;
+          axios
+            .put(api + "product/updateproductdetail", productDetail)
+            .then((response) => {
+              setcount(response.data);
+              setSizeIdUpdate(0);
+            });
+        })
+        .catch((error) => {
+          console.log(error.message);
+        });
+    }
+  }
+
   useEffect(() => {
     axios
       .get(api + "product/detail/" + productId)
       .then((response) => {
+        ProductDetailChange("id", response.data.id);
         ProductDetailChange("productId", response.data.product.id);
         ProductDetailChange("patternId", response.data.pattern.id);
         ProductDetailChange("buttonId", response.data.button.id);
@@ -198,7 +242,7 @@ function ProductSizeColorAdminTable() {
       <ProductSizeColorAdminUpdate
         productDetail={productDetail}
         productDetailColorSizeDetail={productDetailColorSizeDetail}
-        effect={productDetailColorSizesChange}
+        effect={setcount}
         colors={colors}
         sizeId={sizeIdUpdate}
       ></ProductSizeColorAdminUpdate>
@@ -221,6 +265,7 @@ function ProductSizeColorAdminTable() {
           <tbody>
             {productDetailColorSizes &&
               productDetailColorSizes.map((item, index) => {
+                var kichHoat = false;
                 var totalQuantityProductDetail = 0;
                 return (
                   <tr key={index}>
@@ -228,12 +273,32 @@ function ProductSizeColorAdminTable() {
                     <th scope="row">{item.sizeName}</th>
                     <td>
                       {item.listColor.map((item, index) => {
+                        var red = parseInt(item.colorId.substring(1, 3), 16);
+                        var green = parseInt(item.colorId.substring(3, 5), 16);
+                        var blue = parseInt(item.colorId.substring(5, 7), 16);
+                        if (item.status === "Active") {
+                          kichHoat = true;
+                        }
                         return (
                           <div
                             key={index}
-                            className={`${styles.colorDisplay} d-inline-block me-2`}
+                            className={`${styles.colorDisplay} d-inline-block me-2 text-center`}
                             style={{ backgroundColor: item.colorId }}
-                          ></div>
+                          >
+                            <FontAwesomeIcon
+                              icon={
+                                item.status === "InActive" ? faClose : faCheck
+                              }
+                              color={
+                                (red >= 128 && green >= 128 && blue >= 128) ||
+                                (red >= 128 && green >= 128) ||
+                                (blue >= 128 && green >= 128) ||
+                                (blue >= 128 && red >= 128)
+                                  ? "black"
+                                  : "white"
+                              }
+                            ></FontAwesomeIcon>
+                          </div>
                         );
                       })}
                     </td>
@@ -246,9 +311,14 @@ function ProductSizeColorAdminTable() {
                     <td>
                       <button
                         type="submit"
-                        className={`${styles.btnStatusActive} pt-1 pb-1 ps-2 pe-2`}
+                        className={`${
+                          kichHoat === true
+                            ? styles.btnStatusActive
+                            : styles.btnStatusUnActive
+                        } pt-1 pb-1 ps-2 pe-2`}
+                        onClick={() => deleteAllColorSize(kichHoat, item)}
                       >
-                        kích hoạt
+                        {kichHoat === true ? "kích hoạt" : "Ngưng kích hoạt"}
                       </button>
                     </td>
                     <td>

@@ -1,4 +1,8 @@
-import { faClose, faTrash } from "@fortawesome/free-solid-svg-icons";
+import {
+  faClose,
+  faRotateRight,
+  faTrash,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import { useEffect, useState } from "react";
@@ -13,6 +17,7 @@ function ProductSizeColorAdminUpdate(props) {
   const [productColors, setProductColors] = useState(
     props.productDetailColorSizeDetail
   );
+  console.log(productColors);
   const [count, setcount] = useState(0);
 
   const colors = props.colors;
@@ -23,34 +28,18 @@ function ProductSizeColorAdminUpdate(props) {
     document.getElementById("sizeColorFrameUpdate").classList.add("d-none");
   }
 
-  function updateColorPrice(event, colorId, productDetailId, quantity) {
-    let productDetail = props.productDetail;
-    productDetail.id = productDetailId;
-    productDetail.colorId = colorId;
-    productDetail.sizeId = productColors.sizeId;
-    productDetail.price = event.target.value;
-    productDetail.quantity = quantity;
-    productDetail.status = productDetail.status === "Active" ? true : false;
-    axios
-      .put(api + "updateproductdetailcolorsize", productDetail)
-      .then((res) => {
-        console.log(res);
+  function updateColor(color) {
+    if (color.status === "Active") {
+      let productDetail = props.productDetail;
+      productDetail.id = color.productDetailId;
+      productDetail.colorId = color.colorId;
+      productDetail.sizeId = productColors.sizeId;
+      productDetail.price = color.price;
+      productDetail.quantity = color.quantity;
+      axios.put(api + "updateproductdetail", productDetail).then((res) => {
+        props.effect(res.data);
       });
-  }
-  function updateColorQuantity(event, colorId, productDetailId, price) {
-    let productDetail = props.productDetail;
-    productDetail.id = productDetailId;
-    productDetail.colorId = colorId;
-    productDetail.sizeId = productColors.sizeId;
-    productDetail.price = price;
-    productDetail.quantity = event.target.value;
-    productDetail.status = productDetail.status === "Active" ? true : false;
-    axios
-      .put(api + "updateproductdetailcolorsize", productDetail)
-      .then((res) => {
-        console.log(res);
-      });
-    console.log(productDetail);
+    }
   }
 
   function addNewProduct() {
@@ -97,6 +86,34 @@ function ProductSizeColorAdminUpdate(props) {
     closeTab();
   }
 
+  function deleteOrRefreshColor(productDetailId, status) {
+    axios
+      .get(
+        api +
+          "detailStatus?id=" +
+          productDetailId +
+          "&status=" +
+          (status === "Active")
+      )
+      .then((response) => {
+        let productDetailUpdate = props.productDetail;
+        productDetailUpdate.status = status === "Active" ? false : true;
+        productDetailUpdate.id = response.data.id;
+        productDetailUpdate.colorId = response.data.color.id;
+        productDetailUpdate.sizeId = response.data.size.id;
+        productDetailUpdate.quantity = response.data.quantity;
+        axios
+          .put(api + "updateproductdetail", productDetailUpdate)
+          .then((response) => {
+            props.effect(response.data);
+            setcount(response.data);
+          });
+      })
+      .catch((error) => {
+        console.log(error.message);
+      });
+  }
+
   function updateColorProperty(colorId, propertyType, newValue) {
     const newListColor = productColors.listColor.map((color) => {
       if (color.colorId === colorId) {
@@ -115,6 +132,7 @@ function ProductSizeColorAdminUpdate(props) {
   }
 
   useEffect(() => {
+    console.log(props.sizeId);
     if (props.sizeId !== undefined && props.sizeId !== null) {
       axios
         .get(
@@ -129,6 +147,7 @@ function ProductSizeColorAdminUpdate(props) {
         });
     }
   }, [props.sizeId, productId, count]);
+
   return (
     <div id="sizeColorFrameUpdate" className="d-none">
       <div className={`${styles.maxWH}`}>
@@ -187,6 +206,9 @@ function ProductSizeColorAdminUpdate(props) {
                                   className="text-center"
                                   name={color.colorId}
                                   value={color.quantity}
+                                  disabled={
+                                    color.status === "Active" ? false : true
+                                  }
                                   onChange={(event) => {
                                     updateColorProperty(
                                       color.colorId,
@@ -194,14 +216,7 @@ function ProductSizeColorAdminUpdate(props) {
                                       event.target.value
                                     );
                                   }}
-                                  onBlur={(event) =>
-                                    updateColorQuantity(
-                                      event,
-                                      color.colorId,
-                                      color.productDetailId,
-                                      color.price
-                                    )
-                                  }
+                                  onBlur={() => updateColor(color)}
                                 />
                               </li>
                             </ul>
@@ -213,6 +228,9 @@ function ProductSizeColorAdminUpdate(props) {
                               name={color.colorId}
                               placeholder=""
                               value={color.price}
+                              disabled={
+                                color.status === "Active" ? false : true
+                              }
                               onChange={(event) => {
                                 updateColorProperty(
                                   color.colorId,
@@ -220,20 +238,23 @@ function ProductSizeColorAdminUpdate(props) {
                                   event.target.value
                                 );
                               }}
-                              onBlur={(event) =>
-                                updateColorPrice(
-                                  event,
-                                  color.colorId,
-                                  color.productDetailId,
-                                  color.quantity
-                                )
-                              }
+                              onBlur={() => updateColor(color)}
                             />
                           </td>
                           <td>
                             <ButtonCRUD
-                              icon={faTrash}
+                              icon={
+                                color.status === "Active"
+                                  ? faTrash
+                                  : faRotateRight
+                              }
                               className={styles.btnCRUD}
+                              action={() => {
+                                deleteOrRefreshColor(
+                                  color.productDetailId,
+                                  color.status
+                                );
+                              }}
                             />
                           </td>
                         </tr>

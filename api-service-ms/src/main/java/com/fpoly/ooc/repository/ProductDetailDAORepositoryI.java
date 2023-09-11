@@ -23,8 +23,16 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
             "left join Size s on s.id = pd.size.id where pd.product.id=?1 and pd.color is null and pd.size is null" )
     public ProductDetailResponse getProductDetail(Long id);
 
+    @Query("select new com.fpoly.ooc.responce.product.ProductDetailResponse(" +
+            "pd.id, pd.product, pd.pattern, pd.button, pd.material, pd.collar, " +
+            "pd.sleeve, pd.size, pd.color, pd.form, pd.shirtTail, pd.price, " +
+            "pd.quantity, pd.descriptionDetail, pd.status, pd.createdAt, pd.createdBy, " +
+            "pd.updatedAt, pd.updatedBy, pd.deletedAt) " +
+            "from ProductDetail pd  where pd.id=?1 and pd.status=?2" )
+    public ProductDetailResponse getProductDetailByStatus(Long id, String status);
+
     @Query("select od.id as productDetailId, od.color.id as colorId, od.quantity as quantity" +
-            ", od.price as price from ProductDetail od where od.product.id = ?1 and od.size.id=?2")
+            ", od.price as price, od.status as status from ProductDetail od where od.product.id = ?1 and od.size.id=?2")
     public List<ProductDetailColorResponse> getProductDetailColorSizeByIdPAndSizeId(Long id, Long sizeId);
 
     @Query("select distinct od.size as size from ProductDetail od join Product o on o.id = od.product.id where o.id = ?1 " +

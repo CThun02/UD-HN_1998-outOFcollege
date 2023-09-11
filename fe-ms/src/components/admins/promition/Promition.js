@@ -95,10 +95,10 @@ function Promition() {
           <div className={styles.footer}>
             <div className={`${styles.footerRight}`}>
               <label>
-                <strong>Tổng cộng</strong>: 5
+                <strong>Số bản ghi</strong>: 5
               </label>
               <label>
-                <strong>Số bản ghi</strong>:
+                <strong>Hiển thị</strong>:
               </label>
               <select>
                 <option>5</option>

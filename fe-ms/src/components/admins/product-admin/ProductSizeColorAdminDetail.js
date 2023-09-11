@@ -45,7 +45,12 @@ function ProductSizeColorAdminCreate(props) {
                   {detailcolorsize.listColor &&
                     detailcolorsize.listColor.map((color, index) => {
                       return (
-                        <tr key={color.id} className={`size${color.colorId}`}>
+                        <tr
+                          key={color.id}
+                          className={`size${color.colorId} ${
+                            color.status === "InActive" ? "table-secondary" : ""
+                          }`}
+                        >
                           <td>{index + 1}</td>
                           <td>
                             <div

@@ -27,12 +27,15 @@ public class Product extends BaseEntity{
     @Column(name = "description")
     private String description;
 
+<<<<<<< HEAD
     @Column(name = "status")
     private String status;
 
     @Column(name = "img_default")
     private String imgDefault;
 
+=======
+>>>>>>> test
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id")
     private Category category;

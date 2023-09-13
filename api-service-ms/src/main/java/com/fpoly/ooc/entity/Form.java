@@ -21,6 +21,4 @@ public class Form extends BaseEntity{
     @Column(name = "form_name")
     private String formName;
 
-    @Column(name = "status")
-    private String status;
 }

@@ -21,6 +21,4 @@ public class SleeveType extends BaseEntity{
     @Column(name = "seleeve_name")
     private String sleeveName;
 
-    @Column(name = "status")
-    private String status;
 }

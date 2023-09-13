@@ -73,10 +73,7 @@ public class ProductDetail extends BaseEntity{
     @Column(name = "description_detail")
     private String descriptionDetail;
 
-    @Column(name = "status")
-    private String status;
-
     @OneToMany(mappedBy = "productDetailId")
-    private List<DiscountProduct> discountProductList;
+    private List<PromotionProduct> promotionProductList;
 
 }

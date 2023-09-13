@@ -21,6 +21,4 @@ public class Material extends BaseEntity{
     @Column(name = "material_name")
     private String materialName;
 
-    @Column(name = "status")
-    private String status;
 }

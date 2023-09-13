@@ -1,5 +1,7 @@
 import styles from "./AccountAdmin.module.css";
 import ButtonCRUD from "../button-crud/ButtonCRUD";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 import {
   faEye,
   faMinus,
@@ -8,8 +10,50 @@ import {
   faTrash,
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
+import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import "antd/dist/antd.css";
 function AccountAdminCustomerTable() {
+  const api = "http://localhost:8080/account/api/view";
+  const [customer, customerChange] = useState(null);
+  const [page, pageChange] = useState(0);
+  const [pageNumberToTal, pageNumberToTalChange] = useState(0);
+
+  const next = function () {
+    if (page >= pageNumberToTal - 1) {
+      pageChange(0);
+    } else {
+      pageChange(page + 1);
+    }
+  };
+
+  const prev = function () {
+    if (page <= 0) {
+      pageChange(pageNumberToTal - 1);
+    } else {
+      pageChange(page - 1);
+    }
+  };
+
+  useEffect(() => {
+    axios
+      .get(api + "/data?page=" + page)
+      .then((response) => {
+        customerChange(response.data);
+      })
+      .catch((error) => {
+        console.warn(error.message);
+      });
+    axios
+      .get(api + "/total")
+      .then((response) => {
+        pageNumberToTalChange(response.data);
+      })
+      .catch((error) => {
+        console.warn(error.message);
+      });
+  }, [page]);
+
   return (
     <div>
       <table className="table mt-5 text-center align-self-center">
@@ -25,120 +69,58 @@ function AccountAdminCustomerTable() {
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <th scope="row">1</th>
-            <td>
-              <ButtonCRUD className={styles.btnCreate} icon={faUser} />
-            </td>
-            <td>Nguyễn Đình Tới</td>
-            <td>Nam</td>
-            <td>2023/08/13 12:30:20</td>
-            <td>
-              <button
-                type="submit"
-                className={`${styles.btnStatusActive} pt-1 pb-1 ps-2 pe-2`}
-              >
-                Kích hoạt
-              </button>
-            </td>
-            <td>
-              <ButtonCRUD icon={faPencilAlt} className={styles.btnCRUD} />
-              <ButtonCRUD icon={faTrash} className={styles.btnCRUD} />
-              <ButtonCRUD icon={faEye} className={styles.btnCRUD} />
-            </td>
-          </tr>
-          <tr>
-            <th scope="row">1</th>
-            <td>
-              <ButtonCRUD className={styles.btnCreate} icon={faUser} />
-            </td>
-            <td>Nguyễn Đình Tới</td>
-            <td>Nam</td>
-            <td>2023/08/13 12:30:20</td>
-            <td>
-              <button
-                type="submit"
-                className={`${styles.btnStatusActive} pt-1 pb-1 ps-2 pe-2`}
-              >
-                Kích hoạt
-              </button>
-            </td>
-            <td>
-              <ButtonCRUD icon={faPencilAlt} className={styles.btnCRUD} />
-              <ButtonCRUD icon={faTrash} className={styles.btnCRUD} />
-              <ButtonCRUD icon={faEye} className={styles.btnCRUD} />
-            </td>
-          </tr>
-          <tr>
-            <th scope="row">1</th>
-            <td>
-              <ButtonCRUD className={styles.btnCreate} icon={faUser} />
-            </td>
-            <td>Nguyễn Đình Tới</td>
-            <td>Nam</td>
-            <td>2023/08/13 12:30:20</td>
-            <td>
-              <button
-                type="submit"
-                className={`${styles.btnStatusActive} pt-1 pb-1 ps-2 pe-2`}
-              >
-                Kích hoạt
-              </button>
-            </td>
-            <td>
-              <ButtonCRUD icon={faPencilAlt} className={styles.btnCRUD} />
-              <ButtonCRUD icon={faTrash} className={styles.btnCRUD} />
-              <ButtonCRUD icon={faEye} className={styles.btnCRUD} />
-            </td>
-          </tr>
-          <tr>
-            <th scope="row">1</th>
-            <td>
-              <ButtonCRUD className={styles.btnCreate} icon={faUser} />
-            </td>
-            <td>Nguyễn Đình Tới</td>
-            <td>Nam</td>
-            <td>2023/08/13 12:30:20</td>
-            <td>
-              <button
-                type="submit"
-                className={`${styles.btnStatusActive} pt-1 pb-1 ps-2 pe-2`}
-              >
-                Kích hoạt
-              </button>
-            </td>
-            <td>
-              <ButtonCRUD icon={faPencilAlt} className={styles.btnCRUD} />
-              <ButtonCRUD icon={faTrash} className={styles.btnCRUD} />
-              <ButtonCRUD icon={faEye} className={styles.btnCRUD} />
-            </td>
-          </tr>
-          <tr>
-            <th scope="row">1</th>
-            <td>
-              <ButtonCRUD className={styles.btnCreate} icon={faUser} />
-            </td>
-            <td>Nguyễn Đình Tới</td>
-            <td>Nam</td>
-            <td>2023/08/13 12:30:20</td>
-            <td>
-              <button
-                type="submit"
-                className={`${styles.btnStatusUnActive} pt-1 pb-1 ps-2 pe-2`}
-              >
-                Ngưng kích hoạt
-              </button>
-            </td>
-            <td>
-              <ButtonCRUD icon={faPencilAlt} className={styles.btnCRUD} />
-              <ButtonCRUD icon={faTrash} className={styles.btnCRUD} />
-              <ButtonCRUD icon={faEye} className={styles.btnCRUD} />
-            </td>
-          </tr>
+          {customer &&
+            customer.map((item, index) => {
+              return (
+                <tr key={item.id}>
+                  <th scope="row">{index + 1}</th>
+                  <td>
+                    <img
+                      alt="Chua co gi"
+                      src=""
+                      className={`d-inline-block ${styles.imgTable}`}
+                    ></img>
+                  </td>
+                  <td>{item.fullName}</td>
+                  <td>{item.gender}</td>
+                  <td>{item.createAt}</td>
+                  <td>
+                    <button
+                      type="submit"
+                      className={`${
+                        item.status === "Active"
+                          ? styles.btnStatusActive
+                          : styles.btnStatusUnactive
+                      } pt-1 pb-1 ps-2 pe-2`}
+                    >
+                      {item.status === "Active"
+                        ? "Kích Hoạt"
+                        : "Ngừng Kích Hoạt"}
+                    </button>
+                  </td>
+                  <td>
+                    <Link to={`/controller/v1/admin/account/update/${item.id}`}>
+                      <ButtonCRUD
+                        icon={faPencilAlt}
+                        className={styles.btnCRUD}
+                      />
+                    </Link>
+                    <Link to="/controller/v1/admin/product/update">
+                      <ButtonCRUD icon={faTrash} className={styles.btnCRUD} />
+                    </Link>
+                    <Link to="/controller/v1/admin/product/update">
+                      <ButtonCRUD icon={faEye} className={styles.btnCRUD} />
+                    </Link>
+                  </td>
+                </tr>
+              );
+            })}
         </tbody>
       </table>
       <div className="col-12">
-        <ButtonCRUD className={styles.btnCreate} icon={faPlus} />
+        <Link to="/controller/v1/admin/customer/create">
+          <ButtonCRUD className={styles.btnCreate} icon={faPlus} />
+        </Link>
         <div className="row">
           <div className="col-12">
             <div className="d-flex justify-content-center">
@@ -147,13 +129,22 @@ function AccountAdminCustomerTable() {
                   <FontAwesomeIcon
                     icon={faMinus}
                     className="ps-2"
+                    onClick={prev}
                   ></FontAwesomeIcon>
                 </li>
                 <li className={styles.pageNumber}>
-                  <input type={"text"} className="text-center" value={1} />
+                  <input
+                    type={"text"}
+                    className="text-center"
+                    value={page + 1}
+                    onChange={(event) => {
+                      pageChange(event.target.value);
+                    }}
+                  />
                 </li>
                 <li>
                   <FontAwesomeIcon
+                    onClick={next}
                     icon={faPlus}
                     className="pe-2"
                   ></FontAwesomeIcon>

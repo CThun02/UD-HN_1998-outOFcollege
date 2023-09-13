@@ -23,7 +23,7 @@ import java.util.Date;
 @Getter
 @Setter
 @Builder
-public class Account {
+public class Account extends BaseEntity{
 
     @Id
     @Column(name = "username")
@@ -31,7 +31,6 @@ public class Account {
 
     @Column(name = "full_name")
     private String fullName;
-
 
     @Column(name = "dob")
     private Date dob;
@@ -46,31 +45,13 @@ public class Account {
     private String email;
 
     @Column(name = "id_no")
-    private String cccd;
+    private String idNo;
 
     @Column(name = "avatar")
     private String avatar;
 
     @Column(name = "password")
     private String password;
-
-    @Column(name = "status")
-    private String status;
-
-    @Column(name = "created_at")
-    private Date createAt;
-
-    @Column(name = "updated_at")
-    private Date updayteAt;
-
-    @Column(name = "created_by")
-    private String createBy;
-
-    @Column(name = "updated_by")
-    private String updateBy;
-
-    @Column(name = "deleted_at")
-    private Date deleteAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id", referencedColumnName = "id")

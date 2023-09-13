@@ -24,7 +24,7 @@ import java.util.Date;
 @Builder
 @Entity
 @Table(name = "bill")
-public class Bill {
+public class Bill extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,24 +45,6 @@ public class Bill {
 
     @Column(name = "bill_type")
     private String billType;
-
-    @Column(name = "status")
-    private String status;
-
-    @Column(name = "created_at")
-    private Date createdAt;
-
-    @Column(name = "updated_at")
-    private Date updateAt;
-
-    @Column(name = "created_by")
-    private String createdBy;
-
-    @Column(name = "updated_by")
-    private String updatedBy;
-
-    @Column(name = "deleted_at")
-    private Date deletedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id", referencedColumnName = "username")

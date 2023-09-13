@@ -21,8 +21,4 @@ public class Category extends BaseEntity {
     @Column(name = "category_name")
     private String categoryName;
 
-    @Column(name = "status")
-    private String status;
-
-
 }

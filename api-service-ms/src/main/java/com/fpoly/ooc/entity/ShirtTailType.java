@@ -21,6 +21,4 @@ public class ShirtTailType extends BaseEntity{
     @Column(name = "shirt_tail_name")
     private String shirtTailTypeName;
 
-    @Column(name = "status")
-    private String status;
 }

@@ -21,7 +21,7 @@ code {
 
 /* Tùy chỉnh kiểu dáng chung của thanh cuộn */
 ::-webkit-scrollbar {
-  width: 2px; /* Độ rộng của thanh cuộn */
+  width: 4px; /* Độ rộng của thanh cuộn */
 }
 
 /* Tùy chỉnh kiểu dáng phần thumb (thanh trượt) của thanh cuộn */

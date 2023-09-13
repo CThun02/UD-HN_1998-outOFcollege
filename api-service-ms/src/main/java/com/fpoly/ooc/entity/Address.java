@@ -21,7 +21,7 @@ import java.util.Date;
 @Getter
 @Setter
 @Builder
-public class Address {
+public class Address extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,8 +31,8 @@ public class Address {
     @Column(name = "city")
     private String city;
 
-    @Column(name = "distrit")
-    private String distrit;
+    @Column(name = "district")
+    private String district;
 
     @Column(name = "ward")
     private String ward;
@@ -42,23 +42,5 @@ public class Address {
 
     @Column(name = "description_detail")
     private String descriptionDetail;
-
-    @Column(name = "status")
-    private String status;
-
-    @Column(name = "created_at")
-    private Date createAt;
-
-    @Column(name = "updated_at")
-    private Date updayteAt;
-
-    @Column(name = "created_by")
-    private String createBy;
-
-    @Column(name = "updated_by")
-    private String updateBy;
-
-    @Column(name = "deleted_at")
-    private Date deleteAt;
 
 }

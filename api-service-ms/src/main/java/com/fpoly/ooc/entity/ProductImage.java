@@ -27,6 +27,4 @@ public class ProductImage extends BaseEntity{
     @Column(name = "path")
     private String path;
 
-    @Column(name = "status")
-    private String status;
 }

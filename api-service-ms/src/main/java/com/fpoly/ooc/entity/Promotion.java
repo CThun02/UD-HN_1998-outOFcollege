@@ -10,30 +10,39 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Data
+@EqualsAndHashCode(callSuper = true)
+@Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Table(name = "voucher")
+@Table(name = "promotion")
 @Entity
-public class Voucher extends BaseEntity{
+public class Promotion extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "voucher_code")
-    private String voucherCode;
+    @Column(name = "promotion_code")
+    private String promotionCode;
 
-    @Column(name = "voucher_name")
-    private String voucherName;
+    @Column(name = "promotion_name")
+    private String promotionName;
+
+    @Column(name = "promotion_value")
+    private BigDecimal promotionValue;
 
     @Column(name = "start_date")
     private LocalDateTime startDate;
@@ -41,22 +50,16 @@ public class Voucher extends BaseEntity{
     @Column(name = "end_date")
     private LocalDateTime endDate;
 
-    @Column(name = "voucher_value")
-    private BigDecimal voucherValue;
+    @Column(name = "promotion_max_value")
+    private BigDecimal promotionMaxValue;
 
-    @Column(name = "voucher_value_max")
-    private BigDecimal voucherValueMax;
+    @Column(name = "promotion_method")
+    private String promotionMethod;
 
-    @Column(name = "voucher_method")
-    private String voucherMethod;
+    @Column(name = "promotion_condition")
+    private BigDecimal promotionCondition;
 
-    @Column(name = "voucher_condition")
-    private BigDecimal voucherCondition;
-
-    @Column(name = "limit_quantity")
-    private Integer limitQuantity;
-
-    @OneToMany(mappedBy = "voucherAccount")
-    private List<VoucherAccount> voucherAccount;
+    @OneToMany(mappedBy = "promotion")
+    private List<PromotionProduct> promotionProductList;
 
 }

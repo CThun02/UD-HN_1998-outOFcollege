@@ -15,28 +15,19 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.math.BigDecimal;
-import java.util.Date;
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @Builder
 @Entity
-@Table(name = "bill_detail")
-public class BillDetail extends BaseEntity{
+@Table(name = "time_line")
+public class TimeLine extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
-
-    @Column(name = "price")
-    private BigDecimal price;
-
-    @Column(name = "quantity")
-    private Integer quantity;
 
     @Column(name = "note")
     private String note;
@@ -44,9 +35,5 @@ public class BillDetail extends BaseEntity{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bill_id", referencedColumnName = "id")
     private Bill bill;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_detail_id", referencedColumnName = "id")
-    private ProductDetail productDetail;
 
 }

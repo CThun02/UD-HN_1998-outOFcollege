@@ -11,42 +11,42 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.math.BigDecimal;
-import java.util.Date;
 
+@EqualsAndHashCode(callSuper = true)
+@Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
 @Builder
+@Table(name = "promotion_product")
 @Entity
-@Table(name = "bill_detail")
-public class BillDetail extends BaseEntity{
+public class PromotionProduct extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "price")
-    private BigDecimal price;
+    @Column(name = "percent_reduce")
+    private BigDecimal percentReduce;
 
-    @Column(name = "quantity")
-    private Integer quantity;
-
-    @Column(name = "note")
-    private String note;
+    @Column(name = "money_after")
+    private BigDecimal moneyAfter;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "bill_id", referencedColumnName = "id")
-    private Bill bill;
+    @JoinColumn(name = "promotion_id")
+    private Promotion promotion;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_detail_id", referencedColumnName = "id")
-    private ProductDetail productDetail;
+    @JoinColumn(name = "product_detail_id")
+    private ProductDetail productDetailId;
 
 }

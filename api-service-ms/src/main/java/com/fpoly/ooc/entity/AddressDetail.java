@@ -25,33 +25,12 @@ import java.util.Date;
 @Getter
 @Setter
 @Builder
-public class AddressDetail {
+public class AddressDetail extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
-
-    @Column(name = "status")
-    private String status;
-
-    @DateTimeFormat(pattern = "dd-MM-yyyy")
-    @Column(name = "created_at")
-    private Date createAt;
-
-    @DateTimeFormat(pattern = "dd-MM-yyyy")
-    @Column(name = "updated_at")
-    private Date updayteAt;
-
-    @Column(name = "created_by")
-    private String createBy;
-
-    @Column(name = "updated_by")
-    private String updateBy;
-
-    @Column(name = "deleted_at")
-    @DateTimeFormat(pattern = "dd-MM-yyyy")
-    private Date deleteAt;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "address_id", referencedColumnName = "id")

@@ -21,6 +21,4 @@ public class Pattern extends BaseEntity{
     @Column(name = "pattern_name")
     private String patternName;
 
-    @Column(name = "status")
-    private String status;
 }

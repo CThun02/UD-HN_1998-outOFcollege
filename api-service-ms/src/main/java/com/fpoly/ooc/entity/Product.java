@@ -27,9 +27,6 @@ public class Product extends BaseEntity{
     @Column(name = "description")
     private String description;
 
-    @Column(name = "status")
-    private String status;
-
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id")
     private Category category;

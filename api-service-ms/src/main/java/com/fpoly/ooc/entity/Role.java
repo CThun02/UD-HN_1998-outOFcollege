@@ -31,21 +31,4 @@ public class Role {
     @Column(name = "role_name")
     private String roleName;
 
-    @Column(name = "status")
-    private String status;
-
-    @Column(name = "created_at")
-    private Date createAt;
-
-    @Column(name = "updated_at")
-    private Date updayteAt;
-
-    @Column(name = "created_by")
-    private String createBy;
-
-    @Column(name = "updated_by")
-    private String updateBy;
-
-    @Column(name = "deleted_at")
-    private Date deleteAt;
 }

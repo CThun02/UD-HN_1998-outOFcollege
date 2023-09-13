@@ -20,6 +20,4 @@ public class Color extends BaseEntity{
     @Column(name = "color_name")
     private String colorName;
 
-    @Column(name = "status")
-    private String status;
 }

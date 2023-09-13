@@ -33,7 +33,7 @@ import java.util.Date;
 @EnableJpaAuditing
 @Entity
 @Table(name = "cart_detail")
-public class CartDetail {
+public class CartDetail extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,28 +42,6 @@ public class CartDetail {
 
     @Column(name = "quantity")
     private Integer quantity;
-
-    @Column(name = "status")
-    private String status;
-
-    @CreatedDate
-    @Column(name = "created_at")
-    private Date createdAt;
-
-    @LastModifiedDate
-    @Column(name = "updated_at")
-    private Date updateAt;
-
-    @CreatedBy
-    @Column(name = "created_by")
-    private String createdBy;
-
-    @LastModifiedBy
-    @Column(name = "updated_by")
-    private String updatedBy;
-
-    @Column(name = "deleted_at")
-    private Date deletedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cart_id", referencedColumnName = "id")

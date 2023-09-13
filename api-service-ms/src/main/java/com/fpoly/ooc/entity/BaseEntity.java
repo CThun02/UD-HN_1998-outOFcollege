@@ -1,5 +1,6 @@
 package com.fpoly.ooc.entity;
 
+import com.fpoly.ooc.constant.Const;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
@@ -40,10 +41,11 @@ public abstract class BaseEntity implements Serializable {
     protected LocalDateTime deletedAt;
 
     @Column(name = "status")
-    protected String status = "ACTIVE";
+    protected String status;
 
     @PrePersist
     protected void onCreate() {
+        this.status = Const.STATUS_ACTIVE;
         this.createdAt = LocalDateTime.now();
     }
 

@@ -12,6 +12,7 @@ import axios from "axios";
 import Input from "antd/es/input/Input";
 import moment from "moment";
 import { Link } from "react-router-dom";
+import ProductCreate from "./ProductCreate";
 
 const ProductIndex = () => {
   const api = "http://localhost:8080/api/admin/";
@@ -41,7 +42,7 @@ const ProductIndex = () => {
             "https://vapa.vn/wp-content/uploads/2022/12/anh-3d-thien-nhien.jpeg"
           }
           alt="Avatar"
-          style={{ width: "50px", height: "50px" }}
+          style={{ width: "100px", height: "100px" }}
         />
       ),
     },
@@ -86,6 +87,11 @@ const ProductIndex = () => {
       ),
     },
   ];
+
+  //function
+  function showProductCreateFrame() {
+    console.log(1);
+  }
 
   useEffect(() => {
     setLoading(true);
@@ -341,7 +347,12 @@ const ProductIndex = () => {
         </h2>
         <div className={styles.product__tableProducts}>
           <div>
-            <Button className={styles.product_tableButtonCreate}>
+            <Button
+              onClick={() => {
+                showProductCreateFrame();
+              }}
+              className={styles.product_tableButtonCreate}
+            >
               <PlusOutlined />
             </Button>
             <Col span={12} className={styles.filter__search}>
@@ -364,6 +375,12 @@ const ProductIndex = () => {
           ></Table>
         </div>
       </div>
+      <ProductCreate
+        brands={brands}
+        patterns={patterns}
+        categories={categories}
+        forms={forms}
+      />
     </>
   );
 };

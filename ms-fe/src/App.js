@@ -1,9 +1,13 @@
 import "./App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Col, Row } from "antd";
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { Button, Col, Result, Row } from "antd";
 import SideBar from "./components/admin/page/SideBar";
 import NavBar from "./components/admin/page/NavBar";
 import ProductIndex from "./components/admin/product/ProductIndex";
+import Promotion from "./components/admin/promotion/Promotion";
+import Voucher from "./components/admin/voucher/Voucher";
+import CreateVoucher from "./components/admin/voucher/CreateVoucher";
+import ProductCreate from "./components/admin/product/ProductCreate";
 
 function App() {
   return (
@@ -19,42 +23,67 @@ function App() {
             </div>
             <div className="content">
               <Routes>
-                {/* Thống kê */}
-                <Route path="/admin/thong-ke" element="thongke"></Route>
+                <Route path="admin">
+                  {/* Thống kê */}
+                  {/* hiển thị mặc định khi vào admin là trang thống kê */}
+                  <Route index element="statistical" />
+                  <Route path="statistical" element="statistical"></Route>
 
-                {/* Tại quầy */}
-                <Route path="/admin/tai-quay" element="taiquay"></Route>
+                  {/* Tại quầy */}
+                  <Route path="counter-sales" element="counter-sales"></Route>
 
-                {/* Đơn hàng */}
-                <Route path="/admin/don-hang" element="donhang"></Route>
+                  {/* Đơn hàng */}
+                  <Route path="order" element="order"></Route>
 
-                {/* Thu chi */}
-                <Route path="/admin/thu-chi" element="thuchi"></Route>
+                  {/* Thu chi */}
+                  <Route
+                    path="income-and-expenses"
+                    element="income-and-expenses"
+                  ></Route>
+                  {/* Sản phẩm */}
+                  <Route path="product">
+                    <Route index element={<ProductIndex />} />
 
-                {/* Sản phẩm */}
+                    {/* ví dụ path= san-pham/hien-thi ->  
+                    <Route path="hien-thi" element="el" />
+                    */}
+                  </Route>
+                  <Route path="category" element="category"></Route>
+                  <Route path="brand" element={<SideBar />}></Route>
+
+                  {/* Tài khoản */}
+                  <Route path="employee" element="employee"></Route>
+                  <Route path="customer" element="customer"></Route>
+
+                  {/* Voucher */}
+                  <Route path="voucher">
+                    <Route index element={<Voucher />} />
+                    <Route path="create" element={<CreateVoucher />} />
+
+                    <Route path="detail" element={"Chi tiet"} />
+                    <Route path="update" element={"Chi tiet"} />
+                  </Route>
+
+                  {/* Promotion */}
+                  <Route path="promotion" element={<Promotion />}></Route>
+                </Route>
+
+                {/* Not found */}
                 <Route
-                  path="/admin/san-pham"
-                  element={<ProductIndex />}
-                ></Route>
-                <Route
-                  path="/admin/loai-san-pham"
-                  element="loaisanpham"
-                ></Route>
-                <Route path="/admin/thuong-hieu" element={<SideBar />}></Route>
-
-                {/* Tài khoản */}
-                <Route path="/admin/nhan-vien" element="nhanvien"></Route>
-                <Route path="/admin/khach-hang" element="khachhang"></Route>
-
-                {/* Giảm giá */}
-                <Route
-                  path="/admin/phieu-giam-gia"
-                  element="phieugiamgia"
-                ></Route>
-                <Route
-                  path="/admin/giam-gia-san-pham"
-                  element="giamgiasanpham"
-                ></Route>
+                  path="*"
+                  element={
+                    <Result
+                      status={"404"}
+                      title={"404"}
+                      subTitle={"Xin lỗi, trang bạn truy cập không tồn tại."}
+                      extra={
+                        <Link to={"/admin"}>
+                          <Button type="primary">Back Home</Button>
+                        </Link>
+                      }
+                    />
+                  }
+                />
               </Routes>
             </div>
           </Col>

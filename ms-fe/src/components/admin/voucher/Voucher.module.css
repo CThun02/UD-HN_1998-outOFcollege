@@ -1,0 +1,25 @@
+.voucher {
+  padding: 20px;
+}
+
+.content {
+  margin-top: 25px;
+  height: calc(100vh - 70px);
+  overflow: auto;
+  background-color: #fff;
+  padding: 20px;
+}
+
+.color {
+  color: #000000e0;
+}
+
+.btn {
+  background-color: #00b2ff;
+}
+
+.btn:hover {
+  background-color: #00b2ff;
+}
+
+/* button color: 00B2FF */

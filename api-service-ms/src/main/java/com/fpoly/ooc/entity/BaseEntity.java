@@ -21,11 +21,11 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 public abstract class BaseEntity implements Serializable {
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", updatable = false)
     @CreatedDate
     protected LocalDateTime createdAt;
 
-    @Column(name = "created_by")
+    @Column(name = "created_by", updatable = false)
     @CreatedBy
     protected String createdBy;
 
@@ -44,13 +44,13 @@ public abstract class BaseEntity implements Serializable {
     protected String status;
 
     @PrePersist
-    protected void onCreate() {
+    protected void prePersist() {
         this.status = Const.STATUS_ACTIVE;
         this.createdAt = LocalDateTime.now();
     }
 
     @PreUpdate
-    protected void onUpdate() {
+    protected void preUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
 

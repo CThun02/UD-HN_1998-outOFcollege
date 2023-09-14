@@ -157,10 +157,10 @@ function ProductSizeColorAdminTable() {
       axios
         .get(
           api +
-            "product/detailStatus?id=" +
-            listColor[i].productDetailId +
-            "&status=" +
-            (listColor[i].status === "Active")
+          "product/detailStatus?id=" +
+          listColor[i].productDetailId +
+          "&status=" +
+          (listColor[i].status === "Active")
         )
         .then((response) => {
           let productDetailUpdate = productDetail;
@@ -228,7 +228,7 @@ function ProductSizeColorAdminTable() {
       .catch((err) => {
         console.error(err);
       });
-  }, [productId, count]);
+  }, [productId, count, productDetail.id]);
 
   return (
     <div className={`${styles.radiusFrame} mt-5 col-lg-10 offset-md-1`}>
@@ -291,9 +291,9 @@ function ProductSizeColorAdminTable() {
                               }
                               color={
                                 (red >= 128 && green >= 128 && blue >= 128) ||
-                                (red >= 128 && green >= 128) ||
-                                (blue >= 128 && green >= 128) ||
-                                (blue >= 128 && red >= 128)
+                                  (red >= 128 && green >= 128) ||
+                                  (blue >= 128 && green >= 128) ||
+                                  (blue >= 128 && red >= 128)
                                   ? "black"
                                   : "white"
                               }
@@ -311,11 +311,10 @@ function ProductSizeColorAdminTable() {
                     <td>
                       <button
                         type="submit"
-                        className={`${
-                          kichHoat === true
+                        className={`${kichHoat === true
                             ? styles.btnStatusActive
                             : styles.btnStatusUnActive
-                        } pt-1 pb-1 ps-2 pe-2`}
+                          } pt-1 pb-1 ps-2 pe-2`}
                         onClick={() => deleteAllColorSize(kichHoat, item)}
                       >
                         {kichHoat === true ? "kích hoạt" : "Ngưng kích hoạt"}
@@ -326,9 +325,9 @@ function ProductSizeColorAdminTable() {
                         <ButtonCRUD
                           action={
                             (index,
-                            (event) => {
-                              displaySizeColorDetail(index, event);
-                            })
+                              (event) => {
+                                displaySizeColorDetail(index, event);
+                              })
                           }
                           className={styles.btnCRUD}
                           icon={faEye}
@@ -338,9 +337,9 @@ function ProductSizeColorAdminTable() {
                         <ButtonCRUD
                           action={
                             (index,
-                            (event) => {
-                              displaySizeColorUpdate(index, event, item.sizeId);
-                            })
+                              (event) => {
+                                displaySizeColorUpdate(index, event, item.sizeId);
+                              })
                           }
                           className={styles.btnCRUD}
                           icon={faPencilAlt}

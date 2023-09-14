@@ -82,8 +82,8 @@ const ProductModal = ({ showModal, handleCloseModal }) => {
                                     <th scope="col">Sản phẩm</th>
                                     <th scope="col">Số lượng</th>
                                     <th scope="col">kích cỡ</th>
-                                    <th scope="col">đơn giá</th>
                                     <th scope="col">màu sắc</th>
+                                    <th scope="col">đơn giá</th>
                                     <th scope="col">Thao tác</th>
                                 </tr>
                             </thead>
@@ -94,8 +94,8 @@ const ProductModal = ({ showModal, handleCloseModal }) => {
                                         <td>{item.product.productName}</td>
                                         <td>{item.quantity}</td>
                                         <td>{item.size.sizeName}</td>
-                                        <td>{item.price}</td>
                                         <td>{item.color.colorName}</td>
+                                        <td>{item.price}</td>
                                         <td>
                                             <button className='btn btn-success' >Chọn</button>
                                         </td>

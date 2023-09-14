@@ -26,37 +26,37 @@ const SideBar = () => {
   const handelClick = (key) => {
     switch (key) {
       case "thongKe":
-        navigate(href + "thong-ke");
+        navigate(href + "statistical");
         break;
       case "taiQuay":
-        navigate(href + "tai-quay");
+        navigate(href + "counter-sales");
         break;
       case "donHang":
-        navigate(href + "don-hang");
+        navigate(href + "order");
         break;
       case "thuChi":
-        navigate(href + "thu-chi");
+        navigate(href + "income-and-expenses");
         break;
       case "sanPhamChiTiet":
-        navigate(href + "san-pham");
+        navigate(href + "product");
         break;
       case "loaiSanPham":
-        navigate(href + "loai-san-pham");
+        navigate(href + "category");
         break;
       case "thuongHieu":
-        navigate(href + "thuong-hieu");
+        navigate(href + "brand");
         break;
       case "nhanVien":
-        navigate(href + "nhan-vien");
+        navigate(href + "employee");
         break;
       case "khachHang":
-        navigate(href + "khach-hang");
+        navigate(href + "customer");
         break;
       case "phieuGiamGia":
-        navigate(href + "phieu-giam-gia");
+        navigate(href + "voucher");
         break;
       case "giamGiaSanPham":
-        navigate(href + "giam-gia-san-pham");
+        navigate(href + "promotion");
         break;
       default:
         break;

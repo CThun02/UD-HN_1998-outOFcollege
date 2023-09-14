@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Col, Row } from "antd";
 import SideBar from "./components/admin/page/SideBar";
 import NavBar from "./components/admin/page/NavBar";
+import AccountForm from "./components/admin/account/AccountForm";
 
 function App() {
   return (
@@ -40,7 +41,9 @@ function App() {
 
                 {/* Tài khoản */}
                 <Route path="/admin/nhan-vien" element="nhanvien"></Route>
+                <Route path="/admin/nhan-vien/create" element={<AccountForm/>}></Route>
                 <Route path="/admin/khach-hang" element="khachhang"></Route>
+               
 
                 {/* Giảm giá */}
                 <Route

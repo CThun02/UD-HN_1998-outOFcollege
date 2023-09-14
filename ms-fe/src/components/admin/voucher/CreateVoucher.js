@@ -1,18 +1,16 @@
-import styles from "./CreateVoucher.module.css";
+import FloatingLabels from "../../element/FloatingLabels/FloatingLabels";
+import { Form, Input } from "antd";
 
-import FloatingLabel from "react-bootstrap/FloatingLabel";
-import Form from "react-bootstrap/Form";
+import styles from "./CreateVoucher.module.css";
 
 function CreateVoucher() {
   return (
     <div className={styles.createVoucher}>
-      <FloatingLabel
-        controlId="floatingInput"
-        label="Email address"
-        className="mb-3"
-      >
-        <Form.Control type="email" placeholder="name@example.com" />
-      </FloatingLabel>
+      <Form>
+        <FloatingLabels label="Last Name" name="lastName">
+          <Input size="large" />
+        </FloatingLabels>
+      </Form>
     </div>
   );
 }

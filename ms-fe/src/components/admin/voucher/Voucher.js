@@ -124,7 +124,6 @@ function Voucher() {
       <FilterVoucherAndPromotion />
 
       <div className={styles.content}>
-        s
         <Space style={{ width: "100%" }} direction="vertical" size={16}>
           <Row>
             <Col span={20}>

@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Col, Row } from "antd";
 import SideBar from "./components/admin/page/SideBar";
 import NavBar from "./components/admin/page/NavBar";
+import ProductIndex from "./components/admin/product/ProductIndex";
 
 function App() {
   return (
@@ -12,7 +13,7 @@ function App() {
           <Col span={4}>
             <SideBar />
           </Col>
-          <Col span={20}>
+          <Col span={20} className="h-100vh">
             <div>
               <NavBar />
             </div>
@@ -31,7 +32,10 @@ function App() {
                 <Route path="/admin/thu-chi" element="thuchi"></Route>
 
                 {/* Sản phẩm */}
-                <Route path="/admin/san-pham" element="sanpham"></Route>
+                <Route
+                  path="/admin/san-pham"
+                  element={<ProductIndex />}
+                ></Route>
                 <Route
                   path="/admin/loai-san-pham"
                   element="loaisanpham"

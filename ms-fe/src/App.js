@@ -41,9 +41,11 @@ function App() {
 
                 {/* Tài khoản */}
                 <Route path="/admin/nhan-vien" element="nhanvien"></Route>
-                <Route path="/admin/nhan-vien/create" element={<AccountForm/>}></Route>
+                <Route
+                  path="/admin/nhan-vien/create"
+                  element={<AccountForm />}
+                ></Route>
                 <Route path="/admin/khach-hang" element="khachhang"></Route>
-               
 
                 {/* Giảm giá */}
                 <Route

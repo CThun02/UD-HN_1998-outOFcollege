@@ -1,0 +1,19 @@
+.container {
+  padding: 30px;
+  width: 96%;
+  margin: 20px;
+}
+
+.header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.listProduct {
+  background-color: #eeeded;
+  min-height: 200px;
+  height: auto;
+}

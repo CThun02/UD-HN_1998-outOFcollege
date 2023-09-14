@@ -6,6 +6,8 @@ import NavBar from "./components/admin/page/NavBar";
 import Promotion from "./components/admin/promotion/Promotion";
 import Voucher from "./components/admin/voucher/Voucher";
 import CreateVoucher from "./components/admin/voucher/CreateVoucher";
+import Bill from "./components/admin/sale-couter/Bill"
+import CreateBill from "./components/admin/sale-couter/CreateBill";
 
 function App() {
   return (
@@ -28,7 +30,10 @@ function App() {
                   <Route path="statistical" element="statistical"></Route>
 
                   {/* Tại quầy */}
-                  <Route path="counter-sales" element="counter-sales"></Route>
+                  <Route path="counter-sales">
+                    <Route index element={<Bill />} ></Route>
+                    <Route path="bill" element={<CreateBill />} ></Route>
+                  </Route>
 
                   {/* Đơn hàng */}
                   <Route path="order" element="order"></Route>

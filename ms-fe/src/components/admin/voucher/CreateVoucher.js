@@ -1,6 +1,5 @@
 import FloatingLabels from "../../element/FloatingLabels/FloatingLabels";
 import { Form, Input } from "antd";
-
 import styles from "./CreateVoucher.module.css";
 
 function CreateVoucher() {

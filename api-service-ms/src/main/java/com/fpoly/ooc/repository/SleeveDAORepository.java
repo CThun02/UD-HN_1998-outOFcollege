@@ -1,12 +1,10 @@
 package com.fpoly.ooc.repository;
 
-import com.fpoly.ooc.entity.ProductDetail;
+import com.fpoly.ooc.entity.Brand;
+import com.fpoly.ooc.entity.SleeveType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 @Repository
-public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail, Long> {
-
+public interface SleeveDAORepository extends JpaRepository<SleeveType, Long> {
 }

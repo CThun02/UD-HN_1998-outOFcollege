@@ -27,20 +27,23 @@ public class Product extends BaseEntity {
     @Column(name = "description")
     private String description;
 
-<<<<<<< HEAD
-    @Column(name = "status")
-    private String status;
-
     @Column(name = "img_default")
     private String imgDefault;
 
-=======
->>>>>>> test
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id")
     private Category category;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "brand_id")
-    private Brand brand;
+    private  Brand brand;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "pattern_id")
+    private Pattern pattern;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "form_id")
+    private Form form;
+
 }

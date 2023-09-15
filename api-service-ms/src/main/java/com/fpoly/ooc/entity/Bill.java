@@ -1,4 +1,5 @@
 package com.fpoly.ooc.entity;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -17,7 +18,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -26,7 +27,7 @@ import java.util.Date;
 @Builder
 @Entity
 @Table(name = "bill")
-public class Bill extends BaseEntity{
+public class Bill extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,11 +36,11 @@ public class Bill extends BaseEntity{
 
     @Column(name = "date_of_receipt")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date dateOfReceipt;
+    private LocalDateTime dateOfReceipt;
 
     @Column(name = "completion_date")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date completionDate;
+    private LocalDateTime completionDate;
 
     @Column(name = "price")
     private BigDecimal price;

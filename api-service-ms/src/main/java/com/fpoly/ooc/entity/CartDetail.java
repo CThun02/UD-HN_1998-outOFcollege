@@ -15,14 +15,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
-
-import java.util.Date;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -33,7 +27,7 @@ import java.util.Date;
 @EnableJpaAuditing
 @Entity
 @Table(name = "cart_detail")
-public class CartDetail extends BaseEntity{
+public class CartDetail extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

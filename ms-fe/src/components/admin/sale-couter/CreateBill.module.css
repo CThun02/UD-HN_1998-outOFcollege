@@ -12,8 +12,34 @@
   margin-bottom: 20px;
 }
 
-.listProduct {
+.lstProduct {
   background-color: #eeeded;
-  min-height: 200px;
+  min-height: 300px;
   height: auto;
+  margin-bottom: 20px;
+}
+
+.lstAccount {
+  background-color: #eeeded;
+  min-height: 100px;
+  height: auto;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.blackDivider {
+  background-color: black;
+  height: 1px;
+}
+
+.infBill {
+  background-color: #eeeded;
+  min-height: 400px;
+  height: auto;
+  padding: 20px;
+}
+
+.font {
+  font-size: 14px;
+  font-weight: 600;
 }

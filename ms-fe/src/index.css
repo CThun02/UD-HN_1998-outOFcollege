@@ -9,7 +9,7 @@ body {
     "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue",
     Helvetica, Arial, sans-serif !important;
   font-size: 14px;
-  background-color: #f9fbfd;
+  background-color: #f9fbfd !important;
   color: #53535f;
   line-height: 1.5;
   overflow-x: hidden;

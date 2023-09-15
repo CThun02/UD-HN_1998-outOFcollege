@@ -7,7 +7,7 @@ import ProductIndex from "./components/admin/product/ProductIndex";
 import Promotion from "./components/admin/promotion/Promotion";
 import Voucher from "./components/admin/voucher/Voucher";
 import CreateVoucher from "./components/admin/voucher/CreateVoucher";
-import ProductCreate from "./components/admin/product/ProductCreate";
+import ProductUpdate from "./components/admin/product/ProductUpdate";
 
 function App() {
   return (
@@ -43,6 +43,7 @@ function App() {
                   {/* Sản phẩm */}
                   <Route path="product">
                     <Route index element={<ProductIndex />} />
+                    <Route path={"update"} element={<ProductUpdate />} />
 
                     {/* ví dụ path= san-pham/hien-thi ->  
                     <Route path="hien-thi" element="el" />

@@ -13,6 +13,8 @@ import Input from "antd/es/input/Input";
 import moment from "moment";
 import { Link } from "react-router-dom";
 import ProductCreate from "./ProductCreate";
+import "../animations/animation.css";
+import { displayFrame } from "../animations/animation";
 
 const ProductIndex = () => {
   const api = "http://localhost:8080/api/admin/";
@@ -78,7 +80,7 @@ const ProductIndex = () => {
       dataIndex: "id",
       render: (item) => (
         <>
-          <Link to={"/admin/san-pham/update"}>
+          <Link to={"/admin/product/update"}>
             <Button className={styles.product__button}>
               <EditOutlined />
             </Button>
@@ -89,9 +91,6 @@ const ProductIndex = () => {
   ];
 
   //function
-  function showProductCreateFrame() {
-    console.log(1);
-  }
 
   useEffect(() => {
     setLoading(true);
@@ -349,7 +348,7 @@ const ProductIndex = () => {
           <div>
             <Button
               onClick={() => {
-                showProductCreateFrame();
+                displayFrame("productCreate", "productCreateFrame");
               }}
               className={styles.product_tableButtonCreate}
             >

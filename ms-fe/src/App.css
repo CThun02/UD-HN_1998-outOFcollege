@@ -8,3 +8,11 @@
   height: 100vh;
   overflow: auto;
 }
+
+.d-none {
+  display: none !important;
+}
+
+.mse-5 {
+  margin: 0 5px;
+}

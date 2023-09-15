@@ -15,5 +15,4 @@ public interface ProductDAORepositoryI extends JpaRepository<Product, Long> {
             "count(od) as quantity from Product o join ProductDetail od on od.product.id = o.id" +
            " group by o.id, o.productName, o.status, o.imgDefault, o.createdAt")
     public Page<ProductTableResponse> getProductsTable(Pageable pageable);
-
 }

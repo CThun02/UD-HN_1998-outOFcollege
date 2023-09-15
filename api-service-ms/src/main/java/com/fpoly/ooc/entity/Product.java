@@ -37,4 +37,12 @@ public class Product extends BaseEntity{
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "brand_id")
     private  Brand brand;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "pattern_id")
+    private Pattern pattern;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "form_id")
+    private Form form;
 }

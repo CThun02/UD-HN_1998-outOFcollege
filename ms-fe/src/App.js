@@ -4,8 +4,8 @@ import { Button, Col, Result, Row } from "antd";
 import SideBar from "./components/admin/page/SideBar";
 import NavBar from "./components/admin/page/NavBar";
 import Promotion from "./components/admin/promotion/Promotion";
+import CreatePromotion from "./components/admin/promotion/CreatePromotion";
 import Voucher from "./components/admin/voucher/Voucher";
-import CreateVoucher from "./components/admin/voucher/CreateVoucher";
 
 function App() {
   return (
@@ -56,14 +56,16 @@ function App() {
                   {/* Voucher */}
                   <Route path="voucher">
                     <Route index element={<Voucher />} />
-                    <Route path="create" element={<CreateVoucher />} />
 
                     <Route path="detail" element={"Chi tiet"} />
                     <Route path="update" element={"Chi tiet"} />
                   </Route>
 
                   {/* Promotion */}
-                  <Route path="promotion" element={<Promotion />}></Route>
+                  <Route path="promotion">
+                    <Route index element={<Promotion />} />
+                    <Route path="create" element={<CreatePromotion />} />
+                  </Route>
                 </Route>
 
                 {/* Not found */}

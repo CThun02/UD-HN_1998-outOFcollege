@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import styles from "./FloatingLabels.module.css";
-function FloatingLabels({ children, label, value }) {
+function FloatingLabels({ children, label, value, zIndex }) {
   const [focus, setFocus] = useState(false);
 
   return (
@@ -14,7 +14,7 @@ function FloatingLabels({ children, label, value }) {
       <div
         className={`${styles.label} ${
           focus || (value && value.length !== 0) ? styles.labelFloat : ""
-        }`}
+        } ${zIndex ? styles.zIndex : ""}`}
       >
         {label}
       </div>

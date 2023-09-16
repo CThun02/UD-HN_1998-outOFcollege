@@ -2,15 +2,11 @@ package com.fpoly.ooc.responce.product;
 
 import java.time.LocalDateTime;
 
-public interface ProductResponse {
+public interface ProductTableResponse {
     Long getId();
-    Long getBrandId();
-    Long getCategoryId();
-    String getProductCode();
     String getProductName();
-    String getDescription();
     String getImgDefault();
+    Integer getQuantity();
     String getStatus();
     LocalDateTime getCreatedAt();
-    String getCreatedBy();
 }

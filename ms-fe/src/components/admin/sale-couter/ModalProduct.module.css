@@ -1,0 +1,22 @@
+.modalSize {
+  width: 1200px !important;
+  min-height: 600px !important;
+  position: relative;
+  top: 40px;
+}
+.selectContainer {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.selectContainer .select {
+  margin: 0 8px;
+}
+
+.selectContainer .select .ant-select-selector {
+  border: none;
+  border-bottom: 2px solid #000;
+  border-radius: 0;
+  box-shadow: none;
+}

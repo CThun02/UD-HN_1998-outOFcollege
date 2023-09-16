@@ -28,9 +28,6 @@ public class ProductDetail extends BaseEntity{
     @JoinColumn(name = "product_id")
     private Product product;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "pattern_id")
-    private Pattern pattern;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "button_id")
@@ -55,10 +52,6 @@ public class ProductDetail extends BaseEntity{
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "color_id")
     private Color color;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "form_id")
-    private Form form;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "shirt_tail_id")

@@ -1,3 +1,68 @@
+<<<<<<< HEAD
+.formContainer {
+  padding: 12px;
+
+   text-align: left
+  
+  }
+  .container{
+    margin-top: 25px;
+  margin-bottom: 25px;
+  margin-left: 25px;
+  margin-right: 25px;
+    background-color: white;
+    padding: 20px;
+border: 1px solid #edf2f9;
+border-radius: 4px;
+  }
+  .ten{
+    /* padding: 12px;
+    width: 100%; */
+    
+  }
+  .create{
+    text-align: center  ; 
+   
+}
+.cmnd{
+  margin-right: 10px;
+
+}
+.email{
+  margin-right: 10px;
+}
+  
+.sdt{
+
+  margin-right: 10px;
+}
+.thanhpho{
+
+  margin-right: 10px;
+
+}
+.quan{
+
+  margin-right: 10px;
+
+}.duong{
+  margin-right: 10px;
+}
+
+
+.duong{
+  margin-bottom: 60px;
+}
+/* .qrcodeContainer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.qrcode {
+  width: 100px;
+  height: 100px;
+} */
+=======
 .form-container {
     display: flex;
     flex-wrap: wrap;
@@ -37,3 +102,4 @@
     border-radius: 6px;
     transition: all 0.2s;
 }  */
+>>>>>>> test

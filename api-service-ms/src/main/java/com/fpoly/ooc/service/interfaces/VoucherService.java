@@ -13,10 +13,12 @@ public interface VoucherService {
 
     Voucher saveOrUpdate(VoucherRequest voucherRequest);
 
-    Voucher updateStatus(Long id);
+    Voucher updateStatus(String code);
 
     VoucherRequest findVoucherRequestById(Long id);
 
     Voucher findVoucherById(Long id);
+
+    VoucherRequest findByVoucherCode(String code);
 
 }

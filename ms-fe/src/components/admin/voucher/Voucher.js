@@ -12,60 +12,33 @@ import {
   Input,
   Drawer,
   DatePicker,
-  RadioChangeEvent,
   Radio,
+  Spin,
 } from "antd";
 import FilterVoucherAndPromotion from "../../element/filter/FilterVoucherAndPromotion";
 import { Link } from "react-router-dom";
 import {
-  EditOutlined,
+  DeleteOutlined,
   EyeOutlined,
   PlusOutlined,
   UnorderedListOutlined,
 } from "@ant-design/icons";
-import { useState } from "react";
-import FloatingLabels from "../../element/FloatingLabels/FloatingLabels";
+import { useEffect, useState } from "react";
 
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import numeral from "numeral";
+import axios from "axios";
+import moment from "moment";
+import * as Yup from "yup";
+
+import FloatingLabels from "../../element/FloatingLabels/FloatingLabels";
 
 dayjs.extend(customParseFormat);
 
 const dateFormat = "DD/MM/YYYY";
 
-const data = [
-  {
-    key: "1",
-    stt: "1",
-    voucherCode: "VOUCHER_1",
-    voucherName: "Black friday",
-    limitQuantity: 20,
-    voucherValue: 50000,
-    startAndEndDate: "2012/20/20 - 2020/20/20",
-    status: ["Đang diễn ra"],
-  },
-  {
-    key: "2",
-    stt: "2",
-    voucherCode: "VOUCHER_2",
-    voucherName: "Black friday",
-    limitQuantity: 20,
-    voucherValue: 50000,
-    startAndEndDate: "2012/20/20 - 2020/20/20",
-    status: ["Sắp diễn ra"],
-  },
-  {
-    key: "3",
-    stt: "3",
-    voucherCode: "VOUCHER_3",
-    voucherName: "Black friday",
-    limitQuantity: 20,
-    voucherValue: 50000,
-    startAndEndDate: "2012/20/20 - 2020/20/20",
-    status: ["Đã kết thúc"],
-  },
-];
+const baseUrl = "http://localhost:8080/admin/api/voucher/";
 
 const options = [
   { label: "VND", value: "vnd" },
@@ -73,7 +46,17 @@ const options = [
 ];
 
 function Voucher() {
+  // filter
+  const [searchNameOrCode, setSearchNameOrCode] = useState("");
+  const [searchStartDate, setSearchStartDate] = useState("");
+  const [searchEndDate, setSearchEndDate] = useState("");
+  const [searchStatus, setSearchStatus] = useState("ALL");
+
   const [open, setOpen] = useState(false);
+  const [isUpdate, setIsUpdate] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [voucherId, setVoucherId] = useState("");
   const [voucherName, setVoucherName] = useState("");
   const [voucherCode, setVoucherCode] = useState("");
   const [limitQuantity, setLimitQuantity] = useState("");
@@ -82,12 +65,41 @@ function Voucher() {
   const [voucherCondition, setVoucherCondition] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [voucherMethod, setvoucherMethod] = useState("vnd");
+  const [voucherMethod, setVoucherMethod] = useState("vnd");
+  const [vouchers, setVouchers] = useState([]);
+  const [totalElements, setTotalElements] = useState(1);
+  const [pageNo, setPageNo] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
+
+  // const schema = Yup.object().shape({
+  //   voucherName: Yup.string().required("Tên voucher không được bỏ trống"),
+  //   limitQuantity: Yup.string()
+  //     .required("Vui lòng nhập số lượng")
+  //     .matches(/^[0-9]+$/),
+  //   voucherValue: Yup.string()
+  //     .required("Vui lòng nhập giá trị của voucher")
+  //     .matches(/^\d+(\.\d+)?$/, "Sai định dạng"),
+  //   voucherValueMax: Yup.string()
+  //     .required("Vui lòng nhập giá trị của voucher tối đa")
+  //     .matches(/^\d+(\.\d+)?$/, "Sai định dạng"),
+  //   startDate: Yup.date()
+  //     .required("Không được bỏ trống")
+  //     .min(moment(new Date()).format("YYYY/MM/DD")),
+  // });
+
+  const calculateStt = (index) => {
+    return (pageNo - 1) * pageSize + index + 1;
+  };
+
+  function handlePageSize(current, size) {
+    setPageNo(current);
+    setPageSize(size);
+  }
 
   const onChangevoucherMethod = ({ target: { value } }) => {
     console.log("voucher method checked", value);
     setVoucherValue("");
-    setvoucherMethod(value);
+    setVoucherMethod(value);
   };
 
   const showDrawer = () => {
@@ -96,7 +108,30 @@ function Voucher() {
 
   const onClose = () => {
     setOpen(false);
+    setIsUpdate(false);
+
+    setVoucherId("");
+    setVoucherCode("");
+    setVoucherName("");
+    setLimitQuantity("");
+    setVoucherValue("");
+    setVoucherValueMax("");
+    setVoucherCondition("");
+    setStartDate("");
+    setEndDate("");
+    setVoucherMethod("");
   };
+
+  function handleDelete(value) {
+    try {
+      axios
+        .put(baseUrl + "update-status/" + value.id)
+        .then((res) => console.log(res.data))
+        .catch((err) => console.log("Exception: ", err));
+    } catch (err) {
+      console.log("Error: ", err);
+    }
+  }
 
   function handleStartDatChange(startDate) {
     setStartDate(startDate);
@@ -113,22 +148,136 @@ function Voucher() {
     else return formattedValue;
   }
 
+  useEffect(
+    function () {
+      async function fetchData() {
+        setIsLoading(true);
+        try {
+          const filter = {
+            voucherCode: searchNameOrCode,
+            voucherName: searchNameOrCode,
+            startDate:
+              searchStartDate !== ""
+                ? moment(searchStartDate?.$d, "DD-MM-YYYY").format(
+                    "YYYY-MM-DDTHH:mm:ss.SSS"
+                  )
+                : "",
+            endDate:
+              searchEndDate !== ""
+                ? moment(searchEndDate?.$d, "DD-MM-YYYY").format(
+                    "YYYY-MM-DDTHH:mm:ss.SSS"
+                  )
+                : "",
+            status: searchStatus,
+          };
+
+          const res = await axios.post(
+            `${
+              pageNo !== 1 || pageSize !== 5
+                ? baseUrl +
+                  "?pageNo=" +
+                  (pageNo - 1) +
+                  "&" +
+                  "pageSize=" +
+                  pageSize
+                : baseUrl
+            }`,
+            filter
+          );
+
+          console.log("filer: ", filter);
+          const data = await res.data;
+
+          setTotalElements(data.totalElements);
+          setVouchers(data.content);
+        } catch (error) {
+          console.error(error.message);
+        }
+        setIsLoading(false);
+      }
+
+      fetchData();
+    },
+    [
+      searchNameOrCode,
+      searchStartDate,
+      searchEndDate,
+      searchStatus,
+      pageNo,
+      pageSize,
+    ]
+  );
+
   function handleOnSubmit(e) {
     e.preventDefault();
-
     const voucher = {
       voucherName,
       voucherCode,
-      limitQuantity,
-      voucherValue,
-      voucherValueMax,
-      voucherCondition,
+      limitQuantity: Number(limitQuantity.replace(",", "")),
+      voucherValue: Number(voucherValue.replace(",", "")),
+      voucherValueMax: Number(voucherValueMax.replace(",", "")),
+      voucherCondition: Number(voucherCondition.replace(",", "")),
       voucherMethod,
       startDate,
       endDate,
     };
 
-    console.log("voucher: ", voucher);
+    try {
+      const addVoucher = axios.post(baseUrl + "add", voucher);
+      console.log("Add: ", voucher);
+
+      if (addVoucher.code === "ERR_BAD_REQUEST") {
+        setOpen(true);
+        return;
+      } else {
+        setOpen(false);
+
+        setVoucherCode("");
+        setVoucherName("");
+        setLimitQuantity("");
+        setVoucherValue("");
+        setVoucherValueMax("");
+        setVoucherCondition("");
+        setVoucherMethod("");
+        setStartDate("");
+        setEndDate("");
+      }
+    } catch (err) {
+      console.log("error: ", err);
+    }
+  }
+
+  function handleDetailVoucher(value) {
+    console.log("code: ", baseUrl + value.code);
+    axios.get(baseUrl + value.code).then((res) => {
+      const {
+        voucherId,
+        voucherCode,
+        voucherName,
+        limitQuantity,
+        voucherValue,
+        voucherValueMax,
+        voucherCondition,
+        startDate,
+        endDate,
+        voucherMethod,
+      } = res.data;
+
+      setVoucherId(voucherId);
+      setVoucherCode(voucherCode);
+      setVoucherName(voucherName);
+      setLimitQuantity(numeral(limitQuantity).format("0,0"));
+      setVoucherValue(numeral(voucherValue).format("0,0"));
+      setVoucherValueMax(
+        voucherValueMax === 0 ? "" : numeral(voucherValueMax).format("0,0")
+      );
+      setVoucherCondition(numeral(voucherCondition).format("0,0"));
+      setStartDate(moment(startDate));
+      setEndDate(moment(endDate));
+      setVoucherMethod(voucherMethod);
+      setIsUpdate(true);
+      setOpen(true);
+    });
   }
 
   const columns = [
@@ -141,7 +290,9 @@ function Voucher() {
       title: "Mã",
       dataIndex: "voucherCode",
       key: "voucherCode",
-      render: (code) => <Link onClick={() => setOpen(true)}>{code}</Link>,
+      render: (code) => (
+        <Link onClick={() => handleDetailVoucher({ code })}>{code}</Link>
+      ),
     },
     {
       title: "Tên",
@@ -167,40 +318,33 @@ function Voucher() {
       title: "Trạng thái",
       dataIndex: "status",
       key: "status",
-      render: (_, { status }) => (
-        <>
-          {status.map((sta) => {
-            let color =
-              sta === "Đang diễn ra"
-                ? "geekblue"
-                : sta === "Sắp diễn ra"
-                ? "green"
-                : "red";
-            if (sta === "loser") {
-              color = "volcano";
-            }
-            return (
-              <Tag color={color} key={sta}>
-                {sta.toUpperCase()}
-              </Tag>
-            );
-          })}
-        </>
-      ),
+      render: (status) => {
+        let color =
+          status === "Đang diễn ra"
+            ? "geekblue"
+            : status === "Sắp diễn ra"
+            ? "green"
+            : "Đã kết thúc"
+            ? "red"
+            : null;
+        return <Tag color={color}>{status}</Tag>;
+      },
     },
     {
       title: "Thao tác",
       dataIndex: "action",
       key: "action",
-      render: (_) => (
+      render: (code) => (
         <Space size="middle">
-          <Link onClick={() => setOpen(true)}>
+          <Button
+            className={styles.iconButton}
+            onClick={() => handleDetailVoucher({ code })}
+          >
             <EyeOutlined />
-          </Link>
-
-          <Link onClick={() => setOpen(true)}>
-            <EditOutlined />
-          </Link>
+          </Button>
+          <Button className={styles.iconButton}>
+            <DeleteOutlined />
+          </Button>
         </Space>
       ),
     },
@@ -208,7 +352,16 @@ function Voucher() {
 
   return (
     <div className={styles.voucher}>
-      <FilterVoucherAndPromotion />
+      <FilterVoucherAndPromotion
+        searchNameOrCode={searchNameOrCode}
+        setSearchNameOrCode={setSearchNameOrCode}
+        startDate={searchStartDate}
+        setStartDate={setSearchStartDate}
+        endDate={searchEndDate}
+        setEndDate={setSearchEndDate}
+        status={searchStatus}
+        setStatus={setSearchStatus}
+      />
 
       <div className={styles.content}>
         <Space style={{ width: "100%" }} direction="vertical" size={16}>
@@ -232,13 +385,15 @@ function Voucher() {
                   Tạo voucher
                 </Button>
                 <Drawer
-                  title="Tạo voucher"
+                  title={`${isUpdate ? "Cập nhập voucher" : "Tạo voucher"}`}
                   width={720}
                   onClose={onClose}
                   open={open}
                   bodyStyle={{ paddingBottom: 80 }}
                 >
                   <Form layout="vertical">
+                    <Input style={{ display: "none" }} value={voucherId} />
+
                     <Space
                       style={{ width: "100%" }}
                       size={8}
@@ -421,7 +576,10 @@ function Voucher() {
 
                       <Row
                         gutter={16}
-                        style={{ display: "flex", justifyContent: "flex-end" }}
+                        style={{
+                          display: "flex",
+                          justifyContent: "flex-end",
+                        }}
                       >
                         <Space>
                           <Button onClick={onClose}>Hủy</Button>
@@ -437,13 +595,54 @@ function Voucher() {
             </Col>
           </Row>
 
-          <Table
-            columns={columns}
-            dataSource={data}
-            className={styles.table}
-            pagination={false}
-          />
-          <Pagination defaultCurrent={1} total={500} />
+          <Spin
+            tip="Loading..."
+            spinning={isLoading}
+            size="large"
+            style={{ width: "100%" }}
+          >
+            <>
+              <Space style={{ width: "100%" }} direction="vertical" size={12}>
+                <Table
+                  style={{ width: "100%" }}
+                  columns={columns}
+                  dataSource={vouchers.map((voucher, index) => ({
+                    key: voucher.voucherId,
+                    stt: calculateStt(index),
+                    voucherCode: voucher.voucherCode,
+                    voucherName: voucher.voucherName,
+                    limitQuantity: numeral(voucher.limitQuantity).format("0,0"),
+                    voucherValue: `${numeral(voucher.voucherValue).format(
+                      "0,0"
+                    )} ${voucher.voucherMethod === "vnd" ? "VND" : "%"}`,
+                    startAndEndDate: `${moment(voucher.startDate).format(
+                      "DD/MM/YYYY"
+                    )} - ${moment(voucher.endDate).format("DD/MM/YYYY")}`,
+                    status:
+                      voucher.status === "ACTIVE"
+                        ? "Đang diễn ra"
+                        : voucher.status === "INACTIVE"
+                        ? "Đã kết thúc"
+                        : voucher.status === "UPCOMING"
+                        ? "Sắp diễn ra"
+                        : null,
+                    action: voucher.voucherCode,
+                  }))}
+                  className={styles.table}
+                  pagination={false}
+                />
+                <Pagination
+                  defaultCurrent={pageNo}
+                  total={totalElements}
+                  showSizeChanger={true}
+                  pageSize={pageSize}
+                  pageSizeOptions={["5", "10", "20", "50", "100"]}
+                  onShowSizeChange={handlePageSize}
+                  onChange={(page) => setPageNo(page)}
+                />
+              </Space>
+            </>
+          </Spin>
         </Space>
       </div>
     </div>

@@ -12,10 +12,14 @@ import com.fpoly.ooc.service.interfaces.VoucherService;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -28,14 +32,17 @@ public class VoucherServiceImpl implements VoucherService {
 
     @Override
     public Page<VoucherResponse> findAllVoucher(Pageable pageable, VoucherConditionDTO voucherConditionDTO) {
-        return voucherRepository.findAllVoucher(
+
+        return page(
+                voucherRepository.findAllVoucher(
                 Objects.isNull(voucherConditionDTO.getVoucherCode()) ? null : "%" + voucherConditionDTO.getVoucherCode() + "%",
                 Objects.isNull(voucherConditionDTO.getVoucherName()) ? null : "%" + voucherConditionDTO.getVoucherName() + "%",
                 Objects.isNull(voucherConditionDTO.getStartDate()) ? null : voucherConditionDTO.getStartDate(),
                 Objects.isNull(voucherConditionDTO.getEndDate()) ? null : voucherConditionDTO.getEndDate(),
-                voucherConditionDTO.getStatus(),
-                pageable
-        );
+                Objects.isNull(voucherConditionDTO.getStatus()) ?
+                        null : voucherConditionDTO.getStatus().equals("ALL") ?
+                        null : voucherConditionDTO.getStatus()
+                        ), pageable);
     }
 
     @Override
@@ -47,12 +54,18 @@ public class VoucherServiceImpl implements VoucherService {
     }
 
     @Override
-    public Voucher updateStatus(Long id) {
-        Voucher voucher = findVoucherById(id);
-        voucher.setStatus(Const.STATUS_INACTIVE);
-        voucher.setDeletedAt(LocalDateTime.now());
+    public Voucher updateStatus(String code) {
+        Optional<Voucher> voucherOptional = voucherRepository.findVoucherByVoucherCode(code);
 
-        return voucherRepository.save(voucher);
+        if(voucherOptional.isEmpty()) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.CODE_NOT_FOUND));
+        } else {
+            voucherOptional.get().setStatus(Const.STATUS_INACTIVE);
+            voucherOptional.get().setDeletedAt(LocalDateTime.now());
+
+            return voucherRepository.save(voucherOptional.get());
+        }
+
     }
 
     @Override
@@ -76,13 +89,43 @@ public class VoucherServiceImpl implements VoucherService {
 
     @Override
     public Voucher findVoucherById(Long id) {
-        Optional<Voucher> voucherRequestOptional = voucherRepository.findById(id);
+//        Optional<Voucher> voucherRequestOptional = voucherRepository.findById(id);
+//
+//        if(voucherRequestOptional.isPresent()) {
+//            return voucherRequestOptional.get();
+//        } else {
+//            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND));
+//        }
 
-        if(voucherRequestOptional.isPresent()) {
-            return voucherRequestOptional.get();
+        return null;
+    }
+
+    @Override
+    public VoucherRequest findByVoucherCode(String code) {
+        Optional<Voucher> voucherOptional = voucherRepository.findVoucherByVoucherCode(code);
+
+        if(voucherOptional.isEmpty()) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.CODE_NOT_FOUND));
         } else {
-            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND));
+            return convertVoucher(voucherOptional.get());
         }
+    }
+
+    private VoucherRequest convertVoucher(Voucher voucher) {
+
+        return VoucherRequest.builder()
+                .voucherId(voucher.getId())
+                .voucherCode(voucher.getVoucherCode())
+                .voucherName(voucher.getVoucherName())
+                .voucherMethod(voucher.getVoucherMethod())
+                .voucherValue(voucher.getVoucherValue())
+                .voucherValueMax(voucher.getVoucherValueMax())
+                .limitQuantity(voucher.getLimitQuantity())
+                .voucherCondition(voucher.getVoucherCondition())
+                .startDate(voucher.getStartDate())
+                .endDate(voucher.getEndDate())
+                .status(voucher.getStatus())
+                .build();
     }
 
     private Voucher convertVoucherRequest(VoucherRequest request) {
@@ -106,6 +149,24 @@ public class VoucherServiceImpl implements VoucherService {
 
     private String generatorCode() {
         return RandomStringUtils.random(15, true, true);
+    }
+
+    private Page<VoucherResponse> page(List<VoucherResponse> inputList, Pageable pageable) {
+
+        int pageNo = pageable.getPageNumber();
+        int pageSize = pageable.getPageSize();
+        int startItem = pageNo * pageSize;
+
+        List<VoucherResponse> outputList;
+
+        if(inputList.size() < startItem) {
+            outputList = Collections.emptyList();
+        } else {
+            int toIndex = Math.min(startItem + pageSize, inputList.size());
+            outputList = inputList.subList(startItem, toIndex);
+        }
+
+        return new PageImpl<>(outputList, PageRequest.of(pageNo, pageSize), inputList.size());
     }
 
 }

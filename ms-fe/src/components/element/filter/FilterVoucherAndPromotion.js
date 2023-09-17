@@ -8,45 +8,52 @@ import { faFilter } from "@fortawesome/free-solid-svg-icons";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import FloatingLabels from "../FloatingLabels/FloatingLabels";
-import { useState } from "react";
 
 const options = [];
 
 options.push({
   label: "Tất cả",
-  value: "all",
+  value: "ALL",
 });
 
 options.push({
   label: "Đang hoạt động",
-  value: "Đang hoạt động",
+  value: "ACTIVE",
 });
 
 dayjs.extend(customParseFormat);
 
 const dateFormat = "DD/MM/YYYY";
 
-function FilterVoucherAndPromotion() {
-  const [searchNameOrCode, setSearchNameOrCode] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [status, setStatus] = useState("all");
-
+function FilterVoucherAndPromotion({
+  searchNameOrCode,
+  setSearchNameOrCode,
+  startDate,
+  setStartDate,
+  endDate,
+  setEndDate,
+  status,
+  setStatus,
+}) {
   function handleSearchNameOrCode(query) {
     setSearchNameOrCode(query);
   }
 
-  function handleStartDatChange(startDate) {
-    setStartDate(startDate);
+  function handleStartDateChange(startDate) {
+    if (startDate === undefined || startDate === null || startDate === "")
+      setStartDate("");
+    else setStartDate(startDate);
   }
 
-  function handleEndDatChange(endDate) {
-    setEndDate(endDate);
+  function handleEndDateChange(endDate) {
+    if (endDate === undefined || endDate === null || endDate === "")
+      setEndDate("");
+    else setEndDate(endDate);
   }
 
-  function handleSetStatus(status) {
-    console.log(`selected ${status}`);
-    setStatus(status);
+  function handleSetStatus(value) {
+    console.log(`selected ${value}`);
+    setStatus(value);
   }
 
   return (
@@ -72,6 +79,7 @@ function FilterVoucherAndPromotion() {
               width={"20%"}
               value={searchNameOrCode}
               onChange={(e) => handleSearchNameOrCode(e.target.value)}
+              allowClear
             />
           </Col>
         </Row>
@@ -88,7 +96,7 @@ function FilterVoucherAndPromotion() {
                 size="large"
                 placeholder={null}
                 value={startDate}
-                onChange={handleStartDatChange}
+                onChange={handleStartDateChange}
               />
             </FloatingLabels>
           </Col>
@@ -103,7 +111,8 @@ function FilterVoucherAndPromotion() {
                 size="large"
                 placeholder={null}
                 value={endDate}
-                onChange={handleEndDatChange}
+                onChange={handleEndDateChange}
+                allowClear
               />
             </FloatingLabels>
           </Col>

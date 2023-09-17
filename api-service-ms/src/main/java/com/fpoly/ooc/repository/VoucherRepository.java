@@ -1,6 +1,7 @@
 package com.fpoly.ooc.repository;
 
 import com.fpoly.ooc.entity.Voucher;
+import com.fpoly.ooc.request.voucher.VoucherRequest;
 import com.fpoly.ooc.responce.voucher.VoucherResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,10 +20,11 @@ import java.util.Optional;
 public interface VoucherRepository extends JpaRepository<Voucher, Long> {
 
     @Query(name = "Voucher.findAllVoucher", nativeQuery = true)
-    Page<VoucherResponse> findAllVoucher(String voucherCode,
+    List<VoucherResponse> findAllVoucher(String voucherCode,
                                          String voucherName,
                                          LocalDateTime startDate,
                                          LocalDateTime endDate,
-                                         Collection<String> status,
-                                         Pageable pageable);
+                                         String status);
+
+    Optional<Voucher> findVoucherByVoucherCode( String code);
 }

@@ -6,6 +6,8 @@ import com.fpoly.ooc.service.interfaces.VoucherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/admin/api/voucher")
+@CrossOrigin(origins = "http://localhost:3000/", maxAge = 3600)
 public class VoucherController {
 
     @Autowired
@@ -25,7 +28,7 @@ public class VoucherController {
     @PostMapping("/")
     public ResponseEntity<?> findAllVoucher(
             @RequestParam(value = "pageNo",defaultValue = "0") int pageNo,
-            @RequestParam(value = "pageSize",defaultValue = "10") int pageSize,
+            @RequestParam(value = "pageSize",defaultValue = "5  ") int pageSize,
             @RequestBody VoucherConditionDTO voucherConditionDTO
             ) {
         return ResponseEntity.ok()
@@ -44,10 +47,16 @@ public class VoucherController {
         return ResponseEntity.ok().body(voucherService.saveOrUpdate(request));
     }
 
-    @PutMapping("/update-status/{id}")
-    public ResponseEntity<?> updateStatus(@PathVariable("id") Long id) {
+    @PutMapping("/update/{code}")
+    public ResponseEntity<?> updateStatus(@PathVariable("code") String code) {
 
-        return ResponseEntity.ok().body(voucherService.updateStatus(id));
+        return ResponseEntity.ok().body(voucherService.updateStatus(code));
+    }
+
+    @GetMapping("/{code}")
+    public ResponseEntity<?> findByCode(@PathVariable("code") String code) {
+
+        return ResponseEntity.ok().body(voucherService.findByVoucherCode(code));
     }
 
 }

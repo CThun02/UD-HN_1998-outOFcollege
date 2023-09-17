@@ -24,6 +24,6 @@ public class VoucherConditionDTO {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     private LocalDateTime endDate;
 
-    private Collection<String> status;
+    private String status;
 
 }

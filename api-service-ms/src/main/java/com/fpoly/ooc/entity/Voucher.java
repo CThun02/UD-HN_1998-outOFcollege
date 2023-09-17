@@ -32,7 +32,8 @@ import java.util.List;
                 "and (?2 is null or voucher.voucher_name like ?2)\n" +
                 "and (?3 is null or voucher.start_date >= ?3)\n" +
                 "and (?4 is null or voucher.end_date <= ?4)\n" +
-                "and (?5 is null or voucher.status in (?5))",
+                "and (?5 is null or voucher.status = (?5)) " +
+                "order by created_at desc ",
         resultSetMapping = "Mapping.VoucherResponse"
 )
 

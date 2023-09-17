@@ -23,4 +23,8 @@
   background-color: #00b2ff;
 }
 
+.iconButton:hover {
+  background-color: #e6f4ff;
+}
+
 /* button color: 00B2FF */

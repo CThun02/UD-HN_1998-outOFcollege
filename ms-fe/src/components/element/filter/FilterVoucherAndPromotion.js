@@ -7,15 +7,58 @@ import { faFilter } from "@fortawesome/free-solid-svg-icons";
 
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
+import FloatingLabels from "../FloatingLabels/FloatingLabels";
+
+const options = [];
+
+options.push({
+  label: "Tất cả",
+  value: "ALL",
+});
+
+options.push({
+  label: "Đang hoạt động",
+  value: "ACTIVE",
+});
 
 dayjs.extend(customParseFormat);
 
 const dateFormat = "DD/MM/YYYY";
 
-function FilterVoucherAndPromotion() {
+function FilterVoucherAndPromotion({
+  searchNameOrCode,
+  setSearchNameOrCode,
+  startDate,
+  setStartDate,
+  endDate,
+  setEndDate,
+  status,
+  setStatus,
+}) {
+  function handleSearchNameOrCode(query) {
+    setSearchNameOrCode(query);
+  }
+
+  function handleStartDateChange(startDate) {
+    if (startDate === undefined || startDate === null || startDate === "")
+      setStartDate("");
+    else setStartDate(startDate);
+  }
+
+  function handleEndDateChange(endDate) {
+    if (endDate === undefined || endDate === null || endDate === "")
+      setEndDate("");
+    else setEndDate(endDate);
+  }
+
+  function handleSetStatus(value) {
+    console.log(`selected ${value}`);
+    setStatus(value);
+  }
+
   return (
     <div className={styles.filter}>
-      <Space size={12} style={{ width: "100%" }} direction="vertical">
+      <Space size={18} style={{ width: "100%" }} direction="vertical">
         <Row>
           <Space size={10} className={styles.color}>
             <i>
@@ -34,35 +77,57 @@ function FilterVoucherAndPromotion() {
               placeholder="Nhập tên hoặc mã"
               prefix={<SearchOutlined />}
               width={"20%"}
+              value={searchNameOrCode}
+              onChange={(e) => handleSearchNameOrCode(e.target.value)}
+              allowClear
             />
           </Col>
         </Row>
 
         <Row>
           <Col span={4}>
-            <DatePicker
-              format={dateFormat}
-              size="middle"
-              placeholder="Ngày bắt đầu"
-            />
+            <FloatingLabels
+              label="Ngày bắt đầu"
+              name="startDate"
+              value={startDate}
+            >
+              <DatePicker
+                format={dateFormat}
+                size="large"
+                placeholder={null}
+                value={startDate}
+                onChange={handleStartDateChange}
+              />
+            </FloatingLabels>
           </Col>
           <Col span={4}>
-            <DatePicker
-              format={dateFormat}
-              size="middle"
-              placeholder="Ngày kết thúc"
-            />
-          </Col>
-          <Col span={6}>
-            <Space style={{ width: "100%" }} direction="vertical">
-              <Select
-                mode="multiple"
+            <FloatingLabels
+              label="Ngày kết thúc"
+              name="endDate"
+              value={endDate}
+            >
+              <DatePicker
+                format={dateFormat}
+                size="large"
+                placeholder={null}
+                value={endDate}
+                onChange={handleEndDateChange}
                 allowClear
-                style={{ width: "100%" }}
-                placeholder="Please select"
-                defaultValue={["Tất cả", "Đang diễn ra"]}
-                size="middle"
               />
+            </FloatingLabels>
+          </Col>
+          <Col span={4}>
+            <Space style={{ width: "100%" }} direction="vertical">
+              <FloatingLabels label="Trạng thái" name="status" value={status}>
+                <Select
+                  onChange={handleSetStatus}
+                  options={options}
+                  style={{ width: "100%" }}
+                  placeholder={null}
+                  defaultValue={["Tất cả"]}
+                  size="large"
+                />
+              </FloatingLabels>
             </Space>
           </Col>
         </Row>

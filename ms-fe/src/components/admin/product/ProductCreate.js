@@ -1,22 +1,29 @@
 import { CloseOutlined, PlusOutlined } from "@ant-design/icons";
-import { Col, Row, Form, Input, Select, Button } from "antd";
+import { Col, Row, Form, Input, Select, Button, message } from "antd";
 import TextArea from "antd/es/input/TextArea";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styles from "./ProductCreate.module.css";
 import { closeFrame } from "../animations/animation";
+import { isString } from "antd/es/button";
+import { isFormInputEmpty } from "./ValidateForm";
+import axios from "axios";
 
 const ProductCreate = (props) => {
+  const api = "http://localhost:8080/api/admin/product/";
+  const [messageApi, contextHolder] = message.useMessage();
+  const formRef = useRef();
   const brands = props.brands;
   const categories = props.categories;
   const forms = props.forms;
   const patterns = props.patterns;
+  const renderIndex = props.render;
   const [product, setProduct] = useState({
-    productName: "",
-    brandId: null,
-    categoryId: null,
-    patternId: null,
-    formId: null,
-    description: "",
+    productName: " ",
+    brandId: " ",
+    categoryId: " ",
+    patternId: " ",
+    formId: " ",
+    description: " ",
   });
 
   //function
@@ -29,11 +36,43 @@ const ProductCreate = (props) => {
   }
 
   function createProduct() {
-    console.log(product);
+    for (let key in product) {
+      if (isString(product[key])) {
+        if (product[key].trim() === "") {
+          handleSetProduct(key, product[key].trim());
+        }
+      }
+    }
+    let check = isFormInputEmpty(product);
+    if (!check) {
+      axios
+        .post(api + "create", product)
+        .then((res) => {
+          messageApi.loading("Vui lòng chờ!", 2);
+          setTimeout(() => {
+            messageApi.success("Thêm mới thành công!", 2);
+            closeFrame("productCreate", "productCreateFrame");
+            formRef.current.resetFields();
+            handleSetProduct("productName", " ");
+            handleSetProduct("brandId", " ");
+            handleSetProduct("categoryId", " ");
+            handleSetProduct("patternId", " ");
+            handleSetProduct("formId", " ");
+            handleSetProduct("description", " ");
+            renderIndex(res.data);
+          }, 2000);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      messageApi.error("Vui lòng nhập đầy đủ các trường");
+    }
   }
 
   return (
     <div id="productCreate" className={`${styles.product__create} d-none`}>
+      {contextHolder}
       <div id="productCreateFrame" className={styles.product__createFrame}>
         <div className={styles.product__createClose}>
           <Button
@@ -48,14 +87,15 @@ const ProductCreate = (props) => {
         <br />
         <Row>
           <Col span={24}>
-            <Form>
+            <Form ref={formRef}>
               <span>Tên sản phẩm</span>
               <Form.Item name="productName">
                 <Input
                   placeholder="Product name"
-                  onChange={(event) =>
+                  onBlur={(event) =>
                     handleSetProduct("productName", event.target.value)
                   }
+                  status={product.productName === "" ? "error" : ""}
                 ></Input>
               </Form.Item>
               <Row>
@@ -64,8 +104,9 @@ const ProductCreate = (props) => {
                     <span>Thương hiệu</span>
                     <Form.Item name="brand">
                       <Select
-                        placeholder="Thương hiệu"
                         onChange={(event) => handleSetProduct("brandId", event)}
+                        placeholder="Brand"
+                        status={product.brandId === "" ? "error" : ""}
                       >
                         {brands &&
                           brands.map((item) => {
@@ -84,10 +125,11 @@ const ProductCreate = (props) => {
                     <span>Loại sản phẩm</span>
                     <Form.Item name="category">
                       <Select
-                        placeholder="Loại sản phẩm"
                         onChange={(event) =>
                           handleSetProduct("categoryId", event)
                         }
+                        placeholder="Category"
+                        status={product.categoryId === "" ? "error" : ""}
                       >
                         {categories &&
                           categories.map((item) => {
@@ -106,10 +148,11 @@ const ProductCreate = (props) => {
                     <span>Hoạt tiết</span>
                     <Form.Item name="pattern">
                       <Select
-                        placeholder="Họa tiết"
                         onChange={(event) =>
                           handleSetProduct("patternId", event)
                         }
+                        placeholder="Pattern"
+                        status={product.patternId === "" ? "error" : ""}
                       >
                         {patterns &&
                           patterns.map((item) => {
@@ -128,8 +171,9 @@ const ProductCreate = (props) => {
                     <span>Dáng áo</span>
                     <Form.Item name="form">
                       <Select
-                        placeholder="Dáng áo"
                         onChange={(event) => handleSetProduct("formId", event)}
+                        placeholder="form"
+                        status={product.formId === "" ? "error" : ""}
                       >
                         {forms &&
                           forms.map((item) => {
@@ -149,9 +193,10 @@ const ProductCreate = (props) => {
                 <TextArea
                   placeholder="Description"
                   allowClear
-                  onChange={(event) =>
+                  onBlur={(event) =>
                     handleSetProduct("description", event.target.value)
                   }
+                  status={product.description === "" ? "error" : ""}
                 />
               </Form.Item>
               <Form.Item>

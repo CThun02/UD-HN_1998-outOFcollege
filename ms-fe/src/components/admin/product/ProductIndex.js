@@ -26,6 +26,7 @@ const ProductIndex = () => {
   const [forms, setForms] = useState(null);
   const [productsTable, setProductsTable] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [render, setRendering] = useState(null);
   const { RangePicker } = DatePicker;
 
   const columns = [
@@ -78,9 +79,9 @@ const ProductIndex = () => {
       key: "7",
       title: "Thao tác",
       dataIndex: "id",
-      render: (item) => (
+      render: (id) => (
         <>
-          <Link to={"/admin/product/update"}>
+          <Link to={`/admin/product/update/${id}`}>
             <Button className={styles.product__button}>
               <EditOutlined />
             </Button>
@@ -89,7 +90,6 @@ const ProductIndex = () => {
       ),
     },
   ];
-
   //function
 
   useEffect(() => {
@@ -151,7 +151,7 @@ const ProductIndex = () => {
       .catch((error) => {
         console.log(error);
       });
-  }, []);
+  }, [render]);
   return (
     <>
       <div className={styles.product__filter}>
@@ -329,8 +329,8 @@ const ProductIndex = () => {
               }
             >
               <Select.Option key={"All"}>Tất cả</Select.Option>
-              <Select.Option key={"active"}>Đang kinh doanh</Select.Option>
-              <Select.Option key={"InActive"}>Ngưng kinh doanh</Select.Option>
+              <Select.Option key={"ACTIVE"}>Đang kinh doanh</Select.Option>
+              <Select.Option key={"INACTIVE"}>Ngưng kinh doanh</Select.Option>
             </Select>
           </Col>
           <Col span={24} className={styles.filter__dateCreate}>
@@ -379,6 +379,7 @@ const ProductIndex = () => {
         patterns={patterns}
         categories={categories}
         forms={forms}
+        render={setRendering}
       />
     </>
   );

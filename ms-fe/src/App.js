@@ -7,14 +7,10 @@ import ProductIndex from "./components/admin/product/ProductIndex";
 import Promotion from "./components/admin/promotion/Promotion";
 import CreatePromotion from "./components/admin/promotion/CreatePromotion";
 import Voucher from "./components/admin/voucher/Voucher";
-<<<<<<< HEAD
-import CreateVoucher from "./components/admin/voucher/CreateVoucher";
-import ProductCreateDetails from "./components/admin/product/ProductCreateDetails";
-=======
 import Bill from "./components/admin/sale-couter/Bill";
 import CreateBill from "./components/admin/sale-couter/CreateBill";
->>>>>>> test
 import ProductUpdate from "./components/admin/product/ProductUpdate";
+import ProductCreateDetails from "./components/admin/product/ProductCreateDetails";
 
 function App() {
   return (

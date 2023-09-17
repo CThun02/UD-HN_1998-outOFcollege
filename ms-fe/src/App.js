@@ -3,7 +3,13 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Col, Row } from "antd";
 import SideBar from "./components/admin/page/SideBar";
 import NavBar from "./components/admin/page/NavBar";
-import AccountForm from "./components/admin/account/AccountForm";
+import ProductIndex from "./components/admin/product/ProductIndex";
+import Promotion from "./components/admin/promotion/Promotion";
+import CreatePromotion from "./components/admin/promotion/CreatePromotion";
+import Voucher from "./components/admin/voucher/Voucher";
+import Bill from "./components/admin/sale-couter/Bill";
+import CreateBill from "./components/admin/sale-couter/CreateBill";
+import ProductUpdate from "./components/admin/product/ProductUpdate";
 
 function App() {
   return (
@@ -13,7 +19,7 @@ function App() {
           <Col span={4}>
             <SideBar />
           </Col>
-          <Col span={20}>
+          <Col span={20} className="h-100vh">
             <div>
               <NavBar />
             </div>
@@ -23,39 +29,50 @@ function App() {
                 <Route path="/admin/thong-ke" element="thongke"></Route>
 
                 {/* Tại quầy */}
-                <Route path="/admin/tai-quay" element="taiquay"></Route>
+                <Route path="counter-sales">
+                  <Route index element={<Bill />}></Route>
+                  <Route path="bill" element={<CreateBill />}></Route>
+                </Route>
 
                 {/* Đơn hàng */}
                 <Route path="/admin/don-hang" element="donhang"></Route>
 
                 {/* Thu chi */}
-                <Route path="/admin/thu-chi" element="thuchi"></Route>
-
-                {/* Sản phẩm */}
-                <Route path="/admin/san-pham" element="sanpham"></Route>
                 <Route
-                  path="/admin/loai-san-pham"
-                  element="loaisanpham"
+                  path="income-and-expenses"
+                  element="income-and-expenses"
                 ></Route>
-                <Route path="/admin/thuong-hieu" element={<SideBar />}></Route>
+                {/* Sản phẩm */}
+                <Route path="product">
+                  <Route index element={<ProductIndex />} />
+                  <Route path={"update"} element={<ProductUpdate />} />
+
+                  {/* ví dụ path= san-pham/hien-thi ->  
+                    <Route path="hien-thi" element="el" />
+                    */}
+                </Route>
+                <Route path="category" element="category"></Route>
+                <Route path="brand" element={<SideBar />}></Route>
 
                 {/* Tài khoản */}
-                <Route path="/admin/nhan-vien" element="nhanvien"></Route>
-                <Route
-                  path="/admin/nhan-vien/create"
-                  element={<AccountForm />}
-                ></Route>
-                <Route path="/admin/khach-hang" element="khachhang"></Route>
+                <Route path="employee" element="employee"></Route>
+                <Route path="customer" element="customer"></Route>
 
-                {/* Giảm giá */}
-                <Route
-                  path="/admin/phieu-giam-gia"
-                  element="phieugiamgia"
-                ></Route>
-                <Route
-                  path="/admin/giam-gia-san-pham"
-                  element="giamgiasanpham"
-                ></Route>
+                {/* Voucher */}
+                <Route path="voucher">
+                  <Route index element={<Voucher />} />
+
+                  <Route path="detail" element={"Chi tiet"} />
+                  <Route path="update" element={"Chi tiet"} />
+                </Route>
+
+                {/* Promotion */}
+                <Route path="promotion">
+                  <Route index element={<Promotion />} />
+                  <Route path="create" element={<CreatePromotion />} />
+                </Route>
+
+                {/* Not found */}
               </Routes>
             </div>
           </Col>

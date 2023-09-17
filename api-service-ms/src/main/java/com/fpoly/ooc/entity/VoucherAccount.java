@@ -18,7 +18,7 @@ import java.math.BigDecimal;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "voucher_detail")
+@Table(name = "voucher_account")
 @Entity
 public class VoucherAccount extends BaseEntity{
 
@@ -35,7 +35,7 @@ public class VoucherAccount extends BaseEntity{
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id")
-    private Account account;
+    private Account accountVoucher;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "voucher_id")

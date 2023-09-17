@@ -297,3 +297,24 @@ VALUES
 (4, 4, 2, 'ACTIVE', '2023-09-12', '2023-09-12', N'Admin', N'Admin', NULL),
 (5, 5, 1, 'ACTIVE', '2023-09-15', '2023-09-15', N'Admin', N'Admin', NULL);
 select * from cart_detail
+
+
+
+
+SELECT p.id, p.product_name, s.size_name, c.color_name, pd.price, pd.quantity
+FROM product p
+JOIN product_detail pd ON p.id = pd.product_id
+JOIN size s ON s.id = pd.size_id
+JOIN color c ON c.id = pd.color_id
+WHERE p.id = 1;
+
+SELECT p.id, p.product_name, s.size_name, c.color_name, pd.price, pd.quantity
+FROM product p
+JOIN product_detail pd ON p.id = pd.product_id
+JOIN size s ON s.id = pd.size_id
+JOIN color c ON c.id = pd.color_id
+WHERE p.id = 1
+
+INSERT INTO product_detail (product_id, button_id, material_id, collar_id, sleeve_id, size_id, color_id, shirt_tail_id, price, quantity, description_detail, status, created_at, updated_at, created_by, updated_by, deleted_at)
+VALUES 
+(1, 1, 1, 1, 1, 1,2, 1, 200.00, 22, N'Soft and comfortable fabric', 'ACTIVE', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL),

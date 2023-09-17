@@ -14,12 +14,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/admin/api/bill")
+@RequestMapping("/api/admin/bill")
 @CrossOrigin("*")
 public class BillController {
 
     @Autowired
     private BillService billService;
+
+    @GetMapping("/product")
+    public ResponseEntity<?> getAllProduct() {
+        return ResponseEntity.ok(billService.getAllProduct());
+    }
 
     @GetMapping("")
     public ResponseEntity<?> getAll() {

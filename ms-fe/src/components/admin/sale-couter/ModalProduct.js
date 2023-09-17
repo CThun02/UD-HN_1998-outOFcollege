@@ -1,28 +1,45 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal, Input, Select, Button, Table } from 'antd';
 import styles from './ModalProduct.module.css';
+import axios from 'axios';
 
 
 const columns = [
     {
         title: 'Ảnh',
-        dataIndex: 'img',
-        key: 'img',
+        dataIndex: 'imgDefault',
+        key: 'imgDefault',
     },
     {
         title: 'ID',
-        dataIndex: 'id',
+        dataIndex: 'productDetailId',
         key: 'id',
     },
     {
         title: 'Tên sản phẩm',
-        dataIndex: 'name',
-        key: 'name',
+        dataIndex: 'productName',
+        key: 'productName',
+    },
+    {
+        title: 'Kích cỡ',
+        dataIndex: 'sizeName',
+        key: 'sizeName',
+    },
+    {
+        title: 'màu sắc',
+        dataIndex: 'colorName',
+        key: 'colorName',
     },
     {
         title: 'Giá',
         key: 'price',
         dataIndex: 'price',
+
+    },
+    {
+        title: 'Số lượng',
+        key: 'quantity',
+        dataIndex: 'quantity',
 
     },
     {
@@ -35,36 +52,23 @@ const columns = [
         ),
     },
 ];
-const data = [
-    {
-        key: '1',
-        img: 'J',
-        id: 32,
-        name: 'New York No. 1 Lake Park',
-        price: 177,
-    },
-    {
-        key: '1',
-        img: 'J',
-        id: 32,
-        name: 'New York No. 1 Lake Park',
-        price: 177,
-    },
-    {
-        key: '1',
-        img: 'J',
-        id: 32,
-        name: 'New York No. 1 Lake Park',
-        price: 177
-    },
-];
+
 const { Option } = Select;
 
 const ModalProduct = ({ visible, onCancel }) => {
     const [searchInput, setSearchInput] = useState('');
     const [selectedItem, setSelectedItem] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
+    const [data, setData] = useState([]);
 
+    useEffect(() => {
+        axios.get("http://localhost:8080/api/admin/bill/product")
+            .then((response) => {
+                setData(response.data);
+            }).catch((error) => {
+                console.log(error)
+            })
+    }, [])
     const handleSelectItem = (item) => {
         setSelectedItem(item);
         setModalVisible(true);

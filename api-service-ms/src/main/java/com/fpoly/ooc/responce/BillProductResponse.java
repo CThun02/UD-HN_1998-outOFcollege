@@ -6,31 +6,27 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.Date;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-public class BillResponse {
+public class BillProductResponse {
 
-    private Long billId;
-
-    private Long billDetailId;
+    private Long productId;
 
     private Long productDetailId;
 
     private String imgDefault;
 
-    private Integer quantity;
+    private String productName;
 
-    private String productDetailName;
+    private String sizeName;
+
+    private String colorName;
 
     private BigDecimal price;
 
-    private String status;
-
-    private LocalDateTime createDate;
+    private Integer quantity;
 
 }

@@ -9,6 +9,7 @@ import com.fpoly.ooc.repository.BillRepo;
 import com.fpoly.ooc.repository.CartDetailRepo;
 import com.fpoly.ooc.repository.CartRepo;
 import com.fpoly.ooc.request.BillRequest;
+import com.fpoly.ooc.responce.BillProductResponse;
 import com.fpoly.ooc.responce.BillResponse;
 import com.fpoly.ooc.responce.CartResponse;
 import com.fpoly.ooc.service.interfaces.BillService;
@@ -17,7 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -57,8 +58,8 @@ public class BillDetailServiceImpl implements BillService {
 
         Bill bill = Bill.builder()
                 .account(accountBuilder)
-                .completionDate(new Date())
-                .dateOfReceipt(new Date())
+                .completionDate(LocalDateTime.now())
+                .dateOfReceipt(LocalDateTime.now())
                 .price(totalPrice)
                 .billType("sale counter")
                 .build();
@@ -71,7 +72,6 @@ public class BillDetailServiceImpl implements BillService {
                     .productDetail(ProductDetail.builder().id(cart.getProductDetailId()).build())
                     .price(cart.getPrice())
                     .quantity(cart.getQuantity())
-                    .status("wating")
                     .build();
 
             billDetailRepo.save(billDetail);
@@ -97,5 +97,10 @@ public class BillDetailServiceImpl implements BillService {
     @Override
     public void deleteBill(Long id) {
         billDetailRepo.deleteById(id);
+    }
+
+    @Override
+    public List<BillProductResponse> getAllProduct() {
+        return billRepo.getAll();
     }
 }

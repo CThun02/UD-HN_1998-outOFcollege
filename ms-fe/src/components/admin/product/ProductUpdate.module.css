@@ -1,23 +1,21 @@
-.product__update {
+.product__update,
+.product__details {
   background-color: #fff;
   border: 1px solid #edf2f9;
   padding: 10px 20px 10px 20px;
   border-radius: 4px;
 }
-
-.product__updateForm,
-.product__createDetails {
-  padding: 10px 20px;
-  border-right: 1px solid #edf2f9;
+.product__update {
+  margin-right: 5px;
 }
 
-.product__updateFormImg {
+.product__FormImg {
   position: relative;
   display: inline-block;
   padding: 12px;
 }
 
-.product__updateFormImgIcon {
+.product__FormImgIcon {
   position: absolute;
   display: flex;
   align-items: center;
@@ -28,11 +26,16 @@
   width: 24px;
   height: 24px;
   border: 1px solid #ccc;
-  bottom: 0;
+  bottom: 4%;
   right: 42%;
 }
 
-.product__updateFormImg img {
+.product__FormImgIcon:hover {
+  opacity: 0.7;
+  cursor: pointer;
+}
+
+.product__FormImg img {
   width: 100%;
   height: 100%;
   box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
@@ -40,22 +43,24 @@
 }
 
 .product__updateSelect {
-  padding-right: 4px;
-  padding-left: 4px;
-}
-
-.product__createDetailsSelect {
   width: 100%;
 }
 
-.optionColor {
-  display: flex;
-  align-items: center;
+.product__details {
+  margin-left: 5px;
 }
 
-.optionColor span {
-  height: 20px;
-  width: 20px;
-  border-radius: 50%;
-  margin-right: 8px;
+.product__updateButton {
+  border: none;
+  box-shadow: none;
+}
+
+.product__updateButton:hover {
+  background-color: #e6f4ff;
+}
+
+.product__updateCreateButton {
+  font-weight: 200;
+  border-radius: 8px;
+  font-size: 24px;
 }

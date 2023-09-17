@@ -2,8 +2,10 @@ package com.fpoly.ooc.service.impl;
 
 import com.fpoly.ooc.entity.Product;
 import com.fpoly.ooc.repository.ProductDAORepositoryI;
+import com.fpoly.ooc.responce.product.ProductResponse;
 import com.fpoly.ooc.responce.product.ProductTableResponse;
 import com.fpoly.ooc.service.interfaces.ProductServiceI;
+import com.fpoly.ooc.utilities.UniqueRandomHex;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,6 +23,14 @@ public class ProductServiceImpl implements ProductServiceI {
 
     @Override
     public Product create(Product product) {
+        while(true){
+            String productCode= "PRO_"+ UniqueRandomHex.generateUniqueRandomHex();
+            Optional<Product> check = Optional.ofNullable(repo.findFirstByProductCode(productCode));
+            if(check.isEmpty()){
+                product.setProductCode(productCode);
+                break;
+            }
+        };
         return repo.save(product);
     }
 
@@ -56,6 +66,11 @@ public class ProductServiceImpl implements ProductServiceI {
     }
 
     @Override
+    public Product getOneByCode(String code) {
+        return repo.findFirstByProductCode(code);
+    }
+
+    @Override
     public Page<ProductTableResponse> getProductsTable(int pageNumber) {
         Pageable pageable = PageRequest.of(pageNumber, 5);
         return repo.getProductsTable(pageable);
@@ -64,5 +79,10 @@ public class ProductServiceImpl implements ProductServiceI {
     @Override
     public ProductTableResponse getProductEdit(Long id) {
         return null;
+    }
+
+    @Override
+    public ProductResponse getProductResponseById(Long id) {
+        return repo.getProductResponseById(id);
     }
 }

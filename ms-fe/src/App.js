@@ -3,9 +3,13 @@ import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import { Button, Col, Result, Row } from "antd";
 import SideBar from "./components/admin/page/SideBar";
 import NavBar from "./components/admin/page/NavBar";
+import ProductIndex from "./components/admin/product/ProductIndex";
 import Promotion from "./components/admin/promotion/Promotion";
+import CreatePromotion from "./components/admin/promotion/CreatePromotion";
 import Voucher from "./components/admin/voucher/Voucher";
-import CreateVoucher from "./components/admin/voucher/CreateVoucher";
+import Bill from "./components/admin/sale-couter/Bill";
+import CreateBill from "./components/admin/sale-couter/CreateBill";
+import ProductUpdate from "./components/admin/product/ProductUpdate";
 
 function App() {
   return (
@@ -15,7 +19,7 @@ function App() {
           <Col span={4}>
             <SideBar />
           </Col>
-          <Col span={20}>
+          <Col span={20} className="h-100vh">
             <div>
               <NavBar />
             </div>
@@ -28,7 +32,10 @@ function App() {
                   <Route path="statistical" element="statistical"></Route>
 
                   {/* Tại quầy */}
-                  <Route path="counter-sales" element="counter-sales"></Route>
+                  <Route path="counter-sales">
+                    <Route index element={<Bill />}></Route>
+                    <Route path="bill" element={<CreateBill />}></Route>
+                  </Route>
 
                   {/* Đơn hàng */}
                   <Route path="order" element="order"></Route>
@@ -38,10 +45,11 @@ function App() {
                     path="income-and-expenses"
                     element="income-and-expenses"
                   ></Route>
-
                   {/* Sản phẩm */}
                   <Route path="product">
-                    <Route index element={"product"} />
+                    <Route index element={<ProductIndex />} />
+                    <Route path={"update"} element={<ProductUpdate />} />
+
                     {/* ví dụ path= san-pham/hien-thi ->  
                     <Route path="hien-thi" element="el" />
                     */}
@@ -56,14 +64,16 @@ function App() {
                   {/* Voucher */}
                   <Route path="voucher">
                     <Route index element={<Voucher />} />
-                    <Route path="create" element={<CreateVoucher />} />
 
                     <Route path="detail" element={"Chi tiet"} />
                     <Route path="update" element={"Chi tiet"} />
                   </Route>
 
                   {/* Promotion */}
-                  <Route path="promotion" element={<Promotion />}></Route>
+                  <Route path="promotion">
+                    <Route index element={<Promotion />} />
+                    <Route path="create" element={<CreatePromotion />} />
+                  </Route>
                 </Route>
 
                 {/* Not found */}

@@ -26,14 +26,9 @@ CREATE TABLE category(
     deleted_at          DATETIME 
 )
 
-CREATE TABLE product(
+CREATE TABLE pattern(
     id                  BIGINT IDENTITY PRIMARY KEY,
-    brand_id            BIGINT FOREIGN KEY(brand_id) REFERENCES brand(id),
-    category_id         BIGINT FOREIGN KEY(category_id) REFERENCES category(id),
-    product_code        NVARCHAR(50),
-    product_name        NVARCHAR(50),
-    img_default         VARCHAR(MAX),
-    description         NVARCHAR(100),
+    pattern_name        NVARCHAR(50),
     status              VARCHAR(50),
     created_at          DATETIME,
     updated_at          DATETIME,
@@ -53,9 +48,16 @@ CREATE TABLE form(
     deleted_at          DATETIME
 )
 
-CREATE TABLE pattern(
+CREATE TABLE product(
     id                  BIGINT IDENTITY PRIMARY KEY,
-    pattern_name        NVARCHAR(50),
+    brand_id            BIGINT FOREIGN KEY(brand_id) REFERENCES brand(id),
+    category_id         BIGINT FOREIGN KEY(category_id) REFERENCES category(id),
+    pattern_id          BIGINT FOREIGN KEY(pattern_id) REFERENCES pattern(id),
+    form_id             BIGINT FOREIGN KEY(form_id) REFERENCES form(id),
+    product_code        NVARCHAR(50),
+    product_name        NVARCHAR(50),
+    img_default         VARCHAR(MAX),
+    description         NVARCHAR(100),
     status              VARCHAR(50),
     created_at          DATETIME,
     updated_at          DATETIME,
@@ -63,6 +65,7 @@ CREATE TABLE pattern(
     updated_by          NVARCHAR(50),
     deleted_at          DATETIME 
 )
+
 
 CREATE TABLE collar_type(
     id                  BIGINT IDENTITY PRIMARY KEY,
@@ -145,14 +148,12 @@ CREATE TABLE size(
 CREATE TABLE product_detail(
     id                  BIGINT IDENTITY PRIMARY KEY,
     product_id          BIGINT FOREIGN KEY(product_id) REFERENCES product(id),
-    pattern_id          BIGINT FOREIGN KEY(pattern_id) REFERENCES pattern(id),
     button_id           BIGINT FOREIGN KEY(button_id) REFERENCES button_type(id),
     material_id         BIGINT FOREIGN KEY(material_id) REFERENCES material(id),
     collar_id           BIGINT FOREIGN KEY(collar_id) REFERENCES collar_type(id),
     sleeve_id           BIGINT FOREIGN KEY(sleeve_id) REFERENCES sleeve_type(id),
     size_id             BIGINT FOREIGN KEY(size_id) REFERENCES size(id),
     color_id            BIGINT FOREIGN KEY(color_id) REFERENCES color(id),
-    form_id             BIGINT FOREIGN KEY(form_id) REFERENCES form(id),
     shirt_tail_id       BIGINT FOREIGN KEY(shirt_tail_id) REFERENCES shirt_tail_type(id),
     price               DECIMAL,
     quantity            INT,

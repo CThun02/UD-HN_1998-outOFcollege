@@ -20,5 +20,4 @@ public class Size extends BaseEntity{
 
     @Column(name = "size_name")
     private String sizeName;
-
 }

@@ -12,7 +12,7 @@ import java.util.Date;
 @Table(name = "product")
 @Entity
 @Builder
-public class Product extends BaseEntity{
+public class Product extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -27,20 +27,23 @@ public class Product extends BaseEntity{
     @Column(name = "description")
     private String description;
 
-<<<<<<< HEAD
-    @Column(name = "status")
-    private String status;
-
     @Column(name = "img_default")
     private String imgDefault;
 
-=======
->>>>>>> test
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "brand_id")
     private  Brand brand;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "pattern_id")
+    private Pattern pattern;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "form_id")
+    private Form form;
+
 }

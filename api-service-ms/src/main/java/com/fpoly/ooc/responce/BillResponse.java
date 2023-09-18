@@ -25,7 +25,7 @@ public class BillResponse {
 
     private Integer quantity;
 
-    private String productDetailName;
+    private String productName;
 
     private BigDecimal price;
 

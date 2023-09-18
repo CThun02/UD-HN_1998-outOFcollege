@@ -34,6 +34,22 @@ const CreateBill = () => {
             title: 'Sản phẩm',
             dataIndex: 'imgDefault',
             key: 'imgDefault',
+            render: (_, record) => (
+                <Row>
+                    <Col span={12}>
+                        <img src={null} alt="Ảnh" />
+                    </Col>
+                    <Col span={12} className={styles.product} style={{ textAlign: 'left', display: 'flex', flexDirection: 'column' }}>
+                        <h2>{record.productName}</h2>
+                        <div style={{ display: 'flex', alignItems: 'center', color: 'red' }}>
+                            <span>{record.price}</span>
+                            <span style={{ marginLeft: '4px' }}>d</span>
+                        </div>
+                        <span>size: {record.sizeName}</span>
+                        <span>color: {record.colorName}</span>
+                    </Col>
+                </Row>
+            )
         },
         {
             title: 'Số lượng',
@@ -77,7 +93,7 @@ const CreateBill = () => {
             </div>
             {/* danh sách sản phẩm */}
             <div className={styles.lstProduct}>
-                <Table columns={columns} dataSource={data} />
+                <Table columns={columns} dataSource={data} pagination={false} />
             </div>
 
             {/* chọn tài khoản */}

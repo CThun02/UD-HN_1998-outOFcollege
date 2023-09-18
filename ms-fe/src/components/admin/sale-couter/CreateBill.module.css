@@ -13,7 +13,7 @@
 }
 
 .lstProduct {
-  background-color: #ffffff;
+  background-color: #ffffff !important;
   min-height: 300px;
   height: auto;
   margin-bottom: 20px;
@@ -42,4 +42,10 @@
 .font {
   font-size: 14px;
   font-weight: 600;
+}
+
+.product {
+  text-align: "left";
+  display: "flex";
+  flex-direction: "column";
 }

@@ -1,4 +1,4 @@
-﻿USE MASTER;
+﻿﻿USE MASTER;
 
 CREATE DATABASE DATN_DB_MS;
 
@@ -448,4 +448,3 @@ CREATE TABLE favorites_list_detail(
     updated_by          NVARCHAR(50),
     deleted_at          DATETIME    
 )
-

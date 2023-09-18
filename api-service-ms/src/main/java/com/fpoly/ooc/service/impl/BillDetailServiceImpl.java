@@ -53,7 +53,7 @@ public class BillDetailServiceImpl implements BillService {
         }
 
         for (CartResponse cart : cartDetailRepo.getAllCart()) {
-            totalPrice = totalPrice.add(cart.getPrice());
+            totalPrice = totalPrice.add(cart.getPrice().multiply(BigDecimal.valueOf(cart.getQuantity())));
         }
 
         Bill bill = Bill.builder()
@@ -72,6 +72,7 @@ public class BillDetailServiceImpl implements BillService {
                     .productDetail(ProductDetail.builder().id(cart.getProductDetailId()).build())
                     .price(cart.getPrice())
                     .quantity(cart.getQuantity())
+                    .status("wating")
                     .build();
 
             billDetailRepo.save(billDetail);

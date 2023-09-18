@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public interface BillRepo extends JpaRepository<Bill, Long> {
 
-    @Query("SELECT new com.fpoly.ooc.responce.BillProductResponse(p.id, p.imgDefault, p.productName, " +
+    @Query("SELECT new com.fpoly.ooc.responce.bill.BillProductResponse(p.id, p.imgDefault, p.productName, " +
             "   b.brandName, c.categoryName, f.formName, pt.patternName  ) " +
             "FROM Product p JOIN Brand b ON p.brand.id = b.id " +
             "JOIN Category c ON p.category.id = c.id " +

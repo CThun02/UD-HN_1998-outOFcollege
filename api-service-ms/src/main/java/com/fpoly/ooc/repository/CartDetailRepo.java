@@ -13,7 +13,7 @@ import java.util.List;
 @Repository
 public interface CartDetailRepo extends JpaRepository<CartDetail, Long> {
 
-    @Query("SELECT new com.fpoly.ooc.responce.CartResponse(c.id, cd.id,pd.id, p.imgDefault, p.productName, " +
+    @Query("SELECT new com.fpoly.ooc.responce.cart.CartResponse(c.id, cd.id,pd.id, p.imgDefault, p.productName, " +
             "s.sizeName, color.colorName, pd.price, cd.quantity) " +
             "FROM CartDetail cd " +
             "JOIN cd.cart c " +

@@ -8,4 +8,8 @@ public class Const {
 
     public static final String STATUS_INACTIVE = "INACTIVE";
 
+    //error code
+    public static final String CODE_NOT_FOUND = "CODE_NOT_FOUND";
+    public static final String ID_NOT_FOUND = "ID_NOT_FOUND";
+
 }

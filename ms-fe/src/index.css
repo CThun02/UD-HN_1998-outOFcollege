@@ -17,6 +17,10 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 
+p {
+  text-align: justify;
+}
+
 /* Tùy chỉnh kiểu dáng chung của thanh cuộn */
 ::-webkit-scrollbar {
   width: 4px; /* Độ rộng của thanh cuộn */

@@ -5,11 +5,12 @@ import SideBar from "./components/admin/page/SideBar";
 import NavBar from "./components/admin/page/NavBar";
 import ProductIndex from "./components/admin/product/ProductIndex";
 import Promotion from "./components/admin/promotion/Promotion";
+import CreatePromotion from "./components/admin/promotion/CreatePromotion";
 import Voucher from "./components/admin/voucher/Voucher";
-import CreateVoucher from "./components/admin/voucher/CreateVoucher";
-import Bill from "./components/admin/sale-couter/Bill"
+import Bill from "./components/admin/sale-couter/Bill";
 import CreateBill from "./components/admin/sale-couter/CreateBill";
 import ProductUpdate from "./components/admin/product/ProductUpdate";
+import ProductCreateDetails from "./components/admin/product/ProductCreateDetails";
 
 function App() {
   return (
@@ -33,8 +34,8 @@ function App() {
 
                   {/* Tại quầy */}
                   <Route path="counter-sales">
-                    <Route index element={<Bill />} ></Route>
-                    <Route path="bill" element={<CreateBill />} ></Route>
+                    <Route index element={<Bill />}></Route>
+                    <Route path="bill" element={<CreateBill />}></Route>
                   </Route>
 
                   {/* Đơn hàng */}
@@ -48,14 +49,21 @@ function App() {
                   {/* Sản phẩm */}
                   <Route path="product">
                     <Route index element={<ProductIndex />} />
-                    <Route path={"update"} element={<ProductUpdate />} />
+                    <Route
+                      path={"update/:productId"}
+                      element={<ProductUpdate />}
+                    />
+                    <Route
+                      path={"create-details/:productId"}
+                      element={<ProductCreateDetails />}
+                    />
 
                     {/* ví dụ path= san-pham/hien-thi ->  
                     <Route path="hien-thi" element="el" />
                     */}
                   </Route>
                   <Route path="category" element="category"></Route>
-                  <Route path="brand" element={<SideBar />}></Route>
+                  <Route path="brand" element="brand"></Route>
 
                   {/* Tài khoản */}
                   <Route path="employee" element="employee"></Route>
@@ -64,14 +72,16 @@ function App() {
                   {/* Voucher */}
                   <Route path="voucher">
                     <Route index element={<Voucher />} />
-                    <Route path="create" element={<CreateVoucher />} />
 
                     <Route path="detail" element={"Chi tiet"} />
                     <Route path="update" element={"Chi tiet"} />
                   </Route>
 
                   {/* Promotion */}
-                  <Route path="promotion" element={<Promotion />}></Route>
+                  <Route path="promotion">
+                    <Route index element={<Promotion />} />
+                    <Route path="create" element={<CreatePromotion />} />
+                  </Route>
                 </Route>
 
                 {/* Not found */}

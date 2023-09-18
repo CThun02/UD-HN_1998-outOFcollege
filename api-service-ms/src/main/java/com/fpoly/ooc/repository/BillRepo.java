@@ -1,7 +1,7 @@
 package com.fpoly.ooc.repository;
 
 import com.fpoly.ooc.entity.Bill;
-import com.fpoly.ooc.responce.BillProductResponse;
+import com.fpoly.ooc.responce.bill.BillProductResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -11,11 +11,12 @@ import java.util.List;
 @Repository
 public interface BillRepo extends JpaRepository<Bill, Long> {
 
-    @Query("SELECT new com.fpoly.ooc.responce.BillProductResponse(p.id, pd.id, p.imgDefault, p.productName, " +
-            "   s.sizeName, c.colorName, pd.price, pd.quantity) " +
-            "FROM Product p join ProductDetail pd on p.id = pd.id " +
-            "join  Size s on pd.size.id = s.id " +
-            "join Color c on c.id = pd.color.id")
+    @Query("SELECT new com.fpoly.ooc.responce.BillProductResponse(p.id, p.imgDefault, p.productName, " +
+            "   b.brandName, c.categoryName, f.formName, pt.patternName  ) " +
+            "FROM Product p JOIN Brand b ON p.brand.id = b.id " +
+            "JOIN Category c ON p.category.id = c.id " +
+            "JOIN Form f ON p.form.id = f.id " +
+            "JOIN Pattern pt ON p.pattern.id = pt.id")
     List<BillProductResponse> getAll();
 
 }

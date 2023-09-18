@@ -1,8 +1,7 @@
 package com.fpoly.ooc.repository;
 
 import com.fpoly.ooc.entity.BillDetail;
-import com.fpoly.ooc.responce.BillResponse;
-import com.fpoly.ooc.responce.CartResponse;
+import com.fpoly.ooc.responce.bill.BillResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

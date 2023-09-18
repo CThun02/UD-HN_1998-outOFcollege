@@ -1,36 +1,36 @@
-package com.fpoly.ooc.responce;
+package com.fpoly.ooc.responce.bill;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.Date;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-@Builder
-public class CartResponse {
+public class BillResponse {
 
-    private Long cartId;
+    private Long billId;
 
-    private Long cartDetailId;
+    private Long billDetailId;
 
     private Long productDetailId;
 
     private String imgDefault;
 
+    private Integer quantity;
+
     private String productName;
-
-    private String sizeName;
-
-    private String colorName;
 
     private BigDecimal price;
 
-    private Integer quantity;
+    private String status;
+
+    private LocalDateTime createDate;
 
 }

@@ -1,4 +1,4 @@
-package com.fpoly.ooc.responce;
+package com.fpoly.ooc.responce.bill;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,18 +15,16 @@ public class BillProductResponse {
 
     private Long productId;
 
-    private Long productDetailId;
-
     private String imgDefault;
 
     private String productName;
 
-    private String sizeName;
+    private String brandName;
 
-    private String colorName;
+    private String categoryName;
 
-    private BigDecimal price;
+    private String patternName;
 
-    private Integer quantity;
+    private String formName;
 
 }

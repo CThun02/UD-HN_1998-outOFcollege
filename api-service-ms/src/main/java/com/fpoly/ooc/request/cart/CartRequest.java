@@ -1,6 +1,5 @@
-package com.fpoly.ooc.request;
+package com.fpoly.ooc.request.cart;
 
-import com.fpoly.ooc.entity.CartDetail;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -1,12 +1,10 @@
 package com.fpoly.ooc.service.interfaces;
 
 
-import com.fpoly.ooc.entity.Bill;
 import com.fpoly.ooc.entity.BillDetail;
-import com.fpoly.ooc.request.BillRequest;
-import com.fpoly.ooc.responce.BillProductResponse;
-import com.fpoly.ooc.responce.BillResponse;
-import org.springframework.data.domain.Page;
+import com.fpoly.ooc.request.bill.BillRequest;
+import com.fpoly.ooc.responce.bill.BillProductResponse;
+import com.fpoly.ooc.responce.bill.BillResponse;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-﻿﻿USE DATN_DB_MS;
+﻿USE DATN_DB_MS;
 
 INSERT INTO promotion (promotion_code, promotion_name, promotion_value, start_date, end_date, promotion_max_value, promotion_method, promotion_condition, status, created_at, updated_at, created_by, updated_by, deleted_at)
 VALUES

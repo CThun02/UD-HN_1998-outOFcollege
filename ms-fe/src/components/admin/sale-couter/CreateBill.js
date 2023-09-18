@@ -31,6 +31,13 @@ const CreateBill = () => {
 
     const columns = [
         {
+            title: 'STT',
+            dataIndex: 'STT',
+            render: (_, index) => {
+                return index + 1;
+            }
+        },
+        {
             title: 'Sản phẩm',
             dataIndex: 'imgDefault',
             key: 'imgDefault',

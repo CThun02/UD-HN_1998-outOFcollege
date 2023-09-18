@@ -1,6 +1,6 @@
 package com.fpoly.ooc.controller;
 
-import com.fpoly.ooc.request.BillRequest;
+import com.fpoly.ooc.request.bill.BillRequest;
 import com.fpoly.ooc.service.interfaces.BillService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

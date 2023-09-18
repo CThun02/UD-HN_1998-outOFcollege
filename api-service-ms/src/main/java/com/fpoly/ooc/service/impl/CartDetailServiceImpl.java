@@ -1,14 +1,13 @@
 package com.fpoly.ooc.service.impl;
 
-import com.fpoly.ooc.entity.Account;
 import com.fpoly.ooc.entity.Cart;
 import com.fpoly.ooc.entity.CartDetail;
 import com.fpoly.ooc.entity.ProductDetail;
 import com.fpoly.ooc.repository.CartDetailRepo;
 import com.fpoly.ooc.repository.CartRepo;
-import com.fpoly.ooc.request.CartDetailRequest;
-import com.fpoly.ooc.request.CartRequest;
-import com.fpoly.ooc.responce.CartResponse;
+import com.fpoly.ooc.request.cart.CartDetailRequest;
+import com.fpoly.ooc.request.cart.CartRequest;
+import com.fpoly.ooc.responce.cart.CartResponse;
 import com.fpoly.ooc.service.interfaces.CartDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

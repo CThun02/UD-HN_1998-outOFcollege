@@ -1,6 +1,6 @@
 package com.fpoly.ooc.controller;
 
-import com.fpoly.ooc.request.CartRequest;
+import com.fpoly.ooc.request.cart.CartRequest;
 import com.fpoly.ooc.service.interfaces.CartDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

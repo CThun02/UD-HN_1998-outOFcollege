@@ -2,8 +2,8 @@ package com.fpoly.ooc.service.interfaces;
 
 import com.fpoly.ooc.entity.Cart;
 import com.fpoly.ooc.entity.CartDetail;
-import com.fpoly.ooc.request.CartRequest;
-import com.fpoly.ooc.responce.CartResponse;
+import com.fpoly.ooc.request.cart.CartRequest;
+import com.fpoly.ooc.responce.cart.CartResponse;
 
 import java.util.List;
 

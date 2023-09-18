@@ -3,6 +3,7 @@ package com.fpoly.ooc.controller;
 import com.fpoly.ooc.dto.VoucherConditionDTO;
 import com.fpoly.ooc.request.voucher.VoucherRequest;
 import com.fpoly.ooc.service.interfaces.VoucherService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
@@ -36,13 +37,13 @@ public class VoucherController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> createVoucher(@RequestBody VoucherRequest request) {
+    public ResponseEntity<?> createVoucher(@Valid @RequestBody VoucherRequest request) {
 
         return ResponseEntity.ok().body(voucherService.saveOrUpdate(request));
     }
 
     @PutMapping("/update")
-    public ResponseEntity<?> updateVoucher(@RequestBody VoucherRequest request) {
+    public ResponseEntity<?> updateVoucher(@Valid @RequestBody VoucherRequest request) {
 
         return ResponseEntity.ok().body(voucherService.saveOrUpdate(request));
     }

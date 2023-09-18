@@ -10,6 +10,7 @@ import com.fpoly.ooc.request.voucher.VoucherRequest;
 import com.fpoly.ooc.responce.voucher.VoucherResponse;
 import com.fpoly.ooc.service.interfaces.VoucherService;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -33,22 +34,32 @@ public class VoucherServiceImpl implements VoucherService {
     @Override
     public Page<VoucherResponse> findAllVoucher(Pageable pageable, VoucherConditionDTO voucherConditionDTO) {
 
+        String status = Objects.isNull(voucherConditionDTO.getStatus()) ?
+                null : voucherConditionDTO.getStatus().equals("ALL") ?
+                null : voucherConditionDTO.getStatus();
+
+        System.out.println("status: " + status);
+
         return page(
                 voucherRepository.findAllVoucher(
-                Objects.isNull(voucherConditionDTO.getVoucherCode()) ? null : "%" + voucherConditionDTO.getVoucherCode() + "%",
-                Objects.isNull(voucherConditionDTO.getVoucherName()) ? null : "%" + voucherConditionDTO.getVoucherName() + "%",
+                Objects.isNull(voucherConditionDTO.getVoucherCodeOrName()) ? null : "%" + voucherConditionDTO.getVoucherCodeOrName() + "%",
                 Objects.isNull(voucherConditionDTO.getStartDate()) ? null : voucherConditionDTO.getStartDate(),
                 Objects.isNull(voucherConditionDTO.getEndDate()) ? null : voucherConditionDTO.getEndDate(),
-                Objects.isNull(voucherConditionDTO.getStatus()) ?
-                        null : voucherConditionDTO.getStatus().equals("ALL") ?
-                        null : voucherConditionDTO.getStatus()
+                        status
                         ), pageable);
     }
 
     @Override
     public Voucher saveOrUpdate(VoucherRequest voucherRequest) {
         Voucher voucher = convertVoucherRequest(voucherRequest);
-        voucher.setVoucherCode(generatorCode());
+
+        if(voucherRequest.getEndDate().isAfter(voucherRequest.getStartDate())) {
+            voucher.setStatus(Const.STATUS_ACTIVE);
+        } else {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.END_DATE_LESS_START_DATE));
+        }
+
+        voucher.setVoucherCode(StringUtils.isBlank(voucher.getVoucherCode()) ? generatorCode(): voucher.getVoucherCode());
 
         return voucherRepository.save(voucher);
     }

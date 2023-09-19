@@ -40,6 +40,9 @@ public class BillDetail extends BaseEntity {
     @Column(name = "note")
     private String note;
 
+    @Column(name = "status")
+    private String status;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bill_id", referencedColumnName = "id")
     private Bill bill;

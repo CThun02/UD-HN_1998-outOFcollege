@@ -1,70 +1,77 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal, Input, Select, Button, Table } from 'antd';
 import styles from './ModalProduct.module.css';
+import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 
-const columns = [
-    {
-        title: 'Ảnh',
-        dataIndex: 'img',
-        key: 'img',
-    },
-    {
-        title: 'ID',
-        dataIndex: 'id',
-        key: 'id',
-    },
-    {
-        title: 'Tên sản phẩm',
-        dataIndex: 'name',
-        key: 'name',
-    },
-    {
-        title: 'Giá',
-        key: 'price',
-        dataIndex: 'price',
 
-    },
-    {
-        title: 'Action',
-        key: 'action',
-        render: () => (
-            <Button type="primary" style={{ backgroundColor: "white", color: 'blue' }}>
-                Chọn
-            </Button>
-        ),
-    },
-];
-const data = [
-    {
-        key: '1',
-        img: 'J',
-        id: 32,
-        name: 'New York No. 1 Lake Park',
-        price: 177,
-    },
-    {
-        key: '1',
-        img: 'J',
-        id: 32,
-        name: 'New York No. 1 Lake Park',
-        price: 177,
-    },
-    {
-        key: '1',
-        img: 'J',
-        id: 32,
-        name: 'New York No. 1 Lake Park',
-        price: 177
-    },
-];
 const { Option } = Select;
 
 const ModalProduct = ({ visible, onCancel }) => {
     const [searchInput, setSearchInput] = useState('');
     const [selectedItem, setSelectedItem] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
+    const [data, setData] = useState([]);
+    const [request, setRequest] = useState();
 
+    const columns = [
+        {
+            title: 'Ảnh',
+            dataIndex: 'imgDefault',
+            key: 'imgDefault',
+        },
+        {
+            title: 'ID',
+            dataIndex: 'productDetailId',
+            key: 'id',
+        },
+        {
+            title: 'Tên sản phẩm',
+            dataIndex: 'productName',
+            key: 'productName',
+        },
+        {
+            title: 'Kích cỡ',
+            dataIndex: 'sizeName',
+            key: 'sizeName',
+        },
+        {
+            title: 'màu sắc',
+            dataIndex: 'colorName',
+            key: 'colorName',
+        },
+        {
+            title: 'Giá',
+            key: 'price',
+            dataIndex: 'price',
+
+        },
+        {
+            title: 'Số lượng',
+            key: 'quantity',
+            dataIndex: 'quantity',
+
+        },
+        {
+            title: 'Action',
+            key: 'action',
+            render: () => (
+                <Link type="primary" style={{ backgroundColor: "white", color: 'blue' }}>
+                    Chọn
+                </Link>
+            ),
+        },
+    ];
+
+    useEffect(() => {
+        axios.get("http://localhost:8080/api/admin/bill/product")
+            .then((response) => {
+                setData(response.data);
+            }).catch((error) => {
+                console.log(error)
+            })
+    }, [])
     const handleSelectItem = (item) => {
         setSelectedItem(item);
         setModalVisible(true);
@@ -136,24 +143,7 @@ const ModalProduct = ({ visible, onCancel }) => {
                     dataSource={data}
                     scroll={{ y: 400 }}
                     pagination={false}
-                    onRow={(record) => ({
-                        onClick: () => handleSelectItem(record),
-                    })} />
-                <Modal
-                    visible={modalVisible}
-                    onCancel={handleModalClose}
-                    footer={null}
-                >
-                    {selectedItem && (
-                        <>
-                            <h2>Chi tiết sản phẩm</h2>
-                            <p>ID: {selectedItem.id}</p>
-                            <p>Tên sản phẩm: {selectedItem.name}</p>
-                            <p>Giá: {selectedItem.price}</p>
-                            {/* Thêm thông tin chi tiết khác tại đây */}
-                        </>
-                    )}
-                </Modal>
+                />
             </div>
         </Modal>
     );

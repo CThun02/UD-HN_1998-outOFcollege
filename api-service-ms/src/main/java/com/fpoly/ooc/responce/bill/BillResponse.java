@@ -1,4 +1,4 @@
-package com.fpoly.ooc.responce;
+package com.fpoly.ooc.responce.bill;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @AllArgsConstructor
@@ -20,14 +21,16 @@ public class BillResponse {
 
     private Long productDetailId;
 
+    private String imgDefault;
+
     private Integer quantity;
 
-    private String productDetailName;
+    private String productName;
 
     private BigDecimal price;
 
     private String status;
 
-    private Date createDate;
+    private LocalDateTime createDate;
 
 }

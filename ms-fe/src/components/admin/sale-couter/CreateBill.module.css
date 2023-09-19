@@ -13,14 +13,14 @@
 }
 
 .lstProduct {
-  background-color: #eeeded;
+  background-color: #ffffff !important;
   min-height: 300px;
   height: auto;
   margin-bottom: 20px;
 }
 
 .lstAccount {
-  background-color: #eeeded;
+  background-color: #ffffff;
   min-height: 100px;
   height: auto;
   padding: 20px;
@@ -33,7 +33,7 @@
 }
 
 .infBill {
-  background-color: #eeeded;
+  background-color: #ffffff;
   min-height: 400px;
   height: auto;
   padding: 20px;
@@ -42,4 +42,10 @@
 .font {
   font-size: 14px;
   font-weight: 600;
+}
+
+.product {
+  text-align: "left";
+  display: "flex";
+  flex-direction: "column";
 }

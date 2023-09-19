@@ -12,7 +12,7 @@
 }
 .bill {
   margin: 20px;
-  background-color: #eeeded;
+  background-color: #ffffff;
   border-radius: 20px;
   min-height: 90%;
   width: 95%;
@@ -50,4 +50,18 @@ btn {
 
 btn:hover {
   background-color: #3367d6;
+}
+
+.btnDelete {
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.btnEdit {
+  border: none;
+  padding: 0;
+  margin: 0;
+  color: #1890ff;
 }

@@ -2,7 +2,9 @@ package com.fpoly.ooc.controller;
 
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.entity.Product;
-import com.fpoly.ooc.request.ProductRequest;
+import com.fpoly.ooc.entity.ProductDetail;
+import com.fpoly.ooc.request.product.ProductDetailRequest;
+import com.fpoly.ooc.request.product.ProductRequest;
 import com.fpoly.ooc.responce.product.ProductDetailResponse;
 import com.fpoly.ooc.responce.product.ProductResponse;
 import com.fpoly.ooc.responce.product.ProductTableResponse;
@@ -35,9 +37,44 @@ public class ProductController {
         return productDetailService.getProductDetailsTableByIdProduct(productId);
     }
 
+    @GetMapping("/getProductDetailUpdate")
+    public ResponseEntity<?> getProductDetailsUpdate(@RequestParam Long productId,
+                                                               @RequestParam Long buttonId,
+                                                               @RequestParam Long materialId,
+                                                               @RequestParam Long shirtTailId,
+                                                               @RequestParam Long sleeveId,
+                                                               @RequestParam Long collarId){
+        return  ResponseEntity.ok(productDetailService.getProductDetailsResponseByIdCompo(productId, buttonId,
+                materialId, shirtTailId, sleeveId, collarId).get(0));
+    }
+
     @GetMapping("/getProductEdit")
     public ProductResponse getProductEdit(@RequestParam("productId")Long productId){
         return service.getProductResponseById(productId);
+    }
+
+    @GetMapping("/getColorsByIdComPdAndIdPro")
+    public ResponseEntity<?> getColorsByIdComPdAndIdPro(@RequestParam Long productId,
+                                                     @RequestParam Long buttonId,
+                                                     @RequestParam Long materialId,
+                                                     @RequestParam Long shirtTailId,
+                                                     @RequestParam Long sleeveId,
+                                                     @RequestParam Long collarId){
+        return  ResponseEntity.ok(productDetailService.getColorsByIdCompoPDAndIdPro(productId, buttonId,
+                materialId, shirtTailId, sleeveId, collarId));
+    }
+
+
+    @GetMapping("/getSizesByIdComPdAndIdPro")
+    public ResponseEntity<?> getSizesByIdComPdAndIdPro(@RequestParam Long productId,
+                                                        @RequestParam Long buttonId,
+                                                        @RequestParam Long materialId,
+                                                        @RequestParam Long shirtTailId,
+                                                        @RequestParam Long sleeveId,
+                                                        @RequestParam Long collarId,
+                                                       @RequestParam Long colorId){
+        return  ResponseEntity.ok(productDetailService.getSizesPDByIdCompoPDAndIdPro(productId, buttonId,
+                materialId, shirtTailId, sleeveId, collarId, colorId));
     }
 
     @PostMapping("/create")
@@ -45,6 +82,19 @@ public class ProductController {
         Product product = request.dto();
         product.setStatus(Const.STATUS_ACTIVE);
         return ResponseEntity.ok(service.create(product));
+    }
+
+    @PostMapping("/createDetail")
+    public ResponseEntity<?> createProductDetail(@RequestBody ProductDetailRequest request){
+        ProductDetail productDetail = request.dto();
+        productDetail.setStatus(Const.STATUS_ACTIVE);
+        return ResponseEntity.ok(productDetailService.create(productDetail));
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<?> updateProduct(@RequestBody ProductRequest request){
+        Product product = request.dto();
+        return ResponseEntity.ok(service.update(product));
     }
 
 }

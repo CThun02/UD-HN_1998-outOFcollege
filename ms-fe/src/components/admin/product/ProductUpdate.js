@@ -5,7 +5,8 @@ import {
   TableOutlined,
   PlusCircleOutlined,
 } from "@ant-design/icons";
-import { Button, Col, Row, Select, Table } from "antd";
+import { Button, Col, message, Row, Select, Table } from "antd";
+import { isString } from "antd/es/button";
 import Input from "antd/es/input/Input";
 import TextArea from "antd/es/input/TextArea";
 import Upload from "antd/es/upload/Upload";
@@ -13,11 +14,13 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import styles from "./ProductUpdate.module.css";
+import { isFormInputEmpty } from "./ValidateForm";
 
 const ProductUpdate = () => {
   const { productId } = useParams();
   const api = "http://localhost:8080/api/admin/";
   const [loading, setLoading] = useState(true);
+  const [messageApi, contextHolder] = message.useMessage();
   const [brands, setBrands] = useState(null);
   const [categories, setCategories] = useState(null);
   const [patterns, setPatterns] = useState(null);
@@ -92,9 +95,15 @@ const ProductUpdate = () => {
       dataIndex: "id",
       render: (text, record, index) => (
         <>
-          <Button className={styles.product__updateButton}>
-            <EditOutlined />
-          </Button>
+          <Link
+            to={`/admin/product/update-details?productDetail=${encodeURIComponent(
+              JSON.stringify(record)
+            )}`}
+          >
+            <Button className={styles.product__updateButton}>
+              <EditOutlined />
+            </Button>
+          </Link>
           <Button className={styles.product__updateButton}>
             <EyeOutlined />
           </Button>
@@ -123,6 +132,35 @@ const ProductUpdate = () => {
 
       // Đọc nội dung của file dưới dạng URL
       reader.readAsDataURL(uploadedFile);
+    }
+  }
+
+  function update() {
+    for (let key in product) {
+      if (isString(product[key])) {
+        if (product[key].trim() === "") {
+          handleSetProduct(key, product[key].trim());
+        }
+      }
+    }
+    let check = isFormInputEmpty(product);
+    if (!check) {
+      messageApi.loading("Đang tải!", 2);
+      axios
+        .put(api + "product/update", product)
+        .then((response) => {
+          setTimeout(() => {
+            messageApi.success("Chỉnh sửa sản phẩm thành công!", 2);
+          }, 2000);
+        })
+        .catch((err) => {
+          console.log(err);
+          setTimeout(() => {
+            messageApi.error("Chỉnh sửa sản phẩm thất bại!", 2);
+          }, 2000);
+        });
+    } else {
+      messageApi.error("Vui lòng nhập tất cả các trường!", 2);
     }
   }
 
@@ -188,6 +226,7 @@ const ProductUpdate = () => {
         handleSetProduct("patternId", response.data.pattern.id);
         handleSetProduct("formId", response.data.form.id);
         handleSetProduct("description", response.data.description);
+        handleSetProduct("status", response.data.status);
       })
       .catch((error) => {
         console.log(error);
@@ -195,6 +234,7 @@ const ProductUpdate = () => {
   }, [productId]);
   return (
     <div>
+      {contextHolder}
       <Row>
         <Col span={8}>
           <div className={styles.product__update}>
@@ -227,6 +267,7 @@ const ProductUpdate = () => {
                     onChange={(event) => {
                       handleSetProduct("productName", event.target.value);
                     }}
+                    status={product.productName === "" ? "error" : ""}
                   />
                 </div>
                 <div className="m-5">
@@ -246,7 +287,7 @@ const ProductUpdate = () => {
                     }
                     value={product.brandId}
                     onChange={(event) => {
-                      handleSetProduct("brandId", event.target.value);
+                      handleSetProduct("brandId", event);
                     }}
                   >
                     {brands &&
@@ -276,7 +317,7 @@ const ProductUpdate = () => {
                     }
                     value={product.categoryId}
                     onChange={(event) => {
-                      handleSetProduct("categoryId", event.target.value);
+                      handleSetProduct("categoryId", event);
                     }}
                   >
                     {categories &&
@@ -306,7 +347,7 @@ const ProductUpdate = () => {
                     }
                     value={product.patternId}
                     onChange={(event) => {
-                      handleSetProduct("patternId", event.target.value);
+                      handleSetProduct("patternId", event);
                     }}
                   >
                     {patterns &&
@@ -336,7 +377,7 @@ const ProductUpdate = () => {
                     }
                     value={product.formId}
                     onChange={(event) => {
-                      handleSetProduct("formId", event.target.value);
+                      handleSetProduct("formId", event);
                     }}
                   >
                     {forms &&
@@ -355,17 +396,21 @@ const ProductUpdate = () => {
                   <h6>Mô tả</h6>
                   <TextArea
                     style={{ height: "200px" }}
-                    value={
-                      "Áo sơ mi nam có đường chỉ may đều đặn, tỉ mỉ, form áo tôn lên đường nét cơ thể săn chắc và nam tính. Hình thức đẹp mắt kết hợp cùng khả năng thấm hút mồ hôi tốt, tạo sự thông thoáng khi mặc. Sự kết hợp khác nhau đến từ chất liệu vải, họa tiết trên áo, màu sắc mang đến cho phái mạnh nhiều sự lựa chọn."
-                    }
+                    value={product.description}
                     onChange={(event) => {
                       handleSetProduct("description", event.target.value);
                     }}
+                    status={product.description === "" ? "error" : ""}
                   />
                 </div>
                 <br />
                 <div style={{ textAlign: "end" }}>
-                  <Button>Hoàn thành</Button>
+                  <Button
+                    className={styles.product__updateButtonConfirm}
+                    onClick={update}
+                  >
+                    Hoàn thành
+                  </Button>
                 </div>
                 <br />
               </Col>
@@ -377,30 +422,32 @@ const ProductUpdate = () => {
             <h2>
               <TableOutlined /> Bảng chi tiết sản phẩm
             </h2>
-            <Table
-              dataSource={
-                productDetails &&
-                productDetails.map((record, index) => ({
-                  ...record,
-                  key: index,
-                }))
-              }
-              columns={columns}
-              loading={loading}
-              footer={() => {
-                return (
-                  <div style={{ textAlign: "center" }}>
-                    <Link to={"/admin/product/create-details/" + productId}>
-                      <Button className={styles.product__updateButton}>
-                        <PlusCircleOutlined
-                          className={styles.product__updateCreateButton}
-                        />
-                      </Button>
-                    </Link>
-                  </div>
-                );
-              }}
-            ></Table>
+            <div className="m-5">
+              <Table
+                dataSource={
+                  productDetails &&
+                  productDetails.map((record, index) => ({
+                    ...record,
+                    key: index,
+                  }))
+                }
+                columns={columns}
+                loading={loading}
+                footer={() => {
+                  return (
+                    <div style={{ textAlign: "center" }}>
+                      <Link to={"/admin/product/create-details/" + productId}>
+                        <Button className={styles.product__updateButton}>
+                          <PlusCircleOutlined
+                            className={styles.product__updateCreateButton}
+                          />
+                        </Button>
+                      </Link>
+                    </div>
+                  );
+                }}
+              ></Table>
+            </div>
           </div>
         </Col>
       </Row>

@@ -57,7 +57,10 @@ function App() {
                       path={"create-details/:productId"}
                       element={<ProductCreateDetails />}
                     />
-
+                    <Route
+                      path={"update-details"}
+                      element={<ProductCreateDetails />}
+                    />
                     {/* ví dụ path= san-pham/hien-thi ->  
                     <Route path="hien-thi" element="el" />
                     */}

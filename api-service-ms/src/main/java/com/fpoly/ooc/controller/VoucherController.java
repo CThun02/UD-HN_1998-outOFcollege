@@ -43,7 +43,6 @@ public class VoucherController {
 
     @PutMapping("/update")
     public ResponseEntity<?> updateVoucher(@RequestBody VoucherRequest request) {
-
         return ResponseEntity.ok().body(voucherService.saveOrUpdate(request));
     }
 

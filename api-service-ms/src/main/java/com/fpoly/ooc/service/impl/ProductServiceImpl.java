@@ -2,6 +2,7 @@ package com.fpoly.ooc.service.impl;
 
 import com.fpoly.ooc.entity.Product;
 import com.fpoly.ooc.repository.ProductDAORepositoryI;
+import com.fpoly.ooc.responce.product.ProductDetailResponse;
 import com.fpoly.ooc.responce.product.ProductResponse;
 import com.fpoly.ooc.responce.product.ProductTableResponse;
 import com.fpoly.ooc.service.interfaces.ProductServiceI;
@@ -37,6 +38,7 @@ public class ProductServiceImpl implements ProductServiceI {
     @Override
     public Product update(Product product) {
         Product productCheck = this.getOne(product.getId());
+        System.out.println(product.getId());
         if(productCheck != null){
             productCheck = repo.save(product);
         }
@@ -85,4 +87,6 @@ public class ProductServiceImpl implements ProductServiceI {
     public ProductResponse getProductResponseById(Long id) {
         return repo.getProductResponseById(id);
     }
+
+
 }

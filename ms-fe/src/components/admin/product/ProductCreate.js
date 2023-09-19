@@ -1,7 +1,7 @@
 import { CloseOutlined, PlusOutlined } from "@ant-design/icons";
 import { Col, Row, Form, Input, Select, Button, message } from "antd";
 import TextArea from "antd/es/input/TextArea";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import styles from "./ProductCreate.module.css";
 import { closeFrame } from "../animations/animation";
 import { isString } from "antd/es/button";

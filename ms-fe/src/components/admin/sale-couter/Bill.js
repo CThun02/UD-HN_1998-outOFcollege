@@ -1,80 +1,74 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button, Space, Table, Tag } from 'antd';
 import { Input } from 'antd';
 import styles from "./Bill.module.css"
-import { SearchOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, SearchOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 const Bill = () => {
+    const [data, setData] = useState([])
+    const handleDelete = (record) => {
+        const id = record.billDetailId;
+        console.log(id)
+    }
+
+    useEffect(() => {
+        axios.get('http://localhost:8080/api/admin/bill')
+            .then(response => {
+                setData(response.data)
+            }).catch(err => {
+                console.log(err)
+            })
+    }, [])
     const columns = [
         {
-            title: 'Name',
-            dataIndex: 'name',
-            key: 'name',
-            render: (text) => <a href='#1'>{text}</a>,
+            title: 'Ảnh',
+            dataIndex: 'imgDefault',
+            key: 'imgDefault',
         },
         {
-            title: 'Age',
-            dataIndex: 'age',
-            key: 'age',
+            title: 'Tổng số tiền',
+            dataIndex: 'totalPrice',
+            key: 'totalPrice',
+            render: (_, record) => record.price * record.quantity,
         },
         {
-            title: 'Address',
-            dataIndex: 'address',
-            key: 'address',
+            title: 'Số lượng',
+            dataIndex: 'quantity',
+            key: 'quantity',
         },
         {
-            title: 'Tags',
-            key: 'tags',
-            dataIndex: 'tags',
-            render: (_, { tags }) => (
-                <>
-                    {tags.map((tag) => {
-                        let color = tag.length > 5 ? 'geekblue' : 'green';
-                        if (tag === 'loser') {
-                            color = 'volcano';
-                        }
-                        return (
-                            <Tag color={color} key={tag}>
-                                {tag.toUpperCase()}
-                            </Tag>
-                        );
-                    })}
-                </>
-            ),
+            title: 'Ngày tạo',
+            dataIndex: 'createDate',
+            key: 'createDate',
+        },
+        {
+            title: 'Trạng thái',
+            key: 'status',
+            dataIndex: 'status',
+            render: (_, record) => {
+                const tagColor = record.status === 'active' ? 'red' : 'green';
+                return <Tag color={tagColor}>{record.status}</Tag>;
+            },
         },
         {
             title: 'Action',
             key: 'action',
             render: (_, record) => (
                 <Space size="middle">
-                    <a href='#1'>Invite {record.name}</a>
-                    <a href='#1'>Delete</a>
+                    <Button
+                        icon={<EditOutlined />}
+                        className={styles.btnEdit}
+                        href='#1'></Button>
+                    <Button
+                        icon={<DeleteOutlined />}
+                        danger
+                        className={styles.btnDelete}
+                        href='#1'
+                        onClick={() => handleDelete(record)}></Button>
                 </Space>
             ),
-        },
-    ];
-    const data = [
-        {
-            key: '1',
-            name: 'John Brown',
-            age: 32,
-            address: 'New York No. 1 Lake Park',
-            tags: ['nice', 'developer'],
-        },
-        {
-            key: '2',
-            name: 'Jim Green',
-            age: 42,
-            address: 'London No. 1 Lake Park',
-            tags: ['loser'],
-        },
-        {
-            key: '3',
-            name: 'Joe Black',
-            age: 32,
-            address: 'Sydney No. 1 Lake Park',
-            tags: ['cool', 'teacher'],
         },
     ];
     return (
@@ -89,7 +83,7 @@ const Bill = () => {
                 </div>
                 <div className={styles.headerRight}>
                     <Link to="/admin/counter-sales/bill" type="primary" className={styles.btn} >
-                        <Button type='primary'>Tạo hóa đơn</Button>
+                        <Button type='primary' >Tạo hóa đơn</Button>
                     </Link>
                 </div>
             </div>

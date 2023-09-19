@@ -1,4 +1,4 @@
-package com.fpoly.ooc.responce;
+package com.fpoly.ooc.responce.cart;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,12 +19,18 @@ public class CartResponse {
 
     private Long cartDetailId;
 
-    private String productName;
-
-    private Integer quantity;
-
     private Long productDetailId;
 
+    private String imgDefault;
+
+    private String productName;
+
+    private String sizeName;
+
+    private String colorName;
+
     private BigDecimal price;
+
+    private Integer quantity;
 
 }

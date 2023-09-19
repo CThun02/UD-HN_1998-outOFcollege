@@ -45,6 +45,17 @@ const options = [
   { label: "%", value: "%" },
 ];
 
+function disabledDate(current) {
+  return (
+    current &&
+    current <
+      dayjs(
+        moment(new Date().toLocaleDateString()).format(dateFormat),
+        dateFormat
+      )
+  );
+}
+
 function Voucher() {
   // filter
   const [searchNameOrCode, setSearchNameOrCode] = useState("");
@@ -121,12 +132,8 @@ function Voucher() {
     }
   }
 
-  function handleStartDatChange(startDate) {
-    setStartDate(startDate);
-  }
-
-  function handleEndDatChange(endDate) {
-    setEndDate(endDate);
+  function handleChangeDate(date, dateString) {
+    return date;
   }
 
   function handleChangeNumber(value) {
@@ -269,14 +276,12 @@ function Voucher() {
       setVoucherId(voucherId);
       setVoucherCode(voucherCode);
       setVoucherName(voucherName);
-      setLimitQuantity(numeral(limitQuantity).format("0,0"));
-      setVoucherValue(numeral(voucherValue).format("0,0"));
-      setVoucherValueMax(
-        voucherValueMax === 0 ? "" : numeral(voucherValueMax).format("0,0")
-      );
-      setVoucherCondition(numeral(voucherCondition).format("0,0"));
-      setStartDate(moment(startDate));
-      setEndDate(moment(endDate));
+      setLimitQuantity(limitQuantity);
+      setVoucherValue(voucherValue);
+      setVoucherValueMax(voucherValueMax);
+      setVoucherCondition(voucherCondition);
+      setStartDate(dayjs(moment(startDate).format(dateFormat), dateFormat));
+      setEndDate(dayjs(moment(endDate).format(dateFormat), dateFormat));
       setVoucherMethod(voucherMethod);
       setStatus(status);
 
@@ -448,7 +453,11 @@ function Voucher() {
                                 size="large"
                                 suffix={"VND"}
                                 allowClear
-                                value={voucherValue}
+                                value={
+                                  voucherValue === ""
+                                    ? ""
+                                    : numeral(voucherValue).format("0,0")
+                                }
                                 onChange={(e) =>
                                   setVoucherValue(
                                     handleChangeNumber(e.target.value)
@@ -470,7 +479,11 @@ function Voucher() {
                                   size="large"
                                   suffix={"%"}
                                   allowClear
-                                  value={voucherValue}
+                                  value={
+                                    voucherValue === ""
+                                      ? ""
+                                      : numeral(voucherValue).format("0,0")
+                                  }
                                   onChange={(e) =>
                                     setVoucherValue(
                                       handleChangeNumber(e.target.value)
@@ -491,7 +504,11 @@ function Voucher() {
                                   size="large"
                                   suffix={"VND"}
                                   allowClear
-                                  value={voucherValueMax}
+                                  value={
+                                    voucherValueMax === ""
+                                      ? ""
+                                      : numeral(voucherValueMax).format("0,0")
+                                  }
                                   onChange={(e) =>
                                     setVoucherValueMax(
                                       handleChangeNumber(e.target.value)
@@ -514,7 +531,11 @@ function Voucher() {
                             <Input
                               size="large"
                               allowClear
-                              value={limitQuantity}
+                              value={
+                                limitQuantity === ""
+                                  ? ""
+                                  : numeral(limitQuantity).format("0,0")
+                              }
                               onChange={(e) =>
                                 setLimitQuantity(
                                   handleChangeNumber(e.target.value)
@@ -535,7 +556,11 @@ function Voucher() {
                               size="large"
                               suffix={"VND"}
                               allowClear
-                              value={voucherCondition}
+                              value={
+                                voucherCondition === ""
+                                  ? ""
+                                  : numeral(voucherCondition).format("0,0")
+                              }
                               onChange={(e) =>
                                 setVoucherCondition(
                                   handleChangeNumber(e.target.value)
@@ -554,12 +579,15 @@ function Voucher() {
                             value={startDate}
                           >
                             <DatePicker
+                              disabledDate={disabledDate}
                               format={dateFormat}
                               size="large"
                               placeholder={null}
                               style={{ width: "100%" }}
                               value={startDate}
-                              onChange={handleStartDatChange}
+                              onChange={(date, dateString) =>
+                                setStartDate(handleChangeDate(date, dateString))
+                              }
                             />
                           </FloatingLabels>
                         </Col>
@@ -571,12 +599,15 @@ function Voucher() {
                             value={endDate}
                           >
                             <DatePicker
+                              disabledDate={disabledDate}
                               format={dateFormat}
                               size="large"
                               placeholder={null}
                               style={{ width: "100%" }}
                               value={endDate}
-                              onChange={handleEndDatChange}
+                              onChange={(date, dateString) =>
+                                setEndDate(handleChangeDate(date, dateString))
+                              }
                             />
                           </FloatingLabels>
                         </Col>

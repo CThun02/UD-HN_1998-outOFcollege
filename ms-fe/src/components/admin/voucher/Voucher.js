@@ -65,27 +65,12 @@ function Voucher() {
   const [voucherCondition, setVoucherCondition] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [status, setStatus] = useState("");
   const [voucherMethod, setVoucherMethod] = useState("vnd");
   const [vouchers, setVouchers] = useState([]);
   const [totalElements, setTotalElements] = useState(1);
   const [pageNo, setPageNo] = useState(1);
   const [pageSize, setPageSize] = useState(5);
-
-  // const schema = Yup.object().shape({
-  //   voucherName: Yup.string().required("Tên voucher không được bỏ trống"),
-  //   limitQuantity: Yup.string()
-  //     .required("Vui lòng nhập số lượng")
-  //     .matches(/^[0-9]+$/),
-  //   voucherValue: Yup.string()
-  //     .required("Vui lòng nhập giá trị của voucher")
-  //     .matches(/^\d+(\.\d+)?$/, "Sai định dạng"),
-  //   voucherValueMax: Yup.string()
-  //     .required("Vui lòng nhập giá trị của voucher tối đa")
-  //     .matches(/^\d+(\.\d+)?$/, "Sai định dạng"),
-  //   startDate: Yup.date()
-  //     .required("Không được bỏ trống")
-  //     .min(moment(new Date()).format("YYYY/MM/DD")),
-  // });
 
   const calculateStt = (index) => {
     return (pageNo - 1) * pageSize + index + 1;
@@ -119,14 +104,17 @@ function Voucher() {
     setVoucherCondition("");
     setStartDate("");
     setEndDate("");
-    setVoucherMethod("");
+    setVoucherMethod("vnd");
   };
 
   function handleDelete(value) {
     try {
       axios
-        .put(baseUrl + "update-status/" + value.id)
-        .then((res) => console.log(res.data))
+        .put(baseUrl + "update/" + value.code)
+        .then((res) => {
+          console.log(res.data);
+          setStatus(res.data.voucherCode);
+        })
         .catch((err) => console.log("Exception: ", err));
     } catch (err) {
       console.log("Error: ", err);
@@ -154,8 +142,7 @@ function Voucher() {
         setIsLoading(true);
         try {
           const filter = {
-            voucherCode: searchNameOrCode,
-            voucherName: searchNameOrCode,
+            voucherCodeOrName: searchNameOrCode,
             startDate:
               searchStartDate !== ""
                 ? moment(searchStartDate?.$d, "DD-MM-YYYY").format(
@@ -205,12 +192,15 @@ function Voucher() {
       searchStatus,
       pageNo,
       pageSize,
+      open,
+      status,
     ]
   );
 
   function handleOnSubmit(e) {
     e.preventDefault();
     const voucher = {
+      voucherId,
       voucherName,
       voucherCode,
       limitQuantity: Number(limitQuantity.replace(",", "")),
@@ -220,28 +210,40 @@ function Voucher() {
       voucherMethod,
       startDate,
       endDate,
+      status,
     };
 
     try {
-      const addVoucher = axios.post(baseUrl + "add", voucher);
-      console.log("Add: ", voucher);
+      axios
+        .post(baseUrl + "add", voucher)
+        .then((res) => {
+          setOpen(false);
 
-      if (addVoucher.code === "ERR_BAD_REQUEST") {
-        setOpen(true);
-        return;
-      } else {
-        setOpen(false);
+          setVoucherCode("");
+          setVoucherName("");
+          setLimitQuantity("");
+          setVoucherValue("");
+          setVoucherValueMax("");
+          setVoucherCondition("");
+          setVoucherMethod("vnd");
+          setStartDate("");
+          setEndDate("");
+          setStatus("");
+        })
+        .catch((err) => {
+          console.log(err);
 
-        setVoucherCode("");
-        setVoucherName("");
-        setLimitQuantity("");
-        setVoucherValue("");
-        setVoucherValueMax("");
-        setVoucherCondition("");
-        setVoucherMethod("");
-        setStartDate("");
-        setEndDate("");
-      }
+          setVoucherCode("");
+          setVoucherName("");
+          setLimitQuantity("");
+          setVoucherValue("");
+          setVoucherValueMax("");
+          setVoucherCondition("");
+          setVoucherMethod("vnd");
+          setStartDate("");
+          setEndDate("");
+          setStatus("");
+        });
     } catch (err) {
       console.log("error: ", err);
     }
@@ -261,6 +263,7 @@ function Voucher() {
         startDate,
         endDate,
         voucherMethod,
+        status,
       } = res.data;
 
       setVoucherId(voucherId);
@@ -275,6 +278,8 @@ function Voucher() {
       setStartDate(moment(startDate));
       setEndDate(moment(endDate));
       setVoucherMethod(voucherMethod);
+      setStatus(status);
+
       setIsUpdate(true);
       setOpen(true);
     });
@@ -342,7 +347,10 @@ function Voucher() {
           >
             <EyeOutlined />
           </Button>
-          <Button className={styles.iconButton}>
+          <Button
+            onClick={() => handleDelete({ code })}
+            className={styles.iconButton}
+          >
             <DeleteOutlined />
           </Button>
         </Space>

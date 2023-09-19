@@ -70,7 +70,7 @@ const ProductCreateDetails = () => {
     }
     let check = isFormInputEmpty(productDetail);
     if (!check) {
-      messageApi.loading("Vui lòng chờ!", 2);
+      messageApi.loading("Vui lòng chờ!", 5);
       for (let color of colorsCreate) {
         for (let size of sizesCreate) {
           let productDetailCreate = { ...productDetail };
@@ -85,39 +85,43 @@ const ProductCreateDetails = () => {
         }
       }
       setTimeout(() => {
-        messageApi.success("Thêm mới thành công!", 5);
-      }, 2000);
-      axios
-        .get(
-          api +
-            "product/getProductDetailUpdate?productId=" +
-            productId +
-            "&buttonId=" +
-            productDetail.buttonId +
-            "&materialId=" +
-            productDetail.materialId +
-            "&shirtTailId=" +
-            productDetail.shirtTailId +
-            "&sleeveId=" +
-            productDetail.sleeveId +
-            "&collarId=" +
-            productDetail.collarId
-        )
-        .then((res) => {
-          setTimeout(() => {
-            navigate(
-              `/admin/product/update-details?productDetail=${encodeURIComponent(
-                JSON.stringify(res.data)
-              )}`
-            );
-          }, 2000);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+        messageApi.success("Thêm mới thành công!", 2);
+        linkToUpdate();
+      }, 5000);
     } else {
       messageApi.error("Vui lòng chọn tất cả các trường!", 5);
     }
+  }
+
+  function linkToUpdate() {
+    axios
+      .get(
+        api +
+          "product/getProductDetailUpdate?productId=" +
+          productId +
+          "&buttonId=" +
+          productDetail.buttonId +
+          "&materialId=" +
+          productDetail.materialId +
+          "&shirtTailId=" +
+          productDetail.shirtTailId +
+          "&sleeveId=" +
+          productDetail.sleeveId +
+          "&collarId=" +
+          productDetail.collarId
+      )
+      .then((res) => {
+        setTimeout(() => {
+          navigate(
+            `/admin/product/update-details?productDetail=${encodeURIComponent(
+              JSON.stringify(res.data)
+            )}`
+          );
+        }, 2000);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 
   function handleSetProductDetail(field, value) {
@@ -126,6 +130,7 @@ const ProductCreateDetails = () => {
       [field]: value,
     }));
   }
+
   useEffect(() => {
     axios
       .get(api + "size")

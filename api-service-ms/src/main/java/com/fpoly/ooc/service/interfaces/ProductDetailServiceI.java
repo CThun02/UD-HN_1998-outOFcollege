@@ -19,4 +19,6 @@ public interface ProductDetailServiceI {
             (Long productId, Long idButton, Long idMaterial, Long idShirtTail, Long idSleeve, Long idCollar);
     public List<ProductDetailResponse> getSizesPDByIdCompoPDAndIdPro
             (Long productId, Long idButton, Long idMaterial, Long idShirtTail, Long idSleeve, Long idCollar, Long idColor);
+    public ProductDetailResponse getOneByIdCom
+            (Long productId, Long idButton, Long idMaterial, Long idShirtTail, Long idSleeve, Long idCollar, Long idColor, Long idSize);
 }

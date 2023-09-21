@@ -28,11 +28,10 @@ import java.util.List;
                 "voucher.voucher_value as 'voucherValue', voucher.voucher_value_max as 'voucherValueMax', voucher.voucher_method as 'voucherMethod',\n" +
                 "voucher.limit_quantity as 'limitQuantity', voucher.start_date as 'startDate', voucher.end_date as 'endDate', voucher.status as 'status'\n" +
                 "from Voucher voucher\n" +
-                "where (?1 is null or voucher.voucher_code like ?1)\n" +
-                "and (?2 is null or voucher.voucher_name like ?2)\n" +
-                "and (?3 is null or voucher.start_date >= ?3)\n" +
-                "and (?4 is null or voucher.end_date <= ?4)\n" +
-                "and (?5 is null or voucher.status = (?5)) " +
+                "where (?1 is null or voucher.voucher_code like ?1 or voucher.voucher_name like ?1)\n" +
+                "and (?2 is null or voucher.start_date >= ?2)\n" +
+                "and (?3 is null or voucher.end_date <= ?3)\n" +
+                "and (?4 is null or voucher.status = (?4)) " +
                 "order by created_at desc ",
         resultSetMapping = "Mapping.VoucherResponse"
 )

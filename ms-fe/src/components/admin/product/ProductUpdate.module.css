@@ -64,3 +64,8 @@
   border-radius: 8px;
   font-size: 24px;
 }
+
+.product__updateButtonConfirm {
+  background-color: #00b2ff;
+  color: white !important;
+}

@@ -6,6 +6,8 @@ export function isFormInputEmpty(object) {
       if (object[key].trim() === "") {
         return true;
       }
+    } else if (object[key] === null || object[key] === undefined) {
+      return false;
     }
   }
 }

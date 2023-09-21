@@ -5,7 +5,16 @@ import {
   SearchOutlined,
   TableOutlined,
 } from "@ant-design/icons";
-import { Col, Row, Select, DatePicker, Table, Button, Switch } from "antd";
+import {
+  Col,
+  Row,
+  Select,
+  DatePicker,
+  Table,
+  Button,
+  Switch,
+  Radio,
+} from "antd";
 import React, { useEffect, useState } from "react";
 import styles from "./ProductIndex.module.css";
 import axios from "axios";
@@ -160,7 +169,7 @@ const ProductIndex = () => {
         </h2>
         <Row className={styles.produt__filterSelects}>
           <Col span={24} className={styles.produt__filterSelectsChildren}>
-            <span>Thành phần</span>
+            <h6>Thành phần</h6>
           </Col>
           <Col span={6}>
             <Select
@@ -215,59 +224,6 @@ const ProductIndex = () => {
           <Col span={6}>
             <Select
               showSearch
-              placeholder="Kích cỡ"
-              optionFilterProp="children"
-              className={styles.produt__filterSelectsChildren}
-              filterOption={(input, option) =>
-                (option?.label ?? "").includes(input)
-              }
-              filterSort={(optionA, optionB) =>
-                (optionA?.label ?? "")
-                  .toLowerCase()
-                  .localeCompare((optionB?.label ?? "").toLowerCase())
-              }
-            >
-              {sizes &&
-                sizes.map((item) => {
-                  return (
-                    <Select.Option key={item.id}>{item.sizeName}</Select.Option>
-                  );
-                })}
-            </Select>
-          </Col>
-          <Col span={6}>
-            <Select
-              showSearch
-              placeholder="Màu sắc"
-              optionFilterProp="children"
-              className={styles.produt__filterSelectsChildren}
-              filterOption={(input, option) =>
-                (option?.label ?? "").includes(input)
-              }
-              filterSort={(optionA, optionB) =>
-                (optionA?.label ?? "")
-                  .toLowerCase()
-                  .localeCompare((optionB?.label ?? "").toLowerCase())
-              }
-            >
-              {colors &&
-                colors.map((item) => {
-                  return (
-                    <Select.Option key={item.id}>
-                      <div className={styles.optionColor}>
-                        <span
-                          style={{ backgroundColor: item.colorCode }}
-                        ></span>
-                        {item.colorName}
-                      </div>
-                    </Select.Option>
-                  );
-                })}
-            </Select>
-          </Col>
-          <Col span={6}>
-            <Select
-              showSearch
               placeholder="Họa tiết"
               optionFilterProp="children"
               className={styles.produt__filterSelectsChildren}
@@ -313,30 +269,21 @@ const ProductIndex = () => {
                 })}
             </Select>
           </Col>
-          <Col span={6}>
-            <Select
-              showSearch
-              placeholder="Trạng thái"
-              optionFilterProp="children"
-              className={styles.produt__filterSelectsChildren}
-              filterOption={(input, option) =>
-                (option?.label ?? "").includes(input)
-              }
-              filterSort={(optionA, optionB) =>
-                (optionA?.label ?? "")
-                  .toLowerCase()
-                  .localeCompare((optionB?.label ?? "").toLowerCase())
-              }
-            >
-              <Select.Option key={"All"}>Tất cả</Select.Option>
-              <Select.Option key={"ACTIVE"}>Đang kinh doanh</Select.Option>
-              <Select.Option key={"INACTIVE"}>Ngưng kinh doanh</Select.Option>
-            </Select>
+          <Col span={12}>
+            <div className={styles.filter__dateCreate}>
+              <h6 style={{ marginBottom: "8px" }}>Ngày tạo</h6>
+              <RangePicker showTime />
+            </div>
           </Col>
-          <Col span={24} className={styles.filter__dateCreate}>
-            <span>Ngày tạo</span>
-            <br />
-            <RangePicker showTime />
+          <Col span={12}>
+            <div className={styles.filter__dateCreate}>
+              <h6 style={{ marginBottom: "8px" }}>Trạng thái</h6>
+              <Radio.Group onChange={""} value={"ALL"}>
+                <Radio value={"ALL"}>Tất cả</Radio>
+                <Radio value={"ACTIVE"}>Đang kinh doanh</Radio>
+                <Radio value={"INACTIVE"}>Ngừng kinh doanh</Radio>
+              </Radio.Group>
+            </div>
           </Col>
         </Row>
       </div>

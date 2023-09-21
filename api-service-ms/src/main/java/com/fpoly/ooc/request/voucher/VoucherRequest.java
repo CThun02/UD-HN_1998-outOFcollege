@@ -1,6 +1,7 @@
 package com.fpoly.ooc.request.voucher;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fpoly.ooc.validation.CompareDateNow;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -41,9 +42,11 @@ public class VoucherRequest {
     private BigDecimal voucherCondition;
 
     @JsonProperty("startDate")
+    @CompareDateNow(message = "Ngày bắt đầu phải lớn hơn ngày hiện tại")
     private LocalDateTime startDate;
 
     @JsonProperty("endDate")
+    @CompareDateNow(message = "Ngày kết thúc phải lớn hơn ngày hiện tại")
     private LocalDateTime endDate;
 
     @JsonProperty("status")

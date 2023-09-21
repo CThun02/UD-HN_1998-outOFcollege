@@ -91,14 +91,6 @@ const ModalProduct = ({ visible, onCancel }) => {
             })
     }, [])
 
-    const handleSearch = () => {
-        // Xử lý tìm kiếm
-    };
-
-    const handleReset = () => {
-        // Xử lý làm mới
-    };
-
     return (
         <>
             <Modal
@@ -116,12 +108,6 @@ const ModalProduct = ({ visible, onCancel }) => {
                             onChange={(e) => setSearchInput(e.target.value)}
                             style={{ marginRight: '8px', width: '650px' }}
                         />
-                        <Button type="primary" onClick={handleSearch} style={{ marginRight: '10px' }}>
-                            Tìm kiếm
-                        </Button>
-                        <Button type="primary" onClick={handleReset} style={{ backgroundColor: '#FFA216' }}>
-                            Làm mới
-                        </Button>
                     </div>
                     <div className={styles.selectContainer}>
                         <Select defaultValue="option1" className={styles.select}>
@@ -182,7 +168,8 @@ const ModalProduct = ({ visible, onCancel }) => {
                         </Row>
                     </Modal>
                 )
-            }</>
+            }
+        </>
     );
 };
 

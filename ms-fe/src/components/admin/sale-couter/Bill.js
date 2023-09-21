@@ -23,6 +23,14 @@ const Bill = () => {
     }, [])
     const columns = [
         {
+            title: 'STT',
+            // dataIndex: 'STT',
+            key: 'STT',
+            render: (_, record) => {
+                return data.indexOf(record) + 1;
+            }
+        },
+        {
             title: 'Ảnh',
             dataIndex: 'imgDefault',
             key: 'imgDefault',

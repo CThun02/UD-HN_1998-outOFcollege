@@ -33,11 +33,11 @@ public class MsHandleException {
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler
-    public ResponseEntity<ErrorMessageResponse> notFoundExceptionMessage(NotFoundException ex) {
-
-        return new ResponseEntity<>(new ErrorMessageResponse(HttpStatus.BAD_REQUEST, ex.getMessage()), HttpStatus.BAD_REQUEST);
-    }
+//    @ExceptionHandler
+//    public ResponseEntity<ErrorMessageResponse> notFoundExceptionMessage(NotFoundException ex) {
+//
+//        return new ResponseEntity<>(new ErrorMessageResponse(HttpStatus.BAD_REQUEST, ex.getMessage()), HttpStatus.BAD_REQUEST);
+//    }
 
     @ExceptionHandler({NotFoundException.class})
     public ResponseEntity<Map<String, String>> notFoundException(NotFoundException ex) {

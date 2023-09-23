@@ -2,9 +2,11 @@ package com.fpoly.ooc.request.product;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fpoly.ooc.entity.*;
+import lombok.Getter;
 
 import java.math.BigDecimal;
 
+@Getter
 public class ProductDetailRequest {
     @JsonProperty("id")
     private Long id;

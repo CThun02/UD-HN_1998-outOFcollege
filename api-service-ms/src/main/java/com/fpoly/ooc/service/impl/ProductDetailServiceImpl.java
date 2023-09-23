@@ -72,4 +72,10 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
         return repo.getSizesPDByIdCompoPDAndIdPro(productId, idButton, idMaterial, idShirtTail,
                 idSleeve,  idCollar, idColor);
     }
+
+    @Override
+    public ProductDetailResponse getOneByIdCom(Long productId, Long idButton, Long idMaterial, Long idShirtTail, Long idSleeve, Long idCollar, Long idColor, Long idSize) {
+        return repo.getOneByIdCom(productId, idButton, idMaterial, idShirtTail,
+                idSleeve,  idCollar, idColor, idSize);
+    }
 }

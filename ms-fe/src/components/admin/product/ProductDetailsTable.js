@@ -1,12 +1,13 @@
 import styles from "./ProductDetailsTable.module.css";
 
 import React, { useEffect, useState } from "react";
-import { Table } from "antd";
+import { message, Table } from "antd";
 import axios from "axios";
 import Input from "antd/es/input/Input";
 
 const ProductDetailsTable = (props) => {
   const api = "http://localhost:8080/api/admin/";
+  const [messageApi, contextHolder] = message.useMessage();
   const product = props.product;
   const [productDetail, setProductDetail] = useState(props.productDetail);
   const buttonId = productDetail.button.id;
@@ -16,6 +17,7 @@ const ProductDetailsTable = (props) => {
   const shirtTailId = productDetail.shirtTail.id;
   const [colors, setColors] = useState(null);
   const [listSizes, setlistSizes] = useState([]);
+
   const columns = [
     {
       key: "productname",
@@ -37,11 +39,12 @@ const ProductDetailsTable = (props) => {
       key: "quantity",
       dataIndex: "quantity",
       title: "Số lượng",
-      render: () => {
+      render: (text, record, index) => {
         return (
           <Input
             style={{ width: "100px", textAlign: "center" }}
-            value={productDetail.quantity}
+            defaultValue={record.quantity}
+            onChange={(event) => updateProductDetail("quantity", event, record)}
           ></Input>
         );
       },
@@ -50,11 +53,12 @@ const ProductDetailsTable = (props) => {
       key: "price",
       dataIndex: "price",
       title: "Giá",
-      render: () => {
+      render: (text, record, index) => {
         return (
           <Input
             style={{ width: "100px", textAlign: "center" }}
-            value={productDetail.price}
+            defaultValue={record.price}
+            onChange={(event) => updateProductDetail("price", event, record)}
           ></Input>
         );
       },
@@ -92,6 +96,29 @@ const ProductDetailsTable = (props) => {
     } catch (error) {
       console.log(error);
       return null;
+    }
+  }
+  function updateProductDetail(fildeName, event, productDetail) {
+    fildeName === "quantity"
+      ? (productDetail.quantity = event.target.value)
+      : (productDetail.price = event.target.value);
+    if (event.target.value.trim() !== "") {
+      event.target.style.removeProperty("border");
+      axios
+        .put(api + "product/updateProductDetail", productDetail)
+        .then((response) => {
+          messageApi.loading("Đang tải!", 2);
+          setTimeout(() => {
+            messageApi.success("Chỉnh sửa chi tiết sản phẩm thành công!", 2);
+          }, 2000);
+        })
+        .catch((error) => {
+          messageApi.loading("Chỉnh sửa chi tiết sản phẩm thất bại!", 2);
+          console.log(error);
+        });
+    } else {
+      messageApi.error("Vui lòng nhập đủ tất cả các trường!", 2);
+      event.target.style.border = "1px solid red";
     }
   }
 
@@ -153,6 +180,7 @@ const ProductDetailsTable = (props) => {
   ]);
   return (
     <>
+      {contextHolder}
       {colors &&
         colors.map((item, index) => {
           return (

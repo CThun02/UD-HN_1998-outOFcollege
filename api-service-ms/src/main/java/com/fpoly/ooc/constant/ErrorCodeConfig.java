@@ -20,6 +20,10 @@ public class ErrorCodeConfig {
         errors.put("START_DATE_LESS_DATE_NOW", "Ngày bắt đầu phải lớn hơn ngày hiện tại");
         errors.put("END_DATE_LESS_DATE_NOW", "Ngày kết thúc phải lớn hơn ngày hiện tại");
         errors.put("END_DATE_LESS_START_DATE", "Ngày kết thúc phải lớn hơn ngày bắt đầu");
+        errors.put("VOUCHER_NAME_ALREADY_EXISTS", "Tên voucher đã tồn tại");
+        errors.put("VOUCHER_VALUE_LESS_100_PERCENT", "Không được quá 100%");
+        errors.put("LIMIT_QUANTITY_LESS_ZERO", "Số lượng lớn hơn 0");
+        errors.put("VOUCHER_CONDITION_LESS_ZERO", "Điều kiện giảm không được nhỏ hơn 0");
     }
 
     public static String getMessage(String code) {

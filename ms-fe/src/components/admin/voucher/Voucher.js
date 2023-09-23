@@ -14,6 +14,7 @@ import {
   DatePicker,
   Radio,
   Spin,
+  message,
 } from "antd";
 import FilterVoucherAndPromotion from "../../element/filter/FilterVoucherAndPromotion";
 import { Link } from "react-router-dom";
@@ -33,6 +34,7 @@ import moment from "moment";
 import * as Yup from "yup";
 
 import FloatingLabels from "../../element/FloatingLabels/FloatingLabels";
+import { ValidNotBlank, ValidStartDateAndEndDate } from "./ValidationVoucher";
 
 dayjs.extend(customParseFormat);
 
@@ -83,6 +85,13 @@ function Voucher() {
   const [pageNo, setPageNo] = useState(1);
   const [pageSize, setPageSize] = useState(5);
 
+  //message
+  const [messageApi, contextHolder] = message.useMessage();
+
+  //error
+  const [error, setError] = useState({});
+  const [isCheckSubmit, setIsCheckSubmit] = useState(false);
+
   const calculateStt = (index) => {
     return (pageNo - 1) * pageSize + index + 1;
   };
@@ -105,14 +114,15 @@ function Voucher() {
   const onClose = () => {
     setOpen(false);
     setIsUpdate(false);
+    setIsCheckSubmit(false);
 
     setVoucherId("");
     setVoucherCode("");
     setVoucherName("");
-    setLimitQuantity("");
-    setVoucherValue("");
-    setVoucherValueMax("");
-    setVoucherCondition("");
+    setLimitQuantity(0);
+    setVoucherValue(0);
+    setVoucherValueMax(0);
+    setVoucherCondition(0);
     setStartDate("");
     setEndDate("");
     setVoucherMethod("vnd");
@@ -134,13 +144,6 @@ function Voucher() {
 
   function handleChangeDate(date, dateString) {
     return date;
-  }
-
-  function handleChangeNumber(value) {
-    const formattedValue = numeral(value).format("0,0");
-
-    if (formattedValue === "0") return "";
-    else return formattedValue;
   }
 
   useEffect(
@@ -204,55 +207,78 @@ function Voucher() {
     ]
   );
 
-  function handleOnSubmit(e) {
-    e.preventDefault();
+  let isCheckNotEmpty = null;
+  let isCheckStartDateAndEndDate = null;
+
+  function handleOnSubmit() {
+    setIsCheckSubmit(true);
+
     const voucher = {
-      voucherId,
+      voucherId: voucherId === "" ? "" : voucherId,
       voucherName,
-      voucherCode,
-      limitQuantity: Number(limitQuantity.replace(",", "")),
-      voucherValue: Number(voucherValue.replace(",", "")),
-      voucherValueMax: Number(voucherValueMax.replace(",", "")),
-      voucherCondition: Number(voucherCondition.replace(",", "")),
+      voucherCode: voucherCode === "" ? "" : voucherCode,
+      limitQuantity: isNaN(limitQuantity)
+        ? Number.parseInt(limitQuantity?.replace(",", ""))
+        : limitQuantity,
+      voucherValue: isNaN(voucherValue)
+        ? Number.parseInt(voucherValue?.replace(",", ""))
+        : voucherValue,
+      voucherValueMax: isNaN(voucherValueMax)
+        ? Number.parseInt(voucherValueMax?.replace(",", ""))
+        : voucherValueMax,
+      voucherCondition: isNaN(voucherCondition)
+        ? Number.parseInt(voucherCondition?.replace(",", ""))
+        : voucherCondition,
       voucherMethod,
-      startDate,
-      endDate,
+      startDate: moment(startDate?.$d, "DD-MM-YYYY").format(
+        "YYYY-MM-DDTHH:mm:ss.SSS"
+      ),
+      endDate: moment(endDate?.$d, "DD-MM-YYYY").format(
+        "YYYY-MM-DDTHH:mm:ss.SSS"
+      ),
       status,
     };
 
-    try {
-      axios
-        .post(baseUrl + "add", voucher)
-        .then((res) => {
-          setOpen(false);
+    console.log("voucher: ", voucher);
 
-          setVoucherCode("");
-          setVoucherName("");
-          setLimitQuantity("");
-          setVoucherValue("");
-          setVoucherValueMax("");
-          setVoucherCondition("");
-          setVoucherMethod("vnd");
-          setStartDate("");
-          setEndDate("");
-          setStatus("");
-        })
-        .catch((err) => {
-          console.log(err);
+    isCheckNotEmpty = ValidNotBlank(voucher);
+    isCheckStartDateAndEndDate = ValidStartDateAndEndDate(startDate, endDate);
 
-          setVoucherCode("");
-          setVoucherName("");
-          setLimitQuantity("");
-          setVoucherValue("");
-          setVoucherValueMax("");
-          setVoucherCondition("");
-          setVoucherMethod("vnd");
-          setStartDate("");
-          setEndDate("");
-          setStatus("");
-        });
-    } catch (err) {
-      console.log("error: ", err);
+    console.log("isCheckNotEmpty: ", isCheckNotEmpty);
+    console.log("isCheckStartDateAndEndDate: ", isCheckStartDateAndEndDate);
+
+    if (isCheckNotEmpty?.status && isCheckStartDateAndEndDate?.status) {
+      try {
+        axios
+          .post(baseUrl + "add", voucher)
+          .then((res) => {
+            setOpen(false);
+            setIsCheckSubmit(false);
+
+            setVoucherCode("");
+            setVoucherName("");
+            setLimitQuantity("");
+            setVoucherValue("");
+            setVoucherValueMax("");
+            setVoucherCondition("");
+            setVoucherMethod("vnd");
+            setStartDate("");
+            setEndDate("");
+            setStatus("");
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      } catch (err) {
+        console.log("error: ", err);
+      }
+    } else {
+      setError({
+        empty: isCheckNotEmpty?.message,
+        startDate: isCheckStartDateAndEndDate?.message,
+        endDate: isCheckStartDateAndEndDate?.message,
+      });
+      messageApi.error("Có lỗi xảy ra. Vui lòng thử lại");
     }
   }
 
@@ -273,12 +299,14 @@ function Voucher() {
         status,
       } = res.data;
 
+      console.log("handleDetail: ", res.data);
+
       setVoucherId(voucherId);
       setVoucherCode(voucherCode);
       setVoucherName(voucherName);
       setLimitQuantity(limitQuantity);
       setVoucherValue(voucherValue);
-      setVoucherValueMax(voucherValueMax);
+      setVoucherValueMax(voucherValueMax === null ? "" : voucherValueMax);
       setVoucherCondition(voucherCondition);
       setStartDate(dayjs(moment(startDate).format(dateFormat), dateFormat));
       setEndDate(dayjs(moment(endDate).format(dateFormat), dateFormat));
@@ -404,8 +432,10 @@ function Voucher() {
                   open={open}
                   bodyStyle={{ paddingBottom: 80 }}
                 >
+                  {contextHolder}
                   <Form layout="vertical">
                     <Input style={{ display: "none" }} value={voucherId} />
+                    <Input style={{ display: "none" }} value={voucherCode} />
 
                     <Space
                       style={{ width: "100%" }}
@@ -426,6 +456,14 @@ function Voucher() {
                               allowClear
                               value={voucherName}
                               onChange={(e) => setVoucherName(e.target.value)}
+                              status={
+                                !isCheckSubmit
+                                  ? ""
+                                  : voucherName === ""
+                                  ? "error"
+                                  : ""
+                              }
+                              readOnly={isUpdate}
                             />
                           </FloatingLabels>
                         </Col>
@@ -459,9 +497,14 @@ function Voucher() {
                                     : numeral(voucherValue).format("0,0")
                                 }
                                 onChange={(e) =>
-                                  setVoucherValue(
-                                    handleChangeNumber(e.target.value)
-                                  )
+                                  setVoucherValue(e.target.value)
+                                }
+                                status={
+                                  !isCheckSubmit
+                                    ? ""
+                                    : voucherValue === ""
+                                    ? "error"
+                                    : ""
                                 }
                               />
                             </FloatingLabels>
@@ -485,9 +528,15 @@ function Voucher() {
                                       : numeral(voucherValue).format("0,0")
                                   }
                                   onChange={(e) =>
-                                    setVoucherValue(
-                                      handleChangeNumber(e.target.value)
-                                    )
+                                    setVoucherValue(e.target.value)
+                                  }
+                                  status={
+                                    !isCheckSubmit
+                                      ? ""
+                                      : voucherValue === "" ||
+                                        Number(voucherValue) === 0
+                                      ? "error"
+                                      : ""
                                   }
                                 />
                               </FloatingLabels>
@@ -510,9 +559,14 @@ function Voucher() {
                                       : numeral(voucherValueMax).format("0,0")
                                   }
                                   onChange={(e) =>
-                                    setVoucherValueMax(
-                                      handleChangeNumber(e.target.value)
-                                    )
+                                    setVoucherValueMax(e.target.value)
+                                  }
+                                  status={
+                                    !isCheckSubmit
+                                      ? ""
+                                      : voucherValueMax === ""
+                                      ? "error"
+                                      : ""
                                   }
                                 />
                               </FloatingLabels>
@@ -536,10 +590,13 @@ function Voucher() {
                                   ? ""
                                   : numeral(limitQuantity).format("0,0")
                               }
-                              onChange={(e) =>
-                                setLimitQuantity(
-                                  handleChangeNumber(e.target.value)
-                                )
+                              onChange={(e) => setLimitQuantity(e.target.value)}
+                              status={
+                                !isCheckSubmit
+                                  ? ""
+                                  : limitQuantity === ""
+                                  ? "error"
+                                  : ""
                               }
                             />
                           </FloatingLabels>
@@ -562,9 +619,14 @@ function Voucher() {
                                   : numeral(voucherCondition).format("0,0")
                               }
                               onChange={(e) =>
-                                setVoucherCondition(
-                                  handleChangeNumber(e.target.value)
-                                )
+                                setVoucherCondition(e.target.value)
+                              }
+                              status={
+                                !isCheckSubmit
+                                  ? ""
+                                  : voucherCondition === ""
+                                  ? "error"
+                                  : ""
                               }
                             />
                           </FloatingLabels>
@@ -588,7 +650,17 @@ function Voucher() {
                               onChange={(date, dateString) =>
                                 setStartDate(handleChangeDate(date, dateString))
                               }
+                              status={
+                                !isCheckSubmit
+                                  ? ""
+                                  : startDate === ""
+                                  ? "error"
+                                  : ""
+                              }
                             />
+                            {isCheckStartDateAndEndDate
+                              ? ""
+                              : isCheckStartDateAndEndDate?.message}
                           </FloatingLabels>
                         </Col>
 
@@ -608,7 +680,15 @@ function Voucher() {
                               onChange={(date, dateString) =>
                                 setEndDate(handleChangeDate(date, dateString))
                               }
+                              status={
+                                !isCheckSubmit
+                                  ? ""
+                                  : endDate === "" || error?.endDate
+                                  ? "error"
+                                  : ""
+                              }
                             />
+                            {error?.endDate}
                           </FloatingLabels>
                         </Col>
                       </Row>
@@ -622,7 +702,11 @@ function Voucher() {
                       >
                         <Space>
                           <Button onClick={onClose}>Hủy</Button>
-                          <Button type="primary" onClick={handleOnSubmit}>
+                          <Button
+                            type="primary"
+                            htmlType="submit"
+                            onClick={handleOnSubmit}
+                          >
                             Xác nhận
                           </Button>
                         </Space>

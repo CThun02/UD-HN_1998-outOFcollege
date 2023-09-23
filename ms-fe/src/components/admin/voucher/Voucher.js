@@ -274,6 +274,16 @@ function Voucher() {
             setOpen(false);
             setIsCheckSubmit(false);
 
+            api.success({
+              message: `Thêm thành công.`,
+              description: (
+                <Context.Consumer>
+                  {() => `Sản phẩm đã được thêm`}
+                </Context.Consumer>
+              ),
+              placement,
+            });
+
             setVoucherCode("");
             setVoucherName("");
             setLimitQuantity("");

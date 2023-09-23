@@ -16,8 +16,8 @@ function ValidNotBlank(object) {
 function ValidStartDateAndEndDate(startDate, endDate) {
   if (moment.isDate(startDate?.$d) && moment.isDate(endDate?.$d)) {
     if (
-      moment(startDate?.$d).format("DD/MM/YYYY") <
-      moment(endDate?.$d).format("DD/MM/YYYY")
+      moment(startDate?.$d).format("DD-MM-YYYY") <
+      moment(endDate?.$d).format("DD-MM-YYYY")
     ) {
       return { status: true };
     } else {
@@ -28,7 +28,11 @@ function ValidStartDateAndEndDate(startDate, endDate) {
     }
   }
 
-  return { status: false, messsage: "Sai định dạng" };
+  return {
+    status: false,
+    messsage:
+      "Sai định dạng hoặc ngày bắt đầu và kết thúc phải lớn hơn ngày hiện tại",
+  };
 }
 
 export { ValidNotBlank, ValidStartDateAndEndDate };

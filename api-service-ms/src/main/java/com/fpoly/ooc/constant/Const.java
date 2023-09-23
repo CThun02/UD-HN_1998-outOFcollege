@@ -19,5 +19,11 @@ public class Const {
     public static final String VOUCHER_VALUE_LESS_100_PERCENT="VOUCHER_VALUE_LESS_100_PERCENT";
     public static final String LIMIT_QUANTITY_LESS_ZERO="LIMIT_QUANTITY_LESS_ZERO";
     public static final String VOUCHER_CONDITION_LESS_ZERO="VOUCHER_CONDITION_LESS_ZERO";
+    public static final String STATUS_INVALID = "STATUS_INVALID";
+
+
+    //ErrorCode
+    public static final String HTTP_ERROR_CODE = "BAD_REQUEST";
+
 
 }

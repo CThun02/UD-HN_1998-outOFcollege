@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fpoly.ooc.validation.CompareDateNow;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,16 +24,19 @@ public class VoucherRequest {
 
     private Long voucherId;
 
+    @NotBlank(message = "Tên voucher không được bỏ trống")
     private String voucherName;
+
+    private String voucherNameCurrent;
 
     private String voucherCode;
 
+    @NotBlank(message = "Hình thức giảm giá không được bỏ trống")
     private String voucherMethod;
 
     @Min(value = 1, message = "Giá trị tối thiểu là 1")
     private BigDecimal voucherValue;
 
-    @Max(value = 100, message = "Giá trị tối đa là 100")
     private BigDecimal voucherValueMax;
 
     @Min(value = 1, message = "Giá trị tối thiểu là 1")

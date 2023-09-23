@@ -134,41 +134,61 @@ public class VoucherServiceImpl implements VoucherService {
 
     private Voucher convertVoucherRequest(VoucherRequest request) {
 
+        if (!request.getVoucherName().equalsIgnoreCase(request.getVoucherNameCurrent())) {
+            Optional<Voucher> voucherOptional =
+                    voucherRepository.findVoucherByVoucherName(request.getVoucherName());
+
+            if (voucherOptional.isPresent()) {
+                throw new NotFoundException(ErrorCodeConfig.getMessage(Const.VOUCHER_NAME_ALREADY_EXISTS), "voucherName");
+            }
+        }
+
         Voucher voucher = new Voucher();
 
-        if(request.getStartDate().isBefore(request.getEndDate())
-                && request.getStartDate().isAfter(LocalDateTime.now())) {
-            voucher.setStatus(Const.STATUS_UPCOMING);
-        } else {
-            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.END_DATE_LESS_START_DATE));
+        switch (request.getStatus()) {
+            case "", "UPCOMING":
+                if (request.getStartDate().isBefore(request.getEndDate())
+                        && request.getStartDate().isAfter(LocalDateTime.now())) {
+                    voucher.setStatus(Const.STATUS_UPCOMING);
+                } else {
+                    if (request.getStartDate().isBefore(LocalDateTime.now())) {
+                        throw new NotFoundException(ErrorCodeConfig.getMessage(Const.START_DATE_LESS_DATE_NOW), "startDate");
+                    }
+                    throw new NotFoundException(ErrorCodeConfig.getMessage(Const.END_DATE_LESS_START_DATE), "endDate");
+                }
+                break;
+            case "ACTIVE":
+                if (request.getStartDate().isBefore(request.getEndDate())) {
+                    voucher.setStatus(Const.STATUS_ACTIVE);
+                } else {
+                    throw new NotFoundException(ErrorCodeConfig.getMessage(Const.END_DATE_LESS_START_DATE));
+                }
+                voucher.setStatus(request.getStatus());
+                break;
+            case "INACTIVE":
+                break;
+            default:
+                throw new NotFoundException(ErrorCodeConfig.getMessage(Const.STATUS_INVALID));
         }
 
         if (request.getVoucherMethod().equals("%")) {
             if (request.getVoucherValue().compareTo(BigDecimal.valueOf(100l)) == 1) {
-                throw new NotFoundException(ErrorCodeConfig.getMessage(Const.VOUCHER_VALUE_LESS_100_PERCENT));
+                throw new NotFoundException(ErrorCodeConfig.getMessage(Const.VOUCHER_VALUE_LESS_100_PERCENT), "voucherValueMax");
             }
         }
 
         if (request.getLimitQuantity() < 0) {
-            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.LIMIT_QUANTITY_LESS_ZERO));
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.LIMIT_QUANTITY_LESS_ZERO), "limitQuantity");
         }
 
         if (request.getVoucherCondition().compareTo(BigDecimal.valueOf(0l)) == -1) {
-            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.VOUCHER_CONDITION_LESS_ZERO));
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.VOUCHER_CONDITION_LESS_ZERO), "voucherCondition");
         }
 
         if (StringUtils.isNotBlank(String.valueOf(request.getVoucherId()))
                 && StringUtils.isNotEmpty(String.valueOf(request.getVoucherId()))) {
             voucher.setId(request.getVoucherId());
 
-        } else {
-            Optional<Voucher> voucherOptional =
-                    voucherRepository.findVoucherByVoucherName(request.getVoucherName());
-
-            if (voucherOptional.isPresent()) {
-                throw new NotFoundException(ErrorCodeConfig.getMessage(Const.VOUCHER_NAME_ALREADY_EXISTS));
-
-            }
         }
 
         voucher.setVoucherCode(StringUtils.isBlank(voucher.getVoucherCode()) ? generatorCode() : voucher.getVoucherCode());

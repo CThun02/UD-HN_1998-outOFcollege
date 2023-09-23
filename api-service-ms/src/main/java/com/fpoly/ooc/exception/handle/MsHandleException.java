@@ -1,5 +1,6 @@
 package com.fpoly.ooc.exception.handle;
 
+import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.exception.ErrorMessageResponse;
 import com.fpoly.ooc.exception.NotFoundException;
 import org.springframework.http.HttpStatus;
@@ -33,9 +34,19 @@ public class MsHandleException {
     }
 
     @ExceptionHandler
-    public ResponseEntity<ErrorMessageResponse> notFoundException(NotFoundException ex) {
+    public ResponseEntity<ErrorMessageResponse> notFoundExceptionMessage(NotFoundException ex) {
 
         return new ResponseEntity<>(new ErrorMessageResponse(HttpStatus.BAD_REQUEST, ex.getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({NotFoundException.class})
+    public ResponseEntity<Map<String, String>> notFoundException(NotFoundException ex) {
+        Map<String, String> errors = new HashMap<>();
+        errors.put("status", Const.HTTP_ERROR_CODE);
+        errors.put("message", ex.getMessage());
+        errors.put(ex.getField(), "error");
+
+        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler

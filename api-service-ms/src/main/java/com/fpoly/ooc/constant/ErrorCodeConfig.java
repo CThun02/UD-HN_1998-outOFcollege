@@ -24,6 +24,7 @@ public class ErrorCodeConfig {
         errors.put("VOUCHER_VALUE_LESS_100_PERCENT", "Không được quá 100%");
         errors.put("LIMIT_QUANTITY_LESS_ZERO", "Số lượng lớn hơn 0");
         errors.put("VOUCHER_CONDITION_LESS_ZERO", "Điều kiện giảm không được nhỏ hơn 0");
+        errors.put("STATUS_INVALID", "Trạng thái không hợp lệ");
     }
 
     public static String getMessage(String code) {

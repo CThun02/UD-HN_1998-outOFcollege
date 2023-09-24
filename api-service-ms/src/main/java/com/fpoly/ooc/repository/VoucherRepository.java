@@ -25,5 +25,7 @@ public interface VoucherRepository extends JpaRepository<Voucher, Long> {
                                          LocalDateTime endDate,
                                          String status);
 
+    Optional<Voucher> findVoucherByVoucherName(String voucherName);
+
     Optional<Voucher> findVoucherByVoucherCode( String code);
 }

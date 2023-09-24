@@ -18,6 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -42,24 +43,16 @@ public class VoucherServiceImpl implements VoucherService {
 
         return page(
                 voucherRepository.findAllVoucher(
-                Objects.isNull(voucherConditionDTO.getVoucherCodeOrName()) ? null : "%" + voucherConditionDTO.getVoucherCodeOrName() + "%",
-                Objects.isNull(voucherConditionDTO.getStartDate()) ? null : voucherConditionDTO.getStartDate(),
-                Objects.isNull(voucherConditionDTO.getEndDate()) ? null : voucherConditionDTO.getEndDate(),
+                        Objects.isNull(voucherConditionDTO.getVoucherCodeOrName()) ? null : "%" + voucherConditionDTO.getVoucherCodeOrName() + "%",
+                        Objects.isNull(voucherConditionDTO.getStartDate()) ? null : voucherConditionDTO.getStartDate(),
+                        Objects.isNull(voucherConditionDTO.getEndDate()) ? null : voucherConditionDTO.getEndDate(),
                         status
-                        ), pageable);
+                ), pageable);
     }
 
     @Override
     public Voucher saveOrUpdate(VoucherRequest voucherRequest) {
         Voucher voucher = convertVoucherRequest(voucherRequest);
-
-        if(voucherRequest.getEndDate().isAfter(voucherRequest.getStartDate())) {
-            voucher.setStatus(Const.STATUS_ACTIVE);
-        } else {
-            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.END_DATE_LESS_START_DATE));
-        }
-
-        voucher.setVoucherCode(StringUtils.isBlank(voucher.getVoucherCode()) ? generatorCode(): voucher.getVoucherCode());
 
         return voucherRepository.save(voucher);
     }
@@ -68,7 +61,7 @@ public class VoucherServiceImpl implements VoucherService {
     public Voucher updateStatus(String code) {
         Optional<Voucher> voucherOptional = voucherRepository.findVoucherByVoucherCode(code);
 
-        if(voucherOptional.isEmpty()) {
+        if (voucherOptional.isEmpty()) {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.CODE_NOT_FOUND));
         } else {
             voucherOptional.get().setStatus(Const.STATUS_INACTIVE);
@@ -115,7 +108,7 @@ public class VoucherServiceImpl implements VoucherService {
     public VoucherRequest findByVoucherCode(String code) {
         Optional<Voucher> voucherOptional = voucherRepository.findVoucherByVoucherCode(code);
 
-        if(voucherOptional.isEmpty()) {
+        if (voucherOptional.isEmpty()) {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.CODE_NOT_FOUND));
         } else {
             return convertVoucher(voucherOptional.get());
@@ -141,10 +134,64 @@ public class VoucherServiceImpl implements VoucherService {
 
     private Voucher convertVoucherRequest(VoucherRequest request) {
 
+        if (!request.getVoucherName().equalsIgnoreCase(request.getVoucherNameCurrent())) {
+            Optional<Voucher> voucherOptional =
+                    voucherRepository.findVoucherByVoucherName(request.getVoucherName());
+
+            if (voucherOptional.isPresent()) {
+                throw new NotFoundException(ErrorCodeConfig.getMessage(Const.VOUCHER_NAME_ALREADY_EXISTS), "voucherName");
+            }
+        }
+
         Voucher voucher = new Voucher();
 
-        voucher.setId(request.getVoucherId());
-        voucher.setVoucherCode(request.getVoucherCode());
+        switch (request.getStatus()) {
+            case "", "UPCOMING":
+                if (request.getStartDate().isBefore(request.getEndDate())
+                        && request.getStartDate().isAfter(LocalDateTime.now())) {
+                    voucher.setStatus(Const.STATUS_UPCOMING);
+                } else {
+                    if (request.getStartDate().isBefore(LocalDateTime.now())) {
+                        throw new NotFoundException(ErrorCodeConfig.getMessage(Const.START_DATE_LESS_DATE_NOW), "startDate");
+                    }
+                    throw new NotFoundException(ErrorCodeConfig.getMessage(Const.END_DATE_LESS_START_DATE), "endDate");
+                }
+                break;
+            case "ACTIVE":
+                if (request.getStartDate().isBefore(request.getEndDate())) {
+                    voucher.setStatus(Const.STATUS_ACTIVE);
+                } else {
+                    throw new NotFoundException(ErrorCodeConfig.getMessage(Const.END_DATE_LESS_START_DATE));
+                }
+                voucher.setStatus(request.getStatus());
+                break;
+            case "INACTIVE":
+                break;
+            default:
+                throw new NotFoundException(ErrorCodeConfig.getMessage(Const.STATUS_INVALID));
+        }
+
+        if (request.getVoucherMethod().equals("%")) {
+            if (request.getVoucherValue().compareTo(BigDecimal.valueOf(100l)) == 1) {
+                throw new NotFoundException(ErrorCodeConfig.getMessage(Const.VOUCHER_VALUE_LESS_100_PERCENT), "voucherValueMax");
+            }
+        }
+
+        if (request.getLimitQuantity() < 0) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.LIMIT_QUANTITY_LESS_ZERO), "limitQuantity");
+        }
+
+        if (request.getVoucherCondition().compareTo(BigDecimal.valueOf(0l)) == -1) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.VOUCHER_CONDITION_LESS_ZERO), "voucherCondition");
+        }
+
+        if (StringUtils.isNotBlank(String.valueOf(request.getVoucherId()))
+                && StringUtils.isNotEmpty(String.valueOf(request.getVoucherId()))) {
+            voucher.setId(request.getVoucherId());
+
+        }
+
+        voucher.setVoucherCode(StringUtils.isBlank(voucher.getVoucherCode()) ? generatorCode() : voucher.getVoucherCode());
         voucher.setVoucherName(request.getVoucherName());
         voucher.setVoucherMethod(request.getVoucherMethod());
         voucher.setVoucherValue(request.getVoucherValue());
@@ -153,13 +200,12 @@ public class VoucherServiceImpl implements VoucherService {
         voucher.setVoucherCondition(request.getVoucherCondition());
         voucher.setStartDate(request.getStartDate());
         voucher.setEndDate(request.getEndDate());
-        voucher.setStatus(request.getStatus());
 
         return voucher;
     }
 
     private String generatorCode() {
-        return RandomStringUtils.random(15, true, true);
+        return RandomStringUtils.random(15, true, true).toUpperCase();
     }
 
     private Page<VoucherResponse> page(List<VoucherResponse> inputList, Pageable pageable) {
@@ -170,7 +216,7 @@ public class VoucherServiceImpl implements VoucherService {
 
         List<VoucherResponse> outputList;
 
-        if(inputList.size() < startItem) {
+        if (inputList.size() < startItem) {
             outputList = Collections.emptyList();
         } else {
             int toIndex = Math.min(startItem + pageSize, inputList.size());

@@ -50,8 +50,8 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
     }
 
     @Override
-    public List<ProductDetailResponse> getProductDetailsTableByIdProduct(Long idPro) {
-        return repo.getProductDetailsTableByIdProduct(idPro);
+    public List<ProductDetailResponse> getProductDetailsTableByIdProduct(Long idPro, String status) {
+        return repo.getProductDetailsTableByIdProduct(idPro, status);
     }
 
     @Override

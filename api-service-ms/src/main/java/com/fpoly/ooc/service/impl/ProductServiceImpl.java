@@ -2,7 +2,6 @@ package com.fpoly.ooc.service.impl;
 
 import com.fpoly.ooc.entity.Product;
 import com.fpoly.ooc.repository.ProductDAORepositoryI;
-import com.fpoly.ooc.responce.product.ProductDetailResponse;
 import com.fpoly.ooc.responce.product.ProductResponse;
 import com.fpoly.ooc.responce.product.ProductTableResponse;
 import com.fpoly.ooc.service.interfaces.ProductServiceI;
@@ -73,9 +72,9 @@ public class ProductServiceImpl implements ProductServiceI {
     }
 
     @Override
-    public Page<ProductTableResponse> getProductsTable(int pageNumber) {
+    public Page<ProductTableResponse> getProductsTable(int pageNumber, String status1, String status2) {
         Pageable pageable = PageRequest.of(pageNumber, 5);
-        return repo.getProductsTable(pageable);
+        return repo.getProductsTable(pageable, status1, status2);
     }
 
     @Override
@@ -86,6 +85,11 @@ public class ProductServiceImpl implements ProductServiceI {
     @Override
     public ProductResponse getProductResponseById(Long id) {
         return repo.getProductResponseById(id);
+    }
+
+    @Override
+    public List<ProductTableResponse> getProductFilterByCom(Long brandId, Long categoryId, Long patternId, Long formId) {
+        return repo.getProductFilterByCom(brandId, categoryId, patternId, formId);
     }
 
 

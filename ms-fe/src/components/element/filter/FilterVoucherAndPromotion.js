@@ -21,6 +21,16 @@ options.push({
   value: "ACTIVE",
 });
 
+options.push({
+  label: "Đã kết thúc",
+  value: "INACTIVE",
+});
+
+options.push({
+  label: "Sắp diễn ra",
+  value: "UPCOMING",
+});
+
 dayjs.extend(customParseFormat);
 
 const dateFormat = "DD/MM/YYYY";

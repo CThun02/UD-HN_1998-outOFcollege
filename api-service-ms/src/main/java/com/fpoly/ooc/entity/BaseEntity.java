@@ -45,11 +45,10 @@ public abstract class BaseEntity implements Serializable {
     protected LocalDateTime deletedAt;
 
     @Column(name = "status")
-    protected String status;
+    protected String status = Const.STATUS_ACTIVE;
 
     @PrePersist
     protected void prePersist() {
-        this.status = Const.STATUS_ACTIVE;
         this.createdAt = LocalDateTime.now();
     }
 

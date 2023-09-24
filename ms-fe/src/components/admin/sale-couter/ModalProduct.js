@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, Input, Select, Button, Table, Row, Col } from 'antd';
+import { Modal, Input, Select, Button, Table } from 'antd';
 import styles from './ModalProduct.module.css';
 import axios from 'axios';
-
-
 
 const { Option } = Select;
 
@@ -20,8 +18,6 @@ const ModalProduct = ({ visible, onCancel }) => {
     const handleCancel = () => {
         setIsModalVisible(false);
     };
-
-
 
     const columns = [
         {
@@ -91,6 +87,10 @@ const ModalProduct = ({ visible, onCancel }) => {
             })
     }, [])
 
+    const handDetailProduct = (id) => {
+
+    }
+
     return (
         <>
             <Modal
@@ -150,22 +150,42 @@ const ModalProduct = ({ visible, onCancel }) => {
                         title="Chi tiết sản phẩm"
                         open={isModalVisible}
                         onCancel={handleCancel}
+                        className={styles.modalSize}
                         footer={null}
                     >
-                        <Row style={{ height: '300px', width: '300px' }}>
-                            <Col span={12}>
-                                <img
-                                    src={selectedProduct.img}
-                                    alt='ảnh lỗi'
-                                    style={{
-                                        height: "100px",
-                                        width: '100px'
-                                    }} />
-                            </Col>
-                            <Col span={12}>
-
-                            </Col>
-                        </Row>
+                        <div className={styles.selectContainer}>
+                            <Select defaultValue="option1" className={styles.select}>
+                                <Option value="option1">Option 1</Option>
+                                <Option value="option2">Option 2</Option>
+                                <Option value="option3">Option 3</Option>
+                            </Select>
+                            <Select defaultValue="option1" className={styles.select}>
+                                <Option value="option1">Option 1</Option>
+                                <Option value="option2">Option 2</Option>
+                                <Option value="option3">Option 3</Option>
+                            </Select>
+                            <Select defaultValue="option1" className={styles.select}>
+                                <Option value="option1">Option 1</Option>
+                                <Option value="option2">Option 2</Option>
+                                <Option value="option3">Option 3</Option>
+                            </Select>
+                            <Select defaultValue="option1" className={styles.select}>
+                                <Option value="option1">Option 1</Option>
+                                <Option value="option2">Option 2</Option>
+                                <Option value="option3">Option 3</Option>
+                            </Select>
+                            <Select defaultValue="option1" className={styles.select}>
+                                <Option value="option1">Option 1</Option>
+                                <Option value="option2">Option 2</Option>
+                                <Option value="option3">Option 3</Option>
+                            </Select>
+                        </div>
+                        <Table
+                            columns={columns}
+                            dataSource={data}
+                            scroll={{ y: 400 }}
+                            pagination={false}
+                        />
                     </Modal>
                 )
             }

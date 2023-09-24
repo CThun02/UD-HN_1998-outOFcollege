@@ -13,6 +13,9 @@ import com.fpoly.ooc.service.interfaces.ProductServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,13 +33,31 @@ public class ProductController {
     }
 
     @GetMapping("")
-    public List<ProductTableResponse> getProductsTable(@RequestParam(name = "page", defaultValue = "0")Integer page){
-        return service.getProductsTable(page).getContent();
+    public List<ProductTableResponse> getProductsTable(@RequestParam(name = "page", defaultValue = "0")Integer page,
+                                                       @RequestParam(defaultValue = "ALL") String status){
+        if(status.equals("ALL")){
+            return service.getProductsTable(page, "ACTIVE", "INACTIVE").getContent();
+        }else{
+            return service.getProductsTable(page, status, status).getContent();
+        }
+    }
+
+    @GetMapping("/filterByCom")
+    public ResponseEntity<?> filterByCom(@RequestParam Long brandId,
+                                         @RequestParam Long categoryId,
+                                         @RequestParam Long patternId,
+                                         @RequestParam Long formId){
+        return ResponseEntity.ok(service.getProductFilterByCom(brandId, categoryId, patternId, formId));
+    }
+
+    @GetMapping("/totalPage")
+    public ResponseEntity<?> getTotalPage(){
+        return ResponseEntity.ok(service.getProductsTable(0, "ACTIVE", "INACTIVE").getTotalPages());
     }
 
     @GetMapping("/getProductDetailsTableByIdProduct")
-    public List<ProductDetailResponse> getProductDetailsByIdPro(@RequestParam("productId")Long productId){
-        return productDetailService.getProductDetailsTableByIdProduct(productId);
+    public List<ProductDetailResponse> getProductDetailsByIdPro(@RequestParam("productId")Long productId, @RequestParam String status){
+        return productDetailService.getProductDetailsTableByIdProduct(productId, status);
     }
 
     @GetMapping("/getProductDetailUpdate")
@@ -48,6 +69,17 @@ public class ProductController {
                                                                @RequestParam Long collarId){
         return  ResponseEntity.ok(productDetailService.getProductDetailsResponseByIdCompo(productId, buttonId,
                 materialId, shirtTailId, sleeveId, collarId).get(0));
+    }
+
+    @GetMapping("/getProductDetailsByIdCom")
+    public ResponseEntity<?> getProductDetailsByIdCom(@RequestParam Long productId,
+                                                     @RequestParam Long buttonId,
+                                                     @RequestParam Long materialId,
+                                                     @RequestParam Long shirtTailId,
+                                                     @RequestParam Long sleeveId,
+                                                     @RequestParam Long collarId){
+        return  ResponseEntity.ok(productDetailService.getProductDetailsResponseByIdCompo(productId, buttonId,
+                materialId, shirtTailId, sleeveId, collarId));
     }
 
     @GetMapping("/getProductEdit")
@@ -65,17 +97,6 @@ public class ProductController {
         return  ResponseEntity.ok(productDetailService.getColorsByIdCompoPDAndIdPro(productId, buttonId,
                 materialId, shirtTailId, sleeveId, collarId));
     }
-    @GetMapping("/test")
-    public ResponseEntity<?> test(@RequestParam Long productId,
-                                                       @RequestParam Long buttonId,
-                                                       @RequestParam Long materialId,
-                                                       @RequestParam Long shirtTailId,
-                                                       @RequestParam Long sleeveId,
-                                                       @RequestParam Long collarId,
-                                                       @RequestParam Long colorId,
-                                                       @RequestParam Long sizeId){
-        return  ResponseEntity.ok(1);
-    }
 
     @GetMapping("/getSizesByIdComPdAndIdPro")
     public ResponseEntity<?> getSizesByIdComPdAndIdPro(@RequestParam Long productId,
@@ -91,7 +112,6 @@ public class ProductController {
 
     @PostMapping("/create")
     public ResponseEntity<?> createProduct(@RequestBody ProductRequest request){
-
         Product product = request.dto();
         product.setStatus(Const.STATUS_ACTIVE);
         return ResponseEntity.ok(service.create(product));
@@ -102,7 +122,6 @@ public class ProductController {
         ProductDetailResponse productDetailResponse = productDetailService.getOneByIdCom(request.getProductId(), request.getButtonId(),
                 request.getMaterialId(), request.getShirtTailId(), request.getSleeveId(), request.getCollarId(),
                 request.getColorId(), request.getSizeId());
-
         if (productDetailResponse == null) {
             ProductDetail productDetail = request.dto();
             productDetail.setStatus(Const.STATUS_ACTIVE);
@@ -120,12 +139,12 @@ public class ProductController {
                     .color(productDetailResponse.getColor())
                     .shirtTail(productDetailResponse.getShirtTail())
                     .price(productDetailResponse.getPrice())
-                    .descriptionDetail(productDetailResponse.getDescriptionDetail())
+                    .descriptionDetail(request.getDescriptionDetail())
                     .quantity(productDetailResponse.getQuantity() + request.getQuantity())
                     .build();
             productDetail.setStatus(Const.STATUS_ACTIVE);
             productDetail = productDetailService.update(productDetail);
-            return ResponseEntity.ok(productDetail);
+                return ResponseEntity.ok("update");
         }
     }
 
@@ -135,8 +154,26 @@ public class ProductController {
         return ResponseEntity.ok(service.update(product));
     }
 
+
+    @PutMapping("/updateProductStatus")
+    public ResponseEntity<?> updateProductStatus(@RequestParam Long productId, @RequestParam String status){
+        Product product = service.getOne(productId);
+        product.setStatus(status);
+        return ResponseEntity.ok(service.update(product));
+    }
+
     @PutMapping("/updateProductDetail")
-    public ResponseEntity<?> updateProductDetail(@RequestBody ProductDetail request){
+    public ResponseEntity<?> updateProductDetail(@RequestBody ProductDetail request,
+                                                 @RequestParam(name = "method", defaultValue = "Update") String method){
+        if(method.equals("Deleted")){
+            if(request.getStatus().equals("DELETED")){
+                request.setDeletedAt(LocalDateTime.now());
+            }else{
+                request.setDeletedAt(null);
+            }
+        }else{
+            request.setDeletedAt(null);
+        }
         return ResponseEntity.ok(productDetailService.update(request));
     }
 }

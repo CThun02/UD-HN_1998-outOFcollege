@@ -18,4 +18,5 @@ public interface ProductDetailResponse {
     public BigDecimal getPrice();
     public Integer getQuantity();
     public String getDescriptionDetail();
+    public String getStatus();
 }

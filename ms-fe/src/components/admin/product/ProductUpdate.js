@@ -1,11 +1,11 @@
 import {
   EditOutlined,
-  EyeOutlined,
   FormOutlined,
   TableOutlined,
   PlusCircleOutlined,
+  DeleteOutlined,
 } from "@ant-design/icons";
-import { Button, Col, message, Row, Select, Table } from "antd";
+import { Button, Col, message, Popconfirm, Row, Select, Table } from "antd";
 import { isString } from "antd/es/button";
 import Input from "antd/es/input/Input";
 import TextArea from "antd/es/input/TextArea";
@@ -25,6 +25,7 @@ const ProductUpdate = () => {
   const [categories, setCategories] = useState(null);
   const [patterns, setPatterns] = useState(null);
   const [forms, setForms] = useState(null);
+  const [render, changeRender] = useState(null);
   const [url, setUrl] = useState(
     "https://vapa.vn/wp-content/uploads/2022/12/anh-3d-thien-nhien.jpeg"
   );
@@ -95,18 +96,29 @@ const ProductUpdate = () => {
       dataIndex: "id",
       render: (text, record, index) => (
         <>
-          <Link
-            to={`/admin/product/update-details?productDetail=${encodeURIComponent(
-              JSON.stringify(record)
-            )}`}
+          <Button className={styles.product__updateButton}>
+            <Link
+              to={`/admin/product/update-details?productDetail=${encodeURIComponent(
+                JSON.stringify(record)
+              )}`}
+            >
+              <EditOutlined />
+            </Link>
+          </Button>
+          <Popconfirm
+            placement="leftTop"
+            title="Xóa bản ghi"
+            description="Xóa bản ghi sẽ ảnh hưởng đến các dữ liệu khác?"
+            okText="Yes"
+            cancelText="No"
+            onConfirm={() => {
+              deleteProductDetails(record);
+            }}
           >
             <Button className={styles.product__updateButton}>
-              <EditOutlined />
+              <DeleteOutlined />
             </Button>
-          </Link>
-          <Button className={styles.product__updateButton}>
-            <EyeOutlined />
-          </Button>
+          </Popconfirm>
         </>
       ),
     },
@@ -164,6 +176,56 @@ const ProductUpdate = () => {
     }
   }
 
+  function deleteProductDetails(productDetail) {
+    axios
+      .get(
+        api +
+          "product/getProductDetailsByIdCom?productId=" +
+          productId +
+          "&buttonId=" +
+          productDetail.button.id +
+          "&materialId=" +
+          productDetail.material.id +
+          "&shirtTailId=" +
+          productDetail.shirtTail.id +
+          "&sleeveId=" +
+          productDetail.sleeve.id +
+          "&collarId=" +
+          productDetail.collar.id
+      )
+      .then((res) => {
+        messageApi.loading("Đang tải!", 0.5);
+        setTimeout(() => {
+          messageApi.success("Xóa thành công!", 2);
+          changeRender(res.data);
+        }, 500);
+        for (let productDetailUpdate of res.data) {
+          deleteProdcutDetail(productDetailUpdate);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  function deleteProdcutDetail(productDetail) {
+    productDetail.status === "DELETED"
+      ? (productDetail.status = "ACTIVE")
+      : (productDetail.status = "DELETED");
+    axios
+      .put(api + "product/updateProductDetail?method=Deleted", productDetail)
+      .then((response) => {})
+      .catch((error) => {
+        messageApi.error(
+          productDetail.status === "DELETED"
+            ? "Xóa thất bại!"
+            : "Khôi phục thất bại",
+          2
+        );
+        console.log(error);
+      });
+  }
+
   function handleSetProduct(field, value) {
     setProduct((prevProduct) => ({
       ...prevProduct,
@@ -205,7 +267,10 @@ const ProductUpdate = () => {
       });
     axios
       .get(
-        api + "product/getProductDetailsTableByIdProduct?productId=" + productId
+        api +
+          "product/getProductDetailsTableByIdProduct?productId=" +
+          productId +
+          "&status=ACTIVE"
       )
       .then((response) => {
         setProductDetails(response.data);
@@ -231,7 +296,7 @@ const ProductUpdate = () => {
       .catch((error) => {
         console.log(error);
       });
-  }, [productId]);
+  }, [productId, render]);
   return (
     <div>
       {contextHolder}
@@ -422,8 +487,10 @@ const ProductUpdate = () => {
             <h2>
               <TableOutlined /> Bảng chi tiết sản phẩm
             </h2>
+            <br />
             <div className="m-5">
               <Table
+                scroll={{ y: "55vh" }}
                 dataSource={
                   productDetails &&
                   productDetails.map((record, index) => ({

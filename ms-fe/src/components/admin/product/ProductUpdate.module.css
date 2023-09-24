@@ -4,9 +4,15 @@
   border: 1px solid #edf2f9;
   padding: 10px 20px 10px 20px;
   border-radius: 4px;
+  overflow: auto;
 }
 .product__update {
   margin-right: 5px;
+  height: 100%;
+}
+.product__details {
+  height: 85vh;
+  overflow: auto;
 }
 
 .product__FormImg {

@@ -11,9 +11,11 @@ import {
   Select,
   DatePicker,
   Table,
+  Pagination,
   Button,
   Switch,
   Radio,
+  message,
 } from "antd";
 import React, { useEffect, useState } from "react";
 import styles from "./ProductIndex.module.css";
@@ -27,22 +29,31 @@ import { displayFrame } from "../animations/animation";
 
 const ProductIndex = () => {
   const api = "http://localhost:8080/api/admin/";
+  const [messageApi, contextHolder] = message.useMessage();
   const [brands, setBrands] = useState(null);
   const [categories, setCategories] = useState(null);
-  const [sizes, setSizes] = useState(null);
-  const [colors, setColors] = useState(null);
   const [patterns, setPatterns] = useState(null);
   const [forms, setForms] = useState(null);
+  var brand = 0;
+  var category = 0;
+  var pattern = 0;
+  var form = 0;
+  const [status, setStatus] = useState(null);
   const [productsTable, setProductsTable] = useState(null);
   const [loading, setLoading] = useState(false);
   const [render, setRendering] = useState(null);
   const { RangePicker } = DatePicker;
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(10);
 
   const columns = [
     {
       key: "1",
-      title: "ID",
-      dataIndex: "id",
+      title: "STT",
+      dataIndex: "index",
+      render: (text, record, index) => {
+        return index + 1;
+      },
     },
     {
       key: "2",
@@ -80,8 +91,15 @@ const ProductIndex = () => {
       key: "6",
       title: "Trạng thái",
       dataIndex: "status",
-      render: (status) => (
-        <>{status === "ACTIVE" ? <Switch defaultChecked /> : <Switch />}</>
+      render: (status, record) => (
+        <>
+          <Switch
+            onChange={(event) => {
+              updateStatus(record, event);
+            }}
+            checked={status === "ACTIVE" ? true : false}
+          />
+        </>
       ),
     },
     {
@@ -100,6 +118,66 @@ const ProductIndex = () => {
     },
   ];
   //function
+  const handleChangePage = (page, statusFilter) => {
+    setStatus(statusFilter);
+    setCurrentPage(page);
+    axios
+      .get(api + "product?page=" + (page - 1) + "&status=" + statusFilter)
+      .then((response) => {
+        setProductsTable(response.data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  function filterProductByCom() {
+    axios
+      .get(
+        api +
+          "product/filterByCom?brandId=" +
+          brand +
+          "&categoryId=" +
+          category +
+          "&patternId=" +
+          pattern +
+          "&formId=" +
+          form
+      )
+      .then((res) => {
+        setProductsTable(res.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
+  function updateStatus(product, statusUpdate) {
+    let mess =
+      statusUpdate === true
+        ? `${product.productName} vừa bật hoạt động kinh doanh`
+        : `${product.productName} tạm ngưng hoạt động kinh doanh`;
+    axios
+      .put(
+        api +
+          "product/updateProductStatus?productId=" +
+          product.id +
+          "&status=" +
+          (statusUpdate === true ? "ACTIVE" : "INACTIVE")
+      )
+      .then((response) => {
+        setTimeout(() => {
+          messageApi.success(mess, 2);
+          handleChangePage(1, status);
+        }, 500);
+      })
+      .catch((error) => {
+        setTimeout(() => {
+          messageApi.error(`Cập nhật trạng thái thất bại`, 2);
+        }, 500);
+      });
+  }
 
   useEffect(() => {
     setLoading(true);
@@ -115,22 +193,6 @@ const ProductIndex = () => {
       .get(api + "category")
       .then((response) => {
         setCategories(response.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-    axios
-      .get(api + "size")
-      .then((response) => {
-        setSizes(response.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-    axios
-      .get(api + "color")
-      .then((response) => {
-        setColors(response.data);
       })
       .catch((error) => {
         console.log(error);
@@ -160,9 +222,18 @@ const ProductIndex = () => {
       .catch((error) => {
         console.log(error);
       });
+    axios
+      .get(api + "product/totalPage")
+      .then((response) => {
+        setTotalPage(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }, [render]);
   return (
     <>
+      {contextHolder}
       <div className={styles.product__filter}>
         <h2>
           <FilterFilled /> Bộ lọc
@@ -185,11 +256,15 @@ const ProductIndex = () => {
                   .toLowerCase()
                   .localeCompare((optionB?.label ?? "").toLowerCase())
               }
+              onChange={(event) => {
+                brand = event;
+                filterProductByCom();
+              }}
             >
               {brands &&
                 brands.map((item) => {
                   return (
-                    <Select.Option key={item.id}>
+                    <Select.Option key={item.id} value={item.id}>
                       {item.brandName}
                     </Select.Option>
                   );
@@ -210,6 +285,10 @@ const ProductIndex = () => {
                   .toLowerCase()
                   .localeCompare((optionB?.label ?? "").toLowerCase())
               }
+              onChange={(event) => {
+                category = event;
+                filterProductByCom();
+              }}
             >
               {categories &&
                 categories.map((item) => {
@@ -235,6 +314,10 @@ const ProductIndex = () => {
                   .toLowerCase()
                   .localeCompare((optionB?.label ?? "").toLowerCase())
               }
+              onChange={(event) => {
+                pattern = event;
+                filterProductByCom();
+              }}
             >
               {patterns &&
                 patterns.map((item) => {
@@ -260,6 +343,10 @@ const ProductIndex = () => {
                   .toLowerCase()
                   .localeCompare((optionB?.label ?? "").toLowerCase())
               }
+              onChange={(event) => {
+                form = event;
+                filterProductByCom();
+              }}
             >
               {forms &&
                 forms.map((item) => {
@@ -278,7 +365,14 @@ const ProductIndex = () => {
           <Col span={12}>
             <div className={styles.filter__dateCreate}>
               <h6 style={{ marginBottom: "8px" }}>Trạng thái</h6>
-              <Radio.Group onChange={""} value={"ALL"}>
+              <Radio.Group
+                onChange={""}
+                defaultValue={"ALL"}
+                onFocus={(event) => {
+                  setStatus(event.target.value);
+                  handleChangePage(1, event.target.value);
+                }}
+              >
                 <Radio value={"ALL"}>Tất cả</Radio>
                 <Radio value={"ACTIVE"}>Đang kinh doanh</Radio>
                 <Radio value={"INACTIVE"}>Ngừng kinh doanh</Radio>
@@ -318,7 +412,18 @@ const ProductIndex = () => {
                 key: index,
               }))
             }
-          ></Table>
+            pagination={false}
+          />
+          <div style={{ textAlign: "end", marginTop: "10px" }}>
+            <Pagination
+              current={currentPage}
+              total={totalPage < 10 ? 10 : totalPage}
+              pageSize={5}
+              onChange={(event) => {
+                handleChangePage(event, status);
+              }}
+            />
+          </div>
         </div>
       </div>
       <ProductCreate

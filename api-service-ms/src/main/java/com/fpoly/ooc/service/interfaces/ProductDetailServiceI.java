@@ -12,7 +12,7 @@ public interface ProductDetailServiceI {
     public Boolean delete(Long id);
     public ProductDetail getOne(Long id);
     public List<ProductDetailResponse> getProductDetailsByIdProduct(Long idPro);
-    public List<ProductDetailResponse> getProductDetailsTableByIdProduct(Long idPro);
+    public List<ProductDetailResponse> getProductDetailsTableByIdProduct(Long idPro, String status);
     public List<ProductDetailResponse> getProductDetailsResponseByIdCompo
             (Long id, Long idButton, Long idMaterial, Long idShirtTail, Long idSleeve, Long idCollar);
     public List<Color> getColorsByIdCompoPDAndIdPro

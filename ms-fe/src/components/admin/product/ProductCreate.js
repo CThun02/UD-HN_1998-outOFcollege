@@ -1,5 +1,5 @@
 import { CloseOutlined, PlusOutlined } from "@ant-design/icons";
-import { Col, Row, Form, Input, Select, Button, message } from "antd";
+import { Col, Row, Form, Input, Select, Button, message, Space } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import React, { useRef, useState } from "react";
 import styles from "./ProductCreate.module.css";
@@ -9,13 +9,17 @@ import { isFormInputEmpty } from "./ValidateForm";
 import axios from "axios";
 
 const ProductCreate = (props) => {
-  const api = "http://localhost:8080/api/admin/product/";
+  const api = "http://localhost:8080/api/admin/";
   const [messageApi, contextHolder] = message.useMessage();
   const formRef = useRef();
   const brands = props.brands;
+  const [brandCreate, setBrandCreate] = useState("");
   const categories = props.categories;
+  const [categoryCreate, setCategoryCreate] = useState("");
   const forms = props.forms;
+  const [formCreate, setFormCreate] = useState("");
   const patterns = props.patterns;
+  const [patternCreate, setPatternCreate] = useState("");
   const renderIndex = props.render;
   const [product, setProduct] = useState({
     productName: " ",
@@ -35,6 +39,119 @@ const ProductCreate = (props) => {
     }));
   }
 
+  function handleCustomOptionClick(event) {
+    event.stopPropagation();
+    event.target.focus();
+  }
+
+  function createBrand(event) {
+    event.stopPropagation();
+    messageApi.loading("Đang tải", 1);
+    if (brandCreate.trim() !== "") {
+      axios
+        .post(api + "brand?brandName=" + brandCreate, null)
+        .then((res) => {
+          setTimeout(() => {
+            if (res.data === "") {
+              messageApi.error("Thương hiệu đã tồn tại!", 1);
+            } else {
+              messageApi.success("Thêm thương hiệu thành công!", 1);
+              renderIndex(res.data);
+            }
+            setBrandCreate(" ");
+          }, 1000);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      setTimeout(() => {
+        messageApi.error("Vui lòng nhập thương hiệu!", 1);
+      }, 1000);
+    }
+  }
+
+  function createCategory(event) {
+    event.stopPropagation();
+    messageApi.loading("Đang tải", 1);
+    if (categoryCreate.trim() !== "") {
+      axios
+        .post(api + "category?categoryName=" + categoryCreate, null)
+        .then((res) => {
+          setTimeout(() => {
+            if (res.data === "") {
+              messageApi.error("Loại sản phẩm đã tồn tại!", 1);
+            } else {
+              messageApi.success("Thêm loại sản phẩm thành công!", 1);
+              renderIndex(res.data);
+            }
+            setCategoryCreate(" ");
+          }, 1000);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      setTimeout(() => {
+        messageApi.error("Vui lòng nhập loại sản phẩm!", 1);
+      }, 1000);
+    }
+  }
+
+  function createPattern(event) {
+    event.stopPropagation();
+    messageApi.loading("Đang tải", 1);
+    if (patternCreate.trim() !== "") {
+      axios
+        .post(api + "pattern?patternName=" + patternCreate, null)
+        .then((res) => {
+          setTimeout(() => {
+            if (res.data === "") {
+              messageApi.error("Họa tiết đã tồn tại!", 1);
+            } else {
+              messageApi.success("Thêm hoạt tiết thành công!", 1);
+              renderIndex(res.data);
+            }
+            setPatternCreate(" ");
+          }, 1000);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      setTimeout(() => {
+        messageApi.error("Vui lòng nhập hoạt tiết!", 1);
+      }, 1000);
+    }
+  }
+
+  function createForm(event) {
+    event.stopPropagation();
+    messageApi.loading("Đang tải", 1);
+    if (formCreate.trim() !== "") {
+      axios
+        .post(api + "form?formName=" + formCreate, null)
+        .then((res) => {
+          setTimeout(() => {
+            if (res.data === "") {
+              messageApi.error("Dáng áo đã tồn tại!", 1);
+            } else {
+              messageApi.success("Thêm dáng áo thành công!", 1);
+              renderIndex(res.data);
+            }
+            setFormCreate(" ");
+          }, 1000);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      setTimeout(() => {
+        messageApi.error("Vui lòng nhập dáng áo!", 1);
+      }, 1000);
+    }
+  }
+
   function createProduct() {
     for (let key in product) {
       if (isString(product[key])) {
@@ -46,7 +163,7 @@ const ProductCreate = (props) => {
     let check = isFormInputEmpty(product);
     if (!check) {
       axios
-        .post(api + "create", product)
+        .post(api + "product/create", product)
         .then((res) => {
           messageApi.loading("Vui lòng chờ!", 2);
           setTimeout(() => {
@@ -108,6 +225,28 @@ const ProductCreate = (props) => {
                         placeholder="Brand"
                         status={product.brandId === "" ? "error" : ""}
                       >
+                        <Select.Option value={""}>
+                          <Space.Compact style={{ width: "100%" }}>
+                            <Input
+                              placeholder="Add new brand"
+                              size="small"
+                              onClick={(event) => {
+                                handleCustomOptionClick(event);
+                              }}
+                              value={brandCreate}
+                              onChange={(event) => {
+                                setBrandCreate(event.target.value);
+                              }}
+                            />
+                            <Button
+                              onClick={(event) => {
+                                createBrand(event);
+                              }}
+                            >
+                              <PlusOutlined />
+                            </Button>
+                          </Space.Compact>
+                        </Select.Option>
                         {brands &&
                           brands.map((item) => {
                             return (
@@ -131,6 +270,28 @@ const ProductCreate = (props) => {
                         placeholder="Category"
                         status={product.categoryId === "" ? "error" : ""}
                       >
+                        <Select.Option value={""}>
+                          <Space.Compact style={{ width: "100%" }}>
+                            <Input
+                              placeholder="Add new category"
+                              size="small"
+                              onClick={(event) => {
+                                handleCustomOptionClick(event);
+                              }}
+                              value={categoryCreate}
+                              onChange={(event) => {
+                                setCategoryCreate(event.target.value);
+                              }}
+                            />
+                            <Button
+                              onClick={(event) => {
+                                createCategory(event);
+                              }}
+                            >
+                              <PlusOutlined />
+                            </Button>
+                          </Space.Compact>
+                        </Select.Option>
                         {categories &&
                           categories.map((item) => {
                             return (
@@ -154,6 +315,28 @@ const ProductCreate = (props) => {
                         placeholder="Pattern"
                         status={product.patternId === "" ? "error" : ""}
                       >
+                        <Select.Option value={""}>
+                          <Space.Compact style={{ width: "100%" }}>
+                            <Input
+                              placeholder="Add new pattern"
+                              size="small"
+                              onClick={(event) => {
+                                handleCustomOptionClick(event);
+                              }}
+                              value={patternCreate}
+                              onChange={(event) => {
+                                setPatternCreate(event.target.value);
+                              }}
+                            />
+                            <Button
+                              onClick={(event) => {
+                                createPattern(event);
+                              }}
+                            >
+                              <PlusOutlined />
+                            </Button>
+                          </Space.Compact>
+                        </Select.Option>
                         {patterns &&
                           patterns.map((item) => {
                             return (
@@ -175,6 +358,28 @@ const ProductCreate = (props) => {
                         placeholder="form"
                         status={product.formId === "" ? "error" : ""}
                       >
+                        <Select.Option value={""}>
+                          <Space.Compact style={{ width: "100%" }}>
+                            <Input
+                              placeholder="Add new form"
+                              size="small"
+                              onClick={(event) => {
+                                handleCustomOptionClick(event);
+                              }}
+                              value={formCreate}
+                              onChange={(event) => {
+                                setFormCreate(event.target.value);
+                              }}
+                            />
+                            <Button
+                              onClick={(event) => {
+                                createForm(event);
+                              }}
+                            >
+                              <PlusOutlined />
+                            </Button>
+                          </Space.Compact>
+                        </Select.Option>
                         {forms &&
                           forms.map((item) => {
                             return (

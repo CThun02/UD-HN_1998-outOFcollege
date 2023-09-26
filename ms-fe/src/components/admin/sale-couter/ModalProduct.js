@@ -8,16 +8,8 @@ const { Option } = Select;
 const ModalProduct = ({ visible, onCancel }) => {
     const [searchInput, setSearchInput] = useState('');
     const [data, setData] = useState([]);
-    const [isModalVisible, setIsModalVisible] = useState(false);
-    const [selectedProduct, setSelectedProduct] = useState(null);
-    const showModal = (product) => {
-        setIsModalVisible(true);
-        setSelectedProduct(product);
-    };
 
-    const handleCancel = () => {
-        setIsModalVisible(false);
-    };
+
 
     const columns = [
         {
@@ -33,7 +25,7 @@ const ModalProduct = ({ visible, onCancel }) => {
             dataIndex: 'imgDefault',
             key: 'imgDefault',
             render: (_, record) => {
-                return <img src={record.imgDefault} alt='bug' />
+                return <img src={record.imgDefault} alt='bug' key={record.imgDefault} />
             }
         },
         {
@@ -70,8 +62,7 @@ const ModalProduct = ({ visible, onCancel }) => {
                 <Button
                     type="primary"
                     style={{ backgroundColor: "white", color: 'blue' }}
-                    onClick={() => showModal(record)}
-                    key={record.key}>
+                    key={record.productId}>
                     Chọn
                 </Button>
             ),
@@ -86,10 +77,6 @@ const ModalProduct = ({ visible, onCancel }) => {
                 console.log(error)
             })
     }, [])
-
-    const handDetailProduct = (id) => {
-
-    }
 
     return (
         <>
@@ -144,51 +131,6 @@ const ModalProduct = ({ visible, onCancel }) => {
                     />
                 </div>
             </Modal>
-            {
-                selectedProduct && (
-                    <Modal
-                        title="Chi tiết sản phẩm"
-                        open={isModalVisible}
-                        onCancel={handleCancel}
-                        className={styles.modalSize}
-                        footer={null}
-                    >
-                        <div className={styles.selectContainer}>
-                            <Select defaultValue="option1" className={styles.select}>
-                                <Option value="option1">Option 1</Option>
-                                <Option value="option2">Option 2</Option>
-                                <Option value="option3">Option 3</Option>
-                            </Select>
-                            <Select defaultValue="option1" className={styles.select}>
-                                <Option value="option1">Option 1</Option>
-                                <Option value="option2">Option 2</Option>
-                                <Option value="option3">Option 3</Option>
-                            </Select>
-                            <Select defaultValue="option1" className={styles.select}>
-                                <Option value="option1">Option 1</Option>
-                                <Option value="option2">Option 2</Option>
-                                <Option value="option3">Option 3</Option>
-                            </Select>
-                            <Select defaultValue="option1" className={styles.select}>
-                                <Option value="option1">Option 1</Option>
-                                <Option value="option2">Option 2</Option>
-                                <Option value="option3">Option 3</Option>
-                            </Select>
-                            <Select defaultValue="option1" className={styles.select}>
-                                <Option value="option1">Option 1</Option>
-                                <Option value="option2">Option 2</Option>
-                                <Option value="option3">Option 3</Option>
-                            </Select>
-                        </div>
-                        <Table
-                            columns={columns}
-                            dataSource={data}
-                            scroll={{ y: 400 }}
-                            pagination={false}
-                        />
-                    </Modal>
-                )
-            }
         </>
     );
 };

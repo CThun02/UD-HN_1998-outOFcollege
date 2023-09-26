@@ -1,45 +1,34 @@
-import React, { useEffect, useState } from 'react'
-import { Button, Space, Table, Tag } from 'antd';
-import { Input } from 'antd';
-import styles from "./Bill.module.css"
-import { DeleteOutlined, EditOutlined, SearchOutlined } from '@ant-design/icons';
-import { Link } from 'react-router-dom';
-import axios from 'axios';
+import { Tabs, Button, Table, Space, Tag } from 'antd';
+import React, { useRef, useState } from 'react';
+import styles from './Bill.module.css';
+import ModalProduct from './ModalProduct';
+
+const initialItems = [
+    {
+        label: 'Tab 1',
+        key: '1',
+    },
+    {
+        label: 'Tab 2',
+        key: '2',
+    },
+    {
+        label: 'Tab 3',
+        key: '3',
+    },
+];
 
 const Bill = () => {
-    const [data, setData] = useState([])
-    const handleDelete = (record) => {
-        const id = record.billDetailId;
-        console.log(id)
-    }
 
-    useEffect(() => {
-        axios.get('http://localhost:8080/api/admin/bill')
-            .then(response => {
-                setData(response.data)
-            }).catch(err => {
-                console.log(err)
-            })
-    }, [])
     const columns = [
         {
             title: 'STT',
-            // dataIndex: 'STT',
-            key: 'STT',
-            render: (_, record) => {
-                return data.indexOf(record) + 1;
-            }
+            key: 'stt',
         },
         {
-            title: 'Ảnh',
-            dataIndex: 'imgDefault',
-            key: 'imgDefault',
-        },
-        {
-            title: 'Tổng số tiền',
-            dataIndex: 'totalPrice',
-            key: 'totalPrice',
-            render: (_, record) => record.price * record.quantity,
+            title: 'Sản phẩm',
+            dataIndex: 'name',
+            key: 'name',
         },
         {
             title: 'Số lượng',
@@ -47,57 +36,123 @@ const Bill = () => {
             key: 'quantity',
         },
         {
-            title: 'Ngày tạo',
-            dataIndex: 'createDate',
-            key: 'createDate',
+            title: 'Thành tiền',
+            dataIndex: 'totalPrice',
+            key: 'totalPrice',
         },
         {
-            title: 'Trạng thái',
-            key: 'status',
-            dataIndex: 'status',
-            render: (_, record) => {
-                const tagColor = record.status === 'active' ? 'red' : 'green';
-                return <Tag color={tagColor}>{record.status}</Tag>;
-            },
-        },
-        {
-            title: 'Action',
+            title: 'Thao tác',
             key: 'action',
             render: (_, record) => (
                 <Space size="middle">
-                    <Button
-                        icon={<EditOutlined />}
-                        className={styles.btnEdit}
-                        href='#1'></Button>
-                    <Button
-                        icon={<DeleteOutlined />}
-                        danger
-                        className={styles.btnDelete}
-                        href='#1'
-                        onClick={() => handleDelete(record)}></Button>
+                    <Button>delete</Button>
                 </Space>
             ),
         },
     ];
-    return (
-        <div className={styles.bill}>
-            <div className={styles.header}>
-                <div >
-                    <Input
-                        placeholder="Tìm hóa đơn"
-                        prefix={<SearchOutlined />}
-                        className={styles.headerLeft}
-                    />
-                </div>
-                <div className={styles.headerRight}>
-                    <Link to="/admin/counter-sales/bill" type="primary" className={styles.btn} >
-                        <Button type='primary' >Tạo hóa đơn</Button>
-                    </Link>
-                </div>
-            </div>
-            <Table columns={columns} dataSource={data} />
-        </div>
-    )
-}
+    const data = [
+        {
+            key: '1',
+            name: '`John Brown`',
+            tags: ['nice', 'developer'],
+        },
+        {
+            key: '2',
+            name: 'Jim Green',
+            tags: ['loser'],
+        },
+        {
+            key: '3',
+            name: 'Joe Black',
+            tags: ['cool', 'teacher'],
+        },
+    ];
+    const [activeKey, setActiveKey] = useState(initialItems[0].key);
+    const [items, setItems] = useState(initialItems);
+    const newTabIndex = useRef(0);
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const showModal = () => {
+        setIsModalVisible(true);
+    };
 
-export default Bill
+    const handleCancel = () => {
+        setIsModalVisible(false);
+    };
+
+    const onChange = (newActiveKey) => {
+        setActiveKey(newActiveKey);
+    };
+
+    const add = () => {
+        const newActiveKey = `newTab${newTabIndex.current++}`;
+        const newPanes = [...items];
+        newPanes.push({
+            label: 'New Tab',
+            key: newActiveKey,
+        });
+        setItems(newPanes);
+        setActiveKey(newActiveKey);
+    };
+
+    const remove = (targetKey) => {
+        let newActiveKey = activeKey;
+        let lastIndex = -1;
+        items.forEach((item, i) => {
+            if (item.key === targetKey) {
+                lastIndex = i - 1;
+            }
+        });
+        const newPanes = items.filter((item) => item.key !== targetKey);
+        if (newPanes.length && newActiveKey === targetKey) {
+            if (lastIndex >= 0) {
+                newActiveKey = newPanes[lastIndex].key;
+            } else {
+                newActiveKey = newPanes[0].key;
+            }
+        }
+        setItems(newPanes);
+        setActiveKey(newActiveKey);
+    };
+
+    const onEdit = (targetKey, action) => {
+        if (action === 'add') {
+            add();
+        } else {
+            remove(targetKey);
+        }
+    };
+
+    const renderTabContent = () => {
+        return items.map((item) => (
+            <Tabs.TabPane key={item.key} tab={item.label}>
+                <div className={styles.tabContent}>
+                    <div className={styles.cartContainer}>
+                        <h2>Giỏ hàng</h2>
+                        <Button type='primary'
+                            className={styles.addButton}
+                            onClick={showModal}>Thêm giỏ hàng</Button>
+                    </div>
+                    <div className={styles.separator}></div>
+                    <Table dataSource={data} columns={columns} />
+                    <ModalProduct visible={isModalVisible} onCancel={handleCancel} />
+                </div>
+            </Tabs.TabPane>
+        ));
+    };
+
+    return (
+        <>
+            <Tabs
+                type="editable-card"
+                onChange={onChange}
+                activeKey={activeKey}
+                onEdit={onEdit}
+                className={styles.bill}
+            >
+                {renderTabContent()}
+            </Tabs>
+        </>
+    );
+};
+
+export default Bill;

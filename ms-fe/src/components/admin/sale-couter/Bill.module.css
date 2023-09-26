@@ -65,3 +65,25 @@ btn:hover {
   margin: 0;
   color: #1890ff;
 }
+
+/* Bill.module.css */
+
+.tabContent {
+  position: relative;
+}
+
+.cartContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.addButton {
+  float: right;
+}
+
+.separator {
+  border-bottom: 1px solid black;
+  margin-bottom: 10px;
+}

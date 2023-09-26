@@ -8,11 +8,11 @@ import com.fpoly.ooc.repository.BillDetailRepo;
 import com.fpoly.ooc.repository.BillRepo;
 import com.fpoly.ooc.repository.CartDetailRepo;
 import com.fpoly.ooc.repository.CartRepo;
-import com.fpoly.ooc.request.bill.BillRequest;
+import com.fpoly.ooc.request.bill.BillDetailRequest;
 import com.fpoly.ooc.responce.bill.BillProductResponse;
 import com.fpoly.ooc.responce.bill.BillResponse;
 import com.fpoly.ooc.responce.cart.CartResponse;
-import com.fpoly.ooc.service.interfaces.BillService;
+import com.fpoly.ooc.service.interfaces.BillDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-public class BillDetailServiceImpl implements BillService {
+public class BillDetailServiceImpl implements BillDetailService {
 
     @Autowired
     private BillRepo billRepo;
@@ -43,7 +43,7 @@ public class BillDetailServiceImpl implements BillService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public BillDetail createBill(BillRequest request) {
+    public BillDetail createBill(BillDetailRequest request) {
         Account accountBuilder = null;
         BillDetail billDetail = null;
         BigDecimal totalPrice = new BigDecimal(0);
@@ -85,7 +85,7 @@ public class BillDetailServiceImpl implements BillService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public BillDetail updateBill(Long id, BillRequest request) {
+    public BillDetail updateBill(Long id, BillDetailRequest request) {
         BillDetail billDetail = billDetailRepo.findById(id).orElse(null);
         if (billDetail == null) {
             throw new IllegalArgumentException("bill detail không tồn tại");

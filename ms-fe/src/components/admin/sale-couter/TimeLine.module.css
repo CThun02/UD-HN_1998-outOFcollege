@@ -1,6 +1,43 @@
-.backgroud {
+.background {
   padding: 50px;
-  min-height: 200px;
+  /* min-height: 00px; */
   height: auto;
   background-color: #ffffff;
+}
+
+.blackDivider {
+  background-color: black;
+  height: 1px;
+}
+
+.span {
+  font-size: 16px;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.timeLineEnd {
+  margin-top: 20px;
+  display: flex;
+  /* justify-content: left; */
+  margin-left: 700px;
+}
+
+/* YourComponent.css */
+
+.btnWarning {
+  margin-left: 800px;
+  background-color: #f0ad4e;
+  color: #fff;
+  border-color: #eea236;
+  border: none;
+}
+
+.btnWarning:hover,
+.btnWarning:focus {
+  background-color: #ec971f;
+  border-color: #eea236;
+  border: none;
+  color: #fff !important;
+  opacity: 1 !important;
 }

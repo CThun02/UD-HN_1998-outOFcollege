@@ -70,6 +70,7 @@ btn:hover {
 
 .tabContent {
   position: relative;
+  border-bottom: 10px solid #f9fbfd;
 }
 
 .cartContainer {
@@ -86,4 +87,29 @@ btn:hover {
 .separator {
   border-bottom: 1px solid black;
   margin-bottom: 10px;
+}
+
+.lstAccount {
+  background-color: #ffffff;
+  min-height: 100px;
+  height: auto;
+  padding: 20px;
+  margin: 20px 0;
+  border-bottom: 10px solid #f9fbfd;
+}
+
+.blackDivider {
+  background-color: black;
+  height: 1px;
+}
+
+.input {
+  border: none;
+  border-bottom: 1px solid black;
+  outline: none;
+}
+
+.input:focus {
+  border: none;
+  border-bottom: 1px solid black;
 }

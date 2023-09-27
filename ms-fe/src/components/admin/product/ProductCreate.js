@@ -1,7 +1,7 @@
 import { CloseOutlined, PlusOutlined } from "@ant-design/icons";
 import { Col, Row, Form, Input, Select, Button, message, Space } from "antd";
 import TextArea from "antd/es/input/TextArea";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styles from "./ProductCreate.module.css";
 import { closeFrame } from "../animations/animation";
 import { isString } from "antd/es/button";
@@ -12,13 +12,13 @@ const ProductCreate = (props) => {
   const api = "http://localhost:8080/api/admin/";
   const [messageApi, contextHolder] = message.useMessage();
   const formRef = useRef();
-  const brands = props.brands;
+  const [brands, setBrands] = useState([]);
   const [brandCreate, setBrandCreate] = useState("");
-  const categories = props.categories;
+  const [categories, setCategories] = useState([]);
   const [categoryCreate, setCategoryCreate] = useState("");
-  const forms = props.forms;
+  const [forms, setForms] = useState([]);
   const [formCreate, setFormCreate] = useState("");
-  const patterns = props.patterns;
+  const [patterns, setPatterns] = useState([]);
   const [patternCreate, setPatternCreate] = useState("");
   const renderIndex = props.render;
   const [product, setProduct] = useState({
@@ -186,6 +186,41 @@ const ProductCreate = (props) => {
       messageApi.error("Vui lòng nhập đầy đủ các trường");
     }
   }
+
+  useEffect(() => {
+    axios
+      .get(api + "brand")
+      .then((res) => {
+        setBrands(res.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    axios
+      .get(api + "category")
+      .then((res) => {
+        setCategories(res.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    axios
+      .get(api + "pattern")
+      .then((res) => {
+        setPatterns(res.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    axios
+      .get(api + "form")
+      .then((res) => {
+        setForms(res.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []);
 
   return (
     <div id="productCreate" className={`${styles.product__create} d-none`}>

@@ -45,6 +45,11 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
     }
 
     @Override
+    public List<ProductDetail> getAll() {
+        return repo.findAll();
+    }
+
+    @Override
     public List<ProductDetailResponse> getProductDetailsByIdProduct(Long idPro) {
         return repo.getProductDetailsByIdProduct(idPro);
     }
@@ -77,5 +82,10 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
     public ProductDetailResponse getOneByIdCom(Long productId, Long idButton, Long idMaterial, Long idShirtTail, Long idSleeve, Long idCollar, Long idColor, Long idSize) {
         return repo.getOneByIdCom(productId, idButton, idMaterial, idShirtTail,
                 idSleeve,  idCollar, idColor, idSize);
+    }
+
+    @Override
+    public List<ProductDetailResponse> filterProductDetailsByIdCom(Long productId, Long idButton, Long idMaterial, Long idShirtTail, Long idSleeve, Long idCollar, Long idColor, Long idSize) {
+        return repo.filterProductDetailsByIdCom(productId, idButton, idMaterial, idShirtTail, idSleeve, idCollar, idColor, idSize);
     }
 }

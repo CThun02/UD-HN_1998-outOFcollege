@@ -7,9 +7,6 @@ import com.fpoly.ooc.responce.product.ProductTableResponse;
 import com.fpoly.ooc.service.interfaces.ProductServiceI;
 import com.fpoly.ooc.utilities.UniqueRandomHex;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -72,9 +69,8 @@ public class ProductServiceImpl implements ProductServiceI {
     }
 
     @Override
-    public Page<ProductTableResponse> getProductsTable(int pageNumber, String status1, String status2) {
-        Pageable pageable = PageRequest.of(pageNumber, 5);
-        return repo.getProductsTable(pageable, status1, status2);
+    public List<ProductTableResponse> getProductsTable(String status1, String status2) {
+        return repo.getProductsTable(status1, status2);
     }
 
     @Override

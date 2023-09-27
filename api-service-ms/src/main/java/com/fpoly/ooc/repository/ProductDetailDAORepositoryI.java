@@ -53,4 +53,17 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
             " and pd.sleeve.id = ?5 and pd.collar.id = ?6 and pd.color.id=?7 and pd.size.id=?8")
     public ProductDetailResponse getOneByIdCom
             (Long productId, Long idButton, Long idMaterial, Long idShirtTail, Long idSleeve, Long idCollar, Long idColor, Long idSize);
+
+    @Query("SELECT pd.id AS id, pd.product AS product, pd.button AS button" +
+            ", pd.material AS material, pd.collar AS collar, pd.sleeve AS sleeve" +
+            ", pd.size AS size, pd.color AS color, pd.shirtTail AS shirtTail" +
+            ", pd.price AS price, pd.quantity AS quantity, pd.descriptionDetail AS descriptionDetail" +
+            " FROM ProductDetail pd WHERE (pd.product.id = ?1 OR ?1 IS NULL) " +
+            "AND (pd.button.id = ?2 OR ?2 IS NULL) AND (pd.material.id = ?3 OR ?3 IS NULL) " +
+            "AND (pd.shirtTail.id = ?4 OR ?4 IS NULL) AND (pd.sleeve.id = ?5 OR ?5 IS NULL) " +
+            "AND (pd.collar.id = ?6 OR ?6 IS NULL) AND (pd.color.id = ?7 OR ?7 IS NULL) " +
+            "AND (pd.size.id = ?8 OR ?8 IS NULL)")
+    public List<ProductDetailResponse> filterProductDetailsByIdCom(Long productId, Long idButton, Long idMaterial,
+                                                                   Long idShirtTail, Long idSleeve, Long idCollar,
+                                                                   Long idColor, Long idSize);
 }

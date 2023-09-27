@@ -1,48 +1,45 @@
 package com.fpoly.ooc.request.product;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fpoly.ooc.entity.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-
 
 @Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public class ProductDetailRequest {
+    @JsonProperty("id")
     private Long id;
+    @JsonProperty("productId")
     private Long productId;
-    private Long patternId;
+    @JsonProperty("buttonId")
     private Long buttonId;
+    @JsonProperty("materialId")
     private Long materialId;
+    @JsonProperty("collarId")
     private Long collarId;
+    @JsonProperty("sleeveId")
     private Long sleeveId;
+    @JsonProperty("sizeId")
     private Long sizeId;
-    private String colorId;
-    private Long formId;
+    @JsonProperty("colorId")
+    private Long colorId;
+    @JsonProperty("shirtTailId")
     private Long shirtTailId;
+    @JsonProperty("price")
     private BigDecimal price;
+    @JsonProperty("quantity")
     private Integer quantity;
+    @JsonProperty("descriptionDetail")
     private String descriptionDetail;
-    private Boolean status;
-    private LocalDateTime createdAt;
-    private String createdBy;
 
     public ProductDetail dto(){
-        Size size = sizeId==null?null:Size.builder().id(sizeId).build();
-        Color color = sizeId==null?null:Color.builder().id(colorId).build();
-        ProductDetail productDetail= new ProductDetail(id, Product.builder().id(productId).build(), Pattern.builder().id(patternId).build(),
-                ButtonType.builder().id(buttonId).build(), Material.builder().id(materialId).build(), CollarType.builder().id(collarId).build(),
-                SleeveType.builder().id(sleeveId).build(), size, color,
-                Form.builder().id(formId).build(), ShirtTailType.builder().id(shirtTailId).build(), price, quantity,
-                descriptionDetail, status==null?"Active":status==true?"Active":"InActive", null);
-        productDetail.setCreatedAt(createdAt);
-        productDetail.setCreatedBy(createdBy);
+        ProductDetail productDetail = ProductDetail.builder().id(id).product(Product.builder().id(productId).build())
+                .button(ButtonType.builder().id(buttonId).build()).material(Material.builder().id(materialId).build())
+                .collar(CollarType.builder().id(collarId).build()).sleeve(SleeveType.builder().id(sleeveId).build())
+                .shirtTail(ShirtTailType.builder().id(shirtTailId).build()).size(Size.builder().id(sizeId).build())
+                .color(Color.builder().id(colorId).build()).color(Color.builder().id(colorId).build()).price(price)
+                .quantity(quantity).descriptionDetail(descriptionDetail).build();
         return productDetail;
     }
 }

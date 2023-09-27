@@ -1,5 +1,6 @@
 package com.fpoly.ooc.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fpoly.ooc.constant.Const;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
@@ -21,36 +22,38 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 public abstract class BaseEntity implements Serializable {
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", updatable = false)
     @CreatedDate
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     protected LocalDateTime createdAt;
 
-    @Column(name = "created_by")
+    @Column(name = "created_by", updatable = false)
     @CreatedBy
     protected String createdBy;
 
-    @Column(name = "updated_at")
+    @Column(name = "updated_at", insertable = false)
     @LastModifiedDate
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     protected LocalDateTime updatedAt;
 
-    @Column(name = "updated_by")
+    @Column(name = "updated_by", insertable = false)
     @LastModifiedBy
     protected String updatedBy;
 
     @Column(name = "deleted_at")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     protected LocalDateTime deletedAt;
 
     @Column(name = "status")
-    protected String status;
+    protected String status = Const.STATUS_ACTIVE;
 
     @PrePersist
-    protected void onCreate() {
-        this.status = Const.STATUS_ACTIVE;
+    protected void prePersist() {
         this.createdAt = LocalDateTime.now();
     }
 
     @PreUpdate
-    protected void onUpdate() {
+    protected void preUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
 

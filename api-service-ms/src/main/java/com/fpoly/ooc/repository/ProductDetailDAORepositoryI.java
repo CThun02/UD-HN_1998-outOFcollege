@@ -1,72 +1,56 @@
 package com.fpoly.ooc.repository;
 
+import com.fpoly.ooc.entity.Color;
 import com.fpoly.ooc.entity.ProductDetail;
-import com.fpoly.ooc.entity.Size;
-import com.fpoly.ooc.responce.product.ProductDetailColorResponse;
 import com.fpoly.ooc.responce.product.ProductDetailResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
 import java.util.List;
 
 @Repository
 public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail, Long> {
-    @Query("select new com.fpoly.ooc.responce.product.ProductDetailResponse(" +
-            "pd.id, pd.product, pd.pattern, pd.button, pd.material, pd.collar, " +
-            "pd.sleeve, s, c, pd.form, pd.shirtTail, pd.price, " +
-            "pd.quantity, pd.descriptionDetail, pd.status, pd.createdAt, pd.createdBy, " +
-            "pd.updatedAt, pd.updatedBy, pd.deletedAt) " +
-            "from ProductDetail pd " +
-            "left join Color  c on pd.color.id = c.id " +
-            "left join Size s on s.id = pd.size.id where pd.product.id=?1 and pd.color is null and pd.size is null" )
-    public ProductDetailResponse getProductDetail(Long id);
+    @Query("select pd.id as id, pd.product as product, pd.button as button, pd.material as material" +
+            ", pd.collar as collar, pd.sleeve as sleeve, pd.size as size, pd.color as color" +
+            ", pd.shirtTail as shirtTail, pd.price as price, pd.quantity as quantity," +
+            "pd.descriptionDetail as descriptionDetail from ProductDetail pd where  pd.product.id=?1")
+    public List<ProductDetailResponse> getProductDetailsByIdProduct(Long idPro);
 
-    @Query("select new com.fpoly.ooc.responce.product.ProductDetailResponse(" +
-            "pd.id, pd.product, pd.pattern, pd.button, pd.material, pd.collar, " +
-            "pd.sleeve, pd.size, pd.color, pd.form, pd.shirtTail, pd.price, " +
-            "pd.quantity, pd.descriptionDetail, pd.status, pd.createdAt, pd.createdBy, " +
-            "pd.updatedAt, pd.updatedBy, pd.deletedAt) " +
-            "from ProductDetail pd  where pd.id=?1 and pd.status=?2" )
-    public ProductDetailResponse getProductDetailByStatus(Long id, String status);
+    @Query("select distinct pd.product as product, pd.button as button, pd.material as material, pd.shirtTail as shirtTail" +
+            ", pd.collar as collar, pd.sleeve as sleeve, pd.descriptionDetail as descriptionDetail from ProductDetail " +
+            "pd where  pd.product.id=?1 and pd.status=?2")
+    public List<ProductDetailResponse> getProductDetailsTableByIdProduct(Long idPro, String status);
 
-    @Query("select od.id as productDetailId, od.color.id as colorId, od.quantity as quantity" +
-            ", od.price as price, od.status as status from ProductDetail od where od.product.id = ?1 and od.size.id=?2")
-    public List<ProductDetailColorResponse> getProductDetailColorSizeByIdPAndSizeId(Long id, Long sizeId);
+    @Query("select pd.id as id, pd.product as product, pd.button as button, pd.material as material" +
+            ", pd.collar as collar, pd.sleeve as sleeve, pd.size as size, pd.color as color" +
+            ", pd.shirtTail as shirtTail, pd.price as price, pd.quantity as quantity," +
+            "pd.descriptionDetail as descriptionDetail, pd.status as status from ProductDetail" +
+            " pd where  pd.product.id = ?1 and pd.button.id = ?2 and pd.material.id = ?3 and pd.shirtTail.id = ?4" +
+            " and pd.sleeve.id = ?5 and pd.collar.id = ?6")
+    public List<ProductDetailResponse> getProductDetailsResponseByIdCompo
+            (Long productId, Long idButton, Long idMaterial, Long idShirtTail, Long idSleeve, Long idCollar);
 
-    @Query("select distinct od.size as size from ProductDetail od join Product o on o.id = od.product.id where o.id = ?1 " +
-            "and od.size.id is not null")
-    public List<Size> getSizeIdByProductId(Long id);
+    @Query("select distinct pd.color from ProductDetail pd where  pd.product.id = ?1" +
+            " and pd.button.id = ?2 and pd.material.id = ?3 and pd.shirtTail.id = ?4" +
+            " and pd.sleeve.id = ?5 and pd.collar.id = ?6")
+    public List<Color> getColorsByIdCompoPDAndIdPro
+            (Long productId, Long idButton, Long idMaterial, Long idShirtTail, Long idSleeve, Long idCollar);
 
-    @Query("select new com.fpoly.ooc.responce.product.ProductDetailResponse(" +
-            "pd.id, pd.product, pd.pattern, pd.button, pd.material, pd.collar, " +
-            "pd.sleeve, s, c, pd.form, pd.shirtTail, pd.price, " +
-            "pd.quantity, pd.descriptionDetail, pd.status, pd.createdAt, pd.createdBy, " +
-            "pd.updatedAt, pd.updatedBy, pd.deletedAt) " +
-            "from ProductDetail pd " +
-            "left join Color  c on pd.color.id = c.id " +
-            "left join Size s on s.id = pd.size.id where pd.color is not null and pd.size is not null" )
-    public List<ProductDetailResponse> getAllProductDetail();
+    @Query("select pd.id as id, pd.product as product, pd.button as button, pd.material as material" +
+            ", pd.collar as collar, pd.sleeve as sleeve, pd.size as size, pd.color as color" +
+            ", pd.shirtTail as shirtTail, pd.price as price, pd.quantity as quantity" +
+            ", pd.descriptionDetail as descriptionDetail, pd.status as status from ProductDetail pd where  pd.product.id = ?1" +
+            " and pd.button.id = ?2 and pd.material.id = ?3 and pd.shirtTail.id = ?4" +
+            " and pd.sleeve.id = ?5 and pd.collar.id = ?6 and pd.color.id=?7")
+    public List<ProductDetailResponse> getSizesPDByIdCompoPDAndIdPro
+            (Long productId, Long idButton, Long idMaterial, Long idShirtTail, Long idSleeve, Long idCollar, Long idColor);
 
-    @Query("select new com.fpoly.ooc.responce.product.ProductDetailResponse(" +
-            "pd.id, pd.product, pd.pattern, pd.button, pd.material, pd.collar, " +
-            "pd.sleeve, s, c, pd.form, pd.shirtTail, pd.price, " +
-            "pd.quantity, pd.descriptionDetail, pd.status, pd.createdAt, pd.createdBy, " +
-            "pd.updatedAt, pd.updatedBy, pd.deletedAt) " +
-            "from ProductDetail pd " +
-            "left join Color  c on pd.color.id = c.id " +
-            "left join Size s on s.id = pd.size.id " +
-            "inner join DiscountProduct  dp on dp.productDetailId.id = pd.id " +
-            "inner join Discount d on d.id = dp.discountId.id " +
-            "where pd.color is not null " +
-            "and pd.size is not null " +
-            "and d = :idDiscount" )
-    List<ProductDetailResponse> findProductDetailByIdDiscount(@Param("idDiscount") Long idDiscount);
-
-    @Query("select od from ProductDetail od where od.product.id=?1 and od.size.id is not null and od.color.id is not null")
-    public List<ProductDetail> getProductDetailByIdPro(Long id);
-
-//    List<ProductDetailResponse> findAllProductDetail();
-
+    @Query("select pd.id as id, pd.product as product, pd.button as button, pd.material as material" +
+            ", pd.collar as collar, pd.sleeve as sleeve, pd.size as size, pd.color as color"+
+            ", pd.shirtTail as shirtTail, pd.price as price, pd.quantity as quantity," +
+            "pd.descriptionDetail as descriptionDetail from ProductDetail pd where  pd.product.id = ?1"+
+            " and pd.button.id = ?2 and pd.material.id = ?3 and pd.shirtTail.id = ?4" +
+            " and pd.sleeve.id = ?5 and pd.collar.id = ?6 and pd.color.id=?7 and pd.size.id=?8")
+    public ProductDetailResponse getOneByIdCom
+            (Long productId, Long idButton, Long idMaterial, Long idShirtTail, Long idSleeve, Long idCollar, Long idColor, Long idSize);
 }

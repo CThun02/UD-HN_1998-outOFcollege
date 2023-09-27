@@ -16,7 +16,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.util.Date;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -25,7 +24,7 @@ import java.util.Date;
 @Builder
 @Entity
 @Table(name = "bill_detail")
-public class BillDetail extends BaseEntity{
+public class BillDetail extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,6 +39,9 @@ public class BillDetail extends BaseEntity{
 
     @Column(name = "note")
     private String note;
+
+    @Column(name = "status")
+    private String status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bill_id", referencedColumnName = "id")

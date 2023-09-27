@@ -1,16 +1,19 @@
 package com.fpoly.ooc.responce.product;
 
-import java.time.LocalDateTime;
+import com.fpoly.ooc.entity.Brand;
+import com.fpoly.ooc.entity.Category;
+import com.fpoly.ooc.entity.Form;
+import com.fpoly.ooc.entity.Pattern;
 
 public interface ProductResponse {
-    Long getId();
-    Long getBrandId();
-    Long getCategoryId();
-    String getProductCode();
-    String getProductName();
-    String getDescription();
-    String getImgDefault();
-    String getStatus();
-    LocalDateTime getCreatedAt();
-    String getCreatedBy();
+    public Long getId();
+    public String getProductCode();
+    public String getProductName();
+    public String getDescription();
+    public String getImgDefault();
+    public Category getCategory();
+    public Brand getBrand();
+    public Pattern getPattern();
+    public Form getForm();
+    public String getStatus();
 }

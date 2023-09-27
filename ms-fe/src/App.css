@@ -4,7 +4,15 @@
 
 /* content height, margin-top */
 .content {
-  margin-top: 70px;
-  height: calc(100vh - 70px);
+  padding: 95px 25px 25px 25px;
+  height: 100vh;
   overflow: auto;
+}
+
+.d-none {
+  display: none !important;
+}
+
+.m-5 {
+  margin: 5px 5px;
 }

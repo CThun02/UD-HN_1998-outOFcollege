@@ -1,5 +1,6 @@
 package com.fpoly.ooc.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,44 +25,44 @@ public class ProductDetail extends BaseEntity{
     @Column(name = "id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Product product;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "pattern_id")
-    private Pattern pattern;
-
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "button_id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private ButtonType button;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "material_id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Material material;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "collar_id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private CollarType collar;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sleeve_id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private SleeveType sleeve;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "size_id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Size size;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "color_id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Color color;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "form_id")
-    private Form form;
-
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "shirt_tail_id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private ShirtTailType shirtTail;
 
     @Column(name = "price")

@@ -1,38 +1,38 @@
 package com.fpoly.ooc.request.product;
 
-import com.fpoly.ooc.entity.BaseEntity;
-import com.fpoly.ooc.entity.Brand;
-import com.fpoly.ooc.entity.Category;
-import com.fpoly.ooc.entity.Product;
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fpoly.ooc.entity.*;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.time.LocalDateTime;
-
 
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class ProductRequest {
+public class ProductRequest{
+    @JsonProperty("id")
     private Long id;
-    private Long brandId;
-    private Long categoryId;
-    private String productCode;
+    @JsonProperty("productName")
     private String productName;
+    @JsonProperty("productCode")
+    private String productCode;
+    @JsonProperty("brandId")
+    private Long brandId;
+    @JsonProperty("categoryId")
+    private Long categoryId;
+    @JsonProperty("formId")
+    private Long formId;
+    @JsonProperty("patternId")
+    private Long patternId;
+    @JsonProperty("description")
     private String description;
-    private Boolean status;
-    private LocalDateTime createdAt;
-    private String imgDefault;
-    private String createdBy;
+    @JsonProperty("status")
+    private String status;
 
     public Product dto(){
-        Product product = new Product(id, productCode, productName, description, status==null?"Active":status==true?"Active":"InActive",
-                imgDefault,Category.builder().id(categoryId).build(), Brand.builder().id(brandId).build());
-        product.setCreatedAt(createdAt);
-        product.setCreatedBy(createdBy);
+        Product product = Product.builder().id(id).productCode(productCode).productName(productName)
+                .brand(Brand.builder().id(brandId).build()).form(Form.builder().id(formId).build())
+                .category(Category.builder().id(categoryId).build()).pattern(Pattern.builder().id(patternId).build())
+                .description(description).build();
+        product.setStatus(status);
         return product;
     }
 }

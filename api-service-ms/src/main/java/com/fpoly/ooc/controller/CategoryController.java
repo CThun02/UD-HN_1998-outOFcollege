@@ -11,14 +11,14 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
+@RequestMapping("/api/admin/category")
 @CrossOrigin("*")
-@RequestMapping("/admin/api/category")
 public class CategoryController {
     @Autowired
     private CategoryServiceI service;
 
-    @GetMapping("/data")
-    public List<Category> getBrands(){
-        return service.getAll();
+    @GetMapping("")
+    public List<Category> data(){
+        return service.findAll();
     }
 }

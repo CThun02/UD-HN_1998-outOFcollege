@@ -11,14 +11,14 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
+@RequestMapping("/api/admin/pattern")
 @CrossOrigin("*")
-@RequestMapping("/admin/api/pattern")
 public class PatternController {
     @Autowired
     private PatternServiceI service;
 
-    @GetMapping("/data")
-    public List<Pattern> getBrands(){
-        return service.getAll();
+    @GetMapping("")
+    public List<Pattern> data(){
+        return service.findAll();
     }
 }

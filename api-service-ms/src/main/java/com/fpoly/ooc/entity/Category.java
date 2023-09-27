@@ -12,7 +12,7 @@ import java.util.Date;
 @Builder
 @Table(name = "category")
 @Entity
-public class Category extends BaseEntity{
+public class Category extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -21,6 +21,4 @@ public class Category extends BaseEntity{
     @Column(name = "category_name")
     private String categoryName;
 
-    @Column(name = "status")
-    private String status;
 }

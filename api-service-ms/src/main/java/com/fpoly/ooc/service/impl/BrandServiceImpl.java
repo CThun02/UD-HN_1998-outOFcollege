@@ -1,19 +1,17 @@
 package com.fpoly.ooc.service.impl;
 
 import com.fpoly.ooc.entity.Brand;
-import com.fpoly.ooc.repository.BrandDAORepositoryI;
+import com.fpoly.ooc.repository.BrandDAORepository;
 import com.fpoly.ooc.service.interfaces.BrandServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class BrandServiceImpl implements BrandServiceI {
-
     @Autowired
-    private BrandDAORepositoryI repo;
+    private BrandDAORepository repo;
 
     @Override
     public Brand create(Brand brand) {
@@ -21,33 +19,31 @@ public class BrandServiceImpl implements BrandServiceI {
     }
 
     @Override
-    public Brand update(Brand brand ) {
-        Brand brandcheck = this.getOne(brand.getId());
-        if(brandcheck != null){
-            brandcheck = repo.save(brand);
+    public Brand update(Brand brand) {
+        Brand brandCheck = this.getOne(brand.getId());
+        if(brandCheck==null){
+            return null;
         }
-        return brandcheck;
+        return repo.save(brand);
     }
 
     @Override
     public Boolean delete(Long id) {
-        boolean deleted = false;
-        Brand brand = this.getOne(id);
-        if(brand!=null){
-            repo.delete(brand);
-            deleted = true;
+        Brand brandCheck = this.getOne(id);
+        if(brandCheck==null){
+            return false;
         }
-        return deleted;
+        repo.delete(brandCheck);
+        return true;
     }
 
     @Override
-    public List<Brand> getAll() {
+    public List<Brand> findAll() {
         return repo.findAll();
     }
 
     @Override
     public Brand getOne(Long id) {
-        Optional<Brand> brandOptional = repo.findById(id);
-        return brandOptional.orElse(null);
+        return repo.findById(id).orElse(null);
     }
 }

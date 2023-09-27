@@ -1,20 +1,30 @@
 package com.fpoly.ooc.service.impl;
 
 import com.fpoly.ooc.constant.Const;
-import com.fpoly.ooc.constant.ExceptionResponse;
+import com.fpoly.ooc.constant.ErrorCodeConfig;
+import com.fpoly.ooc.dto.VoucherConditionDTO;
 import com.fpoly.ooc.entity.Voucher;
-import com.fpoly.ooc.exception.CustomNotFoundException;
-import com.fpoly.ooc.repository.interfaces.VoucherRepository;
+import com.fpoly.ooc.exception.NotFoundException;
+import com.fpoly.ooc.repository.VoucherRepository;
 import com.fpoly.ooc.request.voucher.VoucherRequest;
 import com.fpoly.ooc.responce.voucher.VoucherResponse;
 import com.fpoly.ooc.service.interfaces.VoucherService;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class VoucherServiceImpl implements VoucherService {
@@ -23,62 +33,197 @@ public class VoucherServiceImpl implements VoucherService {
     private VoucherRepository voucherRepository;
 
     @Override
-    public List<VoucherResponse> findAllVoucher() {
-        return voucherRepository.findAllVoucher();
-    }
+    public Page<VoucherResponse> findAllVoucher(Pageable pageable, VoucherConditionDTO voucherConditionDTO) {
 
-    @Override
-    public Page<VoucherResponse> pageAllVoucher(Pageable pageable) {
-        return voucherRepository.pageAllVoucher(pageable);
+        String status = Objects.isNull(voucherConditionDTO.getStatus()) ?
+                null : voucherConditionDTO.getStatus().equals("ALL") ?
+                null : voucherConditionDTO.getStatus();
+
+        System.out.println("status: " + status);
+
+        return page(
+                voucherRepository.findAllVoucher(
+                        Objects.isNull(voucherConditionDTO.getVoucherCodeOrName()) ? null : "%" + voucherConditionDTO.getVoucherCodeOrName() + "%",
+                        Objects.isNull(voucherConditionDTO.getStartDate()) ? null : voucherConditionDTO.getStartDate(),
+                        Objects.isNull(voucherConditionDTO.getEndDate()) ? null : voucherConditionDTO.getEndDate(),
+                        status
+                ), pageable);
     }
 
     @Override
     public Voucher saveOrUpdate(VoucherRequest voucherRequest) {
-
-        Voucher voucher = Voucher.builder()
-                .id(voucherRequest.getId())
-                .voucherCode(voucherRequest.getVoucherCode())
-                .voucherName(voucherRequest.getVoucherName())
-                .startDate(voucherRequest.getStartDate())
-                .endDate(voucherRequest.getEndDate())
-                .voucherValue(voucherRequest.getVoucherValue())
-                .voucherValueMax(voucherRequest.getVoucherValueMax())
-                .voucherMethod(voucherRequest.getVoucherMethod())
-                .voucherCondition(voucherRequest.getVoucherCondition())
-                .limitQuantity(voucherRequest.getLimitQuantity())
-                .permission(voucherRequest.getPermission())
-                .build();
+        Voucher voucher = convertVoucherRequest(voucherRequest);
 
         return voucherRepository.save(voucher);
     }
 
     @Override
-    public VoucherRequest findVoucherById(Long id) {
+    public Voucher updateStatus(String code) {
+        Optional<Voucher> voucherOptional = voucherRepository.findVoucherByVoucherCode(code);
 
-        Optional<Voucher> voucherOptional = voucherRepository.findById(id);
-        Voucher voucher = null;
-
-        if (voucherOptional.isPresent()) {
-            throw new CustomNotFoundException("NOT FOUND EXCEPTION");
+        if (voucherOptional.isEmpty()) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.CODE_NOT_FOUND));
         } else {
-            voucher = voucherOptional.get();
+            voucherOptional.get().setStatus(Const.STATUS_INACTIVE);
+            voucherOptional.get().setDeletedAt(LocalDateTime.now());
+
+            return voucherRepository.save(voucherOptional.get());
         }
+
+    }
+
+    @Override
+    public VoucherRequest findVoucherRequestById(Long id) {
+        Voucher voucher = findVoucherById(id);
+
         return VoucherRequest.builder()
-                .id(voucher.getId())
+                .voucherId(voucher.getId())
                 .voucherCode(voucher.getVoucherCode())
                 .voucherName(voucher.getVoucherName())
-                .startDate(voucher.getStartDate())
-                .endDate(voucher.getEndDate())
+                .voucherMethod(voucher.getVoucherMethod())
                 .voucherValue(voucher.getVoucherValue())
                 .voucherValueMax(voucher.getVoucherValueMax())
-                .voucherCondition(voucher.getVoucherCondition())
                 .limitQuantity(voucher.getLimitQuantity())
-                .permission(voucher.getPermission())
+                .voucherCondition(voucher.getVoucherCondition())
+                .startDate(voucher.getStartDate())
+                .endDate(voucher.getEndDate())
+                .status(voucher.getStatus())
                 .build();
     }
 
     @Override
-    public void delete(Long id) {
-        voucherRepository.deleteById(id);
+    public Voucher findVoucherById(Long id) {
+//        Optional<Voucher> voucherRequestOptional = voucherRepository.findById(id);
+//
+//        if(voucherRequestOptional.isPresent()) {
+//            return voucherRequestOptional.get();
+//        } else {
+//            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND));
+//        }
+
+        return null;
     }
+
+    @Override
+    public VoucherRequest findByVoucherCode(String code) {
+        Optional<Voucher> voucherOptional = voucherRepository.findVoucherByVoucherCode(code);
+
+        if (voucherOptional.isEmpty()) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.CODE_NOT_FOUND));
+        } else {
+            return convertVoucher(voucherOptional.get());
+        }
+    }
+
+    private VoucherRequest convertVoucher(Voucher voucher) {
+
+        return VoucherRequest.builder()
+                .voucherId(voucher.getId())
+                .voucherCode(voucher.getVoucherCode())
+                .voucherName(voucher.getVoucherName())
+                .voucherMethod(voucher.getVoucherMethod())
+                .voucherValue(voucher.getVoucherValue())
+                .voucherValueMax(voucher.getVoucherValueMax())
+                .limitQuantity(voucher.getLimitQuantity())
+                .voucherCondition(voucher.getVoucherCondition())
+                .startDate(voucher.getStartDate())
+                .endDate(voucher.getEndDate())
+                .status(voucher.getStatus())
+                .build();
+    }
+
+    private Voucher convertVoucherRequest(VoucherRequest request) {
+
+        if (!request.getVoucherName().equalsIgnoreCase(request.getVoucherNameCurrent())) {
+            Optional<Voucher> voucherOptional =
+                    voucherRepository.findVoucherByVoucherName(request.getVoucherName());
+
+            if (voucherOptional.isPresent()) {
+                throw new NotFoundException(ErrorCodeConfig.getMessage(Const.VOUCHER_NAME_ALREADY_EXISTS), "voucherName");
+            }
+        }
+
+        Voucher voucher = new Voucher();
+
+        switch (request.getStatus()) {
+            case "", "UPCOMING":
+                if (request.getStartDate().isBefore(request.getEndDate())
+                        && request.getStartDate().isAfter(LocalDateTime.now())) {
+                    voucher.setStatus(Const.STATUS_UPCOMING);
+                } else {
+                    if (request.getStartDate().isBefore(LocalDateTime.now())) {
+                        throw new NotFoundException(ErrorCodeConfig.getMessage(Const.START_DATE_LESS_DATE_NOW), "startDate");
+                    }
+                    throw new NotFoundException(ErrorCodeConfig.getMessage(Const.END_DATE_LESS_START_DATE), "endDate");
+                }
+                break;
+            case "ACTIVE":
+                if (request.getStartDate().isBefore(request.getEndDate())) {
+                    voucher.setStatus(Const.STATUS_ACTIVE);
+                } else {
+                    throw new NotFoundException(ErrorCodeConfig.getMessage(Const.END_DATE_LESS_START_DATE));
+                }
+                voucher.setStatus(request.getStatus());
+                break;
+            case "INACTIVE":
+                break;
+            default:
+                throw new NotFoundException(ErrorCodeConfig.getMessage(Const.STATUS_INVALID));
+        }
+
+        if (request.getVoucherMethod().equals("%")) {
+            if (request.getVoucherValue().compareTo(BigDecimal.valueOf(100l)) == 1) {
+                throw new NotFoundException(ErrorCodeConfig.getMessage(Const.VOUCHER_VALUE_LESS_100_PERCENT), "voucherValueMax");
+            }
+        }
+
+        if (request.getLimitQuantity() < 0) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.LIMIT_QUANTITY_LESS_ZERO), "limitQuantity");
+        }
+
+        if (request.getVoucherCondition().compareTo(BigDecimal.valueOf(0l)) == -1) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.VOUCHER_CONDITION_LESS_ZERO), "voucherCondition");
+        }
+
+        if (StringUtils.isNotBlank(String.valueOf(request.getVoucherId()))
+                && StringUtils.isNotEmpty(String.valueOf(request.getVoucherId()))) {
+            voucher.setId(request.getVoucherId());
+
+        }
+
+        voucher.setVoucherCode(StringUtils.isBlank(voucher.getVoucherCode()) ? generatorCode() : voucher.getVoucherCode());
+        voucher.setVoucherName(request.getVoucherName());
+        voucher.setVoucherMethod(request.getVoucherMethod());
+        voucher.setVoucherValue(request.getVoucherValue());
+        voucher.setVoucherValueMax(request.getVoucherValueMax());
+        voucher.setLimitQuantity(request.getLimitQuantity());
+        voucher.setVoucherCondition(request.getVoucherCondition());
+        voucher.setStartDate(request.getStartDate());
+        voucher.setEndDate(request.getEndDate());
+
+        return voucher;
+    }
+
+    private String generatorCode() {
+        return RandomStringUtils.random(15, true, true).toUpperCase();
+    }
+
+    private Page<VoucherResponse> page(List<VoucherResponse> inputList, Pageable pageable) {
+
+        int pageNo = pageable.getPageNumber();
+        int pageSize = pageable.getPageSize();
+        int startItem = pageNo * pageSize;
+
+        List<VoucherResponse> outputList;
+
+        if (inputList.size() < startItem) {
+            outputList = Collections.emptyList();
+        } else {
+            int toIndex = Math.min(startItem + pageSize, inputList.size());
+            outputList = inputList.subList(startItem, toIndex);
+        }
+
+        return new PageImpl<>(outputList, PageRequest.of(pageNo, pageSize), inputList.size());
+    }
+
 }

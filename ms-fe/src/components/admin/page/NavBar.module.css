@@ -1,0 +1,50 @@
+/* fixed position, width, height, */
+.navBar {
+  position: fixed;
+  width: 83.33333333333334%;
+  z-index: 1;
+  height: 70px;
+  top: 0;
+  right: 0;
+  border-bottom: 1px solid #edf2f9;
+  background-color: white;
+}
+
+/* position content navbar middle */
+.navBar__contentPosition {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-left: 16px;
+  margin-right: 48px;
+}
+
+/* butotn navbar */
+.navBar__button {
+  border: none;
+  box-shadow: none;
+}
+
+.navBar__button:hover {
+  background-color: #e6f4ff;
+}
+
+/* input navbar  */
+.navBar__input {
+  border-radius: 0;
+  box-shadow: none;
+  border: none;
+}
+
+.navBar__input:focus {
+  box-shadow: none;
+}
+
+/* navbar avatar */
+.navBar__avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #edf2f9;
+}

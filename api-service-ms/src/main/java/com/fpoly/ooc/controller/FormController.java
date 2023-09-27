@@ -11,14 +11,14 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
+@RequestMapping("/api/admin/form")
 @CrossOrigin("*")
-@RequestMapping("/admin/api/form")
 public class FormController {
     @Autowired
     private FormServiceI service;
 
-    @GetMapping("/data")
-    public List<Form> getBrands(){
-        return service.getAll();
+    @GetMapping("")
+    public List<Form> data(){
+        return service.findAll();
     }
 }

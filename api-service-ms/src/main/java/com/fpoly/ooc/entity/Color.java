@@ -15,11 +15,12 @@ import java.util.Date;
 public class Color extends BaseEntity{
     @Id
     @Column(name = "id")
-    private String id;
+    private Long id;
+
+    @Column(name="color_code")
+    private String colorCode;
 
     @Column(name = "color_name")
     private String colorName;
 
-    @Column(name = "status")
-    private String status;
 }

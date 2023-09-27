@@ -8,6 +8,6 @@ public interface PatternServiceI {
     public Pattern create(Pattern pattern);
     public Pattern update(Pattern pattern);
     public Boolean delete(Long id);
-    public List<Pattern> getAll();
+    public List<Pattern> findAll();
     public Pattern getOne(Long id);
 }

@@ -1,19 +1,17 @@
 package com.fpoly.ooc.service.impl;
 
 import com.fpoly.ooc.entity.Category;
-import com.fpoly.ooc.repository.CategoryDAORepositoryI;
+import com.fpoly.ooc.repository.CategoryDAORepository;
 import com.fpoly.ooc.service.interfaces.CategoryServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class CategoryServiceImpl implements CategoryServiceI {
-
     @Autowired
-    private CategoryDAORepositoryI repo;
+    private CategoryDAORepository repo;
 
     @Override
     public Category create(Category category) {
@@ -23,31 +21,29 @@ public class CategoryServiceImpl implements CategoryServiceI {
     @Override
     public Category update(Category category) {
         Category categoryCheck = this.getOne(category.getId());
-        if(categoryCheck != null){
-            categoryCheck = repo.save(category);
+        if(categoryCheck==null){
+            return null;
         }
-        return categoryCheck;
+        return repo.save(category);
     }
 
     @Override
     public Boolean delete(Long id) {
-        boolean deleted = false;
-        Category category = this.getOne(id);
-        if(category!=null){
-            repo.delete(category);
-            deleted = true;
+        Category categoryCheck = this.getOne(id);
+        if(categoryCheck==null){
+            return false;
         }
-        return deleted;
+        repo.delete(categoryCheck);
+        return true;
     }
 
     @Override
-    public List<Category> getAll() {
+    public List<Category> findAll() {
         return repo.findAll();
     }
 
     @Override
     public Category getOne(Long id) {
-        Optional<Category> categoryOptional = repo.findById(id);
-        return categoryOptional.orElse(null);
+        return repo.findById(id).orElse(null);
     }
 }

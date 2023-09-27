@@ -3,8 +3,9 @@ package com.fpoly.ooc.service.impl;
 import com.fpoly.ooc.entity.Product;
 import com.fpoly.ooc.repository.ProductDAORepositoryI;
 import com.fpoly.ooc.responce.product.ProductResponse;
-import com.fpoly.ooc.responce.product.ProductResponseEdit;
+import com.fpoly.ooc.responce.product.ProductTableResponse;
 import com.fpoly.ooc.service.interfaces.ProductServiceI;
+import com.fpoly.ooc.utilities.UniqueRandomHex;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,12 +23,21 @@ public class ProductServiceImpl implements ProductServiceI {
 
     @Override
     public Product create(Product product) {
+        while(true){
+            String productCode= "PRO_"+ UniqueRandomHex.generateUniqueRandomHex();
+            Optional<Product> check = Optional.ofNullable(repo.findFirstByProductCode(productCode));
+            if(check.isEmpty()){
+                product.setProductCode(productCode);
+                break;
+            }
+        };
         return repo.save(product);
     }
 
     @Override
     public Product update(Product product) {
         Product productCheck = this.getOne(product.getId());
+        System.out.println(product.getId());
         if(productCheck != null){
             productCheck = repo.save(product);
         }
@@ -57,13 +67,30 @@ public class ProductServiceImpl implements ProductServiceI {
     }
 
     @Override
-    public Page<ProductResponse> pageIndex(int pageNumber) {
-        Pageable pageable = PageRequest.of(pageNumber, 5);
-        return repo.getProducts(pageable);
+    public Product getOneByCode(String code) {
+        return repo.findFirstByProductCode(code);
     }
 
     @Override
-    public ProductResponseEdit getProductEdit(Long id) {
-        return repo.getProduct(id);
+    public Page<ProductTableResponse> getProductsTable(int pageNumber, String status1, String status2) {
+        Pageable pageable = PageRequest.of(pageNumber, 5);
+        return repo.getProductsTable(pageable, status1, status2);
     }
+
+    @Override
+    public ProductTableResponse getProductEdit(Long id) {
+        return null;
+    }
+
+    @Override
+    public ProductResponse getProductResponseById(Long id) {
+        return repo.getProductResponseById(id);
+    }
+
+    @Override
+    public List<ProductTableResponse> getProductFilterByCom(Long brandId, Long categoryId, Long patternId, Long formId) {
+        return repo.getProductFilterByCom(brandId, categoryId, patternId, formId);
+    }
+
+
 }

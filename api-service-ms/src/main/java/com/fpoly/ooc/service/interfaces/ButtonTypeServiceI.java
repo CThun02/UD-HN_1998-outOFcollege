@@ -8,6 +8,6 @@ public interface ButtonTypeServiceI {
     public ButtonType create(ButtonType buttonType);
     public ButtonType update(ButtonType buttonType);
     public Boolean delete(Long id);
-    public List<ButtonType> getAll();
+    public List<ButtonType> findAll();
     public ButtonType getOne(Long id);
 }

@@ -1,19 +1,17 @@
 package com.fpoly.ooc.service.impl;
 
 import com.fpoly.ooc.entity.Pattern;
-import com.fpoly.ooc.repository.PatternDAORepositoryI;
+import com.fpoly.ooc.repository.PatternDAORepository;
 import com.fpoly.ooc.service.interfaces.PatternServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class PatternServiceImpl implements PatternServiceI {
-
     @Autowired
-    private PatternDAORepositoryI repo;
+    private PatternDAORepository repo;
 
     @Override
     public Pattern create(Pattern pattern) {
@@ -23,31 +21,29 @@ public class PatternServiceImpl implements PatternServiceI {
     @Override
     public Pattern update(Pattern pattern) {
         Pattern patternCheck = this.getOne(pattern.getId());
-        if(patternCheck != null){
-            patternCheck = repo.save(pattern);
+        if(patternCheck==null){
+            return null;
         }
-        return patternCheck;
+        return repo.save(pattern);
     }
 
     @Override
     public Boolean delete(Long id) {
-        boolean deleted = false;
-        Pattern pattern = this.getOne(id);
-        if(pattern!=null){
-            repo.delete(pattern);
-            deleted = true;
+        Pattern patternCheck = this.getOne(id);
+        if(patternCheck==null){
+            return false;
         }
-        return deleted;
+        repo.delete(patternCheck);
+        return true;
     }
 
     @Override
-    public List<Pattern> getAll() {
+    public List<Pattern> findAll() {
         return repo.findAll();
     }
 
     @Override
     public Pattern getOne(Long id) {
-        Optional<Pattern> patternOptional = repo.findById(id);
-        return patternOptional.orElse(null);
+        return repo.findById(id).orElse(null);
     }
 }

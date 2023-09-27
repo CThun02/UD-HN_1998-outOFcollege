@@ -1,22 +1,20 @@
 package com.fpoly.ooc.service.impl;
 
-import com.fpoly.ooc.entity.Product;
+import com.fpoly.ooc.entity.Material;
 import com.fpoly.ooc.entity.ShirtTailType;
-import com.fpoly.ooc.repository.ProductDAORepositoryI;
-import com.fpoly.ooc.repository.ShirtTailTypeDAORepositoryI;
-import com.fpoly.ooc.service.interfaces.ProductServiceI;
+import com.fpoly.ooc.repository.MaterialDAORepository;
+import com.fpoly.ooc.repository.ShirtTailTypeDAORepository;
+import com.fpoly.ooc.service.interfaces.MaterialServiceI;
 import com.fpoly.ooc.service.interfaces.ShirtTailTypeServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ShirtTailTypeServiceImpl implements ShirtTailTypeServiceI {
-
     @Autowired
-    private ShirtTailTypeDAORepositoryI repo;
+    private ShirtTailTypeDAORepository repo;
 
     @Override
     public ShirtTailType create(ShirtTailType shirtTailType) {
@@ -24,33 +22,31 @@ public class ShirtTailTypeServiceImpl implements ShirtTailTypeServiceI {
     }
 
     @Override
-    public ShirtTailType update(ShirtTailType shirtTailType ) {
-        ShirtTailType shirtTailTypeCheck = this.getOne(shirtTailType.getId());
-        if(shirtTailTypeCheck != null){
-            shirtTailTypeCheck = repo.save(shirtTailType);
+    public ShirtTailType update(ShirtTailType shirtTailType) {
+        ShirtTailType brandCheck = this.getOne(shirtTailType.getId());
+        if(brandCheck==null){
+            return null;
         }
-        return shirtTailTypeCheck;
+        return repo.save(shirtTailType);
     }
 
     @Override
     public Boolean delete(Long id) {
-        boolean deleted = false;
-        ShirtTailType shirtTailType = this.getOne(id);
-        if(shirtTailType!=null){
-            repo.delete(shirtTailType);
-            deleted = true;
+        ShirtTailType shirtTailTypeCheck = this.getOne(id);
+        if(shirtTailTypeCheck==null){
+            return false;
         }
-        return deleted;
+        repo.delete(shirtTailTypeCheck);
+        return true;
     }
 
     @Override
-    public List<ShirtTailType> getAll() {
+    public List<ShirtTailType> findAll() {
         return repo.findAll();
     }
 
     @Override
     public ShirtTailType getOne(Long id) {
-        Optional<ShirtTailType> shirtTailTypeOptional = repo.findById(id);
-        return shirtTailTypeOptional.orElse(null);
+        return repo.findById(id).orElse(null);
     }
 }

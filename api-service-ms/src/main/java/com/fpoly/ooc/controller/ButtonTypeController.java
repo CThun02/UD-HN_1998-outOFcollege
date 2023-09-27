@@ -11,14 +11,14 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
+@RequestMapping("/api/admin/button")
 @CrossOrigin("*")
-@RequestMapping("/admin/api/buttontype")
 public class ButtonTypeController {
     @Autowired
     private ButtonTypeServiceI service;
 
-    @GetMapping("/data")
-    public List<ButtonType> getBrands(){
-        return service.getAll();
+    @GetMapping("")
+    public List<ButtonType> data(){
+        return service.findAll();
     }
 }

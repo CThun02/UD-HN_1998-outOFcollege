@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,6 +14,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "role")
@@ -21,7 +23,7 @@ import java.util.Date;
 @Getter
 @Setter
 @Builder
-public class Role {
+public class Role extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,21 +33,8 @@ public class Role {
     @Column(name = "role_name")
     private String roleName;
 
-    @Column(name = "status")
-    private String status;
+    @OneToMany(mappedBy = "role")
+    private List<Account> accountList;
 
-    @Column(name = "created_at")
-    private Date createAt;
 
-    @Column(name = "updated_at")
-    private Date updayteAt;
-
-    @Column(name = "created_by")
-    private String createBy;
-
-    @Column(name = "updated_by")
-    private String updateBy;
-
-    @Column(name = "deleted_at")
-    private Date deleteAt;
 }

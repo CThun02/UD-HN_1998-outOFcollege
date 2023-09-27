@@ -1,5 +1,6 @@
 package com.fpoly.ooc.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -15,6 +16,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "account")
@@ -23,15 +25,14 @@ import java.util.Date;
 @Getter
 @Setter
 @Builder
-public class Account {
+public class Account extends BaseEntity{
 
     @Id
     @Column(name = "username")
-    private String userName;
+    private String username;
 
     @Column(name = "full_name")
     private String fullName;
-
 
     @Column(name = "dob")
     private Date dob;
@@ -45,35 +46,24 @@ public class Account {
     @Column(name = "email")
     private String email;
 
+    @Column(name = "id_no")
+    private String idNo;
+
     @Column(name = "avatar")
     private String avatar;
 
     @Column(name = "password")
     private String password;
 
-    @Column(name = "status")
-    private String status;
-
-    @Column(name = "created_at")
-    private Date createAt;
-
-    @Column(name = "updated_at")
-    private Date updayteAt;
-
-    @Column(name = "created_by")
-    private String createBy;
-
-    @Column(name = "updated_by")
-    private String updateBy;
-
-    @Column(name = "deleted_at")
-    private Date deleteAt;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id", referencedColumnName = "id")
     private Role role;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "account_id", referencedColumnName = "id")
-    private AddressDetail addressDetail;
+    @OneToMany(mappedBy = "accountAddress")
+    private List<AddressDetail> addressDetail;
+
+    // mapping
+    @OneToMany(mappedBy = "accountVoucher")
+    private List<VoucherAccount> voucherAccounts;
+
 }

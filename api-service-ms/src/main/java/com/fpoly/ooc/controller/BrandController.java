@@ -11,14 +11,14 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
+@RequestMapping("/api/admin/brand")
 @CrossOrigin("*")
-@RequestMapping("/admin/api/brand")
 public class BrandController {
     @Autowired
     private BrandServiceI service;
 
-    @GetMapping("/data")
-    public List<Brand> getBrands(){
-        return service.getAll();
+    @GetMapping("")
+    public List<Brand> data(){
+        return service.findAll();
     }
 }

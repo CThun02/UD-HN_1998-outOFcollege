@@ -21,6 +21,4 @@ public class ButtonType extends BaseEntity{
     @Column(name = "button_name")
     private String buttonName;
 
-    @Column(name = "status")
-    private String status;
 }

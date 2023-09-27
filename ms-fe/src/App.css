@@ -1,0 +1,18 @@
+.h-100vh {
+  height: 100vh;
+}
+
+/* content height, margin-top */
+.content {
+  padding: 95px 25px 25px 25px;
+  height: 100vh;
+  overflow: auto;
+}
+
+.d-none {
+  display: none !important;
+}
+
+.m-5 {
+  margin: 5px 5px;
+}

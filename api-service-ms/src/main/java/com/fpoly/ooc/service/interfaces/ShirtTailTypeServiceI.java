@@ -8,6 +8,6 @@ public interface ShirtTailTypeServiceI {
     public ShirtTailType create(ShirtTailType shirtTailType);
     public ShirtTailType update(ShirtTailType shirtTailType);
     public Boolean delete(Long id);
-    public List<ShirtTailType> getAll();
+    public List<ShirtTailType> findAll();
     public ShirtTailType getOne(Long id);
 }

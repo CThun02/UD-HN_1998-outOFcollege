@@ -1,123 +1,179 @@
 package com.fpoly.ooc.controller;
 
-import com.fpoly.ooc.entity.*;
-import com.fpoly.ooc.request.product.ProductDetailColorSizeRequest;
+import com.fpoly.ooc.constant.Const;
+import com.fpoly.ooc.entity.Product;
+import com.fpoly.ooc.entity.ProductDetail;
 import com.fpoly.ooc.request.product.ProductDetailRequest;
 import com.fpoly.ooc.request.product.ProductRequest;
-import com.fpoly.ooc.responce.product.*;
-import com.fpoly.ooc.service.impl.ProductDetailServiceImpl;
-import com.fpoly.ooc.service.impl.ProductServiceImpl;
+import com.fpoly.ooc.responce.product.ProductDetailResponse;
+import com.fpoly.ooc.responce.product.ProductResponse;
+import com.fpoly.ooc.responce.product.ProductTableResponse;
+import com.fpoly.ooc.service.interfaces.ProductDetailServiceI;
+import com.fpoly.ooc.service.interfaces.ProductServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
+
 @RestController
 @CrossOrigin(origins = "*")
-@RequestMapping("/admin/api/product")
+@RequestMapping("/api/admin/product")
 public class ProductController {
-
-    private ProductServiceImpl service;
-    private ProductDetailServiceImpl productDetailService;
+    private ProductServiceI service;
+    private ProductDetailServiceI productDetailService;
 
     @Autowired
-    public ProductController(ProductServiceImpl service, ProductDetailServiceImpl productDetailService) {
+    public ProductController(ProductServiceI service, ProductDetailServiceI productDetailService) {
         this.service = service;
         this.productDetailService = productDetailService;
     }
 
-    @GetMapping("/data")
-    public List<ProductResponse> getProducts(@RequestParam(name = "page", defaultValue = "0") int page){
-        Page<ProductResponse> getPage = service.pageIndex(page);
-        return getPage.getContent();
+    @GetMapping("")
+    public List<ProductTableResponse> getProductsTable(@RequestParam(name = "page", defaultValue = "0")Integer page,
+                                                       @RequestParam(defaultValue = "ALL") String status){
+        if(status.equals("ALL")){
+            return service.getProductsTable(page, "ACTIVE", "INACTIVE").getContent();
+        }else{
+            return service.getProductsTable(page, status, status).getContent();
+        }
     }
 
-    @GetMapping("/total")
-    public Integer getTotalPage(){
-        return service.pageIndex(0).getTotalPages();
+    @GetMapping("/filterByCom")
+    public ResponseEntity<?> filterByCom(@RequestParam Long brandId,
+                                         @RequestParam Long categoryId,
+                                         @RequestParam Long patternId,
+                                         @RequestParam Long formId){
+        return ResponseEntity.ok(service.getProductFilterByCom(brandId, categoryId, patternId, formId));
     }
 
-    @GetMapping("/detail/{id}")
-    public ResponseEntity<ProductDetailResponse> getProductDetail(@PathVariable Long id){
-        return ResponseEntity.ok(productDetailService.getProductDetail(id));
+    @GetMapping("/totalPage")
+    public ResponseEntity<?> getTotalPage(){
+        return ResponseEntity.ok(service.getProductsTable(0, "ACTIVE", "INACTIVE").getTotalPages());
     }
 
-    @GetMapping("/detailcolorsize")
-    public List<ProductDetailSizeResponse> getProductDetailColorSizeByIdP(@RequestParam Long productId){
-        return productDetailService.getProductDetailColorSizeByIdP(productId);
+    @GetMapping("/getProductDetailsTableByIdProduct")
+    public List<ProductDetailResponse> getProductDetailsByIdPro(@RequestParam("productId")Long productId, @RequestParam String status){
+        return productDetailService.getProductDetailsTableByIdProduct(productId, status);
     }
 
-    @GetMapping("/getallproductdetail")
-    public List<ProductDetailResponse> getAllProductDetail(){
-        return productDetailService.getAllProductDetailResponse();
+    @GetMapping("/getProductDetailUpdate")
+    public ResponseEntity<?> getProductDetailsUpdate(@RequestParam Long productId,
+                                                               @RequestParam Long buttonId,
+                                                               @RequestParam Long materialId,
+                                                               @RequestParam Long shirtTailId,
+                                                               @RequestParam Long sleeveId,
+                                                               @RequestParam Long collarId){
+        return  ResponseEntity.ok(productDetailService.getProductDetailsResponseByIdCompo(productId, buttonId,
+                materialId, shirtTailId, sleeveId, collarId).get(0));
     }
 
-    @GetMapping("/detailcolorbyidsizenidpro")
-    public ProductDetailSizeResponse getProductDetailColorSizeByIdPAndSizeId(@RequestParam Long productId, @RequestParam Long sizeId){
-        return productDetailService.getProductDetailColorSizeByIdPNIdSize(productId, sizeId);
+    @GetMapping("/getProductDetailsByIdCom")
+    public ResponseEntity<?> getProductDetailsByIdCom(@RequestParam Long productId,
+                                                     @RequestParam Long buttonId,
+                                                     @RequestParam Long materialId,
+                                                     @RequestParam Long shirtTailId,
+                                                     @RequestParam Long sleeveId,
+                                                     @RequestParam Long collarId){
+        return  ResponseEntity.ok(productDetailService.getProductDetailsResponseByIdCompo(productId, buttonId,
+                materialId, shirtTailId, sleeveId, collarId));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ProductResponseEdit> getProductEdit(@PathVariable Long id){
-        return ResponseEntity.ok(service.getProductEdit(id));
+    @GetMapping("/getProductEdit")
+    public ProductResponse getProductEdit(@RequestParam("productId")Long productId){
+        return service.getProductResponseById(productId);
+    }
+
+    @GetMapping("/getColorsByIdComPdAndIdPro")
+    public ResponseEntity<?> getColorsByIdComPdAndIdPro(@RequestParam Long productId,
+                                                     @RequestParam Long buttonId,
+                                                     @RequestParam Long materialId,
+                                                     @RequestParam Long shirtTailId,
+                                                     @RequestParam Long sleeveId,
+                                                     @RequestParam Long collarId){
+        return  ResponseEntity.ok(productDetailService.getColorsByIdCompoPDAndIdPro(productId, buttonId,
+                materialId, shirtTailId, sleeveId, collarId));
+    }
+
+    @GetMapping("/getSizesByIdComPdAndIdPro")
+    public ResponseEntity<?> getSizesByIdComPdAndIdPro(@RequestParam Long productId,
+                                                        @RequestParam Long buttonId,
+                                                        @RequestParam Long materialId,
+                                                        @RequestParam Long shirtTailId,
+                                                        @RequestParam Long sleeveId,
+                                                        @RequestParam Long collarId,
+                                                       @RequestParam Long colorId){
+        return  ResponseEntity.ok(productDetailService.getSizesPDByIdCompoPDAndIdPro(productId, buttonId,
+                materialId, shirtTailId, sleeveId, collarId, colorId));
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> createproduct(@RequestBody ProductRequest request){
-        return ResponseEntity.ok(service.create(request.dto()));
+    public ResponseEntity<?> createProduct(@RequestBody ProductRequest request){
+        Product product = request.dto();
+        product.setStatus(Const.STATUS_ACTIVE);
+        return ResponseEntity.ok(service.create(product));
+    }
+
+    @PostMapping("/createDetail")
+    public ResponseEntity<?> createProductDetail(@RequestBody ProductDetailRequest request) {
+        ProductDetailResponse productDetailResponse = productDetailService.getOneByIdCom(request.getProductId(), request.getButtonId(),
+                request.getMaterialId(), request.getShirtTailId(), request.getSleeveId(), request.getCollarId(),
+                request.getColorId(), request.getSizeId());
+        if (productDetailResponse == null) {
+            ProductDetail productDetail = request.dto();
+            productDetail.setStatus(Const.STATUS_ACTIVE);
+            productDetail = productDetailService.create(productDetail);
+            return ResponseEntity.ok(productDetail);
+        } else {
+            ProductDetail productDetail = ProductDetail.builder()
+                    .id(productDetailResponse.getId())
+                    .product(productDetailResponse.getProduct())
+                    .button(productDetailResponse.getButton())
+                    .material(productDetailResponse.getMaterial())
+                    .collar(productDetailResponse.getCollar())
+                    .sleeve(productDetailResponse.getSleeve())
+                    .size(productDetailResponse.getSize())
+                    .color(productDetailResponse.getColor())
+                    .shirtTail(productDetailResponse.getShirtTail())
+                    .price(productDetailResponse.getPrice())
+                    .descriptionDetail(request.getDescriptionDetail())
+                    .quantity(productDetailResponse.getQuantity() + request.getQuantity())
+                    .build();
+            productDetail.setStatus(Const.STATUS_ACTIVE);
+            productDetail = productDetailService.update(productDetail);
+                return ResponseEntity.ok("update");
+        }
     }
 
     @PutMapping("/update")
-    public ResponseEntity<?> updateproduct(@RequestParam(name = "id") Long id, @RequestBody ProductRequest request){
-        request.setId(id);
-        return ResponseEntity.ok(service.update(request.dto()));
+    public ResponseEntity<?> updateProduct(@RequestBody ProductRequest request){
+        Product product = request.dto();
+        return ResponseEntity.ok(service.update(product));
     }
 
-    @PutMapping("/updateproductdetail")
-    public ResponseEntity<?> updateProductDetail( @RequestBody ProductDetailRequest request){
-        productDetailService.update(request.dto());
-        List<ProductDetail> productDetailListUpdate = productDetailService.getProductDetailsByIdPro(request.getProductId());
-        for (ProductDetail productDetail: productDetailListUpdate) {
-            productDetail.setPattern(Pattern.builder().id(request.getPatternId()).build());
-            productDetail.setButton(ButtonType.builder().id(request.getButtonId()).build());
-            productDetail.setMaterial((Material.builder().id(request.getMaterialId()).build()) );
-            productDetail.setShirtTail(ShirtTailType.builder().id(request.getShirtTailId()).build());
-            productDetail.setCollar(CollarType.builder().id(request.getCollarId()).build());
-            productDetail.setForm(Form.builder().id(request.getFormId()).build());
-            productDetail.setSleeve(SleeveType.builder().id(request.getSleeveId()).build());
-            productDetail.setDescriptionDetail(request.getDescriptionDetail());
-            productDetailService.update(productDetail);
+
+    @PutMapping("/updateProductStatus")
+    public ResponseEntity<?> updateProductStatus(@RequestParam Long productId, @RequestParam String status){
+        Product product = service.getOne(productId);
+        product.setStatus(status);
+        return ResponseEntity.ok(service.update(product));
+    }
+
+    @PutMapping("/updateProductDetail")
+    public ResponseEntity<?> updateProductDetail(@RequestBody ProductDetail request,
+                                                 @RequestParam(name = "method", defaultValue = "Update") String method){
+        if(method.equals("Deleted")){
+            if(request.getStatus().equals("DELETED")){
+                request.setDeletedAt(LocalDateTime.now());
+            }else{
+                request.setDeletedAt(null);
+            }
+        }else{
+            request.setDeletedAt(null);
         }
-        return ResponseEntity.ok("ok");
-    }
-
-    @PostMapping("/createproductdetail")
-    public ResponseEntity<?> createproductDetail(@RequestBody ProductDetailRequest request){
-        return ResponseEntity.ok(productDetailService.create(request.dto()));
-    }
-
-    @PostMapping("/createproductdetail/colorsize/{idprodetail}")
-    public ResponseEntity<?> createproductDetailColorSize(@RequestBody List<ProductDetailColorSizeRequest> request, @PathVariable Long idprodetail){
-        ProductDetail productDetail = productDetailService.getOne(idprodetail);
-        for (ProductDetailColorSizeRequest item:request) {
-            ProductDetail productDetailCreate = ProductDetail.builder().product(productDetail.getProduct())
-                    .pattern(productDetail.getPattern()).button(productDetail.getButton())
-                    .material(productDetail.getMaterial()).collar(productDetail.getCollar())
-                    .sleeve(productDetail.getSleeve()).form(productDetail.getForm())
-                    .shirtTail(productDetail.getShirtTail()).descriptionDetail(productDetail.getDescriptionDetail())
-                    .status(productDetail.getStatus()).build();
-            productDetailCreate.setColor(Color.builder().id(item.getColorId()).build());
-            productDetailCreate.setSize(Size.builder().id(item.getSizeId()).build());
-            productDetailCreate.setQuantity(item.getQuantity());
-            productDetailCreate.setPrice(item.getPrice());
-            productDetailService.create(productDetailCreate);
-        }
-        return ResponseEntity.ok("OK");
-    }
-
-    @PutMapping("/updateproductdetailcolorsize")
-    public ResponseEntity<?> updateProductDetailColorSize(@RequestBody ProductDetailRequest productDetail){
-        return ResponseEntity.ok(productDetailService.update(productDetail.dto()));
+        return ResponseEntity.ok(productDetailService.update(request));
     }
 }

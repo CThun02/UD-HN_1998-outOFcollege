@@ -1,49 +1,19 @@
 package com.fpoly.ooc.service.impl;
 
-import com.fpoly.ooc.entity.ProductDetail;
-import com.fpoly.ooc.entity.Size;
+import com.fpoly.ooc.entity.*;
+import com.fpoly.ooc.repository.ProductDAORepositoryI;
 import com.fpoly.ooc.repository.ProductDetailDAORepositoryI;
-import com.fpoly.ooc.responce.product.ProductDetailColorResponse;
 import com.fpoly.ooc.responce.product.ProductDetailResponse;
-import com.fpoly.ooc.responce.product.ProductDetailSizeResponse;
 import com.fpoly.ooc.service.interfaces.ProductDetailServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ProductDetailServiceImpl implements ProductDetailServiceI {
     @Autowired
     private ProductDetailDAORepositoryI repo;
-
-    @Override
-    public ProductDetailResponse getProductDetail(Long id) {
-        return repo.getProductDetail(id);
-    }
-
-    @Override
-    public List<ProductDetailSizeResponse> getProductDetailColorSizeByIdP(Long id) {
-        List<Size> sizes = repo.getSizeIdByProductId(id);
-        List<ProductDetailSizeResponse> productDetailSizeResponses = new ArrayList<>();
-        for (Size size: sizes){
-            List<ProductDetailColorResponse> productDetailColorResponse = repo.getProductDetailColorSizeByIdPAndSizeId(id, size.getId());
-            ProductDetailSizeResponse productDetailSizeResponse = ProductDetailSizeResponse.builder().sizeId(size.getId()).sizeName(size.getSizeName())
-                    .listColor(productDetailColorResponse).build();
-            productDetailSizeResponses.add(productDetailSizeResponse);
-        }
-        return productDetailSizeResponses;
-    }
-
-    @Override
-    public ProductDetailSizeResponse getProductDetailColorSizeByIdPNIdSize(Long id, Long idSize) {
-        List<ProductDetailColorResponse> productDetailColorResponse = repo.getProductDetailColorSizeByIdPAndSizeId(id, idSize);
-        ProductDetailSizeResponse productDetailSizeResponse = ProductDetailSizeResponse.builder().sizeId(idSize)
-                .listColor(productDetailColorResponse).build();
-        return productDetailSizeResponse;
-    }
 
     @Override
     public ProductDetail create(ProductDetail productDetail) {
@@ -52,11 +22,11 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
 
     @Override
     public ProductDetail update(ProductDetail productDetail) {
-        ProductDetail productDetailCheck = this.getOne(productDetail.getId());
-        if(productDetailCheck != null){
-            productDetailCheck = repo.save(productDetail);
+        ProductDetail productDetailtCheck = this.getOne(productDetail.getId());
+        if(productDetailtCheck != null){
+            productDetailtCheck = repo.save(productDetail);
         }
-        return productDetailCheck;
+        return productDetailtCheck;
     }
 
     @Override
@@ -69,20 +39,43 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
         }
         return deleted;
     }
-
-    @Override
-    public List<ProductDetailResponse> getAllProductDetailResponse() {
-        return repo.getAllProductDetail();
-    }
-
     @Override
     public ProductDetail getOne(Long id) {
-        Optional<ProductDetail> productDetailOptional = repo.findById(id);
-        return productDetailOptional.orElse(null);
+        return repo.findById(id).get();
     }
 
     @Override
-    public List<ProductDetail> getProductDetailsByIdPro(Long id) {
-        return repo.getProductDetailByIdPro(id);
+    public List<ProductDetailResponse> getProductDetailsByIdProduct(Long idPro) {
+        return repo.getProductDetailsByIdProduct(idPro);
+    }
+
+    @Override
+    public List<ProductDetailResponse> getProductDetailsTableByIdProduct(Long idPro, String status) {
+        return repo.getProductDetailsTableByIdProduct(idPro, status);
+    }
+
+    @Override
+    public List<ProductDetailResponse> getProductDetailsResponseByIdCompo
+            (Long id, Long idButton, Long idMaterial, Long idShirtTail, Long idSleeve, Long idCollar) {
+        return repo.getProductDetailsResponseByIdCompo(id, idButton, idMaterial, idShirtTail, idSleeve, idCollar);
+    }
+
+    @Override
+    public List<Color> getColorsByIdCompoPDAndIdPro(Long productId, Long idButton, Long idMaterial, Long idShirtTail,
+                                                    Long idSleeve, Long idCollar) {
+        return repo.getColorsByIdCompoPDAndIdPro(productId, idButton, idMaterial, idShirtTail,
+                 idSleeve,  idCollar);
+    }
+
+    @Override
+    public List<ProductDetailResponse> getSizesPDByIdCompoPDAndIdPro(Long productId, Long idButton, Long idMaterial, Long idShirtTail, Long idSleeve, Long idCollar, Long idColor) {
+        return repo.getSizesPDByIdCompoPDAndIdPro(productId, idButton, idMaterial, idShirtTail,
+                idSleeve,  idCollar, idColor);
+    }
+
+    @Override
+    public ProductDetailResponse getOneByIdCom(Long productId, Long idButton, Long idMaterial, Long idShirtTail, Long idSleeve, Long idCollar, Long idColor, Long idSize) {
+        return repo.getOneByIdCom(productId, idButton, idMaterial, idShirtTail,
+                idSleeve,  idCollar, idColor, idSize);
     }
 }

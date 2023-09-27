@@ -1,0 +1,51 @@
+.container {
+  padding: 30px;
+  width: 96%;
+  margin: 20px;
+}
+
+.header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.lstProduct {
+  background-color: #ffffff !important;
+  min-height: 300px;
+  height: auto;
+  margin-bottom: 20px;
+}
+
+.lstAccount {
+  background-color: #ffffff;
+  min-height: 100px;
+  height: auto;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.blackDivider {
+  background-color: black;
+  height: 1px;
+}
+
+.infBill {
+  background-color: #ffffff;
+  min-height: 400px;
+  height: auto;
+  padding: 20px;
+}
+
+.font {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.product {
+  text-align: "left";
+  display: "flex";
+  flex-direction: "column";
+}

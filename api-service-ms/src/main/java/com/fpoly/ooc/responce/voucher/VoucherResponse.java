@@ -1,24 +1,23 @@
 package com.fpoly.ooc.responce.voucher;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class VoucherResponse {
 
-    private Long id;
+    private Long voucherId;
 
     private String voucherCode;
 
     private String voucherName;
-
-    private LocalDateTime startDate;
-
-    private LocalDateTime endDate;
 
     private BigDecimal voucherValue;
 
@@ -26,10 +25,29 @@ public class VoucherResponse {
 
     private String voucherMethod;
 
-    private BigDecimal voucherCondition;
+    private Integer limitQuantity;
 
-    private Integer limiQuantity;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
+    private LocalDateTime startDate;
 
-    private String permission;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
+    private LocalDateTime endDate;
+
+    private String status;
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./AccountForm.module.css";
-import qrcode from "./qrcode.png";
+
+import axios from "axios";
 import {
   Row,
   Col,
@@ -22,7 +23,9 @@ const { Option } = Select;
 const MyForm = () => {
   const [imageFile, setImageFile] = useState(null);
   const [imageUrl, setImageUrl] = useState(null);
-  const [qrcodeImage, setQRCodeImage] = useState(qrcode);
+  const [provinces, setProvinces] = useState([]);
+  const [districts, setDistricts] = useState([]);
+ 
 
   const handleUpload = (file) => {
     // Xử lý file ảnh tải lên và set state imageUrl
@@ -32,26 +35,102 @@ const MyForm = () => {
     const imageUrl = URL.createObjectURL(file);
     setImageUrl(imageUrl);
   };
+  useEffect(() => {
+    const fetchProvinces = async () => {
+      try {
+        const response = await axios.get(
+          "https://online-gateway.ghn.vn/shiip/public-api/master-data/province",
+          {
+            headers: {
+              "Content-Type": "application/json",
+              token: "0f082cbe-5110-11ee-a59f-a260851ba65c",
+            },
+          }
+        );
 
-  const onFinish = (values) => {
-    // Xử lý khi gửi form thành công
+        const provincesData = response.data.data;
+        console.log(response);
+        setProvinces(provincesData);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchProvinces();
+  }, []);
+
+  axios
+    .get(
+      "https://online-gateway.ghn.vn/shiip/public-api/master-data/district?province_id",
+      {
+        headers: {
+          token: "0f082cbe-5110-11ee-a59f-a260851ba65c",
+        },
+      }
+    )
+    .then((response) => {
+      const districtsData = response.data.data;
+      setDistricts(districtsData);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+  const fetchDistricts = async () => {
+    try {
+      const response = await axios.get(
+        "https://online-gateway.ghn.vn/shiip/public-api/master-data/district",
+        {
+          headers: {
+            token: "0f082cbe-5110-11ee-a59f-a260851ba65c",
+          },
+          data: {
+            province_id: 201, // Thay đổi province_id theo yêu cầu của bạn
+          },
+        }
+      );
+
+      const districtsData = response.data.data;
+      setDistricts(districtsData);
+    } catch (error) {
+      console.error("Error fetching districts:", error);
+    }
+  };
+  fetchDistricts();
+
+  const onFinish = async (values) => {
+    values.idRole = 1;
     console.log(values);
+    // Xử lý khi gửi form thành công
+    try {
+      // Gửi yêu cầu POST đến API
+      const response = await axios.post(
+        "http://localhost:8080/account/api/create",
+        values
+      );
+      console.log(response.data); // Đây là phản hồi từ API
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
     <div className={styles.container}>
       <Form onFinish={onFinish}>
-        <h2>Thêm tài khoản</h2>
+        <Row style={{ marginBottom: "25px" }}>
+          <Col span={8}>
+            <h2>Thông tin nhân viên</h2>
+          </Col>
+          <Col span={16}>
+            <h2>Thông tin chi tiết</h2>
+          </Col>
+        </Row>
         <Row gutter={16}>
           <Col span={8}>
             <Form.Item className={styles.formContainer}>
               <Space wrap size={16}>
-                <Avatar
-                  shape="square"
-                  size={200}
-                  src={imageUrl}
-                  icon={<UserOutlined />}
-                />
+                <div className={styles.avatarContainer}>
+                  <Avatar size={200} src={imageUrl} icon={<UserOutlined />} />
+                </div>
                 <Upload
                   name="avatar"
                   showUploadList={false}
@@ -62,22 +141,57 @@ const MyForm = () => {
               </Space>
             </Form.Item>
           </Col>
-          {/* <Col span={8} offset={8}>
-            <div className={styles.qrcodeContainer}>
-              <img src={qrcodeImage} alt="Mã QR" className={styles.qrcode} />
-            </div>
-          </Col> */}
-          <Col span={16}>
-            <div>
-              <span> Họ và Tên</span>
-              <Form.Item
-                name="fullName"
-                rules={[{ required: true, message: "Vui lòng nhập Họ và Tên" }]}
-              >
-                <Input />
-              </Form.Item>
-            </div>
+          <Col span={16} style={{ marginTop: "20px" }}>
             <Row>
+              <Col span={12}>
+                <div className={styles.email}>
+                  <span>Mã định danh</span>
+                  <Form.Item
+                    name="idNo"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Vui lòng nhập mã định danh",
+                      },
+                    ]}
+                  >
+                    <Input />
+                  </Form.Item>
+                </div>
+              </Col>
+
+              <Col span={12}>
+                <div>
+                  <span>Giới Tính</span>
+                  <Form.Item
+                    name="gender"
+                    rules={[
+                      { required: true, message: "Vui lòng chọn giới tính" },
+                    ]}
+                  >
+                    <Radio.Group>
+                      <Radio value={true}>Nam</Radio>
+                      <Radio value={false}>Nữ</Radio>
+                    </Radio.Group>
+                  </Form.Item>
+                </div>
+              </Col>
+            </Row>
+
+            <Row>
+              <Col span={12}>
+                <div className={styles.email}>
+                  <span>Ngày sinh</span>
+                  <Form.Item
+                    name="dob"
+                    rules={[
+                      { required: true, message: "Vui lòng chọn ngày sinh" },
+                    ]}
+                  >
+                    <DatePicker style={{ width: "100%" }} />
+                  </Form.Item>
+                </div>
+              </Col>
               <Col span={12}>
                 <div className={styles.email}>
                   <span>Email</span>
@@ -92,19 +206,23 @@ const MyForm = () => {
                   </Form.Item>
                 </div>
               </Col>
+            </Row>
+          </Col>
+          <Col span={24}>
+            <Row>
               <Col span={8}>
-                <div>
-                  <span>Giới Tính</span>
+                <div className={styles.email}>
+                  <span>Username</span>
                   <Form.Item
-                    name="gender"
+                    name="username"
                     rules={[
-                      { required: true, message: "Vui lòng chọn giới tính" },
+                      {
+                        required: true,
+                        message: "Vui lòng nhập username",
+                      },
                     ]}
                   >
-                    <Radio.Group>
-                      <Radio value="male">Nam</Radio>
-                      <Radio value="female">Nữ</Radio>
-                    </Radio.Group>
+                    <Input />
                   </Form.Item>
                 </div>
               </Col>
@@ -124,119 +242,112 @@ const MyForm = () => {
                   </Form.Item>
                 </div>
               </Col>
-
               <Col span={8}>
                 <div className={styles.email}>
-                  <span>Số CMND</span>
+                  <span>Địa chỉ chi tiết</span>
                   <Form.Item
-                    name="idCardNumber"
+                    name="descriptionDetail"
                     rules={[
-                      { required: true, message: "Vui lòng nhập số CMND" },
+                      {
+                        required: true,
+                        message: "Vui lòng nhập địa chỉ chi tiết",
+                      },
                     ]}
                   >
                     <Input />
                   </Form.Item>
                 </div>
               </Col>
-
-              <Col span={8}>
-                <div>
-                  <span>Ngày sinh</span>
-                  <Form.Item
-                    name="birthday"
-                    rules={[
-                      { required: true, message: "Vui lòng chọn ngày sinh" },
-                    ]}
-                  >
-                    <DatePicker style={{ width: "100%" }} />
-                  </Form.Item>
-                </div>
-              </Col>
-            </Row>
-          </Col>
-          <Col span={24}>
-            <Row>
-              <Col span={8}>
-                <div className={styles.thanhpho}>
-                  <span>Thành phố</span>
-                  <Form.Item
-                    name="city"
-                    rules={[
-                      { required: true, message: "Vui lòng chọn thành phố" },
-                    ]}
-                  >
-                    <Select>
-                      <Option value="hanoi">Hà Nội</Option>
-                      <Option value="hcm">TP.HCM</Option>
-                      {/* Thêm các tùy chọn cho thành phố khác */}
-                    </Select>
-                  </Form.Item>
-                </div>
-              </Col>
-              <Col span={8}>
-                <div className={styles.quan}>
-                  <span>Quận</span>
-                  <Form.Item
-                    name="district"
-                    rules={[{ required: true, message: "Vui lòng chọn quận" }]}
-                  >
-                    <Select>
-                      <Option value="district1">Quận 1</Option>
-                      <Option value="district2">Quận 2</Option>
-                      {/* Thêm các tùy chọn cho quận khác */}
-                    </Select>
-                  </Form.Item>
-                </div>
-              </Col>
-              <Col span={8}>
-                <div>
-                  <span>Phường</span>
-                  <Form.Item
-                    name="ward"
-                    rules={[
-                      { required: true, message: "Vui lòng chọn phường" },
-                    ]}
-                  >
-                    <Select>
-                      <Option value="ward1">Phường 1</Option>
-                      <Option value="ward2">Phường 2</Option>
-                      {/* Thêm các tùy chọn cho phường khác */}
-                    </Select>
-                  </Form.Item>
-                </div>
-              </Col>
             </Row>
           </Col>
 
           <Col span={24}>
             <Row>
               <Col span={8}>
-                <span>Đường</span>
-                <Form.Item
-                  className={styles.duong}
-                  name="street"
-                  rules={[{ required: true, message: "Vui lòng chọn đường" }]}
-                >
-                  <Select>
-                    <Option value="street1">Đường 1</Option>
-                    <Option value="street2">Đường 2</Option>
-                    {/* Thêm các tùy chọn cho đường khác */}
-                  </Select>
-                </Form.Item>
+                <div className={styles.email}>
+                  <span> Tên Nhân Viên</span>
+                  <Form.Item
+                    name="fullName"
+                    rules={[
+                      { required: true, message: "Vui lòng nhập Họ và Tên" },
+                    ]}
+                  >
+                    <Input />
+                  </Form.Item>
+                </div>
               </Col>
               <Col span={16}>
-                <span>Địa chỉ chi tiết</span>
-                <Form.Item
-                  name="address"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Vui lòng nhập địa chỉ chi tiết",
-                    },
-                  ]}
-                >
-                  <Input />
-                </Form.Item>
+                <Row>
+                  <Col span={8}>
+                    <div className={styles.thanhpho}>
+                      <span>Tỉnh/Thành phố</span>
+                      <Form.Item
+                        name="city"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Vui lòng chọn thành phố",
+                          },
+                        ]}
+                      >
+                        <Select>
+                          {provinces.map((province) => (
+                            <Select.Option
+                              key={province.ProvinceID}
+                              value={province.ProvinceID}
+                            >
+                              {province.ProvinceName}
+                            </Select.Option>
+                          ))}
+                        </Select>
+                      </Form.Item>
+                    </div>
+                  </Col>
+                  <Col span={8}>
+                    <div className={styles.quan}>
+                      <span>Quận/huyện</span>
+                      <Form.Item
+                        name="district"
+                        rules={[
+                          { required: true, message: "Vui lòng chọn quận" },
+                        ]}
+                      >
+                        <Select>
+                          {districts.map((district) => (
+                            <Select.Option
+                              key={district.DistrictID}
+                              value={district.DistrictID}
+                            >
+                              {district.DistrictName}
+                            </Select.Option>
+                          ))}
+                        </Select>
+                      </Form.Item>
+                    </div>
+                  </Col>
+                  <Col span={8}>
+                    <div className={styles.email}>
+                      <span>Xã/Phường/Thị trấn</span>
+                      <Form.Item
+                        name="ward"
+                        rules={[
+                          { required: true, message: "Vui lòng chọn phường" },
+                        ]}
+                      >
+                        <Select>
+                          {districts.map((district) => (
+                            <Option
+                              key={district.DistrictID}
+                              value={district.DistrictID}
+                            >
+                              {district.DistrictName}
+                            </Option>
+                          ))}
+                        </Select>
+                      </Form.Item>
+                    </div>
+                  </Col>
+                </Row>
               </Col>
             </Row>
           </Col>

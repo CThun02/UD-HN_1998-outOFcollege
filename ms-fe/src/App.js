@@ -11,7 +11,9 @@ import Bill from "./components/admin/sale-couter/Bill";
 import CreateBill from "./components/admin/sale-couter/CreateBill";
 import ProductUpdate from "./components/admin/product/ProductUpdate";
 import ProductCreateDetails from "./components/admin/product/ProductCreateDetails";
-
+import AccountForm from "./components/admin/account/AccountForm";
+import CustomerAdmin from "./components/admin/account/CustomorAdmin";
+import DetailForm from "./components/admin/account/DetailForm";
 function App() {
   return (
     <>
@@ -66,8 +68,16 @@ function App() {
                   <Route path="brand" element="brand"></Route>
 
                   {/* Tài khoản */}
-                  <Route path="employee" element="employee"></Route>
-                  <Route path="customer" element="customer"></Route>
+                  <Route path="employee" element={<CustomerAdmin />}></Route>
+                  <Route
+                    path="employee/create"
+                    element={<AccountForm />}
+                  ></Route>
+                  <Route
+                    path="employee/detail"
+                    element={<DetailForm />}
+                  ></Route>
+                  <Route path="customer" element={<CustomerAdmin />}></Route>
 
                   {/* Voucher */}
                   <Route path="voucher">

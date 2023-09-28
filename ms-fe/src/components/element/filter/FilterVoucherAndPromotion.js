@@ -128,8 +128,9 @@ function FilterVoucherAndPromotion({
           </Col>
           <Col span={4}>
             <Space style={{ width: "100%" }} direction="vertical">
-              <FloatingLabels label="Trạng thái" name="status" value={status}>
+              <FloatingLabels label="Trạng thái" name="status" value={"status"}>
                 <Select
+                  className={styles.selectedItem}
                   onChange={handleSetStatus}
                   options={options}
                   style={{ width: "100%" }}

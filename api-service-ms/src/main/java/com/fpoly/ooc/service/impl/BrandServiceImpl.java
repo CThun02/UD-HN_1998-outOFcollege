@@ -15,7 +15,11 @@ public class BrandServiceImpl implements BrandServiceI {
 
     @Override
     public Brand create(Brand brand) {
-        return repo.save(brand);
+        Brand brandCheck = this.findFirstByBrandName(brand.getBrandName());
+        if(brandCheck==null){
+            return repo.save(brand);
+        }
+        return null;
     }
 
     @Override
@@ -45,5 +49,10 @@ public class BrandServiceImpl implements BrandServiceI {
     @Override
     public Brand getOne(Long id) {
         return repo.findById(id).orElse(null);
+    }
+
+    @Override
+    public Brand findFirstByBrandName(String brandName) {
+        return repo.findFirstByBrandName(brandName);
     }
 }

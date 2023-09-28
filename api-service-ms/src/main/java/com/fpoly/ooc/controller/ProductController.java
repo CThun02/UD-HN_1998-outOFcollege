@@ -13,8 +13,6 @@ import com.fpoly.ooc.service.interfaces.ProductServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -33,13 +31,17 @@ public class ProductController {
     }
 
     @GetMapping("")
-    public List<ProductTableResponse> getProductsTable(@RequestParam(name = "page", defaultValue = "0")Integer page,
-                                                       @RequestParam(defaultValue = "ALL") String status){
-        if(status.equals("ALL")){
-            return service.getProductsTable(page, "ACTIVE", "INACTIVE").getContent();
+    public List<ProductTableResponse> getProductsTable(@RequestParam(defaultValue = "ALL") String status){
+        if(status.equals("ALL") || status.equals("")){
+            return service.getProductsTable("ACTIVE", "INACTIVE");
         }else{
-            return service.getProductsTable(page, status, status).getContent();
+            return service.getProductsTable(status, status);
         }
+    }
+
+    @GetMapping("/getAllProductDetail")
+    public ResponseEntity<?> getAllProductDetail(){
+            return ResponseEntity.ok(productDetailService.getAll());
     }
 
     @GetMapping("/filterByCom")
@@ -50,9 +52,24 @@ public class ProductController {
         return ResponseEntity.ok(service.getProductFilterByCom(brandId, categoryId, patternId, formId));
     }
 
-    @GetMapping("/totalPage")
-    public ResponseEntity<?> getTotalPage(){
-        return ResponseEntity.ok(service.getProductsTable(0, "ACTIVE", "INACTIVE").getTotalPages());
+    @GetMapping("/filterProductDetailByIdCom")
+    public ResponseEntity<?> filterProductDetailByIdCom(@RequestParam Optional<Long> productId,
+                                                        @RequestParam Optional<Long> buttonId,
+                                                        @RequestParam Optional<Long> materialId,
+                                                        @RequestParam Optional<Long> shirtTailId,
+                                                        @RequestParam Optional<Long> sleeveId,
+                                                        @RequestParam Optional<Long> collarId,
+                                                        @RequestParam Optional<Long> colorId,
+                                                        @RequestParam Optional<Long> sizeId) {
+        System.out.println(productId);
+        return ResponseEntity.ok(productDetailService.filterProductDetailsByIdCom
+                (productId.orElse(null), buttonId.orElse(null), materialId.orElse(null), shirtTailId.orElse(null),
+                        sleeveId.orElse(null), collarId.orElse(null), colorId.orElse(null), sizeId.orElse(null)));
+    }
+
+    @GetMapping("/searchProductDetail")
+    public ResponseEntity<?> searchProductDetail(@RequestParam String keyWords) {
+        return ResponseEntity.ok(productDetailService.searchByCodeOrName(keyWords));
     }
 
     @GetMapping("/getProductDetailsTableByIdProduct")

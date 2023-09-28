@@ -10,4 +10,6 @@ public interface PatternServiceI {
     public Boolean delete(Long id);
     public List<Pattern> findAll();
     public Pattern getOne(Long id);
+    public Pattern findFirstByPatternName(String patternName);
+
 }

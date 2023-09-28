@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface FormDAORepository extends JpaRepository<Form, Long> {
+    public Form findFirstByFormName(String formName);
+
 }

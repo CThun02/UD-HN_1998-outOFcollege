@@ -38,7 +38,6 @@ const ProductIndex = () => {
   const [productsTable, setProductsTable] = useState(null);
   const [loading, setLoading] = useState(false);
   const [render, setRendering] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
 
   const columns = [
     {
@@ -91,7 +90,7 @@ const ProductIndex = () => {
       width: 100,
       render: (id) => (
         <>
-          <Link to={`/admin/product/update/${id}`}>
+          <Link to={`/admin/product/details/${id}`}>
             <Button className={styles.product__button}>
               <EditOutlined />
             </Button>
@@ -101,9 +100,8 @@ const ProductIndex = () => {
     },
   ];
   //function
-  const handleChangePage = (page, statusFilter) => {
+  const handleChangePage = (statusFilter) => {
     setStatus(statusFilter);
-    setCurrentPage(page);
     axios
       .get(api + "product?status=" + statusFilter)
       .then((response) => {
@@ -152,7 +150,7 @@ const ProductIndex = () => {
       .then((response) => {
         setTimeout(() => {
           messageApi.success(mess, 2);
-          handleChangePage(1, status);
+          handleChangePage(status);
         }, 500);
       })
       .catch((error) => {
@@ -370,7 +368,7 @@ const ProductIndex = () => {
                   defaultValue={"ALL"}
                   onFocus={(event) => {
                     setStatus(event.target.value);
-                    handleChangePage(1, event.target.value);
+                    handleChangePage(event.target.value);
                   }}
                 >
                   <Radio value={"ALL"}>Tất cả</Radio>
@@ -384,7 +382,7 @@ const ProductIndex = () => {
                 <Col span={12}>
                   <Input
                     className={styles.filter_inputSearch}
-                    placeholder="Nhập mã, tên, ngày tạo sản phẩm"
+                    placeholder="Nhập mã, tên sản phẩm"
                     prefix={<SearchOutlined />}
                   />
                 </Col>

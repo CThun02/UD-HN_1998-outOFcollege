@@ -16,7 +16,7 @@ import styles from "./ProductCreateDetails.module.css";
 import ProductDetailsTable from "./ProductDetailsTable";
 import { isFormInputEmpty } from "./ValidateForm";
 
-const ProductCreateDetails = () => {
+const ProductCreateDetails = (props) => {
   const location = useLocation();
   const navigate = useNavigate();
   const searchParams = new URLSearchParams(location.search);

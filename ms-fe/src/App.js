@@ -10,8 +10,7 @@ import CreatePromotion from "./components/admin/promotion/CreatePromotion";
 import Voucher from "./components/admin/voucher/Voucher";
 import Bill from "./components/admin/sale-couter/Bill";
 import CreateBill from "./components/admin/sale-couter/CreateBill";
-import ProductUpdate from "./components/admin/product/ProductUpdate";
-import ProductCreate from "./components/admin/product/ProductCreate";
+import ProductDetails from "./components/admin/product/ProductDetails";
 import ProductCreateDetails from "./components/admin/product/ProductCreateDetails";
 
 function App() {
@@ -52,8 +51,8 @@ function App() {
                   <Route path="product">
                     <Route index element={<ProductIndex />} />
                     <Route
-                      path={"update/:productId"}
-                      element={<ProductUpdate />}
+                      path={"details/:productId"}
+                      element={<ProductDetails />}
                     />
                     <Route
                       path={"create-details/"}

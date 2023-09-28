@@ -40,7 +40,7 @@ public class ProductController {
     }
 
     @GetMapping("/getAllProductDetail")
-    public ResponseEntity<?> getAllProductDetail(@RequestParam(defaultValue = "ALL") String status){
+    public ResponseEntity<?> getAllProductDetail(){
             return ResponseEntity.ok(productDetailService.getAll());
     }
 
@@ -61,9 +61,15 @@ public class ProductController {
                                                         @RequestParam Optional<Long> collarId,
                                                         @RequestParam Optional<Long> colorId,
                                                         @RequestParam Optional<Long> sizeId) {
+        System.out.println(productId);
         return ResponseEntity.ok(productDetailService.filterProductDetailsByIdCom
                 (productId.orElse(null), buttonId.orElse(null), materialId.orElse(null), shirtTailId.orElse(null),
                         sleeveId.orElse(null), collarId.orElse(null), colorId.orElse(null), sizeId.orElse(null)));
+    }
+
+    @GetMapping("/searchProductDetail")
+    public ResponseEntity<?> searchProductDetail(@RequestParam String keyWords) {
+        return ResponseEntity.ok(productDetailService.searchByCodeOrName(keyWords));
     }
 
     @GetMapping("/getProductDetailsTableByIdProduct")

@@ -22,6 +22,7 @@ public class ProductServiceImpl implements ProductServiceI {
     public Product create(Product product) {
         while(true){
             String productCode= "PRO_"+ UniqueRandomHex.generateUniqueRandomHex();
+            productCode = productCode.replace("#", "");
             Optional<Product> check = Optional.ofNullable(repo.findFirstByProductCode(productCode));
             if(check.isEmpty()){
                 product.setProductCode(productCode);

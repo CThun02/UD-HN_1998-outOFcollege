@@ -66,4 +66,25 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
     public List<ProductDetailResponse> filterProductDetailsByIdCom(Long productId, Long idButton, Long idMaterial,
                                                                    Long idShirtTail, Long idSleeve, Long idCollar,
                                                                    Long idColor, Long idSize);
+
+    @Query("SELECT pd.id AS id, pd.product AS product, pd.button AS button" +
+            ", pd.material AS material, pd.collar AS collar, pd.sleeve AS sleeve" +
+            ", pd.size AS size, pd.color AS color, pd.shirtTail AS shirtTail" +
+            ", pd.price AS price, pd.quantity AS quantity, pd.descriptionDetail AS descriptionDetail" +
+            " FROM ProductDetail pd WHERE pd.product.productCode like ?1")
+    public List<ProductDetailResponse> searchProductDetailByProductCode(String productCode);
+
+    @Query("SELECT pd.id AS id, pd.product AS product, pd.button AS button" +
+            ", pd.material AS material, pd.collar AS collar, pd.sleeve AS sleeve" +
+            ", pd.size AS size, pd.color AS color, pd.shirtTail AS shirtTail" +
+            ", pd.price AS price, pd.quantity AS quantity, pd.descriptionDetail AS descriptionDetail" +
+            " FROM ProductDetail pd WHERE pd.product.productName like ?1")
+    public List<ProductDetailResponse> searchProductDetailByProductName(String productName);
+
+    @Query("SELECT pd.id AS id, pd.product AS product, pd.button AS button" +
+            ", pd.material AS material, pd.collar AS collar, pd.sleeve AS sleeve" +
+            ", pd.size AS size, pd.color AS color, pd.shirtTail AS shirtTail" +
+            ", pd.price AS price, pd.quantity AS quantity, pd.descriptionDetail AS descriptionDetail" +
+            " FROM ProductDetail pd")
+    public List<ProductDetailResponse> getAll();
 }

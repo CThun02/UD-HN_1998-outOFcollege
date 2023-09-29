@@ -15,7 +15,9 @@ import ProductCreateDetails from "./components/admin/product/ProductCreateDetail
 import SaveVoucher from "./components/admin/voucher/SaveVoucher";
 import { useState } from "react";
 import { NotificationProvider } from "./components/element/notification/Notification";
-
+import AccountForm from "./components/admin/account/AccountForm";
+import CustomerAdmin from "./components/admin/account/CustomorAdmin";
+import DetailForm from "./components/admin/account/DetailForm";
 function App() {
   const [message, setMessage] = useState("");
 
@@ -95,7 +97,50 @@ function App() {
                       <Route index element={<Promotion />} />
                       <Route path="create" element={<CreatePromotion />} />
                     </Route>
+                    <Route path="category" element="category"></Route>
+                    <Route path="brand" element="brand"></Route>
+
+                    {/* Tài khoản */}
+                    <Route
+                      path="employee"
+                      element={<CustomerAdmin roleId={1} />}
+                    ></Route>
+                    <Route
+                      path="employee/create"
+                      element={<AccountForm roleId={1} />}
+                    ></Route>
+                    <Route
+                      path="employee/detail"
+                      element={<DetailForm />}
+                    ></Route>
+                    <Route
+                      path="customer"
+                      element={<CustomerAdmin roleId={2} />}
+                    ></Route>
+                    <Route
+                      path="customer/create"
+                      element={<AccountForm roleId={2} />}
+                    ></Route>
+                    <Route
+                      path="employee/detail"
+                      element={<DetailForm roleId={2} />}
+                    ></Route>
+
+                    {/* Voucher */}
+                    <Route path="voucher">
+                      <Route index element={<Voucher />} />
+
+                      <Route path="detail" element={"Chi tiet"} />
+                      <Route path="update" element={"Chi tiet"} />
+                    </Route>
+
+                    {/* Promotion */}
+                    <Route path="promotion">
+                      <Route index element={<Promotion />} />
+                      <Route path="create" element={<CreatePromotion />} />
+                    </Route>
                   </Route>
+
                   {/* Not found */}
                   <Route
                     path="*"
@@ -113,6 +158,9 @@ function App() {
                     }
                   />
                 </Routes>
+              </div>
+              <div>
+                <Footer />
               </div>
             </Col>
           </Row>

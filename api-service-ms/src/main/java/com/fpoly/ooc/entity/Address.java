@@ -44,8 +44,4 @@ public class Address extends BaseEntity{
 
     @Column(name = "description_detail")
     private String descriptionDetail;
-
-    @OneToMany(mappedBy = "addressDetail")
-    private List<AddressDetail> addressDetails;
-
 }

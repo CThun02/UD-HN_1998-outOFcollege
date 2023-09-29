@@ -1,6 +1,5 @@
 package com.fpoly.ooc.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -14,6 +13,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 import java.util.List;
@@ -35,10 +35,11 @@ public class Account extends BaseEntity{
     private String fullName;
 
     @Column(name = "dob")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date dob;
 
     @Column(name = "gender")
-    private Integer gender;
+    private Boolean gender;
 
     @Column(name = "phone_number")
     private String numberPhone;
@@ -60,10 +61,6 @@ public class Account extends BaseEntity{
     private Role role;
 
     @OneToMany(mappedBy = "accountAddress")
-    private List<AddressDetail> addressDetail;
-
-    // mapping
-    @OneToMany(mappedBy = "accountVoucher")
-    private List<VoucherAccount> voucherAccounts;
+    private List<AddressDetail> addAdress;
 
 }

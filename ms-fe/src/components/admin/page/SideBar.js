@@ -53,7 +53,7 @@ const SideBar = () => {
         navigate(href + "customer");
         break;
       case "phieuGiamGia":
-        navigate(href + "voucher");
+        navigate(href + "vouchers");
         break;
       case "giamGiaSanPham":
         navigate(href + "promotion");

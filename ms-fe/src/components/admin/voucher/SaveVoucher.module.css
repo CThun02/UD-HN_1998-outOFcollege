@@ -1,0 +1,33 @@
+.content {
+  height: calc(100vh - 70px);
+  overflow: auto;
+  background-color: #fff;
+  border-radius: 4px;
+  padding: 30px;
+}
+
+.color {
+  color: #000000e0;
+}
+
+.label {
+  height: 3rem !important;
+}
+
+.label label {
+  height: 100% !important;
+  line-height: 3rem !important;
+}
+
+.errors {
+  color: red;
+}
+
+.noneSpacing {
+  margin: 0;
+}
+
+.selectedItem div {
+  height: 2.9rem !important;
+  align-items: center;
+}

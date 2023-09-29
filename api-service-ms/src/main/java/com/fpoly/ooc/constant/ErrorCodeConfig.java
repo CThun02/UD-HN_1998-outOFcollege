@@ -25,6 +25,10 @@ public class ErrorCodeConfig {
         errors.put("LIMIT_QUANTITY_LESS_ZERO", "Số lượng lớn hơn 0");
         errors.put("VOUCHER_CONDITION_LESS_ZERO", "Điều kiện giảm không được nhỏ hơn 0");
         errors.put("STATUS_INVALID", "Trạng thái không hợp lệ");
+        errors.put("VOUCHER_METHOD_EMPTY", "Hình thức giảm không được bỏ trống");
+        errors.put("VOUCHER_VALUE_EMPTY", "Giá trị giảm không được bỏ trống");
+        errors.put("VOUCHER_VALUE_MAX_EMPTY", "Giá trị giảm tối đa không được bỏ trống");
+        errors.put("DATE_LESS_NOW", "Ngày nhỏ hơn ngày hiện tại");
     }
 
     public static String getMessage(String code) {

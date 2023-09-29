@@ -1,14 +1,14 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { Select, Input, Row, Col, Radio, Button } from "antd";
 import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
 import CustomerTable from "./CustomerAdminTable";
 import style from "./styles/Customerlndex.module.css";
 
-const CustomerAddminIndex = function () {
+const CustomerAddminIndex = function (props) {
   const { Option } = Select;
   const [value, setValue] = useState(1);
-
+  let roleId = props.roleId;
   const onChange = (e) => {
     console.log("radio checked", e.target.value);
     setValue(e.target.value);
@@ -30,12 +30,15 @@ const CustomerAddminIndex = function () {
     // Ví dụ: cập nhật lại dữ liệu, hiển thị thông báo thành công, vv.
     console.log("Form submitted successfully!");
   };
+  useEffect(() => {
+    console.log("render");
+  }, [roleId]);
 
   return (
     <div className={style.customer}>
       <div className={style.radiusFrame}>
         <Row className={style.titleTB}>
-          <h3>Danh Sách Khách Hàng</h3>
+          <h3>Danh Sách {roleId === 1 ? "nhân viên" : "khách hàng"}</h3>
         </Row>
         <Row className={style.adminMenu}>
           <Col span={10}>
@@ -69,7 +72,7 @@ const CustomerAddminIndex = function () {
           </Col>
         </Row>
         <div className={style.customerTable}>
-          <CustomerTable></CustomerTable>
+          <CustomerTable roleId={roleId}></CustomerTable>
         </div>
       </div>
     </div>

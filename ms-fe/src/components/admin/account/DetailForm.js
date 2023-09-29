@@ -23,7 +23,7 @@ const DetailForm = () => {
   const [imageFile, setImageFile] = useState(null);
   const [districts, setDistricts] = useState([]);
   const [provinces, setProvinces] = useState([]);
-  const [initialValues, setInitialValues] = useState(null);
+
   const { Panel } = Collapse;
   const handlePanelChange = (key) => {
     console.log("Expanded panel keys:", key);
@@ -37,31 +37,7 @@ const DetailForm = () => {
     const imageUrl = URL.createObjectURL(file);
     setImageUrl(imageUrl);
   };
-  // useEffect(() => {
-  //   const handleAddAccount1 = async () => {
-  //     try {
-  //       // Lấy dữ liệu từ các trường nhập liệu trong Form
-  //       const formValues = await Form.validateFields();
 
-  //       // Gửi dữ liệu lên server
-  //       const response = await axios.post(
-  //         "http://localhost:8080/account/api/viewAll",
-  //         formValues
-  //       );
-
-  //       // Xử lý kết quả từ server (nếu cần)
-  //       console.log(response.data);
-
-  //       // Reset Form sau khi gửi thành công
-  //       Form.resetFields();
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   };
-  // }, []);
-  // if (!initialValues) {
-  //   return <div>Loading...</div>;
-  // }
   return (
     <div className={styles.container}>
       <Row style={{ marginBottom: "25px" }}>
@@ -265,9 +241,10 @@ const DetailForm = () => {
                           },
                         ]}
                       >
-                        <Select>
+                        <Select showSearch>
                           {provinces.map((province) => (
                             <Select.Option
+                              label={province.ProvinceName}
                               key={province.ProvinceID}
                               value={province.ProvinceID}
                             >

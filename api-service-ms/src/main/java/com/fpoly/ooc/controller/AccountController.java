@@ -27,6 +27,10 @@ public class AccountController {
     public ResponseEntity<?> phanTrang(@RequestParam(name = "page", defaultValue = "0") Integer pageNo) {
         return ResponseEntity.ok(service.phanTrang(pageNo, 5));
     }
+    @GetMapping("detail/{username}")
+    public ResponseEntity<?> detail(@PathVariable String username){
+        return ResponseEntity.ok(service.detail(username));
+    }
 
     @PostMapping("create")
     public ResponseEntity<?> save(@RequestBody AccountRequest request) {

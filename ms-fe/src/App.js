@@ -68,16 +68,29 @@ function App() {
                   <Route path="brand" element="brand"></Route>
 
                   {/* Tài khoản */}
-                  <Route path="employee" element={<CustomerAdmin />}></Route>
+                  <Route
+                    path="employee"
+                    element={<CustomerAdmin roleId={1} />}
+                  ></Route>
                   <Route
                     path="employee/create"
-                    element={<AccountForm />}
+                    element={<AccountForm roleId={1} />}
                   ></Route>
                   <Route
                     path="employee/detail"
                     element={<DetailForm />}
                   ></Route>
-                  <Route path="customer" element={<CustomerAdmin />}></Route>
+                  <Route path="customer" element={<CustomerAdmin roleId={2} />}>
+                   
+                  </Route>
+                  <Route
+                      path="customer/create"
+                      element={<AccountForm roleId={2} />}
+                    ></Route>
+                      <Route
+                    path="employee/detail"
+                    element={<DetailForm roleId={2} />}
+                  ></Route>
 
                   {/* Voucher */}
                   <Route path="voucher">

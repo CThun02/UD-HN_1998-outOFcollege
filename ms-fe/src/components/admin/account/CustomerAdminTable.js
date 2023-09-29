@@ -11,25 +11,27 @@ import {
   Form,
   Input,
   Radio,
+  DetailForm,
 } from "antd";
 import {
   HighlightOutlined,
   PlusOutlined,
   EyeOutlined,
   FileOutlined,
-  CloseOutlined,
 } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import style from "./styles/Customerlndex.module.css";
 import axios from "axios";
-function CustomerTable() {
+function CustomerTable(props) {
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  let roleId = props.roleId;
 
   const [form] = Form.useForm();
   const [name, setName] = useState(null);
   const [gender, setGender] = useState(null);
   const [birthdate, setBirthdate] = useState(null);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
 
   useEffect(() => {
     axios
@@ -43,10 +45,10 @@ function CustomerTable() {
   const navigate = useNavigate();
 
   const handleAddAccount = () => {
-    navigate("/admin/employee/create");
+    navigate(`/admin/${roleId === 1 ? "employee" : "customer"}/create`);
   };
   const handleAddAccount1 = () => {
-    navigate("/admin/employee/detail");
+    navigate(`/admin/${roleId === 1 ? "employee" : "customer"}/detail`);
   };
 
   const handlePageChange = (page) => {
@@ -66,17 +68,26 @@ function CustomerTable() {
         console.error(error);
       });
   };
-  const handleDeleteCustomer = (username) => {
-    // Gửi yêu cầu xóa dữ liệu đến API
-    axios
-      .delete(`http://localhost:8080/account/api/delete/${username}`)
-      .then((response) => {
-        // Xóa thành công, tải lại dữ liệu từ API
-        fetchData(currentPage - 1);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+  const fetchCustomerData = async (username) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8080/account/api/detail/${username}`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching customer data:", error);
+      return null;
+    }
+  };
+  const handleOpenSecondModal1 = async (customer) => {
+    try {
+      const customerData = await fetchCustomerData(customer.username);
+      if (customerData) {
+        setSelectedCustomer(customerData);
+      }
+    } catch (error) {
+      console.error("Error retrieving customer data:", error);
+    }
   };
 
   const handleOpenSecondModal = (customer) => {
@@ -85,21 +96,6 @@ function CustomerTable() {
     setBirthdate(customer.creatAt);
   };
 
-  const onFinish = async (values) => {
-    values.idRole = 1;
-    console.log(values);
-    // Xử lý khi gửi form thành công
-    try {
-      // Gửi yêu cầu POST đến API
-      const response = await axios.post(
-        "http://localhost:8080/account/api/create",
-        values
-      );
-      console.log(response.data); // Đây là phản hồi từ API
-    } catch (error) {
-      console.error(error);
-    }
-  };
   return (
     <div>
       <Table
@@ -158,6 +154,15 @@ function CustomerTable() {
           },
         ]}
       />
+      {/* <Modal
+  visible={!!selectedCustomer}
+  onCancel={() => setSelectedCustomer(null)}
+  footer={null}
+>
+  {selectedCustomer && (
+    <DetailForm customer={selectedCustomer} />
+  )}
+</Modal> */}
       <div className="">
         <Row align="bottom" className={style.btnCRUD}>
           <Col span={2} offset={1}>

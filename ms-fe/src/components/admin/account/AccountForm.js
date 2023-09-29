@@ -17,15 +17,14 @@ import {
 } from "antd";
 import { UserOutlined } from "@ant-design/icons";
 // Nhập ảnh mã QR
-
 const { Option } = Select;
-
-const MyForm = () => {
+const MyForm = (props) => {
   const [imageFile, setImageFile] = useState(null);
   const [imageUrl, setImageUrl] = useState(null);
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
- 
+  const [wards, setWards] = useState([]);
+  let roleId = props.roleId;
 
   const handleUpload = (file) => {
     // Xử lý file ảnh tải lên và set state imageUrl
@@ -59,47 +58,43 @@ const MyForm = () => {
     fetchProvinces();
   }, []);
 
-  axios
-    .get(
-      "https://online-gateway.ghn.vn/shiip/public-api/master-data/district?province_id",
-      {
-        headers: {
-          token: "0f082cbe-5110-11ee-a59f-a260851ba65c",
-        },
-      }
-    )
-    .then((response) => {
-      const districtsData = response.data.data;
-      setDistricts(districtsData);
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-  const fetchDistricts = async () => {
-    try {
-      const response = await axios.get(
-        "https://online-gateway.ghn.vn/shiip/public-api/master-data/district",
+  const fetchDistricts = async (value) => {
+    await axios
+      .get(
+        `https://online-gateway.ghn.vn/shiip/public-api/master-data/district?province_id=${value}`,
         {
           headers: {
             token: "0f082cbe-5110-11ee-a59f-a260851ba65c",
           },
-          data: {
-            province_id: 201, // Thay đổi province_id theo yêu cầu của bạn
+        }
+      )
+      .then((response) => {
+        setDistricts(response.data.data);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+  const fetchWard = async (value) => {
+    await axios
+      .get(
+        `https://online-gateway.ghn.vn/shiip/public-api/master-data/ward?district_id=${value}`,
+        {
+          headers: {
+            token: "0f082cbe-5110-11ee-a59f-a260851ba65c",
           },
         }
-      );
-
-      const districtsData = response.data.data;
-      setDistricts(districtsData);
-    } catch (error) {
-      console.error("Error fetching districts:", error);
-    }
+      )
+      .then((response) => {
+        setWards(response.data.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
-  fetchDistricts();
 
   const onFinish = async (values) => {
-    values.idRole = 1;
-    console.log(values);
+    values.idRole = roleId;
     // Xử lý khi gửi form thành công
     try {
       // Gửi yêu cầu POST đến API
@@ -118,7 +113,9 @@ const MyForm = () => {
       <Form onFinish={onFinish}>
         <Row style={{ marginBottom: "25px" }}>
           <Col span={8}>
-            <h2>Thông tin nhân viên</h2>
+            <h2>
+              Thông tin {Number(roleId) === 1 ? "nhân viên" : "khách hàng"}
+            </h2>
           </Col>
           <Col span={16}>
             <h2>Thông tin chi tiết</h2>
@@ -230,7 +227,7 @@ const MyForm = () => {
                 <div className={styles.sdt}>
                   <span>Số điện thoại</span>
                   <Form.Item
-                    name="phoneNumber"
+                    name="numberPhone"
                     rules={[
                       {
                         required: true,
@@ -290,11 +287,26 @@ const MyForm = () => {
                           },
                         ]}
                       >
-                        <Select>
+                        <Select
+                          showSearch
+                          onChange={fetchDistricts}
+                          optionFilterProp="children"
+                          filterOption={(input, option) =>
+                            (option?.label ?? "").includes(input)
+                          }
+                          filterSort={(optionA, optionB) =>
+                            (optionA?.label ?? "")
+                              .toLowerCase()
+                              .localeCompare(
+                                (optionB?.label ?? "").toLowerCase()
+                              )
+                          }
+                        >
                           {provinces.map((province) => (
                             <Select.Option
                               key={province.ProvinceID}
                               value={province.ProvinceID}
+                              label={province.ProvinceName}
                             >
                               {province.ProvinceName}
                             </Select.Option>
@@ -312,9 +324,24 @@ const MyForm = () => {
                           { required: true, message: "Vui lòng chọn quận" },
                         ]}
                       >
-                        <Select>
+                        <Select
+                          showSearch
+                          onChange={fetchWard}
+                          optionFilterProp="children"
+                          filterOption={(input, option) =>
+                            (option?.label ?? "").includes(input)
+                          }
+                          filterSort={(optionA, optionB) =>
+                            (optionA?.label ?? "")
+                              .toLowerCase()
+                              .localeCompare(
+                                (optionB?.label ?? "").toLowerCase()
+                              )
+                          }
+                        >
                           {districts.map((district) => (
                             <Select.Option
+                              label={district.DistrictName}
                               key={district.DistrictID}
                               value={district.DistrictID}
                             >
@@ -334,14 +361,28 @@ const MyForm = () => {
                           { required: true, message: "Vui lòng chọn phường" },
                         ]}
                       >
-                        <Select>
-                          {districts.map((district) => (
-                            <Option
-                              key={district.DistrictID}
-                              value={district.DistrictID}
+                        <Select
+                          showSearch
+                          optionFilterProp="children"
+                          filterOption={(input, option) =>
+                            (option?.label ?? "").includes(input)
+                          }
+                          filterSort={(optionA, optionB) =>
+                            (optionA?.label ?? "")
+                              .toLowerCase()
+                              .localeCompare(
+                                (optionB?.label ?? "").toLowerCase()
+                              )
+                          }
+                        >
+                          {wards.map((ward) => (
+                            <Select.Option
+                              label={ward.WardName}
+                              key={ward.WardCode}
+                              value={ward.WardCode}
                             >
-                              {district.DistrictName}
-                            </Option>
+                              {ward.WardName}
+                            </Select.Option>
                           ))}
                         </Select>
                       </Form.Item>

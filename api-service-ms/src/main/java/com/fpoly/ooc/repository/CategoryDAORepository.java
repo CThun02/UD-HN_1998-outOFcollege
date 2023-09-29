@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CategoryDAORepository extends JpaRepository<Category, Long> {
+    public Category findFirstByCategoryName(String categoryName);
 }

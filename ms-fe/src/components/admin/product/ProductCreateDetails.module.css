@@ -38,3 +38,15 @@
   border-radius: 50%;
   margin-right: 8px;
 }
+
+.product_ButtonCreate {
+  font-size: 12px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid #edf2f9;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+}

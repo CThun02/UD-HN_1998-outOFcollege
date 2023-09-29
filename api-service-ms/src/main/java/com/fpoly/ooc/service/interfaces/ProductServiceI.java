@@ -15,7 +15,7 @@ public interface ProductServiceI {
     public List<Product> getAll();
     public Product getOne(Long id);
     public Product getOneByCode(String code);
-    public Page<ProductTableResponse> getProductsTable(int pageNumber, String status1, String status2);
+    public List<ProductTableResponse> getProductsTable(String status1, String status2);
     public ProductTableResponse getProductEdit(Long id);
     public ProductResponse getProductResponseById(Long id);
     public List<ProductTableResponse> getProductFilterByCom(Long brandId, Long categoryId, Long patternId, Long formId);

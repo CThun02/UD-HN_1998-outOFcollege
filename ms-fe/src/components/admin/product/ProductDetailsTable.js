@@ -1,16 +1,19 @@
 import styles from "./ProductDetailsTable.module.css";
 
 import React, { useEffect, useState } from "react";
-import { Button, Col, message, Row, Table } from "antd";
+import { Button, Col, message, Row, Table, Card } from "antd";
 import axios from "axios";
 import Input from "antd/es/input/Input";
 import {
+  AreaChartOutlined,
   DeleteFilled,
   PlusCircleOutlined,
   ReloadOutlined,
 } from "@ant-design/icons";
 import Modal from "antd/es/modal/Modal";
 import Checkbox from "antd/es/checkbox/Checkbox";
+import { saveImage } from "../../../config/FireBase";
+import { ref, uploadBytes, listAll, getDownloadURL } from "firebase/storage";
 
 const ProductDetailsTable = (props) => {
   const api = "http://localhost:8080/api/admin/";
@@ -28,6 +31,7 @@ const ProductDetailsTable = (props) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [colorsCreate, setColorsCreate] = useState([]);
   const [sizesCreate, setSizesCreate] = useState([]);
+  const [imgDisplay, setimgDisplay] = useState([]);
 
   const columns = [
     {
@@ -110,6 +114,19 @@ const ProductDetailsTable = (props) => {
   function handleCancel() {
     setIsModalOpen(false);
   }
+
+  function uploadImage(productName, colorName, imgs) {
+    for (let img of imgs) {
+      const currentTimeInMillis = new Date().getTime();
+      console.log(currentTimeInMillis + img.name);
+      const imgRef = ref(
+        saveImage,
+        `products/${productName}/${colorName}/${currentTimeInMillis + img.name}`
+      );
+      uploadBytes(imgRef, img);
+    }
+  }
+
   async function getSizes(Colors) {
     try {
       let list = [];
@@ -139,6 +156,7 @@ const ProductDetailsTable = (props) => {
       return null;
     }
   }
+
   function updateProductDetail(fildeName, event, productDetail) {
     fildeName === "quantity"
       ? (productDetail.quantity = event.target.value)
@@ -210,7 +228,6 @@ const ProductDetailsTable = (props) => {
           collarId
       )
       .then((res) => {
-        console.log(res.data);
         setColors(res.data);
         getSizes(res.data);
       })
@@ -233,6 +250,38 @@ const ProductDetailsTable = (props) => {
       .catch((err) => {
         console.log(err);
       });
+    if (colors !== null) {
+      var index = { colorName: "", imgsColor: [] };
+      for (let color of colors) {
+        if (index.colorName !== color.colorName) {
+          index.colorName = color.colorName;
+          index.imgsColor = [];
+        }
+        listAll(
+          ref(
+            saveImage,
+            `products/${product.productName.replace(
+              " ",
+              "_"
+            )}/${color.colorName.replace(" ", "_")}`
+          )
+        )
+          .then((imgs) => {
+            imgs.items.forEach((item) => {
+              getDownloadURL(item).then((url) => {
+                index.imgsColor.push(url);
+              });
+            });
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
+      setimgDisplay(index);
+      if (imgDisplay === undefined) {
+        renderChange(index);
+      }
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     buttonId,
@@ -273,6 +322,7 @@ const ProductDetailsTable = (props) => {
                       <Button
                         className={styles.product__updateButton}
                         onClick={showModal}
+                        style={{ marginRight: "4px" }}
                       >
                         <PlusCircleOutlined
                           className={styles.product__updateCreateButton}
@@ -306,10 +356,42 @@ const ProductDetailsTable = (props) => {
                           </Row>
                         </Checkbox.Group>
                       </Modal>
+                      <Button
+                        style={{ marginLeft: "4px" }}
+                        className={styles.product__updateButton}
+                      >
+                        <input
+                          type={"file"}
+                          onChange={(event) => {
+                            uploadImage(
+                              product.productName.replace(" ", "_"),
+                              item.colorName.replace(" ", "_"),
+                              event.target.files
+                            );
+                          }}
+                          multiple={true}
+                          id="upload"
+                          style={{ display: "none" }}
+                        />
+                        <label htmlFor="upload">
+                          <AreaChartOutlined
+                            className={styles.product__updateCreateButton}
+                          />
+                        </label>
+                      </Button>
                     </div>
                   );
                 }}
               ></Table>
+              <div style={{ margin: "16px 30px" }}>
+                <Row>
+                  <Col span={3} key={item.id}>
+                    <Card hoverable cover={<img alt="example" src={item} />}>
+                      <DeleteFilled />
+                    </Card>
+                  </Col>
+                </Row>
+              </div>
             </div>
           );
         })}

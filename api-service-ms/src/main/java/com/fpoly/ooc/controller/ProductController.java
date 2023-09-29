@@ -61,7 +61,6 @@ public class ProductController {
                                                         @RequestParam Optional<Long> collarId,
                                                         @RequestParam Optional<Long> colorId,
                                                         @RequestParam Optional<Long> sizeId) {
-        System.out.println(productId);
         return ResponseEntity.ok(productDetailService.filterProductDetailsByIdCom
                 (productId.orElse(null), buttonId.orElse(null), materialId.orElse(null), shirtTailId.orElse(null),
                         sleeveId.orElse(null), collarId.orElse(null), colorId.orElse(null), sizeId.orElse(null)));

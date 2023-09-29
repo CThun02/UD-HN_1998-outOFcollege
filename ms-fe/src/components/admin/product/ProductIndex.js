@@ -50,22 +50,51 @@ const ProductIndex = () => {
       },
     },
     {
+      key: "2",
+      title: "Mã sản phẩm",
+      dataIndex: "productCode",
+    },
+    {
       key: "3",
       title: "Tên sản phẩm",
       dataIndex: "productName",
     },
     {
       key: "4",
-      title: "Số lượng",
-      dataIndex: "quantity",
+      title: "Thương hiệu",
+      dataIndex: "brand.brandName",
+      render: (index, record) => {
+        return record.brand.brandName;
+      },
     },
     {
       key: "5",
-      title: "Ngày tạo",
-      dataIndex: "createdAt",
-      render: (createdAt) => (
-        <>{moment(createdAt).format("DD/MM/YYYY HH:mm:ss")}</>
-      ),
+      title: "Loại sản phẩm",
+      dataIndex: "category.categoryName",
+      render: (index, record) => {
+        return record.category.categoryName;
+      },
+    },
+    {
+      key: "5",
+      title: "Họa tiết",
+      dataIndex: "pattern.patternName",
+      render: (index, record) => {
+        return record.pattern.patternName;
+      },
+    },
+    {
+      key: "6",
+      title: "Dáng áo",
+      dataIndex: "form.formName",
+      render: (index, record) => {
+        return record.form.formName;
+      },
+    },
+    {
+      key: "4",
+      title: "Số lượng",
+      dataIndex: "quantity",
     },
     {
       key: "6",
@@ -163,6 +192,15 @@ const ProductIndex = () => {
   useEffect(() => {
     setLoading(true);
     axios
+      .get(api + "product")
+      .then((response) => {
+        setProductsTable(response.data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    axios
       .get(api + "brand")
       .then((response) => {
         setBrands(response.data);
@@ -190,15 +228,6 @@ const ProductIndex = () => {
       .get(api + "form")
       .then((response) => {
         setForms(response.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-    axios
-      .get(api + "product")
-      .then((response) => {
-        setProductsTable(response.data);
-        setLoading(false);
       })
       .catch((error) => {
         console.log(error);
@@ -241,7 +270,11 @@ const ProductIndex = () => {
                   {brands &&
                     brands.map((item) => {
                       return (
-                        <Select.Option key={item.id} value={item.id}>
+                        <Select.Option
+                          key={item.id}
+                          value={item.id}
+                          label={item.brandName}
+                        >
                           {item.brandName}
                         </Select.Option>
                       );

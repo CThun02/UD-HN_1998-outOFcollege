@@ -10,7 +10,7 @@ import CreatePromotion from "./components/admin/promotion/CreatePromotion";
 import Voucher from "./components/admin/voucher/Voucher";
 import Bill from "./components/admin/sale-couter/Bill";
 import CreateBill from "./components/admin/sale-couter/CreateBill";
-import ProductDetails from "./components/admin/product/ProductDetails";
+import ProductDetailsByProductId from "./components/admin/product/ProductDetailsByProductId";
 import ProductCreateDetails from "./components/admin/product/ProductCreateDetails";
 
 function App() {
@@ -52,7 +52,7 @@ function App() {
                     <Route index element={<ProductIndex />} />
                     <Route
                       path={"details/:productId"}
-                      element={<ProductDetails />}
+                      element={<ProductDetailsByProductId />}
                     />
                     <Route
                       path={"create-details/"}

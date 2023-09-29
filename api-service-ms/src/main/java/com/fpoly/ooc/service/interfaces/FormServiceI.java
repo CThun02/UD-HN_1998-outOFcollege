@@ -11,4 +11,6 @@ public interface FormServiceI {
     public Boolean delete(Long id);
     public List<Form> findAll();
     public Form getOne(Long id);
+    public Form findFirstByFormName(String formName);
+
 }

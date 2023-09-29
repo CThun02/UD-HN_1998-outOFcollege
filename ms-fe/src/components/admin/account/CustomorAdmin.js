@@ -45,7 +45,7 @@ const CustomerAddminIndex = function (props) {
             <Row>
               <p>Nhập tên khách hàng, email, số điện thoại</p>
             </Row>
-            <Row className={style.adminMenu1}>
+            <Row>
               <Input
                 placeholder="Nhập từ khóa để tìm kiếm"
                 prefix={<SearchOutlined />}

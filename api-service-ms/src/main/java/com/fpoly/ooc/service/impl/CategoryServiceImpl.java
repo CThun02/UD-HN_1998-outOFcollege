@@ -46,4 +46,9 @@ public class CategoryServiceImpl implements CategoryServiceI {
     public Category getOne(Long id) {
         return repo.findById(id).orElse(null);
     }
+
+    @Override
+    public Category findFirstByCategoryName(String categoryName) {
+        return repo.findFirstByCategoryName(categoryName);
+    }
 }

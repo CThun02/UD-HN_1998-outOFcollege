@@ -14,6 +14,8 @@ import {
   DatePicker,
   Radio,
   Spin,
+  message,
+  notification,
 } from "antd";
 import FilterVoucherAndPromotion from "../../element/filter/FilterVoucherAndPromotion";
 import { Link } from "react-router-dom";
@@ -23,7 +25,7 @@ import {
   PlusOutlined,
   UnorderedListOutlined,
 } from "@ant-design/icons";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
@@ -33,6 +35,7 @@ import moment from "moment";
 import * as Yup from "yup";
 
 import FloatingLabels from "../../element/FloatingLabels/FloatingLabels";
+import { ValidNotBlank, ValidStartDateAndEndDate } from "./ValidationVoucher";
 
 dayjs.extend(customParseFormat);
 
@@ -40,10 +43,23 @@ const dateFormat = "DD/MM/YYYY";
 
 const baseUrl = "http://localhost:8080/admin/api/voucher/";
 
+const Context = React.createContext({ name: "Default" });
+
 const options = [
   { label: "VND", value: "vnd" },
   { label: "%", value: "%" },
 ];
+
+function disabledDate(current) {
+  return (
+    current &&
+    current <
+      dayjs(
+        moment(new Date().toLocaleDateString()).format(dateFormat),
+        dateFormat
+      )
+  );
+}
 
 function Voucher() {
   // filter
@@ -58,6 +74,7 @@ function Voucher() {
 
   const [voucherId, setVoucherId] = useState("");
   const [voucherName, setVoucherName] = useState("");
+  const [voucherNameCurrent, setVoucherNameCurrent] = useState("");
   const [voucherCode, setVoucherCode] = useState("");
   const [limitQuantity, setLimitQuantity] = useState("");
   const [voucherValue, setVoucherValue] = useState("");
@@ -65,27 +82,19 @@ function Voucher() {
   const [voucherCondition, setVoucherCondition] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [status, setStatus] = useState("");
   const [voucherMethod, setVoucherMethod] = useState("vnd");
   const [vouchers, setVouchers] = useState([]);
   const [totalElements, setTotalElements] = useState(1);
   const [pageNo, setPageNo] = useState(1);
   const [pageSize, setPageSize] = useState(5);
 
-  // const schema = Yup.object().shape({
-  //   voucherName: Yup.string().required("Tên voucher không được bỏ trống"),
-  //   limitQuantity: Yup.string()
-  //     .required("Vui lòng nhập số lượng")
-  //     .matches(/^[0-9]+$/),
-  //   voucherValue: Yup.string()
-  //     .required("Vui lòng nhập giá trị của voucher")
-  //     .matches(/^\d+(\.\d+)?$/, "Sai định dạng"),
-  //   voucherValueMax: Yup.string()
-  //     .required("Vui lòng nhập giá trị của voucher tối đa")
-  //     .matches(/^\d+(\.\d+)?$/, "Sai định dạng"),
-  //   startDate: Yup.date()
-  //     .required("Không được bỏ trống")
-  //     .min(moment(new Date()).format("YYYY/MM/DD")),
-  // });
+  //nofitication
+  const [api, nofiticationContextHolder] = notification.useNotification();
+
+  //error
+  const [error, setError] = useState({});
+  const [isCheckSubmit, setIsCheckSubmit] = useState(false);
 
   const calculateStt = (index) => {
     return (pageNo - 1) * pageSize + index + 1;
@@ -109,6 +118,7 @@ function Voucher() {
   const onClose = () => {
     setOpen(false);
     setIsUpdate(false);
+    setIsCheckSubmit(false);
 
     setVoucherId("");
     setVoucherCode("");
@@ -119,33 +129,39 @@ function Voucher() {
     setVoucherCondition("");
     setStartDate("");
     setEndDate("");
-    setVoucherMethod("");
+    setVoucherMethod("vnd");
   };
 
   function handleDelete(value) {
     try {
       axios
-        .put(baseUrl + "update-status/" + value.id)
-        .then((res) => console.log(res.data))
+        .put(baseUrl + "update/" + value.code)
+        .then((res) => {
+          console.log(res.data);
+          setStatus(res.data.voucherCode);
+        })
         .catch((err) => console.log("Exception: ", err));
     } catch (err) {
       console.log("Error: ", err);
     }
   }
 
-  function handleStartDatChange(startDate) {
-    setStartDate(startDate);
+  function handleChangeDate(date, dateString) {
+    if (
+      moment(startDate.$d).format("DD-MM-YYYY") >
+      moment(endDate.$d).format("DD-MM-YYYY")
+    ) {
+      setError({ ...error, endDate: { status: true } });
+    }
+    return date;
   }
 
-  function handleEndDatChange(endDate) {
-    setEndDate(endDate);
-  }
-
-  function handleChangeNumber(value) {
-    const formattedValue = numeral(value).format("0,0");
-
-    if (formattedValue === "0") return "";
-    else return formattedValue;
+  function handleCheckNameVoucher(value) {
+    if (voucherId === "") {
+      setVoucherName(value);
+    } else {
+      setVoucherNameCurrent(value);
+    }
   }
 
   useEffect(
@@ -154,8 +170,7 @@ function Voucher() {
         setIsLoading(true);
         try {
           const filter = {
-            voucherCode: searchNameOrCode,
-            voucherName: searchNameOrCode,
+            voucherCodeOrName: searchNameOrCode,
             startDate:
               searchStartDate !== ""
                 ? moment(searchStartDate?.$d, "DD-MM-YYYY").format(
@@ -205,45 +220,120 @@ function Voucher() {
       searchStatus,
       pageNo,
       pageSize,
+      open,
+      status,
     ]
   );
 
-  function handleOnSubmit(e) {
-    e.preventDefault();
+  let isCheckNotEmpty = null;
+  let isCheckStartDateAndEndDate = null;
+
+  function handleOnSubmit(placement) {
+    setIsCheckSubmit(true);
+
     const voucher = {
+      voucherId: voucherId === "" ? "" : voucherId,
       voucherName,
-      voucherCode,
-      limitQuantity: Number(limitQuantity.replace(",", "")),
-      voucherValue: Number(voucherValue.replace(",", "")),
-      voucherValueMax: Number(voucherValueMax.replace(",", "")),
-      voucherCondition: Number(voucherCondition.replace(",", "")),
+      voucherNameCurrent,
+      voucherCode: voucherCode === "" ? "" : voucherCode,
+      limitQuantity: isNaN(limitQuantity)
+        ? Number.parseInt(limitQuantity?.replace(/,/g, ""))
+        : limitQuantity,
+      voucherValue: isNaN(voucherValue)
+        ? Number.parseInt(voucherValue?.replace(/,/g, ""))
+        : voucherValue,
+      voucherValueMax: isNaN(voucherValueMax)
+        ? Number.parseInt(voucherValueMax?.replace(/,/g, ""))
+        : voucherValueMax,
+      voucherCondition: isNaN(voucherCondition)
+        ? Number.parseInt(voucherCondition?.replace(/,/g, ""))
+        : voucherCondition,
       voucherMethod,
-      startDate,
-      endDate,
+      startDate: moment(startDate?.$d, "DD-MM-YYYY").format(
+        "YYYY-MM-DDTHH:mm:ss.SSS"
+      ),
+      endDate: moment(endDate?.$d, "DD-MM-YYYY").format(
+        "YYYY-MM-DDTHH:mm:ss.SSS"
+      ),
+      status,
     };
 
-    try {
-      const addVoucher = axios.post(baseUrl + "add", voucher);
-      console.log("Add: ", voucher);
+    console.log("voucher: ", voucher);
 
-      if (addVoucher.code === "ERR_BAD_REQUEST") {
-        setOpen(true);
-        return;
-      } else {
-        setOpen(false);
+    isCheckNotEmpty = ValidNotBlank(voucher);
+    isCheckStartDateAndEndDate = ValidStartDateAndEndDate(startDate, endDate);
 
-        setVoucherCode("");
-        setVoucherName("");
-        setLimitQuantity("");
-        setVoucherValue("");
-        setVoucherValueMax("");
-        setVoucherCondition("");
-        setVoucherMethod("");
-        setStartDate("");
-        setEndDate("");
+    console.log("isCheckNotEmpty: ", isCheckNotEmpty);
+    console.log("isCheckStartDateAndEndDate: ", isCheckStartDateAndEndDate);
+
+    if (isCheckNotEmpty?.status && isCheckStartDateAndEndDate?.status) {
+      try {
+        axios
+          .post(baseUrl + "add", voucher)
+          .then((res) => {
+            setOpen(false);
+            setIsCheckSubmit(false);
+
+            api.success({
+              message: `Thêm thành công.`,
+              description: (
+                <Context.Consumer>
+                  {() => `Sản phẩm đã được thêm`}
+                </Context.Consumer>
+              ),
+              placement,
+            });
+
+            setVoucherCode("");
+            setVoucherName("");
+            setLimitQuantity("");
+            setVoucherValue("");
+            setVoucherValueMax("");
+            setVoucherCondition("");
+            setVoucherMethod("vnd");
+            setStartDate("");
+            setEndDate("");
+            setStatus("");
+          })
+          .catch((err) => {
+            api.error({
+              message: `Cố lỗi xảy ra.`,
+              description: (
+                <Context.Consumer>
+                  {() => err.response.data.message}
+                </Context.Consumer>
+              ),
+              placement,
+            });
+            const errors = err.response.data;
+            setError({ ...error, voucher: errors });
+            console.log("Error: ", err.response.data);
+          });
+      } catch (err) {
+        console.log("errorCatch: ", err.response.data);
       }
-    } catch (err) {
-      console.log("error: ", err);
+    } else {
+      api.error({
+        message: `Cố lỗi xảy ra.`,
+        description: (
+          <Context.Consumer>
+            {() =>
+              `${isCheckNotEmpty?.status ? "" : isCheckNotEmpty?.message} 
+              ${
+                isCheckStartDateAndEndDate?.status
+                  ? ""
+                  : isCheckStartDateAndEndDate?.message
+              } `
+            }
+          </Context.Consumer>
+        ),
+        placement,
+      });
+      setError({
+        empty: isCheckNotEmpty,
+        startDate: isCheckStartDateAndEndDate,
+        endDate: isCheckStartDateAndEndDate,
+      });
     }
   }
 
@@ -261,20 +351,24 @@ function Voucher() {
         startDate,
         endDate,
         voucherMethod,
+        status,
       } = res.data;
+
+      console.log("handleDetail: ", res.data);
 
       setVoucherId(voucherId);
       setVoucherCode(voucherCode);
       setVoucherName(voucherName);
-      setLimitQuantity(numeral(limitQuantity).format("0,0"));
-      setVoucherValue(numeral(voucherValue).format("0,0"));
-      setVoucherValueMax(
-        voucherValueMax === 0 ? "" : numeral(voucherValueMax).format("0,0")
-      );
-      setVoucherCondition(numeral(voucherCondition).format("0,0"));
-      setStartDate(moment(startDate));
-      setEndDate(moment(endDate));
+      setVoucherNameCurrent(voucherName);
+      setLimitQuantity(limitQuantity);
+      setVoucherValue(voucherValue);
+      setVoucherValueMax(voucherValueMax === null ? "" : voucherValueMax);
+      setVoucherCondition(voucherCondition);
+      setStartDate(dayjs(moment(startDate).format(dateFormat), dateFormat));
+      setEndDate(dayjs(moment(endDate).format(dateFormat), dateFormat));
       setVoucherMethod(voucherMethod);
+      setStatus(status);
+
       setIsUpdate(true);
       setOpen(true);
     });
@@ -342,7 +436,10 @@ function Voucher() {
           >
             <EyeOutlined />
           </Button>
-          <Button className={styles.iconButton}>
+          <Button
+            onClick={() => handleDelete({ code })}
+            className={styles.iconButton}
+          >
             <DeleteOutlined />
           </Button>
         </Space>
@@ -391,67 +488,58 @@ function Voucher() {
                   open={open}
                   bodyStyle={{ paddingBottom: 80 }}
                 >
-                  <Form layout="vertical">
-                    <Input style={{ display: "none" }} value={voucherId} />
+                  <Context.Provider value={{ name: "xin chao" }}>
+                    {nofiticationContextHolder}
+                    <Form layout="vertical">
+                      <Input style={{ display: "none" }} value={voucherId} />
+                      <Input style={{ display: "none" }} value={voucherCode} />
 
-                    <Space
-                      style={{ width: "100%" }}
-                      size={8}
-                      direction="vertical"
-                    >
-                      <Row gutter={16}>
-                        <Col span={24}>
-                          <FloatingLabels
-                            label="Tên voucher"
-                            name="voucherName"
-                            value={voucherName}
-                            zIndex={true}
-                          >
-                            <Input
-                              size="large"
-                              name="voucherName"
-                              allowClear
-                              value={voucherName}
-                              onChange={(e) => setVoucherName(e.target.value)}
-                            />
-                          </FloatingLabels>
-                        </Col>
-                      </Row>
-                      <Row gutter={16}>
-                        <Col span={5}>
-                          <Radio.Group
-                            style={{ width: "100%" }}
-                            size="large"
-                            options={options}
-                            onChange={onChangevoucherMethod}
-                            value={voucherMethod}
-                            optionType="button"
-                          />
-                        </Col>
-                        {voucherMethod === "vnd" ? (
-                          <Col span={19}>
+                      <Space
+                        style={{ width: "100%" }}
+                        size={8}
+                        direction="vertical"
+                      >
+                        <Row gutter={16}>
+                          <Col span={24}>
                             <FloatingLabels
-                              label="Giá trị voucher"
-                              name="voucherValue"
-                              value={voucherValue}
+                              label="Tên voucher"
+                              name="voucherName"
+                              value={voucherName}
                               zIndex={true}
                             >
                               <Input
                                 size="large"
-                                suffix={"VND"}
+                                name="voucherName"
                                 allowClear
-                                value={voucherValue}
+                                value={voucherName}
                                 onChange={(e) =>
-                                  setVoucherValue(
-                                    handleChangeNumber(e.target.value)
-                                  )
+                                  handleCheckNameVoucher(e.target.value)
+                                }
+                                status={
+                                  !isCheckSubmit
+                                    ? ""
+                                    : voucherName === "" ||
+                                      error?.voucher?.voucherName === "error"
+                                    ? "error"
+                                    : ""
                                 }
                               />
                             </FloatingLabels>
                           </Col>
-                        ) : (
-                          <>
-                            <Col span={7}>
+                        </Row>
+                        <Row gutter={16}>
+                          <Col span={5}>
+                            <Radio.Group
+                              style={{ width: "100%" }}
+                              size="large"
+                              options={options}
+                              onChange={onChangevoucherMethod}
+                              value={voucherMethod}
+                              optionType="button"
+                            />
+                          </Col>
+                          {voucherMethod === "vnd" ? (
+                            <Col span={19}>
                               <FloatingLabels
                                 label="Giá trị voucher"
                                 name="voucherValue"
@@ -460,136 +548,241 @@ function Voucher() {
                               >
                                 <Input
                                   size="large"
-                                  suffix={"%"}
-                                  allowClear
-                                  value={voucherValue}
-                                  onChange={(e) =>
-                                    setVoucherValue(
-                                      handleChangeNumber(e.target.value)
-                                    )
-                                  }
-                                />
-                              </FloatingLabels>
-                            </Col>
-
-                            <Col span={12}>
-                              <FloatingLabels
-                                label="Giá trị voucher tối đa"
-                                name="voucherValueMax"
-                                value={voucherValueMax}
-                                zIndex={true}
-                              >
-                                <Input
-                                  size="large"
                                   suffix={"VND"}
                                   allowClear
-                                  value={voucherValueMax}
+                                  value={
+                                    voucherValue === ""
+                                      ? ""
+                                      : numeral(voucherValue).format("0,0")
+                                  }
                                   onChange={(e) =>
-                                    setVoucherValueMax(
-                                      handleChangeNumber(e.target.value)
-                                    )
+                                    setVoucherValue(e.target.value)
+                                  }
+                                  status={
+                                    !isCheckSubmit
+                                      ? ""
+                                      : voucherValue === "" ||
+                                        error?.voucher?.voucherValue === "error"
+                                      ? "error"
+                                      : ""
                                   }
                                 />
                               </FloatingLabels>
                             </Col>
-                          </>
-                        )}
-                      </Row>
-                      <Row gutter={16}>
-                        <Col span={12}>
-                          <FloatingLabels
-                            label="Số lượng"
-                            name="limitQuantity"
-                            value={limitQuantity}
-                            zIndex={true}
-                          >
-                            <Input
-                              size="large"
-                              allowClear
+                          ) : (
+                            <>
+                              <Col span={7}>
+                                <FloatingLabels
+                                  label="Giá trị voucher"
+                                  name="voucherValue"
+                                  value={voucherValue}
+                                  zIndex={true}
+                                >
+                                  <Input
+                                    size="large"
+                                    suffix={"%"}
+                                    allowClear
+                                    value={
+                                      voucherValue === ""
+                                        ? ""
+                                        : numeral(voucherValue).format("0,0")
+                                    }
+                                    onChange={(e) =>
+                                      setVoucherValue(e.target.value)
+                                    }
+                                    status={
+                                      !isCheckSubmit
+                                        ? ""
+                                        : voucherValue === "" ||
+                                          error?.response?.data
+                                            ?.voucherValue === "error"
+                                        ? "error"
+                                        : ""
+                                    }
+                                  />
+                                </FloatingLabels>
+                              </Col>
+
+                              <Col span={12}>
+                                <FloatingLabels
+                                  label="Giá trị voucher tối đa"
+                                  name="voucherValueMax"
+                                  value={voucherValueMax}
+                                  zIndex={true}
+                                >
+                                  <Input
+                                    size="large"
+                                    suffix={"VND"}
+                                    allowClear
+                                    value={
+                                      voucherValueMax === ""
+                                        ? ""
+                                        : numeral(voucherValueMax).format("0,0")
+                                    }
+                                    onChange={(e) =>
+                                      setVoucherValueMax(e.target.value)
+                                    }
+                                    status={
+                                      !isCheckSubmit
+                                        ? ""
+                                        : voucherValueMax === "" ||
+                                          error?.response?.data
+                                            ?.voucherValueMax === "error"
+                                        ? "error"
+                                        : ""
+                                    }
+                                  />
+                                </FloatingLabels>
+                              </Col>
+                            </>
+                          )}
+                        </Row>
+                        <Row gutter={16}>
+                          <Col span={12}>
+                            <FloatingLabels
+                              label="Số lượng"
+                              name="limitQuantity"
                               value={limitQuantity}
-                              onChange={(e) =>
-                                setLimitQuantity(
-                                  handleChangeNumber(e.target.value)
-                                )
-                              }
-                            />
-                          </FloatingLabels>
-                        </Col>
+                              zIndex={true}
+                            >
+                              <Input
+                                size="large"
+                                allowClear
+                                value={
+                                  limitQuantity === ""
+                                    ? ""
+                                    : numeral(limitQuantity).format("0,0")
+                                }
+                                onChange={(e) =>
+                                  setLimitQuantity(e.target.value)
+                                }
+                                status={
+                                  !isCheckSubmit
+                                    ? ""
+                                    : limitQuantity === "" ||
+                                      error?.voucher?.limitQuantity === "error"
+                                    ? "error"
+                                    : ""
+                                }
+                              />
+                            </FloatingLabels>
+                          </Col>
 
-                        <Col span={12}>
-                          <FloatingLabels
-                            label="Điều kiện áp dụng"
-                            name="voucherCondition"
-                            value={voucherCondition}
-                            zIndex={true}
-                          >
-                            <Input
-                              size="large"
-                              suffix={"VND"}
-                              allowClear
+                          <Col span={12}>
+                            <FloatingLabels
+                              label="Điều kiện áp dụng"
+                              name="voucherCondition"
                               value={voucherCondition}
-                              onChange={(e) =>
-                                setVoucherCondition(
-                                  handleChangeNumber(e.target.value)
-                                )
-                              }
-                            />
-                          </FloatingLabels>
-                        </Col>
-                      </Row>
+                              zIndex={true}
+                            >
+                              <Input
+                                size="large"
+                                suffix={"VND"}
+                                allowClear
+                                value={
+                                  voucherCondition === ""
+                                    ? ""
+                                    : numeral(voucherCondition).format("0,0")
+                                }
+                                onChange={(e) =>
+                                  setVoucherCondition(e.target.value)
+                                }
+                                status={
+                                  !isCheckSubmit
+                                    ? ""
+                                    : voucherCondition === "" ||
+                                      error?.response?.data
+                                        ?.voucherCondition === "error"
+                                    ? "error"
+                                    : ""
+                                }
+                              />
+                            </FloatingLabels>
+                          </Col>
+                        </Row>
 
-                      <Row gutter={16}>
-                        <Col span={12}>
-                          <FloatingLabels
-                            label="Ngày bắt đầu"
-                            name="startDate"
-                            value={startDate}
-                          >
-                            <DatePicker
-                              format={dateFormat}
-                              size="large"
-                              placeholder={null}
-                              style={{ width: "100%" }}
+                        <Row gutter={16}>
+                          <Col span={12}>
+                            <FloatingLabels
+                              label="Ngày bắt đầu"
+                              name="startDate"
                               value={startDate}
-                              onChange={handleStartDatChange}
-                            />
-                          </FloatingLabels>
-                        </Col>
+                            >
+                              <DatePicker
+                                disabledDate={disabledDate}
+                                format={dateFormat}
+                                size="large"
+                                placeholder={null}
+                                style={{ width: "100%" }}
+                                value={startDate}
+                                onChange={(date, dateString) =>
+                                  setStartDate(
+                                    handleChangeDate(date, dateString)
+                                  )
+                                }
+                                status={
+                                  !isCheckSubmit
+                                    ? ""
+                                    : startDate === "" ||
+                                      error?.voucher?.startDate === "error"
+                                    ? "error"
+                                    : ""
+                                }
+                              />
+                            </FloatingLabels>
+                          </Col>
 
-                        <Col span={12}>
-                          <FloatingLabels
-                            label="Ngày kết thúc"
-                            name="endDate"
-                            value={endDate}
-                          >
-                            <DatePicker
-                              format={dateFormat}
-                              size="large"
-                              placeholder={null}
-                              style={{ width: "100%" }}
+                          <Col span={12}>
+                            <FloatingLabels
+                              label="Ngày kết thúc"
+                              name="endDate"
                               value={endDate}
-                              onChange={handleEndDatChange}
-                            />
-                          </FloatingLabels>
-                        </Col>
-                      </Row>
+                            >
+                              <DatePicker
+                                disabledDate={disabledDate}
+                                format={dateFormat}
+                                size="large"
+                                placeholder={null}
+                                style={{ width: "100%" }}
+                                value={endDate}
+                                onChange={(date, dateString) =>
+                                  setEndDate(handleChangeDate(date, dateString))
+                                }
+                                status={
+                                  !isCheckSubmit
+                                    ? ""
+                                    : endDate === "" ||
+                                      error?.endDate?.status ||
+                                      error?.voucher?.endDate === "error"
+                                    ? ""
+                                    : "error"
+                                }
+                              />
+                            </FloatingLabels>
+                          </Col>
+                        </Row>
 
-                      <Row
-                        gutter={16}
-                        style={{
-                          display: "flex",
-                          justifyContent: "flex-end",
-                        }}
-                      >
-                        <Space>
-                          <Button onClick={onClose}>Hủy</Button>
-                          <Button type="primary" onClick={handleOnSubmit}>
-                            Xác nhận
-                          </Button>
-                        </Space>
-                      </Row>
-                    </Space>
-                  </Form>
+                        <Row
+                          gutter={16}
+                          style={{
+                            display: "flex",
+                            justifyContent: "flex-end",
+                          }}
+                        >
+                          <Space>
+                            <Button onClick={onClose}>Hủy</Button>
+                            <Button
+                              type="primary"
+                              htmlType="submit"
+                              onClick={() => handleOnSubmit("topRight")}
+                            >
+                              Xác nhận
+                            </Button>
+                          </Space>
+                        </Row>
+                      </Space>
+                    </Form>
+                  </Context.Provider>
                 </Drawer>
               </>
             </Col>

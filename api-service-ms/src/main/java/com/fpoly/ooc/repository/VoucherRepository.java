@@ -20,11 +20,12 @@ import java.util.Optional;
 public interface VoucherRepository extends JpaRepository<Voucher, Long> {
 
     @Query(name = "Voucher.findAllVoucher", nativeQuery = true)
-    List<VoucherResponse> findAllVoucher(String voucherCode,
-                                         String voucherName,
+    List<VoucherResponse> findAllVoucher(String voucherCodeOrName,
                                          LocalDateTime startDate,
                                          LocalDateTime endDate,
                                          String status);
+
+    Optional<Voucher> findVoucherByVoucherName(String voucherName);
 
     Optional<Voucher> findVoucherByVoucherCode( String code);
 }

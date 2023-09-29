@@ -1,9 +1,13 @@
-package com.fpoly.ooc.request;
+package com.fpoly.ooc.request.product;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fpoly.ooc.entity.*;
+import lombok.Getter;
+import lombok.Setter;
 
-public class ProductRequest {
+@Getter
+@Setter
+public class ProductRequest{
     @JsonProperty("id")
     private Long id;
     @JsonProperty("productName")

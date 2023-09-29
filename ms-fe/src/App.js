@@ -3,13 +3,14 @@ import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import { Button, Col, Result, Row } from "antd";
 import SideBar from "./components/admin/page/SideBar";
 import NavBar from "./components/admin/page/NavBar";
+import Footer from "./components/admin/page/Footer";
 import ProductIndex from "./components/admin/product/ProductIndex";
 import Promotion from "./components/admin/promotion/Promotion";
 import CreatePromotion from "./components/admin/promotion/CreatePromotion";
 import Voucher from "./components/admin/voucher/Voucher";
 import Bill from "./components/admin/sale-couter/Bill";
 import CreateBill from "./components/admin/sale-couter/CreateBill";
-import ProductUpdate from "./components/admin/product/ProductUpdate";
+import ProductDetails from "./components/admin/product/ProductDetails";
 import ProductCreateDetails from "./components/admin/product/ProductCreateDetails";
 import AccountForm from "./components/admin/account/AccountForm";
 import CustomerAdmin from "./components/admin/account/CustomorAdmin";
@@ -52,14 +53,17 @@ function App() {
                   <Route path="product">
                     <Route index element={<ProductIndex />} />
                     <Route
-                      path={"update/:productId"}
-                      element={<ProductUpdate />}
+                      path={"details/:productId"}
+                      element={<ProductDetails />}
                     />
                     <Route
-                      path={"create-details/:productId"}
+                      path={"create-details/"}
                       element={<ProductCreateDetails />}
                     />
-
+                    <Route
+                      path={"update-details"}
+                      element={<ProductCreateDetails />}
+                    />
                     {/* ví dụ path= san-pham/hien-thi ->  
                     <Route path="hien-thi" element="el" />
                     */}
@@ -124,6 +128,9 @@ function App() {
                   }
                 />
               </Routes>
+              <div>
+                <Footer />
+              </div>
             </div>
           </Col>
         </Row>

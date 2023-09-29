@@ -118,6 +118,7 @@ function CustomerTable(props) {
             render: (_, image) => (
               <img
                 src={image.image}
+                className={style.picture}
                 alt="Avatar"
                 style={{ width: "50px", height: "50px" }}
               />

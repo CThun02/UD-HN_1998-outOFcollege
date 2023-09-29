@@ -46,4 +46,9 @@ public class FormServiceImpl implements FormServiceI {
     public Form getOne(Long id) {
         return repo.findById(id).orElse(null);
     }
+
+    @Override
+    public Form findFirstByFormName(String formName) {
+        return repo.findFirstByFormName(formName);
+    }
 }

@@ -7,9 +7,6 @@ import com.fpoly.ooc.responce.product.ProductTableResponse;
 import com.fpoly.ooc.service.interfaces.ProductServiceI;
 import com.fpoly.ooc.utilities.UniqueRandomHex;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,6 +22,7 @@ public class ProductServiceImpl implements ProductServiceI {
     public Product create(Product product) {
         while(true){
             String productCode= "PRO_"+ UniqueRandomHex.generateUniqueRandomHex();
+            productCode = productCode.replace("#", "");
             Optional<Product> check = Optional.ofNullable(repo.findFirstByProductCode(productCode));
             if(check.isEmpty()){
                 product.setProductCode(productCode);
@@ -37,6 +35,7 @@ public class ProductServiceImpl implements ProductServiceI {
     @Override
     public Product update(Product product) {
         Product productCheck = this.getOne(product.getId());
+        System.out.println(product.getId());
         if(productCheck != null){
             productCheck = repo.save(product);
         }
@@ -71,9 +70,8 @@ public class ProductServiceImpl implements ProductServiceI {
     }
 
     @Override
-    public Page<ProductTableResponse> getProductsTable(int pageNumber) {
-        Pageable pageable = PageRequest.of(pageNumber, 5);
-        return repo.getProductsTable(pageable);
+    public List<ProductTableResponse> getProductsTable(String status1, String status2) {
+        return repo.getProductsTable(status1, status2);
     }
 
     @Override
@@ -85,4 +83,11 @@ public class ProductServiceImpl implements ProductServiceI {
     public ProductResponse getProductResponseById(Long id) {
         return repo.getProductResponseById(id);
     }
+
+    @Override
+    public List<ProductTableResponse> getProductFilterByCom(Long brandId, Long categoryId, Long patternId, Long formId) {
+        return repo.getProductFilterByCom(brandId, categoryId, patternId, formId);
+    }
+
+
 }

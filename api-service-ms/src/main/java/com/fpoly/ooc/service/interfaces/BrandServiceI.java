@@ -8,4 +8,6 @@ public interface BrandServiceI {
     public Boolean delete(Long id);
     public List<Brand> findAll();
     public Brand getOne(Long id);
+    public Brand findFirstByBrandName(String brandName);
+
 }

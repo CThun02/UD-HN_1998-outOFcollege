@@ -46,4 +46,9 @@ public class PatternServiceImpl implements PatternServiceI {
     public Pattern getOne(Long id) {
         return repo.findById(id).orElse(null);
     }
+
+    @Override
+    public Pattern findFirstByPatternName(String patternName) {
+        return repo.findFirstByPatternName(patternName);
+    }
 }

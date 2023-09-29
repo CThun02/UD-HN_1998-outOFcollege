@@ -1,23 +1,28 @@
-import { EyeOutlined, PlusSquareOutlined } from "@ant-design/icons";
+import {
+  EyeOutlined,
+  PlusOutlined,
+  PlusSquareOutlined,
+} from "@ant-design/icons";
 import { Button, Col, message, Row, Select } from "antd";
 import { isString } from "antd/es/button";
-import Input from "antd/es/input/Input";
 import TextArea from "antd/es/input/TextArea";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { displayFrame } from "../animations/animation";
+import "../animations/animation.css";
+import ProductCreate from "./ProductCreate";
 import styles from "./ProductCreateDetails.module.css";
 import ProductDetailsTable from "./ProductDetailsTable";
 import { isFormInputEmpty } from "./ValidateForm";
 
-const ProductCreateDetails = () => {
+const ProductCreateDetails = (props) => {
   const location = useLocation();
   const navigate = useNavigate();
   const searchParams = new URLSearchParams(location.search);
   const currentHref = window.location.href;
   const api = "http://localhost:8080/api/admin/";
   const [messageApi, contextHolder] = message.useMessage();
-  const { productId } = useParams();
   const [sizes, setSizes] = useState(null);
   const [colors, setColors] = useState(null);
   const [buttons, setButtons] = useState(null);
@@ -25,6 +30,8 @@ const ProductCreateDetails = () => {
   const [materials, setMaterials] = useState(null);
   const [sleeves, setSleeves] = useState(null);
   const [shirtTails, setshirtTails] = useState(null);
+  const [productList, setProductList] = useState(null);
+  const [render, setRender] = useState(null);
   const [url, setUrl] = useState(
     "https://vapa.vn/wp-content/uploads/2022/12/anh-3d-thien-nhien.jpeg"
   );
@@ -37,7 +44,7 @@ const ProductCreateDetails = () => {
     description: "",
   });
   const [productDetail, setProductDetail] = useState({
-    productId: productId,
+    productId: "",
     buttonId: " ",
     materialId: " ",
     collarId: " ",
@@ -45,13 +52,16 @@ const ProductCreateDetails = () => {
     sizeId: " ",
     colorId: " ",
     shirtTailId: " ",
-    price: " ",
+    price: 200000,
     quantity: 1,
     descriptionDetail: " ",
   });
   const [colorsCreate, setColorsCreate] = useState([]);
+  const [colorsUpdate, setColorsUpdate] = useState([]);
   const [sizesCreate, setSizesCreate] = useState([]);
+  const [sizesUpdate, setSizesUpdate] = useState([]);
   const productDetailUpdate = getProductUpdate();
+
   //fucntion
   function getProductUpdate() {
     if (currentHref.includes("update-details")) {
@@ -70,7 +80,7 @@ const ProductCreateDetails = () => {
     }
     let check = isFormInputEmpty(productDetail);
     if (!check) {
-      messageApi.loading("Vui lòng chờ!", 5);
+      messageApi.loading("Đang tải!", 2);
       for (let color of colorsCreate) {
         for (let size of sizesCreate) {
           let productDetailCreate = { ...productDetail };
@@ -78,50 +88,33 @@ const ProductCreateDetails = () => {
           productDetailCreate.sizeId = size;
           axios
             .post(api + "product/createDetail", productDetailCreate)
-            .then((response) => {})
-            .catch((error) => {
-              console.log(error);
+            .then((response) => {
+              let colorCreate = colors.find(function (obj) {
+                return Number(obj.id) === Number(color);
+              });
+              let sizeCreate = sizes.find(function (obj) {
+                return Number(obj.id) === Number(size);
+              });
+              if (response.data === "update") {
+                messageApi.success(
+                  `Cập nhập chi tiết sản phẩm màu ${colorCreate.colorName} Kích cỡ 
+                  ${sizeCreate.sizeName} số lượng + ${productDetailCreate.quantity}`,
+                  3
+                );
+              }
+            })
+            .catch((err) => {
+              console.log(err);
+              messageApi.error("Thêm mới thất bại!", 2);
             });
         }
       }
       setTimeout(() => {
-        messageApi.success("Thêm mới thành công!", 2);
-        linkToUpdate();
-      }, 5000);
+        messageApi.success("Thêm mới thành công!", 3);
+      }, 3000);
     } else {
       messageApi.error("Vui lòng chọn tất cả các trường!", 5);
     }
-  }
-
-  function linkToUpdate() {
-    axios
-      .get(
-        api +
-          "product/getProductDetailUpdate?productId=" +
-          productId +
-          "&buttonId=" +
-          productDetail.buttonId +
-          "&materialId=" +
-          productDetail.materialId +
-          "&shirtTailId=" +
-          productDetail.shirtTailId +
-          "&sleeveId=" +
-          productDetail.sleeveId +
-          "&collarId=" +
-          productDetail.collarId
-      )
-      .then((res) => {
-        setTimeout(() => {
-          navigate(
-            `/admin/product/update-details?productDetail=${encodeURIComponent(
-              JSON.stringify(res.data)
-            )}`
-          );
-        }, 2000);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
   }
 
   function handleSetProductDetail(field, value) {
@@ -132,6 +125,14 @@ const ProductCreateDetails = () => {
   }
 
   useEffect(() => {
+    axios
+      .get(api + "product")
+      .then((res) => {
+        setProductList(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
     axios
       .get(api + "size")
       .then((response) => {
@@ -189,21 +190,63 @@ const ProductCreateDetails = () => {
         console.log(error);
       });
     if (currentHref.includes("create-details")) {
-      axios
-        .get(api + "product/getProductEdit?productId=" + productId)
-        .then((response) => {
-          setProduct(response.data);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
     } else {
-      setProduct(productDetailUpdate.product);
+      if (productDetailUpdate !== null && productDetailUpdate !== undefined) {
+        axios
+          .get(
+            api +
+              "product/getColorsByIdComPdAndIdPro?productId=" +
+              productDetailUpdate.product.id +
+              "&buttonId=" +
+              productDetailUpdate.button.id +
+              "&materialId=" +
+              productDetailUpdate.material.id +
+              "&shirtTailId=" +
+              productDetailUpdate.shirtTail.id +
+              "&sleeveId=" +
+              productDetailUpdate.sleeve.id +
+              "&collarId=" +
+              productDetailUpdate.collar.id
+          )
+          .then((res) => {
+            setColorsUpdate(res.data);
+            axios
+              .get(
+                api +
+                  "product/getSizesByIdComPdAndIdPro?productId=" +
+                  productDetailUpdate.product.id +
+                  "&buttonId=" +
+                  productDetailUpdate.button.id +
+                  "&materialId=" +
+                  productDetailUpdate.material.id +
+                  "&shirtTailId=" +
+                  productDetailUpdate.shirtTail.id +
+                  "&sleeveId=" +
+                  productDetailUpdate.sleeve.id +
+                  "&collarId=" +
+                  productDetailUpdate.collar.id +
+                  "&colorId=" +
+                  res.data[0].id
+              )
+              .then((response) => {
+                setSizesUpdate(response.data);
+              })
+              .catch((err) => {
+                console.log(err);
+              });
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+        setProduct(productDetailUpdate.product);
+      }
     }
-  }, [productId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [render]);
   return (
     <>
       <div className={styles.product}>
+        <ProductCreate render={setRender} />
         {contextHolder}
         <Row>
           <Col span={10} className={styles.product__Form}>
@@ -220,31 +263,84 @@ const ProductCreateDetails = () => {
               <Col span={16}>
                 <div className="m-5">
                   <h6>Tên sản phẩm</h6>
-                  <p>{product.productName}</p>
+                  <Row>
+                    <Col span={22}>
+                      <div
+                        style={{
+                          marginRight: "20px",
+                        }}
+                      >
+                        <Select
+                          showSearch
+                          style={{
+                            width: "100%",
+                          }}
+                          placeholder="Search to Select"
+                          optionFilterProp="children"
+                          filterOption={(input, option) =>
+                            (option?.label ?? "").includes(input)
+                          }
+                          filterSort={(optionA, optionB) =>
+                            (optionA?.label ?? "")
+                              .toLowerCase()
+                              .localeCompare(
+                                (optionB?.label ?? "").toLowerCase()
+                              )
+                          }
+                          onChange={(value) => {
+                            setProduct(productList[value]);
+                          }}
+                        >
+                          {productList &&
+                            productList.map((item, index) => {
+                              return (
+                                <Select.Option
+                                  key={item.id}
+                                  label={item.productName}
+                                  value={index}
+                                >
+                                  {item.productName}
+                                </Select.Option>
+                              );
+                            })}
+                        </Select>
+                      </div>
+                    </Col>
+                    <Col span={2}>
+                      <Button
+                        onClick={() => {
+                          displayFrame("productCreate", "productCreateFrame");
+                        }}
+                        className={styles.product_ButtonCreate}
+                      >
+                        <PlusOutlined />
+                      </Button>
+                    </Col>
+                  </Row>
                 </div>
                 <Row>
                   <Col span={12}>
                     <div className="m-5">
                       <h6>Thương hiệu</h6>
-                      <p>{product.brand.brandName}</p>
+                      <p>{product.brand.brandName || "Brand Name"}</p>
                     </div>
                   </Col>
                   <Col span={12}>
                     <div className="m-5">
                       <h6>Loại sản phẩm</h6>
-                      <p>{product.category.categoryName}</p>
+                      <p>{product.category.categoryName || "Category Name"}</p>
                     </div>
                   </Col>
                   <Col span={12}>
                     <div className="m-5">
                       <h6>Họa tiết</h6>
-                      <p>{product.pattern.patternName}</p>
+                      <p>{product.pattern.patternName || "Pattern name"}</p>
                     </div>
                   </Col>
                   <Col span={12}>
                     <div className="m-5">
                       <h6>Dáng áo</h6>
-                      <p>{product.form.formName}</p>
+                      <p>{product.form.formName || "Form Name"}</p>
                     </div>
                   </Col>
                 </Row>
@@ -252,7 +348,7 @@ const ProductCreateDetails = () => {
               <Col span={24}>
                 <div className="m-5">
                   <h6>Mô tả</h6>
-                  <p>{product.description}</p>
+                  <p>{product.description || "Description"}</p>
                   <hr />
                 </div>
               </Col>
@@ -434,7 +530,9 @@ const ProductCreateDetails = () => {
                         })}
                     </Select>
                   ) : (
-                    productDetailUpdate.material.materialName
+                    sizesUpdate.map((item) => {
+                      return <span key={item.id}>{item.size.sizeName} </span>;
+                    })
                   )}
                 </div>
               </Col>
@@ -477,24 +575,16 @@ const ProductCreateDetails = () => {
                         })}
                     </Select>
                   ) : (
-                    productDetailUpdate.material.materialName
-                  )}
-                </div>
-              </Col>
-              <Col span={8}>
-                <div className="m-5">
-                  <h6>Giá mặc định</h6>
-                  {currentHref.includes("create-details") ? (
-                    <Input
-                      size="small"
-                      placeholder="Default price"
-                      onChange={(event) => {
-                        handleSetProductDetail("price", event.target.value);
-                      }}
-                      status={productDetail.price === "" ? "error" : ""}
-                    ></Input>
-                  ) : (
-                    productDetailUpdate.price + " VND"
+                    <div className={styles.optionColor}>
+                      {colorsUpdate.map((item) => {
+                        return (
+                          <span
+                            key={item.id}
+                            style={{ backgroundColor: item.colorCode }}
+                          ></span>
+                        );
+                      })}
+                    </div>
                   )}
                 </div>
               </Col>

@@ -3,10 +3,8 @@ package com.fpoly.ooc.controller;
 import com.fpoly.ooc.entity.Brand;
 import com.fpoly.ooc.service.interfaces.BrandServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -20,5 +18,11 @@ public class BrandController {
     @GetMapping("")
     public List<Brand> data(){
         return service.findAll();
+    }
+
+    @PostMapping("")
+    public ResponseEntity<?> create(@RequestParam String brandName){
+        Brand brand = Brand.builder().brandName(brandName).build();
+        return ResponseEntity.ok(service.create(brand));
     }
 }

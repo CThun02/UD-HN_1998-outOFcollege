@@ -8,7 +8,9 @@ import com.fpoly.ooc.service.interfaces.ProductDetailServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProductDetailServiceImpl implements ProductDetailServiceI {
@@ -45,13 +47,18 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
     }
 
     @Override
+    public List<ProductDetailResponse> getAll() {
+        return repo.getAll();
+    }
+
+    @Override
     public List<ProductDetailResponse> getProductDetailsByIdProduct(Long idPro) {
         return repo.getProductDetailsByIdProduct(idPro);
     }
 
     @Override
-    public List<ProductDetailResponse> getProductDetailsTableByIdProduct(Long idPro) {
-        return repo.getProductDetailsTableByIdProduct(idPro);
+    public List<ProductDetailResponse> getProductDetailsTableByIdProduct(Long idPro, String status) {
+        return repo.getProductDetailsTableByIdProduct(idPro, status);
     }
 
     @Override
@@ -77,5 +84,20 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
     public ProductDetailResponse getOneByIdCom(Long productId, Long idButton, Long idMaterial, Long idShirtTail, Long idSleeve, Long idCollar, Long idColor, Long idSize) {
         return repo.getOneByIdCom(productId, idButton, idMaterial, idShirtTail,
                 idSleeve,  idCollar, idColor, idSize);
+    }
+
+    @Override
+    public List<ProductDetailResponse> filterProductDetailsByIdCom(Long productId, Long idButton, Long idMaterial, Long idShirtTail, Long idSleeve, Long idCollar, Long idColor, Long idSize) {
+        return repo.filterProductDetailsByIdCom(productId, idButton, idMaterial, idShirtTail, idSleeve, idCollar, idColor, idSize);
+    }
+
+    @Override
+    public List<ProductDetailResponse> searchByCodeOrName(String keyWords) {
+        keyWords = "%"+keyWords+"%";
+        Optional<List<ProductDetailResponse>> values = Optional.of(repo.searchProductDetailByProductName(keyWords));
+        if(values.get().isEmpty()){
+            values = Optional.of(repo.searchProductDetailByProductCode(keyWords));
+        }
+        return values.orElse(null);
     }
 }

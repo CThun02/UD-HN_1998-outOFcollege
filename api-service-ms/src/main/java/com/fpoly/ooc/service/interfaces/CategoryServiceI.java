@@ -10,4 +10,6 @@ public interface CategoryServiceI {
     public Boolean delete(Long id);
     public List<Category> findAll();
     public Category getOne(Long id);
+    public Category findFirstByCategoryName(String categoryName);
+
 }

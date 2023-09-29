@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PatternDAORepository extends JpaRepository<Pattern, Long> {
+    public Pattern findFirstByPatternName(String patternName);
+
 }

@@ -1,9 +1,19 @@
 import styles from "./ProductDetailsTable.module.css";
 
 import React, { useEffect, useState } from "react";
-import { message, Table } from "antd";
+import { Button, Col, message, Row, Table, Card } from "antd";
 import axios from "axios";
 import Input from "antd/es/input/Input";
+import {
+  AreaChartOutlined,
+  DeleteFilled,
+  PlusCircleOutlined,
+  ReloadOutlined,
+} from "@ant-design/icons";
+import Modal from "antd/es/modal/Modal";
+import Checkbox from "antd/es/checkbox/Checkbox";
+import { saveImage } from "../../../config/FireBase";
+import { ref, uploadBytes, listAll, getDownloadURL } from "firebase/storage";
 
 const ProductDetailsTable = (props) => {
   const api = "http://localhost:8080/api/admin/";
@@ -17,6 +27,11 @@ const ProductDetailsTable = (props) => {
   const shirtTailId = productDetail.shirtTail.id;
   const [colors, setColors] = useState(null);
   const [listSizes, setlistSizes] = useState([]);
+  const [render, renderChange] = useState();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [colorsCreate, setColorsCreate] = useState([]);
+  const [sizesCreate, setSizesCreate] = useState([]);
+  const [imgDisplay, setimgDisplay] = useState([]);
 
   const columns = [
     {
@@ -44,7 +59,9 @@ const ProductDetailsTable = (props) => {
           <Input
             style={{ width: "100px", textAlign: "center" }}
             defaultValue={record.quantity}
-            onChange={(event) => updateProductDetail("quantity", event, record)}
+            type={"number"}
+            onBlur={(event) => updateProductDetail("quantity", event, record)}
+            disabled={record.status === "DELETED"}
           ></Input>
         );
       },
@@ -58,7 +75,9 @@ const ProductDetailsTable = (props) => {
           <Input
             style={{ width: "100px", textAlign: "center" }}
             defaultValue={record.price}
-            onChange={(event) => updateProductDetail("price", event, record)}
+            type={"number"}
+            onBlur={(event) => updateProductDetail("price", event, record)}
+            disabled={record.status === "DELETED"}
           ></Input>
         );
       },
@@ -67,8 +86,47 @@ const ProductDetailsTable = (props) => {
       key: "action",
       dataIndex: "action",
       title: "Thao tác",
+      render: (text, record, index) => {
+        return (
+          <Button
+            onClick={() => {
+              deleteProductDetail(record);
+            }}
+          >
+            {record.status === "DELETED" ? (
+              <ReloadOutlined />
+            ) : (
+              <DeleteFilled />
+            )}
+          </Button>
+        );
+      },
     },
   ];
+  function showModal() {
+    setIsModalOpen(true);
+  }
+
+  function handleOk() {
+    setIsModalOpen(false);
+  }
+
+  function handleCancel() {
+    setIsModalOpen(false);
+  }
+
+  function uploadImage(productName, colorName, imgs) {
+    for (let img of imgs) {
+      const currentTimeInMillis = new Date().getTime();
+      console.log(currentTimeInMillis + img.name);
+      const imgRef = ref(
+        saveImage,
+        `products/${productName}/${colorName}/${currentTimeInMillis + img.name}`
+      );
+      uploadBytes(imgRef, img);
+    }
+  }
+
   async function getSizes(Colors) {
     try {
       let list = [];
@@ -98,6 +156,7 @@ const ProductDetailsTable = (props) => {
       return null;
     }
   }
+
   function updateProductDetail(fildeName, event, productDetail) {
     fildeName === "quantity"
       ? (productDetail.quantity = event.target.value)
@@ -107,13 +166,13 @@ const ProductDetailsTable = (props) => {
       axios
         .put(api + "product/updateProductDetail", productDetail)
         .then((response) => {
-          messageApi.loading("Đang tải!", 2);
+          messageApi.loading("Đang tải!", 0.5);
           setTimeout(() => {
             messageApi.success("Chỉnh sửa chi tiết sản phẩm thành công!", 2);
-          }, 2000);
+          }, 500);
         })
         .catch((error) => {
-          messageApi.loading("Chỉnh sửa chi tiết sản phẩm thất bại!", 2);
+          messageApi.error("Chỉnh sửa chi tiết sản phẩm thất bại!", 2);
           console.log(error);
         });
     } else {
@@ -122,29 +181,36 @@ const ProductDetailsTable = (props) => {
     }
   }
 
-  useEffect(() => {
+  function deleteProductDetail(productDetail) {
+    productDetail.status === "DELETED"
+      ? (productDetail.status = "ACTIVE")
+      : (productDetail.status = "DELETED");
     axios
-      .get(
-        api +
-          "product/getProductDetailUpdate?productId=" +
-          productDetail.product.id +
-          "&buttonId=" +
-          buttonId +
-          "&materialId=" +
-          materialId +
-          "&shirtTailId=" +
-          shirtTailId +
-          "&sleeveId=" +
-          sleeveId +
-          "&collarId=" +
-          collarId
-      )
-      .then((res) => {
-        setProductDetail(res.data);
+      .put(api + "product/updateProductDetail?method=Deleted", productDetail)
+      .then((response) => {
+        messageApi.loading("Đang tải!", 0.5);
+        setTimeout(() => {
+          messageApi.success(
+            productDetail.status === "DELETED"
+              ? "Xóa thành công!"
+              : "Khôi phục thành công!",
+            2
+          );
+        }, 500);
       })
-      .catch((err) => {
-        console.log(err);
+      .catch((error) => {
+        messageApi.error(
+          productDetail.status === "DELETED"
+            ? "Xóa thất bại!"
+            : "Khôi phục thất bại",
+          2
+        );
+        console.log(error);
       });
+    renderChange(productDetail);
+  }
+
+  useEffect(() => {
     axios
       .get(
         api +
@@ -168,6 +234,54 @@ const ProductDetailsTable = (props) => {
       .catch((err) => {
         console.log(err);
       });
+    axios
+      .get(api + "color")
+      .then((res) => {
+        setColorsCreate(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    axios
+      .get(api + "size")
+      .then((res) => {
+        setSizesCreate(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    if (colors !== null) {
+      var index = { colorName: "", imgsColor: [] };
+      for (let color of colors) {
+        if (index.colorName !== color.colorName) {
+          index.colorName = color.colorName;
+          index.imgsColor = [];
+        }
+        listAll(
+          ref(
+            saveImage,
+            `products/${product.productName.replace(
+              " ",
+              "_"
+            )}/${color.colorName.replace(" ", "_")}`
+          )
+        )
+          .then((imgs) => {
+            imgs.items.forEach((item) => {
+              getDownloadURL(item).then((url) => {
+                index.imgsColor.push(url);
+              });
+            });
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
+      setimgDisplay(index);
+      if (imgDisplay === undefined) {
+        renderChange(index);
+      }
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     buttonId,
@@ -177,6 +291,7 @@ const ProductDetailsTable = (props) => {
     productDetail.product.id,
     shirtTailId,
     sleeveId,
+    render,
   ]);
   return (
     <>
@@ -201,7 +316,82 @@ const ProductDetailsTable = (props) => {
                   }))
                 }
                 pagination={false}
+                footer={(record) => {
+                  return (
+                    <div style={{ textAlign: "center" }}>
+                      <Button
+                        className={styles.product__updateButton}
+                        onClick={showModal}
+                        style={{ marginRight: "4px" }}
+                      >
+                        <PlusCircleOutlined
+                          className={styles.product__updateCreateButton}
+                        />
+                      </Button>
+                      <Modal
+                        title="Thêm kích cỡ"
+                        visible={isModalOpen}
+                        onOk={handleOk}
+                        onCancel={handleCancel}
+                        key={item.id}
+                      >
+                        <h2 className={styles.product__DetailsColorTable}>
+                          <span
+                            style={{ backgroundColor: item.colorCode }}
+                          ></span>
+                          <p>{item.colorName}</p>
+                        </h2>
+                        <Checkbox.Group style={{ width: "100%" }}>
+                          <Row>
+                            {sizesCreate &&
+                              sizesCreate.map((item) => {
+                                return (
+                                  <Col span={8} key={item.id}>
+                                    <Checkbox value={item.id}>
+                                      {item.sizeName}
+                                    </Checkbox>
+                                  </Col>
+                                );
+                              })}
+                          </Row>
+                        </Checkbox.Group>
+                      </Modal>
+                      <Button
+                        style={{ marginLeft: "4px" }}
+                        className={styles.product__updateButton}
+                      >
+                        <input
+                          type={"file"}
+                          onChange={(event) => {
+                            uploadImage(
+                              product.productName.replace(" ", "_"),
+                              item.colorName.replace(" ", "_"),
+                              event.target.files
+                            );
+                          }}
+                          multiple={true}
+                          id="upload"
+                          style={{ display: "none" }}
+                        />
+                        <label htmlFor="upload">
+                          <AreaChartOutlined
+                            className={styles.product__updateCreateButton}
+                          />
+                        </label>
+                      </Button>
+                    </div>
+                  );
+                }}
               ></Table>
+              <div style={{ margin: "16px 30px" }}>
+                <Row>
+                  <Col span={3} key={item.id}>
+                    <Card hoverable cover={<img alt="example" src={item} />}>
+                      <DeleteFilled />
+                    </Card>
+                  </Col>
+                </Row>
+              </div>
             </div>
           );
         })}

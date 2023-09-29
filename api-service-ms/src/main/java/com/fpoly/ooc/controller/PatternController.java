@@ -3,10 +3,8 @@ package com.fpoly.ooc.controller;
 import com.fpoly.ooc.entity.Pattern;
 import com.fpoly.ooc.service.interfaces.PatternServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -20,5 +18,11 @@ public class PatternController {
     @GetMapping("")
     public List<Pattern> data(){
         return service.findAll();
+    }
+
+    @PostMapping("")
+    public ResponseEntity<?> create(@RequestParam String categoryName){
+        Pattern pattern = Pattern.builder().patternName(categoryName).build();
+        return ResponseEntity.ok(service.create(pattern));
     }
 }

@@ -10,6 +10,7 @@ import com.fpoly.ooc.request.voucher.VoucherRequest;
 import com.fpoly.ooc.responce.voucher.VoucherResponse;
 import com.fpoly.ooc.service.interfaces.EmailService;
 import com.fpoly.ooc.service.interfaces.VoucherService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@Slf4j
 public class VoucherServiceImpl implements VoucherService {
 
     @Autowired
@@ -59,6 +61,7 @@ public class VoucherServiceImpl implements VoucherService {
         Voucher voucher = convertVoucherRequest(voucherRequest);
 
         String result = emailService.sendSimpleMail(voucherRequest.getEmailDetails());
+        log.info("Email: " + result);
 
         return voucherRepository.save(voucher);
     }

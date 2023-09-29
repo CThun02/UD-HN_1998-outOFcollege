@@ -1,25 +1,27 @@
-import { Tabs, Button, Table, Space, Tag, Divider, Row, Col, Input, Switch, Segmented } from 'antd';
+import { Tabs, Button, Table, Space, Tag, Divider, Row, Col, Input, Switch, Segmented, Form, Select } from 'antd';
 import React, { useRef, useState } from 'react';
 import styles from './Bill.module.css';
 import ModalProduct from './ModalProduct';
-import { AppstoreOutlined, BarsOutlined, ShoppingCartOutlined } from '@ant-design/icons';
-
-const initialItems = [
-    {
-        label: 'Tab 1',
-        key: '1',
-    },
-    {
-        label: 'Tab 2',
-        key: '2',
-    },
-    {
-        label: 'Tab 3',
-        key: '3',
-    },
-];
+import logoGhn from '../../../Assets/img/logo/logo_ghn.png'
+import { DeleteOutlined, DollarOutlined, SearchOutlined, SwapOutlined } from '@ant-design/icons';
+import axios from 'axios';
 
 const Bill = () => {
+    // danh sách table
+    const initialItems = [
+        {
+            label: 'Tab 1',
+            key: '1',
+        },
+        {
+            label: 'Tab 2',
+            key: '2',
+        },
+        {
+            label: 'Tab 3',
+            key: '3',
+        },
+    ];
 
     const columns = [
         {
@@ -46,7 +48,12 @@ const Bill = () => {
             key: 'action',
             render: (_, record) => (
                 <Space size="middle">
-                    <Button>delete</Button>
+                    <Button
+                        icon={<DeleteOutlined />}
+                        danger
+                        href='#1'
+                        key={record.key}
+                    ></Button>
                 </Space>
             ),
         },
@@ -72,6 +79,64 @@ const Bill = () => {
     const [items, setItems] = useState(initialItems);
     const newTabIndex = useRef(0);
     const [isModalVisible, setIsModalVisible] = useState(false);
+    const [switchChange, setSwitchChange] = useState(false)
+    const [provinces, setProvinces] = useState([])
+    const [districts, setDistricts] = useState([])
+    const [wards, setWards] = useState([])
+
+    const fetchProvinces = async () => {
+        await axios
+            .get(`https://online-gateway.ghn.vn/shiip/public-api/master-data/province`,
+                {
+                    headers: {
+                        token: '0f082cbe-5110-11ee-a59f-a260851ba65c',
+                    }
+                })
+            .then(res =>
+                // console.log(res.data.data)
+                setProvinces(res.data.data)
+            )
+            .catch(err =>
+                console.log(err)
+            )
+    }
+
+    fetchProvinces();
+
+    const handleProvinceChange = async (value) => {
+        await axios
+            .get(`https://online-gateway.ghn.vn/shiip/public-api/master-data/district?province_id=${value}`, {
+                headers: {
+                    token: '0f082cbe-5110-11ee-a59f-a260851ba65c',
+                }
+            })
+            .then((response) => {
+                setDistricts(response.data.data);
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    };
+
+    const handleDistrictChange = async (value) => {
+        console.log(value)
+        await axios.get(`https://online-gateway.ghn.vn/shiip/public-api/master-data/ward?district_id=${value}`,
+            {
+                headers: {
+                    token: `0f082cbe-5110-11ee-a59f-a260851ba65c`
+                }
+            })
+            .then(res => {
+                setWards(res.data.data)
+            })
+            .catch(err => {
+                console.log(err)
+            })
+    }
+
+    const handleChangSwitch = (checked) => {
+        setSwitchChange(checked)
+    }
     const showModal = () => {
         setIsModalVisible(true);
     };
@@ -125,7 +190,7 @@ const Bill = () => {
 
     const renderTabContent = () => {
         return items.map((item) => (
-            <Tabs.TabPane key={item.key} tab={item.label}>
+            < Tabs.TabPane key={item.key} tab={item.label} >
                 <div className={styles.tabContent} >
                     <div className={styles.cartContainer}>
                         <h2>Giỏ hàng</h2>
@@ -144,6 +209,7 @@ const Bill = () => {
                             <h2>Tài khoản</h2>
                         </Col>
                         <Col span={12} style={{ textAlign: 'right' }}>
+                            <Input prefix={<SearchOutlined />} placeholder='tìm kiếm tài khoản' style={{ width: '200px', marginRight: '20px' }} />
                             <Button style={{ color: "blue" }}>Chọn tài khoản</Button>
                         </Col>
                     </Row>
@@ -158,15 +224,93 @@ const Bill = () => {
                     </Row>
                 </div>
 
-                <div className={styles.lstAccount}>
+                <div className={styles.infoPayment}>
                     <h2 style={{ textAlign: "left" }}>Thông tin thanh toán</h2>
                     <Divider className={styles.blackDivider} style={{ marginTop: '3px' }} />
                     <Row>
-                        <Col span={15}>
-
+                        <Col span={16}>
+                            {switchChange && (
+                                <Row>
+                                    <Col span={10}>
+                                        <span>
+                                            <b style={{ color: 'red' }}>*</b> Họ và tên
+                                        </span>
+                                        <Input placeholder='nhập họ và tên' />
+                                    </Col>
+                                    <Col span={10} style={{ marginLeft: '40px' }}>
+                                        <span>
+                                            <b style={{ color: 'red' }}>*</b> Số điện thoại
+                                        </span>
+                                        <Input placeholder='nhập số điện thoại' />
+                                    </Col>
+                                </Row>
+                            )}
+                            {switchChange && (
+                                <Row style={{ margin: '40px 0' }}>
+                                    <Col span={7} >
+                                        <span>
+                                            <b style={{ color: 'red' }}>*</b> Tỉnh/thành phố
+                                        </span>
+                                        <br />
+                                        <Select style={{ width: 200 }} onChange={handleProvinceChange}>
+                                            {provinces.map((province) => (
+                                                <Select.Option
+                                                    key={province.ProvinceID}
+                                                    value={province.ProvinceID}
+                                                >
+                                                    {province.ProvinceName}
+                                                </Select.Option>
+                                            ))}
+                                        </Select>
+                                    </Col>
+                                    <Col span={7}>
+                                        <span>
+                                            <b style={{ color: 'red' }}>*</b> Quận/huyện
+                                        </span>
+                                        <br />
+                                        <Select style={{ width: 200 }} onChange={handleDistrictChange}>
+                                            {districts.map((district) => (
+                                                <Select.Option
+                                                    key={district.DistrictID}
+                                                    value={district.DistrictID}
+                                                >
+                                                    {district.DistrictName}
+                                                </Select.Option>
+                                            ))}
+                                        </Select>
+                                    </Col>
+                                    <Col span={7}>
+                                        <span>
+                                            <b style={{ color: 'red' }}>*</b> Phường/xã
+                                        </span>
+                                        <br />
+                                        <Select style={{ width: 200 }}>
+                                            {wards.map((ward) => (
+                                                <Select.Option
+                                                    key={ward.WardCode}
+                                                    value={ward.WardCode}
+                                                >
+                                                    {ward.WardName}
+                                                </Select.Option>
+                                            ))}
+                                        </Select>
+                                    </Col>
+                                </Row>
+                            )}
+                            {switchChange && (
+                                <Row>
+                                    <Col span={16}>
+                                        <span>Địa chỉ cụ thể</span>
+                                        <Input placeholder='Nhập địa chỉ cụ thể' />
+                                    </Col>
+                                    <Col span={6} style={{ marginLeft: '30px' }}>
+                                        <img src={logoGhn} alt='an sẽ' style={{ width: '90px', height: '80px' }} />
+                                    </Col>
+                                </Row>
+                            )}
                         </Col>
-                        <Col span={9}>
-                            <Switch />
+                        <Col span={8}>
+                            <Switch onChange={handleChangSwitch} />
                             <span style={{ marginLeft: "5px" }}>Giao hàng</span>
                             <br />
                             <Input style={{ width: '200px' }}
@@ -189,24 +333,19 @@ const Bill = () => {
                                     <input className={styles.input} />
                                     <span style={{ fontSize: '16px', display: 'block' }}>3.000.000</span>
                                 </Col>
-                                <div>
-                                    {/* <Segmented
-                                        options={[
-                                            {
-                                                label: 'List',
-                                                value: 'List',
-                                                icon: <BarsOutlined />,
-                                            },
-                                            {
-                                                label: 'Kanban',
-                                                value: 'Kanban',
-                                                icon: <AppstoreOutlined />,
-                                            },
-                                        ]}
-                                    /> */}
+                                <div style={{ marginTop: '20px' }}>
+                                    <Button icon={<DollarOutlined />} className="cash-button">
+                                        Tiền
+                                    </Button>
+                                    <Button style={{ margin: '0 10px' }} icon={<SwapOutlined />} className="cash-button">
+                                        Chuyển khoản
+                                    </Button>
+                                    <Button icon={<DollarOutlined />} className="cash-button">
+                                        Cả hai
+                                    </Button>
                                 </div>
-                                <div style={{ marginTop: '30px' }}>
-                                    <Button style={{ backgroundColor: '#212121', color: 'white' }}>
+                                <div style={{ marginTop: '20px' }}>
+                                    <Button type='primary' style={{ width: '350px', height: '40px' }}>
                                         Xác nhận thanh toán
                                     </Button>
                                 </div>
@@ -214,7 +353,7 @@ const Bill = () => {
                         </Col>
                     </Row>
                 </div >
-            </Tabs.TabPane>
+            </ Tabs.TabPane>
         ));
     };
 

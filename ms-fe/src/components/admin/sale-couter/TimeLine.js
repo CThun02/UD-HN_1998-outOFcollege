@@ -1,9 +1,14 @@
 import { Button, Col, Divider, message, Row, Steps, Table, Tag } from 'antd';
 import { LoadingOutlined, SmileOutlined, SolutionOutlined, UserOutlined } from '@ant-design/icons';
 import { useState } from 'react';
+import { Timeline, TimelineEvent } from '@mailtop/horizontal-timeline';
+import { FaBug, FaRegCalendarCheck, FaRegFileAlt } from 'react-icons/fa';
 import styles from './TimeLine.module.css'
+import ModalConfirm from './ModalConfirm';
+import SpanBorder from './SpanBorder';
+import ModalDetail from './ModalDetail';
 
-const Timeline = () => {
+const BillTimeLine = () => {
     const columns = [
         {
             title: 'Mã giao dịch',
@@ -73,38 +78,63 @@ const Timeline = () => {
         },
     ];
 
-    const [current, setCurrent] = useState(0);
-    const next = () => {
-        setCurrent(current + 1);
-    };
-    const prev = () => {
-        setCurrent(current - 1);
-    };
-    const items = steps.map((item) => ({
-        key: item.title,
-        title: item.title,
-        icon: item.icon,
-    }));
 
+
+    const [isModalConfirm, setIsModalConfirm] = useState(false);
+    const [isModalDetal, setIsModalDetail] = useState(false);
+
+    const showModalConfirm = () => {
+        setIsModalConfirm(true);
+    };
+
+    const handleOkConFirm = () => {
+        setIsModalConfirm(false);
+    };
+
+    const showModalDetail = () => {
+        setIsModalDetail(true);
+    };
+
+    const handleOkDetail = () => {
+        setIsModalDetail(false);
+    };
     return (
         <>
             <section className={styles.background}>
-                <Steps current={current} items={items} />
-                <div style={{ marginTop: 24 }}>
-                    {current < steps.length - 1 && (
-                        <Button type="primary" onClick={() => next()}>
-                            Xác nhận
-                        </Button>
-                    )}
-                    {current === steps.length - 1 && (
-                        <Button type="primary" onClick={() => message.success('Processing complete!')}>
-                            Done
-                        </Button>
-                    )}
-                    <Button type='primary' danger style={{ margin: '0 10px' }}>Hủy</Button>
-                    <Button className={styles.btnWarning} >Chi tiết</Button>
+                <div style={{ overflowX: 'scroll' }}>
+                    <div style={{ width: 'fit-content' }}>
+                        <Timeline minEvents={6} placeholder className={styles.timeLine}>
+                            <TimelineEvent
+                                color='#00cc00'
+                                icon={FaRegFileAlt}
+                                title='Tạo đơn hàng'
+                                subtitle='26/03/2019 09:51'
+                            />
+                            <TimelineEvent
+                                color='#87a2c7'
+                                icon={FaRegCalendarCheck}
+                                title='Agendado'
+                                subtitle='26/03/2019 09:51'
+                            />
+                            <TimelineEvent
+                                color='#9c2919'
+                                icon={FaBug}
+                                title='Erro'
+                                subtitle='26/03/2019 09:51'
+                            />
+                        </Timeline>
+                    </div>
                 </div>
-            </section>
+                <div style={{ marginTop: 24 }}>
+                    <Button type="primary" onClick={() => showModalConfirm()}>
+                        Xác nhận
+                    </Button>
+                    <Button type='primary' danger style={{ margin: '0 10px' }}>Hủy</Button>
+                    <Button className={styles.btnWarning} onClick={() => showModalDetail()} >Chi tiết</Button>
+                    <ModalConfirm isModalOpen={isModalConfirm} handleCancel={handleOkConFirm} handleOk={handleOkConFirm} />
+                    <ModalDetail isModalOpen={isModalDetal} handleCancel={handleOkDetail} handleOk={handleOkDetail} />
+                </div>
+            </section >
 
             <section className={styles.background} style={{ marginTop: '20px' }}>
                 <Row>
@@ -127,24 +157,16 @@ const Timeline = () => {
                             </Col>
                             <Col span={12}>
                                 <div style={{ display: 'flex', alignItems: 'center', width: '10px', margin: '5px 0 10px 0' }}>
-                                    <Tag color="magenta" style={{ fontSize: '16px', flex: '1' }}>
-                                        HD123121
-                                    </Tag>
+                                    <SpanBorder child={'HD1000'} color={'#1677ff'} />
                                 </div>
                                 <div style={{ display: 'flex', alignItems: 'center', width: '10px', marginBottom: '10px' }}>
-                                    <Tag color="magenta" style={{ fontSize: '16px', flex: '1' }}>
-                                        Giao hàng
-                                    </Tag>
+                                    <SpanBorder child={'HD1000'} color={'#1677ff'} />
                                 </div>
                                 <div style={{ display: 'flex', alignItems: 'center', width: '10px', marginBottom: '10px' }}>
-                                    <Tag color="magenta" style={{ fontSize: '16px', flex: '1' }}>
-                                        Đang giao
-                                    </Tag>
+                                    <SpanBorder child={'HD1000'} color={'#00cc00'} />
                                 </div>
                                 <div style={{ display: 'flex', alignItems: 'center', width: '10px' }}>
-                                    <Tag color="processing" style={{ fontSize: '16px', flex: '1' }}>
-                                        25/09/2023
-                                    </Tag>
+                                    <SpanBorder child={'HD1000'} color={'gray'} />
                                 </div>
                             </Col>
                         </Row>
@@ -211,4 +233,4 @@ const Timeline = () => {
     );
 };
 
-export default Timeline;
+export default BillTimeLine;

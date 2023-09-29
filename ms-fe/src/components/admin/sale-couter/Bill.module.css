@@ -11,11 +11,10 @@
   width: 40px;
 }
 .bill {
-  margin: 20px;
+  margin: 5px;
   background-color: #ffffff;
-  border-radius: 20px;
-  min-height: 90%;
-  width: 95%;
+  border-radius: 10px;
+  width: auto;
   height: auto;
   padding: 20px;
 }
@@ -90,6 +89,15 @@ btn:hover {
 }
 
 .lstAccount {
+  background-color: #ffffff;
+  min-height: 100px;
+  height: auto;
+  padding: 20px;
+  margin: 20px 0;
+  border-bottom: 10px solid #f9fbfd;
+}
+
+.infoPayment {
   background-color: #ffffff;
   min-height: 100px;
   height: auto;

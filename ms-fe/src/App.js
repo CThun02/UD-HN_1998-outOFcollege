@@ -9,9 +9,9 @@ import CreatePromotion from "./components/admin/promotion/CreatePromotion";
 import Voucher from "./components/admin/voucher/Voucher";
 import Bill from "./components/admin/sale-couter/Bill";
 import CreateBill from "./components/admin/sale-couter/CreateBill";
-import Timeline from "./components/admin/sale-couter/TimeLine";
 import ProductUpdate from "./components/admin/product/ProductUpdate";
 import ProductCreateDetails from "./components/admin/product/ProductCreateDetails";
+import BillTimeLine from "./components/admin/sale-couter/TimeLine";
 
 function App() {
   return (
@@ -37,7 +37,7 @@ function App() {
                   <Route path="counter-sales">
                     <Route index element={<Bill />}></Route>
                     <Route path="bill" element={<CreateBill />}></Route>
-                    <Route path="time-line" element={<Timeline />}></Route>
+                    <Route path="time-line" element={<BillTimeLine />}></Route>
                   </Route>
 
                   {/* Đơn hàng */}

@@ -12,6 +12,7 @@ import com.fpoly.ooc.responce.timeline.TimeLineResponse;
 import com.fpoly.ooc.service.interfaces.TimeLineService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -34,13 +35,22 @@ public class TimeLineServiceImpl implements TimeLineService {
         return timeLineRepo.getTimeLineByBillId(id);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
-    public TimeLine createTimeLine(TimeLinerequest request) {
-        TimeLine timeLine = new TimeLine();
-        timeLine.setBill(Bill.builder().id(request.getBillId()).build());
-        timeLine.setNote(request.getNote());
-        timeLine.setStatus(request.getStatus());
+    public TimeLine createTimeLine(Long billId, TimeLinerequest request) {
+        Bill bill = billRepo.findById(billId).orElse(null);
+        if (bill == null) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND));
+        }
 
-        return timeLine;
+        List<TimeLineResponse> lst = timeLineRepo.getTimeLineByBillId(billId);
+        Integer statusIncrease = Integer.valueOf(lst.get(lst.size() - 1).getStatus());
+
+        TimeLine timeLine = new TimeLine();
+        timeLine.setBill(bill);
+        timeLine.setNote(request.getNote());
+        timeLine.setStatus(String.valueOf(++statusIncrease));
+
+        return timeLineRepo.save(timeLine);
     }
 }

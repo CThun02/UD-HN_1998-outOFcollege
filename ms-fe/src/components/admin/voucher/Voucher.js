@@ -54,10 +54,10 @@ function disabledDate(current) {
   return (
     current &&
     current <
-      dayjs(
-        moment(new Date().toLocaleDateString()).format(dateFormat),
-        dateFormat
-      )
+    dayjs(
+      moment(new Date().toLocaleDateString()).format(dateFormat),
+      dateFormat
+    )
   );
 }
 
@@ -174,28 +174,27 @@ function Voucher() {
             startDate:
               searchStartDate !== ""
                 ? moment(searchStartDate?.$d, "DD-MM-YYYY").format(
-                    "YYYY-MM-DDTHH:mm:ss.SSS"
-                  )
+                  "YYYY-MM-DDTHH:mm:ss.SSS"
+                )
                 : "",
             endDate:
               searchEndDate !== ""
                 ? moment(searchEndDate?.$d, "DD-MM-YYYY").format(
-                    "YYYY-MM-DDTHH:mm:ss.SSS"
-                  )
+                  "YYYY-MM-DDTHH:mm:ss.SSS"
+                )
                 : "",
             status: searchStatus,
           };
 
           const res = await axios.post(
-            `${
-              pageNo !== 1 || pageSize !== 5
-                ? baseUrl +
-                  "?pageNo=" +
-                  (pageNo - 1) +
-                  "&" +
-                  "pageSize=" +
-                  pageSize
-                : baseUrl
+            `${pageNo !== 1 || pageSize !== 5
+              ? baseUrl +
+              "?pageNo=" +
+              (pageNo - 1) +
+              "&" +
+              "pageSize=" +
+              pageSize
+              : baseUrl
             }`,
             filter
           );
@@ -319,10 +318,9 @@ function Voucher() {
           <Context.Consumer>
             {() =>
               `${isCheckNotEmpty?.status ? "" : isCheckNotEmpty?.message} 
-              ${
-                isCheckStartDateAndEndDate?.status
-                  ? ""
-                  : isCheckStartDateAndEndDate?.message
+              ${isCheckStartDateAndEndDate?.status
+                ? ""
+                : isCheckStartDateAndEndDate?.message
               } `
             }
           </Context.Consumer>
@@ -417,10 +415,10 @@ function Voucher() {
           status === "Đang diễn ra"
             ? "geekblue"
             : status === "Sắp diễn ra"
-            ? "green"
-            : "Đã kết thúc"
-            ? "red"
-            : null;
+              ? "green"
+              : "Đã kết thúc"
+                ? "red"
+                : null;
         return <Tag color={color}>{status}</Tag>;
       },
     },
@@ -520,8 +518,8 @@ function Voucher() {
                                     ? ""
                                     : voucherName === "" ||
                                       error?.voucher?.voucherName === "error"
-                                    ? "error"
-                                    : ""
+                                      ? "error"
+                                      : ""
                                 }
                               />
                             </FloatingLabels>
@@ -563,8 +561,8 @@ function Voucher() {
                                       ? ""
                                       : voucherValue === "" ||
                                         error?.voucher?.voucherValue === "error"
-                                      ? "error"
-                                      : ""
+                                        ? "error"
+                                        : ""
                                   }
                                 />
                               </FloatingLabels>
@@ -596,8 +594,8 @@ function Voucher() {
                                         : voucherValue === "" ||
                                           error?.response?.data
                                             ?.voucherValue === "error"
-                                        ? "error"
-                                        : ""
+                                          ? "error"
+                                          : ""
                                     }
                                   />
                                 </FloatingLabels>
@@ -628,8 +626,8 @@ function Voucher() {
                                         : voucherValueMax === "" ||
                                           error?.response?.data
                                             ?.voucherValueMax === "error"
-                                        ? "error"
-                                        : ""
+                                          ? "error"
+                                          : ""
                                     }
                                   />
                                 </FloatingLabels>
@@ -661,8 +659,8 @@ function Voucher() {
                                     ? ""
                                     : limitQuantity === "" ||
                                       error?.voucher?.limitQuantity === "error"
-                                    ? "error"
-                                    : ""
+                                      ? "error"
+                                      : ""
                                 }
                               />
                             </FloatingLabels>
@@ -693,8 +691,8 @@ function Voucher() {
                                     : voucherCondition === "" ||
                                       error?.response?.data
                                         ?.voucherCondition === "error"
-                                    ? "error"
-                                    : ""
+                                      ? "error"
+                                      : ""
                                 }
                               />
                             </FloatingLabels>
@@ -725,8 +723,8 @@ function Voucher() {
                                     ? ""
                                     : startDate === "" ||
                                       error?.voucher?.startDate === "error"
-                                    ? "error"
-                                    : ""
+                                      ? "error"
+                                      : ""
                                 }
                               />
                             </FloatingLabels>
@@ -754,8 +752,8 @@ function Voucher() {
                                     : endDate === "" ||
                                       error?.endDate?.status ||
                                       error?.voucher?.endDate === "error"
-                                    ? ""
-                                    : "error"
+                                      ? ""
+                                      : "error"
                                 }
                               />
                             </FloatingLabels>
@@ -815,10 +813,10 @@ function Voucher() {
                       voucher.status === "ACTIVE"
                         ? "Đang diễn ra"
                         : voucher.status === "INACTIVE"
-                        ? "Đã kết thúc"
-                        : voucher.status === "UPCOMING"
-                        ? "Sắp diễn ra"
-                        : null,
+                          ? "Đã kết thúc"
+                          : voucher.status === "UPCOMING"
+                            ? "Sắp diễn ra"
+                            : null,
                     action: voucher.voucherCode,
                   }))}
                   className={styles.table}

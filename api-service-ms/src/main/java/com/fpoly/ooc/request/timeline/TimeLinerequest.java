@@ -9,10 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class TimeLinerequest {
 
-    private Long billId;
-
     private String note;
-
-    private String status;
 
 }

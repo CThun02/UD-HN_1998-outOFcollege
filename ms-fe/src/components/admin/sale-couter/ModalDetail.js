@@ -1,26 +1,43 @@
 import { Modal, Table } from 'antd'
-import React from 'react'
+import axios from 'axios'
+import React, { useEffect, useState } from 'react'
 
 const ModalDetail = ({ isModalOpen, handleOk, handleCancel }) => {
+
+    const [timelinesDetail, setTimelinesDetail] = useState([])
+
+    useEffect(() => {
+        axios.get('http://localhost:8080/api/admin/bill/1/timeline')
+            .then((response) => {
+                setTimelinesDetail(response.data);
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+    }, [])
+
     const columns = [
         {
             title: 'STT',
             key: 'stt',
+            render: (_, record, index) => {
+                return index + 1;
+            }
         },
         {
             title: 'Thao tác',
-            dataIndex: 'action',
-            key: 'action',
+            dataIndex: 'status',
+            key: 'status',
         },
         {
             title: 'Thời gian',
-            dataIndex: 'time',
-            key: 'time',
+            dataIndex: 'createdDate',
+            key: 'createdDate',
         },
         {
             title: 'Người xác nhận',
-            dataIndex: 'useConfirm',
-            key: 'useConfirm',
+            dataIndex: 'createdBy',
+            key: 'createdBy',
         },
         {
             title: 'Ghi chú',
@@ -30,11 +47,18 @@ const ModalDetail = ({ isModalOpen, handleOk, handleCancel }) => {
     ];
 
     return (
-        <div >
-            <Modal closeIcon={false} style={{ width: '1000px' }} open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
-                <Table columns={columns} style={{ width: '1000px' }} />
-            </Modal>
-        </div>
+        <Modal closeIcon={true}
+            open={isModalOpen}
+            onOk={handleOk}
+            onCancel={handleCancel}
+            footer={null}
+        >
+            <Table
+                columns={columns}
+                dataSource={timelinesDetail}
+                pagination={false}
+                closeIcon />
+        </Modal>
     )
 }
 

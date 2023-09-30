@@ -1,12 +1,13 @@
-import { Button, Col, Divider, message, Row, Steps, Table, Tag } from 'antd';
-import { LoadingOutlined, SmileOutlined, SolutionOutlined, UserOutlined } from '@ant-design/icons';
-import { useState } from 'react';
+import { Button, Col, Divider, Row, Table } from 'antd';
+import { useEffect, useState } from 'react';
 import { Timeline, TimelineEvent } from '@mailtop/horizontal-timeline';
-import { FaBug, FaRegCalendarCheck, FaRegFileAlt } from 'react-icons/fa';
+import { FaRegFileAlt } from 'react-icons/fa';
 import styles from './TimeLine.module.css'
 import ModalConfirm from './ModalConfirm';
 import SpanBorder from './SpanBorder';
 import ModalDetail from './ModalDetail';
+import axios from 'axios';
+import { useParams } from 'react-router-dom';
 
 const BillTimeLine = () => {
     const columns = [
@@ -45,43 +46,10 @@ const BillTimeLine = () => {
             key: 'admin',
         },
     ];
-    const steps = [
-        {
-            title: 'Login',
-            status: 'finish',
-            icon: <UserOutlined />,
-        },
-        {
-            title: 'Verification',
-            status: 'finish',
-            icon: <SolutionOutlined />,
-        },
-        {
-            title: 'Pay',
-            status: 'process',
-            icon: <LoadingOutlined />,
-        },
-        {
-            title: 'Done',
-            status: 'wait',
-            icon: <SmileOutlined />,
-        },
-        {
-            title: 'Done',
-            status: 'wait',
-            icon: <SmileOutlined />,
-        },
-        {
-            title: 'Done',
-            status: 'wait',
-            icon: <SmileOutlined />,
-        },
-    ];
-
-
-
     const [isModalConfirm, setIsModalConfirm] = useState(false);
-    const [isModalDetal, setIsModalDetail] = useState(false);
+    const [isModalDetail, setIsModalDetail] = useState(false);
+    const [timelines, setTimelines] = useState([]);
+    const { bilId } = useParams();
 
     const showModalConfirm = () => {
         setIsModalConfirm(true);
@@ -98,41 +66,49 @@ const BillTimeLine = () => {
     const handleOkDetail = () => {
         setIsModalDetail(false);
     };
+
+    useEffect(() => {
+        axios.get(`http://localhost:8080/api/admin/bill/${bilId}/timeline`)
+            .then((response) => {
+                setTimelines(response.data);
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+    }, [])
+
+    const handleCreateTimeline = () => {
+        console.log(bilId)
+    }
+
     return (
         <>
             <section className={styles.background}>
                 <div style={{ overflowX: 'scroll' }}>
                     <div style={{ width: 'fit-content' }}>
                         <Timeline minEvents={6} placeholder className={styles.timeLine}>
-                            <TimelineEvent
-                                color='#00cc00'
-                                icon={FaRegFileAlt}
-                                title='Tạo đơn hàng'
-                                subtitle='26/03/2019 09:51'
-                            />
-                            <TimelineEvent
-                                color='#87a2c7'
-                                icon={FaRegCalendarCheck}
-                                title='Agendado'
-                                subtitle='26/03/2019 09:51'
-                            />
-                            <TimelineEvent
-                                color='#9c2919'
-                                icon={FaBug}
-                                title='Erro'
-                                subtitle='26/03/2019 09:51'
-                            />
+                            {timelines && timelines.map((data) => (
+                                <TimelineEvent
+                                    color='#00cc00'
+                                    icon={FaRegFileAlt}
+                                    title={data.status}
+                                    subtitle={data.createdDate}
+                                />
+                            ))}
                         </Timeline>
                     </div>
                 </div>
                 <div style={{ marginTop: 24 }}>
-                    <Button type="primary" onClick={() => showModalConfirm()}>
+                    <Button type="primary" onClick={() => handleCreateTimeline()}>
                         Xác nhận
                     </Button>
-                    <Button type='primary' danger style={{ margin: '0 10px' }}>Hủy</Button>
-                    <Button className={styles.btnWarning} onClick={() => showModalDetail()} >Chi tiết</Button>
                     <ModalConfirm isModalOpen={isModalConfirm} handleCancel={handleOkConFirm} handleOk={handleOkConFirm} />
-                    <ModalDetail isModalOpen={isModalDetal} handleCancel={handleOkDetail} handleOk={handleOkDetail} />
+                    <Button type='primary' danger style={{ margin: '0 10px' }}>Hủy</Button>
+                    <Button
+                        className={styles.btnWarning}
+                        onClick={() => showModalDetail()} >Chi tiết</Button>
+
+                    <ModalDetail isModalOpen={isModalDetail} handleCancel={handleOkDetail} handleOk={handleOkDetail} />
                 </div>
             </section >
 

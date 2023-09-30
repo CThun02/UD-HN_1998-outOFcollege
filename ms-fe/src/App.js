@@ -38,7 +38,7 @@ function App() {
                   <Route path="counter-sales">
                     <Route index element={<Bill />}></Route>
                     <Route path="bill" element={<CreateBill />}></Route>
-                    <Route path="time-line" element={<BillTimeLine />}></Route>
+                    <Route path=":billId/timeline" element={<BillTimeLine />}></Route>
                   </Route>
 
                   {/* Đơn hàng */}

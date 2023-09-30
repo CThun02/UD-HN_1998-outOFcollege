@@ -1,5 +1,6 @@
 package com.fpoly.ooc.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -32,6 +33,7 @@ public class TimeLine extends BaseEntity{
     @Column(name = "note")
     private String note;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bill_id", referencedColumnName = "id")
     private Bill bill;

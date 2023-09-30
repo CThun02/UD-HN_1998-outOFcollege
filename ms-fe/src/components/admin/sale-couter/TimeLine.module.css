@@ -1,6 +1,5 @@
 .background {
   padding: 50px;
-  /* min-height: 00px; */
   height: auto;
   background-color: #ffffff;
 }
@@ -19,7 +18,6 @@
 .timeLineEnd {
   margin-top: 20px;
   display: flex;
-  /* justify-content: left; */
   margin-left: 700px;
 }
 

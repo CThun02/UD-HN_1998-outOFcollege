@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 
+
 public interface ProductDetailResponse {
     public Long getId();
     public Product getProduct();

@@ -58,6 +58,7 @@ const Bill = () => {
             ),
         },
     ];
+
     const data = [
         {
             key: '1',
@@ -252,9 +253,20 @@ const Bill = () => {
                                             <b style={{ color: 'red' }}>*</b> Tỉnh/thành phố
                                         </span>
                                         <br />
-                                        <Select style={{ width: 200 }} onChange={handleProvinceChange}>
+                                        <Select
+                                            optionFilterProp="children"
+                                            filterOption={(input, option) =>
+                                                (option?.label ?? "").includes(input)
+                                            }
+                                            filterSort={(optionA, optionB) =>
+                                                (optionA?.label ?? "")
+                                                    .toLowerCase()
+                                                    .localeCompare((optionB?.label ?? "").toLowerCase())
+                                            }
+                                            showSearch style={{ width: 200 }} onChange={handleProvinceChange}>
                                             {provinces.map((province) => (
                                                 <Select.Option
+                                                    label={province.ProvinceName}
                                                     key={province.ProvinceID}
                                                     value={province.ProvinceID}
                                                 >

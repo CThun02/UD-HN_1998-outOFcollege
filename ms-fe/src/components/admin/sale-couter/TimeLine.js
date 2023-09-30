@@ -75,7 +75,7 @@ const BillTimeLine = () => {
             .catch((error) => {
                 console.log(error)
             })
-    }, [])
+    }, [billId])
 
     const handleCreateTimeline = () => {
         console.log(billId)

@@ -1,6 +1,6 @@
 .floatLabel {
   position: relative;
-  margin-bottom: 12px;
+  /* margin-bottom: 12px; */
 }
 
 .label {
@@ -9,18 +9,28 @@
   font-weight: normal;
   position: absolute;
   pointer-events: none;
-  left: 20px;
-  top: 6px;
+  left: 30px;
+  top: 10px;
   transition: 0.2s ease all;
 }
 
 .labelFloat {
+  padding: 0 6px;
   color: #737070;
+  left: 20px;
   top: -12px;
   font-size: 14px;
   background: #fff;
 }
 
 .zIndex {
-  z-index: 1111;
+  z-index: 11;
+}
+
+.floatLabel input {
+  height: 2rem;
+}
+
+.floatLabel div div input {
+  height: 2rem !important;
 }

@@ -95,6 +95,9 @@ public class Voucher extends BaseEntity{
     @Column(name = "limit_quantity")
     private Integer limitQuantity;
 
+    @Column(name = "private")
+    private String objectUse;
+
     @OneToMany(mappedBy = "voucherAccount")
     private List<VoucherAccount> voucherAccount;
 

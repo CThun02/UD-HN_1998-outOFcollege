@@ -49,7 +49,7 @@ const BillTimeLine = () => {
     const [isModalConfirm, setIsModalConfirm] = useState(false);
     const [isModalDetail, setIsModalDetail] = useState(false);
     const [timelines, setTimelines] = useState([]);
-    const { bilId } = useParams();
+    const { billId } = useParams();
 
     const showModalConfirm = () => {
         setIsModalConfirm(true);
@@ -68,7 +68,7 @@ const BillTimeLine = () => {
     };
 
     useEffect(() => {
-        axios.get(`http://localhost:8080/api/admin/bill/${bilId}/timeline`)
+        axios.get(`http://localhost:8080/api/admin/bill/${billId}/timeline`)
             .then((response) => {
                 setTimelines(response.data);
             })
@@ -78,7 +78,7 @@ const BillTimeLine = () => {
     }, [])
 
     const handleCreateTimeline = () => {
-        console.log(bilId)
+        console.log(billId)
     }
 
     return (

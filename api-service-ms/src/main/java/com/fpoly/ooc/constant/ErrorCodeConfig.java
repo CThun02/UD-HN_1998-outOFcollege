@@ -29,6 +29,7 @@ public class ErrorCodeConfig {
         errors.put("VOUCHER_VALUE_EMPTY", "Giá trị giảm không được bỏ trống");
         errors.put("VOUCHER_VALUE_MAX_EMPTY", "Giá trị giảm tối đa không được bỏ trống");
         errors.put("DATE_LESS_NOW", "Ngày nhỏ hơn ngày hiện tại");
+        errors.put("SEND_EMAIL_ERROR", "Gửi email thất bại");
     }
 
     public static String getMessage(String code) {

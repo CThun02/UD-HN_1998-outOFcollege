@@ -130,4 +130,9 @@ public class AccountServiceImpl implements AccountService {
     public void remove(String useName) {
         accountRepository.deleteById(useName);
     }
+
+    @Override
+    public List<String> findAllEmailAccount() {
+        return accountRepository.emailAccountList();
+    }
 }

@@ -38,25 +38,32 @@ public class VoucherRequest {
 
     @Min(value = 1, message = "Giá trị tối thiểu là 1")
     @DecimalMin(value = "1", message = "Giá trị giảm phải là số nguyên dương.")
+    @NotNull(message = "Giá trị giảm không được bỏ trống")
     private BigDecimal voucherValue;
 
     private BigDecimal voucherValueMax;
 
     @Min(value = 1, message = "Giá trị tối thiểu là 1")
+    @NotNull(message = "Số lượng áp dụng không được bỏ trống")
     private Integer limitQuantity;
 
     @DecimalMin(value = "1", message = "Điều kiện giảm phải là số nguyên dương.")
+    @NotNull(message = "Đơn hàng tối thiểu không được bỏ trống")
     private BigDecimal voucherCondition;
 
     @CompareDateNow(message = "Ngày bắt đầu phải lớn hơn ngày hiện tại")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
+    @NotNull(message = "Ngày bắt đầu không được bỏ trống")
     private LocalDateTime startDate;
 
     @CompareDateNow(message = "Ngày kết thúc phải lớn hơn ngày hiện tại")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
+    @NotNull(message = "Ngày kết thúc không được bỏ trống")
     private LocalDateTime endDate;
 
     private String status;
+
+    private String objectUse;
 
     private EmailDetails emailDetails;
 

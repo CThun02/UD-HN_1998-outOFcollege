@@ -10,6 +10,10 @@ public class CompareDateNowConstraint implements ConstraintValidator<CompareDate
     @Override
     public boolean isValid(LocalDateTime value, ConstraintValidatorContext context) {
 
+        if(value == null) {
+            return false;
+        }
+
         LocalDateTime dateNow = LocalDateTime.now();
 
         return value.isAfter(dateNow);

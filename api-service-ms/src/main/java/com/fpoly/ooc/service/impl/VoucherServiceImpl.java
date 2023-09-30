@@ -38,11 +38,14 @@ public class VoucherServiceImpl implements VoucherService {
     @Autowired
     private EmailService emailService;
 
+    @Autowired
+    private AccountServiceImpl accountService;
+
     @Override
     public Page<VoucherResponse> findAllVoucher(Pageable pageable, VoucherConditionDTO voucherConditionDTO) {
 
         String status = Objects.isNull(voucherConditionDTO.getStatus()) ?
-                null : voucherConditionDTO.getStatus().equals("ALL") ?
+                null : voucherConditionDTO.getStatus().equalsIgnoreCase("ALL") ?
                 null : voucherConditionDTO.getStatus();
 
         System.out.println("status: " + status);
@@ -59,9 +62,28 @@ public class VoucherServiceImpl implements VoucherService {
     @Override
     public Voucher saveOrUpdate(VoucherRequest voucherRequest) {
         Voucher voucher = convertVoucherRequest(voucherRequest);
+        String result = null;
+//        if (voucherRequest.getObjectUse().equalsIgnoreCase("all")) {
+//            List<String> emails = accountService.findAllEmailAccount();
+//
+//            if(emails.isEmpty()) {
+//                throw new NotFoundException(ErrorCodeConfig.getMessage(Const.SEND_EMAIL_ERROR));
+//            }
+//
+//            voucher.setObjectUse(voucherRequest.getObjectUse());
+//            voucherRequest.getEmailDetails().setRecipient(emails);
+//            result = emailService.sendSimpleMail(voucherRequest.getEmailDetails());
+//        } else {
+//
+//            voucher.setObjectUse(voucherRequest.getObjectUse());
+//            result = emailService.sendSimpleMail(voucherRequest.getEmailDetails());
+//        }
 
-        String result = emailService.sendSimpleMail(voucherRequest.getEmailDetails());
         log.info("Email: " + result);
+
+//        if(result.equals("ERROR")) {
+//            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.SEND_EMAIL_ERROR));
+//        }
 
         return voucherRepository.save(voucher);
     }
@@ -148,12 +170,12 @@ public class VoucherServiceImpl implements VoucherService {
         if (request.getVoucherName().equalsIgnoreCase(request.getVoucherNameCurrent())) {
             voucher.setVoucherName(request.getVoucherName());
         } else {
-            Optional<Voucher> voucherOptional = voucherRepository.findVoucherByVoucherName(request.getVoucherName());
+            Optional<Voucher> voucherOptional = voucherRepository.findVoucherByVoucherName(request.getVoucherNameCurrent());
 
             if (voucherOptional.isPresent()) {
-                throw new NotFoundException(Const.VOUCHER_NAME_ALREADY_EXISTS, "voucherName");
+                throw new NotFoundException(ErrorCodeConfig.getMessage(Const.VOUCHER_NAME_ALREADY_EXISTS), "voucherName");
             } else {
-                voucher.setVoucherName(request.getVoucherName());
+                voucher.setVoucherName(request.getVoucherNameCurrent());
             }
         }
 
@@ -164,29 +186,28 @@ public class VoucherServiceImpl implements VoucherService {
         switch (request.getVoucherMethod()) {
             case "vnd":
                 if (StringUtils.isEmpty(String.valueOf(voucherValue))) {
-                    throw new NotFoundException(Const.VOUCHER_VALUE_EMPTY, "voucherValue");
+                    throw new NotFoundException(ErrorCodeConfig.getMessage(Const.VOUCHER_VALUE_EMPTY), "voucherValue");
                 }
                 break;
             case "%":
                 if (StringUtils.isEmpty(String.valueOf(voucherValue)) || voucherValue > 100 || voucherValue < 1) {
-                    throw new NotFoundException(Const.VOUCHER_VALUE_EMPTY, "voucherValue");
+                    throw new NotFoundException(ErrorCodeConfig.getMessage(Const.VOUCHER_VALUE_EMPTY), "voucherValue");
                 }
 
                 if (StringUtils.isEmpty(String.valueOf(voucherValueMax))) {
-                    throw new NotFoundException(Const.VOUCHER_VALUE_MAX_EMPTY, "voucherValueMax");
-
+                    throw new NotFoundException(ErrorCodeConfig.getMessage(Const.VOUCHER_VALUE_MAX_EMPTY), "voucherValueMax");
                 }
                 break;
             default:
-                throw new NotFoundException(Const.VOUCHER_METHOD_EMPTY, "voucherMethod");
+                throw new NotFoundException(ErrorCodeConfig.getMessage(Const.VOUCHER_METHOD_EMPTY), "voucherMethod");
         }
 
         if (request.getLimitQuantity() < 1) {
-            throw new NotFoundException(Const.LIMIT_QUANTITY_LESS_ZERO, "limitQuantity");
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.LIMIT_QUANTITY_LESS_ZERO), "limitQuantity");
         }
 
         if (voucherCondition < 1) {
-            throw new NotFoundException(Const.VOUCHER_CONDITION_LESS_ZERO, "voucherCondition");
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.VOUCHER_CONDITION_LESS_ZERO), "voucherCondition");
         }
 
         LocalDateTime dateNow = LocalDateTime.now();
@@ -196,21 +217,20 @@ public class VoucherServiceImpl implements VoucherService {
             case "UPCOMING":
 
                 if (dateNow.isAfter(request.getStartDate()) && dateNow.isAfter(request.getEndDate())) {
-                    throw new NotFoundException(Const.DATE_LESS_NOW, "date");
+                    throw new NotFoundException(ErrorCodeConfig.getMessage(Const.DATE_LESS_NOW), "date");
                 } else {
                     if (dateNow.isAfter(request.getStartDate())) {
-                        throw new NotFoundException(Const.START_DATE_LESS_DATE_NOW, "startDate");
+                        throw new NotFoundException(ErrorCodeConfig.getMessage(Const.START_DATE_LESS_DATE_NOW), "startDate");
                     }
 
-                    if (dateNow.isAfter(request.getEndDate())){
-                        throw new NotFoundException(Const.END_DATE_LESS_DATE_NOW, "endDate");
+                    if (dateNow.isAfter(request.getEndDate())) {
+                        throw new NotFoundException(ErrorCodeConfig.getMessage(Const.END_DATE_LESS_DATE_NOW), "endDate");
                     }
                 }
 
-                if(request.getStartDate().isAfter(request.getEndDate())) {
-                    throw new NotFoundException(Const.END_DATE_LESS_START_DATE, "endDate");
+                if (request.getStartDate().isAfter(request.getEndDate())) {
+                    throw new NotFoundException(ErrorCodeConfig.getMessage(Const.END_DATE_LESS_START_DATE), "endDate");
                 }
-
 
                 voucher.setStartDate(request.getStartDate());
                 voucher.setEndDate(request.getEndDate());
@@ -218,14 +238,14 @@ public class VoucherServiceImpl implements VoucherService {
 
                 break;
             case "ACTIVE":
-                if(request.getStartDate().isAfter(request.getEndDate())) {
-                    throw new NotFoundException(Const.END_DATE_LESS_START_DATE, "endDate");
+                if (request.getStartDate().isAfter(request.getEndDate())) {
+                    throw new NotFoundException(ErrorCodeConfig.getMessage(Const.END_DATE_LESS_START_DATE), "endDate");
                 }
 
                 voucher.setEndDate(request.getEndDate());
                 break;
             default:
-                throw new NotFoundException(Const.STATUS_INVALID, "status");
+                throw new NotFoundException(ErrorCodeConfig.getMessage(Const.STATUS_INVALID), "status");
         }
 
         voucher.setId(
@@ -238,6 +258,7 @@ public class VoucherServiceImpl implements VoucherService {
         voucher.setVoucherValue(request.getVoucherValue());
         voucher.setVoucherValueMax(request.getVoucherValueMax());
         voucher.setLimitQuantity(request.getLimitQuantity());
+        voucher.setVoucherCondition(request.getVoucherCondition());
 
         return voucher;
     }

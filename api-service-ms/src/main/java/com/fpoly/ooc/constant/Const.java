@@ -24,6 +24,7 @@ public class Const {
     public static final String LIMIT_QUANTITY_LESS_ZERO="LIMIT_QUANTITY_LESS_ZERO";
     public static final String VOUCHER_CONDITION_LESS_ZERO="VOUCHER_CONDITION_LESS_ZERO";
     public static final String STATUS_INVALID = "STATUS_INVALID";
+    public static final String SEND_EMAIL_ERROR = "SEND_EMAIL_ERROR";
 
 
     //ErrorCode

@@ -12,6 +12,7 @@ import Bill from "./components/admin/sale-couter/Bill";
 import CreateBill from "./components/admin/sale-couter/CreateBill";
 import ProductDetails from "./components/admin/product/ProductDetails";
 import ProductCreateDetails from "./components/admin/product/ProductCreateDetails";
+import BillTimeLine from "./components/admin/sale-couter/TimeLine";
 import SaveVoucher from "./components/admin/voucher/SaveVoucher";
 import { useState } from "react";
 import { NotificationProvider } from "./components/element/notification/Notification";
@@ -45,6 +46,7 @@ function App() {
                     <Route path="counter-sales">
                       <Route index element={<Bill />}></Route>
                       <Route path="bill" element={<CreateBill />}></Route>
+                      <Route path=":billId/timeline" element={<BillTimeLine />}></Route>
                     </Route>
 
                     {/* Đơn hàng */}

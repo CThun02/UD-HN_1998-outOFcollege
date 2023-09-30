@@ -84,28 +84,27 @@ function Voucher() {
             startDate:
               searchStartDate !== ""
                 ? moment(searchStartDate?.$d, "DD-MM-YYYY").format(
-                    "YYYY-MM-DDTHH:mm:ss.SSS"
-                  )
+                  "YYYY-MM-DDTHH:mm:ss.SSS"
+                )
                 : "",
             endDate:
               searchEndDate !== ""
                 ? moment(searchEndDate?.$d, "DD-MM-YYYY").format(
-                    "YYYY-MM-DDTHH:mm:ss.SSS"
-                  )
+                  "YYYY-MM-DDTHH:mm:ss.SSS"
+                )
                 : "",
             status: searchStatus,
           };
 
           const res = await axios.post(
-            `${
-              pageNo !== 1 || pageSize !== 5
-                ? baseUrl +
-                  "?pageNo=" +
-                  (pageNo - 1) +
-                  "&" +
-                  "pageSize=" +
-                  pageSize
-                : baseUrl
+            `${pageNo !== 1 || pageSize !== 5
+              ? baseUrl +
+              "?pageNo=" +
+              (pageNo - 1) +
+              "&" +
+              "pageSize=" +
+              pageSize
+              : baseUrl
             }`,
             filter
           );
@@ -152,6 +151,7 @@ function Voucher() {
           clearNotification();
         }
       }
+
 
       return () => {
         notification(true);
@@ -204,10 +204,10 @@ function Voucher() {
           status === "Đang diễn ra"
             ? "geekblue"
             : status === "Sắp diễn ra"
-            ? "green"
-            : "Đã kết thúc"
-            ? "red"
-            : null;
+              ? "green"
+              : "Đã kết thúc"
+                ? "red"
+                : null;
         return <Tag color={color}>{status}</Tag>;
       },
     },
@@ -269,8 +269,8 @@ function Voucher() {
                   </Button>
                 </Link>
               </>
-            </Col>
-          </Row>
+            </Col >
+          </Row >
 
           <Spin
             tip="Loading..."
@@ -299,10 +299,11 @@ function Voucher() {
                       voucher.status === "ACTIVE"
                         ? "Đang diễn ra"
                         : voucher.status === "INACTIVE"
-                        ? "Đã kết thúc"
-                        : voucher.status === "UPCOMING"
-                        ? "Sắp diễn ra"
-                        : null,
+
+                          ? "Đã kết thúc"
+                          : voucher.status === "UPCOMING"
+                            ? "Sắp diễn ra"
+                            : null,
                     action: [voucher.voucherCode, voucher.status],
                   }))}
                   className={styles.table}
@@ -320,9 +321,9 @@ function Voucher() {
               </Space>
             </>
           </Spin>
-        </Space>
-      </div>
-    </div>
+        </Space >
+      </div >
+    </div >
   );
 }
 

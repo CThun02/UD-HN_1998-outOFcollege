@@ -8,10 +8,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface AccountRepository extends JpaRepository<Account,String> {
 
     @Query("SELECT new com.fpoly.ooc.responce.account.AccountResponce(a.avatar, a.fullName, a.gender, a.createdAt,a.status)" +
             "FROM Account a ")
     Page<AccountResponce> phanTrang(Pageable pageable);
+
+    @Query(value = "select email from account", nativeQuery = true)
+    List<String> emailAccountList();
 }

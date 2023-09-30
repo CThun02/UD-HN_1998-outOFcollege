@@ -2,7 +2,6 @@ import {
   Button,
   Col,
   DatePicker,
-  Divider,
   Form,
   Input,
   Modal,
@@ -11,26 +10,28 @@ import {
   Select,
   Space,
   Table,
+  notification,
 } from "antd";
 import styles from "./SaveVoucher.module.css";
 import { EditOutlined, ExclamationCircleFilled } from "@ant-design/icons";
 import FloatingLabels from "../../element/FloatingLabels/FloatingLabels";
 import moment from "moment";
 import { Formik } from "formik";
-import React, { useContext, useRef } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import * as Yup from "yup";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import numeral from "numeral";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { NotificationContext } from "../../element/notification/Notification";
+import axios from "axios";
 
 const options = [
   { label: "VND", value: "vnd" },
   { label: "%", value: "%" },
 ];
 
-const optionsPrivate = [
+const optionsobjectUse = [
   { label: "Tất cả", value: "all" },
   { label: "Thành viên", value: "member" },
 ];
@@ -66,12 +67,7 @@ const validationSchema = Yup.object().shape({
       function (startDate) {
         const currentDate = new Date();
         if (startDate) {
-          console.log("startDate: ", startDate);
-          console.log("currentDate: ", currentDate);
-          return (
-            moment(startDate).format(dateFormat) >
-            moment(currentDate).format(dateFormat)
-          );
+          return startDate > currentDate;
         }
         return true;
       }
@@ -176,10 +172,16 @@ const data = [
 
 const { confirm } = Modal;
 
+const baseUrl = "http://localhost:8080/admin/api/voucher/";
+
 function SaveVoucher() {
   const ref = useRef();
   const navigate = useNavigate();
   const { showSuccessNotification } = useContext(NotificationContext);
+  const [apiNotification, contextProviderNotification] =
+    notification.useNotification();
+  const [errorsServer, setErrorsServer] = useState({});
+  const { code } = useParams();
 
   const rowSelection = {
     onChange: (selectedRowKeys, selectedRows) => {
@@ -198,15 +200,61 @@ function SaveVoucher() {
 
   const handleOnSubmit = (values, actions) => {
     confirm({
-      title: "Bạn có chắc là muốn thêm voucher này không?",
+      title: "Xác nhận",
       icon: <ExclamationCircleFilled />,
-      content: "Some descriptions",
-      onOk() {
-        console.log("submit!", values, actions);
-        console.log("test: ", ref);
+      content: "Bạn có chắc là muốn lưu thay đổi không?",
 
-        navigate("/admin/vouchers");
-        showSuccessNotification("Thêm voucher thành công");
+      onOk() {
+        async function saveVoucher() {
+          const voucher = ref.current?.values;
+          if (voucher) {
+            await axios
+              .post(baseUrl + "add", {
+                ...voucher,
+                startDate: moment(voucher?.startDate.$d).format(
+                  "YYYY-MM-DDTHH:mm:ss.SSS"
+                ),
+                endDate: moment(voucher?.endDate.$d).format(
+                  "YYYY-MM-DDTHH:mm:ss.SSS"
+                ),
+                limitQuantity: isNaN(voucher?.limitQuantity)
+                  ? Number.parseInt(voucher?.limitQuantity?.replace(/,/g, ""))
+                  : voucher?.limitQuantity,
+                voucherValue: isNaN(voucher?.voucherValue)
+                  ? Number.parseInt(voucher?.voucherValue?.replace(/,/g, ""))
+                  : voucher?.voucherValue,
+                voucherValueMax: isNaN(voucher?.voucherValueMax)
+                  ? Number.parseInt(voucher?.voucherValueMax?.replace(/,/g, ""))
+                  : voucher?.voucherValueMax,
+                voucherCondition: isNaN(voucher?.voucherCondition)
+                  ? Number.parseInt(
+                      voucher?.voucherCondition?.replace(/,/g, "")
+                    )
+                  : voucher?.voucherCondition,
+                voucherId: voucher?.voucherId ? voucher?.voucherId : "",
+                voucherCode: voucher?.voucherCode ? voucher?.voucherCode : "",
+                voucherCurrentName: voucher?.voucherCurrentName,
+              })
+              .then(() => {
+                navigate("/admin/vouchers");
+                showSuccessNotification("Thêm voucher thành công");
+              })
+              .catch((err) => {
+                const error = err.response.data;
+                setErrorsServer(error);
+                apiNotification.error({
+                  message: `Lỗi`,
+                  description: `${err.response.data.message}`,
+                });
+              });
+          } else {
+            apiNotification.error({
+              message: `Lỗi`,
+            });
+          }
+        }
+
+        saveVoucher();
       },
       onCancel() {
         console.log("Cancel");
@@ -214,9 +262,87 @@ function SaveVoucher() {
     });
   };
 
+  useEffect(
+    function () {
+      console.log("code: ", baseUrl + code);
+      if (code) {
+        async function getVoucher() {
+          await axios.get(baseUrl + code).then((res) => {
+            const {
+              voucherId,
+              voucherCode,
+              voucherName,
+              voucherMethod,
+              voucherValue,
+              voucherValueMax,
+              limitQuantity,
+              voucherCondition,
+              startDate,
+              endDate,
+              status,
+            } = res.data;
+
+            console.log(
+              "startDate: ",
+              dayjs(moment(startDate).format(dateFormat), dateFormat)
+            );
+            console.log(
+              "endDate: ",
+              dayjs(moment(endDate).format(dateFormat), dateFormat)
+            );
+
+            ref.current.setFieldValue("voucherId", voucherId);
+            ref.current.setFieldValue("voucherCode", voucherCode);
+            ref.current.setFieldValue("voucherName", voucherName);
+            ref.current.setFieldValue("voucherNameCurrent", voucherName);
+            ref.current.setFieldValue("voucherMethod", voucherMethod);
+            ref.current.setFieldValue(
+              "voucherValue",
+              handleChangeNumber(voucherValue)
+            );
+            ref.current.setFieldValue(
+              "voucherValueMax",
+              handleChangeNumber(voucherValueMax)
+            );
+            ref.current.setFieldValue(
+              "limitQuantity",
+              handleChangeNumber(limitQuantity)
+            );
+            ref.current.setFieldValue(
+              "voucherCondition",
+              handleChangeNumber(voucherCondition)
+            );
+            ref.current.setFieldValue(
+              "startDate",
+              dayjs(moment(startDate).format(dateFormat), dateFormat)
+            );
+            ref.current.setFieldValue(
+              "endDate",
+              dayjs(moment(endDate).format(dateFormat), dateFormat)
+            );
+            ref.current.setFieldValue("status", status);
+          });
+        }
+
+        getVoucher();
+      }
+    },
+    [code]
+  );
+
+  const isCheck =
+    ref.current?.values.status === "" ||
+    ref.current?.values.status === "UPCOMING"
+      ? false
+      : ref.current?.values.status === "ACTIVE" ||
+        ref.current?.values.status === "INACTIVE"
+      ? true
+      : true;
+
   return (
     <div className={styles.saveVoucher}>
       <div className={styles.content}>
+        {contextProviderNotification}
         <Space style={{ width: "100%" }} direction="vertical" size={30}>
           <Space size={16} className={styles.color}>
             <i>
@@ -231,6 +357,7 @@ function SaveVoucher() {
                 voucherId: "",
                 voucherCode: "",
                 voucherName: "",
+                voucherCurrentName: "",
                 voucherMethod: "vnd",
                 voucherValue: "",
                 voucherValueMax: "",
@@ -238,7 +365,8 @@ function SaveVoucher() {
                 voucherCondition: "",
                 startDate: "",
                 endDate: "",
-                private: "all",
+                objectUse: "all",
+                status: "",
               }}
               onSubmit={handleOnSubmit}
               validationSchema={validationSchema}
@@ -248,21 +376,28 @@ function SaveVoucher() {
                 handleBlur,
                 handleSubmit,
                 handleChange,
-                isValid,
                 setFieldValue,
                 values,
                 errors,
                 touched,
-                setTouched,
-                setErrors,
               }) => (
                 <>
                   <Col span={3}></Col>
 
                   <Col span={18}>
                     <Form onFinish={handleSubmit}>
-                      <Input style={{ display: "none" }} />
-                      <Input style={{ display: "none" }} />
+                      <Input
+                        style={{ display: "none" }}
+                        name="voucherId"
+                        value={values.voucherId}
+                        onChange={handleChange}
+                      />
+                      <Input
+                        style={{ display: "none" }}
+                        name="voucherCode"
+                        value={values.voucherCode}
+                        onChange={handleChange}
+                      />
 
                       <Space
                         style={{ width: "100%" }}
@@ -271,31 +406,75 @@ function SaveVoucher() {
                       >
                         <Row gutter={16}>
                           <Col span={24}>
-                            <FloatingLabels
-                              label="Tên voucher"
-                              name="voucherName"
-                              value={values.voucherName}
-                              zIndex={true}
-                            >
-                              <Input
-                                size="large"
+                            {code ? (
+                              <FloatingLabels
+                                label="Tên voucher"
+                                name="voucherNameCurrent"
+                                value={values.voucherNameCurrent}
+                                zIndex={true}
+                              >
+                                <Input
+                                  size="large"
+                                  name="voucherNameCurrent"
+                                  onChange={(e) => {
+                                    setFieldValue(
+                                      "voucherNameCurrent",
+                                      e.target.value
+                                    );
+                                  }}
+                                  onBlur={handleBlur}
+                                  value={values.voucherNameCurrent}
+                                  allowClear
+                                  status={
+                                    (touched.voucherNameCurrent &&
+                                      errors.voucherNameCurrent) ||
+                                    errorsServer?.voucherNameCurrent
+                                      ? "error"
+                                      : "success"
+                                  }
+                                />
+                                {touched.voucherNameCurrent && (
+                                  <div className={styles.errors}>
+                                    {errors.voucherNameCurrent}
+                                    {errorsServer.voucherNameCurrent}
+                                  </div>
+                                )}
+                              </FloatingLabels>
+                            ) : (
+                              <FloatingLabels
+                                label="Tên voucher"
                                 name="voucherName"
-                                onChange={handleChange}
-                                onBlur={handleBlur}
                                 value={values.voucherName}
-                                allowClear
-                                status={
-                                  touched.voucherName && errors.voucherName
-                                    ? "error"
-                                    : "success"
-                                }
-                              />
-                              {touched.voucherName && (
-                                <div className={styles.errors}>
-                                  {errors.voucherName}
-                                </div>
-                              )}
-                            </FloatingLabels>
+                                zIndex={true}
+                              >
+                                <Input
+                                  size="large"
+                                  name="voucherName"
+                                  onChange={(e) => {
+                                    setFieldValue(
+                                      "voucherName",
+                                      e.target.value
+                                    );
+                                  }}
+                                  onBlur={handleBlur}
+                                  value={values.voucherName}
+                                  allowClear
+                                  status={
+                                    (touched.voucherName &&
+                                      errors.voucherName) ||
+                                    errorsServer?.voucherName
+                                      ? "error"
+                                      : "success"
+                                  }
+                                />
+                                {touched.voucherName && (
+                                  <div className={styles.errors}>
+                                    {errors.voucherName}
+                                    {errorsServer.voucherName}
+                                  </div>
+                                )}
+                              </FloatingLabels>
+                            )}
                           </Col>
                         </Row>
 
@@ -336,7 +515,9 @@ function SaveVoucher() {
                                   onBlur={handleBlur}
                                   value={values.voucherValue}
                                   status={
-                                    touched.voucherValue && errors.voucherValue
+                                    (touched.voucherValue &&
+                                      errors.voucherValue) ||
+                                    errorsServer?.voucherValue
                                       ? "error"
                                       : ""
                                   }
@@ -345,6 +526,7 @@ function SaveVoucher() {
                               {touched.voucherValue && (
                                 <div className={styles.errors}>
                                   {errors.voucherValue}
+                                  {errorsServer?.voucherValue}
                                 </div>
                               )}
                             </Col>
@@ -371,8 +553,9 @@ function SaveVoucher() {
                                     onBlur={handleBlur}
                                     allowClear
                                     status={
-                                      touched.voucherValue &&
-                                      errors.voucherValue
+                                      (touched.voucherValue &&
+                                        errors.voucherValue) ||
+                                      errorsServer.voucherValue
                                         ? "error"
                                         : ""
                                     }
@@ -381,6 +564,7 @@ function SaveVoucher() {
                                 {touched.voucherValue && (
                                   <div className={styles.errors}>
                                     {errors.voucherValue}
+                                    {errorsServer.voucherValue}
                                   </div>
                                 )}
                               </Col>
@@ -406,18 +590,20 @@ function SaveVoucher() {
                                     onBlur={handleBlur}
                                     allowClear
                                     status={
-                                      touched.voucherValueMax &&
-                                      errors.voucherValueMax
+                                      (touched?.voucherValueMax &&
+                                        errors.voucherValueMax) ||
+                                      errorsServer.voucherValueMax
                                         ? "error"
                                         : ""
                                     }
                                   />
                                 </FloatingLabels>
-                                {touched.voucherValueMax && (
+                                {/* {touched?.voucherValueMax(
                                   <div className={styles.errors}>
                                     {errors.voucherValueMax}
+                                    {errorsServer.voucherValueMax}
                                   </div>
-                                )}
+                                )} */}
                               </Col>
                             </>
                           )}
@@ -444,7 +630,9 @@ function SaveVoucher() {
                                 }
                                 onBlur={handleBlur}
                                 status={
-                                  touched.limitQuantity && errors.limitQuantity
+                                  (touched.limitQuantity &&
+                                    errors.limitQuantity) ||
+                                  errorsServer.limitQuantity
                                     ? "error"
                                     : ""
                                 }
@@ -453,6 +641,7 @@ function SaveVoucher() {
                             {touched.limitQuantity && (
                               <div className={styles.errors}>
                                 {errors.limitQuantity}
+                                {errorsServer.limitQuantity}
                               </div>
                             )}
                           </Col>
@@ -478,8 +667,9 @@ function SaveVoucher() {
                                 }
                                 onBlur={handleBlur}
                                 status={
-                                  touched.voucherCondition &&
-                                  errors.voucherCondition
+                                  (touched.voucherCondition &&
+                                    errors.voucherCondition) ||
+                                  errorsServer.voucherCondition
                                     ? "error"
                                     : ""
                                 }
@@ -488,6 +678,7 @@ function SaveVoucher() {
                             {touched.voucherCondition && (
                               <div className={styles.errors}>
                                 {errors.voucherCondition}
+                                {errorsServer.voucherCondition}
                               </div>
                             )}
                           </Col>
@@ -507,11 +698,12 @@ function SaveVoucher() {
                                 size="large"
                                 placeholder={null}
                                 style={{ width: "100%" }}
-                                values={values.startDate}
+                                value={values.startDate}
                                 onChange={(e) => setFieldValue("startDate", e)}
                                 onBlur={handleBlur}
                                 status={
-                                  touched.startDate && errors.startDate
+                                  (touched.startDate && errors.startDate) ||
+                                  errorsServer.startDate
                                     ? "error"
                                     : ""
                                 }
@@ -519,7 +711,7 @@ function SaveVoucher() {
                             </FloatingLabels>
                             {touched.startDate && (
                               <div className={styles.errors}>
-                                {errors.startDate}
+                                {errors.startDate} {errorsServer.startDate}
                               </div>
                             )}
                           </Col>
@@ -537,11 +729,14 @@ function SaveVoucher() {
                                 size="large"
                                 placeholder={null}
                                 style={{ width: "100%" }}
-                                values={values.endDate}
-                                onChange={(e) => setFieldValue("endDate", e)}
+                                value={values.endDate}
+                                onChange={(e) => {
+                                  setFieldValue("endDate", e);
+                                }}
                                 onBlur={handleBlur}
                                 status={
-                                  touched.endDate && errors.endDate
+                                  (touched.endDate && errors.endDate) ||
+                                  errorsServer.endDate
                                     ? "error"
                                     : ""
                                 }
@@ -549,7 +744,7 @@ function SaveVoucher() {
                             </FloatingLabels>
                             {touched.endDate && (
                               <div className={styles.errors}>
-                                {errors.endDate}
+                                {errors.endDate} {errorsServer.endDate}
                               </div>
                             )}
                           </Col>
@@ -564,15 +759,17 @@ function SaveVoucher() {
                               <FloatingLabels
                                 label="Đối tượng sử dụng"
                                 name="status"
-                                value={values.private}
+                                value={values.objectUse}
                               >
                                 <Select
-                                  name="private"
+                                  name="objectUse"
                                   className={styles.selectedItem}
-                                  onChange={(e) => setFieldValue("private", e)}
+                                  onChange={(e) =>
+                                    setFieldValue("objectUse", e)
+                                  }
                                   onBlur={handleBlur}
-                                  options={optionsPrivate}
-                                  value={values.private}
+                                  options={optionsobjectUse}
+                                  value={values.objectUse}
                                   style={{ width: "100%" }}
                                   placeholder={null}
                                   size="large"
@@ -584,7 +781,12 @@ function SaveVoucher() {
 
                         <Row>
                           <Space size={10}>
-                            <Button size="large">Hủy</Button>
+                            <Button
+                              size="large"
+                              onClick={() => navigate("/admin/vouchers")}
+                            >
+                              Hủy
+                            </Button>
 
                             <Button
                               type="primary"
@@ -606,7 +808,7 @@ function SaveVoucher() {
                     direction="vertical"
                     size={12}
                   >
-                    {values?.private === "member" ? (
+                    {values?.objectUse === "member" ? (
                       <Space
                         style={{ width: "100%" }}
                         direction="vertical"

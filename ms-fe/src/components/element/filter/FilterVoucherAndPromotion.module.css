@@ -18,3 +18,8 @@
 .color {
   color: #000000e0;
 }
+
+.selectedItem div {
+  height: 2.9rem !important;
+  align-items: center;
+}

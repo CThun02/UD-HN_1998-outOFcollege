@@ -32,9 +32,10 @@ const CreateBill = () => {
     const columns = [
         {
             title: 'STT',
-            dataIndex: 'STT',
-            render: (_, index) => {
-                return index + 1;
+            // dataIndex: 'STT',
+            key: 'STT',
+            render: (_, record) => {
+                return data.indexOf(record) + 1;
             }
         },
         {
@@ -79,6 +80,7 @@ const CreateBill = () => {
                         danger
                         className={styles.btnDelete}
                         href='#1'
+                        key={record.key}
                     ></Button>
                 </Space>
             ),

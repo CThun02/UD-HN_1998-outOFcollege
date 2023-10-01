@@ -26,6 +26,13 @@
 .adminMenu {
   margin-bottom: 10px;
 }
+.adminMenu1 {
+  margin-right: 10px;
+}
+/* .btnDetails {
+  box-shadow: 4px 4px 10px gray;
+} */
+
 .faPlus {
   background-color: white;
   border-radius: 50%;

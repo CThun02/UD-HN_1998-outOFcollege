@@ -30,6 +30,8 @@ public class MsHandleException {
             errors.put(message.getField(), message.getDefaultMessage());
         }
 
+        errors.put("message", "Vui lòng nhập đúng kiểu dữ liệu");
+
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
@@ -40,11 +42,11 @@ public class MsHandleException {
 //    }
 
     @ExceptionHandler({NotFoundException.class})
-    public ResponseEntity<Map<String, String>> notFoundException(NotFoundException ex) {
-        Map<String, String> errors = new HashMap<>();
+    public ResponseEntity<Map<String, Object>> notFoundException(NotFoundException ex) {
+        Map<String, Object> errors = new HashMap<>();
         errors.put("status", Const.HTTP_ERROR_CODE);
         errors.put("message", ex.getMessage());
-        errors.put(ex.getField(), "error");
+        errors.put(ex.getField(), ex.getMessage());
 
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }

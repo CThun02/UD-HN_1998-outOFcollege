@@ -137,22 +137,22 @@ VALUES
 (4, 3, 5, 4, N'P005', N'Shoes A', N'These shoes provide excellent support.', 'ACTIVE', '2023-09-20', '2023-09-20', N'Admin', N'Admin', NULL);
 select * from product
 
-INSERT INTO voucher (voucher_code, voucher_name, start_date, end_date, voucher_value, voucher_value_max, voucher_method, voucher_condition, limit_quantity, status, created_at, updated_at, created_by, updated_by, deleted_at)
+INSERT INTO voucher (voucher_code, voucher_name, start_date, end_date, voucher_value, voucher_value_max, voucher_method, voucher_condition, limit_quantity, status, created_at, updated_at, created_by, updated_by, deleted_at, private)
 VALUES
-('DISCOUNT10', N'Discount 10%', '2023-09-01', '2023-09-30', 10, 100, 'Percentage', 50, 100, 'ACTIVE', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL),
-('FREESHIP', N'Free Shipping', '2023-09-15', '2023-09-30', 0, NULL, 'Fixed', 0, 50, 'ACTIVE', '2023-09-15', '2023-09-15', N'Admin', N'Admin', NULL),
-('FLASH20', N'Flash Sale 20%', '2023-09-10', '2023-09-12', 20, 50, 'Percentage', 100, 200, 'ACTIVE', '2023-09-10', '2023-09-10', N'Admin', N'Admin', NULL),
-('NEWCUST10', N'New Customer Discount', '2023-09-01', '2023-12-31', 10, 100, 'Percentage', 0, NULL, 'ACTIVE', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL),
-('HOLIDAY25', N'Holiday Special', '2023-12-15', '2024-01-01', 25, 0, 'Fixed', 150, 1000, 'ACTIVE', '2023-12-15', '2023-12-15', N'Admin', N'Admin', NULL);
+('DISCOUNT10', N'Discount 10%', '2023-09-01', '2023-09-30', 10, 100, 'Percentage', 50, 100, 'ACTIVE', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL, 'all'),
+('FREESHIP', N'Free Shipping', '2023-09-15', '2023-09-30', 0, NULL, 'Fixed', 0, 50, 'ACTIVE', '2023-09-15', '2023-09-15', N'Admin', N'Admin', NULL, 'member'),
+('FLASH20', N'Flash Sale 20%', '2023-09-10', '2023-09-12', 20, 50, 'Percentage', 100, 200, 'ACTIVE', '2023-09-10', '2023-09-10', N'Admin', N'Admin', NULL, 'all'),
+('NEWCUST10', N'New Customer Discount', '2023-09-01', '2023-12-31', 10, 100, 'Percentage', 0, NULL, 'ACTIVE', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL, 'member'),
+('HOLIDAY25', N'Holiday Special', '2023-12-15', '2024-01-01', 25, 0, 'Fixed', 150, 1000, 'ACTIVE', '2023-12-15', '2023-12-15', N'Admin', N'Admin', NULL, 'member');
 select * from voucher
 
 INSERT INTO account (username, role_id, full_name, dob, gender, phone_number, email, id_no, password, status, created_at, updated_at, created_by, updated_by, deleted_at)
 VALUES 
-('user1', 1, N'Hannah Johnson', '1990-05-15', 0, '1234567890', 'user1@example.com', 'A12345678', '123456', 'ACTIVE', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL),
-('user2', 2, N'Michael Smith', '1985-12-20', 1, '9876543210', 'user2@example.com', 'B98765432', '234567', 'ACTIVE', '2023-09-05', '2023-09-05', N'Admin', N'Admin', NULL),
-('user3', 3, N'Emma Davis', '1995-08-10', 0, '5558889999', 'user3@example.com', 'C76543210', '345678', 'ACTIVE', '2023-09-10', '2023-09-10', N'Admin', N'Admin', NULL),
-('user4', 2, N'Sophia Wilson', '1992-04-15', 1, '7778889999', 'user4@example.com', 'D54321098', '456789', 'ACTIVE', '2023-09-12', '2023-09-12', N'Admin', N'Admin', NULL),
-('user5', 1, N'Oliver Thompson','1992-04-04' , 1, '1231231234', 'user5@example.com', 'E98765432', '445566', 'ACTIVE', '2023-09-15', '2023-09-15', N'Admin', N'Admin', NULL);
+('user1', 1, N'Hannah Johnson', '1990-05-15', 0, '1234567890', 'tuanpaph26902@fpt.edu.vn', 'A12345678', '123456', 'ACTIVE', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL),
+('user2', 2, N'Michael Smith', '1985-12-20', 1, '9876543210', 'kienptph26901@fpt.edu.vn', 'B98765432', '234567', 'ACTIVE', '2023-09-05', '2023-09-05', N'Admin', N'Admin', NULL),
+('user3', 3, N'Emma Davis', '1995-08-10', 0, '5558889999', 'thuanctph26631@fpt.edu.vn', 'C76543210', '345678', 'ACTIVE', '2023-09-10', '2023-09-10', N'Admin', N'Admin', NULL),
+('user4', 2, N'Sophia Wilson', '1992-04-15', 1, '7778889999', 'anpvph26925@fpt.edu.vn', 'D54321098', '456789', 'ACTIVE', '2023-09-12', '2023-09-12', N'Admin', N'Admin', NULL),
+('user5', 1, N'Oliver Thompson','1992-04-04' , 1, '1231231234', 'email@gmail.com', 'E98765432', '445566', 'ACTIVE', '2023-09-15', '2023-09-15', N'Admin', N'Admin', NULL);
 select * from account
 
 INSERT INTO cart (account_id, status, created_at, updated_at, created_by, updated_by, deleted_at)

@@ -110,10 +110,7 @@ const ProductDetails = (props) => {
       width: 150,
       render: (text, record, index) => {
         return (
-          <div
-            className={styles.optionColor}
-            style={{ justifyContent: "center" }}
-          >
+          <div className={styles.optionColor}>
             <span style={{ backgroundColor: record.color.colorCode }}></span>
             {record.color.colorName}
           </div>

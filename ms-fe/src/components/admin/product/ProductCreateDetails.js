@@ -4,8 +4,6 @@ import {
   PlusSquareOutlined,
 } from "@ant-design/icons";
 import { Button, Col, message, Row, Select } from "antd";
-import { isString } from "antd/es/button";
-import TextArea from "antd/es/input/TextArea";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
@@ -14,8 +12,14 @@ import "../animations/animation.css";
 import ProductCreate from "./ProductCreate";
 import styles from "./ProductCreateDetails.module.css";
 import ProductDetailsTable from "./ProductDetailsTable";
-import { isFormInputEmpty } from "./ValidateForm";
 
+var buttonsCreate = [];
+var collarsCreate = [];
+var materialsCreate = [];
+var sleevesCreate = [];
+var shirtTailsCreate = [];
+var colorsCreate = [];
+var sizesCreate = [];
 const ProductCreateDetails = (props) => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -31,11 +35,12 @@ const ProductCreateDetails = (props) => {
   const [sleeves, setSleeves] = useState(null);
   const [shirtTails, setshirtTails] = useState(null);
   const [productList, setProductList] = useState(null);
-  const [render, setRender] = useState(null);
+  const [render, setRender] = useState(1);
   const [url, setUrl] = useState(
     "https://vapa.vn/wp-content/uploads/2022/12/anh-3d-thien-nhien.jpeg"
   );
   const [product, setProduct] = useState({
+    productId: null,
     productName: "",
     brand: {},
     pattern: {},
@@ -44,7 +49,7 @@ const ProductCreateDetails = (props) => {
     description: "",
   });
   const [productDetail, setProductDetail] = useState({
-    productId: "",
+    productId: null,
     buttonId: " ",
     materialId: " ",
     collarId: " ",
@@ -55,10 +60,6 @@ const ProductCreateDetails = (props) => {
     price: 200000,
     quantity: 1,
   });
-  const [colorsCreate, setColorsCreate] = useState([]);
-  const [colorsUpdate, setColorsUpdate] = useState([]);
-  const [sizesCreate, setSizesCreate] = useState([]);
-  const [sizesUpdate, setSizesUpdate] = useState([]);
   const productDetailUpdate = getProductUpdate();
 
   //fucntion
@@ -66,29 +67,6 @@ const ProductCreateDetails = (props) => {
     if (currentHref.includes("update-details")) {
       const productDetailParam = searchParams.get("productDetail");
       return JSON.parse(productDetailParam);
-    }
-  }
-
-  function createProductDetail() {
-    for (let key in productDetail) {
-      if (isString(productDetail[key])) {
-        if (productDetail[key].trim() === "") {
-          handleSetProductDetail(key, productDetail[key].trim());
-        }
-      }
-    }
-    console.log(productDetail.productId);
-    if (!(productDetail.productId.toString().trim() === "")) {
-      let check = isFormInputEmpty(productDetail);
-      if (!check) {
-        setTimeout(() => {
-          messageApi.success("Thêm mới thành công!", 3);
-        }, 3000);
-      } else {
-        messageApi.error("Vui lòng chọn tất cả các trường!", 5);
-      }
-    } else {
-      messageApi.error("Vui lòng chọn sản phẩm!", 2);
     }
   }
 
@@ -184,7 +162,6 @@ const ProductCreateDetails = (props) => {
               productDetailUpdate.collar.id
           )
           .then((res) => {
-            setColorsUpdate(res.data);
             axios
               .get(
                 api +
@@ -203,9 +180,7 @@ const ProductCreateDetails = (props) => {
                   "&colorId=" +
                   res.data[0].id
               )
-              .then((response) => {
-                setSizesUpdate(response.data);
-              })
+              .then((response) => {})
               .catch((err) => {
                 console.log(err);
               });
@@ -264,10 +239,7 @@ const ProductCreateDetails = (props) => {
                           }
                           onChange={(value) => {
                             setProduct(productList[value]);
-                            handleSetProductDetail(
-                              "productId",
-                              productList[value].id
-                            );
+                            handleSetProductDetail("productId", value);
                           }}
                         >
                           {productList &&
@@ -348,15 +320,20 @@ const ProductCreateDetails = (props) => {
                     placeholder="Button"
                     mode="multiple"
                     className={styles.product__createDetailsSelect}
-                    onChange={(event) => {
-                      handleSetProductDetail("buttonId", event);
+                    onChange={(event, record) => {
+                      buttonsCreate = record;
+                      setRender(event);
                     }}
                     status={productDetail.buttonId === "" ? "error" : ""}
                   >
                     {buttons &&
                       buttons.map((item) => {
                         return (
-                          <Select.Option value={item.id} key={item.id}>
+                          <Select.Option
+                            value={item.id}
+                            label={item.buttonName}
+                            key={item.id}
+                          >
                             {item.buttonName}
                           </Select.Option>
                         );
@@ -372,15 +349,20 @@ const ProductCreateDetails = (props) => {
                     placeholder="Material"
                     mode="multiple"
                     className={styles.product__createDetailsSelect}
-                    onChange={(event) => {
-                      handleSetProductDetail("materialId", event);
+                    onChange={(event, record) => {
+                      materialsCreate = record;
+                      setRender(event);
                     }}
                     status={productDetail.materialId === "" ? "error" : ""}
                   >
                     {materials &&
                       materials.map((item) => {
                         return (
-                          <Select.Option value={item.id} key={item.id}>
+                          <Select.Option
+                            value={item.id}
+                            label={item.materialName}
+                            key={item.id}
+                          >
                             {item.materialName}
                           </Select.Option>
                         );
@@ -396,8 +378,9 @@ const ProductCreateDetails = (props) => {
                     placeholder="Collar"
                     mode="multiple"
                     className={styles.product__createDetailsSelect}
-                    onChange={(event) => {
-                      handleSetProductDetail("collarId", event);
+                    onChange={(event, record) => {
+                      collarsCreate = record;
+                      setRender(event);
                     }}
                     status={productDetail.collarId === "" ? "error" : ""}
                   >
@@ -424,15 +407,20 @@ const ProductCreateDetails = (props) => {
                     placeholder="Sleeve"
                     mode="multiple"
                     className={styles.product__createDetailsSelect}
-                    onChange={(event) => {
-                      handleSetProductDetail("sleeveId", event);
+                    onChange={(event, record) => {
+                      sleevesCreate = record;
+                      setRender(event);
                     }}
                     status={productDetail.sleeveId === "" ? "error" : ""}
                   >
                     {sleeves &&
                       sleeves.map((item) => {
                         return (
-                          <Select.Option value={item.id} key={item.id}>
+                          <Select.Option
+                            value={item.id}
+                            label={item.sleeveName}
+                            key={item.id}
+                          >
                             {item.sleeveName}
                           </Select.Option>
                         );
@@ -448,15 +436,20 @@ const ProductCreateDetails = (props) => {
                     placeholder="Shirt tail"
                     mode="multiple"
                     className={styles.product__createDetailsSelect}
-                    onChange={(event) => {
-                      handleSetProductDetail("shirtTailId", event);
+                    onChange={(event, record) => {
+                      shirtTailsCreate = record;
+                      setRender(event);
                     }}
                     status={productDetail.shirtTailId === "" ? "error" : ""}
                   >
                     {shirtTails &&
                       shirtTails.map((item) => {
                         return (
-                          <Select.Option value={item.id} key={item.id}>
+                          <Select.Option
+                            value={item.id}
+                            label={item.shirtTailTypeName}
+                            key={item.id}
+                          >
                             {item.shirtTailTypeName}
                           </Select.Option>
                         );
@@ -481,16 +474,20 @@ const ProductCreateDetails = (props) => {
                         .toLowerCase()
                         .localeCompare((optionB?.label ?? "").toLowerCase())
                     }
-                    onChange={(event) => {
-                      setSizesCreate(event);
-                      handleSetProductDetail("sizeId", event);
+                    onChange={(event, record) => {
+                      sizesCreate = record;
+                      setRender(event);
                     }}
                     status={productDetail.sizeId === "" ? "error" : ""}
                   >
                     {sizes &&
                       sizes.map((item) => {
                         return (
-                          <Select.Option key={item.id}>
+                          <Select.Option
+                            key={item.id}
+                            label={item.sizeName}
+                            value={item.id}
+                          >
                             {item.sizeName}
                           </Select.Option>
                         );
@@ -515,16 +512,20 @@ const ProductCreateDetails = (props) => {
                         .toLowerCase()
                         .localeCompare((optionB?.label ?? "").toLowerCase())
                     }
-                    onChange={(event) => {
-                      setColorsCreate(event);
-                      handleSetProductDetail("colorId", event);
+                    onChange={(event, record) => {
+                      colorsCreate = record;
+                      setRender(event);
                     }}
                     status={productDetail.colorId === "" ? "error" : ""}
                   >
                     {colors &&
                       colors.map((item) => {
                         return (
-                          <Select.Option key={item.id}>
+                          <Select.Option
+                            key={item.id}
+                            label={item.colorName}
+                            value={item.colorCode}
+                          >
                             <div className={styles.optionColor}>
                               <span
                                 style={{ backgroundColor: item.colorCode }}
@@ -537,21 +538,29 @@ const ProductCreateDetails = (props) => {
                   </Select>
                 </div>
               </Col>
-              <Col span={24} style={{ textAlign: "end" }}>
-                <Button onClick={createProductDetail}>Hoàn thành</Button>
-              </Col>
             </Row>
           </Col>
         </Row>
       </div>
-      {currentHref.includes("update-details") ? (
+      {product.productId !== null &&
+      buttonsCreate.length > 0 &&
+      materialsCreate.length > 0 &&
+      collarsCreate.length > 0 &&
+      shirtTailsCreate.length > 0 &&
+      sleevesCreate.length > 0 &&
+      colorsCreate.length > 0 &&
+      sizesCreate.length > 0 ? (
         <ProductDetailsTable
-          productDetail={productDetailUpdate}
-          product={productDetailUpdate.product}
+          product={product}
+          buttonsCreate={buttonsCreate}
+          materialsCreate={materialsCreate}
+          collarsCreate={collarsCreate}
+          shirtTailsCreate={shirtTailsCreate}
+          sleevesCreate={sleevesCreate}
+          colorsCreate={colorsCreate}
+          sizesCreate={sizesCreate}
         />
-      ) : (
-        ""
-      )}
+      ) : null}
     </>
   );
 };

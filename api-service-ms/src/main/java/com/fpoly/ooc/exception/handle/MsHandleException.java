@@ -44,7 +44,6 @@ public class MsHandleException {
         Map<String, String> errors = new HashMap<>();
         errors.put("status", Const.HTTP_ERROR_CODE);
         errors.put("message", ex.getMessage());
-        errors.put(ex.getField(), "error");
 
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }

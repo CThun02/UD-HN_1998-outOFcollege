@@ -111,7 +111,12 @@ const ProductDetails = (props) => {
       dataIndex: "color",
       title: "Màu sắc",
       render: (text, record, index) => {
-        return record.color.colorName;
+        return (
+          <div className={styles.optionColor}>
+            <span style={{ backgroundColor: record.color.colorCode }}></span>
+            {record.color.colorName}
+          </div>
+        );
       },
     },
     {

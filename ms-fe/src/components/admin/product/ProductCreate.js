@@ -21,6 +21,7 @@ const ProductCreate = (props) => {
   const [patterns, setPatterns] = useState([]);
   const [patternCreate, setPatternCreate] = useState("");
   const renderIndex = props.render;
+  const [render, setRender] = useState(null);
   const [product, setProduct] = useState({
     productName: " ",
     brandId: " ",
@@ -56,7 +57,7 @@ const ProductCreate = (props) => {
               messageApi.error("Thương hiệu đã tồn tại!", 1);
             } else {
               messageApi.success("Thêm thương hiệu thành công!", 1);
-              renderIndex(res.data);
+              setRender(res.data);
             }
             setBrandCreate(" ");
           }, 1000);
@@ -83,7 +84,7 @@ const ProductCreate = (props) => {
               messageApi.error("Loại sản phẩm đã tồn tại!", 1);
             } else {
               messageApi.success("Thêm loại sản phẩm thành công!", 1);
-              renderIndex(res.data);
+              setRender(res.data);
             }
             setCategoryCreate(" ");
           }, 1000);
@@ -110,7 +111,7 @@ const ProductCreate = (props) => {
               messageApi.error("Họa tiết đã tồn tại!", 1);
             } else {
               messageApi.success("Thêm hoạt tiết thành công!", 1);
-              renderIndex(res.data);
+              setRender(res.data);
             }
             setPatternCreate(" ");
           }, 1000);
@@ -137,7 +138,7 @@ const ProductCreate = (props) => {
               messageApi.error("Dáng áo đã tồn tại!", 1);
             } else {
               messageApi.success("Thêm dáng áo thành công!", 1);
-              renderIndex(res.data);
+              setRender(res.data);
             }
             setFormCreate(" ");
           }, 1000);
@@ -256,6 +257,7 @@ const ProductCreate = (props) => {
                     <span>Thương hiệu</span>
                     <Form.Item name="brand">
                       <Select
+                        showSearch
                         onChange={(event) => handleSetProduct("brandId", event)}
                         placeholder="Brand"
                         status={product.brandId === "" ? "error" : ""}
@@ -299,6 +301,7 @@ const ProductCreate = (props) => {
                     <span>Loại sản phẩm</span>
                     <Form.Item name="category">
                       <Select
+                        showSearch
                         onChange={(event) =>
                           handleSetProduct("categoryId", event)
                         }
@@ -344,6 +347,7 @@ const ProductCreate = (props) => {
                     <span>Hoạt tiết</span>
                     <Form.Item name="pattern">
                       <Select
+                        showSearch
                         onChange={(event) =>
                           handleSetProduct("patternId", event)
                         }
@@ -389,6 +393,7 @@ const ProductCreate = (props) => {
                     <span>Dáng áo</span>
                     <Form.Item name="form">
                       <Select
+                        showSearch
                         onChange={(event) => handleSetProduct("formId", event)}
                         placeholder="form"
                         status={product.formId === "" ? "error" : ""}

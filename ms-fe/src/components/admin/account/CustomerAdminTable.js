@@ -84,9 +84,9 @@ function CustomerTable() {
             key: "action",
             render: (_, record) => (
               <Space size="middle">
-                <a href="#">
+                <Button>
                   <FormOutlined />
-                </a>
+                </Button>
               </Space>
             ),
           },

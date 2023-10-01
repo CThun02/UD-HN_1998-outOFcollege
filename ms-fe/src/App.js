@@ -12,6 +12,7 @@ import Bill from "./components/admin/sale-couter/Bill";
 import CreateBill from "./components/admin/sale-couter/CreateBill";
 import ProductDetails from "./components/admin/product/ProductDetails";
 import ProductCreateDetails from "./components/admin/product/ProductCreateDetails";
+import CustomerAddminIndex from "./components/admin/account/CustomorAdmin";
 
 function App() {
   return (
@@ -71,7 +72,10 @@ function App() {
 
                   {/* Tài khoản */}
                   <Route path="employee" element="employee"></Route>
-                  <Route path="customer" element="customer"></Route>
+                  <Route
+                    path="customer"
+                    element={<CustomerAddminIndex />}
+                  ></Route>
 
                   {/* Voucher */}
                   <Route path="voucher">

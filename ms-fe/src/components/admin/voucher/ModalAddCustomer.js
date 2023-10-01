@@ -1,7 +1,7 @@
 import { DeleteOutlined } from "@ant-design/icons";
 import { Button, Divider, Modal, Pagination, Space, Spin, Table } from "antd";
 import axios from "axios";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 const columns = [
   {
@@ -52,7 +52,6 @@ function ModalAddCustomer({
   const [pageSize, setPageSize] = useState(5);
   const [totalElements, setTotalElements] = useState(5);
   const [isLoading, setIsLoading] = useState(true);
-  const tableRef = useRef(null);
 
   const [selectedRows, setSelectedRows] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -90,6 +89,7 @@ function ModalAddCustomer({
           .then((res) => {
             setTotalElements(res.data.totalElements);
             setCustomersVoucher(res.data.content);
+
             setIsLoading(false);
             console.log(res.data.content);
           })
@@ -98,7 +98,21 @@ function ModalAddCustomer({
 
       getCustomers();
     },
-    [pageNo, pageSize, setCustomers]
+    [pageNo, pageSize]
+  );
+
+  useEffect(
+    function () {
+      if (
+        values?.voucherId &&
+        values?.objectUse === "member" &&
+        !customers.length
+      ) {
+        setSelectedRowKeys(values?.usernames.map((user) => user.username));
+        setSelectedRows(values?.usernames);
+      }
+    },
+    [values, customers]
   );
 
   function handleOnOk() {
@@ -117,20 +131,27 @@ function ModalAddCustomer({
   }
 
   function handleDeleted(value) {
-    // setWatched((watched) => watched.filter((movie) => movie.imdbID !== id));
-    console.log(value);
     setSelectedRows((selectedRows) =>
       selectedRows.filter((row) => row !== value)
     );
     setSelectedRowKeys((selectedRowKeys) =>
       selectedRowKeys.filter((row) => row !== value.key)
     );
-    setCustomers((selectedRows) => selectedRows.filter((row) => row !== value));
+    if (!values?.voucherId) {
+      setCustomers((selectedRows) =>
+        selectedRows.filter((row) => row !== value)
+      );
+    }
   }
 
   const rowSelection = {
     selectedRowKeys,
     onChange: handleOnChange,
+    getCheckboxProps: (record) => ({
+      disabled: values?.usernames?.some(
+        (item) => item.username === record.username
+      ),
+    }),
   };
 
   const newColumns = {
@@ -172,7 +193,6 @@ function ModalAddCustomer({
                     size={12}
                   >
                     <Table
-                      ref={tableRef}
                       style={{ width: "100%" }}
                       rowSelection={{
                         type: rowSelection,
@@ -207,12 +227,12 @@ function ModalAddCustomer({
         </Modal>
       )}
 
-      {customers.length ? (
+      {customers?.length && !values?.voucherId ? (
         <Space style={{ width: "100%" }} direction="vertical" size={12}>
           <Table
             style={{ width: "100%" }}
-            columns={[...columns, newColumns]}
-            dataSource={customers.map((customer, index) => ({
+            columns={[...columns, values.voucherId ? "" : newColumns]}
+            dataSource={customers?.map((customer, index) => ({
               key: customer.username,
               stt: calculateStt(index),
               username: customer.username,
@@ -224,7 +244,7 @@ function ModalAddCustomer({
             }))}
             pagination={false}
           />
-          <Pagination
+          {/* <Pagination
             defaultCurrent={pageNo}
             total={totalElements}
             showSizeChanger={true}
@@ -232,11 +252,30 @@ function ModalAddCustomer({
             pageSizeOptions={["5", "10", "20", "50", "100"]}
             onShowSizeChange={handlePageSize}
             onChange={(page) => setPageNo(page)}
-          />
+          /> */}
         </Space>
       ) : (
         ""
       )}
+
+      {values?.objectUse === "member" && values?.voucherId ? (
+        <Space style={{ width: "100%" }} direction="vertical" size={12}>
+          <Table
+            style={{ width: "100%" }}
+            columns={columns}
+            dataSource={values?.usernames.map((customer, index) => ({
+              key: customer.username,
+              stt: calculateStt(index),
+              username: customer.username,
+              fullName: customer.fullName,
+              gender: customer.gender ? "Nam" : "Nữ",
+              email: customer.email,
+              phoneNumber: customer.phoneNumber,
+            }))}
+            pagination={false}
+          />
+        </Space>
+      ) : null}
     </>
   );
 }

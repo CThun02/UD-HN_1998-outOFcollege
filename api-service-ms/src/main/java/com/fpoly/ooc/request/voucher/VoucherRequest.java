@@ -31,7 +31,7 @@ public class VoucherRequest {
     @NotBlank(message = "Tên voucher không được bỏ trống")
     private String voucherName;
 
-    private String voucherCurrentName;
+    private String voucherNameCurrent;
 
     private String voucherCode;
 

@@ -27,5 +27,5 @@ public interface VoucherRepository extends JpaRepository<Voucher, Long> {
 
     Optional<Voucher> findVoucherByVoucherName(String voucherName);
 
-    Optional<Voucher> findVoucherByVoucherCode( String code);
+    Optional<Voucher> findVoucherByVoucherCode(String code);
 }

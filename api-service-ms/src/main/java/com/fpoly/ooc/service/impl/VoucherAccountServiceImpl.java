@@ -23,16 +23,13 @@ public class VoucherAccountServiceImpl implements VoucherAccountService {
     private VoucherAccountRepository voucherAccountRepository;
 
     @Autowired
-    private VoucherHistoryRepository voucherHistoryRepository;
-
-    @Autowired
     private AccountService accountService;
 
     @Override
     public VoucherAccount saveOrUpdate(VoucherAccountConditionDTO voucherAccountConditionDTO) {
 
-        if (voucherHistoryRepository.isCheckUserUsedVoucher(
-                voucherAccountConditionDTO.getVoucher().getVoucherCode(),
+        if (voucherAccountRepository.isCheckUserUsedVoucher(
+                voucherAccountConditionDTO.getVoucher().getId(),
                 voucherAccountConditionDTO.getUsername())
         ) {
             throw new NotFoundException(ErrorCodeConfig.getFormatMessage(

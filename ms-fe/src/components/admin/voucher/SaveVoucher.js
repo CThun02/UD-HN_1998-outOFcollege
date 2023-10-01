@@ -156,12 +156,37 @@ function SaveVoucher() {
         async function saveVoucher() {
           const voucher = ref.current?.values;
           const usernames = ref.current?.values.usernames.map((user) => {
-            if (user.gender === "Nam") {
-              return { ...user, gender: true };
+            const { key, stt, ...rest } = user;
+
+            if (rest.gender === "Nam") {
+              return { ...rest, gender: true };
             } else {
-              return { ...user, gender: false };
+              return { ...rest, gender: false };
             }
           });
+
+          const usernamesCurrent = ref.current?.values.usernamesCurrent.map(
+            (user) => {
+              const { key, stt, ...rest } = user;
+
+              if (rest.gender === "Nam") {
+                return { ...rest, gender: true };
+              } else {
+                return { ...rest, gender: false };
+              }
+            }
+          );
+
+          const differentList = usernames.reduce(
+            (result, item) =>
+              usernamesCurrent.some((el) => el.username !== item.username)
+                ? [...result, item]
+                : result,
+            []
+          );
+
+          console.log("Values: ", differentList);
+
           setIsLoading(true);
           if (voucher) {
             await axios
@@ -191,14 +216,20 @@ function SaveVoucher() {
                 voucherCode: voucher?.voucherCode ? voucher?.voucherCode : "",
                 voucherCurrentName: voucher?.voucherCurrentName,
                 objectUser: voucher?.objectUser,
-                emailDetails: voucher?.emailDetails,
+                emailDetails: {
+                  messageBody:
+                    "Hi bạn, \n Men's Shirt Shop gửi bạn voucher đặc biệt: \n\t1. Mã voucher: ASDFSAF724, Bạn có thể lên shop hoặc tới cửa hàng để sử dụng voucher này.\nThanks.",
+                  subject: "Men's Shirt Shop",
+                  attachment: null,
+                  recipient: [],
+                },
                 isCheckSendEmail: voucher?.isCheckSendEmail,
-                usernames: usernames,
+                usernames: differentList,
               })
               .then(() => {
                 setIsLoading(false);
                 navigate("/admin/vouchers");
-                showSuccessNotification("Thêm voucher thành công");
+                showSuccessNotification("Thao tác thành công");
               })
               .catch((err) => {
                 setIsLoading(false);
@@ -243,6 +274,9 @@ function SaveVoucher() {
               endDate,
               status,
               objectUse,
+              isCheckSendEmail,
+              emailDetails,
+              usernames,
             } = res.data;
 
             ref.current.setFieldValue("voucherId", voucherId);
@@ -276,9 +310,12 @@ function SaveVoucher() {
             );
             ref.current.setFieldValue("status", status);
             ref.current.setFieldValue("objectUse", objectUse);
+            ref.current.setFieldValue("isCheckSendEmail", isCheckSendEmail);
+            ref.current.setFieldValue("emailDetails", emailDetails);
+            ref.current.setFieldValue("usernames", usernames);
+            ref.current.setFieldValue("usernamesCurrent", usernames);
           });
         }
-
         getVoucher();
       }
     },
@@ -309,7 +346,7 @@ function SaveVoucher() {
                   voucherId: "",
                   voucherCode: "",
                   voucherName: "",
-                  voucherCurrentName: "",
+                  voucherNameCurrent: "",
                   voucherMethod: "vnd",
                   voucherValue: "",
                   voucherValueMax: "",
@@ -320,14 +357,9 @@ function SaveVoucher() {
                   objectUse: "all",
                   status: "",
                   isCheckSendEmail: false,
-                  emailDetails: {
-                    messageBody:
-                      "Hi bạn, \n Men's Shirt Shop gửi bạn voucher đặc biệt: \n\t1. Mã voucher: ASDFSAF724, Bạn có thể lên shop hoặc tới cửa hàng để sử dụng voucher này.\nThanks.",
-                    subject: "Men's Shirt Shop",
-                    attachment: null,
-                    recipient: [],
-                  },
+                  emailDetails: {},
                   usernames: [],
+                  usernamesCurrent: [],
                 }}
                 onSubmit={handleOnSubmit}
                 validationSchema={validationSchema}
@@ -828,11 +860,13 @@ function SaveVoucher() {
                                   />
                                 </FloatingLabels>
                                 <Checkbox
+                                  checked={values.isCheckSendEmail}
                                   onChange={(e) => {
                                     setFieldValue(
                                       "isCheckSendEmail",
                                       e.target.checked
                                     );
+                                    console.log("values: ", e.target.checked);
                                   }}
                                 >
                                   Gửi mã giảm giá cho khách hàng

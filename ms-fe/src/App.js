@@ -12,6 +12,7 @@ import Bill from "./components/admin/sale-couter/Bill";
 import CreateBill from "./components/admin/sale-couter/CreateBill";
 import ProductDetailsByProductId from "./components/admin/product/ProductDetailsByProductId";
 import ProductCreateDetails from "./components/admin/product/ProductCreateDetails";
+import BillTimeLine from "./components/admin/sale-couter/TimeLine";
 import SaveVoucher from "./components/admin/voucher/SaveVoucher";
 import { useState } from "react";
 import { NotificationProvider } from "./components/element/notification/Notification";
@@ -46,6 +47,7 @@ function App() {
                     <Route path="counter-sales">
                       <Route index element={<Bill />}></Route>
                       <Route path="bill" element={<CreateBill />}></Route>
+                      <Route path=":billId/timeline" element={<BillTimeLine />}></Route>
                     </Route>
 
                     {/* Đơn hàng */}
@@ -79,10 +81,6 @@ function App() {
                     <Route path="category" element="category"></Route>
                     <Route path="brand" element="brand"></Route>
 
-                    {/* Tài khoản */}
-                    <Route path="employee" element="employee"></Route>
-                    <Route path="customer" element="customer"></Route>
-
                     {/* Voucher */}
                     <Route path="vouchers">
                       <Route index element={<Voucher message={message} />} />
@@ -90,8 +88,10 @@ function App() {
                         path="save"
                         element={<SaveVoucher setMessage={setMessage} />}
                       />
-
-                      <Route path="detail" element={"Chi tiet"} />
+                      <Route
+                        path="detail/:code"
+                        element={<SaveVoucher setMessage={setMessage} />}
+                      />
                     </Route>
 
                     {/* Promotion */}
@@ -127,20 +127,6 @@ function App() {
                       path="employee/detail"
                       element={<DetailForm roleId={2} />}
                     ></Route>
-
-                    {/* Voucher */}
-                    <Route path="voucher">
-                      <Route index element={<Voucher />} />
-
-                      <Route path="detail" element={"Chi tiet"} />
-                      <Route path="update" element={"Chi tiet"} />
-                    </Route>
-
-                    {/* Promotion */}
-                    <Route path="promotion">
-                      <Route index element={<Promotion />} />
-                      <Route path="create" element={<CreatePromotion />} />
-                    </Route>
                   </Route>
 
                   {/* Not found */}

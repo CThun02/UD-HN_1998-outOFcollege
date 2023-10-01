@@ -142,22 +142,22 @@ const ProductDetails = (props) => {
     axios
       .get(
         api +
-          "product/filterProductDetailByIdCom?productId=" +
-          productId +
-          "&buttonId=" +
-          buttonId +
-          "&materialId=" +
-          materialId +
-          "&shirtTailId=" +
-          shirtTailId +
-          "&sleeveId=" +
-          sleeveId +
-          "&collarId=" +
-          collarId +
-          "&colorId=" +
-          colorId +
-          "&sizeId=" +
-          sizeId
+        "product/filterProductDetailByIdCom?productId=" +
+        productId +
+        "&buttonId=" +
+        buttonId +
+        "&materialId=" +
+        materialId +
+        "&shirtTailId=" +
+        shirtTailId +
+        "&sleeveId=" +
+        sleeveId +
+        "&collarId=" +
+        collarId +
+        "&colorId=" +
+        colorId +
+        "&sizeId=" +
+        sizeId
       )
       .then((response) => {
         setProductDetails(response.data);
@@ -246,10 +246,7 @@ const ProductDetails = (props) => {
     <>
       {contextHolder}
       <div className={styles.productDetails}>
-        <h2>
-          <FilePptOutlined /> Sản phẩm
-        </h2>
-        <Col span={20} offset={2} style={{ marginTop: "24px" }}>
+        <Col span={20} offset={2}>
           <Row className={styles.productDetails__filter}>
             <Col span={6}>
               <div style={{ margin: "0 8px 24px 8px" }}>
@@ -624,7 +621,7 @@ const ProductDetails = (props) => {
           <Table
             columns={columns}
             dataSource={productDetails}
-            scroll={{ y: 500 }}
+            scroll={{ y: 200 }}
             loading={loading}
           />
         </div>

@@ -17,7 +17,7 @@ options.push({
 });
 
 options.push({
-  label: "Đang hoạt động",
+  label: "Đang diễn ra",
   value: "ACTIVE",
 });
 

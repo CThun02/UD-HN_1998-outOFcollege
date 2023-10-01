@@ -6,7 +6,9 @@ import com.fpoly.ooc.responce.account.AccountDetailResponce;
 import com.fpoly.ooc.responce.account.AccountResponce;
 import org.springframework.data.domain.Page;
 
-    public interface AccountService {
+import java.util.List;
+
+public interface AccountService {
 
     Page<AccountResponce> phanTrang(Integer pageNo, Integer size);
 
@@ -17,5 +19,7 @@ import org.springframework.data.domain.Page;
     AccountDetailResponce detail(String userName);
 
     void remove(String useName);
+
+    List<String> findAllEmailAccount();
 
 }

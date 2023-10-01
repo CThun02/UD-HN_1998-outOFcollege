@@ -17,7 +17,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class AccountServiceImpl implements AccountService {
@@ -130,4 +129,10 @@ public class AccountServiceImpl implements AccountService {
     public void remove(String useName) {
         accountRepository.deleteById(useName);
     }
+
+    @Override
+    public List<String> findAllEmailAccount() {
+        return accountRepository.emailAccountList();
+    }
 }
+ 

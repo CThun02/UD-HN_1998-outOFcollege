@@ -1,19 +1,26 @@
 import {
   Button,
+  Checkbox,
   Col,
   DatePicker,
   Form,
   Input,
   Modal,
+  Pagination,
   Radio,
   Row,
   Select,
   Space,
+  Spin,
   Table,
   notification,
 } from "antd";
 import styles from "./SaveVoucher.module.css";
-import { EditOutlined, ExclamationCircleFilled } from "@ant-design/icons";
+import {
+  EditOutlined,
+  ExclamationCircleFilled,
+  PlusOutlined,
+} from "@ant-design/icons";
 import FloatingLabels from "../../element/FloatingLabels/FloatingLabels";
 import moment from "moment";
 import { Formik } from "formik";
@@ -25,6 +32,7 @@ import numeral from "numeral";
 import { useNavigate, useParams } from "react-router-dom";
 import { NotificationContext } from "../../element/notification/Notification";
 import axios from "axios";
+import ModalAddCustomer from "./ModalAddCustomer";
 
 const options = [
   { label: "VND", value: "vnd" },
@@ -116,63 +124,9 @@ function disabledDate(current) {
   );
 }
 
-const columns = [
-  {
-    title: "STT",
-    dataIndex: "stt",
-    key: "stt",
-  },
-  {
-    title: "Username",
-    dataIndex: "username",
-    key: "username",
-  },
-  {
-    title: "Họ và tên",
-    dataIndex: "fullName",
-    key: "fullName",
-  },
-  {
-    title: "Giới tính",
-    dataIndex: "gender",
-    key: "gender",
-  },
-  {
-    title: "Email",
-    dataIndex: "email",
-    key: "email",
-  },
-  {
-    title: "Số điện thoại",
-    dataIndex: "phoneNumber",
-    key: "phoneNumber",
-  },
-];
-
-const data = [
-  {
-    key: "1",
-    stt: "1",
-    username: "tuanpaph26902",
-    fullName: "Phạm Anh Tuấn",
-    gender: "Nam",
-    email: "tuanpaph26902@fpt.edu.vn",
-    phoneNumber: "0123456789",
-  },
-  {
-    key: "2",
-    stt: "2",
-    username: "kienptph26901",
-    fullName: "Phạm Trung Kiên",
-    gender: "Nam",
-    email: "kienptph26901@fpt.edu.vn",
-    phoneNumber: "0123456789",
-  },
-];
-
 const { confirm } = Modal;
 
-const baseUrl = "http://localhost:8080/admin/api/voucher/";
+const baseUrl = "http://localhost:8080/api/admin/vouchers/";
 
 function SaveVoucher() {
   const ref = useRef();
@@ -180,17 +134,11 @@ function SaveVoucher() {
   const { showSuccessNotification } = useContext(NotificationContext);
   const [apiNotification, contextProviderNotification] =
     notification.useNotification();
-  const [errorsServer, setErrorsServer] = useState({});
   const { code } = useParams();
-
-  const rowSelection = {
-    onChange: (selectedRowKeys, selectedRows) => {
-      console.log("row: ", selectedRows);
-    },
-    getCheckboxProps: (record) => ({
-      name: record.name,
-    }),
-  };
+  const [errorsServer, setErrorsServer] = useState({});
+  const [isLoadingModal, setIsLoadingModal] = useState(false);
+  const [customers, setCustomers] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   function handleChangeNumber(value) {
     const formattedValue = numeral(value).format("0,0");
@@ -207,6 +155,14 @@ function SaveVoucher() {
       onOk() {
         async function saveVoucher() {
           const voucher = ref.current?.values;
+          const usernames = ref.current?.values.usernames.map((user) => {
+            if (user.gender === "Nam") {
+              return { ...user, gender: true };
+            } else {
+              return { ...user, gender: false };
+            }
+          });
+          setIsLoading(true);
           if (voucher) {
             await axios
               .post(baseUrl + "add", {
@@ -234,12 +190,18 @@ function SaveVoucher() {
                 voucherId: voucher?.voucherId ? voucher?.voucherId : "",
                 voucherCode: voucher?.voucherCode ? voucher?.voucherCode : "",
                 voucherCurrentName: voucher?.voucherCurrentName,
+                objectUser: voucher?.objectUser,
+                emailDetails: voucher?.emailDetails,
+                isCheckSendEmail: voucher?.isCheckSendEmail,
+                usernames: usernames,
               })
               .then(() => {
+                setIsLoading(false);
                 navigate("/admin/vouchers");
                 showSuccessNotification("Thêm voucher thành công");
               })
               .catch((err) => {
+                setIsLoading(false);
                 const error = err.response.data;
                 setErrorsServer(error);
                 apiNotification.error({
@@ -248,6 +210,7 @@ function SaveVoucher() {
                 });
               });
           } else {
+            setIsLoading(false);
             apiNotification.error({
               message: `Lỗi`,
             });
@@ -264,7 +227,6 @@ function SaveVoucher() {
 
   useEffect(
     function () {
-      console.log("code: ", baseUrl + code);
       if (code) {
         async function getVoucher() {
           await axios.get(baseUrl + code).then((res) => {
@@ -280,16 +242,8 @@ function SaveVoucher() {
               startDate,
               endDate,
               status,
+              objectUse,
             } = res.data;
-
-            console.log(
-              "startDate: ",
-              dayjs(moment(startDate).format(dateFormat), dateFormat)
-            );
-            console.log(
-              "endDate: ",
-              dayjs(moment(endDate).format(dateFormat), dateFormat)
-            );
 
             ref.current.setFieldValue("voucherId", voucherId);
             ref.current.setFieldValue("voucherCode", voucherCode);
@@ -321,6 +275,7 @@ function SaveVoucher() {
               dayjs(moment(endDate).format(dateFormat), dateFormat)
             );
             ref.current.setFieldValue("status", status);
+            ref.current.setFieldValue("objectUse", objectUse);
           });
         }
 
@@ -330,220 +285,210 @@ function SaveVoucher() {
     [code]
   );
 
-  const isCheck =
-    ref.current?.values.status === "" ||
-    ref.current?.values.status === "UPCOMING"
-      ? false
-      : ref.current?.values.status === "ACTIVE" ||
-        ref.current?.values.status === "INACTIVE"
-      ? true
-      : true;
-
   return (
     <div className={styles.saveVoucher}>
       <div className={styles.content}>
         {contextProviderNotification}
-        <Space style={{ width: "100%" }} direction="vertical" size={30}>
-          <Space size={16} className={styles.color}>
-            <i>
-              <EditOutlined />
-            </i>
-            <h2>Tạo Voucher</h2>
-          </Space>
+        <Spin
+          tip="Loading..."
+          spinning={isLoading}
+          size="large"
+          style={{ width: "100%" }}
+        >
+          <Space style={{ width: "100%" }} direction="vertical" size={30}>
+            <Space size={16} className={styles.color}>
+              <i>
+                <EditOutlined />
+              </i>
+              <h2>Tạo Voucher</h2>
+            </Space>
 
-          <Row>
-            <Formik
-              initialValues={{
-                voucherId: "",
-                voucherCode: "",
-                voucherName: "",
-                voucherCurrentName: "",
-                voucherMethod: "vnd",
-                voucherValue: "",
-                voucherValueMax: "",
-                limitQuantity: "",
-                voucherCondition: "",
-                startDate: "",
-                endDate: "",
-                objectUse: "all",
-                status: "",
-              }}
-              onSubmit={handleOnSubmit}
-              validationSchema={validationSchema}
-              innerRef={ref}
-            >
-              {({
-                handleBlur,
-                handleSubmit,
-                handleChange,
-                setFieldValue,
-                values,
-                errors,
-                touched,
-              }) => (
-                <>
-                  <Col span={3}></Col>
+            <Row>
+              <Formik
+                initialValues={{
+                  voucherId: "",
+                  voucherCode: "",
+                  voucherName: "",
+                  voucherCurrentName: "",
+                  voucherMethod: "vnd",
+                  voucherValue: "",
+                  voucherValueMax: "",
+                  limitQuantity: "",
+                  voucherCondition: "",
+                  startDate: "",
+                  endDate: "",
+                  objectUse: "all",
+                  status: "",
+                  isCheckSendEmail: false,
+                  emailDetails: {
+                    messageBody:
+                      "Hi bạn, \n Men's Shirt Shop gửi bạn voucher đặc biệt: \n\t1. Mã voucher: ASDFSAF724, Bạn có thể lên shop hoặc tới cửa hàng để sử dụng voucher này.\nThanks.",
+                    subject: "Men's Shirt Shop",
+                    attachment: null,
+                    recipient: [],
+                  },
+                  usernames: [],
+                }}
+                onSubmit={handleOnSubmit}
+                validationSchema={validationSchema}
+                innerRef={ref}
+              >
+                {({
+                  handleBlur,
+                  handleSubmit,
+                  handleChange,
+                  setFieldValue,
+                  values,
+                  errors,
+                  touched,
+                }) => (
+                  <>
+                    <Col span={3}></Col>
 
-                  <Col span={18}>
-                    <Form onFinish={handleSubmit}>
-                      <Input
-                        style={{ display: "none" }}
-                        name="voucherId"
-                        value={values.voucherId}
-                        onChange={handleChange}
-                      />
-                      <Input
-                        style={{ display: "none" }}
-                        name="voucherCode"
-                        value={values.voucherCode}
-                        onChange={handleChange}
-                      />
+                    <Col span={18}>
+                      <Form onFinish={handleSubmit}>
+                        <Input
+                          style={{ display: "none" }}
+                          name="voucherId"
+                          value={values.voucherId}
+                          onChange={handleChange}
+                        />
+                        <Input
+                          style={{ display: "none" }}
+                          name="voucherCode"
+                          value={values.voucherCode}
+                          onChange={handleChange}
+                        />
 
-                      <Space
-                        style={{ width: "100%" }}
-                        size={20}
-                        direction="vertical"
-                      >
-                        <Row gutter={16}>
-                          <Col span={24}>
-                            {code ? (
-                              <FloatingLabels
-                                label="Tên voucher"
-                                name="voucherNameCurrent"
-                                value={values.voucherNameCurrent}
-                                zIndex={true}
-                              >
-                                <Input
-                                  size="large"
+                        <Space
+                          style={{ width: "100%" }}
+                          size={20}
+                          direction="vertical"
+                        >
+                          <Row gutter={16}>
+                            <Col span={24}>
+                              {code ? (
+                                <FloatingLabels
+                                  label="Tên voucher"
                                   name="voucherNameCurrent"
-                                  onChange={(e) => {
-                                    setFieldValue(
-                                      "voucherNameCurrent",
-                                      e.target.value
-                                    );
-                                  }}
-                                  onBlur={handleBlur}
                                   value={values.voucherNameCurrent}
-                                  allowClear
-                                  status={
-                                    (touched.voucherNameCurrent &&
-                                      errors.voucherNameCurrent) ||
-                                    errorsServer?.voucherNameCurrent
-                                      ? "error"
-                                      : "success"
-                                  }
-                                />
-                                {touched.voucherNameCurrent && (
-                                  <div className={styles.errors}>
-                                    {errors.voucherNameCurrent}
-                                    {errorsServer.voucherNameCurrent}
-                                  </div>
-                                )}
-                              </FloatingLabels>
-                            ) : (
-                              <FloatingLabels
-                                label="Tên voucher"
-                                name="voucherName"
-                                value={values.voucherName}
-                                zIndex={true}
-                              >
-                                <Input
-                                  size="large"
+                                  zIndex={true}
+                                  disabled={values.status === "INACTIVE"}
+                                >
+                                  <Input
+                                    size="large"
+                                    name="voucherNameCurrent"
+                                    onChange={(e) => {
+                                      setFieldValue(
+                                        "voucherNameCurrent",
+                                        e.target.value
+                                      );
+                                    }}
+                                    onBlur={handleBlur}
+                                    value={values.voucherNameCurrent}
+                                    allowClear
+                                    status={
+                                      (touched.voucherNameCurrent &&
+                                        errors.voucherNameCurrent) ||
+                                      errorsServer?.voucherNameCurrent
+                                        ? "error"
+                                        : "success"
+                                    }
+                                    disabled={values.status === "INACTIVE"}
+                                  />
+                                  {touched.voucherNameCurrent && (
+                                    <div className={styles.errors}>
+                                      {errors.voucherNameCurrent}
+                                      {errorsServer.voucherNameCurrent}
+                                    </div>
+                                  )}
+                                </FloatingLabels>
+                              ) : (
+                                <FloatingLabels
+                                  label="Tên voucher"
                                   name="voucherName"
-                                  onChange={(e) => {
-                                    setFieldValue(
-                                      "voucherName",
-                                      e.target.value
-                                    );
-                                  }}
-                                  onBlur={handleBlur}
                                   value={values.voucherName}
-                                  allowClear
-                                  status={
-                                    (touched.voucherName &&
-                                      errors.voucherName) ||
-                                    errorsServer?.voucherName
-                                      ? "error"
-                                      : "success"
-                                  }
-                                />
-                                {touched.voucherName && (
-                                  <div className={styles.errors}>
-                                    {errors.voucherName}
-                                    {errorsServer.voucherName}
-                                  </div>
-                                )}
-                              </FloatingLabels>
-                            )}
-                          </Col>
-                        </Row>
+                                  zIndex={true}
+                                >
+                                  <Input
+                                    size="large"
+                                    name="voucherName"
+                                    onChange={(e) => {
+                                      setFieldValue(
+                                        "voucherName",
+                                        e.target.value
+                                      );
 
-                        <Row gutter={16}>
-                          <Col span={4}>
-                            <Radio.Group
-                              name="voucherMethod"
-                              className={styles.label}
-                              style={{ width: "100%" }}
-                              size="large"
-                              options={options}
-                              onChange={(v) => {
-                                setFieldValue("voucherMethod", v.target.value);
-                              }}
-                              value={values.voucherMethod}
-                              optionType="button"
-                            />
-                          </Col>
-                          {values.voucherMethod === "vnd" ? (
-                            <Col span={20}>
-                              <FloatingLabels
-                                label="Giá trị giảm"
-                                name="voucherValue"
-                                value={values.voucherValue}
-                                zIndex={true}
-                              >
-                                <Input
-                                  name="voucherValue"
-                                  size="large"
-                                  suffix={"VND"}
-                                  allowClear
-                                  onChange={(e) =>
-                                    setFieldValue(
-                                      "voucherValue",
-                                      handleChangeNumber(e.target.value)
-                                    )
-                                  }
-                                  onBlur={handleBlur}
-                                  value={values.voucherValue}
-                                  status={
-                                    (touched.voucherValue &&
-                                      errors.voucherValue) ||
-                                    errorsServer?.voucherValue
-                                      ? "error"
-                                      : ""
-                                  }
-                                />
-                              </FloatingLabels>
-                              {touched.voucherValue && (
-                                <div className={styles.errors}>
-                                  {errors.voucherValue}
-                                  {errorsServer?.voucherValue}
-                                </div>
+                                      if (!values.voucherId) {
+                                        setFieldValue(
+                                          "voucherCurrentName",
+                                          e.target.value
+                                        );
+                                      }
+                                    }}
+                                    onBlur={handleBlur}
+                                    value={values.voucherName}
+                                    allowClear
+                                    status={
+                                      (touched.voucherName &&
+                                        errors.voucherName) ||
+                                      errorsServer?.voucherName
+                                        ? "error"
+                                        : "success"
+                                    }
+                                  />
+                                  {touched.voucherName && (
+                                    <div className={styles.errors}>
+                                      {errors.voucherName}
+                                      {errorsServer.voucherName}
+                                    </div>
+                                  )}
+                                </FloatingLabels>
                               )}
                             </Col>
-                          ) : (
-                            <>
-                              <Col span={8}>
+                          </Row>
+
+                          <Row gutter={16}>
+                            <Col span={4}>
+                              <Radio.Group
+                                name="voucherMethod"
+                                className={styles.label}
+                                style={{ width: "100%" }}
+                                size="large"
+                                options={options}
+                                onChange={(v) => {
+                                  setFieldValue(
+                                    "voucherMethod",
+                                    v.target.value
+                                  );
+                                }}
+                                value={values.voucherMethod}
+                                optionType="button"
+                                disabled={
+                                  values.status === "INACTIVE"
+                                    ? true
+                                    : values.status === "ACTIVE"
+                                }
+                              />
+                            </Col>
+                            {values.voucherMethod === "vnd" ? (
+                              <Col span={20}>
                                 <FloatingLabels
                                   label="Giá trị giảm"
                                   name="voucherValue"
                                   value={values.voucherValue}
                                   zIndex={true}
+                                  disabled={
+                                    values.status === "INACTIVE"
+                                      ? true
+                                      : values.status === "ACTIVE"
+                                  }
                                 >
                                   <Input
                                     name="voucherValue"
                                     size="large"
-                                    suffix={"%"}
-                                    value={values.voucherValue}
+                                    suffix={"VND"}
+                                    allowClear
                                     onChange={(e) =>
                                       setFieldValue(
                                         "voucherValue",
@@ -551,321 +496,425 @@ function SaveVoucher() {
                                       )
                                     }
                                     onBlur={handleBlur}
-                                    allowClear
+                                    value={values.voucherValue}
                                     status={
                                       (touched.voucherValue &&
                                         errors.voucherValue) ||
-                                      errorsServer.voucherValue
+                                      errorsServer?.voucherValue
                                         ? "error"
                                         : ""
+                                    }
+                                    disabled={
+                                      values.status === "INACTIVE"
+                                        ? true
+                                        : values.status === "ACTIVE"
                                     }
                                   />
                                 </FloatingLabels>
                                 {touched.voucherValue && (
                                   <div className={styles.errors}>
                                     {errors.voucherValue}
-                                    {errorsServer.voucherValue}
+                                    {errorsServer?.voucherValue}
                                   </div>
                                 )}
                               </Col>
+                            ) : (
+                              <>
+                                <Col span={8}>
+                                  <FloatingLabels
+                                    label="Giá trị giảm"
+                                    name="voucherValue"
+                                    value={values.voucherValue}
+                                    zIndex={true}
+                                    disabled={
+                                      values.status === "INACTIVE"
+                                        ? true
+                                        : values.status === "ACTIVE"
+                                    }
+                                  >
+                                    <Input
+                                      name="voucherValue"
+                                      size="large"
+                                      suffix={"%"}
+                                      value={values.voucherValue}
+                                      onChange={(e) =>
+                                        setFieldValue(
+                                          "voucherValue",
+                                          handleChangeNumber(e.target.value)
+                                        )
+                                      }
+                                      onBlur={handleBlur}
+                                      allowClear
+                                      status={
+                                        (touched.voucherValue &&
+                                          errors.voucherValue) ||
+                                        errorsServer.voucherValue
+                                          ? "error"
+                                          : ""
+                                      }
+                                      disabled={
+                                        values.status === "INACTIVE"
+                                          ? true
+                                          : values.status === "ACTIVE"
+                                      }
+                                    />
+                                  </FloatingLabels>
+                                  {touched.voucherValue && (
+                                    <div className={styles.errors}>
+                                      {errors.voucherValue}
+                                      {errorsServer.voucherValue}
+                                    </div>
+                                  )}
+                                </Col>
 
-                              <Col span={12}>
-                                <FloatingLabels
-                                  label="Giá trị giảm tối đa"
-                                  name="voucherValueMax"
-                                  value={values.voucherValueMax}
-                                  zIndex={true}
-                                >
-                                  <Input
-                                    name="voucherVoucherMax"
-                                    size="large"
-                                    suffix={"VND"}
+                                <Col span={12}>
+                                  <FloatingLabels
+                                    label="Giá trị giảm tối đa"
+                                    name="voucherValueMax"
                                     value={values.voucherValueMax}
-                                    onChange={(e) =>
-                                      setFieldValue(
-                                        "voucherValueMax",
-                                        handleChangeNumber(e.target.value)
-                                      )
+                                    zIndex={true}
+                                    disabled={
+                                      values.status === "INACTIVE"
+                                        ? true
+                                        : values.status === "ACTIVE"
                                     }
-                                    onBlur={handleBlur}
-                                    allowClear
-                                    status={
-                                      (touched?.voucherValueMax &&
-                                        errors.voucherValueMax) ||
-                                      errorsServer.voucherValueMax
-                                        ? "error"
-                                        : ""
-                                    }
-                                  />
-                                </FloatingLabels>
-                                {/* {touched?.voucherValueMax(
+                                  >
+                                    <Input
+                                      name="voucherVoucherMax"
+                                      size="large"
+                                      suffix={"VND"}
+                                      value={values.voucherValueMax}
+                                      onChange={(e) =>
+                                        setFieldValue(
+                                          "voucherValueMax",
+                                          handleChangeNumber(e.target.value)
+                                        )
+                                      }
+                                      onBlur={handleBlur}
+                                      allowClear
+                                      status={
+                                        (touched?.voucherValueMax &&
+                                          errors.voucherValueMax) ||
+                                        errorsServer.voucherValueMax
+                                          ? "error"
+                                          : ""
+                                      }
+                                      disabled={
+                                        values.status === "INACTIVE"
+                                          ? true
+                                          : values.status === "ACTIVE"
+                                      }
+                                    />
+                                  </FloatingLabels>
+                                  {/* {touched?.voucherValueMax(
                                   <div className={styles.errors}>
                                     {errors.voucherValueMax}
                                     {errorsServer.voucherValueMax}
                                   </div>
                                 )} */}
-                              </Col>
-                            </>
-                          )}
-                        </Row>
-
-                        <Row gutter={16}>
-                          <Col span={12}>
-                            <FloatingLabels
-                              label="Số lượng giới hạn"
-                              name="limitQuantity"
-                              value={values.limitQuantity}
-                              zIndex={true}
-                            >
-                              <Input
-                                name="limitQuantity"
-                                size="large"
-                                allowClear
-                                value={values.limitQuantity}
-                                onChange={(e) =>
-                                  setFieldValue(
-                                    "limitQuantity",
-                                    handleChangeNumber(e.target.value)
-                                  )
-                                }
-                                onBlur={handleBlur}
-                                status={
-                                  (touched.limitQuantity &&
-                                    errors.limitQuantity) ||
-                                  errorsServer.limitQuantity
-                                    ? "error"
-                                    : ""
-                                }
-                              />
-                            </FloatingLabels>
-                            {touched.limitQuantity && (
-                              <div className={styles.errors}>
-                                {errors.limitQuantity}
-                                {errorsServer.limitQuantity}
-                              </div>
+                                </Col>
+                              </>
                             )}
-                          </Col>
+                          </Row>
 
-                          <Col span={12}>
-                            <FloatingLabels
-                              label="Đơn hàng tối thiểu"
-                              name="voucherCondition"
-                              value={values.voucherCondition}
-                              zIndex={true}
-                            >
-                              <Input
-                                name="voucherCondition"
-                                size="large"
-                                suffix={"VND"}
-                                allowClear
-                                value={values.voucherCondition}
-                                onChange={(e) =>
-                                  setFieldValue(
-                                    "voucherCondition",
-                                    handleChangeNumber(e.target.value)
-                                  )
-                                }
-                                onBlur={handleBlur}
-                                status={
-                                  (touched.voucherCondition &&
-                                    errors.voucherCondition) ||
-                                  errorsServer.voucherCondition
-                                    ? "error"
-                                    : ""
-                                }
-                              />
-                            </FloatingLabels>
-                            {touched.voucherCondition && (
-                              <div className={styles.errors}>
-                                {errors.voucherCondition}
-                                {errorsServer.voucherCondition}
-                              </div>
-                            )}
-                          </Col>
-                        </Row>
-
-                        <Row gutter={16}>
-                          <Col span={12}>
-                            <FloatingLabels
-                              label="Ngày bắt đầu"
-                              name="endDate"
-                              value={values.startDate}
-                            >
-                              <DatePicker
-                                name="startDate"
-                                disabledDate={disabledDate}
-                                format={dateFormat}
-                                size="large"
-                                placeholder={null}
-                                style={{ width: "100%" }}
-                                value={values.startDate}
-                                onChange={(e) => setFieldValue("startDate", e)}
-                                onBlur={handleBlur}
-                                status={
-                                  (touched.startDate && errors.startDate) ||
-                                  errorsServer.startDate
-                                    ? "error"
-                                    : ""
-                                }
-                              />
-                            </FloatingLabels>
-                            {touched.startDate && (
-                              <div className={styles.errors}>
-                                {errors.startDate} {errorsServer.startDate}
-                              </div>
-                            )}
-                          </Col>
-
-                          <Col span={12}>
-                            <FloatingLabels
-                              label="Ngày kết thúc"
-                              name="endDate"
-                              value={values.endDate}
-                            >
-                              <DatePicker
-                                name="endDate"
-                                disabledDate={disabledDate}
-                                format={dateFormat}
-                                size="large"
-                                placeholder={null}
-                                style={{ width: "100%" }}
-                                value={values.endDate}
-                                onChange={(e) => {
-                                  setFieldValue("endDate", e);
-                                }}
-                                onBlur={handleBlur}
-                                status={
-                                  (touched.endDate && errors.endDate) ||
-                                  errorsServer.endDate
-                                    ? "error"
-                                    : ""
-                                }
-                              />
-                            </FloatingLabels>
-                            {touched.endDate && (
-                              <div className={styles.errors}>
-                                {errors.endDate} {errorsServer.endDate}
-                              </div>
-                            )}
-                          </Col>
-                        </Row>
-
-                        <Row>
-                          <Col span={5}>
-                            <Space
-                              style={{ width: "100%" }}
-                              direction="vertical"
-                            >
+                          <Row gutter={16}>
+                            <Col span={12}>
                               <FloatingLabels
-                                label="Đối tượng sử dụng"
-                                name="status"
-                                value={values.objectUse}
+                                label="Số lượng giới hạn"
+                                name="limitQuantity"
+                                value={values.limitQuantity}
+                                zIndex={true}
+                                disabled={
+                                  values.status === "INACTIVE"
+                                    ? true
+                                    : values.status === "ACTIVE"
+                                }
                               >
-                                <Select
-                                  name="objectUse"
-                                  className={styles.selectedItem}
+                                <Input
+                                  name="limitQuantity"
+                                  size="large"
+                                  allowClear
+                                  value={values.limitQuantity}
                                   onChange={(e) =>
-                                    setFieldValue("objectUse", e)
+                                    setFieldValue(
+                                      "limitQuantity",
+                                      handleChangeNumber(e.target.value)
+                                    )
                                   }
                                   onBlur={handleBlur}
-                                  options={optionsobjectUse}
-                                  value={values.objectUse}
-                                  style={{ width: "100%" }}
-                                  placeholder={null}
-                                  size="large"
+                                  status={
+                                    (touched.limitQuantity &&
+                                      errors.limitQuantity) ||
+                                    errorsServer.limitQuantity
+                                      ? "error"
+                                      : ""
+                                  }
+                                  disabled={
+                                    values.status === "INACTIVE"
+                                      ? true
+                                      : values.status === "ACTIVE"
+                                  }
                                 />
                               </FloatingLabels>
-                            </Space>
-                          </Col>
-                        </Row>
+                              {touched.limitQuantity && (
+                                <div className={styles.errors}>
+                                  {errors.limitQuantity}
+                                  {errorsServer.limitQuantity}
+                                </div>
+                              )}
+                            </Col>
 
-                        <Row>
-                          <Space size={10}>
-                            <Button
-                              size="large"
-                              onClick={() => navigate("/admin/vouchers")}
-                            >
-                              Hủy
-                            </Button>
+                            <Col span={12}>
+                              <FloatingLabels
+                                label="Đơn hàng tối thiểu"
+                                name="voucherCondition"
+                                value={values.voucherCondition}
+                                zIndex={true}
+                                disabled={
+                                  values.status === "INACTIVE"
+                                    ? true
+                                    : values.status === "ACTIVE"
+                                }
+                              >
+                                <Input
+                                  name="voucherCondition"
+                                  size="large"
+                                  suffix={"VND"}
+                                  allowClear
+                                  value={values.voucherCondition}
+                                  onChange={(e) =>
+                                    setFieldValue(
+                                      "voucherCondition",
+                                      handleChangeNumber(e.target.value)
+                                    )
+                                  }
+                                  onBlur={handleBlur}
+                                  status={
+                                    (touched.voucherCondition &&
+                                      errors.voucherCondition) ||
+                                    errorsServer.voucherCondition
+                                      ? "error"
+                                      : ""
+                                  }
+                                  disabled={
+                                    values.status === "INACTIVE"
+                                      ? true
+                                      : values.status === "ACTIVE"
+                                  }
+                                />
+                              </FloatingLabels>
+                              {touched.voucherCondition && (
+                                <div className={styles.errors}>
+                                  {errors.voucherCondition}
+                                  {errorsServer.voucherCondition}
+                                </div>
+                              )}
+                            </Col>
+                          </Row>
 
-                            <Button
-                              type="primary"
-                              htmlType="submit"
-                              size="large"
-                            >
-                              Xác nhận
-                            </Button>
-                          </Space>
-                        </Row>
-                      </Space>
-                    </Form>
-                  </Col>
+                          <Row gutter={16}>
+                            <Col span={12}>
+                              <FloatingLabels
+                                label="Ngày bắt đầu"
+                                name="endDate"
+                                value={values.startDate}
+                                disabled={
+                                  values.status === "INACTIVE"
+                                    ? true
+                                    : values.status === "ACTIVE"
+                                }
+                              >
+                                <DatePicker
+                                  name="startDate"
+                                  disabledDate={disabledDate}
+                                  format={dateFormat}
+                                  size="large"
+                                  placeholder={null}
+                                  style={{ width: "100%" }}
+                                  value={values.startDate}
+                                  onChange={(e) =>
+                                    setFieldValue("startDate", e)
+                                  }
+                                  onBlur={handleBlur}
+                                  status={
+                                    (touched.startDate && errors.startDate) ||
+                                    errorsServer.startDate
+                                      ? "error"
+                                      : ""
+                                  }
+                                  disabled={
+                                    values.status === "INACTIVE"
+                                      ? true
+                                      : values.status === "ACTIVE"
+                                  }
+                                />
+                              </FloatingLabels>
+                              {touched.startDate && (
+                                <div className={styles.errors}>
+                                  {errors.startDate} {errorsServer.startDate}
+                                </div>
+                              )}
+                            </Col>
 
-                  <Col span={3}></Col>
+                            <Col span={12}>
+                              <FloatingLabels
+                                label="Ngày kết thúc"
+                                name="endDate"
+                                value={values.endDate}
+                                disabled={values.status === "INACTIVE"}
+                              >
+                                <DatePicker
+                                  name="endDate"
+                                  disabledDate={disabledDate}
+                                  format={dateFormat}
+                                  size="large"
+                                  placeholder={null}
+                                  style={{ width: "100%" }}
+                                  value={values.endDate}
+                                  onChange={(e) => {
+                                    setFieldValue("endDate", e);
+                                  }}
+                                  onBlur={handleBlur}
+                                  status={
+                                    (touched.endDate && errors.endDate) ||
+                                    errorsServer.endDate
+                                      ? "error"
+                                      : ""
+                                  }
+                                  disabled={values.status === "INACTIVE"}
+                                />
+                              </FloatingLabels>
+                              {touched.endDate && (
+                                <div className={styles.errors}>
+                                  {errors.endDate} {errorsServer.endDate}
+                                </div>
+                              )}
+                            </Col>
+                          </Row>
 
-                  <Space
-                    style={{ width: "100%" }}
-                    direction="vertical"
-                    size={12}
-                  >
-                    {values?.objectUse === "member" ? (
-                      <Space
-                        style={{ width: "100%" }}
-                        direction="vertical"
-                        size={12}
-                      >
-                        <Table
-                          style={{ width: "100%" }}
-                          rowSelection={{
-                            type: rowSelection,
-                            ...rowSelection,
-                          }}
-                          columns={columns}
-                          dataSource={data}
-                          pagination={false}
-                          // dataSource={vouchers.map((voucher, index) => ({
-                          //   key: voucher.voucherId,
-                          //   stt: calculateStt(index),
-                          //   voucherCode: voucher.voucherCode,
-                          //   voucherName: voucher.voucherName,
-                          //   limitQuantity: numeral(voucher.limitQuantity).format("0,0"),
-                          //   voucherValue: `${numeral(voucher.voucherValue).format("0,0")} ${
-                          //     voucher.voucherMethod === "vnd" ? "VND" : "%"
-                          //   }`,
-                          //   startAndEndDate: `${moment(voucher.startDate).format(
-                          //     "DD/MM/YYYY"
-                          //   )} - ${moment(voucher.endDate).format("DD/MM/YYYY")}`,
-                          //   status:
-                          //     voucher.status === "ACTIVE"
-                          //       ? "Đang diễn ra"
-                          //       : voucher.status === "INACTIVE"
-                          //       ? "Đã kết thúc"
-                          //       : voucher.status === "UPCOMING"
-                          //       ? "Sắp diễn ra"
-                          //       : null,
-                          //   action: voucher.voucherCode,
-                          // }))}
-                          // className={styles.table}
-                        />
-                        {/* <Pagination
-                defaultCurrent={pageNo}
-                total={totalElements}
-                showSizeChanger={true}
-                pageSize={pageSize}
-                pageSizeOptions={["5", "10", "20", "50", "100"]}
-                onShowSizeChange={handlePageSize}
-                onChange={(page) => setPageNo(page)}
-              /> */}
-                      </Space>
-                    ) : (
-                      ""
-                    )}
-                  </Space>
-                </>
-              )}
-            </Formik>
-          </Row>
-        </Space>
+                          <Row>
+                            <Col span={12}>
+                              <Space
+                                style={{ width: "100%" }}
+                                direction="vertical"
+                              >
+                                <FloatingLabels
+                                  label="Đối tượng sử dụng"
+                                  name="status"
+                                  value={values.objectUse}
+                                  disabled={
+                                    values.status === "INACTIVE"
+                                      ? true
+                                      : values.status === "ACTIVE"
+                                  }
+                                >
+                                  <Select
+                                    name="objectUse"
+                                    className={styles.selectedItem}
+                                    onChange={(e) =>
+                                      setFieldValue("objectUse", e)
+                                    }
+                                    onBlur={handleBlur}
+                                    options={optionsobjectUse}
+                                    value={values.objectUse}
+                                    style={{ width: "100%" }}
+                                    placeholder={null}
+                                    size="large"
+                                    disabled={
+                                      values.status === "INACTIVE"
+                                        ? true
+                                        : values.status === "ACTIVE"
+                                    }
+                                  />
+                                </FloatingLabels>
+                                <Checkbox
+                                  onChange={(e) => {
+                                    setFieldValue(
+                                      "isCheckSendEmail",
+                                      e.target.checked
+                                    );
+                                  }}
+                                >
+                                  Gửi mã giảm giá cho khách hàng
+                                </Checkbox>
+                              </Space>
+                            </Col>
+                          </Row>
+
+                          <Row>
+                            <Col span={18}>
+                              <Space size={10}>
+                                <Button
+                                  size="large"
+                                  onClick={() => navigate("/admin/vouchers")}
+                                >
+                                  {`${
+                                    values.status === "INACTIVE"
+                                      ? "Quay lại"
+                                      : "Hủy"
+                                  }`}
+                                </Button>
+
+                                <Button
+                                  type="primary"
+                                  htmlType="submit"
+                                  size="large"
+                                  disabled={values.status === "INACTIVE"}
+                                >
+                                  Xác nhận
+                                </Button>
+                              </Space>
+                            </Col>
+
+                            <Col span={6}>
+                              <div
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "flex-end",
+                                }}
+                              >
+                                {(values.objectUse === "member" &&
+                                  values.isCheckSendEmail) ||
+                                customers.length ? (
+                                  <Button
+                                    type="primary"
+                                    ghost
+                                    icon={<PlusOutlined />}
+                                    onClick={() => setIsLoadingModal(true)}
+                                    size="large"
+                                  >
+                                    Chọn khách hàng
+                                  </Button>
+                                ) : null}
+                              </div>
+                            </Col>
+                          </Row>
+                        </Space>
+                      </Form>
+                    </Col>
+
+                    <Col span={3}></Col>
+
+                    <Space
+                      style={{ width: "100%" }}
+                      direction="vertical"
+                      size={12}
+                    >
+                      <ModalAddCustomer
+                        isLoadingModal={isLoadingModal}
+                        setIsLoadingModal={setIsLoadingModal}
+                        values={values}
+                        setFieldValue={setFieldValue}
+                        customers={customers}
+                        setCustomers={setCustomers}
+                      />
+                    </Space>
+                  </>
+                )}
+              </Formik>
+            </Row>
+          </Space>
+        </Spin>
       </div>
     </div>
   );

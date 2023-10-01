@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @Data
 public class ErrorCodeConfig {
@@ -30,6 +31,8 @@ public class ErrorCodeConfig {
         errors.put("VOUCHER_VALUE_MAX_EMPTY", "Giá trị giảm tối đa không được bỏ trống");
         errors.put("DATE_LESS_NOW", "Ngày nhỏ hơn ngày hiện tại");
         errors.put("SEND_EMAIL_ERROR", "Gửi email thất bại");
+        errors.put("VOUCHER_USED_BY_USER", "Username %s này đã sở hữu voucher này.");
+        errors.put("USER_NOT_FOUND", "Không tìm thấy tài khoản này.");
     }
 
     public static String getMessage(String code) {
@@ -37,6 +40,14 @@ public class ErrorCodeConfig {
             return errors.get(code);
         } else {
             return "Không tìm thấy nội dung " + code;
+        }
+    }
+
+    public static String getFormatMessage(String code, Object... objects) {
+        if(StringUtils.isNotBlank(code)) {
+            return String.format(errors.get(code), objects);
+        } else {
+            return String.format(errors.get(code));
         }
     }
 

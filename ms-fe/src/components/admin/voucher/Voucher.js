@@ -27,7 +27,7 @@ import moment from "moment";
 
 import { NotificationContext } from "../../element/notification/Notification";
 
-const baseUrl = "http://localhost:8080/admin/api/voucher/";
+const baseUrl = "http://localhost:8080/api/admin/vouchers/";
 
 function Voucher() {
   // filter
@@ -191,24 +191,31 @@ function Voucher() {
       key: "voucherValue",
     },
     {
+      title: "Đối tượng sử dụng",
+      dataIndex: "objectUse",
+      key: "objectUse",
+    },
+    {
       title: "Thời gian",
       dataIndex: "startAndEndDate",
       key: "startAndEndDate",
-    },
-    {
-      title: "Trạng thái",
-      dataIndex: "status",
-      key: "status",
-      render: (status) => {
+      render: (object) => {
         let color =
-          status === "Đang diễn ra"
+          object[1] === "Đang diễn ra"
             ? "geekblue"
-            : status === "Sắp diễn ra"
+            : object[1] === "Sắp diễn ra"
             ? "green"
             : "Đã kết thúc"
             ? "red"
             : null;
-        return <Tag color={color}>{status}</Tag>;
+        return (
+          <Space direction="vertical">
+            <div style={{ width: "auto", display: "flex" }}>
+              <Tag color={color}>{object[1]}</Tag>
+            </div>
+            {object[0]}
+          </Space>
+        );
       },
     },
     {
@@ -292,10 +299,12 @@ function Voucher() {
                     voucherValue: `${numeral(voucher.voucherValue).format(
                       "0,0"
                     )} ${voucher.voucherMethod === "vnd" ? "VND" : "%"}`,
-                    startAndEndDate: `${moment(voucher.startDate).format(
-                      "DD/MM/YYYY"
-                    )} - ${moment(voucher.endDate).format("DD/MM/YYYY")}`,
-                    status:
+                    objectUse:
+                      voucher.objectUse === "all" ? "Tất cả" : "Thành viên",
+                    startAndEndDate: [
+                      `${moment(voucher.startDate).format(
+                        "DD/MM/YYYY"
+                      )} - ${moment(voucher.endDate).format("DD/MM/YYYY")}`,
                       voucher.status === "ACTIVE"
                         ? "Đang diễn ra"
                         : voucher.status === "INACTIVE"
@@ -303,6 +312,7 @@ function Voucher() {
                         : voucher.status === "UPCOMING"
                         ? "Sắp diễn ra"
                         : null,
+                    ],
                     action: [voucher.voucherCode, voucher.status],
                   }))}
                   className={styles.table}

@@ -2,13 +2,16 @@ package com.fpoly.ooc.service.impl;
 
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
+import com.fpoly.ooc.dto.VoucherAccountConditionDTO;
 import com.fpoly.ooc.dto.VoucherConditionDTO;
 import com.fpoly.ooc.entity.Voucher;
 import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.VoucherRepository;
 import com.fpoly.ooc.request.voucher.VoucherRequest;
+import com.fpoly.ooc.responce.account.AccountVoucher;
 import com.fpoly.ooc.responce.voucher.VoucherResponse;
 import com.fpoly.ooc.service.interfaces.EmailService;
+import com.fpoly.ooc.service.interfaces.VoucherAccountService;
 import com.fpoly.ooc.service.interfaces.VoucherService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -41,14 +44,15 @@ public class VoucherServiceImpl implements VoucherService {
     @Autowired
     private AccountServiceImpl accountService;
 
+    @Autowired
+    private VoucherAccountService voucherAccountService;
+
     @Override
     public Page<VoucherResponse> findAllVoucher(Pageable pageable, VoucherConditionDTO voucherConditionDTO) {
 
         String status = Objects.isNull(voucherConditionDTO.getStatus()) ?
                 null : voucherConditionDTO.getStatus().equalsIgnoreCase("ALL") ?
                 null : voucherConditionDTO.getStatus();
-
-        System.out.println("status: " + status);
 
         return page(
                 voucherRepository.findAllVoucher(
@@ -63,29 +67,39 @@ public class VoucherServiceImpl implements VoucherService {
     public Voucher saveOrUpdate(VoucherRequest voucherRequest) {
         Voucher voucher = convertVoucherRequest(voucherRequest);
         String result = null;
-//        if (voucherRequest.getObjectUse().equalsIgnoreCase("all")) {
-//            List<String> emails = accountService.findAllEmailAccount();
-//
-//            if(emails.isEmpty()) {
-//                throw new NotFoundException(ErrorCodeConfig.getMessage(Const.SEND_EMAIL_ERROR));
-//            }
-//
-//            voucher.setObjectUse(voucherRequest.getObjectUse());
-//            voucherRequest.getEmailDetails().setRecipient(emails);
-//            result = emailService.sendSimpleMail(voucherRequest.getEmailDetails());
-//        } else {
-//
-//            voucher.setObjectUse(voucherRequest.getObjectUse());
-//            result = emailService.sendSimpleMail(voucherRequest.getEmailDetails());
-//        }
 
+
+        if(voucherRequest.getIsCheckSendEmail()) {
+            if (voucherRequest.getObjectUse().equalsIgnoreCase("all")) {
+                List<String> emails = accountService.findAllEmailAccount();
+
+                if(emails.isEmpty()) {
+                    throw new NotFoundException(ErrorCodeConfig.getMessage(Const.SEND_EMAIL_ERROR));
+                }
+
+                voucher.setObjectUse(voucherRequest.getObjectUse());
+                voucherRequest.getEmailDetails().setRecipient(emails);
+            } else {
+                voucher.setObjectUse(voucherRequest.getObjectUse());
+            }
+            result = emailService.sendSimpleMail(voucherRequest.getEmailDetails());
+        }
+
+        Voucher dbVoucher = voucherRepository.save(voucher);
         log.info("Email: " + result);
 
-//        if(result.equals("ERROR")) {
-//            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.SEND_EMAIL_ERROR));
-//        }
+        if(result != null && result.equals("ERROR")) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.SEND_EMAIL_ERROR));
+        } else {
+            for (AccountVoucher account: voucherRequest.getUsernames()) {
+                VoucherAccountConditionDTO voucherAccountConditionDTO = new VoucherAccountConditionDTO();
+                voucherAccountConditionDTO.setUsername(account.getUsername());
+                voucherAccountConditionDTO.setVoucher(dbVoucher);
+                voucherAccountService.saveOrUpdate(voucherAccountConditionDTO);
+            }
+        }
 
-        return voucherRepository.save(voucher);
+        return dbVoucher;
     }
 
     @Override
@@ -160,6 +174,7 @@ public class VoucherServiceImpl implements VoucherService {
                 .startDate(voucher.getStartDate())
                 .endDate(voucher.getEndDate())
                 .status(voucher.getStatus())
+                .objectUse(voucher.getObjectUse())
                 .build();
     }
 
@@ -167,15 +182,15 @@ public class VoucherServiceImpl implements VoucherService {
 
         Voucher voucher = new Voucher();
 
-        if (request.getVoucherName().equalsIgnoreCase(request.getVoucherNameCurrent())) {
+        if (request.getVoucherName().equalsIgnoreCase(request.getVoucherCurrentName())) {
             voucher.setVoucherName(request.getVoucherName());
         } else {
-            Optional<Voucher> voucherOptional = voucherRepository.findVoucherByVoucherName(request.getVoucherNameCurrent());
+            Optional<Voucher> voucherOptional = voucherRepository.findVoucherByVoucherName(request.getVoucherCurrentName());
 
             if (voucherOptional.isPresent()) {
                 throw new NotFoundException(ErrorCodeConfig.getMessage(Const.VOUCHER_NAME_ALREADY_EXISTS), "voucherName");
             } else {
-                voucher.setVoucherName(request.getVoucherNameCurrent());
+                voucher.setVoucherName(request.getVoucherCurrentName());
             }
         }
 

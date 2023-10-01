@@ -3,6 +3,7 @@ package com.fpoly.ooc.request.voucher;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fpoly.ooc.dto.EmailDetails;
+import com.fpoly.ooc.responce.account.AccountVoucher;
 import com.fpoly.ooc.validation.CompareDateNow;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Max;
@@ -17,6 +18,7 @@ import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -29,7 +31,7 @@ public class VoucherRequest {
     @NotBlank(message = "Tên voucher không được bỏ trống")
     private String voucherName;
 
-    private String voucherNameCurrent;
+    private String voucherCurrentName;
 
     private String voucherCode;
 
@@ -66,5 +68,9 @@ public class VoucherRequest {
     private String objectUse;
 
     private EmailDetails emailDetails;
+
+    private Boolean isCheckSendEmail;
+
+    private List<AccountVoucher> usernames;
 
 }

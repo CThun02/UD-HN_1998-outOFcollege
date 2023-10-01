@@ -6,13 +6,11 @@ import {
   Form,
   Input,
   Modal,
-  Pagination,
   Radio,
   Row,
   Select,
   Space,
   Spin,
-  Table,
   notification,
 } from "antd";
 import styles from "./SaveVoucher.module.css";
@@ -224,7 +222,7 @@ function SaveVoucher() {
                   recipient: [],
                 },
                 isCheckSendEmail: voucher?.isCheckSendEmail,
-                usernames: differentList,
+                usernames: voucher?.voucherId ? differentList : usernames,
               })
               .then(() => {
                 setIsLoading(false);

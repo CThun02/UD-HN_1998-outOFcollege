@@ -367,6 +367,7 @@ CREATE TABLE voucher(
     voucher_method      VARCHAR(50),
     voucher_condition   DECIMAL,
     limit_quantity      INT,
+    private             VARCHAR(15),
     status              VARCHAR(50),
     created_at          DATETIME,
     updated_at          DATETIME,

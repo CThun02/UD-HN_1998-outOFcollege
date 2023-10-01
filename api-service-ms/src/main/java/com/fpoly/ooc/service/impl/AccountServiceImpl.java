@@ -135,4 +135,3 @@ public class AccountServiceImpl implements AccountService {
         return accountRepository.emailAccountList();
     }
 }
- 

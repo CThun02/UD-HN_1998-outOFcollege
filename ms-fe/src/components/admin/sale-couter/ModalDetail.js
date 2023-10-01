@@ -1,21 +1,8 @@
 import { Modal, Table } from 'antd'
-import axios from 'axios'
-import React, { useEffect, useState } from 'react'
-
-const ModalDetail = ({ isModalOpen, handleOk, handleCancel }) => {
-
-    const [timelinesDetail, setTimelinesDetail] = useState([])
-
-    useEffect(() => {
-        axios.get('http://localhost:8080/api/admin/bill/1/timeline')
-            .then((response) => {
-                setTimelinesDetail(response.data);
-            })
-            .catch((error) => {
-                console.log(error)
-            })
-    }, [])
-
+import React from 'react'
+import styles from './ModalDetail.module.css'
+import moment from 'moment/moment';
+const ModalDetail = ({ isModalOpen, handleOk, handleCancel, timelineDetail }) => {
     const columns = [
         {
             title: 'STT',
@@ -28,16 +15,28 @@ const ModalDetail = ({ isModalOpen, handleOk, handleCancel }) => {
             title: 'Thao tác',
             dataIndex: 'status',
             key: 'status',
+            render: (status) => {
+                return status === '1'
+                    ? 'tạo hóa đơn'
+                    : status === '2'
+                        ? 'thanh toán thành công'
+                        : status === '0' ? 'Đã hủy'
+                            : ''
+            }
         },
         {
             title: 'Thời gian',
             dataIndex: 'createdDate',
             key: 'createdDate',
+            render: (createdDate) => {
+                return moment(createdDate)
+                    .format('DD/MM/YYYY HH:mm')
+            }
         },
         {
             title: 'Người xác nhận',
             dataIndex: 'createdBy',
-            key: 'createdBy',
+            key: 'createdBy'
         },
         {
             title: 'Ghi chú',
@@ -47,18 +46,21 @@ const ModalDetail = ({ isModalOpen, handleOk, handleCancel }) => {
     ];
 
     return (
-        <Modal closeIcon={true}
-            open={isModalOpen}
-            onOk={handleOk}
-            onCancel={handleCancel}
-            footer={null}
-        >
-            <Table
-                columns={columns}
-                dataSource={timelinesDetail}
-                pagination={false}
-                closeIcon />
-        </Modal>
+        <div >
+            <Modal closeIcon={true}
+                open={isModalOpen}
+                onOk={handleOk}
+                onCancel={handleCancel}
+                footer={null}
+                className={styles.w}
+            >
+                <Table
+                    columns={columns}
+                    dataSource={timelineDetail}
+                    pagination={false}
+                    closeIcon />
+            </Modal>
+        </div>
     )
 }
 

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -22,5 +23,23 @@ public class TimeLineResponse {
     private LocalDateTime createdDate;
 
     private String createdBy;
+
+    private String billType;
+
+    private String paymentName;
+
+    private String billStatus;
+
+    private LocalDateTime completionDate;
+
+    private BigDecimal price;
+
+    private String fullName;
+
+    private String phoneNumber;
+
+    private String email;
+
+    private String address;
 
 }

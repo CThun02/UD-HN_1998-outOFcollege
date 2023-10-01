@@ -43,13 +43,22 @@ public class TimeLineServiceImpl implements TimeLineService {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND));
         }
 
-        List<TimeLineResponse> lst = timeLineRepo.getTimeLineByBillId(billId);
-        Integer statusIncrease = Integer.valueOf(lst.get(lst.size() - 1).getStatus());
-
         TimeLine timeLine = new TimeLine();
         timeLine.setBill(bill);
         timeLine.setNote(request.getNote());
-        timeLine.setStatus(String.valueOf(++statusIncrease));
+        if (request.getStatus() == null) {
+            List<TimeLineResponse> lst = timeLineRepo.getTimeLineByBillId(billId);
+            Integer statusIncrease = 0;
+            if (lst.isEmpty()) {
+                statusIncrease++;
+            } else {
+                statusIncrease = Integer.valueOf(lst.get(lst.size() - 1).getStatus());
+                statusIncrease++;
+            }
+            timeLine.setStatus(String.valueOf(statusIncrease));
+        } else {
+            timeLine.setStatus(request.getStatus());
+        }
 
         return timeLineRepo.save(timeLine);
     }

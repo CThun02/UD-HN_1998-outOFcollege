@@ -1,13 +1,14 @@
 import { Button, Col, Divider, Row, Table } from 'antd';
 import { useEffect, useState } from 'react';
 import { Timeline, TimelineEvent } from '@mailtop/horizontal-timeline';
-import { FaRegFileAlt } from 'react-icons/fa';
+import { FaBug, FaRegCheckCircle, FaRegFileAlt } from 'react-icons/fa';
 import styles from './TimeLine.module.css'
 import ModalConfirm from './ModalConfirm';
 import SpanBorder from './SpanBorder';
 import ModalDetail from './ModalDetail';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
+import moment from 'moment/moment';
 
 const BillTimeLine = () => {
     const columns = [
@@ -22,18 +23,18 @@ const BillTimeLine = () => {
         },
         {
             title: 'Phương thức thanh toán',
-            dataIndex: 'paymentType',
-            key: 'paymentType',
+            dataIndex: 'paymentName',
+            key: 'paymentName',
         },
         {
             title: 'Trạng thái',
-            dataIndex: 'status',
-            key: 'stauts',
+            dataIndex: 'billStatus',
+            key: 'billStatus',
         },
         {
             title: 'Thời gian',
-            dataIndex: 'time',
-            key: 'time',
+            dataIndex: 'completionDate',
+            key: 'completionDate',
         },
         {
             title: 'Số tiền',
@@ -42,21 +43,41 @@ const BillTimeLine = () => {
         },
         {
             title: 'Người xác nhận',
-            dataIndex: 'admin',
-            key: 'admin',
+            dataIndex: 'createdBy',
+            key: 'createdBy',
         },
     ];
     const [isModalConfirm, setIsModalConfirm] = useState(false);
     const [isModalDetail, setIsModalDetail] = useState(false);
     const [timelines, setTimelines] = useState([]);
+    const [action, setAction] = useState(null)
     const { billId } = useParams();
+
+    // tạo mới timeline
+    const handleCreateTimeline = async (note, stauts) => {
+        const values = { note: note, status: stauts };
+        await axios.post(`http://localhost:8080/api/admin/bill/${billId}/timelines`,
+            values)
+            .then((response) => {
+                setTimelines([...timelines, response.data])
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
 
     const showModalConfirm = () => {
         setIsModalConfirm(true);
     };
 
-    const handleOkConFirm = () => {
+    const handleCancelConfirm = () => {
+        setIsModalConfirm(false)
+    }
+
+    const handleOkConFirm = (note) => {
+        handleCreateTimeline(note, action === 'cancel' ? '0' : null);
         setIsModalConfirm(false);
+        console.log('ahihi' + action)
     };
 
     const showModalDetail = () => {
@@ -70,16 +91,35 @@ const BillTimeLine = () => {
     useEffect(() => {
         axios.get(`http://localhost:8080/api/admin/bill/${billId}/timeline`)
             .then((response) => {
-                setTimelines(response.data);
+                setTimelines(response.data)
             })
             .catch((error) => {
                 console.log(error)
             })
     }, [billId])
 
-    const handleCreateTimeline = () => {
-        console.log(billId)
-    }
+    const columnProduct = [
+        {
+            title: 'STT',
+            key: 'index',
+            render: (_, record, index) => index + 1
+        },
+        {
+            title: 'Sản phẩm',
+            dataIndex: 'type',
+            key: 'type',
+        },
+        {
+            title: 'Số lượng',
+            dataIndex: 'quantity',
+            key: 'quantity',
+        },
+        {
+            title: 'Giá',
+            dataIndex: 'price',
+            key: 'price',
+        },
+    ]
 
     return (
         <>
@@ -89,26 +129,58 @@ const BillTimeLine = () => {
                         <Timeline minEvents={6} placeholder className={styles.timeLine}>
                             {timelines && timelines.map((data) => (
                                 <TimelineEvent
-                                    color='#00cc00'
-                                    icon={FaRegFileAlt}
-                                    title={data.status}
-                                    subtitle={data.createdDate}
+                                    color={data.status === '0' ? '#9c2919' : '#00cc00'}
+                                    icon={data.status === '1' ? (
+                                        FaRegFileAlt
+                                    ) : data.status === '0' ? (
+                                        FaBug
+                                    ) : (
+                                        FaRegCheckCircle
+                                    )}
+                                    title={data.status === '1' ? 'Tạo hóa đơn' : data.status === '2' ? 'Thanh toán thành công' : data.status === '0' ? 'Đã hủy' : ''}
+                                    subtitle={moment(data.createdDate)
+                                        .format("DD/MM/YYYY HH:MM")}
                                 />
                             ))}
                         </Timeline>
                     </div>
                 </div>
-                <div style={{ marginTop: 24 }}>
-                    <Button type="primary" onClick={() => handleCreateTimeline()}>
-                        Xác nhận
-                    </Button>
-                    <ModalConfirm isModalOpen={isModalConfirm} handleCancel={handleOkConFirm} handleOk={handleOkConFirm} />
-                    <Button type='primary' danger style={{ margin: '0 10px' }}>Hủy</Button>
+                <div className={styles.btnHeader} style={{ marginTop: 24 }}>
+                    {(timelines.length !== 2) && (
+                        <Button
+                            type="primary"
+                            onClick={() => {
+                                setAction('confirm');
+                                showModalConfirm()
+                            }}>
+                            Xác nhận
+                        </Button>
+                    )}
+                    {(timelines.length !== 2) && (
+                        <Button type='primary'
+                            danger
+                            style={{ margin: '0 10px' }}
+                            onClick={() => {
+                                setAction('cancel');
+                                showModalConfirm()
+                            }}
+                        > Hủy</Button>
+                    )}
+                    {console.log(action)}
+                    <ModalConfirm
+                        isModalOpen={isModalConfirm}
+                        handleCancel={handleCancelConfirm}
+                        handleOk={handleOkConFirm}
+                    />
+
                     <Button
                         className={styles.btnWarning}
-                        onClick={() => showModalDetail()} >Chi tiết</Button>
-
-                    <ModalDetail isModalOpen={isModalDetail} handleCancel={handleOkDetail} handleOk={handleOkDetail} />
+                        onClick={() => showModalDetail()} >
+                        Chi tiết
+                    </Button>
+                    <div >
+                        <ModalDetail timelineDetail={timelines} isModalOpen={isModalDetail} handleCancel={handleOkDetail} handleOk={handleOkDetail} />
+                    </div>
                 </div>
             </section >
 
@@ -126,40 +198,42 @@ const BillTimeLine = () => {
                     <Col span={12}>
                         <Row>
                             <Col span={12}>
-                                <span className={styles.span}>mã đơn hàng</span>
+                                <span className={styles.span}>Mã đơn hàng</span>
                                 <span className={styles.span}>Loại đơn hàng</span>
                                 <span className={styles.span}>Trạng thái </span>
                                 <span style={{ fontSize: '16px', display: 'block' }}>Ngày nhận hàng dự kiến</span>
                             </Col>
                             <Col span={12}>
-                                <div style={{ display: 'flex', alignItems: 'center', width: '10px', margin: '5px 0 10px 0' }}>
-                                    <SpanBorder child={'HD1000'} color={'#1677ff'} />
+                                <div style={{ display: 'flex', alignItems: 'center', width: '10px', margin: '20px 0 20px 0' }}>
+                                    <SpanBorder child={'HD1100'} color={'#1677ff'} />
                                 </div>
-                                <div style={{ display: 'flex', alignItems: 'center', width: '10px', marginBottom: '10px' }}>
-                                    <SpanBorder child={'HD1000'} color={'#1677ff'} />
+                                <div style={{ display: 'flex', alignItems: 'center', width: '10px', marginBottom: '20px' }}>
+                                    <SpanBorder child={timelines[0]?.billType} color={'#1677ff'} />
                                 </div>
-                                <div style={{ display: 'flex', alignItems: 'center', width: '10px', marginBottom: '10px' }}>
-                                    <SpanBorder child={'HD1000'} color={'#00cc00'} />
+                                <div style={{ display: 'flex', alignItems: 'center', width: '10px', marginBottom: '20px' }}>
+                                    <SpanBorder child={timelines[0]?.billStatus} color={'#00cc00'} />
                                 </div>
-                                <div style={{ display: 'flex', alignItems: 'center', width: '10px' }}>
-                                    <SpanBorder child={'HD1000'} color={'gray'} />
+                                <div style={{ display: 'flex', alignItems: 'center', width: '50px' }}>
+                                    <SpanBorder child={moment(timelines[0]?.completionDate)
+                                        .format('HH:MM  DD/MM/YYYY')} color={'gray'} />
+
                                 </div>
                             </Col>
                         </Row>
                     </Col>
-                    <Col span={12}>
+                    <Col span={11}>
                         <Row>
-                            <Col span={12}>
+                            <Col span={8}>
                                 <span className={styles.span}>Tên khách hàng</span>
                                 <span className={styles.span}>Số diện thoại</span>
                                 <span className={styles.span}>Email</span>
                                 <span className={styles.span}>Địa chỉ</span>
                             </Col>
                             <Col span={12}>
-                                <span className={styles.span}>Khách lẻ</span>
-                                <span className={styles.span}>__</span>
-                                <span className={styles.span}>__</span>
-                                <span style={{ fontSize: '16px', display: 'block' }}>__</span>
+                                <span className={styles.span}>{timelines[0]?.fullName || 'khách lẻ'}</span>
+                                <span className={styles.span}>{timelines[0]?.phoneNumber || '__'}</span>
+                                <span className={styles.span}>{timelines[0]?.email || '__'}</span>
+                                <span style={{ fontSize: '16px', display: 'block' }}>{timelines[0]?.address || '__'}</span>
                             </Col>
                         </Row>
                     </Col>
@@ -176,7 +250,7 @@ const BillTimeLine = () => {
                     </Col>
                 </Row>
                 <Divider className={styles.blackDivider} style={{ marginTop: '10px' }} />
-                <Table columns={columns} />
+                <Table columns={columns} dataSource={[timelines[0]]} pagination={false} />
             </section>
 
             <section className={styles.background} style={{ marginTop: '20px' }}>

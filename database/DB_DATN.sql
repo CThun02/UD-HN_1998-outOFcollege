@@ -271,6 +271,7 @@ CREATE TABLE address_detail(
 
 CREATE TABLE bill(
     id                  BIGINT IDENTITY PRIMARY KEY,
+    bill_code           VARCHAR(20),
     account_id          VARCHAR(100) FOREIGN KEY(account_id) REFERENCES account(username),
     date_of_receipt     DATETIME,
     completion_date     DATETIME,
@@ -368,6 +369,7 @@ CREATE TABLE voucher(
     voucher_condition   DECIMAL,
     limit_quantity      INT,
     private             VARCHAR(15),
+    is_send_email       BIT,
     status              VARCHAR(50),
     created_at          DATETIME,
     updated_at          DATETIME,

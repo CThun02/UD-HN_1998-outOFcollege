@@ -27,7 +27,7 @@ import moment from "moment";
 
 import { NotificationContext } from "../../element/notification/Notification";
 
-const baseUrl = "http://localhost:8080/admin/api/voucher/";
+const baseUrl = "http://localhost:8080/api/admin/vouchers/";
 
 function Voucher() {
   // filter
@@ -84,27 +84,28 @@ function Voucher() {
             startDate:
               searchStartDate !== ""
                 ? moment(searchStartDate?.$d, "DD-MM-YYYY").format(
-                  "YYYY-MM-DDTHH:mm:ss.SSS"
-                )
+                    "YYYY-MM-DDTHH:mm:ss.SSS"
+                  )
                 : "",
             endDate:
               searchEndDate !== ""
                 ? moment(searchEndDate?.$d, "DD-MM-YYYY").format(
-                  "YYYY-MM-DDTHH:mm:ss.SSS"
-                )
+                    "YYYY-MM-DDTHH:mm:ss.SSS"
+                  )
                 : "",
             status: searchStatus,
           };
 
           const res = await axios.post(
-            `${pageNo !== 1 || pageSize !== 5
-              ? baseUrl +
-              "?pageNo=" +
-              (pageNo - 1) +
-              "&" +
-              "pageSize=" +
-              pageSize
-              : baseUrl
+            `${
+              pageNo !== 1 || pageSize !== 5
+                ? baseUrl +
+                  "?pageNo=" +
+                  (pageNo - 1) +
+                  "&" +
+                  "pageSize=" +
+                  pageSize
+                : baseUrl
             }`,
             filter
           );
@@ -152,7 +153,6 @@ function Voucher() {
         }
       }
 
-
       return () => {
         notification(true);
         isCheck = false;
@@ -191,24 +191,31 @@ function Voucher() {
       key: "voucherValue",
     },
     {
+      title: "Đối tượng sử dụng",
+      dataIndex: "objectUse",
+      key: "objectUse",
+    },
+    {
       title: "Thời gian",
       dataIndex: "startAndEndDate",
       key: "startAndEndDate",
-    },
-    {
-      title: "Trạng thái",
-      dataIndex: "status",
-      key: "status",
-      render: (status) => {
+      render: (object) => {
         let color =
-          status === "Đang diễn ra"
+          object[1] === "Đang diễn ra"
             ? "geekblue"
-            : status === "Sắp diễn ra"
-              ? "green"
-              : "Đã kết thúc"
-                ? "red"
-                : null;
-        return <Tag color={color}>{status}</Tag>;
+            : object[1] === "Sắp diễn ra"
+            ? "green"
+            : "Đã kết thúc"
+            ? "red"
+            : null;
+        return (
+          <Space direction="vertical">
+            <div style={{ width: "auto", display: "flex" }}>
+              <Tag color={color}>{object[1]}</Tag>
+            </div>
+            {object[0]}
+          </Space>
+        );
       },
     },
     {
@@ -269,8 +276,8 @@ function Voucher() {
                   </Button>
                 </Link>
               </>
-            </Col >
-          </Row >
+            </Col>
+          </Row>
 
           <Spin
             tip="Loading..."
@@ -292,18 +299,20 @@ function Voucher() {
                     voucherValue: `${numeral(voucher.voucherValue).format(
                       "0,0"
                     )} ${voucher.voucherMethod === "vnd" ? "VND" : "%"}`,
-                    startAndEndDate: `${moment(voucher.startDate).format(
-                      "DD/MM/YYYY"
-                    )} - ${moment(voucher.endDate).format("DD/MM/YYYY")}`,
-                    status:
+                    objectUse:
+                      voucher.objectUse === "all" ? "Tất cả" : "Thành viên",
+                    startAndEndDate: [
+                      `${moment(voucher.startDate).format(
+                        "DD/MM/YYYY"
+                      )} - ${moment(voucher.endDate).format("DD/MM/YYYY")}`,
                       voucher.status === "ACTIVE"
                         ? "Đang diễn ra"
                         : voucher.status === "INACTIVE"
-
-                          ? "Đã kết thúc"
-                          : voucher.status === "UPCOMING"
-                            ? "Sắp diễn ra"
-                            : null,
+                        ? "Đã kết thúc"
+                        : voucher.status === "UPCOMING"
+                        ? "Sắp diễn ra"
+                        : null,
+                    ],
                     action: [voucher.voucherCode, voucher.status],
                   }))}
                   className={styles.table}
@@ -321,9 +330,9 @@ function Voucher() {
               </Space>
             </>
           </Spin>
-        </Space >
-      </div >
-    </div >
+        </Space>
+      </div>
+    </div>
   );
 }
 

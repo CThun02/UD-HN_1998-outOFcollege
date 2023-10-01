@@ -1,8 +1,10 @@
 package com.fpoly.ooc.controller;
 
+import com.fpoly.ooc.dto.CustomerConditionDTO;
 import com.fpoly.ooc.request.account.AccountRequest;
 import com.fpoly.ooc.service.interfaces.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/account/api/")
+@RequestMapping("/api/admin/account")
 @CrossOrigin("*")
 public class AccountController {
 
@@ -27,8 +29,9 @@ public class AccountController {
     public ResponseEntity<?> phanTrang(@RequestParam(name = "page", defaultValue = "0") Integer pageNo) {
         return ResponseEntity.ok(service.phanTrang(pageNo, 5));
     }
+
     @GetMapping("detail/{username}")
-    public ResponseEntity<?> detail(@PathVariable String username){
+    public ResponseEntity<?> detail(@PathVariable String username) {
         return ResponseEntity.ok(service.detail(username));
     }
 
@@ -48,4 +51,15 @@ public class AccountController {
         service.remove(id);
         return ResponseEntity.ok("Delete successfully");
     }
+
+    @PostMapping("/voucher")
+    public ResponseEntity<?> findAccountCustomerVoucher(
+            @RequestBody CustomerConditionDTO customerConditionDTO,
+            @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
+            @RequestParam(value = "pageSize", defaultValue = "5") Integer pageSize
+    ) {
+
+        return ResponseEntity.ok(service.findAccountVoucher(customerConditionDTO, PageRequest.of(pageNo, pageSize)));
+    }
+
 }

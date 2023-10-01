@@ -1,5 +1,4 @@
-import { PlusOutlined } from "@ant-design/icons";
-import { Button, Divider, Modal, Space, Spin, Table } from "antd";
+import {  Divider, Modal, Space, Table } from "antd";
 import { useState } from "react";
 
 const columns = [

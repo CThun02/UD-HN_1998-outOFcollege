@@ -23,6 +23,14 @@
   background: #fff;
 }
 
+.disabled {
+  background-image: linear-gradient(
+    to bottom,
+    white 50%,
+    rgba(0, 0, 0, 0.04) 50%
+  );
+}
+
 .zIndex {
   z-index: 11;
 }

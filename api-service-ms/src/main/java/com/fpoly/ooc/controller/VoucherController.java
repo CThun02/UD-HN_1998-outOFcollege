@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/admin/api/voucher")
+@RequestMapping("/api/admin/vouchers")
 @CrossOrigin(origins = "http://localhost:3000/", maxAge = 3600)
 public class VoucherController {
 

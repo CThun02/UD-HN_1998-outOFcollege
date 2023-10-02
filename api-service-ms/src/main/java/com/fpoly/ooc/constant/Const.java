@@ -25,6 +25,8 @@ public class Const {
     public static final String VOUCHER_CONDITION_LESS_ZERO="VOUCHER_CONDITION_LESS_ZERO";
     public static final String STATUS_INVALID = "STATUS_INVALID";
     public static final String SEND_EMAIL_ERROR = "SEND_EMAIL_ERROR";
+    public static final String VOUCHER_USED_BY_USER = "VOUCHER_USED_BY_USER";
+    public static final String USER_NOT_FOUND = "USER_NOT_FOUND";
 
 
     //ErrorCode

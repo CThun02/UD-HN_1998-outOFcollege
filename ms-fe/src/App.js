@@ -10,7 +10,7 @@ import CreatePromotion from "./components/admin/promotion/CreatePromotion";
 import Voucher from "./components/admin/voucher/Voucher";
 import Bill from "./components/admin/sale-couter/Bill";
 import CreateBill from "./components/admin/sale-couter/CreateBill";
-import ProductDetails from "./components/admin/product/ProductDetails";
+import ProductDetailsByProductId from "./components/admin/product/ProductDetailsByProductId";
 import ProductCreateDetails from "./components/admin/product/ProductCreateDetails";
 import BillTimeLine from "./components/admin/sale-couter/TimeLine";
 import SaveVoucher from "./components/admin/voucher/SaveVoucher";
@@ -19,6 +19,7 @@ import { NotificationProvider } from "./components/element/notification/Notifica
 import AccountForm from "./components/admin/account/AccountForm";
 import CustomerAdmin from "./components/admin/account/CustomorAdmin";
 import DetailForm from "./components/admin/account/DetailForm";
+import ProductDetails from "./components/admin/product/ProductDetails";
 function App() {
   const [message, setMessage] = useState("");
 
@@ -53,7 +54,8 @@ function App() {
                     <Route path="order" element="order"></Route>
 
                     {/* Thu chi */}
-                    <Route
+
+                    {/* ví dụ path= san-pham/hien-thi ->  
                       path="income-and-expenses"
                       element="income-and-expenses"
                     ></Route>
@@ -62,10 +64,10 @@ function App() {
                       <Route index element={<ProductIndex />} />
                       <Route
                         path={"details/:productId"}
-                        element={<ProductDetails />}
+                        element={<ProductDetailsByProductId />}
                       />
                       <Route
-                        path={"create-details/"}
+                        path={"create-details"}
                         element={<ProductCreateDetails />}
                       />
                       <Route
@@ -144,9 +146,9 @@ function App() {
                     }
                   />
                 </Routes>
-              </div>
-              <div>
-                <Footer />
+                <div>
+                  <Footer />
+                </div>
               </div>
             </Col>
           </Row>

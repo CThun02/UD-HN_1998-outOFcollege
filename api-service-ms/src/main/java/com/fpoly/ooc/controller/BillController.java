@@ -41,6 +41,11 @@ public class BillController {
         return ResponseEntity.ok(timeLineService.getAllTimeLineByBillId(id));
     }
 
+    @GetMapping("/{id}/product")
+    public ResponseEntity<?> getTimelineProductByBillId(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(timeLineService.getTimelineProductByBillId(id));
+    }
+
     @PostMapping()
     public ResponseEntity<?> createBill(@RequestBody(required = false) BillRequest request) {
         return ResponseEntity.ok(billService.createBill(request));

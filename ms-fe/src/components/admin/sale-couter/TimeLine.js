@@ -1,7 +1,7 @@
 import { Button, Col, Divider, Row, Table } from 'antd';
 import { useEffect, useState } from 'react';
 import { Timeline, TimelineEvent } from '@mailtop/horizontal-timeline';
-import { FaBug, FaRegCheckCircle, FaRegFileAlt } from 'react-icons/fa';
+import { FaBug, FaRegCheckCircle, FaRegFileAlt, FaTimes, FaTruck } from 'react-icons/fa';
 import styles from './TimeLine.module.css'
 import ModalConfirm from './ModalConfirm';
 import SpanBorder from './SpanBorder';
@@ -38,8 +38,8 @@ const BillTimeLine = () => {
         },
         {
             title: 'Số tiền',
-            dataIndex: 'price',
-            key: 'price',
+            dataIndex: 'totalPrice',
+            key: 'totalPrice',
         },
         {
             title: 'Người xác nhận',
@@ -51,6 +51,7 @@ const BillTimeLine = () => {
     const [isModalDetail, setIsModalDetail] = useState(false);
     const [timelines, setTimelines] = useState([]);
     const [action, setAction] = useState(null)
+    const [timelinePoduct, setTimelinesPoduct] = useState([])
     const { billId } = useParams();
 
     // tạo mới timeline
@@ -96,18 +97,39 @@ const BillTimeLine = () => {
             .catch((error) => {
                 console.log(error)
             })
+        axios.get(`http://localhost:8080/api/admin/bill/${billId}/product`)
+            .then((response) => {
+                setTimelinesPoduct(response.data)
+            })
+            .catch((error) => {
+                console.log(error)
+            })
     }, [billId])
 
+    console.log('d', timelinePoduct?.imgDefault)
     const columnProduct = [
         {
-            title: 'STT',
-            key: 'index',
-            render: (_, record, index) => index + 1
-        },
-        {
             title: 'Sản phẩm',
-            dataIndex: 'type',
-            key: 'type',
+            key: 'product',
+            render: (_, record, index) => {
+                return (
+                    <div style={{ display: 'flex', alignItems: 'center', fontSize: '15px' }}>
+                        <div style={{ marginLeft: '5%' }}>
+                            <img src={record.imgDefault} alt={record.productName} />
+                        </div>
+                        <div style={{ marginLeft: '30%' }}>
+                            <h3>{record.productName}</h3>
+                            <p>Size: <b>{record.productSize}</b></p>
+                            <p>Màu sắc: {record.productColor}</p>
+                            <p>Chất liệu: <b>{record.productMaterial}</b></p>
+                            <p>Cổ áo: <b>{record.productCollar}</b></p>
+                            <p>Cúc: <b>{record.productButton}</b></p>
+                            <p>Tay áo: <b>{record.productSleeve}</b></p>
+                            <p>Đuôi áo: <b>{record.productShirtTail}</b></p>
+                        </div>
+                    </div>
+                )
+            },
         },
         {
             title: 'Số lượng',
@@ -116,8 +138,8 @@ const BillTimeLine = () => {
         },
         {
             title: 'Giá',
-            dataIndex: 'price',
-            key: 'price',
+            dataIndex: 'productPrice',
+            key: 'productPrice',
         },
     ]
 
@@ -129,11 +151,11 @@ const BillTimeLine = () => {
                         <Timeline minEvents={6} placeholder className={styles.timeLine}>
                             {timelines && timelines.map((data) => (
                                 <TimelineEvent
-                                    color={data.status === '0' ? '#9c2919' : '#00cc00'}
+                                    color={data.status === '0' ? '#FF0000' : '#00cc00'}
                                     icon={data.status === '1' ? (
                                         FaRegFileAlt
                                     ) : data.status === '0' ? (
-                                        FaBug
+                                        FaTimes
                                     ) : (
                                         FaRegCheckCircle
                                     )}
@@ -203,6 +225,7 @@ const BillTimeLine = () => {
                                 <span className={styles.span}>Trạng thái </span>
                                 <span style={{ fontSize: '16px', display: 'block' }}>Ngày nhận hàng dự kiến</span>
                             </Col>
+                            {console.log('con lợn này', timelines[0]?.billType)}
                             <Col span={12}>
                                 <div style={{ display: 'flex', alignItems: 'center', width: '10px', margin: '20px 0 20px 0' }}>
                                     <SpanBorder child={'HD1100'} color={'#1677ff'} />
@@ -211,7 +234,7 @@ const BillTimeLine = () => {
                                     <SpanBorder child={timelines[0]?.billType} color={'#1677ff'} />
                                 </div>
                                 <div style={{ display: 'flex', alignItems: 'center', width: '10px', marginBottom: '20px' }}>
-                                    <SpanBorder child={timelines[0]?.billStatus} color={'#00cc00'} />
+                                    <SpanBorder child={timelines[timelines.length - 1]?.status === '1' ? 'Đang chờ' : timelines[timelines.length - 1]?.status === '0' ? 'Đã hủy' : 'Thanh toán thành công'} color={timelines[timelines.length - 1]?.status === '0' ? '#FF0000' : '#00cc00'} />
                                 </div>
                                 <div style={{ display: 'flex', alignItems: 'center', width: '50px' }}>
                                     <SpanBorder child={moment(timelines[0]?.completionDate)
@@ -263,7 +286,7 @@ const BillTimeLine = () => {
                     </Col>
                 </Row>
                 <Divider className={styles.blackDivider} style={{ marginTop: '10px' }} />
-                <Table />
+                <Table columns={columnProduct} dataSource={timelinePoduct} pagination={false} />
                 <Row className={styles.timeLineEnd}>
                     <Col span={12}>
                         <span className={styles.span}>Tổng tiền hàng</span>
@@ -272,10 +295,10 @@ const BillTimeLine = () => {
                         <span className={styles.span}>Tổng cộng</span>
                     </Col>
                     <Col span={12}  >
-                        <span className={styles.span}>3.000.000đ</span>
+                        <span className={styles.span}>{timelines[0]?.totalPrice}</span>
                         <span className={styles.span}>0đ</span>
                         <span className={styles.span}>0d</span>
-                        <span style={{ fontSize: '16px', display: 'block' }}>3.000.000đ</span>
+                        <span style={{ fontSize: '16px', display: 'block', color: '#FF0000' }}>{timelines[0]?.totalPrice}đ</span>
                     </Col>
                 </Row>
             </section>

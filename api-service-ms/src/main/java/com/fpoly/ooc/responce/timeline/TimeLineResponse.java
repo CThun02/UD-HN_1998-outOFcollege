@@ -32,7 +32,7 @@ public class TimeLineResponse {
 
     private LocalDateTime completionDate;
 
-    private BigDecimal price;
+    private BigDecimal totalPrice;
 
     private String fullName;
 

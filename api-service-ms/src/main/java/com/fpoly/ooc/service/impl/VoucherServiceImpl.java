@@ -3,7 +3,7 @@ package com.fpoly.ooc.service.impl;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
 import com.fpoly.ooc.dto.VoucherAccountConditionDTO;
-import com.fpoly.ooc.dto.VoucherConditionDTO;
+import com.fpoly.ooc.dto.VoucherAndPromotionConditionDTO;
 import com.fpoly.ooc.entity.Voucher;
 import com.fpoly.ooc.entity.VoucherAccount;
 import com.fpoly.ooc.exception.NotFoundException;
@@ -14,13 +14,12 @@ import com.fpoly.ooc.responce.voucher.VoucherResponse;
 import com.fpoly.ooc.service.interfaces.EmailService;
 import com.fpoly.ooc.service.interfaces.VoucherAccountService;
 import com.fpoly.ooc.service.interfaces.VoucherService;
+import com.fpoly.ooc.util.PageUltil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,11 +27,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @Slf4j
@@ -51,15 +48,15 @@ public class VoucherServiceImpl implements VoucherService {
     private VoucherAccountService voucherAccountService;
 
     @Override
-    public Page<VoucherResponse> findAllVoucher(Pageable pageable, VoucherConditionDTO voucherConditionDTO) {
+    public Page<VoucherResponse> findAllVoucher(Pageable pageable, VoucherAndPromotionConditionDTO voucherConditionDTO) {
 
         String status = Objects.isNull(voucherConditionDTO.getStatus()) ?
                 null : voucherConditionDTO.getStatus().equalsIgnoreCase("ALL") ?
                 null : voucherConditionDTO.getStatus();
 
-        return page(
+        return (Page<VoucherResponse>) PageUltil.page(
                 voucherRepository.findAllVoucher(
-                        Objects.isNull(voucherConditionDTO.getVoucherCodeOrName()) ? null : "%" + voucherConditionDTO.getVoucherCodeOrName() + "%",
+                        Objects.isNull(voucherConditionDTO.getCodeOrName()) ? null : "%" + voucherConditionDTO.getCodeOrName() + "%",
                         Objects.isNull(voucherConditionDTO.getStartDate()) ? null : voucherConditionDTO.getStartDate(),
                         Objects.isNull(voucherConditionDTO.getEndDate()) ? null : voucherConditionDTO.getEndDate(),
                         status
@@ -293,24 +290,6 @@ public class VoucherServiceImpl implements VoucherService {
 
     private String generatorCode() {
         return RandomStringUtils.random(15, true, true).toUpperCase();
-    }
-
-    private Page<VoucherResponse> page(List<VoucherResponse> inputList, Pageable pageable) {
-
-        int pageNo = pageable.getPageNumber();
-        int pageSize = pageable.getPageSize();
-        int startItem = pageNo * pageSize;
-
-        List<VoucherResponse> outputList;
-
-        if (inputList.size() < startItem) {
-            outputList = Collections.emptyList();
-        } else {
-            int toIndex = Math.min(startItem + pageSize, inputList.size());
-            outputList = inputList.subList(startItem, toIndex);
-        }
-
-        return new PageImpl<>(outputList, PageRequest.of(pageNo, pageSize), inputList.size());
     }
 
     private Double convertBigDecimal(BigDecimal bigDecimal) {

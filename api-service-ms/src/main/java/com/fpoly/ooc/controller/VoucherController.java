@@ -1,6 +1,6 @@
 package com.fpoly.ooc.controller;
 
-import com.fpoly.ooc.dto.VoucherConditionDTO;
+import com.fpoly.ooc.dto.VoucherAndPromotionConditionDTO;
 import com.fpoly.ooc.request.voucher.VoucherRequest;
 import com.fpoly.ooc.service.interfaces.VoucherService;
 import jakarta.validation.Valid;
@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -30,7 +29,7 @@ public class VoucherController {
     public ResponseEntity<?> findAllVoucher(
             @RequestParam(value = "pageNo",defaultValue = "0") int pageNo,
             @RequestParam(value = "pageSize",defaultValue = "5  ") int pageSize,
-            @RequestBody VoucherConditionDTO voucherConditionDTO
+            @RequestBody VoucherAndPromotionConditionDTO voucherConditionDTO
             ) {
         return ResponseEntity.ok()
                 .body(voucherService.findAllVoucher(PageRequest.of(pageNo, pageSize), voucherConditionDTO));

@@ -7,6 +7,8 @@ export function isFormInputEmpty(object) {
         return true;
       }
     } else if (object[key] === null || object[key] === undefined) {
+      return true;
+    } else {
       return false;
     }
   }

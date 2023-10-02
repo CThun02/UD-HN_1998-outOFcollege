@@ -1,5 +1,6 @@
 import {
   EditOutlined,
+  EyeFilled,
   PlusOutlined,
   SearchOutlined,
   TableOutlined,
@@ -121,7 +122,7 @@ const ProductIndex = () => {
         <>
           <Link to={`/admin/product/details/${id}`}>
             <Button className={styles.product__button}>
-              <EditOutlined />
+              <EyeFilled />
             </Button>
           </Link>
         </>

@@ -3,6 +3,7 @@ import {
   SearchOutlined,
   EyeFilled,
   EyeOutlined,
+  SelectOutlined,
 } from "@ant-design/icons";
 import { Button, Col, message, Row, Select, Table } from "antd";
 import Input from "antd/es/input/Input";
@@ -45,7 +46,7 @@ const ProductDetails = (props) => {
     {
       key: "productCode",
       dataIndex: "productCode",
-      title: "Mã Sản phẩm",
+      title: "Mã",
       render: (text, record, index) => {
         return record.product.productCode;
       },
@@ -53,7 +54,8 @@ const ProductDetails = (props) => {
     {
       key: "productName",
       dataIndex: "productName",
-      title: "Tên sản phẩm",
+      title: "Sản phẩm",
+      width: 110,
       render: (text, record, index) => {
         return record.product.productName;
       },
@@ -70,6 +72,7 @@ const ProductDetails = (props) => {
       key: "material",
       dataIndex: "material",
       title: "Chất liệu",
+      with: 110,
       render: (text, record, index) => {
         return record.material.materialName;
       },
@@ -112,18 +115,47 @@ const ProductDetails = (props) => {
       title: "Màu sắc",
       render: (text, record, index) => {
         return (
-          <div className={styles.optionColor}>
+          <div
+            className={styles.optionColor}
+            style={{ justifyContent: "center" }}
+          >
             <span style={{ backgroundColor: record.color.colorCode }}></span>
-            {record.color.colorName}
           </div>
         );
+      },
+    },
+    {
+      key: "price",
+      dataIndex: "price",
+      title: "Giá",
+      render: (text, record, index) => {
+        return record.price;
+      },
+    },
+    {
+      key: "quntity",
+      dataIndex: "quntity",
+      title: "Số lượng",
+      width: 110,
+      render: (text, record, index) => {
+        return record.quantity;
       },
     },
     {
       key: "action",
       title: "Thao tác",
       dataIndex: "id",
-      render: (text, record, index) => <>{props.action || <EyeFilled />}</>,
+      fixed: "right",
+      render: (text, record, index) => (
+        <>
+          <Button
+            icon={<SelectOutlined />}
+            onClick={() => {
+              props.action(record);
+            }}
+          ></Button>
+        </>
+      ),
     },
   ];
   //functions
@@ -142,22 +174,22 @@ const ProductDetails = (props) => {
     axios
       .get(
         api +
-        "product/filterProductDetailByIdCom?productId=" +
-        productId +
-        "&buttonId=" +
-        buttonId +
-        "&materialId=" +
-        materialId +
-        "&shirtTailId=" +
-        shirtTailId +
-        "&sleeveId=" +
-        sleeveId +
-        "&collarId=" +
-        collarId +
-        "&colorId=" +
-        colorId +
-        "&sizeId=" +
-        sizeId
+          "product/filterProductDetailByIdCom?productId=" +
+          productId +
+          "&buttonId=" +
+          buttonId +
+          "&materialId=" +
+          materialId +
+          "&shirtTailId=" +
+          shirtTailId +
+          "&sleeveId=" +
+          sleeveId +
+          "&collarId=" +
+          collarId +
+          "&colorId=" +
+          colorId +
+          "&sizeId=" +
+          sizeId
       )
       .then((response) => {
         setProductDetails(response.data);
@@ -621,7 +653,7 @@ const ProductDetails = (props) => {
           <Table
             columns={columns}
             dataSource={productDetails}
-            scroll={{ y: 200 }}
+            scroll={{ y: 400, x: 1300 }}
             loading={loading}
           />
         </div>

@@ -154,9 +154,9 @@ public class ProductController {
                     .size(productDetailResponse.getSize())
                     .color(productDetailResponse.getColor())
                     .shirtTail(productDetailResponse.getShirtTail())
-                    .price(productDetailResponse.getPrice())
+                    .price(request.getPrice())
                     .descriptionDetail(request.getDescriptionDetail())
-                    .quantity(productDetailResponse.getQuantity() + request.getQuantity())
+                    .quantity(request.getQuantity())
                     .build();
             productDetail.setStatus(Const.STATUS_ACTIVE);
             productDetail = productDetailService.update(productDetail);

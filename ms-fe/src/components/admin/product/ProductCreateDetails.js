@@ -13,18 +13,9 @@ import ProductCreate from "./ProductCreate";
 import styles from "./ProductCreateDetails.module.css";
 import ProductDetailsTable from "./ProductDetailsTable";
 
-var buttonsCreate = [];
-var collarsCreate = [];
-var materialsCreate = [];
-var sleevesCreate = [];
-var shirtTailsCreate = [];
-var colorsCreate = [];
-var sizesCreate = [];
 const ProductCreateDetails = (props) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const searchParams = new URLSearchParams(location.search);
-  const currentHref = window.location.href;
   const api = "http://localhost:8080/api/admin/";
   const [messageApi, contextHolder] = message.useMessage();
   const [sizes, setSizes] = useState(null);
@@ -34,11 +25,15 @@ const ProductCreateDetails = (props) => {
   const [materials, setMaterials] = useState(null);
   const [sleeves, setSleeves] = useState(null);
   const [shirtTails, setshirtTails] = useState(null);
+  const [sizesCreate, setSizesCreate] = useState([]);
+  const [colorsCreate, setColorsCreate] = useState([]);
+  const [buttonsCreate, setButtonsCreate] = useState([]);
+  const [collarsCreate, setCollarsCreate] = useState([]);
+  const [materialsCreate, setMaterialsCreate] = useState([]);
+  const [sleevesCreate, setSleevesCreate] = useState([]);
+  const [shirtTailsCreate, setshirtTailsCreate] = useState([]);
   const [productList, setProductList] = useState(null);
   const [render, setRender] = useState(1);
-  const [url, setUrl] = useState(
-    "https://vapa.vn/wp-content/uploads/2022/12/anh-3d-thien-nhien.jpeg"
-  );
   const [product, setProduct] = useState({
     productId: null,
     productName: "",
@@ -47,6 +42,7 @@ const ProductCreateDetails = (props) => {
     form: {},
     category: {},
     description: "",
+    imgDefault: "",
   });
   const [productDetail, setProductDetail] = useState({
     productId: null,
@@ -60,16 +56,8 @@ const ProductCreateDetails = (props) => {
     price: 200000,
     quantity: 1,
   });
-  const productDetailUpdate = getProductUpdate();
 
   //fucntion
-  function getProductUpdate() {
-    if (currentHref.includes("update-details")) {
-      const productDetailParam = searchParams.get("productDetail");
-      return JSON.parse(productDetailParam);
-    }
-  }
-
   function handleSetProductDetail(field, value) {
     setProductDetail((prevProduct) => ({
       ...prevProduct,
@@ -142,55 +130,6 @@ const ProductCreateDetails = (props) => {
       .catch((error) => {
         console.log(error);
       });
-    if (currentHref.includes("create-details")) {
-    } else {
-      if (productDetailUpdate !== null && productDetailUpdate !== undefined) {
-        axios
-          .get(
-            api +
-              "product/getColorsByIdComPdAndIdPro?productId=" +
-              productDetailUpdate.product.id +
-              "&buttonId=" +
-              productDetailUpdate.button.id +
-              "&materialId=" +
-              productDetailUpdate.material.id +
-              "&shirtTailId=" +
-              productDetailUpdate.shirtTail.id +
-              "&sleeveId=" +
-              productDetailUpdate.sleeve.id +
-              "&collarId=" +
-              productDetailUpdate.collar.id
-          )
-          .then((res) => {
-            axios
-              .get(
-                api +
-                  "product/getSizesByIdComPdAndIdPro?productId=" +
-                  productDetailUpdate.product.id +
-                  "&buttonId=" +
-                  productDetailUpdate.button.id +
-                  "&materialId=" +
-                  productDetailUpdate.material.id +
-                  "&shirtTailId=" +
-                  productDetailUpdate.shirtTail.id +
-                  "&sleeveId=" +
-                  productDetailUpdate.sleeve.id +
-                  "&collarId=" +
-                  productDetailUpdate.collar.id +
-                  "&colorId=" +
-                  res.data[0].id
-              )
-              .then((response) => {})
-              .catch((err) => {
-                console.log(err);
-              });
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-        setProduct(productDetailUpdate.product);
-      }
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [render]);
   return (
@@ -207,7 +146,14 @@ const ProductCreateDetails = (props) => {
             <Row>
               <Col span={8}>
                 <div className={styles.product__FormImg}>
-                  <img src={url} alt="Avatar" />
+                  <img
+                    src={
+                      product.imgDefault ||
+                      "https://lh3.googleusercontent.com/EbXw8rOdYxOGdXEFjgNP8lh-YAuUxwhOAe2jhrz3sgqvPeMac6a6tHvT35V6YMbyNvkZL4R_a2hcYBrtfUhLvhf-N2X3OB9cvH4uMw=w1064-v0"
+                    }
+                    height={240}
+                    alt="productimage"
+                  />
                 </div>
               </Col>
               <Col span={16}>
@@ -321,7 +267,7 @@ const ProductCreateDetails = (props) => {
                     mode="multiple"
                     className={styles.product__createDetailsSelect}
                     onChange={(event, record) => {
-                      buttonsCreate = record;
+                      setButtonsCreate(record);
                       setRender(event);
                     }}
                     status={productDetail.buttonId === "" ? "error" : ""}
@@ -350,7 +296,7 @@ const ProductCreateDetails = (props) => {
                     mode="multiple"
                     className={styles.product__createDetailsSelect}
                     onChange={(event, record) => {
-                      materialsCreate = record;
+                      setMaterialsCreate(record);
                       setRender(event);
                     }}
                     status={productDetail.materialId === "" ? "error" : ""}
@@ -379,7 +325,7 @@ const ProductCreateDetails = (props) => {
                     mode="multiple"
                     className={styles.product__createDetailsSelect}
                     onChange={(event, record) => {
-                      collarsCreate = record;
+                      setCollarsCreate(record);
                       setRender(event);
                     }}
                     status={productDetail.collarId === "" ? "error" : ""}
@@ -408,7 +354,7 @@ const ProductCreateDetails = (props) => {
                     mode="multiple"
                     className={styles.product__createDetailsSelect}
                     onChange={(event, record) => {
-                      sleevesCreate = record;
+                      setSleevesCreate(record);
                       setRender(event);
                     }}
                     status={productDetail.sleeveId === "" ? "error" : ""}
@@ -437,7 +383,7 @@ const ProductCreateDetails = (props) => {
                     mode="multiple"
                     className={styles.product__createDetailsSelect}
                     onChange={(event, record) => {
-                      shirtTailsCreate = record;
+                      setshirtTailsCreate(record);
                       setRender(event);
                     }}
                     status={productDetail.shirtTailId === "" ? "error" : ""}
@@ -475,7 +421,7 @@ const ProductCreateDetails = (props) => {
                         .localeCompare((optionB?.label ?? "").toLowerCase())
                     }
                     onChange={(event, record) => {
-                      sizesCreate = record;
+                      setSizesCreate(record);
                       setRender(event);
                     }}
                     status={productDetail.sizeId === "" ? "error" : ""}
@@ -513,7 +459,7 @@ const ProductCreateDetails = (props) => {
                         .localeCompare((optionB?.label ?? "").toLowerCase())
                     }
                     onChange={(event, record) => {
-                      colorsCreate = record;
+                      setColorsCreate(record);
                       setRender(event);
                     }}
                     status={productDetail.colorId === "" ? "error" : ""}

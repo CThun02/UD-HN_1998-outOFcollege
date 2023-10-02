@@ -118,16 +118,20 @@ const ProductDetails = (props) => {
       },
     },
     {
-      key: "action",
-      title: "Thao tác",
-      dataIndex: "id",
-      render: (text, record, index) => (
-        <>
-          <Button>
-            <EditOutlined />
-          </Button>
-        </>
-      ),
+      key: "quantity",
+      dataIndex: "quantity",
+      title: "Số lượng",
+      render: (text, record, index) => {
+        return record.quantity;
+      },
+    },
+    {
+      key: "price",
+      dataIndex: "price",
+      title: "Giá",
+      render: (text, record, index) => {
+        return record.price;
+      },
     },
   ];
   //functions
@@ -177,8 +181,16 @@ const ProductDetails = (props) => {
     axios
       .get(api + "product/filterProductDetailByIdCom?productId=" + productId)
       .then((response) => {
-        setProduct(response.data[0].product);
         setProductDetails(response.data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    axios
+      .get(api + "product/getProductEdit?productId=" + productId)
+      .then((response) => {
+        setProduct(response.data);
         setLoading(false);
       })
       .catch((error) => {

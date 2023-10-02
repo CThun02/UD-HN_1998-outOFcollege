@@ -1,97 +1,63 @@
-import React, { useEffect, useState } from 'react';
-import { Modal, Input, Select, Button, Table } from 'antd';
-import styles from './ModalProduct.module.css';
-import axios from 'axios';
-import ProductDetails from '../product/ProductDetails';
+import React, { useEffect, useState } from "react";
+import { Modal, Input, Select, Button, Table } from "antd";
+import styles from "./ModalProduct.module.css";
+import axios from "axios";
+import ProductDetails from "../product/ProductDetails";
 
 const { Option } = Select;
 
-const ModalProduct = ({ visible, onCancel }) => {
-    const [searchInput, setSearchInput] = useState('');
-    const [data, setData] = useState([]);
+const ModalProduct = ({ visible, onCancel, cartId, render }) => {
+  const [searchInput, setSearchInput] = useState("");
+  const [data, setData] = useState([]);
 
+  function action(record) {
+    var cart = JSON.parse(localStorage.getItem(cartId));
+    var productDetails = cart.productDetails;
+    var productDetail = record;
+    if (productDetails.length > 0) {
+      let checkExist = 0;
+      for (let i = 0; i < productDetails.length; i++) {
+        if (productDetails[i].productDetail.id === productDetail.id) {
+          productDetails[i].quantity++;
+          checkExist++;
+        }
+      }
+      if (checkExist === 0) {
+        productDetails.push({ productDetail: productDetail, quantity: 1 });
+      }
+    } else {
+      productDetails.push({ productDetail: productDetail, quantity: 1 });
+    }
+    cart.productDetails = productDetails;
+    localStorage.setItem(cartId, JSON.stringify(cart));
+    render(productDetails);
+    onCancel();
+  }
+  useEffect(() => {
+    axios
+      .get("http://localhost:8080/api/admin/bill/product")
+      .then((response) => {
+        setData(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, [cartId]);
 
-
-    const columns = [
-        {
-            title: 'STT',
-            // dataIndex: 'STT',
-            key: 'STT',
-            render: (_, record) => {
-                return data.indexOf(record) + 1;
-            }
-        },
-        {
-            title: 'Ảnh',
-            dataIndex: 'imgDefault',
-            key: 'imgDefault',
-            render: (_, record) => {
-                return <img src={record.imgDefault} alt='bug' key={record.imgDefault} />
-            }
-        },
-        {
-            title: 'Tên sản phẩm',
-            dataIndex: 'productName',
-            key: 'productName',
-        },
-        {
-            title: 'Thương hiệu',
-            dataIndex: 'brandName',
-            key: 'brandName',
-        },
-        {
-            title: 'Thể loại',
-            dataIndex: 'categoryName',
-            key: 'categoryName',
-        },
-        {
-            title: 'Mẫu',
-            key: 'patternName',
-            dataIndex: 'patternName',
-
-        },
-        {
-            title: 'Dáng áo',
-            key: 'formName',
-            dataIndex: 'formName',
-
-        },
-        {
-            title: 'Action',
-            key: 'action',
-            render: (_, record) => (
-                <Button
-                    type="primary"
-                    style={{ backgroundColor: "white", color: 'blue' }}
-                    key={record.productId}>
-                    Chọn
-                </Button>
-            ),
-        },
-    ];
-
-    useEffect(() => {
-        axios.get("http://localhost:8080/api/admin/bill/product")
-            .then((response) => {
-                setData(response.data);
-            }).catch((error) => {
-                console.log(error)
-            })
-    }, [])
-
-    return (
-        <>
-            <Modal
-                title="Tìm kiếm sản phẩm"
-                open={visible}
-                onCancel={onCancel}
-                className={styles.modalSize}
-                footer={null}
-            >
-                <ProductDetails />
-            </Modal>
-        </>
-    );
+  return (
+    <>
+      <Modal
+        title="Tìm kiếm sản phẩm"
+        open={visible}
+        onCancel={onCancel}
+        className={styles.modalSize}
+        footer={null}
+        width={2000}
+      >
+        <ProductDetails action={action} />
+      </Modal>
+    </>
+  );
 };
 
 export default ModalProduct;

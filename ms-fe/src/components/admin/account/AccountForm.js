@@ -16,9 +16,12 @@ import {
   Upload,
 } from "antd";
 import { UserOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
+
 // Nhập ảnh mã QR
 const { Option } = Select;
 const MyForm = (props) => {
+  const navigate = useNavigate();
   const [imageFile, setImageFile] = useState(null);
   const [imageUrl, setImageUrl] = useState(null);
   const [provinces, setProvinces] = useState([]);
@@ -99,10 +102,11 @@ const MyForm = (props) => {
     try {
       // Gửi yêu cầu POST đến API
       const response = await axios.post(
-        "http://localhost:8080/account/api/create",
+        "http://localhost:8080/api/admin/account/create",
         values
       );
       console.log(response.data); // Đây là phản hồi từ API
+      navigate("/admin/employee");
     } catch (error) {
       console.error(error);
     }

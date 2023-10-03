@@ -1,4 +1,14 @@
-import { Button, Col, Drawer, Pagination, Row, Space, Table, Tag } from "antd";
+import {
+  Button,
+  Col,
+  Drawer,
+  Pagination,
+  Row,
+  Space,
+  Spin,
+  Table,
+  Tag,
+} from "antd";
 import FilterpromotionAndPromotion from "../../element/filter/FilterVoucherAndPromotion";
 
 import styles from "./Promotion.module.css";
@@ -8,8 +18,10 @@ import {
   PlusOutlined,
   UnorderedListOutlined,
 } from "@ant-design/icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
+import moment from "moment";
 
 const columns = [
   {
@@ -29,9 +41,9 @@ const columns = [
     key: "promotionName",
   },
   {
-    title: "Số lượng",
-    dataIndex: "limitQuantity",
-    key: "limitQuantity",
+    title: "Số lượng sản phẩm",
+    dataIndex: "productQuantity",
+    key: "productQuantity",
   },
   {
     title: "Giá trị",
@@ -42,31 +54,24 @@ const columns = [
     title: "Thời gian",
     dataIndex: "startAndEndDate",
     key: "startAndEndDate",
-  },
-  {
-    title: "Trạng thái",
-    dataIndex: "status",
-    key: "status",
-    render: (_, { status }) => (
-      <>
-        {status.map((sta) => {
-          let color =
-            sta === "Đang diễn ra"
-              ? "geekblue"
-              : sta === "Sắp diễn ra"
-              ? "green"
-              : "red";
-          if (sta === "loser") {
-            color = "volcano";
-          }
-          return (
-            <Tag color={color} key={sta}>
-              {sta.toUpperCase()}
-            </Tag>
-          );
-        })}
-      </>
-    ),
+    render: (object) => {
+      let color =
+        object[1] === "Đang diễn ra"
+          ? "geekblue"
+          : object[1] === "Sắp diễn ra"
+          ? "green"
+          : "Đã kết thúc"
+          ? "red"
+          : null;
+      return (
+        <Space direction="vertical">
+          <div style={{ width: "auto", display: "flex" }}>
+            <Tag color={color}>{object[1]}</Tag>
+          </div>
+          {object[0]}
+        </Space>
+      );
+    },
   },
   {
     title: "Thao tác",
@@ -86,52 +91,93 @@ const columns = [
   },
 ];
 
-const data = [
-  {
-    key: "1",
-    stt: "1",
-    promotionCode: "promotion_1",
-    promotionName: "Black friday",
-    limitQuantity: 20,
-    promotionValue: 50000,
-    startAndEndDate: "2012/20/20 - 2020/20/20",
-    status: ["Đang diễn ra"],
-  },
-  {
-    key: "2",
-    stt: "2",
-    promotionCode: "promotion_2",
-    promotionName: "Black friday",
-    limitQuantity: 20,
-    promotionValue: 50000,
-    startAndEndDate: "2012/20/20 - 2020/20/20",
-    status: ["Sắp diễn ra"],
-  },
-  {
-    key: "3",
-    stt: "3",
-    promotionCode: "promotion_3",
-    promotionName: "Black friday",
-    limitQuantity: 20,
-    promotionValue: 50000,
-    startAndEndDate: "2012/20/20 - 2020/20/20",
-    status: ["Đã kết thúc"],
-  },
-];
+const baseUrl = "http://localhost:8080/api/admin/promotion-product/";
 
 function Promotion() {
-  const [open, setOpen] = useState(false);
+  const [promotions, setPromotions] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const showDrawer = () => {
-    setOpen(true);
-  };
+  //paging
+  const [totalElements, setTotalElements] = useState(1);
+  const [pageNo, setPageNo] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
 
-  const onClose = () => {
-    setOpen(false);
-  };
+  //filter
+  const [codeOrName, setCodeOrName] = useState(null);
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+  const [status, setStatus] = useState(null);
+
+  function handlePageSize(current, size) {
+    setPageNo(current);
+    setPageSize(size);
+  }
+
+  useEffect(
+    function () {
+      setIsLoading(true);
+      async function getPromotions() {
+        try {
+          const filter = {
+            codeOrName: codeOrName,
+            startDate:
+              startDate !== null
+                ? moment(startDate?.$d, "DD-MM-YYYY").format(
+                    "YYYY-MM-DDTHH:mm:ss.SSS"
+                  )
+                : "",
+            endDate:
+              endDate !== null
+                ? moment(endDate?.$d, "DD-MM-YYYY").format(
+                    "YYYY-MM-DDTHH:mm:ss.SSS"
+                  )
+                : "",
+            status: status,
+          };
+
+          const res = await axios.post(
+            `${
+              pageNo !== 1 || pageSize !== 5
+                ? baseUrl +
+                  "?pageNo=" +
+                  (pageNo - 1) +
+                  "&" +
+                  "pageSize=" +
+                  pageSize
+                : baseUrl
+            }`,
+            filter
+          );
+
+          const data = res.data;
+          setPromotions(data.content);
+          setTotalElements(data.totalElements);
+
+          setIsLoading(false);
+        } catch (err) {
+          setIsLoading(false);
+          setPromotions([]);
+          console.log("Error: ", err);
+        }
+      }
+
+      getPromotions();
+    },
+    [codeOrName, startDate, endDate, status, pageNo, pageSize]
+  );
+
   return (
     <div className={styles.promotion}>
-      <FilterpromotionAndPromotion />
+      <FilterpromotionAndPromotion
+        searchNameOrCode={codeOrName}
+        setSearchNameOrCode={setCodeOrName}
+        startDate={startDate}
+        setStartDate={setStartDate}
+        endDate={endDate}
+        setEndDate={setEndDate}
+        status={status}
+        setStatus={setStatus}
+      />
 
       <div className={styles.content}>
         <Space style={{ width: "100%" }} direction="vertical" size={16}>
@@ -154,13 +200,49 @@ function Promotion() {
             </Col>
           </Row>
 
-          <Table
-            columns={columns}
-            dataSource={data}
-            className={styles.table}
-            pagination={false}
+          <Spin
+            tip="Loading..."
+            spinning={isLoading}
+            size="large"
+            style={{ width: "100%" }}
+          >
+            <Table
+              columns={columns}
+              dataSource={promotions.map((promotion, index) => ({
+                key: promotion.promotionProductId,
+                stt: index,
+                promotionCode: promotion.promotionCode,
+                promotionName: promotion.promotionName,
+                productQuantity: promotion.productQuantity,
+                promotionValue: `${promotion.promotionValue} ${
+                  promotion.promotionMethod === "vnd" ? "VND" : "%"
+                }`,
+                startAndEndDate: [
+                  `${moment(promotion.startDate).format(
+                    "DD/MM/YYYY"
+                  )} - ${moment(promotion.endDate).format("DD/MM/YYYY")}`,
+                  promotion.status === "ACTIVE"
+                    ? "Đang diễn ra"
+                    : promotion.status === "INACTIVE"
+                    ? "Đã kết thúc"
+                    : promotion.status === "UPCOMING"
+                    ? "Sắp diễn ra"
+                    : null,
+                ],
+              }))}
+              className={styles.table}
+              pagination={false}
+            />
+          </Spin>
+          <Pagination
+            defaultCurrent={pageNo}
+            total={totalElements}
+            showSizeChanger={true}
+            pageSize={pageSize}
+            pageSizeOptions={["5", "10", "20", "50", "100"]}
+            onShowSizeChange={handlePageSize}
+            onChange={(page) => setPageNo(page)}
           />
-          <Pagination defaultCurrent={1} total={500} />
         </Space>
       </div>
     </div>

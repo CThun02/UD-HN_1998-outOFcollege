@@ -19,6 +19,16 @@
   padding: 20px;
 }
 
+.optionColor {
+  display: inline-block;
+}
+
+.optionColor span {
+  padding: 2px 12px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
 .header {
   display: flex;
   flex-direction: row;

@@ -1,7 +1,7 @@
 package com.fpoly.ooc.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fpoly.ooc.responce.account.AccountVoucher;
-import com.fpoly.ooc.responce.voucher.VoucherResponse;
 import jakarta.persistence.Column;
 import jakarta.persistence.ColumnResult;
 import jakarta.persistence.ConstructorResult;
@@ -99,10 +99,12 @@ public class Account extends BaseEntity{
     @Column(name = "password")
     private String password;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id", referencedColumnName = "id")
     private Role role;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "accountAddress")
     private List<AddressDetail> addAdress;
 

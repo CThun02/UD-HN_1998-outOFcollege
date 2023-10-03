@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 
 public interface ProductTableResponse {
     Long getId();
+    String getProductCode();
     String getProductName();
     String getImgDefault();
     Brand getBrand();

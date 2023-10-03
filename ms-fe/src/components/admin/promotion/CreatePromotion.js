@@ -207,7 +207,7 @@ function CreatePromotion() {
 
                   <Row>
                     <Space>
-                      <Link to="promotion">
+                      <Link to="/admin/promotion">
                         <Button>Hủy</Button>
                       </Link>
                       <Button

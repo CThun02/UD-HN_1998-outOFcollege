@@ -61,7 +61,6 @@ public class ProductController {
                                                         @RequestParam Optional<Long> collarId,
                                                         @RequestParam Optional<Long> colorId,
                                                         @RequestParam Optional<Long> sizeId) {
-        System.out.println(productId);
         return ResponseEntity.ok(productDetailService.filterProductDetailsByIdCom
                 (productId.orElse(null), buttonId.orElse(null), materialId.orElse(null), shirtTailId.orElse(null),
                         sleeveId.orElse(null), collarId.orElse(null), colorId.orElse(null), sizeId.orElse(null)));
@@ -155,9 +154,9 @@ public class ProductController {
                     .size(productDetailResponse.getSize())
                     .color(productDetailResponse.getColor())
                     .shirtTail(productDetailResponse.getShirtTail())
-                    .price(productDetailResponse.getPrice())
+                    .price(request.getPrice())
                     .descriptionDetail(request.getDescriptionDetail())
-                    .quantity(productDetailResponse.getQuantity() + request.getQuantity())
+                    .quantity(request.getQuantity())
                     .build();
             productDetail.setStatus(Const.STATUS_ACTIVE);
             productDetail = productDetailService.update(productDetail);

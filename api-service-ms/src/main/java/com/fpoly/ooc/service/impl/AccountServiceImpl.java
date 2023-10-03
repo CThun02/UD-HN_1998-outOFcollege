@@ -2,6 +2,7 @@ package com.fpoly.ooc.service.impl;
 
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
+import com.fpoly.ooc.dto.CustomerConditionDTO;
 import com.fpoly.ooc.entity.Account;
 import com.fpoly.ooc.entity.Address;
 import com.fpoly.ooc.entity.AddressDetail;
@@ -13,15 +14,23 @@ import com.fpoly.ooc.repository.AddressRepository;
 import com.fpoly.ooc.request.account.AccountRequest;
 import com.fpoly.ooc.responce.account.AccountDetailResponce;
 import com.fpoly.ooc.responce.account.AccountResponce;
+import com.fpoly.ooc.responce.account.AccountVoucher;
+import com.fpoly.ooc.responce.voucher.VoucherResponse;
 import com.fpoly.ooc.service.interfaces.AccountService;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
+@Slf4j
 public class AccountServiceImpl implements AccountService {
 
     @Autowired
@@ -139,5 +148,42 @@ public class AccountServiceImpl implements AccountService {
     public List<String> findAllEmailAccount() {
         return accountRepository.emailAccountList();
     }
+
+    @Override
+    public Page<AccountVoucher> findAccountVoucher(CustomerConditionDTO customerConditionDTO, Pageable pageable) {
+        List<AccountVoucher> accountVoucherList = accountRepository.customerAccountList(
+                StringUtils.isEmpty(customerConditionDTO.getSearchText())
+                        ? null : "%" + customerConditionDTO.getSearchText() + "%", customerConditionDTO.getGender());
+        accountVoucherList.forEach((e) -> log.info("Data: " + e));
+
+        return page(accountRepository.customerAccountList(
+                StringUtils.isEmpty(customerConditionDTO.getSearchText()) ? null : "%" + customerConditionDTO.getSearchText() + "%",
+                customerConditionDTO.getGender()
+        ), pageable);
+    }
+
+    @Override
+    public Account findByUsername(String username) {
+        return accountRepository.findById(username).orElseThrow(() ->
+                new NotFoundException(ErrorCodeConfig.getMessage(Const.USER_NOT_FOUND)));
+    }
+
+    private Page<AccountVoucher> page(List<AccountVoucher> inputList, Pageable pageable) {
+
+        int pageNo = pageable.getPageNumber();
+        int pageSize = pageable.getPageSize();
+        int startItem = pageNo * pageSize;
+
+        List<AccountVoucher> outputList;
+
+        if (inputList.size() < startItem) {
+            outputList = Collections.emptyList();
+        } else {
+            int toIndex = Math.min(startItem + pageSize, inputList.size());
+            outputList = inputList.subList(startItem, toIndex);
+        }
+
+        return new PageImpl<>(outputList, PageRequest.of(pageNo, pageSize), inputList.size());
+    }
 }
- 
+

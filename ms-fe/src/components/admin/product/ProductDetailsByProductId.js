@@ -2,18 +2,18 @@ import {
   FilePptOutlined,
   SearchOutlined,
   EyeFilled,
+  EditOutlined,
   EyeOutlined,
-  SelectOutlined,
 } from "@ant-design/icons";
 import { Button, Col, message, Row, Select, Table } from "antd";
 import Input from "antd/es/input/Input";
 import Modal from "antd/es/modal/Modal";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import styles from "./ProductDetails.module.css";
+import { useParams } from "react-router-dom";
+import styles from "./ProductDetailsByProductId.module.css";
 
-var productId = "",
-  buttonId = "",
+var buttonId = "",
   materialId = "",
   collarId = "",
   sleeveId = "",
@@ -23,7 +23,18 @@ var productId = "",
 const ProductDetails = (props) => {
   const api = "http://localhost:8080/api/admin/";
   const [messageApi, contextHolder] = message.useMessage();
-  const [products, setProducts] = useState(null);
+  const { productId } = useParams();
+  const [product, setProduct] = useState({
+    productCode: "",
+    productName: "",
+    brand: {},
+    pattern: {},
+    form: {},
+    category: {},
+    description: "",
+  });
+  var url =
+    "https://vapa.vn/wp-content/uploads/2022/12/anh-3d-thien-nhien.jpeg";
   const [sizes, setSizes] = useState(null);
   const [colors, setColors] = useState(null);
   const [buttons, setButtons] = useState(null);
@@ -33,6 +44,7 @@ const ProductDetails = (props) => {
   const [shirtTails, setshirtTails] = useState(null);
   const [productDetails, setProductDetails] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const columns = [
     {
       key: "stt",
@@ -41,23 +53,6 @@ const ProductDetails = (props) => {
       width: 70,
       render: (text, record, index) => {
         return index + 1;
-      },
-    },
-    {
-      key: "productCode",
-      dataIndex: "productCode",
-      title: "Mã",
-      render: (text, record, index) => {
-        return record.product.productCode;
-      },
-    },
-    {
-      key: "productName",
-      dataIndex: "productName",
-      title: "Sản phẩm",
-      width: 110,
-      render: (text, record, index) => {
-        return record.product.productName;
       },
     },
     {
@@ -72,7 +67,6 @@ const ProductDetails = (props) => {
       key: "material",
       dataIndex: "material",
       title: "Chất liệu",
-      with: 110,
       render: (text, record, index) => {
         return record.material.materialName;
       },
@@ -113,15 +107,22 @@ const ProductDetails = (props) => {
       key: "color",
       dataIndex: "color",
       title: "Màu sắc",
+      width: 150,
       render: (text, record, index) => {
         return (
-          <div
-            className={styles.optionColor}
-            style={{ justifyContent: "center" }}
-          >
+          <div className={styles.optionColor}>
             <span style={{ backgroundColor: record.color.colorCode }}></span>
+            {record.color.colorName}
           </div>
         );
+      },
+    },
+    {
+      key: "quantity",
+      dataIndex: "quantity",
+      title: "Số lượng",
+      render: (text, record, index) => {
+        return record.quantity;
       },
     },
     {
@@ -132,43 +133,8 @@ const ProductDetails = (props) => {
         return record.price;
       },
     },
-    {
-      key: "quntity",
-      dataIndex: "quntity",
-      title: "Số lượng",
-      width: 110,
-      render: (text, record, index) => {
-        return record.quantity;
-      },
-    },
-    {
-      key: "action",
-      title: "Thao tác",
-      dataIndex: "id",
-      fixed: "right",
-      render: (text, record, index) => (
-        <>
-          <Button
-            icon={<SelectOutlined />}
-            onClick={() => {
-              props.action(record);
-            }}
-          ></Button>
-        </>
-      ),
-    },
   ];
   //functions
-  function search(keywords) {
-    axios
-      .get(api + `product/searchProductDetail?keyWords=` + keywords.toString())
-      .then((response) => {
-        setProductDetails(response.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }
   function filter() {
     setLoading(true);
     axios
@@ -193,17 +159,38 @@ const ProductDetails = (props) => {
       )
       .then((response) => {
         setProductDetails(response.data);
+        setProduct(response.data[0].product);
         setLoading(false);
       })
       .catch((error) => {
         console.log(error);
       });
+    setTimeout(() => {
+      setLoading(false);
+    }, 1000);
   }
+
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
   useEffect(() => {
     axios
-      .get(api + "product")
+      .get(api + "product/filterProductDetailByIdCom?productId=" + productId)
       .then((response) => {
-        setProducts(response.data);
+        setProductDetails(response.data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    axios
+      .get(api + "product/getProductEdit?productId=" + productId)
+      .then((response) => {
+        setProduct(response.data);
         setLoading(false);
       })
       .catch((error) => {
@@ -265,65 +252,56 @@ const ProductDetails = (props) => {
       .catch((error) => {
         console.log(error);
       });
-    axios
-      .get(api + "product/getAllProductDetail")
-      .then((response) => {
-        setProductDetails(response.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
   }, []);
   return (
     <>
       {contextHolder}
       <div className={styles.productDetails}>
+        <h2>
+          <FilePptOutlined /> Sản phẩm
+        </h2>
+        <Button type="primary" onClick={showModal}>
+          <EyeOutlined />
+        </Button>
+        <Modal
+          title={product.productName + " - " + product.productCode}
+          open={isModalOpen}
+          onCancel={handleCancel}
+          footer={null}
+        >
+          <Row>
+            <Col span={6}>
+              <img src={url} width={"100%"} alt={"Not loading"} />
+            </Col>
+            <Col span={18}>
+              <Row style={{ marginLeft: "12px" }}>
+                <Col span={12} style={{ marginBottom: "16px" }}>
+                  <span style={{ fontWeight: 500 }}>Thương hiệu</span>
+                  <p>{product.brand.brandName}</p>
+                </Col>
+                <Col span={12} style={{ marginBottom: "16px" }}>
+                  <span style={{ fontWeight: 500 }}>Loại sản phẩm</span>
+                  <p>{product.category.categoryName}</p>
+                </Col>
+                <Col span={12} style={{ marginBottom: "16px" }}>
+                  <span style={{ fontWeight: 500 }}>Họa tiết</span>
+                  <p>{product.pattern.patternName}</p>
+                </Col>
+                <Col span={12} style={{ marginBottom: "16px" }}>
+                  <span style={{ fontWeight: 500 }}>form</span>
+                  <p>{product.form.formName}</p>
+                </Col>
+              </Row>
+            </Col>
+            <Col span={24} style={{ marginBottom: "20px" }}>
+              <span style={{ fontWeight: 500 }}>Mô tả</span>
+              <p>{product.description}</p>
+              <hr />
+            </Col>
+          </Row>
+        </Modal>
         <Col span={20} offset={2}>
           <Row className={styles.productDetails__filter}>
-            <Col span={6}>
-              <div style={{ margin: "0 8px 24px 8px" }}>
-                <span
-                  style={{
-                    fontWeight: "500",
-                    display: "block",
-                    textAlign: "center",
-                  }}
-                >
-                  Sản phẩm
-                </span>
-                <Select
-                  showSearch
-                  optionFilterProp="children"
-                  filterOption={(input, option) =>
-                    (option?.label ?? "").includes(input)
-                  }
-                  filterSort={(optionA, optionB) =>
-                    (optionA?.label ?? "")
-                      .toLowerCase()
-                      .localeCompare((optionB?.label ?? "").toLowerCase())
-                  }
-                  bordered={false}
-                  onChange={(event) => {
-                    productId = event;
-                    filter();
-                  }}
-                  defaultValue={""}
-                  style={{ borderBottom: "1px solid black", width: "100%" }}
-                >
-                  <Select.Option key={"ALL"} value={""}>
-                    Tất cả
-                  </Select.Option>
-                  {products &&
-                    products.map((item) => {
-                      return (
-                        <Select.Option key={item.id} value={item.id}>
-                          {item.productName}
-                        </Select.Option>
-                      );
-                    })}
-                </Select>
-              </div>
-            </Col>
             <Col span={6}>
               <div style={{ margin: "0 8px 24px 8px" }}>
                 <span
@@ -500,152 +478,146 @@ const ProductDetails = (props) => {
                 </Select>
               </div>
             </Col>
-            <Col span={6}>
-              <div style={{ margin: "0 8px 24px 8px" }}>
-                <span
-                  style={{
-                    fontWeight: "500",
-                    display: "block",
-                    textAlign: "center",
-                  }}
-                >
-                  Đuôi áo
-                </span>
-                <Select
-                  showSearch
-                  optionFilterProp="children"
-                  filterOption={(input, option) =>
-                    (option?.label ?? "").includes(input)
-                  }
-                  filterSort={(optionA, optionB) =>
-                    (optionA?.label ?? "")
-                      .toLowerCase()
-                      .localeCompare((optionB?.label ?? "").toLowerCase())
-                  }
-                  bordered={false}
-                  onChange={(event) => {
-                    shirtTailId = event;
-                    filter();
-                  }}
-                  defaultValue={""}
-                  style={{ borderBottom: "1px solid black", width: "100%" }}
-                >
-                  <Select.Option key={"ALL"} value={""}>
-                    Tất cả
-                  </Select.Option>
-                  {shirtTails &&
-                    shirtTails.map((item) => {
-                      return (
-                        <Select.Option key={item.id} value={item.id}>
-                          {item.shirtTailTypeName}
-                        </Select.Option>
-                      );
-                    })}
-                </Select>
-              </div>
-            </Col>
-            <Col span={6}>
-              <div style={{ margin: "0 8px 24px 8px" }}>
-                <span
-                  style={{
-                    fontWeight: "500",
-                    display: "block",
-                    textAlign: "center",
-                  }}
-                >
-                  Kích cỡ
-                </span>
-                <Select
-                  showSearch
-                  optionFilterProp="children"
-                  filterOption={(input, option) =>
-                    (option?.label ?? "").includes(input)
-                  }
-                  filterSort={(optionA, optionB) =>
-                    (optionA?.label ?? "")
-                      .toLowerCase()
-                      .localeCompare((optionB?.label ?? "").toLowerCase())
-                  }
-                  bordered={false}
-                  onChange={(event) => {
-                    sizeId = event;
-                    filter();
-                  }}
-                  defaultValue={""}
-                  style={{ borderBottom: "1px solid black", width: "100%" }}
-                >
-                  <Select.Option key={"ALL"} value={""}>
-                    Tất cả
-                  </Select.Option>
-                  {sizes &&
-                    sizes.map((item) => {
-                      return (
-                        <Select.Option key={item.id} value={item.id}>
-                          {item.sizeName}
-                        </Select.Option>
-                      );
-                    })}
-                </Select>
-              </div>
-            </Col>
-            <Col span={6}>
-              <div style={{ margin: "0 8px 24px 8px" }}>
-                <span
-                  style={{
-                    fontWeight: "500",
-                    display: "block",
-                    textAlign: "center",
-                  }}
-                >
-                  Màu sắc
-                </span>
-                <Select
-                  showSearch
-                  optionFilterProp="children"
-                  filterOption={(input, option) =>
-                    (option?.label ?? "").includes(input)
-                  }
-                  filterSort={(optionA, optionB) =>
-                    (optionA?.label ?? "")
-                      .toLowerCase()
-                      .localeCompare((optionB?.label ?? "").toLowerCase())
-                  }
-                  bordered={false}
-                  onChange={(event) => {
-                    colorId = event;
-                    filter();
-                  }}
-                  defaultValue={""}
-                  style={{ borderBottom: "1px solid black", width: "100%" }}
-                >
-                  <Select.Option key={"ALL"} value={""}>
-                    Tất cả
-                  </Select.Option>
-                  {colors &&
-                    colors.map((item) => {
-                      return (
-                        <Select.Option key={item.id}>
-                          <div className={styles.optionColor}>
-                            <span
-                              style={{ backgroundColor: item.colorCode }}
-                            ></span>
-                            {item.colorName}
-                          </div>
-                        </Select.Option>
-                      );
-                    })}
-                </Select>
-              </div>
-            </Col>
-            <Col span={12} offset={6}>
-              <Input
-                className={styles.filter_inputSearch}
-                placeholder="Nhập mã, tên sản phẩm"
-                onChange={(event) => {
-                  search(event.target.value);
-                }}
-                prefix={<SearchOutlined />}
-              />
+            <Col span={18} offset={3}>
+              <Row>
+                <Col span={8}>
+                  <div style={{ margin: "0 8px 24px 8px" }}>
+                    <span
+                      style={{
+                        fontWeight: "500",
+                        display: "block",
+                        textAlign: "center",
+                      }}
+                    >
+                      Đuôi áo
+                    </span>
+                    <Select
+                      showSearch
+                      optionFilterProp="children"
+                      filterOption={(input, option) =>
+                        (option?.label ?? "").includes(input)
+                      }
+                      filterSort={(optionA, optionB) =>
+                        (optionA?.label ?? "")
+                          .toLowerCase()
+                          .localeCompare((optionB?.label ?? "").toLowerCase())
+                      }
+                      bordered={false}
+                      onChange={(event) => {
+                        shirtTailId = event;
+                        filter();
+                      }}
+                      defaultValue={""}
+                      style={{ borderBottom: "1px solid black", width: "100%" }}
+                    >
+                      <Select.Option key={"ALL"} value={""}>
+                        Tất cả
+                      </Select.Option>
+                      {shirtTails &&
+                        shirtTails.map((item) => {
+                          return (
+                            <Select.Option key={item.id} value={item.id}>
+                              {item.shirtTailTypeName}
+                            </Select.Option>
+                          );
+                        })}
+                    </Select>
+                  </div>
+                </Col>
+                <Col span={8}>
+                  <div style={{ margin: "0 8px 24px 8px" }}>
+                    <span
+                      style={{
+                        fontWeight: "500",
+                        display: "block",
+                        textAlign: "center",
+                      }}
+                    >
+                      Kích cỡ
+                    </span>
+                    <Select
+                      showSearch
+                      optionFilterProp="children"
+                      filterOption={(input, option) =>
+                        (option?.label ?? "").includes(input)
+                      }
+                      filterSort={(optionA, optionB) =>
+                        (optionA?.label ?? "")
+                          .toLowerCase()
+                          .localeCompare((optionB?.label ?? "").toLowerCase())
+                      }
+                      bordered={false}
+                      onChange={(event) => {
+                        sizeId = event;
+                        filter();
+                      }}
+                      defaultValue={""}
+                      style={{ borderBottom: "1px solid black", width: "100%" }}
+                    >
+                      <Select.Option key={"ALL"} value={""}>
+                        Tất cả
+                      </Select.Option>
+                      {sizes &&
+                        sizes.map((item) => {
+                          return (
+                            <Select.Option key={item.id} value={item.id}>
+                              {item.sizeName}
+                            </Select.Option>
+                          );
+                        })}
+                    </Select>
+                  </div>
+                </Col>
+                <Col span={8}>
+                  <div style={{ margin: "0 8px 24px 8px" }}>
+                    <span
+                      style={{
+                        fontWeight: "500",
+                        display: "block",
+                        textAlign: "center",
+                      }}
+                    >
+                      Màu sắc
+                    </span>
+                    <Select
+                      showSearch
+                      optionFilterProp="children"
+                      filterOption={(input, option) =>
+                        (option?.label ?? "").includes(input)
+                      }
+                      filterSort={(optionA, optionB) =>
+                        (optionA?.label ?? "")
+                          .toLowerCase()
+                          .localeCompare((optionB?.label ?? "").toLowerCase())
+                      }
+                      bordered={false}
+                      onChange={(event) => {
+                        colorId = event;
+                        filter();
+                      }}
+                      defaultValue={""}
+                      style={{ borderBottom: "1px solid black", width: "100%" }}
+                    >
+                      <Select.Option key={"ALL"} value={""}>
+                        Tất cả
+                      </Select.Option>
+                      {colors &&
+                        colors.map((item) => {
+                          return (
+                            <Select.Option key={item.id}>
+                              <div className={styles.optionColor}>
+                                <span
+                                  style={{ backgroundColor: item.colorCode }}
+                                ></span>
+                                {item.colorName}
+                              </div>
+                            </Select.Option>
+                          );
+                        })}
+                    </Select>
+                  </div>
+                </Col>
+              </Row>
             </Col>
           </Row>
         </Col>
@@ -653,7 +625,7 @@ const ProductDetails = (props) => {
           <Table
             columns={columns}
             dataSource={productDetails}
-            scroll={{ y: 400, x: 1300 }}
+            scroll={{ y: 500 }}
             loading={loading}
           />
         </div>

@@ -35,6 +35,8 @@ public class VoucherResponse {
 
     private String status;
 
+    private String objectUse;
+
 }
 
 

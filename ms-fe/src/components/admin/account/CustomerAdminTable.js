@@ -32,12 +32,12 @@ function CustomerTable(props) {
 
   useEffect(() => {
     axios
-      .get("http://localhost:8080/api/admin/account/viewAll")
+      .get("http://localhost:8080/api/admin/account/viewAll?roleId=" + roleId)
       .then((response) => {
         setData(response.data.content);
       })
       .catch((err) => console.log(err));
-  }, []);
+  }, [roleId]);
 
   const navigate = useNavigate();
 

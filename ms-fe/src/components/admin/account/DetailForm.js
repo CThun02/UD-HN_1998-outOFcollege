@@ -18,10 +18,12 @@ import {
 import { UserOutlined, FormOutlined } from "@ant-design/icons";
 import { useParams } from "react-router-dom";
 import moment from "moment/moment";
+import { saveImage } from "../../../config/FireBase";
+import { ref, getDownloadURL } from "firebase/storage";
 const { Option } = Select;
 const { Panel } = Collapse;
 const DetailForm = (props) => {
-  const customer = props.customer;
+  var roleId = props.roleId;
   const [data, setData] = useState({
     username: "",
     fullName: "",
@@ -30,6 +32,7 @@ const DetailForm = (props) => {
     numberPhone: "",
     email: "",
     idNo: "",
+    roleId: roleId,
   });
 
   const [imageUrl, setImageUrl] = useState(null);
@@ -63,8 +66,17 @@ const DetailForm = (props) => {
       .then((response) => {
         setData(response.data);
         console.log(response.data);
+        getDownloadURL(ref(saveImage, response.data.image))
+          .then((url) => {
+            console.log(url);
+            setImageUrl(url);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
       })
       .catch((err) => console.log(err));
+    console.log(data);
   };
   useEffect(() => {
     const fetchProvinces = async () => {
@@ -146,7 +158,7 @@ const DetailForm = (props) => {
     <div className={styles.container}>
       <Row style={{ marginBottom: "25px" }}>
         <Col span={8}>
-          <h2>Thông tin nhân viên</h2>
+          <h2>Thông tin {Number(roleId) === 1 ? "nhân viên" : "khách hàng"}</h2>
         </Col>
         <Col span={16}>
           <h2>Thông tin địa chỉ</h2>

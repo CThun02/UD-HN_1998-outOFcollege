@@ -6,7 +6,6 @@ import {
 import { Button, Col, message, Row, Select } from "antd";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { displayFrame } from "../animations/animation";
 import "../animations/animation.css";
 import ProductCreate from "./ProductCreate";
@@ -14,8 +13,6 @@ import styles from "./ProductCreateDetails.module.css";
 import ProductDetailsTable from "./ProductDetailsTable";
 
 const ProductCreateDetails = (props) => {
-  const location = useLocation();
-  const navigate = useNavigate();
   const api = "http://localhost:8080/api/admin/";
   const [messageApi, contextHolder] = message.useMessage();
   const [sizes, setSizes] = useState(null);
@@ -65,9 +62,14 @@ const ProductCreateDetails = (props) => {
     }));
   }
 
+  function selectProduct(index) {
+    setProduct(productList[index]);
+    handleSetProductDetail("productId", productList[index].id);
+  }
+
   useEffect(() => {
     axios
-      .get(api + "product")
+      .get(api + "product/getProductCreateDetail")
       .then((res) => {
         setProductList(res.data);
       })
@@ -183,9 +185,8 @@ const ProductCreateDetails = (props) => {
                                 (optionB?.label ?? "").toLowerCase()
                               )
                           }
-                          onChange={(value) => {
-                            setProduct(productList[value]);
-                            handleSetProductDetail("productId", value);
+                          onChange={(index) => {
+                            selectProduct(index);
                           }}
                         >
                           {productList &&

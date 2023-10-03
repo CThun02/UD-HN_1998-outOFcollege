@@ -43,8 +43,8 @@ public class AccountServiceImpl implements AccountService {
     private AddressDetailRepository addressDetailRepository;
 
     @Override
-    public Page<AccountResponce> phanTrang(Integer pageNo, Integer size) {
-        return accountRepository.phanTrang(PageRequest.of(pageNo, 5));
+    public Page<AccountResponce> phanTrang(Integer pageNo, Integer size, Long roleId) {
+        return accountRepository.phanTrang(PageRequest.of(pageNo, 5), roleId);
     }
 
     @Override

@@ -15,9 +15,9 @@ import java.util.List;
 @Repository
 public interface AccountRepository extends JpaRepository<Account, String> {
 
-    @Query("SELECT new com.fpoly.ooc.responce.account.AccountResponce(a.avatar, a.fullName, a.gender, a.createdAt,a.status)" +
-            "FROM Account a ")
-    Page<AccountResponce> phanTrang(Pageable pageable);
+    @Query("SELECT new com.fpoly.ooc.responce.account.AccountResponce(a.username,a.avatar, a.fullName, a.gender, a.createdAt,a.status)" +
+            "FROM Account a where a.role.id=?1")
+    Page<AccountResponce> phanTrang(Pageable pageable, Long roleId);
 
     @Query(value = "select email from account", nativeQuery = true)
     List<String> emailAccountList();

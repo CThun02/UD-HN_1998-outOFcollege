@@ -10,6 +10,8 @@ import {
   Input,
   Switch,
   Select,
+  InputNumber,
+  notification,
 } from "antd";
 import React, { useEffect, useRef, useState } from "react";
 import styles from "./Bill.module.css";
@@ -57,6 +59,17 @@ const Bill = () => {
 
   getCart();
   // danh sách table
+
+  const updateQuantity = (record, index, value) => {
+    let cart = JSON.parse(localStorage.getItem(cartId));
+    let productDetails = cart.productDetails;
+    productDetails[index].quantity = value;
+    cart.productDetails = productDetails;
+    localStorage.setItem(cartId, JSON.stringify(cart));
+    console.log(cartId)
+    setRendered(cart)
+  }
+
   const columns = [
     {
       title: "#",
@@ -130,6 +143,12 @@ const Bill = () => {
       title: "Số lượng",
       dataIndex: "quantity",
       key: "quantity",
+      render: (text, record, index) => {
+        console.log('record: ', record)
+        return (
+          <InputNumber min={1} value={record.quantity} onChange={(value) => updateQuantity(record, index, value)} />
+        )
+      }
     },
     {
       title: "Thành tiền",
@@ -138,7 +157,7 @@ const Bill = () => {
       render: (text, record, index) => {
         return (
           <span>
-            {record.productDetail.quantity * record.productDetail.price}
+            {record.productDetail.price * record.quantity}
           </span>
         );
       },
@@ -242,16 +261,40 @@ const Bill = () => {
     setActiveKey(newActiveKey);
   };
 
+  function generateRandomBillCode() {
+    let result = '';
+    const characters = 'ABCDEF0123456789';
+
+    for (let i = 0; i < 6; i++) {
+      const randomIndex = Math.floor(Math.random() * characters.length);
+      result += characters.charAt(randomIndex);
+    }
+
+    return 'HD_' + result;
+  }
+
+  const randomHex = generateRandomBillCode();
+  console.log(randomHex);
+
   const add = () => {
-    const newActiveKey = `cart${++newTabIndex.current}`;
-    const newPanes = [...items];
-    newPanes.push({
-      label: `Đơn hàng`,
-      key: newActiveKey,
-    });
-    setItems(newPanes);
-    setCartId(newActiveKey);
-    setActiveKey(newActiveKey);
+    if (items.length >= 5) {
+      notification.error({
+        message: 'Thông báo',
+        description: 'Đã đạt tối đa 5 hóa đơn.',
+        duration: 2
+      });
+    } else {
+      const newActiveKey = `cart${++newTabIndex.current}`;
+      const newPanes = [...items];
+      newPanes.push({
+        label: `Hóa đơn: ${generateRandomBillCode()}`,
+        key: newActiveKey,
+      });
+
+      setItems(newPanes);
+      setCartId(newActiveKey);
+      setActiveKey(newActiveKey);
+    }
   };
 
   const remove = (targetKey) => {

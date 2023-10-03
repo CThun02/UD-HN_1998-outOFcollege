@@ -225,7 +225,6 @@ const BillTimeLine = () => {
                                 <span className={styles.span}>Trạng thái </span>
                                 <span style={{ fontSize: '16px', display: 'block' }}>Ngày nhận hàng dự kiến</span>
                             </Col>
-                            {console.log('con lợn này', timelines[0]?.billType)}
                             <Col span={12}>
                                 <div style={{ display: 'flex', alignItems: 'center', width: '10px', margin: '20px 0 20px 0' }}>
                                     <SpanBorder child={'HD1100'} color={'#1677ff'} />

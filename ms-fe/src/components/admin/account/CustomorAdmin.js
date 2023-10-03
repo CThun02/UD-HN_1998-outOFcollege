@@ -1,13 +1,20 @@
 import React, { useEffect, useState } from "react";
-
+import { useNavigate } from "react-router-dom";
 import { Select, Input, Row, Col, Radio, Button } from "antd";
 import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
 import CustomerTable from "./CustomerAdminTable";
 import style from "./styles/Customerlndex.module.css";
+import styles from "./AccountForm.module.css";
 
 const CustomerAddminIndex = function (props) {
   const { Option } = Select;
   const [value, setValue] = useState(1);
+
+  const navigate = useNavigate();
+  const handleAddAccount = () => {
+    navigate(`/admin/${roleId === 1 ? "employee" : "customer"}/create`);
+  };
+
   let roleId = props.roleId;
   const onChange = (e) => {
     console.log("radio checked", e.target.value);
@@ -43,9 +50,9 @@ const CustomerAddminIndex = function (props) {
         <Row className={style.adminMenu}>
           <Col span={10}>
             <Row>
-              <p>Nhập tên khách hàng, email, số điện thoại</p>
+              <p>Nhập tên nhân viên , email, số điện thoại</p>
             </Row>
-            <Row>
+            <Row className={styles.thanhpho}>
               <Input
                 placeholder="Nhập từ khóa để tìm kiếm"
                 prefix={<SearchOutlined />}
@@ -63,9 +70,9 @@ const CustomerAddminIndex = function (props) {
                 </Radio.Group>
               </Col>
               <Col span={9} offset={1}>
-                <Button className={style.btnSeach}>
+                <Button className={style.btnSeach} onClick={handleAddAccount}>
                   <PlusOutlined className={style.faPlus} />
-                  <span className={style.titleSeach}>Thêm khách hàng</span>
+                  <span className={style.titleSeach}>Thêm Nhân Viên</span>
                 </Button>
               </Col>
             </Row>

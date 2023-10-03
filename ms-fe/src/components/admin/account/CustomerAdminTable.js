@@ -1,5 +1,6 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import DetailForm from "./DetailForm";
 import {
   Table,
   Space,
@@ -11,31 +12,23 @@ import {
   Form,
   Input,
   Radio,
-  DetailForm,
 } from "antd";
-import {
-  HighlightOutlined,
-  PlusOutlined,
-  EyeOutlined,
-  FileOutlined,
-} from "@ant-design/icons";
+import { EyeOutlined, FileOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import style from "./styles/Customerlndex.module.css";
+
 import axios from "axios";
 function CustomerTable(props) {
+  const [selectedUsername, setSelectedUsername] = useState({});
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   let roleId = props.roleId;
 
   const [form] = Form.useForm();
-  const [name, setName] = useState(null);
-  const [gender, setGender] = useState(null);
-  const [birthdate, setBirthdate] = useState(null);
-  const [selectedCustomer, setSelectedCustomer] = useState(null);
 
   useEffect(() => {
     axios
-      .get("http://localhost:8080/account/api/viewAll")
+      .get("http://localhost:8080/api/admin/account/viewAll")
       .then((response) => {
         setData(response.data.content);
       })
@@ -43,13 +36,6 @@ function CustomerTable(props) {
   }, []);
 
   const navigate = useNavigate();
-
-  const handleAddAccount = () => {
-    navigate(`/admin/${roleId === 1 ? "employee" : "customer"}/create`);
-  };
-  const handleAddAccount1 = () => {
-    navigate(`/admin/${roleId === 1 ? "employee" : "customer"}/detail`);
-  };
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -60,7 +46,7 @@ function CustomerTable(props) {
     // Gửi yêu cầu API để lấy dữ liệu cho trang `page`
     // Sau khi nhận được dữ liệu mới, bạn có thể cập nhật state hoặc thực hiện các thao tác khác
     axios
-      .get(`http://localhost:8080/account/api/viewAll?page=${page}`)
+      .get(`http://localhost:8080/api/admin/account/viewAll?page=${page}`)
       .then((response) => {
         setData(response.data.content);
       })
@@ -68,32 +54,11 @@ function CustomerTable(props) {
         console.error(error);
       });
   };
-  const fetchCustomerData = async (username) => {
-    try {
-      const response = await axios.get(
-        `http://localhost:8080/account/api/detail/${username}`
-      );
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching customer data:", error);
-      return null;
-    }
-  };
-  const handleOpenSecondModal1 = async (customer) => {
-    try {
-      const customerData = await fetchCustomerData(customer.username);
-      if (customerData) {
-        setSelectedCustomer(customerData);
-      }
-    } catch (error) {
-      console.error("Error retrieving customer data:", error);
-    }
-  };
 
-  const handleOpenSecondModal = (customer) => {
-    setName(customer.fullName);
-    setGender(customer.gender ? "Nam" : "Nữ");
-    setBirthdate(customer.creatAt);
+  const handleOpenSecondModal = async (customer) => {
+    navigate(
+      `/admin/${roleId === 1 ? "employee" : "customer"}/detail/${customer}`
+    );
   };
 
   return (
@@ -147,7 +112,7 @@ function CustomerTable(props) {
               <Space size="middle">
                 <Button
                   type="link"
-                  onClick={handleAddAccount1}
+                  onClick={() => handleOpenSecondModal(customer.username)}
                   icon={<EyeOutlined />}
                 ></Button>
               </Space>
@@ -155,24 +120,9 @@ function CustomerTable(props) {
           },
         ]}
       />
-      {/* <Modal
-  visible={!!selectedCustomer}
-  onCancel={() => setSelectedCustomer(null)}
-  footer={null}
->
-  {selectedCustomer && (
-    <DetailForm customer={selectedCustomer} />
-  )}
-</Modal> */}
+
       <div className="">
         <Row align="bottom" className={style.btnCRUD}>
-          <Col span={2} offset={1}>
-            <Button className={style.faPlus} onClick={handleAddAccount}>
-              <span>
-                <PlusOutlined />
-              </span>
-            </Button>
-          </Col>
           <Col span={2} className="">
             <Button className={style.faEye}>
               <span>

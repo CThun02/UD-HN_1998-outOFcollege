@@ -29,11 +29,21 @@ border-radius: 4px;
 }
 .email{
   margin-right: 25px;
+  margin-top: 20px;
 
 }
   
 .sdt{
 
+  margin-right: 25px;
+  margin-top: 20px;
+}
+.sdt1{
+text-align: center;
+  margin-right: 25px;
+  margin-top: 20px;
+}
+.ten1{
   margin-right: 25px;
 }
 .thanhpho{
@@ -52,6 +62,10 @@ border-radius: 4px;
 
   margin-top: 5px;
   
+}
+.form1{
+margin-bottom: 30px;
+
 }
 
 

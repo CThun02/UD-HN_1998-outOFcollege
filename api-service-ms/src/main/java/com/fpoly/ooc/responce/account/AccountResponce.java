@@ -15,6 +15,8 @@ import java.time.LocalDateTime;
 @Builder
 public class AccountResponce {
 
+    private String username;
+
     private String image;
 
     private String fullName;

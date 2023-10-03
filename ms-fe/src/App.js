@@ -110,7 +110,7 @@ function App() {
                       element={<AccountForm roleId={1} />}
                     ></Route>
                     <Route
-                      path="employee/detail"
+                      path="employee/detail/:username"
                       element={<DetailForm />}
                     ></Route>
                     <Route

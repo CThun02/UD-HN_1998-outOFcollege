@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/account/api/")
+@RequestMapping("/api/admin/account/")
 @CrossOrigin("*")
 public class AccountController {
 
@@ -38,9 +39,9 @@ public class AccountController {
         return ResponseEntity.ok("ok");
     }
 
-    @PutMapping("update/{id}")
-    public ResponseEntity<?> update(@PathVariable String id, @RequestBody AccountRequest request) {
-        return ResponseEntity.ok(service.update(request, id));
+    @PutMapping("update/{username}")
+    public ResponseEntity<?> update(@PathVariable String username, @RequestBody AccountRequest request) {
+        return ResponseEntity.ok(service.update(request, username));
     }
 
     @DeleteMapping("delete/{id}")

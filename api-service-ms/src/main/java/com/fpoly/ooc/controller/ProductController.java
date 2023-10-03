@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,26 +31,30 @@ public class ProductController {
         this.productDetailService = productDetailService;
     }
 
-    @GetMapping("")
-    public List<ProductTableResponse> getProductsTable(@RequestParam(defaultValue = "ALL") String status){
-        if(status.equals("ALL") || status.equals("")){
-            return service.getProductsTable("ACTIVE", "INACTIVE");
-        }else{
-            return service.getProductsTable(status, status);
-        }
-    }
-
     @GetMapping("/getAllProductDetail")
     public ResponseEntity<?> getAllProductDetail(){
             return ResponseEntity.ok(productDetailService.getAll());
     }
 
+    @GetMapping("/getProductCreateDetail")
+    public ResponseEntity<?> getProductCreateDetail(){
+        return ResponseEntity.ok(service.getProductCreateDetail("ACTIVE"));
+    }
+
     @GetMapping("/filterByCom")
-    public ResponseEntity<?> filterByCom(@RequestParam Long brandId,
-                                         @RequestParam Long categoryId,
-                                         @RequestParam Long patternId,
-                                         @RequestParam Long formId){
-        return ResponseEntity.ok(service.getProductFilterByCom(brandId, categoryId, patternId, formId));
+    public ResponseEntity<?> filterByCom(@RequestParam Optional<Long> brandId,
+                                         @RequestParam Optional<Long> categoryId,
+                                         @RequestParam Optional<Long> patternId,
+                                         @RequestParam Optional<Long> formId,
+                                         @RequestParam Optional<String> status
+                                         ){
+        if(status.get().equals("ALL") || status.get().equals("")){
+            return ResponseEntity.ok(service.getProductFilterByCom(brandId.orElse(null), categoryId.orElse(null),
+                    patternId.orElse(null), formId.orElse(null), null));
+        }else{
+            return ResponseEntity.ok(service.getProductFilterByCom(brandId.orElse(null), categoryId.orElse(null),
+                    patternId.orElse(null), formId.orElse(null), status.orElse(null)));
+        }
     }
 
     @GetMapping("/filterProductDetailByIdCom")
@@ -76,54 +81,9 @@ public class ProductController {
         return productDetailService.getProductDetailsTableByIdProduct(productId, status);
     }
 
-    @GetMapping("/getProductDetailUpdate")
-    public ResponseEntity<?> getProductDetailsUpdate(@RequestParam Long productId,
-                                                               @RequestParam Long buttonId,
-                                                               @RequestParam Long materialId,
-                                                               @RequestParam Long shirtTailId,
-                                                               @RequestParam Long sleeveId,
-                                                               @RequestParam Long collarId){
-        return  ResponseEntity.ok(productDetailService.getProductDetailsResponseByIdCompo(productId, buttonId,
-                materialId, shirtTailId, sleeveId, collarId).get(0));
-    }
-
-    @GetMapping("/getProductDetailsByIdCom")
-    public ResponseEntity<?> getProductDetailsByIdCom(@RequestParam Long productId,
-                                                     @RequestParam Long buttonId,
-                                                     @RequestParam Long materialId,
-                                                     @RequestParam Long shirtTailId,
-                                                     @RequestParam Long sleeveId,
-                                                     @RequestParam Long collarId){
-        return  ResponseEntity.ok(productDetailService.getProductDetailsResponseByIdCompo(productId, buttonId,
-                materialId, shirtTailId, sleeveId, collarId));
-    }
-
     @GetMapping("/getProductEdit")
     public ProductResponse getProductEdit(@RequestParam("productId")Long productId){
         return service.getProductResponseById(productId);
-    }
-
-    @GetMapping("/getColorsByIdComPdAndIdPro")
-    public ResponseEntity<?> getColorsByIdComPdAndIdPro(@RequestParam Long productId,
-                                                     @RequestParam Long buttonId,
-                                                     @RequestParam Long materialId,
-                                                     @RequestParam Long shirtTailId,
-                                                     @RequestParam Long sleeveId,
-                                                     @RequestParam Long collarId){
-        return  ResponseEntity.ok(productDetailService.getColorsByIdCompoPDAndIdPro(productId, buttonId,
-                materialId, shirtTailId, sleeveId, collarId));
-    }
-
-    @GetMapping("/getSizesByIdComPdAndIdPro")
-    public ResponseEntity<?> getSizesByIdComPdAndIdPro(@RequestParam Long productId,
-                                                        @RequestParam Long buttonId,
-                                                        @RequestParam Long materialId,
-                                                        @RequestParam Long shirtTailId,
-                                                        @RequestParam Long sleeveId,
-                                                        @RequestParam Long collarId,
-                                                       @RequestParam Long colorId){
-        return  ResponseEntity.ok(productDetailService.getSizesPDByIdCompoPDAndIdPro(productId, buttonId,
-                materialId, shirtTailId, sleeveId, collarId, colorId));
     }
 
     @PostMapping("/create")

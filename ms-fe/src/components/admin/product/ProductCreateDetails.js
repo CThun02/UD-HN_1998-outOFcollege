@@ -69,7 +69,7 @@ const ProductCreateDetails = (props) => {
 
   useEffect(() => {
     axios
-      .get(api + "product/filterByCom?status=ALL")
+      .get(api + "product/getProductCreateDetail")
       .then((res) => {
         setProductList(res.data);
       })

@@ -14,14 +14,19 @@ import {
   DatePicker,
   Button,
   Upload,
+  message,
+  notification,
 } from "antd";
-import { UserOutlined } from "@ant-design/icons";
+import { CheckCircleTwoTone, UserOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+import { ref, uploadBytes, listAll, getDownloadURL } from "firebase/storage";
+import { saveImage } from "../../../config/FireBase";
 
 // Nhập ảnh mã QR
 const { Option } = Select;
 const MyForm = (props) => {
   const navigate = useNavigate();
+  const [messageApi, contextHolder] = message.useMessage();
   const [imageFile, setImageFile] = useState(null);
   const [imageUrl, setImageUrl] = useState(null);
   const [provinces, setProvinces] = useState([]);
@@ -98,6 +103,29 @@ const MyForm = (props) => {
 
   const onFinish = async (values) => {
     values.idRole = roleId;
+
+    const currentTimeInMillis = new Date().getTime();
+    const imgRef = ref(
+      saveImage,
+      `accounts/${Number(roleId) === 1 ? "employees" : "customers"}/${
+        currentTimeInMillis + values.username
+      }`
+    );
+
+    uploadBytes(imgRef, imageFile)
+      .then(() => {
+        return getDownloadURL(imgRef);
+      })
+      .then((url) => {
+        console.log("Đường dẫn tham chiếu:", url);
+        values.image = url; // Lưu đường dẫn vào biến values.image
+      })
+      .catch((error) => {
+        console.error("Lỗi khi tải lên ảnh:", error);
+      });
+    values.image = `/accounts/employees/${
+      currentTimeInMillis + values.username
+    }`;
     // Xử lý khi gửi form thành công
     try {
       // Gửi yêu cầu POST đến API
@@ -106,7 +134,17 @@ const MyForm = (props) => {
         values
       );
       console.log(response.data); // Đây là phản hồi từ API
-      navigate("/admin/employee");
+      messageApi.loading("loading", 2);
+      setTimeout(() => {
+        notification.open({
+          message: "Notification",
+          description: `Thêm mới ${
+            Number(roleId) === 1 ? "nhân viên" : "khách hàng"
+          } thành công`,
+          icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
+        });
+        navigate("/admin/employee");
+      }, 2000);
     } catch (error) {
       console.error(error);
     }
@@ -114,6 +152,7 @@ const MyForm = (props) => {
 
   return (
     <div className={styles.container}>
+      {contextHolder}
       <Form onFinish={onFinish}>
         <Row style={{ marginBottom: "25px" }}>
           <Col span={8}>
@@ -280,7 +319,7 @@ const MyForm = (props) => {
               <Col span={16}>
                 <Row>
                   <Col span={8}>
-                    <div className={styles.thanhpho}>
+                    <div className={styles.email}>
                       <span>Tỉnh/Thành phố</span>
                       <Form.Item
                         name="city"
@@ -320,7 +359,7 @@ const MyForm = (props) => {
                     </div>
                   </Col>
                   <Col span={8}>
-                    <div className={styles.quan}>
+                    <div className={styles.email}>
                       <span>Quận/huyện</span>
                       <Form.Item
                         name="district"

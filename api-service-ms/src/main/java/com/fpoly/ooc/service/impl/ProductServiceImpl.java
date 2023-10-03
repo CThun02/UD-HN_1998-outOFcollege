@@ -91,8 +91,7 @@ public class ProductServiceImpl implements ProductServiceI {
 
     @Override
     public List<ProductTableResponse> getProductCreateDetail(String status) {
-        return getProductCreateDetail(status);
+        return repo.getProductCreateDetail(status);
     }
-
 
 }

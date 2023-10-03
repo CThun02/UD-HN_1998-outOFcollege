@@ -50,7 +50,10 @@ const CustomerAddminIndex = function (props) {
         <Row className={style.adminMenu}>
           <Col span={10}>
             <Row>
-              <p>Nhập tên nhân viên , email, số điện thoại</p>
+              <p>
+                Nhập tên {Number(roleId) === 1 ? "nhân viên" : "khách hàng"} ,
+                email, số điện thoại
+              </p>
             </Row>
             <Row className={styles.thanhpho}>
               <Input
@@ -72,7 +75,9 @@ const CustomerAddminIndex = function (props) {
               <Col span={9} offset={1}>
                 <Button className={style.btnSeach} onClick={handleAddAccount}>
                   <PlusOutlined className={style.faPlus} />
-                  <span className={style.titleSeach}>Thêm Nhân Viên</span>
+                  <span className={style.titleSeach}>
+                    Thêm {Number(roleId) === 1 ? "nhân viên" : "khách hàng"}
+                  </span>
                 </Button>
               </Col>
             </Row>

@@ -36,9 +36,9 @@ public interface ProductDAORepositoryI extends JpaRepository<Product, Long> {
             "o.imgDefault as imgDefault, o.brand as brand, o.category as category," +
             "o.pattern as pattern, o.form as form, o.description as description, " +
             "count(od) as quantity from Product o left join ProductDetail od on " +
-            "od.product.id = o.id where (o.status=?1 or ?1 is null) and quantity =0" +
+            "od.product.id = o.id where (o.status=?1 or ?1 is null)" +
             " group by o.id, o.productName, o.status, o.imgDefault, o.brand, o.category," +
-            " o.pattern, o.form, o.description, o.productCode")
+            " o.pattern, o.form, o.description, o.productCode having count(od) =0")
     public List<ProductTableResponse> getProductCreateDetail(String status);
 
     @Query("Select o.id as id, o.productCode as productCode, o.productName as productName, o.brand as brand" +

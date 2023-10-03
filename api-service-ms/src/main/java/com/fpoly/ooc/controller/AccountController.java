@@ -27,8 +27,8 @@ public class AccountController {
     private AccountService service;
 
     @GetMapping("viewAll")
-    public ResponseEntity<?> phanTrang(@RequestParam(name = "page", defaultValue = "0") Integer pageNo) {
-        return ResponseEntity.ok(service.phanTrang(pageNo, 5));
+    public ResponseEntity<?> phanTrang(@RequestParam(name = "page", defaultValue = "0") Integer pageNo, @RequestParam Long roleId) {
+        return ResponseEntity.ok(service.phanTrang(pageNo, 5, roleId));
     }
 
     @GetMapping("detail/{username}")

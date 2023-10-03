@@ -47,7 +47,10 @@ function App() {
                     <Route path="counter-sales">
                       <Route index element={<Bill />}></Route>
                       <Route path="bill" element={<CreateBill />}></Route>
-                      <Route path=":billId/timeline" element={<BillTimeLine />}></Route>
+                      <Route
+                        path=":billId/timeline"
+                        element={<BillTimeLine />}
+                      ></Route>
                     </Route>
 
                     {/* Đơn hàng */}
@@ -113,7 +116,7 @@ function App() {
                     ></Route>
                     <Route
                       path="employee/detail/:username"
-                      element={<DetailForm />}
+                      element={<DetailForm roleId={1} />}
                     ></Route>
                     <Route
                       path="customer"
@@ -124,7 +127,7 @@ function App() {
                       element={<AccountForm roleId={2} />}
                     ></Route>
                     <Route
-                      path="employee/detail"
+                      path="customer/detail/:username"
                       element={<DetailForm roleId={2} />}
                     ></Route>
                   </Route>

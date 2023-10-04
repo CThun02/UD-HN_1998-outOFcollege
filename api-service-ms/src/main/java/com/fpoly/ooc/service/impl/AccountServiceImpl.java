@@ -95,7 +95,7 @@ public class AccountServiceImpl implements AccountService {
         account.setIdNo(request.getIdNo());
         account.setNumberPhone(request.getNumberPhone());
         account.setDob(request.getDob());
-        account.setRole(Role.builder().id(request.getIdRole()).build());
+        account.setRole(Role.builder().id(1).build());
 
         Account createAccount = accountRepository.save(account);
 

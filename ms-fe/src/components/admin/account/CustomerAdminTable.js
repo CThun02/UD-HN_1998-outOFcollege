@@ -101,9 +101,9 @@ function CustomerTable(props) {
             render: (_, record) => (record.gender === true ? "nam" : "nữ"),
           },
           {
-            title: "Ngày Sinh",
-            dataIndex: "creatAt",
-            key: "createdDate",
+            title: "Ngày Tạo",
+            dataIndex: "createdAt",
+            key: "createdAt",
           },
           {
             title: "Action",

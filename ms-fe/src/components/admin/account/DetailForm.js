@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import styles from "./AccountForm.module.css";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
   Row,
@@ -14,8 +15,14 @@ import {
   Button,
   Upload,
   Collapse,
+  message,
+  notification,
 } from "antd";
-import { UserOutlined, FormOutlined } from "@ant-design/icons";
+import {
+  UserOutlined,
+  FormOutlined,
+  CheckCircleTwoTone,
+} from "@ant-design/icons";
 import { useParams } from "react-router-dom";
 import moment from "moment/moment";
 import { saveImage } from "../../../config/FireBase";
@@ -23,6 +30,7 @@ import { ref, getDownloadURL } from "firebase/storage";
 const { Option } = Select;
 const { Panel } = Collapse;
 const DetailForm = (props) => {
+  const navigate = useNavigate();
   var roleId = props.roleId;
   const [data, setData] = useState({
     username: "",
@@ -35,6 +43,7 @@ const DetailForm = (props) => {
     roleId: roleId,
   });
 
+  const [messageApi, contextHolder] = message.useMessage();
   const [imageUrl, setImageUrl] = useState(null);
   const [imageFile, setImageFile] = useState(null);
   const [districts, setDistricts] = useState([]);
@@ -150,6 +159,17 @@ const DetailForm = (props) => {
         data
       );
       console.log("Dữ liệu đã được cập nhật thành công!");
+      messageApi.loading("loading", 2);
+      setTimeout(() => {
+        notification.open({
+          message: "Notification",
+          description: `Cập nhật ${
+            Number(roleId) === 1 ? "nhân viên" : "khách hàng"
+          } thành công`,
+          icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
+        });
+        navigate("/admin/employee");
+      }, 2000);
     } catch (error) {
       console.error(error);
     }

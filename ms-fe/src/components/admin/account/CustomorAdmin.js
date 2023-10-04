@@ -7,10 +7,6 @@ import style from "./styles/Customerlndex.module.css";
 import styles from "./AccountForm.module.css";
 
 const CustomerAddminIndex = function (props) {
-  const navigate = useNavigate();
-  const handleAddAccount = () => {
-    navigate(`/admin/${roleId === 1 ? "employee" : "customer"}/create`);
-  };
   const { Option } = Select;
   const [value, setValue] = useState(1);
 
@@ -54,10 +50,7 @@ const CustomerAddminIndex = function (props) {
         <Row className={style.adminMenu}>
           <Col span={10}>
             <Row>
-              <p>
-                Nhập tên {Number(roleId) === 1 ? "nhân viên" : "khách hàng"} ,
-                email, số điện thoại
-              </p>
+              <p>Nhập tên nhân viên , email, số điện thoại</p>
             </Row>
             <Row className={styles.thanhpho}>
               <Input
@@ -79,9 +72,7 @@ const CustomerAddminIndex = function (props) {
               <Col span={9} offset={1}>
                 <Button className={style.btnSeach} onClick={handleAddAccount}>
                   <PlusOutlined className={style.faPlus} />
-                  <span className={style.titleSeach}>
-                    Thêm {Number(roleId) === 1 ? "nhân viên" : "khách hàng"}
-                  </span>
+                  <span className={style.titleSeach}>Thêm Nhân Viên</span>
                 </Button>
               </Col>
             </Row>

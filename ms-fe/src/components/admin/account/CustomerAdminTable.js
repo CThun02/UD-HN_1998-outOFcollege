@@ -1,45 +1,38 @@
 import React from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import DetailForm from "./DetailForm";
-import {
-  Table,
-  Space,
-  Pagination,
-  Button,
-  Row,
-  Col,
-  Modal,
-  Form,
-  Input,
-  Radio,
-} from "antd";
-<<<<<<< HEAD
+import { useNavigate } from "react-router-dom";
+import { Table, Space, Pagination, Button, Row, Col, Form } from "antd";
 import { FormOutlined } from "@ant-design/icons";
-=======
-import { EyeOutlined, FileOutlined } from "@ant-design/icons";
->>>>>>> test
 import { useEffect, useState } from "react";
 import style from "./styles/Customerlndex.module.css";
-
 import axios from "axios";
 function CustomerTable(props) {
-  const [selectedUsername, setSelectedUsername] = useState({});
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   let roleId = props.roleId;
 
   const [form] = Form.useForm();
+  const [name, setName] = useState(null);
+  const [gender, setGender] = useState(null);
+  const [birthdate, setBirthdate] = useState(null);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
 
   useEffect(() => {
     axios
-      .get("http://localhost:8080/api/admin/account/viewAll?roleId=" + roleId)
+      .get("http://localhost:8080/api/admin/account/viewAll")
       .then((response) => {
         setData(response.data.content);
       })
       .catch((err) => console.log(err));
-  }, [roleId]);
+  }, []);
 
   const navigate = useNavigate();
+
+  const handleAddAccount = () => {
+    navigate(`/admin/${roleId === 1 ? "employee" : "customer"}/create`);
+  };
+  const handleAddAccount1 = () => {
+    navigate(`/admin/${roleId === 1 ? "employee" : "customer"}/detail`);
+  };
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -58,7 +51,6 @@ function CustomerTable(props) {
         console.error(error);
       });
   };
-<<<<<<< HEAD
   const fetchCustomerData = async (username) => {
     try {
       const response = await axios.get(
@@ -80,13 +72,11 @@ function CustomerTable(props) {
       console.error("Error retrieving customer data:", error);
     }
   };
-=======
->>>>>>> test
 
-  const handleOpenSecondModal = async (customer) => {
-    navigate(
-      `/admin/${roleId === 1 ? "employee" : "customer"}/detail/${customer}`
-    );
+  const handleOpenSecondModal = (customer) => {
+    setName(customer.fullName);
+    setGender(customer.gender ? "Nam" : "Nữ");
+    setBirthdate(customer.creatAt);
   };
 
   return (
@@ -141,33 +131,24 @@ function CustomerTable(props) {
                 <Button
                   className={style.btnDetails}
                   type="link"
-<<<<<<< HEAD
                   onClick={handleAddAccount1}
                   icon={<FormOutlined />}
-=======
-                  onClick={() => handleOpenSecondModal(customer.username)}
-                  icon={<EyeOutlined />}
->>>>>>> test
                 ></Button>
               </Space>
             ),
           },
         ]}
       />
-
+      {/* <Modal
+  visible={!!selectedCustomer}
+  onCancel={() => setSelectedCustomer(null)}
+  footer={null}
+>
+  {selectedCustomer && (
+    <DetailForm customer={selectedCustomer} />
+  )}
+</Modal> */}
       <div className="">
-<<<<<<< HEAD
-=======
-        <Row align="bottom" className={style.btnCRUD}>
-          <Col span={2} className="">
-            <Button className={style.faEye}>
-              <span>
-                <FileOutlined />
-              </span>
-            </Button>
-          </Col>
-        </Row>
->>>>>>> test
         <Row justify="center">
           <Col span={12} offset={3}>
             <div className={style.page}>

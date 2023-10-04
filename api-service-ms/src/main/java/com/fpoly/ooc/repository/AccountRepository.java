@@ -25,4 +25,7 @@ public interface AccountRepository extends JpaRepository<Account, String> {
         @Query(name = "Account.customerAccountList", nativeQuery = true)
     List<AccountVoucher> customerAccountList(String username, Boolean gender);
 
+        @Query(name = "Account.customerAccountList", nativeQuery = true)
+    List<Account> findAllAccount(String username, String email, String numberPhone );
+
 }

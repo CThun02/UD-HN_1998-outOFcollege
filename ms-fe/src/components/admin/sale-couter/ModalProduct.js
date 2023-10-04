@@ -7,7 +7,6 @@ import ProductDetails from "../product/ProductDetails";
 const { Option } = Select;
 
 const ModalProduct = ({ visible, onCancel, cartId, render }) => {
-  const [searchInput, setSearchInput] = useState("");
   const [data, setData] = useState([]);
 
   function action(record) {
@@ -33,6 +32,7 @@ const ModalProduct = ({ visible, onCancel, cartId, render }) => {
     render(productDetails);
     onCancel();
   }
+
   useEffect(() => {
     axios
       .get("http://localhost:8080/api/admin/bill/product")

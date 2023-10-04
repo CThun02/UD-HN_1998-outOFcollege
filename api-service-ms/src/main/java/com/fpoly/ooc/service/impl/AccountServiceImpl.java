@@ -186,4 +186,3 @@ public class AccountServiceImpl implements AccountService {
         return new PageImpl<>(outputList, PageRequest.of(pageNo, pageSize), inputList.size());
     }
 }
-

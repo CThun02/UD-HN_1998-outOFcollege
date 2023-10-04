@@ -5,7 +5,7 @@ import {
   EyeOutlined,
   SelectOutlined,
 } from "@ant-design/icons";
-import { Button, Col, message, Row, Select, Table } from "antd";
+import { Button, Checkbox, Col, message, Row, Select, Table } from "antd";
 import Input from "antd/es/input/Input";
 import Modal from "antd/es/modal/Modal";
 import axios from "axios";
@@ -148,17 +148,36 @@ const ProductDetails = (props) => {
       fixed: "right",
       render: (text, record, index) => (
         <>
-          <Button
-            icon={<SelectOutlined />}
-            onClick={() => {
-              props.action(record);
-            }}
-          ></Button>
+          <Checkbox onChange={(event) => {
+            addProductDetail(record, event.target.checked);
+          }} />
         </>
       ),
     },
   ];
   //functions
+  let productDetailsCreate = [];
+  function addProductDetail(record, checked) {
+    let productDetailCreate = {
+      productDetail: {},
+      quantity: 1,
+    };
+
+    if (!checked) {
+      for (let i = 0; i < productDetailsCreate.length; i++) {
+        if (productDetailsCreate[i].productDetail.id === record.id) {
+          productDetailsCreate.splice(i, 1)
+        }
+      }
+    } else {
+      productDetailCreate.productDetail = record;
+      productDetailsCreate.push(productDetailCreate)
+    }
+
+    console.log(productDetailsCreate)
+
+    console.log('object', checked)
+  }
   function search(keywords) {
     axios
       .get(api + `product/searchProductDetail?keyWords=` + keywords.toString())
@@ -174,22 +193,22 @@ const ProductDetails = (props) => {
     axios
       .get(
         api +
-          "product/filterProductDetailByIdCom?productId=" +
-          productId +
-          "&buttonId=" +
-          buttonId +
-          "&materialId=" +
-          materialId +
-          "&shirtTailId=" +
-          shirtTailId +
-          "&sleeveId=" +
-          sleeveId +
-          "&collarId=" +
-          collarId +
-          "&colorId=" +
-          colorId +
-          "&sizeId=" +
-          sizeId
+        "product/filterProductDetailByIdCom?productId=" +
+        productId +
+        "&buttonId=" +
+        buttonId +
+        "&materialId=" +
+        materialId +
+        "&shirtTailId=" +
+        shirtTailId +
+        "&sleeveId=" +
+        sleeveId +
+        "&collarId=" +
+        collarId +
+        "&colorId=" +
+        colorId +
+        "&sizeId=" +
+        sizeId
       )
       .then((response) => {
         setProductDetails(response.data);
@@ -274,6 +293,17 @@ const ProductDetails = (props) => {
         console.log(error);
       });
   }, []);
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const onSelectChange = (newSelectedRowKeys) => {
+    console.log('selectedRowKeys changed: ', newSelectedRowKeys);
+    setSelectedRowKeys(newSelectedRowKeys);
+  };
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: onSelectChange,
+  };
+  const hasSelected = selectedRowKeys.length > 0;
+
   return (
     <>
       {contextHolder}
@@ -649,6 +679,7 @@ const ProductDetails = (props) => {
             </Col>
           </Row>
         </Col>
+
         <div className={styles.productDetails__table}>
           <Table
             columns={columns}

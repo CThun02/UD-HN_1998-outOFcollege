@@ -11,4 +11,6 @@ public class TimeLinerequest {
 
     private String note;
 
+    private String status;
+
 }

@@ -6,7 +6,8 @@ const SpanBorder = ({ color, child }) => {
         borderRadius: '100px',
         color: '#fff',
         with: 'auto',
-        padding: '2px 10px'
+        padding: '2px 10px',
+        whiteSpace: 'nowrap'
     }
     return (
         <span style={styles}>

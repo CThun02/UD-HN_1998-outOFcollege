@@ -52,6 +52,7 @@ const BillTimeLine = () => {
     const [timelines, setTimelines] = useState([]);
     const [action, setAction] = useState(null)
     const [timelinePoduct, setTimelinesPoduct] = useState([])
+    const [billInfo, setBillInfo] = useState([]);
     const { billId } = useParams();
 
     // tạo mới timeline
@@ -104,6 +105,13 @@ const BillTimeLine = () => {
             .catch((error) => {
                 console.log(error)
             })
+        axios.get(`http://localhost:8080/api/admin/timeline/${billId}`)
+            .then((response) => {
+                setBillInfo(response.data)
+            })
+            .catch((error) => {
+                console.log(error)
+            })
     }, [billId])
 
     console.log('d', timelinePoduct?.imgDefault)
@@ -142,53 +150,110 @@ const BillTimeLine = () => {
             key: 'productPrice',
         },
     ]
-
+    console.log('object', billInfo.billType)
     return (
         <>
             <section className={styles.background}>
                 <div style={{ overflowX: 'scroll' }}>
                     <div style={{ width: 'fit-content' }}>
-                        <Timeline minEvents={6} placeholder className={styles.timeLine}>
-                            {timelines && timelines.map((data) => (
-                                <TimelineEvent
-                                    color={data.status === '0' ? '#FF0000' : '#00cc00'}
-                                    icon={data.status === '1' ? (
-                                        FaRegFileAlt
-                                    ) : data.status === '0' ? (
-                                        FaTimes
-                                    ) : (
-                                        FaRegCheckCircle
-                                    )}
-                                    title={data.status === '1' ? 'Tạo hóa đơn' : data.status === '2' ? 'Thanh toán thành công' : data.status === '0' ? 'Đã hủy' : ''}
-                                    subtitle={moment(data.createdDate)
-                                        .format("DD/MM/YYYY HH:MM")}
-                                />
-                            ))}
-                        </Timeline>
+                        {billInfo?.billType === 'Online' ? (
+                            <Timeline minEvents={6} placeholder className={styles.timeLine}>
+                                {timelines && timelines.map((data) => (
+                                    <TimelineEvent
+                                        color={data.status === '0' ? '#FF0000' : '#00cc00'}
+                                        icon={data.status === '1' ? (
+                                            FaRegFileAlt
+                                        ) : data.status === '0' ? (
+                                            FaTimes
+                                        ) : data.status === '2' ? (
+                                            FaRegFileAlt
+                                        ) : data.status === '3' ? (
+                                            FaTruck
+                                        ) : (
+                                            FaTimes
+                                        )}
+                                        title={data.status === '0' ? 'Đã hủy'
+                                            : data.status === '1'
+                                                ? 'Tạo hóa đơn'
+                                                : data.status === '2'
+                                                    ? 'Xác nhận đặt hàng'
+                                                    : data.status === '3'
+                                                        ? 'Đã giao cho đơn vị vận chuyển' : 'Giao hàng thành công'}
+                                        subtitle={moment(data.createdDate)
+                                            .format("DD/MM/YYYY HH:MM")}
+                                    />
+                                ))}
+                            </Timeline>
+                        ) : (
+                            <Timeline minEvents={6} placeholder className={styles.timeLine}>
+                                {timelines && timelines.map((data) => (
+                                    <TimelineEvent
+                                        color={data.status === '0' ? '#FF0000' : '#00cc00'}
+                                        icon={data.status === '1' ? (
+                                            FaRegFileAlt
+                                        ) : data.status === '0' ? (
+                                            FaTimes
+                                        ) : (
+                                            FaRegCheckCircle
+                                        )}
+                                        title={data.status === '1' ? 'Tạo hóa đơn' : data.status === '2' ? 'Thanh toán thành công' : data.status === '0' ? 'Đã hủy' : ''}
+                                        subtitle={moment(data.createdDate)
+                                            .format("DD/MM/YYYY HH:MM")}
+                                    />
+                                ))}
+                            </Timeline>
+                        )}
                     </div>
                 </div>
                 <div className={styles.btnHeader} style={{ marginTop: 24 }}>
-                    {(timelines.length !== 2) && (
-                        <Button
-                            type="primary"
-                            onClick={() => {
-                                setAction('confirm');
-                                showModalConfirm()
-                            }}>
-                            Xác nhận
-                        </Button>
+                    {billInfo.billType !== 'Online' && timelines.length !== 2 && (
+                        <>
+                            <Button
+                                type="primary"
+                                onClick={() => {
+                                    setAction('confirm');
+                                    showModalConfirm();
+                                }}
+                            >
+                                Xác nhận
+                            </Button>
+                            <Button
+                                type="primary"
+                                danger
+                                style={{ margin: '0 10px' }}
+                                onClick={() => {
+                                    setAction('cancel');
+                                    showModalConfirm();
+                                }}
+                            >
+                                Hủy
+                            </Button>
+                        </>
                     )}
-                    {(timelines.length !== 2) && (
-                        <Button type='primary'
-                            danger
-                            style={{ margin: '0 10px' }}
-                            onClick={() => {
-                                setAction('cancel');
-                                showModalConfirm()
-                            }}
-                        > Hủy</Button>
+                    {billInfo.billType !== 'In-store' && timelines.length !== 3 && (
+                        <>
+                            <Button
+                                type="primary"
+                                onClick={() => {
+                                    setAction('confirm');
+                                    showModalConfirm();
+                                }}
+                            >
+                                Xác nhận
+                            </Button>
+                            <Button
+                                type="primary"
+                                danger
+                                style={{ margin: '0 10px' }}
+                                onClick={() => {
+                                    setAction('cancel');
+                                    showModalConfirm();
+                                }}
+                            >
+                                Hủy
+                            </Button>
+                        </>
                     )}
-                    {console.log(action)}
                     <ModalConfirm
                         isModalOpen={isModalConfirm}
                         handleCancel={handleCancelConfirm}
@@ -201,7 +266,7 @@ const BillTimeLine = () => {
                         Chi tiết
                     </Button>
                     <div >
-                        <ModalDetail timelineDetail={timelines} isModalOpen={isModalDetail} handleCancel={handleOkDetail} handleOk={handleOkDetail} />
+                        <ModalDetail timelineDetail={timelines} isModalOpen={isModalDetail} handleCancel={handleOkDetail} handleOk={handleOkDetail} billType={billInfo.billType} />
                     </div>
                 </div>
             </section >
@@ -230,10 +295,33 @@ const BillTimeLine = () => {
                                     <SpanBorder child={'HD1100'} color={'#1677ff'} />
                                 </div>
                                 <div style={{ display: 'flex', alignItems: 'center', width: '10px', marginBottom: '20px' }}>
-                                    <SpanBorder child={timelines[0]?.billType} color={'#1677ff'} />
+                                    <SpanBorder child={billInfo.billType} color={'#1677ff'} />
                                 </div>
                                 <div style={{ display: 'flex', alignItems: 'center', width: '10px', marginBottom: '20px' }}>
-                                    <SpanBorder child={timelines[timelines.length - 1]?.status === '1' ? 'Đang chờ' : timelines[timelines.length - 1]?.status === '0' ? 'Đã hủy' : 'Thanh toán thành công'} color={timelines[timelines.length - 1]?.status === '0' ? '#FF0000' : '#00cc00'} />
+                                    {
+                                        billInfo.billType === 'Online' && <SpanBorder
+                                            child={timelines[timelines.length - 1]?.status === '0'
+                                                ? 'Đã hủy'
+                                                : timelines[timelines.length - 1]?.status === '1'
+                                                    ? 'Đang chờ'
+                                                    : timelines[timelines.length - 1]?.status === '2'
+                                                        ? 'Xác nhận thông tin'
+                                                        : timelines[timelines.length - 1]?.status === '3'
+                                                            ? 'Đã giao cho đơn vị vận chuyển' :
+                                                            timelines[timelines.length - 1] === '4' ? 'Giao hàng thành công' : '#'}
+                                            color={timelines[timelines.length - 1]?.status === '0' ? '#FF0000' : '#00cc00'} />
+                                    }
+                                    {
+                                        billInfo.billType === 'In-store' && <SpanBorder
+                                            child={timelines[timelines.length - 1]?.status === '0'
+                                                ? 'Đã hủy'
+                                                : timelines[timelines.length - 1]?.status === '1'
+                                                    ? 'Đang chờ'
+                                                    : timelines[timelines.length - 1]?.status === '2'
+                                                        ? 'Thanh toán thành công'
+                                                        : '#'}
+                                            color={timelines[timelines.length - 1]?.status === '0' ? '#FF0000' : '#00cc00'} />
+                                    }
                                 </div>
                                 <div style={{ display: 'flex', alignItems: 'center', width: '50px' }}>
                                     <SpanBorder child={moment(timelines[0]?.completionDate)
@@ -252,10 +340,10 @@ const BillTimeLine = () => {
                                 <span className={styles.span}>Địa chỉ</span>
                             </Col>
                             <Col span={12}>
-                                <span className={styles.span}>{timelines[0]?.fullName || 'khách lẻ'}</span>
-                                <span className={styles.span}>{timelines[0]?.phoneNumber || '__'}</span>
-                                <span className={styles.span}>{timelines[0]?.email || '__'}</span>
-                                <span style={{ fontSize: '16px', display: 'block' }}>{timelines[0]?.address || '__'}</span>
+                                <span className={styles.span}>{billInfo.fullName || 'khách lẻ'}</span>
+                                <span className={styles.span}>{billInfo.phoneNumber || '__'}</span>
+                                <span className={styles.span}>{billInfo.email || '__'}</span>
+                                <span style={{ fontSize: '16px', display: 'block' }}>{billInfo.address || '__'}</span>
                             </Col>
                         </Row>
                     </Col>

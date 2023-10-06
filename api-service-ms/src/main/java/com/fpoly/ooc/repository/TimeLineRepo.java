@@ -1,6 +1,7 @@
 package com.fpoly.ooc.repository;
 
 import com.fpoly.ooc.entity.TimeLine;
+import com.fpoly.ooc.responce.bill.BillInfoResponse;
 import com.fpoly.ooc.responce.timeline.TimeLineResponse;
 import com.fpoly.ooc.responce.timeline.TimelineProductResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -35,6 +36,15 @@ public interface TimeLineRepo extends JpaRepository<TimeLine, Long> {
             "   JOIN BillDetail bd ON bd.productDetail.id = pd.id " +
             "WHERE bd.bill.id = :billId")
     List<TimelineProductResponse> getTimelineProductByBillId(@Param("billId") Long id);
+
+    @Query("SELECT new com.fpoly.ooc.responce.bill.BillInfoResponse(b.id, b.billType, ac.fullName, ac.numberPhone, " +
+            "   ac.email, add.descriptionDetail +  ' ' + add.ward + ' ' + add.district + ' ' + add.city) " +
+            "FROM Bill b " +
+            "   JOIN Account ac ON ac.username = b.account.username " +
+            "   JOIN AddressDetail ad ON ad.accountAddress.username = ac.username " +
+            "   JOIN Address add ON add.id = ad.addressDetail.id " +
+            "WHERE b.id = :billId")
+    BillInfoResponse getBillInfoByIdBillId(@Param("billId") Long id);
 
 }
 

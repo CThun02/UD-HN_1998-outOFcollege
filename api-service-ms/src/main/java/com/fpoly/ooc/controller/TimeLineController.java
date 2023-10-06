@@ -18,8 +18,8 @@ public class TimeLineController {
     private TimeLineService timeLineService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getAllTimeLineByBillId(@PathVariable("id") Long id){
-        return ResponseEntity.ok(timeLineService.getAllTimeLineByBillId(id));
+    public ResponseEntity<?> getBillInfoByBillId(@PathVariable("id") Long id){
+        return ResponseEntity.ok(timeLineService.getBillInfoByBillId(id));
     }
 
 }

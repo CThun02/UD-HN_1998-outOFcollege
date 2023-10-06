@@ -8,6 +8,7 @@ import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.BillRepo;
 import com.fpoly.ooc.repository.TimeLineRepo;
 import com.fpoly.ooc.request.timeline.TimeLinerequest;
+import com.fpoly.ooc.responce.bill.BillInfoResponse;
 import com.fpoly.ooc.responce.timeline.TimeLineResponse;
 import com.fpoly.ooc.responce.timeline.TimelineProductResponse;
 import com.fpoly.ooc.service.interfaces.TimeLineService;
@@ -69,4 +70,11 @@ public class TimeLineServiceImpl implements TimeLineService {
     public List<TimelineProductResponse> getTimelineProductByBillId(Long id) {
         return timeLineRepo.getTimelineProductByBillId(id);
     }
+
+    @Override
+    public BillInfoResponse getBillInfoByBillId(Long id) {
+        return timeLineRepo.getBillInfoByIdBillId(id);
+    }
+
+
 }

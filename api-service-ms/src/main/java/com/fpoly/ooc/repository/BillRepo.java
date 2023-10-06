@@ -1,6 +1,7 @@
 package com.fpoly.ooc.repository;
 
 import com.fpoly.ooc.entity.Bill;
+import com.fpoly.ooc.responce.bill.BillInfoResponse;
 import com.fpoly.ooc.responce.bill.BillProductResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

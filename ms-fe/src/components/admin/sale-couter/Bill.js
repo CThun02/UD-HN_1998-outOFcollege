@@ -25,6 +25,7 @@ import {
 } from "@ant-design/icons";
 import axios from "axios";
 import { now } from "moment";
+import TextArea from "antd/es/input/TextArea";
 
 const Bill = () => {
   var initialItems = [];
@@ -582,6 +583,7 @@ const Bill = () => {
                           </span>
                         </Col>
                         <div style={{ marginTop: "20px" }}>
+                          <TextArea rows={3} placeholder="ghi chú ..." style={{ marginBottom: '10px' }} />
                           <Button
                             icon={<DollarOutlined />}
                             className="cash-button"

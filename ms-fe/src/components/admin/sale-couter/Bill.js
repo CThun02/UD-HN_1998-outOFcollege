@@ -29,18 +29,15 @@ import TextArea from "antd/es/input/TextArea";
 
 const Bill = () => {
   var initialItems = [];
-  var cartMaxIndex = 1;
-
+  const [modalVisible, setModalVisible] = useState([]);
   function getCart() {
     initialItems = [];
     var checkEmpty = 0;
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
-      if (key.startsWith("cart")) {
-        let index = Number(key.substring(key.length - 1));
-        cartMaxIndex = cartMaxIndex < index ? index : cartMaxIndex;
+      if (key.startsWith("HD")) {
         var tab = {
-          label: "Đơn Hàng",
+          label: "Hóa đơn: " + localStorage.key(i),
           key: key,
         };
         initialItems.push(tab);
@@ -49,7 +46,7 @@ const Bill = () => {
     }
     if (checkEmpty === 0) {
       localStorage.setItem(
-        "cart1",
+        generateRandomBillCode(),
         JSON.stringify({
           timeStart: now(),
           productDetails: [],
@@ -60,6 +57,10 @@ const Bill = () => {
 
   getCart();
   // danh sách table
+  const initializeModalStates = () => {
+    const initialState = items.map(() => false);
+    setModalVisible(initialState);
+  };
 
   const updateQuantity = (record, index, value) => {
     let cart = JSON.parse(localStorage.getItem(cartId));
@@ -67,9 +68,8 @@ const Bill = () => {
     productDetails[index].quantity = value;
     cart.productDetails = productDetails;
     localStorage.setItem(cartId, JSON.stringify(cart));
-    console.log(cartId)
-    setRendered(cart)
-  }
+    setRendered(cart);
+  };
 
   const columns = [
     {
@@ -145,22 +145,21 @@ const Bill = () => {
       dataIndex: "quantity",
       key: "quantity",
       render: (text, record, index) => {
-        console.log('record: ', record)
         return (
-          <InputNumber min={1} value={record.quantity} onChange={(value) => updateQuantity(record, index, value)} />
-        )
-      }
+          <InputNumber
+            min={1}
+            value={record.quantity}
+            onChange={(value) => updateQuantity(record, index, value)}
+          />
+        );
+      },
     },
     {
       title: "Thành tiền",
       dataIndex: "totalPrice",
       key: "totalPrice",
       render: (text, record, index) => {
-        return (
-          <span>
-            {record.productDetail.price * record.quantity}
-          </span>
-        );
+        return <span>{record.productDetail.price * record.quantity}</span>;
       },
     },
     {
@@ -182,7 +181,6 @@ const Bill = () => {
     initialItems.length === 0 ? null : initialItems[0].key
   );
   const [items, setItems] = useState(initialItems);
-  const newTabIndex = useRef(cartMaxIndex);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [switchChange, setSwitchChange] = useState(false);
   const [provinces, setProvinces] = useState([]);
@@ -249,12 +247,16 @@ const Bill = () => {
   const handleChangSwitch = (checked) => {
     setSwitchChange(checked);
   };
-  const showModal = () => {
-    setIsModalVisible(true);
+  const showModal = (index) => {
+    const newModalVisible = [...modalVisible];
+    newModalVisible[index] = true;
+    setModalVisible(newModalVisible);
   };
 
-  const handleCancel = () => {
-    setIsModalVisible(false);
+  const handleCancel = (index) => {
+    const newModalVisible = [...modalVisible];
+    newModalVisible[index] = false;
+    setModalVisible(newModalVisible);
   };
 
   const onChange = (newActiveKey) => {
@@ -263,35 +265,38 @@ const Bill = () => {
   };
 
   function generateRandomBillCode() {
-    let result = '';
-    const characters = 'ABCDEF0123456789';
+    let result = "";
+    const characters = "ABCDEF0123456789";
 
     for (let i = 0; i < 6; i++) {
       const randomIndex = Math.floor(Math.random() * characters.length);
       result += characters.charAt(randomIndex);
     }
 
-    return 'HD_' + result;
+    return "HD_" + result;
   }
-
-  const randomHex = generateRandomBillCode();
-  console.log(randomHex);
 
   const add = () => {
     if (items.length >= 5) {
       notification.error({
-        message: 'Thông báo',
-        description: 'Đã đạt tối đa 5 hóa đơn.',
-        duration: 2
+        message: "Thông báo",
+        description: "Đã đạt tối đa 5 hóa đơn.",
+        duration: 2,
       });
     } else {
-      const newActiveKey = `cart${++newTabIndex.current}`;
+      const newActiveKey = `${generateRandomBillCode()}`;
       const newPanes = [...items];
       newPanes.push({
-        label: `Hóa đơn: ${generateRandomBillCode()}`,
+        label: `Hóa đơn: ${newActiveKey}`,
         key: newActiveKey,
       });
-
+      localStorage.setItem(
+        newActiveKey,
+        JSON.stringify({
+          timeStart: now(),
+          productDetails: [],
+        })
+      );
       setItems(newPanes);
       setCartId(newActiveKey);
       setActiveKey(newActiveKey);
@@ -323,13 +328,6 @@ const Bill = () => {
   const onEdit = (targetKey, action) => {
     if (action === "add") {
       add();
-      localStorage.setItem(
-        "cart" + newTabIndex.current,
-        JSON.stringify({
-          timeStart: now(),
-          productDetails: [],
-        })
-      );
     } else {
       remove(targetKey);
     }
@@ -337,13 +335,13 @@ const Bill = () => {
   const getProductDetails = () => {
     var cart = JSON.parse(localStorage.getItem(cartId));
     var productDetails = cart.productDetails;
-    console.log(productDetails);
     setProductDetails(productDetails);
   };
 
   useEffect(() => {
     fetchProvinces();
     getProductDetails();
+    initializeModalStates();
   }, [cartId, render]);
   return (
     <>
@@ -355,7 +353,7 @@ const Bill = () => {
         onEdit={onEdit}
       >
         {items &&
-          items.map((item) => {
+          items.map((item, index) => {
             return (
               <Tabs.TabPane key={item.key} tab={item.label}>
                 <div className={styles.tabContent}>
@@ -364,7 +362,7 @@ const Bill = () => {
                     <Button
                       type="primary"
                       className={styles.addButton}
-                      onClick={showModal}
+                      onClick={() => showModal(index)}
                     >
                       Thêm giỏ hàng
                     </Button>
@@ -375,8 +373,8 @@ const Bill = () => {
                   />
                   <Table dataSource={productDetails} columns={columns} />
                   <ModalProduct
-                    visible={isModalVisible}
-                    onCancel={handleCancel}
+                    visible={modalVisible[index]}
+                    onCancel={() => handleCancel(index)}
                     cartId={cartId}
                     render={setRendered}
                   />

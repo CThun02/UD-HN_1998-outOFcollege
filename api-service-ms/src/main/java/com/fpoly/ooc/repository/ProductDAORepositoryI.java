@@ -14,10 +14,14 @@ public interface ProductDAORepositoryI extends JpaRepository<Product, Long> {
             "o.imgDefault as imgDefault, o.brand as brand, o.category as category," +
             "o.pattern as pattern, o.form as form, o.description as description, " +
             "count(od) as quantity from Product o left join ProductDetail od on " +
-            "od.product.id = o.id where o.status=?1 or o.status =?2" +
+            "od.product.id = o.id WHERE (o.brand.id = ?1 OR ?1 IS NULL)" +
+            "  AND (o.category.id = ?2 OR ?2 IS NULL)" +
+            "  AND (o.pattern.id = ?3 OR ?3 IS NULL)" +
+            "  AND (o.form.id = ?4 OR ?4 IS NULL) " +
+            " AND (o.status=?5 or ?5 is NULL)" +
             " group by o.id, o.productName, o.status, o.imgDefault, o.brand, o.category," +
             " o.pattern, o.form, o.description, o.productCode")
-    public List<ProductTableResponse> getProductFilterByCom(Long brandId, Long categoryId, Long patternId, Long formId);
+    public List<ProductTableResponse> getProductFilterByCom(Long brandId, Long categoryId, Long patternId, Long formId, String status);
 
     @Query("Select o.id as id, o.productCode as productCode, o.productName as productName, o.status as status, " +
             "o.imgDefault as imgDefault, o.brand as brand, o.category as category," +
@@ -27,6 +31,15 @@ public interface ProductDAORepositoryI extends JpaRepository<Product, Long> {
            " group by o.id, o.productName, o.status, o.imgDefault, o.brand, o.category," +
             " o.pattern, o.form, o.description, o.productCode")
     public List<ProductTableResponse> getProductsTable(String status1, String status2);
+
+    @Query("Select o.id as id, o.productCode as productCode, o.productName as productName, o.status as status, " +
+            "o.imgDefault as imgDefault, o.brand as brand, o.category as category," +
+            "o.pattern as pattern, o.form as form, o.description as description, " +
+            "count(od) as quantity from Product o left join ProductDetail od on " +
+            "od.product.id = o.id where (o.status=?1 or ?1 is null)" +
+            " group by o.id, o.productName, o.status, o.imgDefault, o.brand, o.category," +
+            " o.pattern, o.form, o.description, o.productCode having count(od) =0")
+    public List<ProductTableResponse> getProductCreateDetail(String status);
 
     @Query("Select o.id as id, o.productCode as productCode, o.productName as productName, o.brand as brand" +
             ",o.category as category, o.pattern as pattern, o.form as form, o.status as status, " +

@@ -119,8 +119,8 @@ function App() {
                       element={<AccountForm roleId={1} />}
                     ></Route>
                     <Route
-                      path="employee/detail"
-                      element={<DetailForm />}
+                      path="employee/detail/:username"
+                      element={<DetailForm roleId={1} />}
                     ></Route>
                     <Route
                       path="customer"
@@ -131,7 +131,7 @@ function App() {
                       element={<AccountForm roleId={2} />}
                     ></Route>
                     <Route
-                      path="employee/detail"
+                      path="customer/detail/:username"
                       element={<DetailForm roleId={2} />}
                     ></Route>
                   </Route>

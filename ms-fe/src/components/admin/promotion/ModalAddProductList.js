@@ -79,6 +79,8 @@ function ModalAddProductList({
   const [totalElements, setTotalElements] = useState(5);
   const [api, contextHolder] = notification.useNotification();
 
+  const productDetailsCreate = products.map((item) => ({ ...item }));
+
   const openNotification = (placement) => {
     api.success({
       message: `Thông báo`,
@@ -102,22 +104,13 @@ function ModalAddProductList({
   }
 
   function action(record) {
-    setProducts(() => [...products, record]);
+    setProducts(() => productDetailsCreate);
   }
 
-  const rowSelection = {
-    onChange: (selectedRowKeys, selectedRows) => {
-      // setProducts(selectedRows);
-      console.log("row: ", selectedRows);
-      setPromotionProducts(selectedRows);
-    },
-    getCheckboxProps: (record) => ({
-      name: record.name,
-    }),
-  };
-
   function handleDeleted(value) {
-    setProducts((product) => product.filter((row) => row !== value));
+    setProducts((product) =>
+      product.filter((row) => row.productDetail !== value)
+    );
     if (values.promotionId) {
       confirm({
         title: "Xác nhận",
@@ -168,30 +161,33 @@ function ModalAddProductList({
         open={isLoadingModal}
         onOk={handleOnOk}
         onCancel={handleOnCancel}
+        footer={null}
       >
-        <ProductDetails action={action} />
+        <ProductDetails
+          action={action}
+          productDetailsCreate={productDetailsCreate}
+        />
       </Modal>
 
       {products.length ? (
         <Space style={{ width: "100%" }} direction="vertical" size={12}>
           <Table
             style={{ width: "100%" }}
-            rowSelection={{ type: rowSelection, ...rowSelection }}
             columns={[...columns, newColumns]}
             dataSource={products.map((product, index) => ({
-              key: product.id,
+              key: product.productDetail.id,
               stt: calculateStt(index),
-              product: product.product.productName,
-              button: product.button.buttonName,
-              material: product.material.materialName,
-              collar: product.collar.collarTypeName,
-              shirtTail: product.shirtTail.shirtTailTypeName,
-              slevee: product.sleeve.sleeveName,
-              size: product.size.sizeName,
-              color: product.color.colorCode,
-              price: product.price,
-              warehouse: product.quantity,
-              deleted: [product, index],
+              product: product.productDetail.product.productName,
+              button: product.productDetail.button.buttonName,
+              material: product.productDetail.material.materialName,
+              collar: product.productDetail.collar.collarTypeName,
+              shirtTail: product.productDetail.shirtTail.shirtTailTypeName,
+              slevee: product.productDetail.sleeve.sleeveName,
+              size: product.productDetail.size.sizeName,
+              color: product.productDetail.color.colorCode,
+              price: product.productDetail.price,
+              warehouse: product.productDetail.quantity,
+              deleted: [product.productDetail, index],
             }))}
             pagination={false}
           />

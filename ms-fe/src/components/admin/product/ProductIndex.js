@@ -20,10 +20,14 @@ import React, { useEffect, useState } from "react";
 import styles from "./ProductIndex.module.css";
 import axios from "axios";
 import Input from "antd/es/input/Input";
-import moment from "moment";
 import { Link } from "react-router-dom";
 import ProductCreate from "./ProductCreate";
 
+var brand = "";
+var category = "";
+var pattern = "";
+var form = "";
+var status = "ALL";
 const ProductIndex = () => {
   const api = "http://localhost:8080/api/admin/";
   const [messageApi, contextHolder] = message.useMessage();
@@ -31,11 +35,6 @@ const ProductIndex = () => {
   const [categories, setCategories] = useState(null);
   const [patterns, setPatterns] = useState(null);
   const [forms, setForms] = useState(null);
-  var brand = 0;
-  var category = 0;
-  var pattern = 0;
-  var form = 0;
-  const [status, setStatus] = useState(null);
   const [productsTable, setProductsTable] = useState(null);
   const [loading, setLoading] = useState(false);
   const [render, setRendering] = useState(null);
@@ -130,18 +129,6 @@ const ProductIndex = () => {
     },
   ];
   //function
-  const handleChangePage = (statusFilter) => {
-    setStatus(statusFilter);
-    axios
-      .get(api + "product?status=" + statusFilter)
-      .then((response) => {
-        setProductsTable(response.data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
 
   function filterProductByCom() {
     axios
@@ -154,10 +141,13 @@ const ProductIndex = () => {
           "&patternId=" +
           pattern +
           "&formId=" +
-          form
+          form +
+          "&status=" +
+          status
       )
       .then((res) => {
         setProductsTable(res.data);
+        setLoading(false);
       })
       .catch((error) => {
         console.log(error);
@@ -180,7 +170,7 @@ const ProductIndex = () => {
       .then((response) => {
         setTimeout(() => {
           messageApi.success(mess, 2);
-          handleChangePage(status);
+          filterProductByCom();
         }, 500);
       })
       .catch((error) => {
@@ -192,15 +182,7 @@ const ProductIndex = () => {
 
   useEffect(() => {
     setLoading(true);
-    axios
-      .get(api + "product")
-      .then((response) => {
-        setProductsTable(response.data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    filterProductByCom();
     axios
       .get(api + "brand")
       .then((response) => {
@@ -260,12 +242,13 @@ const ProductIndex = () => {
                   bordered={false}
                   className={styles.produt__filterSelectsChildren}
                   onChange={(event) => {
+                    console.log(event);
                     brand = event;
                     filterProductByCom();
                   }}
-                  defaultValue={"ALL"}
+                  defaultValue={""}
                 >
-                  <Select.Option key={"ALL"} value={"ALL"}>
+                  <Select.Option key={""} value={""}>
                     Tất cả
                   </Select.Option>
                   {brands &&
@@ -303,15 +286,15 @@ const ProductIndex = () => {
                     category = event;
                     filterProductByCom();
                   }}
-                  defaultValue={"ALL"}
+                  defaultValue={""}
                 >
-                  <Select.Option key={"ALL"} value={"ALL"}>
+                  <Select.Option key={""} value={""}>
                     Tất cả
                   </Select.Option>
                   {categories &&
                     categories.map((item) => {
                       return (
-                        <Select.Option key={item.id}>
+                        <Select.Option key={item.id} value={item.id}>
                           {item.categoryName}
                         </Select.Option>
                       );
@@ -339,15 +322,15 @@ const ProductIndex = () => {
                     pattern = event;
                     filterProductByCom();
                   }}
-                  defaultValue={"ALL"}
+                  defaultValue={""}
                 >
-                  <Select.Option key={"ALL"} value={"ALL"}>
+                  <Select.Option key={""} value={""}>
                     Tất cả
                   </Select.Option>
                   {patterns &&
                     patterns.map((item) => {
                       return (
-                        <Select.Option key={item.id}>
+                        <Select.Option key={item.id} value={item.id}>
                           {item.patternName}
                         </Select.Option>
                       );
@@ -375,15 +358,15 @@ const ProductIndex = () => {
                     form = event;
                     filterProductByCom();
                   }}
-                  defaultValue={"ALL"}
+                  defaultValue={""}
                 >
-                  <Select.Option key={"ALL"} value={"ALL"}>
+                  <Select.Option key={""} value={""}>
                     Tất cả
                   </Select.Option>
                   {forms &&
                     forms.map((item) => {
                       return (
-                        <Select.Option key={item.id}>
+                        <Select.Option key={item.id} value={item.id}>
                           {item.formName}
                         </Select.Option>
                       );
@@ -398,11 +381,10 @@ const ProductIndex = () => {
                 </span>
 
                 <Radio.Group
-                  onChange={""}
                   defaultValue={"ALL"}
                   onFocus={(event) => {
-                    setStatus(event.target.value);
-                    handleChangePage(event.target.value);
+                    status = event.target.value;
+                    filterProductByCom();
                   }}
                 >
                   <Radio value={"ALL"}>Tất cả</Radio>

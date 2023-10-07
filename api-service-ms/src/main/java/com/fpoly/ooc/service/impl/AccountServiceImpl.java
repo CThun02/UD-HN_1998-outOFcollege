@@ -43,8 +43,8 @@ public class AccountServiceImpl implements AccountService {
     private AddressDetailRepository addressDetailRepository;
 
     @Override
-    public Page<AccountResponce> phanTrang(Integer pageNo, Integer size) {
-        return accountRepository.phanTrang(PageRequest.of(pageNo, 5));
+    public Page<AccountResponce> phanTrang(Integer pageNo, Integer size, Long roleId) {
+        return accountRepository.phanTrang(PageRequest.of(pageNo, 5), roleId);
     }
 
     @Override
@@ -82,34 +82,36 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Account update(AccountRequest request, String username) {
-        Account account = Account.builder()
-                .username(request.getUsername())
-                .avatar(request.getImage())
-                .fullName(request.getFullName())
-                .email(request.getEmail())
-                .gender(request.getGender())
-                .password(request.getPassword())
-                .idNo(request.getIdNo())
-                .numberPhone(request.getNumberPhone())
-                .dob(request.getDob())
-                .role(Role.builder().id(request.getIdRole()).build())
-                .build();
+        Account account = accountRepository.findById(username).orElse(null);
+        if (account == null) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND));
+        }
+
+        account.setAvatar(request.getImage());
+        account.setFullName(request.getFullName());
+        account.setEmail(request.getEmail());
+        account.setGender(request.getGender());
+        account.setPassword(request.getPassword());
+        account.setIdNo(request.getIdNo());
+        account.setNumberPhone(request.getNumberPhone());
+        account.setDob(request.getDob());
+        account.setRole(Role.builder().id(request.getIdRole()).build());
 
         Account createAccount = accountRepository.save(account);
 
-        Address address = Address.builder()
-                .city(request.getCity())
-                .descriptionDetail(request.getDescriptionDetail())
-                .district(request.getDistrict())
-                .ward(request.getWard())
-                .build();
-        Address createAddress = addressRepository.save(address);
-
-        AddressDetail addressDetail = AddressDetail.builder()
-                .accountAddress(createAccount)
-                .addressDetail(createAddress)
-                .build();
-        addressDetailRepository.save(addressDetail);
+//        Address address = Address.builder()
+//                .city(request.getCity())
+//                .descriptionDetail(request.getDescriptionDetail())
+//                .district(request.getDistrict())
+//                .ward(request.getWard())
+//                .build();
+//        Address createAddress = addressRepository.save(address);
+//
+//        AddressDetail addressDetail = AddressDetail.builder()
+//                .accountAddress(createAccount)
+//                .addressDetail(createAddress)
+//                .build();
+//        addressDetailRepository.save(addressDetail);
         return createAccount;
     }
 
@@ -184,4 +186,3 @@ public class AccountServiceImpl implements AccountService {
         return new PageImpl<>(outputList, PageRequest.of(pageNo, pageSize), inputList.size());
     }
 }
-

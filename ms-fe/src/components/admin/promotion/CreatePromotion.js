@@ -44,9 +44,9 @@ const options = [
 ];
 
 const validationSchema = Yup.object().shape({
-  promotionName: Yup.string()
-    .required("* Tên voucher không được bỏ trống.")
-    .matches(/^[a-zA-Z0-9 ]+$/, "* Tên voucher không được chứa kí tự đặc biệt"),
+  promotionName: Yup.string().required(
+    "* Tên chương trình không được bỏ trống."
+  ),
   promotionMethod: Yup.string(),
   promotionValue: Yup.string()
     .required("* Giá trị giảm không được bỏ trống")
@@ -130,9 +130,8 @@ function CreatePromotion() {
         async function savePromotion() {
           const promotion = ref.current?.values;
 
-          const idListProductDetails = products.map((item) => item.id);
-          const idListProductDetailsCurrent = promotion?.productsCurrent.map(
-            (item) => item.id
+          const idListProductDetails = products.map(
+            (item) => item.productDetail.id
           );
 
           setIsLoading(true);
@@ -210,6 +209,10 @@ function CreatePromotion() {
               listProductResponse,
             } = res.data;
 
+            const data = listProductResponse.map((item) => ({
+              productDetail: item,
+            }));
+
             ref.current.setFieldValue("promotionId", promotionId);
             ref.current.setFieldValue("promotionCode", promotionCode);
             ref.current.setFieldValue("promotionName", promotionName);
@@ -227,9 +230,9 @@ function CreatePromotion() {
               dayjs(moment(endDate).format(dateFormat), dateFormat)
             );
             ref.current.setFieldValue("status", status);
-            ref.current.setFieldValue("products", listProductResponse);
-            ref.current.setFieldValue("productsCurrent", listProductResponse);
-            setProducts(listProductResponse);
+            ref.current.setFieldValue("products", data);
+            ref.current.setFieldValue("productsCurrent", data);
+            setProducts(data);
           });
         }
         getPromotion();
@@ -491,6 +494,8 @@ function CreatePromotion() {
                               htmlType="submit"
                               disabled={
                                 values.status === "INACTIVE" || products.length
+                                  ? false
+                                  : true
                               }
                             >
                               Xác nhận

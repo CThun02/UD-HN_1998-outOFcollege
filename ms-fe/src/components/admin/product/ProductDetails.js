@@ -4,8 +4,9 @@ import {
   EyeFilled,
   EyeOutlined,
   SelectOutlined,
+  CheckCircleFilled,
 } from "@ant-design/icons";
-import { Button, Col, message, Row, Select, Table } from "antd";
+import { Button, Checkbox, Col, message, Row, Select, Table } from "antd";
 import Input from "antd/es/input/Input";
 import Modal from "antd/es/modal/Modal";
 import axios from "axios";
@@ -33,6 +34,7 @@ const ProductDetails = (props) => {
   const [shirtTails, setshirtTails] = useState(null);
   const [productDetails, setProductDetails] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [renderThis, setRenderThis] = useState(null);
   const columns = [
     {
       key: "stt",
@@ -148,17 +150,41 @@ const ProductDetails = (props) => {
       fixed: "right",
       render: (text, record, index) => (
         <>
-          <Button
-            icon={<SelectOutlined />}
-            onClick={() => {
-              props.action(record);
+          <Checkbox
+            onClick={(event) => {
+              addProductDetail(record, event.target.checked);
             }}
-          ></Button>
+            defaultChecked={props.productDetailsCreate?.some(
+              (item) => item.productDetail.id === record.id
+            )}
+          />
         </>
       ),
     },
   ];
   //functions
+  function completeAdd() {
+    props.action();
+  }
+
+  function addProductDetail(record, checked) {
+    let productDetailCreate = {
+      productDetail: {},
+      quantity: 1,
+    };
+
+    if (!checked) {
+      for (let i = 0; i < props.productDetailsCreate.length; i++) {
+        if (props.productDetailsCreate[i].productDetail.id === record.id) {
+          props.productDetailsCreate?.splice(i, 1);
+        }
+      }
+    } else {
+      productDetailCreate.productDetail = record;
+      props.productDetailsCreate?.push(productDetailCreate);
+    }
+  }
+
   function search(keywords) {
     axios
       .get(api + `product/searchProductDetail?keyWords=` + keywords.toString())
@@ -201,7 +227,7 @@ const ProductDetails = (props) => {
   }
   useEffect(() => {
     axios
-      .get(api + "product")
+      .get(api + "product/filterByCom?status=ACTIVE")
       .then((response) => {
         setProducts(response.data);
         setLoading(false);
@@ -273,7 +299,8 @@ const ProductDetails = (props) => {
       .catch((error) => {
         console.log(error);
       });
-  }, []);
+  }, [props.render, renderThis]);
+
   return (
     <>
       {contextHolder}
@@ -649,6 +676,7 @@ const ProductDetails = (props) => {
             </Col>
           </Row>
         </Col>
+
         <div className={styles.productDetails__table}>
           <Table
             columns={columns}
@@ -656,6 +684,15 @@ const ProductDetails = (props) => {
             scroll={{ y: 400, x: 1300 }}
             loading={loading}
           />
+        </div>
+        <div style={{ textAlign: "center" }}>
+          <Button
+            onClick={() => {
+              completeAdd();
+            }}
+          >
+            Hoàn thành <CheckCircleFilled />
+          </Button>
         </div>
       </div>
     </>

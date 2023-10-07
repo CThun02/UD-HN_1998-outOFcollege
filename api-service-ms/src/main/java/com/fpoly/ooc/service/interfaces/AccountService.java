@@ -13,7 +13,7 @@ import java.util.List;
 
 public interface AccountService {
 
-    Page<AccountResponce> phanTrang(Integer pageNo, Integer size);
+    Page<AccountResponce> phanTrang(Integer pageNo, Integer size, Long roleId);
 
     Account save(AccountRequest request);
 

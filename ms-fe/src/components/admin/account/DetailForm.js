@@ -18,8 +18,6 @@ import {
 import { UserOutlined, FormOutlined } from "@ant-design/icons";
 import { useParams } from "react-router-dom";
 import moment from "moment/moment";
-import { saveImage } from "../../../config/FireBase";
-import { ref, getDownloadURL } from "firebase/storage";
 const { Option } = Select;
 const { Panel } = Collapse;
 const DetailForm = (props) => {
@@ -66,14 +64,6 @@ const DetailForm = (props) => {
       .then((response) => {
         setData(response.data);
         console.log(response.data);
-        getDownloadURL(ref(saveImage, response.data.image))
-          .then((url) => {
-            console.log(url);
-            setImageUrl(url);
-          })
-          .catch((err) => {
-            console.log(err);
-          });
       })
       .catch((err) => console.log(err));
     console.log(data);
@@ -171,7 +161,11 @@ const DetailForm = (props) => {
               <Form.Item className={styles.formContainer}>
                 <Space wrap size={16}>
                   <div className={styles.avatarContainer}>
-                    <Avatar size={200} src={imageUrl} icon={<UserOutlined />} />
+                    <Avatar
+                      size={200}
+                      src={data.image}
+                      icon={<UserOutlined />}
+                    />
                   </div>
                   <Upload
                     name="avatar"

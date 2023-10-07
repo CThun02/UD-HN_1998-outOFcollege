@@ -121,11 +121,9 @@ select * from payment
 
 INSERT INTO role (role_name, status, created_at, updated_at, created_by, updated_by, deleted_at)
 VALUES
-(N'Admin', 'ACTIVE', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL),
-(N'User', 'ACTIVE', '2023-09-15', '2023-09-15', N'Admin', N'Admin', NULL),
-(N'Admin', 'ACTIVE', '2023-10-01', '2023-10-01', N'Admin', N'Admin', NULL),
-(N'User', 'ACTIVE', '2023-09-10', '2023-09-10', N'Admin', N'Admin', NULL),
-(N'Admin', 'ACTIVE', '2023-09-20', '2023-09-20', N'Admin', N'Admin', NULL);
+(N'EMPLOYEE', 'ACTIVE', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL),
+(N'CUSTOMER', 'ACTIVE', '2023-09-15', '2023-09-15', N'Admin', N'Admin', NULL),
+(N'ADMIN', 'ACTIVE', '2023-10-01', '2023-10-01', N'Admin', N'Admin', NULL)
 select * from role
 
 INSERT INTO product (brand_id, category_id, pattern_id, form_id, product_code, product_name, description, status, created_at, updated_at, created_by, updated_by, deleted_at)
@@ -261,15 +259,6 @@ VALUES
 (4, 4, 25.00, 45.00, 'ACTIVE', '2023-09-12', '2023-09-12', N'Admin', N'Admin', NULL),
 (5, 5, 30.00, 63.00, 'ACTIVE', '2023-09-15', '2023-09-15', N'Admin', N'Admin', NULL);
 select * from promotion_product_detail
-
-INSERT INTO product_image (product_detail_id, status, created_at, updated_at, created_by, updated_by, deleted_at)
-VALUES 
-(1, 'ACTIVE', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL),
-(2, 'ACTIVE', '2023-09-05', '2023-09-05', N'Admin', N'Admin', NULL),
-(3, 'ACTIVE', '2023-09-10', '2023-09-10', N'Admin', N'Admin', NULL),
-(4, 'ACTIVE', '2023-09-12', '2023-09-12', N'Admin', N'Admin', NULL),
-(5, 'ACTIVE', '2023-09-15', '2023-09-15', N'Admin', N'Admin', NULL);
-select * from product_image
 
 INSERT INTO favorites_list_detail (favorite_list_id, product_detail_id, status, created_at, updated_at, created_by, updated_by, deleted_at)
 VALUES 

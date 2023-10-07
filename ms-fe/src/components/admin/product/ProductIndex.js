@@ -1,27 +1,16 @@
 import {
-  EditOutlined,
+  EditFilled,
   EyeFilled,
   PlusOutlined,
   SearchOutlined,
   TableOutlined,
 } from "@ant-design/icons";
-import {
-  Col,
-  Row,
-  Select,
-  Table,
-  Pagination,
-  Button,
-  Switch,
-  Radio,
-  message,
-} from "antd";
+import { Col, Row, Select, Table, Button, Switch, Radio, message } from "antd";
 import React, { useEffect, useState } from "react";
 import styles from "./ProductIndex.module.css";
 import axios from "axios";
 import Input from "antd/es/input/Input";
 import { Link } from "react-router-dom";
-import ProductCreate from "./ProductCreate";
 
 var brand = "";
 var category = "";
@@ -116,12 +105,16 @@ const ProductIndex = () => {
       key: "7",
       title: "Thao tác",
       dataIndex: "id",
-      width: 100,
       render: (id) => (
         <>
           <Link to={`/admin/product/details/${id}`}>
             <Button className={styles.product__button}>
               <EyeFilled />
+            </Button>
+          </Link>
+          <Link to={`/admin/product/update-details/${id}`}>
+            <Button className={styles.product__button}>
+              <EditFilled />
             </Button>
           </Link>
         </>
@@ -430,13 +423,6 @@ const ProductIndex = () => {
             />
           </div>
         </div>
-        <ProductCreate
-          brands={brands}
-          patterns={patterns}
-          categories={categories}
-          forms={forms}
-          render={setRendering}
-        />
       </div>
     </>
   );

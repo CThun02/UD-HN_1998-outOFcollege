@@ -119,35 +119,32 @@ const MyForm = (props) => {
       .then((url) => {
         console.log("Đường dẫn tham chiếu:", url);
         values.image = url; // Lưu đường dẫn vào biến values.image
+        try {
+          // Gửi yêu cầu POST đến API
+          const response = axios.post(
+            "http://localhost:8080/api/admin/account/create",
+            values
+          );
+          console.log(response.data); // Đây là phản hồi từ API
+          messageApi.loading("loading", 2);
+          setTimeout(() => {
+            notification.open({
+              message: "Notification",
+              description: `Thêm mới ${
+                Number(roleId) === 1 ? "nhân viên" : "khách hàng"
+              } thành công`,
+              icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
+            });
+            navigate("/admin/employee");
+          }, 2000);
+        } catch (error) {
+          console.error(error);
+        }
       })
       .catch((error) => {
         console.error("Lỗi khi tải lên ảnh:", error);
       });
-    values.image = `/accounts/employees/${
-      currentTimeInMillis + values.username
-    }`;
     // Xử lý khi gửi form thành công
-    try {
-      // Gửi yêu cầu POST đến API
-      const response = await axios.post(
-        "http://localhost:8080/api/admin/account/create",
-        values
-      );
-      console.log(response.data); // Đây là phản hồi từ API
-      messageApi.loading("loading", 2);
-      setTimeout(() => {
-        notification.open({
-          message: "Notification",
-          description: `Thêm mới ${
-            Number(roleId) === 1 ? "nhân viên" : "khách hàng"
-          } thành công`,
-          icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
-        });
-        navigate("/admin/employee");
-      }, 2000);
-    } catch (error) {
-      console.error(error);
-    }
   };
 
   return (

@@ -1,15 +1,16 @@
 package com.fpoly.ooc.repository;
 
-import com.fpoly.ooc.entity.Product;
 import com.fpoly.ooc.entity.ProductImage;
+import com.fpoly.ooc.responce.product.ProductImageResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
 public interface ProductImgRepositoryI extends JpaRepository<ProductImage, Long> {
-    public List<ProductImage> findProductImagesByProduct(Product product);
-    public ProductImage findProductImagesByProductAndAndPath(Product product, String path);
-
+    @Query("SELECT pi.id as id, pi.product as product, pi.color as color," +
+            " pi.path, pi.status as status FROM ProductImage pi where pi.product.id=?1 and pi.color.id=?2")
+    public List<ProductImageResponse> getProductImageByProductIdAndColorId(Long productId, Long colorId);
 }

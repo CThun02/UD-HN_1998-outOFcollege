@@ -35,7 +35,6 @@ public class ProductServiceImpl implements ProductServiceI {
     @Override
     public Product update(Product product) {
         Product productCheck = this.getOne(product.getId());
-        System.out.println(product.getId());
         if(productCheck != null){
             productCheck = repo.save(product);
         }

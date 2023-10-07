@@ -8,6 +8,7 @@ import com.fpoly.ooc.service.interfaces.ProductDetailServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -80,5 +81,40 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
             values = Optional.of(repo.searchProductDetailByProductCode(keyWords));
         }
         return values.orElse(null);
+    }
+
+    @Override
+    public List<Long> getColorsBydIdPro(Long productId) {
+        return repo.getColorsBydIdPro(productId);
+    }
+
+    @Override
+    public List<Long> getSizesBydIdPro(Long productId) {
+        return repo.getSizesBydIdPro(productId);
+    }
+
+    @Override
+    public List<Long> getShirtTailsBydIdPro(Long productId) {
+        return repo.getShirtTailsBydIdPro(productId);
+    }
+
+    @Override
+    public List<Long> getMaterialsBydIdPro(Long productId) {
+        return repo.getMaterialsBydIdPro(productId);
+    }
+
+    @Override
+    public List<Long> getCollarsBydIdPro(Long productId) {
+        return repo.getCollarsBydIdPro(productId);
+    }
+
+    @Override
+    public List<Long> getButtonsBydIdPro(Long productId) {
+        return repo.getButtonsBydIdPro(productId);
+    }
+
+    @Override
+    public List<Long> getSleevesBydIdPro(Long productId) {
+        return repo.getSleevesBydIdPro(productId);
     }
 }

@@ -4,6 +4,7 @@ import com.fpoly.ooc.entity.Color;
 import com.fpoly.ooc.entity.Product;
 import com.fpoly.ooc.entity.ProductImage;
 import com.fpoly.ooc.repository.ProductImgRepositoryI;
+import com.fpoly.ooc.responce.product.ProductImageResponse;
 import com.fpoly.ooc.service.interfaces.ProductImageServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -42,13 +43,9 @@ public class ProductImageService implements ProductImageServiceI {
     }
 
     @Override
-    public List<ProductImage> getProductImagesByProduct(Product product){
-        return repo.findProductImagesByProduct(product);
+    public List<ProductImageResponse> getProductImageByProductIdAndColorId(Long productId, Long colorId) {
+        return repo.getProductImageByProductIdAndColorId(productId, colorId);
     }
 
-    @Override
-    public ProductImage getProductImagesByProductAndPath(Product product, String path) {
-        return repo.findProductImagesByProductAndAndPath(product, path);
-    }
 
 }

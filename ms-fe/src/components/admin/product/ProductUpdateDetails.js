@@ -1,33 +1,34 @@
-import { PlusOutlined, PlusSquareOutlined } from "@ant-design/icons";
-import { Button, Col, message, Row, Select } from "antd";
+import { EditOutlined, PlusSquareOutlined } from "@ant-design/icons";
+import { Button, Col, Row, Select, message } from "antd";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import styles from "./ProductUpdateDetails.module.css";
 import { displayFrame } from "../animations/animation";
 import "../animations/animation.css";
 import ProductCreate from "./ProductCreate";
-import styles from "./ProductCreateDetails.module.css";
 import ProductDetailsTable from "./ProductDetailsTable";
 
-const ProductCreateDetails = (props) => {
+const ProductUpdateDetails = () => {
   const api = "http://localhost:8080/api/admin/";
+  const { productId } = useParams();
   const [messageApi, contextHolder] = message.useMessage();
-  const [sizes, setSizes] = useState(null);
-  const [colors, setColors] = useState(null);
-  const [buttons, setButtons] = useState(null);
-  const [collars, setCollars] = useState(null);
-  const [materials, setMaterials] = useState(null);
-  const [sleeves, setSleeves] = useState(null);
-  const [shirtTails, setshirtTails] = useState(null);
-  const [sizesCreate, setSizesCreate] = useState([]);
-  const [colorsCreate, setColorsCreate] = useState([]);
-  const [buttonsCreate, setButtonsCreate] = useState([]);
-  const [collarsCreate, setCollarsCreate] = useState([]);
-  const [materialsCreate, setMaterialsCreate] = useState([]);
-  const [sleevesCreate, setSleevesCreate] = useState([]);
-  const [shirtTailsCreate, setshirtTailsCreate] = useState([]);
-  const [productList, setProductList] = useState(null);
+  const [sizes, setSizes] = useState([]);
+  const [colors, setColors] = useState([]);
+  const [buttons, setButtons] = useState([]);
+  const [collars, setCollars] = useState([]);
+  const [materials, setMaterials] = useState([]);
+  const [sleeves, setSleeves] = useState([]);
+  const [shirtTails, setshirtTails] = useState([]);
+  const [sizesUpdate, setSizesUpdate] = useState([]);
+  const [colorsUpdate, setColorsUpdate] = useState([]);
+  const [buttonsUpdate, setButtonsUpdate] = useState([]);
+  const [collarsUpdate, setCollarsUpdate] = useState([]);
+  const [materialsUpdate, setMaterialsUpdate] = useState([]);
+  const [sleevesUpdate, setSleevesUpdate] = useState([]);
+  const [shirtTailsUpdate, setshirtTailsUpdate] = useState([]);
   const [render, setRender] = useState(1);
-  const [imgDefault, setImgDefault] = useState("");
+  var productDetailsDisplay = [];
   const [product, setProduct] = useState({
     productId: null,
     productName: "",
@@ -38,107 +39,17 @@ const ProductCreateDetails = (props) => {
     description: "",
     imgDefault: "",
   });
-  const [productDetail, setProductDetail] = useState({
-    productId: null,
-    buttonId: " ",
-    materialId: " ",
-    collarId: " ",
-    sleeveId: " ",
-    sizeId: " ",
-    colorId: " ",
-    shirtTailId: " ",
-    price: 200000,
-    quantity: 1,
-  });
-  var productDetailsCreate = renderProductDetails();
-
-  //fucntion
-  function handleSetProductDetail(field, value) {
-    setProductDetail((prevProduct) => ({
-      ...prevProduct,
-      [field]: value,
-    }));
-  }
-
-  function selectProduct(index) {
-    setProduct(productList[index]);
-    handleSetProductDetail("productId", productList[index].id);
-  }
-
-  function renderProductDetails() {
-    let list = [];
-    if (
-      buttonsCreate.length > 0 &&
-      materialsCreate.length > 0 &&
-      collarsCreate.length > 0 &&
-      shirtTailsCreate.length > 0 &&
-      sleevesCreate.length > 0 &&
-      colorsCreate.length > 0 &&
-      sizesCreate.length > 0
-    ) {
-      var index = 0;
-      for (let button of buttonsCreate) {
-        for (let material of materialsCreate) {
-          for (let collar of collarsCreate) {
-            for (let sleeve of sleevesCreate) {
-              for (let shirtTail of shirtTailsCreate) {
-                for (let size of sizesCreate) {
-                  for (let color of colorsCreate) {
-                    let productDetailDisplay = {
-                      id: index++,
-                      button: {
-                        id: button.key,
-                        name: button.label,
-                      },
-                      material: {
-                        id: material.key,
-                        name: material.label,
-                      },
-                      collar: {
-                        id: collar.key,
-                        name: collar.label,
-                      },
-                      shirtTail: {
-                        id: shirtTail.key,
-                        name: shirtTail.label,
-                      },
-                      sleeve: {
-                        id: sleeve.key,
-                        name: sleeve.label,
-                      },
-                      size: {
-                        id: size.key,
-                        name: size.label,
-                      },
-                      color: {
-                        id: color.key,
-                        code: color.value,
-                        name: color.label,
-                      },
-                      quantity: 10,
-                      price: 200000,
-                      status: "ACTIVE",
-                    };
-                    list.push(productDetailDisplay);
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-    return list;
-  }
-
+  const [productDetails, setProductDetails] = useState([]);
+  var colorUpdatesDisplay = [];
+  //functions
   useEffect(() => {
     axios
-      .get(api + "product/getProductCreateDetail")
-      .then((res) => {
-        setProductList(res.data);
+      .get(api + "product/getProductEdit?productId=" + productId)
+      .then((response) => {
+        setProduct(response.data);
       })
-      .catch((err) => {
-        console.log(err);
+      .catch((error) => {
+        console.log(error);
       });
     axios
       .get(api + "size")
@@ -196,25 +107,133 @@ const ProductCreateDetails = (props) => {
       .catch((error) => {
         console.log(error);
       });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    axios
+      .get(
+        api +
+          "product/getProductDetailEachComByProductId?productId=" +
+          productId +
+          "&comsName=size"
+      )
+      .then((response) => {
+        setSizesUpdate(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    axios
+      .get(
+        api +
+          "product/getProductDetailEachComByProductId?productId=" +
+          productId +
+          "&comsName=color"
+      )
+      .then((response) => {
+        setColorsUpdate(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    axios
+      .get(
+        api +
+          "product/getProductDetailEachComByProductId?productId=" +
+          productId +
+          "&comsName=button"
+      )
+      .then((response) => {
+        setButtonsUpdate(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    axios
+      .get(
+        api +
+          "product/getProductDetailEachComByProductId?productId=" +
+          productId +
+          "&comsName=material"
+      )
+      .then((response) => {
+        setMaterialsUpdate(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    axios
+      .get(
+        api +
+          "product/getProductDetailEachComByProductId?productId=" +
+          productId +
+          "&comsName=collar"
+      )
+      .then((response) => {
+        setCollarsUpdate(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    axios
+      .get(
+        api +
+          "product/getProductDetailEachComByProductId?productId=" +
+          productId +
+          "&comsName=shirtTail"
+      )
+      .then((response) => {
+        setshirtTailsUpdate(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    axios
+      .get(
+        api +
+          "product/getProductDetailEachComByProductId?productId=" +
+          productId +
+          "&comsName=sleeve"
+      )
+      .then((response) => {
+        setSleevesUpdate(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    axios
+      .get(
+        api +
+          "product/getProductDetailByProductId?productId=" +
+          productId +
+          "&status="
+      )
+      .then((response) => {
+        setProductDetails(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }, [render]);
+
   return (
     <>
-      <div className={styles.product}>
-        <ProductCreate render={setRender} />
+      <div className={styles.productUpdateDetails}>
+        <ProductCreate
+          render={setRender}
+          productId={productId}
+          isUpdate={true}
+        />
         {contextHolder}
         <Row>
           <Col span={10} className={styles.product__Form}>
             <h2>
-              <PlusOutlined /> Thêm mới sản phẩm
+              <EditOutlined /> Chỉnh sửa sản phẩm - {product.productCode}
             </h2>
             <br />
             <Row>
               <Col span={8}>
-                <div className={styles.product__FormImg}>
+                <div className={styles.productUpdateDetails__imgProduct}>
                   <img
                     src={
-                      imgDefault ||
+                      product.imgDefault ||
                       "https://lh3.googleusercontent.com/EbXw8rOdYxOGdXEFjgNP8lh-YAuUxwhOAe2jhrz3sgqvPeMac6a6tHvT35V6YMbyNvkZL4R_a2hcYBrtfUhLvhf-N2X3OB9cvH4uMw=w1064-v0"
                     }
                     height={240}
@@ -227,55 +246,16 @@ const ProductCreateDetails = (props) => {
                   <h6>Tên sản phẩm</h6>
                   <Row>
                     <Col span={22}>
-                      <div
-                        style={{
-                          marginRight: "20px",
-                        }}
-                      >
-                        <Select
-                          showSearch
-                          style={{
-                            width: "100%",
-                          }}
-                          placeholder="Search to Select"
-                          optionFilterProp="children"
-                          filterOption={(input, option) =>
-                            (option?.label ?? "").includes(input)
-                          }
-                          filterSort={(optionA, optionB) =>
-                            (optionA?.label ?? "")
-                              .toLowerCase()
-                              .localeCompare(
-                                (optionB?.label ?? "").toLowerCase()
-                              )
-                          }
-                          onChange={(index) => {
-                            selectProduct(index);
-                          }}
-                        >
-                          {productList &&
-                            productList.map((item, index) => {
-                              return (
-                                <Select.Option
-                                  key={item.id}
-                                  label={item.productName}
-                                  value={index}
-                                >
-                                  {item.productName}
-                                </Select.Option>
-                              );
-                            })}
-                        </Select>
-                      </div>
+                      <p>{product.productName}</p>
                     </Col>
-                    <Col span={2}>
+                    <Col span={2} style={{ marginBottom: "4px" }}>
                       <Button
                         onClick={() => {
                           displayFrame("productCreate", "productCreateFrame");
                         }}
-                        className={styles.product_ButtonCreate}
+                        className={styles.product_ButtonUpdate}
                       >
-                        <PlusOutlined />
+                        <EditOutlined />
                       </Button>
                     </Col>
                   </Row>
@@ -328,14 +308,10 @@ const ProductCreateDetails = (props) => {
                   <h6>Loại cúc áo</h6>
                   <Select
                     showSearch
+                    style={{ width: "100%" }}
                     placeholder="Button"
                     mode="multiple"
-                    className={styles.product__createDetailsSelect}
-                    onChange={(event, record) => {
-                      setButtonsCreate(record);
-                      setRender(event);
-                    }}
-                    status={productDetail.buttonId === "" ? "error" : ""}
+                    value={buttonsUpdate}
                   >
                     {buttons &&
                       buttons.map((item) => {
@@ -357,14 +333,11 @@ const ProductCreateDetails = (props) => {
                   <h6>Chất liệu</h6>
                   <Select
                     showSearch
+                    style={{ width: "100%" }}
                     placeholder="Material"
                     mode="multiple"
-                    className={styles.product__createDetailsSelect}
-                    onChange={(event, record) => {
-                      setMaterialsCreate(record);
-                      setRender(event);
-                    }}
-                    status={productDetail.materialId === "" ? "error" : ""}
+                    onChange={(event, record) => {}}
+                    value={materialsUpdate}
                   >
                     {materials &&
                       materials.map((item) => {
@@ -386,14 +359,11 @@ const ProductCreateDetails = (props) => {
                   <h6>Cổ áo</h6>
                   <Select
                     showSearch
+                    style={{ width: "100%" }}
                     placeholder="Collar"
                     mode="multiple"
-                    className={styles.product__createDetailsSelect}
-                    onChange={(event, record) => {
-                      setCollarsCreate(record);
-                      setRender(event);
-                    }}
-                    status={productDetail.collarId === "" ? "error" : ""}
+                    value={collarsUpdate}
+                    onChange={(event, record) => {}}
                   >
                     {collars &&
                       collars.map((item) => {
@@ -415,14 +385,11 @@ const ProductCreateDetails = (props) => {
                   <h6>Tay áo</h6>
                   <Select
                     showSearch
+                    style={{ width: "100%" }}
                     placeholder="Sleeve"
                     mode="multiple"
-                    className={styles.product__createDetailsSelect}
-                    onChange={(event, record) => {
-                      setSleevesCreate(record);
-                      setRender(event);
-                    }}
-                    status={productDetail.sleeveId === "" ? "error" : ""}
+                    value={sleevesUpdate}
+                    onChange={(event, record) => {}}
                   >
                     {sleeves &&
                       sleeves.map((item) => {
@@ -444,14 +411,11 @@ const ProductCreateDetails = (props) => {
                   <h6>Đuôi áo</h6>
                   <Select
                     showSearch
+                    style={{ width: "100%" }}
                     placeholder="Shirt tail"
                     mode="multiple"
-                    className={styles.product__createDetailsSelect}
-                    onChange={(event, record) => {
-                      setshirtTailsCreate(record);
-                      setRender(event);
-                    }}
-                    status={productDetail.shirtTailId === "" ? "error" : ""}
+                    onChange={(event, record) => {}}
+                    value={shirtTailsUpdate}
                   >
                     {shirtTails &&
                       shirtTails.map((item) => {
@@ -473,10 +437,11 @@ const ProductCreateDetails = (props) => {
                   <h6>Kích cỡ</h6>
                   <Select
                     showSearch
+                    style={{ width: "100%" }}
                     mode="multiple"
+                    value={sizesUpdate}
                     placeholder="size"
                     optionFilterProp="children"
-                    className={styles.product__createDetailsSelect}
                     filterOption={(input, option) =>
                       (option?.label ?? "").includes(input)
                     }
@@ -485,11 +450,7 @@ const ProductCreateDetails = (props) => {
                         .toLowerCase()
                         .localeCompare((optionB?.label ?? "").toLowerCase())
                     }
-                    onChange={(event, record) => {
-                      setSizesCreate(record);
-                      setRender(event);
-                    }}
-                    status={productDetail.sizeId === "" ? "error" : ""}
+                    onChange={(event, record) => {}}
                   >
                     {sizes &&
                       sizes.map((item) => {
@@ -511,10 +472,11 @@ const ProductCreateDetails = (props) => {
                   <h6>Màu sắc</h6>
                   <Select
                     showSearch
+                    style={{ width: "100%" }}
                     mode="multiple"
                     placeholder="Color"
                     optionFilterProp="children"
-                    className={styles.product__createDetailsSelect}
+                    value={colorsUpdate}
                     filterOption={(input, option) =>
                       (option?.label ?? "").includes(input)
                     }
@@ -523,19 +485,24 @@ const ProductCreateDetails = (props) => {
                         .toLowerCase()
                         .localeCompare((optionB?.label ?? "").toLowerCase())
                     }
-                    onChange={(event, record) => {
-                      setColorsCreate(record);
-                      setRender(event);
-                    }}
-                    status={productDetail.colorId === "" ? "error" : ""}
+                    onChange={(event, record) => {}}
                   >
                     {colors &&
                       colors.map((item) => {
+                        colorsUpdate.forEach((color) => {
+                          if (color === item.id) {
+                            colorUpdatesDisplay.push({
+                              key: item.id,
+                              label: item.colorName,
+                              value: item.colorCode,
+                            });
+                          }
+                        });
                         return (
                           <Select.Option
-                            key={item.id}
+                            key={item.colorCode}
                             label={item.colorName}
-                            value={item.colorCode}
+                            value={item.id}
                           >
                             <div className={styles.optionColor}>
                               <span
@@ -553,18 +520,21 @@ const ProductCreateDetails = (props) => {
           </Col>
         </Row>
       </div>
-      {product.productId !== null &&
-      colorsCreate.length > 0 &&
-      productDetailsCreate.length > 0 ? (
+
+      {productId !== null &&
+      colorUpdatesDisplay.length > 0 &&
+      productDetails.length > 0 ? (
         <ProductDetailsTable
           product={product}
-          colorsCreate={colorsCreate}
-          productDetails={productDetailsCreate}
-          setImgDefault={setImgDefault}
+          colorsCreate={colorUpdatesDisplay}
+          productDetailsUpdate={productDetails}
+          productDetails={productDetailsDisplay}
+          isUpdate={true}
+          render={setRender}
         />
       ) : null}
     </>
   );
 };
 
-export default ProductCreateDetails;
+export default ProductUpdateDetails;

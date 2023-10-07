@@ -9,6 +9,7 @@ import {
   Form,
   notification,
   Spin,
+  Modal,
 } from "antd";
 import styles from "./CreatePromotion.module.css";
 import { useEffect, useRef, useState } from "react";
@@ -21,11 +22,12 @@ import AddProductInPromotion from "./AddProductInPromotion";
 import { EditOutlined, ExclamationCircleFilled } from "@ant-design/icons";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import confirm from "antd/es/modal/confirm";
 import axios from "axios";
 import moment from "moment";
 import { useContext } from "react";
 import { NotificationContext } from "../../element/notification/Notification";
+
+const { confirm } = Modal;
 
 function disabledDate(current) {
   return (
@@ -163,7 +165,7 @@ function CreatePromotion() {
               .then(() => {
                 setIsLoading(false);
                 navigate("/admin/promotion");
-                showSuccessNotification("Thao tác thành công");
+                showSuccessNotification("Thao tác thành công", "promotion");
               })
               .catch((err) => {
                 console.log("err: ", err);

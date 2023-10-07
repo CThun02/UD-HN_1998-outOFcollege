@@ -30,14 +30,7 @@ import { NotificationContext } from "../../element/notification/Notification";
 const { confirm } = Modal;
 
 function disabledDate(current) {
-  return (
-    current &&
-    current <
-      dayjs(
-        moment(new Date().toLocaleDateString()).format(dateFormat),
-        dateFormat
-      )
-  );
+  return current && current <= dayjs().endOf("day");
 }
 
 const options = [
@@ -70,11 +63,19 @@ const validationSchema = Yup.object().shape({
     .required("* Ngày kết thúc không được bỏ trống")
     .test(
       "end-date",
-      "* Ngày kết thúc phải lớn hơn ngày bắt đầu",
+      "* Ngày kết thúc phải lớn hơn ngày bắt đầu 30 phút",
       function (endDate) {
         const { startDate } = this.parent;
         if (startDate && endDate) {
-          return endDate > startDate;
+          const timeStartDate = moment(startDate).format("HH:mm:ss");
+          const timeEndDate = moment(endDate).format("HH:mm:ss");
+          const time = moment(timeStartDate, "HH:mm:ss").add(29, "minutes");
+
+          console.log("timeEndDate: ", timeEndDate);
+          console.log("time: ", moment(time).format("HH:mm:ss"));
+          return (
+            endDate > startDate && timeEndDate > moment(time).format("HH:mm:ss")
+          );
         }
         return true;
       }
@@ -92,9 +93,39 @@ const validationSchema = Yup.object().shape({
     ),
 });
 
+const range = (start, end) => {
+  const result = [];
+  for (let i = start; i < end; i++) {
+    result.push(i);
+  }
+  return result;
+};
+
+const rangeFunction = (start) => {
+  const result = [];
+  for (let i = start; i >= 0; i--) {
+    result.push(i);
+  }
+  return result;
+};
+
+const disabledDateTime = (current) => {
+  const currentDate = moment(new Date()).format("DD/MM/YYYY");
+  const selectedDate = moment(current).format("DD/MM/YYYY");
+
+  if (selectedDate > currentDate) {
+    return {
+      disabledHours: () => range(0, 24).splice(0, moment().hour()),
+      disabledMinutes: () => rangeFunction(moment().minute()),
+    };
+  }
+
+  return {};
+};
+
 dayjs.extend(customParseFormat);
 
-const dateFormat = "DD/MM/YYYY";
+const dateFormat = "HH:mm:ss DD/MM/YYYY";
 
 const baseUrl = "http://localhost:8080/api/admin/promotion/";
 
@@ -414,6 +445,7 @@ function CreatePromotion() {
                               <DatePicker
                                 name="startDate"
                                 disabledDate={disabledDate}
+                                disabledTime={disabledDateTime}
                                 format={dateFormat}
                                 size="large"
                                 placeholder={null}
@@ -436,6 +468,9 @@ function CreatePromotion() {
                                     ? "error"
                                     : "success"
                                 }
+                                showTime={{
+                                  defaultValue: dayjs("00:00:00", "HH:mm:ss"),
+                                }}
                               />
                               {touched.startDate && (
                                 <div className={styles.errors}>
@@ -456,6 +491,7 @@ function CreatePromotion() {
                               <DatePicker
                                 name="endDate"
                                 disabledDate={disabledDate}
+                                disabledTime={disabledDateTime}
                                 format={dateFormat}
                                 size="large"
                                 placeholder={null}
@@ -475,6 +511,9 @@ function CreatePromotion() {
                                     : "success"
                                 }
                                 disabled={values.status === "INACTIVE"}
+                                showTime={{
+                                  defaultValue: dayjs("00:00:00", "HH:mm:ss"),
+                                }}
                               />
                               {touched.endDate && (
                                 <div className={styles.errors}>

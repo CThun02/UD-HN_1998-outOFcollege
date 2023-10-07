@@ -27,6 +27,7 @@ import axios from "axios";
 import moment from "moment";
 import { useContext } from "react";
 import { NotificationContext } from "../../element/notification/Notification";
+import numeral from "numeral";
 
 const baseUrl = "http://localhost:8080/api/admin/promotion-product/";
 const basePromotionUrl = "http://localhost:8080/api/admin/promotion/";
@@ -272,14 +273,18 @@ function Promotion() {
                 stt: calculateStt(index),
                 promotionCode: promotion.promotionCode,
                 promotionName: promotion.promotionName,
-                productQuantity: promotion.productQuantity,
-                promotionValue: `${promotion.promotionValue} ${
-                  promotion.promotionMethod === "vnd" ? "VND" : "%"
-                }`,
+                productQuantity: numeral(promotion.productQuantity).format(
+                  "0,0"
+                ),
+                promotionValue: `${numeral(promotion.promotionValue).format(
+                  "0,0"
+                )} ${promotion.promotionMethod === "vnd" ? "VND" : "%"}`,
                 startAndEndDate: [
                   `${moment(promotion.startDate).format(
-                    "DD/MM/YYYY"
-                  )} - ${moment(promotion.endDate).format("DD/MM/YYYY")}`,
+                    "HH:mm:ss DD/MM/YYYY"
+                  )} - ${moment(promotion.endDate).format(
+                    "HH:mm:ss DD/MM/YYYY"
+                  )}`,
                   promotion.status === "ACTIVE"
                     ? "Đang diễn ra"
                     : promotion.status === "INACTIVE"

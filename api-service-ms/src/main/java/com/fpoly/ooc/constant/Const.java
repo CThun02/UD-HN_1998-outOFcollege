@@ -39,5 +39,9 @@ public class Const {
     //ErrorCode
     public static final String HTTP_ERROR_CODE = "BAD_REQUEST";
 
+    //kafka
+    public static final String KAFKA_SERVER = "localhost:9092";
+    public static final String KAFKA_GROUP_ID = "group-id";
+
 
 }

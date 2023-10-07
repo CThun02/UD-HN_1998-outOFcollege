@@ -304,8 +304,10 @@ function Voucher() {
                       voucher.objectUse === "all" ? "Tất cả" : "Thành viên",
                     startAndEndDate: [
                       `${moment(voucher.startDate).format(
-                        "DD/MM/YYYY"
-                      )} - ${moment(voucher.endDate).format("DD/MM/YYYY")}`,
+                        "HH:mm:ss DD/MM/YYYY"
+                      )} - ${moment(voucher.endDate).format(
+                        "HH:mm:ss DD/MM/YYYY"
+                      )}`,
                       voucher.status === "ACTIVE"
                         ? "Đang diễn ra"
                         : voucher.status === "INACTIVE"

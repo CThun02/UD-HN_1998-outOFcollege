@@ -1,27 +1,19 @@
 import React from "react";
+import QRScanner from "./QRScanner";
 import { useNavigate, useParams } from "react-router-dom";
 import DetailForm from "./DetailForm";
-import {
-  Table,
-  Space,
-  Pagination,
-  Button,
-  Row,
-  Col,
-  Modal,
-  Form,
-  Input,
-  Radio,
-} from "antd";
+import { Table, Space, Pagination, Button, Row, Col, Form, Modal } from "antd";
 import { EyeOutlined, FileOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import style from "./styles/Customerlndex.module.css";
-
+import { saveImage } from "../../../config/FireBase";
+import { ref, getDownloadURL } from "firebase/storage";
 import axios from "axios";
 function CustomerTable(props) {
-  const [selectedUsername, setSelectedUsername] = useState({});
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [showQRScannerModal, setShowQRScannerModal] = useState(false); // State để xác định hiển thị modal
+  const [qrCodeResult, setQRCodeResult] = useState("");
   let roleId = props.roleId;
 
   const [form] = Form.useForm();
@@ -43,22 +35,43 @@ function CustomerTable(props) {
     fetchData(page - 1);
   };
   const fetchData = (page) => {
-    // Gửi yêu cầu API để lấy dữ liệu cho trang `page`
-    // Sau khi nhận được dữ liệu mới, bạn có thể cập nhật state hoặc thực hiện các thao tác khác
-    axios
-      .get(`http://localhost:8080/api/admin/account/viewAll?page=${page}`)
-      .then((response) => {
-        setData(response.data.content);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    if (roleId) {
+      axios
+        .get(
+          `http://localhost:8080/api/admin/account/viewAll?page=${page}&roleId=${roleId}`
+        )
+        .then((response) => {
+          setData(response.data.content);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
   };
 
+  const url = async (urlImg) => {
+    if (urlImg !== null && urlImg !== undefined && urlImg !== "") {
+      await getDownloadURL(ref(saveImage, urlImg))
+        .then((url) => {
+          console.log(url);
+          return url;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  };
   const handleOpenSecondModal = async (customer) => {
     navigate(
       `/admin/${roleId === 1 ? "employee" : "customer"}/detail/${customer}`
     );
+  };
+  const handleOpenQRScannerModal = () => {
+    setShowQRScannerModal(true); // Hiển thị modal quét mã QR
+  };
+
+  const handleCloseQRScannerModal = () => {
+    setShowQRScannerModal(false); // Ẩn modal quét mã QR
   };
 
   return (
@@ -72,21 +85,23 @@ function CustomerTable(props) {
             dataIndex: "stt",
             key: "id",
             render: (_, record) => {
-              return data.indexOf(record) + 1;
+              return (currentPage - 1) * 5 + data.indexOf(record) + 1;
             },
           },
 
           {
             title: "Ảnh",
-            dataIndex: "image",
-            key: "image",
+            dataIndex: "avatar",
+            key: "avatar",
             render: (_, image) => (
-              <img
-                src={image.image}
-                className={style.picture}
-                alt="Avatar"
-                style={{ width: "50px", height: "50px" }}
-              />
+              <>
+                <img
+                  src={url(image.image)}
+                  className={style.picture}
+                  alt="Avatar"
+                  style={{ width: "50px", height: "50px" }}
+                />
+              </>
             ),
           },
           {
@@ -124,7 +139,7 @@ function CustomerTable(props) {
       <div className="">
         <Row align="bottom" className={style.btnCRUD}>
           <Col span={2} className="">
-            <Button className={style.faEye}>
+            <Button className={style.faEye} onClick={handleOpenQRScannerModal}>
               <span>
                 <FileOutlined />
               </span>
@@ -146,6 +161,18 @@ function CustomerTable(props) {
           </Col>
         </Row>
       </div>
+      <Modal
+        visible={showQRScannerModal}
+        onCancel={handleCloseQRScannerModal}
+        footer={null}
+      >
+        <QRScanner
+          onScan={(result) => {
+            setQRCodeResult(result); // Lưu kết quả quét mã QR
+            handleCloseQRScannerModal(); // Đóng modal sau khi quét thành công
+          }}
+        />
+      </Modal>
     </div>
   );
 }

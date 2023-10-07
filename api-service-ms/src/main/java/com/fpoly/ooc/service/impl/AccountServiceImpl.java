@@ -26,6 +26,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -41,6 +42,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Autowired
     private AddressDetailRepository addressDetailRepository;
+
 
     @Override
     public Page<AccountResponce> phanTrang(Integer pageNo, Integer size, Long roleId) {
@@ -114,6 +116,22 @@ public class AccountServiceImpl implements AccountService {
 //        addressDetailRepository.save(addressDetail);
         return createAccount;
     }
+
+    @Override
+    public List<AddressDetail> getAddressDetailsByUsername(String username) {
+        Account account = accountRepository.findById(username).orElse(null);
+        if (account == null) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.USER_NOT_FOUND));
+        }
+
+        List<AddressDetail> addressDetails = account.getAddAdress();
+        List<AddressDetail> addressDetailDTOs = new ArrayList<>();
+
+
+
+
+    }
+
 
     @Override
     public AccountDetailResponce detail(String username) {

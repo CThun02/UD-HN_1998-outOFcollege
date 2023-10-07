@@ -11,13 +11,11 @@ import com.fpoly.ooc.repository.CartRepo;
 import com.fpoly.ooc.request.bill.BillDetailRequest;
 import com.fpoly.ooc.responce.bill.BillProductResponse;
 import com.fpoly.ooc.responce.bill.BillResponse;
-import com.fpoly.ooc.responce.cart.CartResponse;
 import com.fpoly.ooc.service.interfaces.BillDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -44,43 +42,33 @@ public class BillDetailServiceImpl implements BillDetailService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public BillDetail createBill(BillDetailRequest request) {
-        Account accountBuilder = null;
-        BillDetail billDetail = null;
-        BigDecimal totalPrice = new BigDecimal(0);
+//        Account accountBuilder = null;
+//
+//        if (request.getAccountId() != null) {
+//            accountBuilder = Account.builder().username(request.getAccountId()).build();
+//        }
+//
+//        Bill bill = Bill.builder()
+//                .account(accountBuilder)
+//                .completionDate(LocalDateTime.now())
+//                .dateOfReceipt(LocalDateTime.now())
+//                .price(request.getTotalPrice())
+//                .billType("in-store")
+//                .build();
+//
+//        billRepo.save(bill);
+//
+//        BillDetail   billDetail = BillDetail.builder()
+//                .bill(bill)
+//                .productDetail(ProductDetail.builder().id(request.getProductDetailId()).build())
+//                .price(request.getPrice())
+//                .quantity(request.getQuantity())
+//                .status("wating")
+//                .build();
+//
+//        billDetailRepo.save(billDetail);
 
-        if (request.getAccountId() != null) {
-            accountBuilder = Account.builder().username(request.getAccountId()).build();
-        }
-
-        for (CartResponse cart : cartDetailRepo.getAllCart()) {
-            totalPrice = totalPrice.add(cart.getPrice().multiply(BigDecimal.valueOf(cart.getQuantity())));
-        }
-
-        Bill bill = Bill.builder()
-                .account(accountBuilder)
-                .completionDate(LocalDateTime.now())
-                .dateOfReceipt(LocalDateTime.now())
-                .price(totalPrice)
-                .billType("sale counter")
-                .build();
-
-        billRepo.save(bill);
-
-        for (CartResponse cart : cartDetailRepo.getAllCart()) {
-            billDetail = BillDetail.builder()
-                    .bill(bill)
-                    .productDetail(ProductDetail.builder().id(cart.getProductDetailId()).build())
-                    .price(cart.getPrice())
-                    .quantity(cart.getQuantity())
-                    .status("wating")
-                    .build();
-
-            billDetailRepo.save(billDetail);
-            cartDetailRepo.deleteById(cart.getCartDetailId());
-            cartRepo.deleteById(cart.getCartId());
-        }
-
-        return billDetail;
+        return null;
     }
 
     @Transactional(rollbackFor = Exception.class)

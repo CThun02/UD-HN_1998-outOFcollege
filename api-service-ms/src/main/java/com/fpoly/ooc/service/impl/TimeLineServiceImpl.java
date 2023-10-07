@@ -3,7 +3,7 @@ package com.fpoly.ooc.service.impl;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
 import com.fpoly.ooc.entity.Bill;
-import com.fpoly.ooc.entity.TimeLine;
+import com.fpoly.ooc.entity.Timeline;
 import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.BillRepo;
 import com.fpoly.ooc.repository.TimeLineRepo;
@@ -39,13 +39,13 @@ public class TimeLineServiceImpl implements TimeLineService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public TimeLine createTimeLine(Long billId, TimeLinerequest request) {
+    public Timeline createTimeLine(Long billId, TimeLinerequest request) {
         Bill bill = billRepo.findById(billId).orElse(null);
         if (bill == null) {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND));
         }
 
-        TimeLine timeLine = new TimeLine();
+        Timeline timeLine = new Timeline();
         timeLine.setBill(bill);
         timeLine.setNote(request.getNote());
         if (request.getStatus() == null) {

@@ -26,6 +26,9 @@ import {
 import axios from "axios";
 import { now } from "moment";
 import TextArea from "antd/es/input/TextArea";
+import moment from "moment/moment";
+import { useNavigate } from "react-router-dom";
+import ModalAccount from "./ModalAccount";
 
 const Bill = () => {
   var initialItems = [];
@@ -177,6 +180,8 @@ const Bill = () => {
       ),
     },
   ];
+
+
   const [activeKey, setActiveKey] = useState(
     initialItems.length === 0 ? null : initialItems[0].key
   );
@@ -191,6 +196,28 @@ const Bill = () => {
   );
   const [render, setRendered] = useState(null);
   const [productDetails, setProductDetails] = useState([]);
+  const [remainAmount, setRemainAmount] = useState(0);
+  const [shippingFee, setShippingFee] = useState(0)
+  const [leadtime, setLeadtime] = useState(null)
+  const [selectedDictrict, setSelectedDictrict] = useState(null);
+  const [selectedWard, setSelectedWard] = useState(null)
+  const [selectedButton, setSelectedButton] = useState(null);
+  const [showModalAccount, setShowModalAccount] = useState(false);
+  const handleShowModalAccount = () => {
+    setShowModalAccount(true)
+  }
+
+  const handleCancelModaleAccount = () => {
+    setShowModalAccount(false)
+  }
+  const navigate = useNavigate();
+  const handleButtonClick = (button) => {
+    if (selectedButton === button) {
+      setSelectedButton(null);
+    } else {
+      setSelectedButton(button);
+    }
+  };
   const fetchProvinces = async () => {
     await axios
       .get(
@@ -202,10 +229,11 @@ const Bill = () => {
         }
       )
       .then((res) =>
-        // console.log(res.data.data)
-        setProvinces(res.data.data)
+        setProvinces(res.data.data),
       )
-      .catch((err) => console.log(err));
+      .catch((err) =>
+        console.log(err)
+      );
   };
 
   const handleProvinceChange = async (value) => {
@@ -227,26 +255,113 @@ const Bill = () => {
   };
 
   const handleDistrictChange = async (value) => {
-    await axios
-      .get(
+    try {
+      const response = await axios.get(
         `https://online-gateway.ghn.vn/shiip/public-api/master-data/ward?district_id=${value}`,
         {
           headers: {
             token: `0f082cbe-5110-11ee-a59f-a260851ba65c`,
           },
         }
-      )
-      .then((res) => {
-        setWards(res.data.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+      );
+
+      const wards = response.data.data;
+      setWards(wards);
+      setSelectedDictrict(value)
+    } catch (error) {
+      console.log(error);
+    }
   };
+
+  const handleWardChange = (value) => {
+    setSelectedWard(value)
+  }
+
+  const handleShippingOrderLeadtime = async (toDistrictId, toWardCode) => {
+    const values = {
+      from_district_id: 3440,
+      from_ward_code: '13010',
+      to_district_id: toDistrictId,
+      to_ward_code: `${toWardCode}`,
+      service_id: 53321
+    };
+
+    try {
+      const response = await axios.post(
+        'https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/leadtime',
+        values,
+        {
+          headers: {
+            token: '0f082cbe-5110-11ee-a59f-a260851ba65c',
+            shop_id: '4534109'
+          }
+        }
+      );
+
+      const leadtimeTimestamp = response.data.data.leadtime;
+      const leadtimeMoment = moment.unix(leadtimeTimestamp);
+      const formattedDateTime = leadtimeMoment.format('DD/MM/YYYY');
+
+      setLeadtime(`${formattedDateTime}`);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const totalPrice = productDetails.reduce((total, product) => {
+    return total + product.productDetail.price * product.quantity;
+  }, 0);
+
+  const handleShippingFee = async (insuranceValue, toDistrictId, toWardCode) => {
+    const values = {
+      service_id: 53321,
+      insurance_value: insuranceValue,
+      coupon: null,
+      from_district_id: 3440,
+      to_district_id: toDistrictId,
+      to_ward_code: toWardCode,
+      height: 15,
+      length: 15,
+      weight: 1000,
+      width: 15
+    };
+
+    try {
+      const response = await axios.post(
+        'https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee',
+        values,
+        {
+          headers: {
+            token: '0f082cbe-5110-11ee-a59f-a260851ba65c',
+            shop_id: '4534109'
+          }
+        }
+      );
+
+      setShippingFee(response.data.data.total);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // tính phí vận chuyển && tính ngày giao hàng
+  handleShippingFee(totalPrice, selectedDictrict, selectedWard)
+  handleShippingOrderLeadtime(selectedDictrict, selectedWard)
 
   const handleChangSwitch = (checked) => {
     setSwitchChange(checked);
+    if (!checked) {
+      setShippingFee(0);
+      setLeadtime(null)
+      setBilType('In-store')
+    } else {
+      setBilType('Online')
+    }
+
   };
+
+  console.log(`aaa`, shippingFee)
+
   const showModal = (index) => {
     const newModalVisible = [...modalVisible];
     newModalVisible[index] = true;
@@ -332,17 +447,64 @@ const Bill = () => {
       remove(targetKey);
     }
   };
+
   const getProductDetails = () => {
     var cart = JSON.parse(localStorage.getItem(cartId));
     var productDetails = cart.productDetails;
     setProductDetails(productDetails);
   };
 
+
   useEffect(() => {
     fetchProvinces();
     getProductDetails();
     initializeModalStates();
   }, [cartId, render]);
+
+
+  // if (!switchChange) {
+  //   setLeadtime(null);
+  //   setShippingFee(null);
+  //   render()
+  // }
+
+
+  // thanh toán
+
+  const [billType, setBilType] = useState('In-store')
+  const handleCreateBill = () => {
+    const bill = {
+      price: totalPrice,
+      priceReduce: null,
+      billType: billType,
+      status: 'watting',
+      lstBillDetailRequest: [],
+    };
+
+    if (productDetails.length <= 0) {
+      return console.log('không có sản phẩm')
+    } else {
+      for (let i = 0; i < productDetails.length; i++) {
+        const billDetail = {
+          productDetailId: productDetails[i].productDetail.id,
+          price: productDetails[i].productDetail.price,
+          quantity: productDetails[i].quantity
+        };
+
+        bill.lstBillDetailRequest.push(billDetail);
+      }
+    }
+    console.log(bill)
+
+    axios.post(`http://localhost:8080/api/admin/bill`, bill)
+      .then(response => {
+        navigate(`/admin/counter-sales/${response.data.id}/timeline`)
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+  }
+
   return (
     <>
       <Tabs
@@ -390,7 +552,13 @@ const Bill = () => {
                         placeholder="tìm kiếm tài khoản"
                         style={{ width: "200px", marginRight: "20px" }}
                       />
-                      <Button style={{ color: "blue" }}>Chọn tài khoản</Button>
+                      <Button style={{ color: "blue" }} onClick={handleShowModalAccount}>Chọn tài khoản</Button>
+                      <ModalAccount
+                        visible={showModalAccount}
+                        onCancel={handleCancelModaleAccount}
+                        cartId={cartId}
+                        render={setRendered}
+                      />
                     </Col>
                   </Row>
                   <Divider
@@ -408,6 +576,7 @@ const Bill = () => {
                       >
                         Khách lẻ
                       </Tag>
+
                     </Col>
                   </Row>
                 </div>
@@ -444,22 +613,10 @@ const Bill = () => {
                             </span>
                             <br />
                             <Select
-                              optionFilterProp="children"
-                              filterOption={(input, option) =>
-                                (option?.label ?? "").includes(input)
-                              }
-                              filterSort={(optionA, optionB) =>
-                                (optionA?.label ?? "")
-                                  .toLowerCase()
-                                  .localeCompare(
-                                    (optionB?.label ?? "").toLowerCase()
-                                  )
-                              }
-                              showSearch
                               style={{ width: 200 }}
                               onChange={handleProvinceChange}
                             >
-                              {provinces.map((province) => (
+                              {provinces && provinces.map((province) => (
                                 <Select.Option
                                   label={province.ProvinceName}
                                   key={province.ProvinceID}
@@ -479,7 +636,7 @@ const Bill = () => {
                               style={{ width: 200 }}
                               onChange={handleDistrictChange}
                             >
-                              {districts.map((district) => (
+                              {districts && districts.map((district) => (
                                 <Select.Option
                                   key={district.DistrictID}
                                   value={district.DistrictID}
@@ -494,8 +651,10 @@ const Bill = () => {
                               <b style={{ color: "red" }}>*</b> Phường/xã
                             </span>
                             <br />
-                            <Select style={{ width: 200 }}>
-                              {wards.map((ward) => (
+                            <Select style={{ width: 200 }}
+                              onChange={handleWardChange}
+                            >
+                              {wards && wards.map((ward) => (
                                 <Select.Option
                                   key={ward.WardCode}
                                   value={ward.WardCode}
@@ -520,6 +679,7 @@ const Bill = () => {
                               style={{ width: "90px", height: "80px" }}
                             />
                           </Col>
+                          <h3>Ngày giao hàng dự kiến: {leadtime || ''}</h3>
                         </Row>
                       )}
                     </Col>
@@ -549,23 +709,44 @@ const Bill = () => {
                           <span style={{ fontSize: "16px", display: "block" }}>
                             Giảm giá
                           </span>
+                          {switchChange &&
+                            <>
+                              <span style={{ fontSize: "16px", display: "block" }}>
+                                Phí ship
+                              </span>
+                            </>}
                           <span style={{ fontSize: "16px", display: "block" }}>
                             Tổng số tiền
                           </span>
-                          <span style={{ fontSize: "16px", display: "block" }}>
-                            Khách cần trả
-                          </span>
-                          <span style={{ fontSize: "16px", display: "block" }}>
-                            Tiền thừa trả khách
-                          </span>
+                          {!switchChange && <>
+                            <span style={{ fontSize: "16px", display: "block" }}>
+                              Khách cần trả
+                            </span>
+                            <span style={{ fontSize: "16px", display: "block" }}>
+                              Tiền thừa trả khách
+                            </span></>}
                         </Col>
                         <Col span={12}>
+                          {/* tiền hàng */}
                           <span style={{ fontSize: "16px", display: "block" }}>
-                            3.000.000
+                            {totalPrice.toLocaleString('vi-VN', {
+                              style: 'currency',
+                              currency: 'VND',
+                            })}
                           </span>
+                          {/* giảm giá */}
                           <span style={{ fontSize: "16px", display: "block" }}>
                             0
                           </span>
+                          {/* phí ship */}
+                          {switchChange && <>
+                            <span style={{ fontSize: "16px", display: "block" }}>
+                              {shippingFee?.toLocaleString('vi-VN', {
+                                style: 'currency',
+                                currency: 'VND'
+                              })}
+                            </span></>}
+                          {/* tổng tiền */}
                           <span
                             style={{
                               color: "red",
@@ -573,39 +754,56 @@ const Bill = () => {
                               display: "block",
                             }}
                           >
-                            3.000.000
+                            {(totalPrice + (shippingFee || 0)).toLocaleString('vi-VN', {
+                              style: 'currency',
+                              currency: 'VND'
+                            })}
                           </span>
-                          <input className={styles.input} />
-                          <span style={{ fontSize: "16px", display: "block" }}>
-                            3.000.000
-                          </span>
+                          {!switchChange && <>
+                            {/* khách cần trả */}
+                            <input type="number" className={styles.input}
+                              onChange={(e) => setRemainAmount(e.target.value - totalPrice)
+                              }
+                            />
+                            {/* tiền thừa */}
+                            <span style={{ fontSize: "16px", display: "block" }}>
+                              {remainAmount.toLocaleString('vi-VN', {
+                                style: 'currency',
+                                currency: 'VND'
+                              })}
+                            </span></>}
                         </Col>
+                        <TextArea rows={3} placeholder="ghi chú ..." style={{ margin: '10px 0' }} />
                         <div style={{ marginTop: "20px" }}>
-                          <TextArea rows={3} placeholder="ghi chú ..." style={{ marginBottom: '10px' }} />
-                          <Button
-                            icon={<DollarOutlined />}
-                            className="cash-button"
-                          >
-                            Tiền
-                          </Button>
-                          <Button
-                            style={{ margin: "0 10px" }}
-                            icon={<SwapOutlined />}
-                            className="cash-button"
-                          >
-                            Chuyển khoản
-                          </Button>
-                          <Button
-                            icon={<DollarOutlined />}
-                            className="cash-button"
-                          >
-                            Cả hai
-                          </Button>
+                          <div className={styles.buttonGroup}>
+                            <Button
+                              className={`${styles.cashButton} ${selectedButton === 'money' ? styles.selected : ''}`}
+                              icon={<DollarOutlined />}
+                              onClick={() => handleButtonClick('money')}
+                            >
+                              Tiền
+                            </Button>
+                            <Button
+                              style={{ margin: "0 10px" }}
+                              className={`${styles.cashButton} ${selectedButton === 'transfer' ? styles.selected : ''}`}
+                              icon={<SwapOutlined />}
+                              onClick={() => handleButtonClick('transfer')}
+                            >
+                              Chuyển khoản
+                            </Button>
+                            <Button
+                              className={`${styles.cashButton} ${selectedButton === 'both' ? styles.selected : ''}`}
+                              onClick={() => handleButtonClick('both')}
+                            >
+                              Cả hai
+                            </Button>
+                          </div>
                         </div>
                         <div style={{ marginTop: "20px" }}>
                           <Button
                             type="primary"
-                            style={{ width: "350px", height: "40px" }}
+                            onClick={() => handleCreateBill()}
+                            style={{ width: "380px", height: "40px" }}
                           >
                             Xác nhận thanh toán
                           </Button>

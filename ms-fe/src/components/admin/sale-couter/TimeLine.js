@@ -58,7 +58,7 @@ const BillTimeLine = () => {
     // tạo mới timeline
     const handleCreateTimeline = async (note, stauts) => {
         const values = { note: note, status: stauts };
-        await axios.post(`http://localhost:8080/api/admin/bill/${billId}/timelines`,
+        await axios.post(`http://localhost:8080/api/admin/timeline/${billId}`,
             values)
             .then((response) => {
                 setTimelines([...timelines, response.data])
@@ -91,21 +91,21 @@ const BillTimeLine = () => {
     };
 
     useEffect(() => {
-        axios.get(`http://localhost:8080/api/admin/bill/${billId}/timeline`)
+        axios.get(`http://localhost:8080/api/admin/timeline/${billId}`)
             .then((response) => {
                 setTimelines(response.data)
             })
             .catch((error) => {
                 console.log(error)
             })
-        axios.get(`http://localhost:8080/api/admin/bill/${billId}/product`)
+        axios.get(`http://localhost:8080/api/admin/timeline/${billId}/product`)
             .then((response) => {
                 setTimelinesPoduct(response.data)
             })
             .catch((error) => {
                 console.log(error)
             })
-        axios.get(`http://localhost:8080/api/admin/timeline/${billId}`)
+        axios.get(`http://localhost:8080/api/admin/timeline/${billId}/info`)
             .then((response) => {
                 setBillInfo(response.data)
             })
@@ -150,7 +150,7 @@ const BillTimeLine = () => {
             key: 'productPrice',
         },
     ]
-    console.log('object', billInfo.billType)
+    console.log('bill type', billInfo.billType)
     return (
         <>
             <section className={styles.background}>
@@ -230,7 +230,8 @@ const BillTimeLine = () => {
                             </Button>
                         </>
                     )}
-                    {billInfo.billType !== 'In-store' && timelines.length !== 3 && (
+                    {console.log('timeline', timelines.length)}
+                    {billInfo.billType !== 'In-store' && (timelines.length !== 3 && timelines.length !== 4) && (
                         <>
                             <Button
                                 type="primary"

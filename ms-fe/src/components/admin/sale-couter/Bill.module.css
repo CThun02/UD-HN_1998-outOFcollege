@@ -131,3 +131,15 @@ btn:hover {
   border: none;
   border-bottom: 1px solid black;
 }
+
+.cashButton {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+  color: #000;
+  transition: border-color 0.3s ease;
+}
+
+.cashButton.selected {
+  border-color: #00f;
+}

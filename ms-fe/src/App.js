@@ -101,6 +101,10 @@ function App() {
                     <Route path="promotion">
                       <Route index element={<Promotion />} />
                       <Route path="create" element={<CreatePromotion />} />
+                      <Route
+                        path="detail/:code"
+                        element={<CreatePromotion />}
+                      />
                     </Route>
                     <Route path="category" element="category"></Route>
                     <Route path="brand" element="brand"></Route>

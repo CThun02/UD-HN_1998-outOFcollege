@@ -23,3 +23,7 @@
 .radioGroup span {
   line-height: 3rem;
 }
+
+.errors {
+  color: red;
+}

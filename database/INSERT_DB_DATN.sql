@@ -31,11 +31,11 @@ select * from brand
 
 INSERT INTO color (color_code, color_name, status, created_at, updated_at, created_by, updated_by, deleted_at)
 VALUES
-('C001', N'Red', 'ACTIVE', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL),
-('C002', N'Blue', 'ACTIVE', '2023-09-15', '2023-09-15', N'Admin', N'Admin', NULL),
-('C003', N'Green', 'InACTIVE', '2023-10-01', '2023-10-01', N'Admin', N'Admin', NULL),
-('C004', N'Yellow', 'ACTIVE', '2023-09-10', '2023-09-10', N'Admin', N'Admin', NULL),
-('C005', N'Orange', 'ACTIVE', '2023-09-20', '2023-09-20', N'Admin', N'Admin', NULL);
+('#CC0000', N'Red', 'ACTIVE', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL),
+('#99CCFF', N'Blue', 'ACTIVE', '2023-09-15', '2023-09-15', N'Admin', N'Admin', NULL),
+('#99FF99', N'Green', 'InACTIVE', '2023-10-01', '2023-10-01', N'Admin', N'Admin', NULL),
+('#FFFF33', N'Yellow', 'ACTIVE', '2023-09-10', '2023-09-10', N'Admin', N'Admin', NULL),
+('#FFCC66', N'Orange', 'ACTIVE', '2023-09-20', '2023-09-20', N'Admin', N'Admin', NULL);
 select * from color
 
 INSERT INTO pattern (pattern_name, status, created_at, updated_at, created_by, updated_by, deleted_at)

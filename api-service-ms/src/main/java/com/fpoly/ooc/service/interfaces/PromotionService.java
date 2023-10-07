@@ -16,4 +16,12 @@ public interface PromotionService {
 
     Promotion updateStatus(Long id);
 
+    PromotionRequest findByIdProductDetail(String promotionCode);
+
+    Promotion findByCode(String code);
+
+    Promotion findById(Long id);
+
+    Promotion updateStatus(String code);
+
 }

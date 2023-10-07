@@ -4,8 +4,8 @@ import com.fpoly.ooc.dto.EmailDetails;
 
 public interface EmailService {
 
-    String sendSimpleMail(EmailDetails details);
+    String sendSimpleMail(EmailDetails details, Long idVoucher);
 
-    String sendMailWithAttachment(EmailDetails details);
+    String sendMailWithAttachment(EmailDetails details, Long idVoucher);
 
 }

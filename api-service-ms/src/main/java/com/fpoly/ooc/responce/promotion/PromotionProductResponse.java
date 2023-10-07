@@ -12,8 +12,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class PromotionProductResponse {
 
-    private Long promotionProductId;
-
     private String promotionCode;
 
     private String promotionName;

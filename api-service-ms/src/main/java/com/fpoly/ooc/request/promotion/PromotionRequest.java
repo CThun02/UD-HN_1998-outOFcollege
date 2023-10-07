@@ -1,7 +1,9 @@
 package com.fpoly.ooc.request.promotion;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fpoly.ooc.entity.ProductDetail;
 import com.fpoly.ooc.request.product.ProductDetailRequest;
+import com.fpoly.ooc.responce.product.ProductDetailResponse;
 import com.fpoly.ooc.validation.CompareDateNow;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -20,7 +22,8 @@ public class PromotionRequest {
 
     private Long promotionId;
 
-    @NotBlank(message = "Không được bỏ trống")
+    private Long promotionProductId;
+
     private String promotionCode;
 
     @NotBlank(message = "Không được bỏ trống")
@@ -44,6 +47,10 @@ public class PromotionRequest {
     @CompareDateNow(message = "Ngày kết thúc lớn hơn ngày hiện tại")
     private LocalDateTime endDate;
 
-    private List<ProductDetailRequest> products;
+    private String status;
+
+    private List<Long> products;
+
+    private List<ProductDetail> listProductResponse;
 
 }

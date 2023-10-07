@@ -1,7 +1,9 @@
 package com.fpoly.ooc.service.impl;
 
 import com.fpoly.ooc.dto.EmailDetails;
+import com.fpoly.ooc.repository.VoucherRepository;
 import com.fpoly.ooc.service.interfaces.EmailService;
+import com.fpoly.ooc.service.interfaces.VoucherService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,16 +22,24 @@ public class EmailServiceImpl implements EmailService {
     @Autowired
     private JavaMailSender javaMailSender;
 
+    @Autowired
+    private VoucherRepository voucherRepository;
+
     @Value(value = "${spring.mail.username}")
     private String sender;
 
     @Override
-    public String sendSimpleMail(EmailDetails details) {
+    public String sendSimpleMail(EmailDetails details, Long idVoucher) {
 
         try {
             SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
 
             for (String recipient: details.getRecipient()) {
+
+                if(voucherRepository.isCheckAccountOwnerVoucher(idVoucher, recipient)) {
+                    continue;
+                }
+
                 //setup a mail basic
                 simpleMailMessage.setFrom(sender);
                 simpleMailMessage.setTo(recipient);
@@ -46,7 +56,7 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public String sendMailWithAttachment(EmailDetails details) {
+    public String sendMailWithAttachment(EmailDetails details, Long idVoucher) {
 
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         MimeMessageHelper mimeMessageHelper;

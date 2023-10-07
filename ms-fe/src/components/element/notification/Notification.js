@@ -4,9 +4,11 @@ export const NotificationContext = createContext();
 
 export const NotificationProvider = ({ children }) => {
   const [successMessage, setSuccessMessage] = useState(null);
+  const [context, setContext] = useState(null);
 
-  const showSuccessNotification = (message) => {
+  const showSuccessNotification = (message, context) => {
     setSuccessMessage(message);
+    setContext(context);
   };
 
   const clearNotification = () => {
@@ -15,7 +17,12 @@ export const NotificationProvider = ({ children }) => {
 
   return (
     <NotificationContext.Provider
-      value={{ successMessage, showSuccessNotification, clearNotification }}
+      value={{
+        successMessage,
+        showSuccessNotification,
+        clearNotification,
+        context,
+      }}
     >
       {children}
     </NotificationContext.Provider>

@@ -33,6 +33,12 @@ public class ErrorCodeConfig {
         errors.put("SEND_EMAIL_ERROR", "Gửi email thất bại");
         errors.put("VOUCHER_USED_BY_USER", "Username %s này đã sở hữu voucher này.");
         errors.put("USER_NOT_FOUND", "Không tìm thấy tài khoản này.");
+        errors.put("PROMOTION_NAME_NOT_FOUND", "Tên chương trình khuyến mại không được bỏ trống.");
+        errors.put("PROMOTION_METHOD_NOT_FOUND", "Hình thức giảm không được bỏ trống.");
+        errors.put("PROMOTION_VALUE_NOT_FOUND", "Giá trị giảm không được bỏ trống.");
+        errors.put("DATE_NOT_FOUND", "Định dạng ngày không hợp lệ.");
+        errors.put("END_DATE_NOT_FOUND", "Định dạng ngày không hợp lệ.");
+        errors.put("START_DATE_NOT_FOUND", "Định dạng ngày không hợp lệ.");
     }
 
     public static String getMessage(String code) {

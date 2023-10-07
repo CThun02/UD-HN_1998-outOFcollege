@@ -4,6 +4,7 @@ import {
   EyeFilled,
   EyeOutlined,
   SelectOutlined,
+  CheckCircleFilled,
 } from "@ant-design/icons";
 import { Button, Checkbox, Col, message, Row, Select, Table } from "antd";
 import Input from "antd/es/input/Input";
@@ -33,6 +34,7 @@ const ProductDetails = (props) => {
   const [shirtTails, setshirtTails] = useState(null);
   const [productDetails, setProductDetails] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [renderThis, setRenderThis] = useState(null);
   const columns = [
     {
       key: "stt",
@@ -148,15 +150,23 @@ const ProductDetails = (props) => {
       fixed: "right",
       render: (text, record, index) => (
         <>
-          <Checkbox onChange={(event) => {
-            addProductDetail(record, event.target.checked);
-          }} />
+          <Checkbox
+            onClick={(event) => {
+              addProductDetail(record, event.target.checked);
+            }}
+            defaultChecked={props.productDetailsCreate?.some(
+              (item) => item.productDetail.id === record.id
+            )}
+          />
         </>
       ),
     },
   ];
   //functions
-  let productDetailsCreate = [];
+  function completeAdd() {
+    props.action();
+  }
+
   function addProductDetail(record, checked) {
     let productDetailCreate = {
       productDetail: {},
@@ -164,20 +174,17 @@ const ProductDetails = (props) => {
     };
 
     if (!checked) {
-      for (let i = 0; i < productDetailsCreate.length; i++) {
-        if (productDetailsCreate[i].productDetail.id === record.id) {
-          productDetailsCreate.splice(i, 1)
+      for (let i = 0; i < props.productDetailsCreate.length; i++) {
+        if (props.productDetailsCreate[i].productDetail.id === record.id) {
+          props.productDetailsCreate?.splice(i, 1);
         }
       }
     } else {
       productDetailCreate.productDetail = record;
-      productDetailsCreate.push(productDetailCreate)
+      props.productDetailsCreate?.push(productDetailCreate);
     }
-
-    console.log(productDetailsCreate)
-
-    console.log('object', checked)
   }
+
   function search(keywords) {
     axios
       .get(api + `product/searchProductDetail?keyWords=` + keywords.toString())
@@ -193,22 +200,22 @@ const ProductDetails = (props) => {
     axios
       .get(
         api +
-        "product/filterProductDetailByIdCom?productId=" +
-        productId +
-        "&buttonId=" +
-        buttonId +
-        "&materialId=" +
-        materialId +
-        "&shirtTailId=" +
-        shirtTailId +
-        "&sleeveId=" +
-        sleeveId +
-        "&collarId=" +
-        collarId +
-        "&colorId=" +
-        colorId +
-        "&sizeId=" +
-        sizeId
+          "product/filterProductDetailByIdCom?productId=" +
+          productId +
+          "&buttonId=" +
+          buttonId +
+          "&materialId=" +
+          materialId +
+          "&shirtTailId=" +
+          shirtTailId +
+          "&sleeveId=" +
+          sleeveId +
+          "&collarId=" +
+          collarId +
+          "&colorId=" +
+          colorId +
+          "&sizeId=" +
+          sizeId
       )
       .then((response) => {
         setProductDetails(response.data);
@@ -220,7 +227,7 @@ const ProductDetails = (props) => {
   }
   useEffect(() => {
     axios
-      .get(api + "product")
+      .get(api + "product/filterByCom?status=ACTIVE")
       .then((response) => {
         setProducts(response.data);
         setLoading(false);
@@ -292,17 +299,7 @@ const ProductDetails = (props) => {
       .catch((error) => {
         console.log(error);
       });
-  }, []);
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-  const onSelectChange = (newSelectedRowKeys) => {
-    console.log('selectedRowKeys changed: ', newSelectedRowKeys);
-    setSelectedRowKeys(newSelectedRowKeys);
-  };
-  const rowSelection = {
-    selectedRowKeys,
-    onChange: onSelectChange,
-  };
-  const hasSelected = selectedRowKeys.length > 0;
+  }, [props.render, renderThis]);
 
   return (
     <>
@@ -687,6 +684,15 @@ const ProductDetails = (props) => {
             scroll={{ y: 400, x: 1300 }}
             loading={loading}
           />
+        </div>
+        <div style={{ textAlign: "center" }}>
+          <Button
+            onClick={() => {
+              completeAdd();
+            }}
+          >
+            Hoàn thành <CheckCircleFilled />
+          </Button>
         </div>
       </div>
     </>

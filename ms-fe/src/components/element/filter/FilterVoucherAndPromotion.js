@@ -63,7 +63,7 @@ function FilterVoucherAndPromotion({
 
   function handleSetStatus(value) {
     console.log(`selected ${value}`);
-    setStatus(value);
+    setStatus(() => value);
   }
 
   return (

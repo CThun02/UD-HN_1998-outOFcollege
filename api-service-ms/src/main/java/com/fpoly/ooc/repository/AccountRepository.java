@@ -22,7 +22,7 @@ public interface AccountRepository extends JpaRepository<Account, String> {
     @Query(value = "select email from account", nativeQuery = true)
     List<String> emailAccountList();
 
-        @Query(name = "Account.customerAccountList", nativeQuery = true)
+    @Query(name = "Account.customerAccountList", nativeQuery = true)
     List<AccountVoucher> customerAccountList(String username, Boolean gender);
 
 }

@@ -2,9 +2,9 @@ package com.fpoly.ooc.responce.product;
 
 import com.fpoly.ooc.entity.*;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 
 import java.math.BigDecimal;
-
 
 public interface ProductDetailResponse {
     public Long getId();

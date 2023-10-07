@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PromotionRepository extends JpaRepository<Promotion, Long> {
@@ -18,4 +19,5 @@ public interface PromotionRepository extends JpaRepository<Promotion, Long> {
                                                            LocalDateTime endDate,
                                                            String status);
 
+    Optional<Promotion> findPromotionByPromotionCode(String code);
 }

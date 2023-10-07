@@ -2,12 +2,14 @@ import {
   Button,
   Col,
   Drawer,
+  Modal,
   Pagination,
   Row,
   Space,
   Spin,
   Table,
   Tag,
+  notification,
 } from "antd";
 import FilterpromotionAndPromotion from "../../element/filter/FilterVoucherAndPromotion";
 
@@ -23,6 +25,8 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import moment from "moment";
+import { useContext } from "react";
+import { NotificationContext } from "../../element/notification/Notification";
 
 const baseUrl = "http://localhost:8080/api/admin/promotion-product/";
 const basePromotionUrl = "http://localhost:8080/api/admin/promotion/";
@@ -42,6 +46,10 @@ function Promotion() {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [status, setStatus] = useState(null);
+
+  const { successMessage, clearNotification, context } =
+    useContext(NotificationContext);
+  const [apiNotification, contextHolder] = notification.useNotification();
 
   const columns = [
     {
@@ -115,6 +123,31 @@ function Promotion() {
       ),
     },
   ];
+
+  useEffect(
+    function () {
+      let isCheck = true;
+
+      async function notification() {
+        if (successMessage && isCheck === true && context === "promotion") {
+          // Hiển thị thông báo thành công ở đây
+          console.log(successMessage);
+          apiNotification.success({
+            message: `Success`,
+            description: `${successMessage}`,
+          });
+          // Xóa thông báo sau khi đã hiển thị
+          clearNotification();
+        }
+      }
+
+      return () => {
+        notification(true);
+        isCheck = false;
+      };
+    },
+    [successMessage, clearNotification, apiNotification, context]
+  );
 
   function handleDeleted(value) {
     try {
@@ -193,6 +226,7 @@ function Promotion() {
 
   return (
     <div className={styles.promotion}>
+      {contextHolder}
       <FilterpromotionAndPromotion
         searchNameOrCode={codeOrName}
         setSearchNameOrCode={setCodeOrName}

@@ -345,15 +345,16 @@ const MyForm = (props) => {
                               )
                           }
                         >
-                          {provinces.map((province) => (
-                            <Select.Option
-                              key={province.ProvinceID}
-                              value={province.ProvinceID}
-                              label={province.ProvinceName}
-                            >
-                              {province.ProvinceName}
-                            </Select.Option>
-                          ))}
+                          {provinces &&
+                            provinces.map((province) => (
+                              <Select.Option
+                                key={province.ProvinceID}
+                                value={province.ProvinceID}
+                                label={province.ProvinceName}
+                              >
+                                {province.ProvinceName}
+                              </Select.Option>
+                            ))}
                         </Select>
                       </Form.Item>
                     </div>
@@ -382,15 +383,16 @@ const MyForm = (props) => {
                               )
                           }
                         >
-                          {districts.map((district) => (
-                            <Select.Option
-                              label={district.DistrictName}
-                              key={district.DistrictID}
-                              value={district.DistrictID}
-                            >
-                              {district.DistrictName}
-                            </Select.Option>
-                          ))}
+                          {districts &&
+                            districts.map((district) => (
+                              <Select.Option
+                                label={district.DistrictName}
+                                key={district.DistrictID}
+                                value={district.DistrictID}
+                              >
+                                {district.DistrictName}
+                              </Select.Option>
+                            ))}
                         </Select>
                       </Form.Item>
                     </div>
@@ -418,15 +420,16 @@ const MyForm = (props) => {
                               )
                           }
                         >
-                          {wards.map((ward) => (
-                            <Select.Option
-                              label={ward.WardName}
-                              key={ward.WardCode}
-                              value={ward.WardCode}
-                            >
-                              {ward.WardName}
-                            </Select.Option>
-                          ))}
+                          {wards &&
+                            wards.map((ward) => (
+                              <Select.Option
+                                label={ward.WardName}
+                                key={ward.WardCode}
+                                value={ward.WardCode}
+                              >
+                                {ward.WardName}
+                              </Select.Option>
+                            ))}
                         </Select>
                       </Form.Item>
                     </div>

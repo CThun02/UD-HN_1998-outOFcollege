@@ -31,7 +31,8 @@
     "react-scripts": "5.0.1",
     "sunflower-antd": "^1.0.0-beta.3",
     "web-vitals": "^2.1.4",
-    "yup": "^1.2.0"
+    "yup": "^1.2.0",
+    "html5-qrcode": "^2.3.8"
   },
   "scripts": {
     "start": "react-scripts start",

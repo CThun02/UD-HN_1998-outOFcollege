@@ -61,4 +61,6 @@ public abstract class BaseEntity implements Serializable {
         this.updatedAt = LocalDateTime.now();
     }
 
+
+
 }

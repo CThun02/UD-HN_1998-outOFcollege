@@ -145,8 +145,8 @@ function Voucher() {
           // Hiển thị thông báo thành công ở đây
           console.log(successMessage);
           apiNotification.success({
-            message: `Thêm thành công. `,
-            description: "Voucher đã được thêm",
+            message: `Success`,
+            description: `${successMessage}`,
           });
           // Xóa thông báo sau khi đã hiển thị
           clearNotification();

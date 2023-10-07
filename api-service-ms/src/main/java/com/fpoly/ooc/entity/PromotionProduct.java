@@ -1,5 +1,8 @@
 package com.fpoly.ooc.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fpoly.ooc.responce.promotion.PromotionProductResponse;
 import com.fpoly.ooc.responce.voucher.VoucherResponse;
 import jakarta.persistence.Column;
@@ -27,8 +30,7 @@ import java.time.LocalDateTime;
 
 @NamedNativeQuery(
         name = "PromotionProduct.findAllPromotionProduct",
-        query = "select ppd.id                as 'promotionProductId',\n" +
-                "       p.promotion_code      as 'promotionCode',\n" +
+        query = "select p.promotion_code      as 'promotionCode',\n" +
                 "       p.promotion_name      as 'promotionName',\n" +
                 "       COUNT(pd.id)          as 'productQuantity',\n" +
                 "       p.promotion_method    as 'promotionMethod',\n" +
@@ -47,7 +49,7 @@ import java.time.LocalDateTime;
                 "  and (?2 is null or p.start_date >= ?2)\n" +
                 "  and (?3 is null or p.end_date <= ?3)\n" +
                 "  and (?4 is null or p.status = ?4)\n" +
-                "group by ppd.id, p.promotion_code, p.promotion_name, p.promotion_method,\n" +
+                "group by p.promotion_code, p.promotion_name, p.promotion_method,\n" +
                 "         p.promotion_value, p.promotion_max_value, p.promotion_condition,\n" +
                 "         p.start_date, p.end_date, p.status, p.created_at \n " +
                 "order by p.created_at desc ",
@@ -59,7 +61,6 @@ import java.time.LocalDateTime;
         classes = @ConstructorResult(
                 targetClass = PromotionProductResponse.class,
                 columns = {
-                        @ColumnResult(name = "promotionProductId", type = Long.class),
                         @ColumnResult(name = "promotionCode", type = String.class),
                         @ColumnResult(name = "promotionName", type = String.class),
                         @ColumnResult(name = "productQuantity", type = Integer.class),
@@ -79,7 +80,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Table(name = "promotion_product")
+@Table(name = "promotion_product_detail")
 @Entity
 public class PromotionProduct extends BaseEntity {
 
@@ -96,6 +97,9 @@ public class PromotionProduct extends BaseEntity {
 
     @Column(name = "money_reduce")
     private BigDecimal moneyReduce;
+
+    @Column(name = "method_reduce")
+    private String methodReduce;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "promotion_id")

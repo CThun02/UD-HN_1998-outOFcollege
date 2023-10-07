@@ -25,4 +25,9 @@ public interface ProductDetailServiceI {
                                                                    Long idShirtTail, Long idSleeve, Long idCollar,
                                                                    Long idColor, Long idSize);
     public List<ProductDetailResponse> searchByCodeOrName(String keyWords);
+
+    ProductDetail findById(Long id);
+
+    List<Long> findAllResponseProduct(Long idPromotion);
+
 }

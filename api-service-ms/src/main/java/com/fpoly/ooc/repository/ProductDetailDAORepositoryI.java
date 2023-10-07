@@ -87,4 +87,11 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
             ", pd.price AS price, pd.quantity AS quantity, pd.descriptionDetail AS descriptionDetail" +
             " FROM ProductDetail pd")
     public List<ProductDetailResponse> getAll();
+
+    @Query("SELECT new java.lang.Long(pd.id) " +
+            " FROM ProductDetail pd " +
+            "left join PromotionProduct pp on pd.id = pp.productDetailId.id " +
+            "left join Promotion p on p.id = pp.promotion.id " +
+            "where p.id = ?1")
+    public List<Long> findAllByIdPromotion(Long promotionId);
 }

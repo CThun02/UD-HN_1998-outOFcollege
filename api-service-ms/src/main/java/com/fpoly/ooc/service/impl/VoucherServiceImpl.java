@@ -235,7 +235,6 @@ public class VoucherServiceImpl implements VoucherService {
         }
 
         LocalDateTime dateNow = LocalDateTime.now();
-
         switch (request.getStatus()) {
             case "":
             case "UPCOMING":

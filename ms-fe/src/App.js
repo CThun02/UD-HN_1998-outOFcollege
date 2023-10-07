@@ -47,7 +47,10 @@ function App() {
                     <Route path="counter-sales">
                       <Route index element={<Bill />}></Route>
                       <Route path="bill" element={<CreateBill />}></Route>
-                      <Route path=":billId/timeline" element={<BillTimeLine />}></Route>
+                      <Route
+                        path=":billId/timeline"
+                        element={<BillTimeLine />}
+                      ></Route>
                     </Route>
 
                     {/* Đơn hàng */}
@@ -98,6 +101,10 @@ function App() {
                     <Route path="promotion">
                       <Route index element={<Promotion />} />
                       <Route path="create" element={<CreatePromotion />} />
+                      <Route
+                        path="detail/:code"
+                        element={<CreatePromotion />}
+                      />
                     </Route>
                     <Route path="category" element="category"></Route>
                     <Route path="brand" element="brand"></Route>

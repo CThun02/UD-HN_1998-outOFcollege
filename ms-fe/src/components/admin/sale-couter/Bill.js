@@ -33,6 +33,7 @@ import ModalAccount from "./ModalAccount";
 const Bill = () => {
   var initialItems = [];
   const [modalVisible, setModalVisible] = useState([]);
+  const [modalAccountVisible, setModalAccountVisible] = useState([]);
   function getCart() {
     initialItems = [];
     var checkEmpty = 0;
@@ -53,6 +54,7 @@ const Bill = () => {
         JSON.stringify({
           timeStart: now(),
           productDetails: [],
+          account: {}
         })
       );
     }
@@ -186,7 +188,6 @@ const Bill = () => {
     initialItems.length === 0 ? null : initialItems[0].key
   );
   const [items, setItems] = useState(initialItems);
-  const [isModalVisible, setIsModalVisible] = useState(false);
   const [switchChange, setSwitchChange] = useState(false);
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
@@ -203,12 +204,17 @@ const Bill = () => {
   const [selectedWard, setSelectedWard] = useState(null)
   const [selectedButton, setSelectedButton] = useState(null);
   const [showModalAccount, setShowModalAccount] = useState(false);
-  const handleShowModalAccount = () => {
-    setShowModalAccount(true)
+
+  const handleShowModalAccount = (index) => {
+    const newModalVisible = [...modalAccountVisible];
+    newModalVisible[index] = true;
+    setModalAccountVisible(newModalVisible);
   }
 
-  const handleCancelModaleAccount = () => {
-    setShowModalAccount(false)
+  const handleCancelModaleAccount = (index) => {
+    const newModalVisible = [...modalAccountVisible];
+    newModalVisible[index] = false;
+    setModalAccountVisible(newModalVisible);
   }
   const navigate = useNavigate();
   const handleButtonClick = (button) => {
@@ -345,8 +351,10 @@ const Bill = () => {
   };
 
   // tính phí vận chuyển && tính ngày giao hàng
-  handleShippingFee(totalPrice, selectedDictrict, selectedWard)
-  handleShippingOrderLeadtime(selectedDictrict, selectedWard)
+  if (switchChange) {
+    handleShippingFee(totalPrice, selectedDictrict, selectedWard);
+    handleShippingOrderLeadtime(selectedDictrict, selectedWard)
+  }
 
   const handleChangSwitch = (checked) => {
     setSwitchChange(checked);
@@ -359,8 +367,6 @@ const Bill = () => {
     }
 
   };
-
-  console.log(`aaa`, shippingFee)
 
   const showModal = (index) => {
     const newModalVisible = [...modalVisible];
@@ -410,6 +416,7 @@ const Bill = () => {
         JSON.stringify({
           timeStart: now(),
           productDetails: [],
+          account: {}
         })
       );
       setItems(newPanes);
@@ -462,14 +469,6 @@ const Bill = () => {
   }, [cartId, render]);
 
 
-  // if (!switchChange) {
-  //   setLeadtime(null);
-  //   setShippingFee(null);
-  //   render()
-  // }
-
-
-  // thanh toán
 
   const [billType, setBilType] = useState('In-store')
   const handleCreateBill = () => {
@@ -552,10 +551,10 @@ const Bill = () => {
                         placeholder="tìm kiếm tài khoản"
                         style={{ width: "200px", marginRight: "20px" }}
                       />
-                      <Button style={{ color: "blue" }} onClick={handleShowModalAccount}>Chọn tài khoản</Button>
+                      <Button style={{ color: "blue" }} onClick={() => handleShowModalAccount(index)}>Chọn tài khoản</Button>
                       <ModalAccount
-                        visible={showModalAccount}
-                        onCancel={handleCancelModaleAccount}
+                        visible={modalAccountVisible[index]}
+                        onCancel={() => handleCancelModaleAccount(index)}
                         cartId={cartId}
                         render={setRendered}
                       />

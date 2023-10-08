@@ -1,10 +1,15 @@
-import { Modal, Table } from 'antd';
+import { Button, Modal, Table } from 'antd';
 import axios from 'axios';
 import React from 'react'
 import { useState } from 'react';
 import { useEffect } from 'react';
 
 const ModalAccount = ({ visible, onCancel, cartId, render }) => {
+    var cart = JSON.parse(localStorage.getItem(cartId));
+    const add = (value) => {
+        cart.account = value;
+        localStorage.setItem(cartId, JSON.stringify(cart))
+    }
     const columns = [
         {
             title: 'Tên',
@@ -24,6 +29,17 @@ const ModalAccount = ({ visible, onCancel, cartId, render }) => {
                 return gender === true ? 'Nam' : 'Nữ'
             }
         },
+        {
+            title: 'Thao tác',
+            key: 'action',
+            render: (_, record) => {
+                return (
+                    <div>
+                        <Button onClick={() => add(record)}>Thêm</Button>
+                    </div>
+                )
+            }
+        },
     ]
     const [data, setData] = useState([])
     useEffect(() => {
@@ -34,18 +50,18 @@ const ModalAccount = ({ visible, onCancel, cartId, render }) => {
             .catch((error) => {
                 console.log(error)
             })
-    })
+    }, [])
     return (
         <div>
             <Modal
-                title="Tìm kiếm sản phẩm"
+                title="Tìm kiếm khách hàng"
                 key={cartId}
                 open={visible}
                 onCancel={onCancel}
                 footer={null}
-                width={2000}
+                width={1000}
             >
-                <Table columns={columns} dataSource={data} />
+                <Table pagination={false} columns={columns} dataSource={data} />
             </Modal>
         </div>
     )

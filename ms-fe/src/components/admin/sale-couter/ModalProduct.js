@@ -1,14 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Modal, Input, Select, Button, Table } from "antd";
 import styles from "./ModalProduct.module.css";
-import axios from "axios";
 import ProductDetails from "../product/ProductDetails";
 import { now } from "moment";
 
-const { Option } = Select;
 
 const ModalProduct = ({ visible, onCancel, cartId, render }) => {
-  const [data, setData] = useState([]);
   const [renderThis, setRenderThis] = useState(null);
   var cart = JSON.parse(localStorage.getItem(cartId));
   let productDetailsCreate = cart.productDetails;

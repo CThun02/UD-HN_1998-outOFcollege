@@ -24,7 +24,7 @@ public class PromotionProductResponse {
 
     private BigDecimal promotionValueMax;
 
-    private String promotionCondition;
+    private BigDecimal promotionCondition;
 
     private LocalDateTime startDate;
 

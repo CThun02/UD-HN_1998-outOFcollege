@@ -154,7 +154,7 @@ const ProductDetails = (props) => {
             onClick={(event) => {
               addProductDetail(record, event.target.checked);
             }}
-            defaultChecked={props.productDetailsCreate.some(
+            defaultChecked={props.productDetailsCreate?.some(
               (item) => item.productDetail.id === record.id
             )}
           />
@@ -176,12 +176,12 @@ const ProductDetails = (props) => {
     if (!checked) {
       for (let i = 0; i < props.productDetailsCreate.length; i++) {
         if (props.productDetailsCreate[i].productDetail.id === record.id) {
-          props.productDetailsCreate.splice(i, 1);
+          props.productDetailsCreate?.splice(i, 1);
         }
       }
     } else {
       productDetailCreate.productDetail = record;
-      props.productDetailsCreate.push(productDetailCreate);
+      props.productDetailsCreate?.push(productDetailCreate);
     }
   }
 

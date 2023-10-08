@@ -21,4 +21,6 @@ public interface VoucherService {
 
     VoucherRequest findByVoucherCode(String code);
 
+    Boolean isCheckAccountOwnerVoucher(Long idVoucher, String username);
+
 }

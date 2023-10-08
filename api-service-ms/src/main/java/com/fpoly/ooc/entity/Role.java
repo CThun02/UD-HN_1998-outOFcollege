@@ -1,5 +1,6 @@
 package com.fpoly.ooc.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -23,7 +24,7 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-public class Role extends BaseEntity{
+public class Role extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,6 +34,7 @@ public class Role extends BaseEntity{
     @Column(name = "role_name")
     private String roleName;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "role")
     private List<Account> accountList;
 

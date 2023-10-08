@@ -48,7 +48,8 @@ function Voucher() {
 
   //nofitication
   const [apiNotification, contextHolder] = notification.useNotification();
-  const { successMessage, clearNotification } = useContext(NotificationContext);
+  const { successMessage, clearNotification, context } =
+    useContext(NotificationContext);
 
   const [reload, setReload] = useState("");
 
@@ -66,7 +67,7 @@ function Voucher() {
       axios
         .put(baseUrl + "update/" + value[0])
         .then((res) => {
-          setReload(res.data.voucherId);
+          setReload(res.data);
         })
         .catch((err) => console.log("Exception: ", err));
     } catch (err) {
@@ -80,7 +81,7 @@ function Voucher() {
         setIsLoading(true);
         try {
           const filter = {
-            voucherCodeOrName: searchNameOrCode,
+            codeOrName: searchNameOrCode,
             startDate:
               searchStartDate !== ""
                 ? moment(searchStartDate?.$d, "DD-MM-YYYY").format(
@@ -141,12 +142,12 @@ function Voucher() {
       let isCheck = true;
 
       async function notification() {
-        if (successMessage && isCheck === true) {
+        if (successMessage && isCheck === true && context === "voucher") {
           // Hiển thị thông báo thành công ở đây
           console.log(successMessage);
           apiNotification.success({
-            message: `Thêm thành công. `,
-            description: "Voucher đã được thêm",
+            message: `Success`,
+            description: `${successMessage}`,
           });
           // Xóa thông báo sau khi đã hiển thị
           clearNotification();
@@ -158,7 +159,7 @@ function Voucher() {
         isCheck = false;
       };
     },
-    [successMessage, clearNotification, apiNotification]
+    [successMessage, clearNotification, apiNotification, context]
   );
 
   const columns = [

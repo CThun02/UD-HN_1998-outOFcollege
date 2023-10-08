@@ -86,10 +86,7 @@ const validationSchema = Yup.object().shape({
       function (endDate) {
         const { startDate } = this.parent;
         if (startDate && endDate) {
-          return (
-            moment(endDate).format(dateFormat) >
-            moment(startDate).format(dateFormat)
-          );
+          return endDate > startDate;
         }
         return true;
       }
@@ -227,7 +224,7 @@ function SaveVoucher() {
               .then(() => {
                 setIsLoading(false);
                 navigate("/admin/vouchers");
-                showSuccessNotification("Thao tác thành công");
+                showSuccessNotification("Thao tác thành công", "voucher");
               })
               .catch((err) => {
                 setIsLoading(false);

@@ -53,12 +53,10 @@ public class VoucherRequest {
     @NotNull(message = "Đơn hàng tối thiểu không được bỏ trống")
     private BigDecimal voucherCondition;
 
-    @CompareDateNow(message = "Ngày bắt đầu phải lớn hơn ngày hiện tại")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     @NotNull(message = "Ngày bắt đầu không được bỏ trống")
     private LocalDateTime startDate;
 
-    @CompareDateNow(message = "Ngày kết thúc phải lớn hơn ngày hiện tại")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     @NotNull(message = "Ngày kết thúc không được bỏ trống")
     private LocalDateTime endDate;

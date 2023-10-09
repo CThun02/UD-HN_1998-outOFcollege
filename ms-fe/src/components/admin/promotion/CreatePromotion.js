@@ -30,14 +30,7 @@ import { NotificationContext } from "../../element/notification/Notification";
 const { confirm } = Modal;
 
 function disabledDate(current) {
-  return (
-    current &&
-    current <
-      dayjs(
-        moment(new Date().toLocaleDateString()).format(dateFormat),
-        dateFormat
-      )
-  );
+  return current && current <= dayjs().endOf("day");
 }
 
 const options = [
@@ -52,15 +45,27 @@ const validationSchema = Yup.object().shape({
   promotionMethod: Yup.string(),
   promotionValue: Yup.string()
     .required("* Giá trị giảm không được bỏ trống")
-    .matches(/^[0-9,]+$/, "Sai định dạng"),
+    .matches(/^[0-9,]+$/, "Sai định dạng")
+    .test(
+      "promotion-value",
+      "* Giá trị không được vượt quá 100%",
+      function (promotionValue) {
+        const { promotionMethod } = this.parent;
+        if (promotionValue && promotionMethod !== "vnd") {
+          return promotionValue < 100;
+        }
+        return true;
+      }
+    ),
   startDate: Yup.date()
     .required("* Ngày bắt đầu không được bỏ trống")
     .test(
       "start-date-current",
       "* Ngày bắt đầu phải lớn hơn ngày hiện tại",
       function (startDate) {
+        const { status } = this.parent;
         const currentDate = new Date();
-        if (startDate) {
+        if (startDate && status !== "ACTIVE") {
           return startDate > currentDate;
         }
         return true;
@@ -70,11 +75,18 @@ const validationSchema = Yup.object().shape({
     .required("* Ngày kết thúc không được bỏ trống")
     .test(
       "end-date",
-      "* Ngày kết thúc phải lớn hơn ngày bắt đầu",
+      "* Ngày kết thúc phải lớn hơn ngày bắt đầu 30 phút",
       function (endDate) {
         const { startDate } = this.parent;
         if (startDate && endDate) {
-          return endDate > startDate;
+          const timeStartDate = moment(startDate).format("HH:mm:ss");
+          const timeEndDate = moment(endDate).format("HH:mm:ss");
+          const time = moment(timeStartDate, "HH:mm:ss").add(29, "minutes");
+          return (
+            endDate > startDate ||
+            (endDate > startDate &&
+              timeEndDate > moment(time).format("HH:mm:ss"))
+          );
         }
         return true;
       }
@@ -92,9 +104,39 @@ const validationSchema = Yup.object().shape({
     ),
 });
 
+const range = (start, end) => {
+  const result = [];
+  for (let i = start; i < end; i++) {
+    result.push(i);
+  }
+  return result;
+};
+
+const rangeFunction = (start) => {
+  const result = [];
+  for (let i = start; i >= 0; i--) {
+    result.push(i);
+  }
+  return result;
+};
+
+const disabledDateTime = (current) => {
+  const currentDate = moment(new Date()).format("DD/MM/YYYY");
+  const selectedDate = moment(current).format("DD/MM/YYYY");
+
+  if (selectedDate > currentDate) {
+    return {
+      disabledHours: () => range(0, 24).splice(0, moment().hour()),
+      disabledMinutes: () => rangeFunction(moment().minute()),
+    };
+  }
+
+  return {};
+};
+
 dayjs.extend(customParseFormat);
 
-const dateFormat = "DD/MM/YYYY";
+const dateFormat = "HH:mm:ss DD/MM/YYYY";
 
 const baseUrl = "http://localhost:8080/api/admin/promotion/";
 
@@ -307,7 +349,10 @@ function CreatePromotion() {
                               name="promotionName"
                               value={values.promotionName}
                               zIndex={true}
-                              disabled={values.status === "INACTIVE"}
+                              disabled={
+                                values.status === "INACTIVE" ||
+                                values.status === "CANCEL"
+                              }
                             >
                               <Input
                                 size="large"
@@ -323,7 +368,10 @@ function CreatePromotion() {
                                     ? "error"
                                     : "success"
                                 }
-                                disabled={values.status === "INACTIVE"}
+                                disabled={
+                                  values.status === "INACTIVE" ||
+                                  values.status === "CANCEL"
+                                }
                               />
                               {touched.promotionName && (
                                 <div className={styles.errors}>
@@ -348,7 +396,8 @@ function CreatePromotion() {
                               optionType="button"
                               disabled={
                                 values.status === "ACTIVE" ||
-                                values.status === "INACTIVE"
+                                values.status === "INACTIVE" ||
+                                values.status === "CANCEL"
                               }
                             />
                           </Col>
@@ -360,7 +409,8 @@ function CreatePromotion() {
                               zIndex={true}
                               disabled={
                                 values.status === "ACTIVE" ||
-                                values.status === "INACTIVE"
+                                values.status === "INACTIVE" ||
+                                values.status === "CANCEL"
                               }
                             >
                               <Input
@@ -380,7 +430,8 @@ function CreatePromotion() {
                                 onBlur={handleBlur}
                                 disabled={
                                   values.status === "ACTIVE" ||
-                                  values.status === "INACTIVE"
+                                  values.status === "INACTIVE" ||
+                                  values.status === "CANCEL"
                                 }
                                 status={
                                   (touched.promotionValue &&
@@ -408,12 +459,14 @@ function CreatePromotion() {
                               value={values.startDate}
                               disabled={
                                 values.status === "ACTIVE" ||
-                                values.status === "INACTIVE"
+                                values.status === "INACTIVE" ||
+                                values.status === "CANCEL"
                               }
                             >
                               <DatePicker
                                 name="startDate"
                                 disabledDate={disabledDate}
+                                disabledTime={disabledDateTime}
                                 format={dateFormat}
                                 size="large"
                                 placeholder={null}
@@ -428,7 +481,8 @@ function CreatePromotion() {
                                 onBlur={handleBlur}
                                 disabled={
                                   values.status === "ACTIVE" ||
-                                  values.status === "INACTIVE"
+                                  values.status === "INACTIVE" ||
+                                  values.status === "CANCEL"
                                 }
                                 status={
                                   (touched.startDate && errors.startDate) ||
@@ -436,6 +490,9 @@ function CreatePromotion() {
                                     ? "error"
                                     : "success"
                                 }
+                                showTime={{
+                                  defaultValue: dayjs("00:00:00", "HH:mm:ss"),
+                                }}
                               />
                               {touched.startDate && (
                                 <div className={styles.errors}>
@@ -451,11 +508,15 @@ function CreatePromotion() {
                               label="Ngày kết thúc"
                               name="endDate"
                               value={values.endDate}
-                              disabled={values.status === "INACTIVE"}
+                              disabled={
+                                values.status === "INACTIVE" ||
+                                values.status === "CANCEL"
+                              }
                             >
                               <DatePicker
                                 name="endDate"
                                 disabledDate={disabledDate}
+                                disabledTime={disabledDateTime}
                                 format={dateFormat}
                                 size="large"
                                 placeholder={null}
@@ -474,7 +535,13 @@ function CreatePromotion() {
                                     ? "error"
                                     : "success"
                                 }
-                                disabled={values.status === "INACTIVE"}
+                                disabled={
+                                  values.status === "INACTIVE" ||
+                                  values.status === "CANCEL"
+                                }
+                                showTime={{
+                                  defaultValue: dayjs("00:00:00", "HH:mm:ss"),
+                                }}
                               />
                               {touched.endDate && (
                                 <div className={styles.errors}>
@@ -495,7 +562,10 @@ function CreatePromotion() {
                               type="primary"
                               htmlType="submit"
                               disabled={
-                                values.status === "INACTIVE" || products.length
+                                values.status === "INACTIVE" ||
+                                values.status === "CANCEL"
+                                  ? true
+                                  : products.length
                                   ? false
                                   : true
                               }

@@ -1,7 +1,6 @@
 import {
   Button,
   Col,
-  Drawer,
   Modal,
   Pagination,
   Row,
@@ -16,7 +15,7 @@ import FilterpromotionAndPromotion from "../../element/filter/FilterVoucherAndPr
 import styles from "./Promotion.module.css";
 import {
   DeleteOutlined,
-  EditOutlined,
+  ExclamationCircleFilled,
   EyeOutlined,
   PlusOutlined,
   UnorderedListOutlined,
@@ -27,9 +26,13 @@ import axios from "axios";
 import moment from "moment";
 import { useContext } from "react";
 import { NotificationContext } from "../../element/notification/Notification";
+import numeral from "numeral";
+import SockJs from "../../../service/SockJs";
 
 const baseUrl = "http://localhost:8080/api/admin/promotion-product/";
 const basePromotionUrl = "http://localhost:8080/api/admin/promotion/";
+
+const { confirm } = Modal;
 
 function Promotion() {
   const [promotions, setPromotions] = useState([]);
@@ -114,7 +117,7 @@ function Promotion() {
           </Link>
           <Button
             className={styles.iconButton}
-            disabled={object[1] === "INACTIVE"}
+            disabled={object[1] === "INACTIVE" || object[1] === "CANCEL"}
             onClick={() => handleDeleted(object)}
           >
             <DeleteOutlined />
@@ -131,7 +134,6 @@ function Promotion() {
       async function notification() {
         if (successMessage && isCheck === true && context === "promotion") {
           // Hiển thị thông báo thành công ở đây
-          console.log(successMessage);
           apiNotification.success({
             message: `Success`,
             description: `${successMessage}`,
@@ -150,13 +152,35 @@ function Promotion() {
   );
 
   function handleDeleted(value) {
+    confirm({
+      title: "Xác nhận",
+      icon: <ExclamationCircleFilled />,
+      content: "Bạn có chắc là hủy chương trình này không?",
+
+      onOk() {
+        async function changeStatusPromotion() {
+          try {
+            await axios
+              .get(basePromotionUrl + "update-status/" + value[0])
+              .then((res) => {
+                apiNotification.success({
+                  message: `Success`,
+                  description: `Thao tác thành công`,
+                });
+                setIsRender(res.data);
+              })
+              .catch((err) => console.log("Exception: ", err));
+          } catch (err) {
+            console.log("Error: ", err);
+          }
+        }
+        changeStatusPromotion();
+      },
+      onCancel() {
+        console.log("Cancel");
+      },
+    });
     try {
-      axios
-        .get(basePromotionUrl + "update-status/" + value[0])
-        .then((res) => {
-          setIsRender(res.data);
-        })
-        .catch((err) => console.log("Error: ", err));
     } catch (err) {
       console.log("Err");
     }
@@ -237,7 +261,7 @@ function Promotion() {
         status={status}
         setStatus={setStatus}
       />
-
+      <SockJs setValues={setPromotions} connectTo="promotion" />;
       <div className={styles.content}>
         <Space style={{ width: "100%" }} direction="vertical" size={16}>
           <Row>
@@ -272,20 +296,24 @@ function Promotion() {
                 stt: calculateStt(index),
                 promotionCode: promotion.promotionCode,
                 promotionName: promotion.promotionName,
-                productQuantity: promotion.productQuantity,
-                promotionValue: `${promotion.promotionValue} ${
-                  promotion.promotionMethod === "vnd" ? "VND" : "%"
-                }`,
+                productQuantity: numeral(promotion.productQuantity).format(
+                  "0,0"
+                ),
+                promotionValue: `${numeral(promotion.promotionValue).format(
+                  "0,0"
+                )} ${promotion.promotionMethod === "vnd" ? "VND" : "%"}`,
                 startAndEndDate: [
                   `${moment(promotion.startDate).format(
-                    "DD/MM/YYYY"
-                  )} - ${moment(promotion.endDate).format("DD/MM/YYYY")}`,
+                    "HH:mm DD/MM/YYYY"
+                  )} - ${moment(promotion.endDate).format("HH:mm DD/MM/YYYY")}`,
                   promotion.status === "ACTIVE"
                     ? "Đang diễn ra"
                     : promotion.status === "INACTIVE"
                     ? "Đã kết thúc"
                     : promotion.status === "UPCOMING"
                     ? "Sắp diễn ra"
+                    : promotion.status === "CANCEL"
+                    ? "Đã hủy"
                     : null,
                 ],
                 action: [promotion.promotionCode, promotion.status],

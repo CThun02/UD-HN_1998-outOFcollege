@@ -112,12 +112,25 @@ public class VoucherServiceImpl implements VoucherService {
         if (voucherOptional.isEmpty()) {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.CODE_NOT_FOUND));
         } else {
-            voucherOptional.get().setStatus(Const.STATUS_INACTIVE);
+            voucherOptional.get().setStatus(Const.STATUS_CANCEL);
             voucherOptional.get().setDeletedAt(LocalDateTime.now());
 
             return voucherRepository.save(voucherOptional.get());
         }
 
+    }
+
+    @Override
+    public Voucher updateStatus(String code, String status) {
+        Optional<Voucher> voucherOptional = voucherRepository.findVoucherByVoucherCode(code);
+
+        if (voucherOptional.isEmpty()) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.CODE_NOT_FOUND));
+        } else {
+            voucherOptional.get().setStatus(status);
+
+            return voucherRepository.save(voucherOptional.get());
+        }
     }
 
     @Override
@@ -166,6 +179,11 @@ public class VoucherServiceImpl implements VoucherService {
     @Override
     public Boolean isCheckAccountOwnerVoucher(Long idVoucher, String username) {
         return voucherRepository.isCheckAccountOwnerVoucher(idVoucher, username);
+    }
+
+    @Override
+    public List<VoucherResponse> findAllNoFilter() {
+        return voucherRepository.findAllVoucherResponseNoCondition();
     }
 
     private VoucherRequest convertVoucher(Voucher voucher) {

@@ -67,7 +67,7 @@ import java.time.LocalDateTime;
                         @ColumnResult(name = "promotionMethod", type = String.class),
                         @ColumnResult(name = "promotionValue", type = BigDecimal.class),
                         @ColumnResult(name = "promotionMaxValue", type = BigDecimal.class),
-                        @ColumnResult(name = "promotionCondition", type = String.class),
+                        @ColumnResult(name = "promotionCondition", type = BigDecimal.class),
                         @ColumnResult(name = "startDate", type = LocalDateTime.class),
                         @ColumnResult(name = "endDate", type = LocalDateTime.class),
                         @ColumnResult(name = "status", type = String.class),

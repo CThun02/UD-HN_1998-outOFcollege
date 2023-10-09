@@ -144,7 +144,11 @@ function ModalAddProductList({
     render: (object) => (
       <Button
         onClick={() => handleDeleted(object[0])}
-        disabled={products.length <= 1}
+        disabled={
+          products.length <= 1 ||
+          values?.status === "INACTIVE" ||
+          values?.status === "CANCEL"
+        }
       >
         <DeleteOutlined />
       </Button>

@@ -33,4 +33,11 @@ public interface VoucherRepository extends JpaRepository<Voucher, Long> {
             "where va.voucherAccount.id = :idVoucher and va.accountVoucher.username = :username")
     Boolean isCheckAccountOwnerVoucher(Long idVoucher, String username);
 
+    @Query("select new com.fpoly.ooc.responce.voucher.VoucherResponse(" +
+            "v.id, v.voucherCode, v.voucherName, v.voucherValue, v.voucherValueMax, v.voucherMethod, " +
+            "v.limitQuantity, v.startDate, v.endDate, v.status, v.objectUse) " +
+            "from Voucher v " +
+            "order by v.createdAt desc ")
+    List<VoucherResponse> findAllVoucherResponseNoCondition();
+
 }

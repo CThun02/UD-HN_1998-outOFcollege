@@ -128,10 +128,25 @@ public class PromotionServiceImpl implements PromotionService {
     public Promotion updateStatus(String code) {
         Promotion promotion = findByCode(code);
 
-        promotion.setStatus(Const.STATUS_INACTIVE);
+        promotion.setStatus(Const.STATUS_CANCEL);
         promotion.setDeletedAt(LocalDateTime.now());
 
         return promotionRepository.save(promotion);
+    }
+
+    @Override
+    public Promotion updateStatus(String code, String status) {
+        Promotion promotion = findByCode(code);
+
+        promotion.setStatus(status);
+        promotion.setDeletedAt(LocalDateTime.now());
+
+        return promotionRepository.save(promotion);
+    }
+
+    @Override
+    public List<PromotionProductResponse> findAllPromotionProductResponse() {
+        return promotionRepository.findAllPromotionProductNoCondition();
     }
 
     private Promotion promotion(PromotionRequest request) {

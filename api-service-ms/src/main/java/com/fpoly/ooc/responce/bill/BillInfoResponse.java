@@ -9,11 +9,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class BillInfoResponse {     
+public class BillInfoResponse {
 
     private Long billId;
 
-//    private String billCode;
+    private String billCode;
 
     private String billType;
 

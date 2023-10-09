@@ -3,6 +3,7 @@ package com.fpoly.ooc.service.impl;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
 import com.fpoly.ooc.entity.Account;
+import com.fpoly.ooc.entity.Address;
 import com.fpoly.ooc.entity.Bill;
 import com.fpoly.ooc.entity.BillDetail;
 import com.fpoly.ooc.entity.Payment;
@@ -23,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -52,7 +54,10 @@ public class BillServiceImpl implements BillService {
                 .account(accountBuilder)
                 .priceReduce(request.getPriceReduce())
                 .price(request.getPrice())
-                .billType("In-store")
+                .billType(request.getBillType())
+                .note(request.getNote())
+                .billCode(request.getBillCode())
+                .completionDate(LocalDateTime.now())
                 .build();
         billRepo.save(bill);
 
@@ -62,7 +67,7 @@ public class BillServiceImpl implements BillService {
                     .productDetail(ProductDetail.builder().id(billDetailRequest.getProductDetailId()).build())
                     .price(billDetailRequest.getPrice())
                     .quantity(billDetailRequest.getQuantity())
-                    .note("nbnot null")
+                    .note("null")
                     .status("wating")
                     .build();
             billDetailRepo.save(billDetail);
@@ -97,5 +102,10 @@ public class BillServiceImpl implements BillService {
     @Override
     public List<GetListCustomer> getListCustomer() {
         return billRepo.getListCustomer();
+    }
+
+    @Override
+    public List<Address> getListAddressByUserName(String username) {
+        return billRepo.getListAddressByUsername(username);
     }
 }

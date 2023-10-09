@@ -170,19 +170,37 @@ const Bill = () => {
     {
       title: "Thao tác",
       key: "action",
-      render: (_, record) => (
+      render: (text, record, index) => (
         <Space size="middle">
           <Button
             icon={<DeleteOutlined />}
             danger
             href="#1"
             key={record.key}
+            onClick={() => handleDeleteProduct(record, index)}
           ></Button>
         </Space>
       ),
     },
   ];
 
+  // xóa sản phẩm trong giỏ hàng
+  const handleDeleteProduct = (record, index) => {
+    let cart = JSON.parse(localStorage.getItem(cartId));
+    let productDetails = cart.productDetails;
+
+    productDetails.splice(index, 1);
+    localStorage.setItem(cartId, JSON.stringify(cart));
+    setRendered(cart);
+  };
+
+  // xóa tài khoản 
+  const handleDeleteAccount = () => {
+    let cart = JSON.parse(localStorage.getItem(cartId));
+    delete cart.account;
+    localStorage.setItem(cartId, JSON.stringify(cart));
+    setRendered(cart);
+  }
 
   const [activeKey, setActiveKey] = useState(
     initialItems.length === 0 ? null : initialItems[0].key
@@ -203,7 +221,9 @@ const Bill = () => {
   const [selectedDictrict, setSelectedDictrict] = useState(null);
   const [selectedWard, setSelectedWard] = useState(null)
   const [selectedButton, setSelectedButton] = useState(null);
-  const [showModalAccount, setShowModalAccount] = useState(false);
+  const [account, setAccount] = useState({});
+  const [address, setAddress] = useState([])
+  const navigate = useNavigate();
 
   const handleShowModalAccount = (index) => {
     const newModalVisible = [...modalAccountVisible];
@@ -216,7 +236,6 @@ const Bill = () => {
     newModalVisible[index] = false;
     setModalAccountVisible(newModalVisible);
   }
-  const navigate = useNavigate();
   const handleButtonClick = (button) => {
     if (selectedButton === button) {
       setSelectedButton(null);
@@ -243,39 +262,43 @@ const Bill = () => {
   };
 
   const handleProvinceChange = async (value) => {
-    await axios
-      .get(
-        `https://online-gateway.ghn.vn/shiip/public-api/master-data/district?province_id=${value}`,
-        {
-          headers: {
-            token: "0f082cbe-5110-11ee-a59f-a260851ba65c",
-          },
-        }
-      )
-      .then((response) => {
-        setDistricts(response.data.data);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    if (value) {
+      await axios
+        .get(
+          `https://online-gateway.ghn.vn/shiip/public-api/master-data/district?province_id=${value}`,
+          {
+            headers: {
+              token: "0f082cbe-5110-11ee-a59f-a260851ba65c",
+            },
+          }
+        )
+        .then((response) => {
+          setDistricts(response.data.data);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
   };
 
   const handleDistrictChange = async (value) => {
-    try {
-      const response = await axios.get(
-        `https://online-gateway.ghn.vn/shiip/public-api/master-data/ward?district_id=${value}`,
-        {
-          headers: {
-            token: `0f082cbe-5110-11ee-a59f-a260851ba65c`,
-          },
-        }
-      );
+    if (value) {
+      try {
+        const response = await axios.get(
+          `https://online-gateway.ghn.vn/shiip/public-api/master-data/ward?district_id=${value}`,
+          {
+            headers: {
+              token: `0f082cbe-5110-11ee-a59f-a260851ba65c`,
+            },
+          }
+        );
 
-      const wards = response.data.data;
-      setWards(wards);
-      setSelectedDictrict(value)
-    } catch (error) {
-      console.log(error);
+        const wards = response.data.data;
+        setWards(wards);
+        setSelectedDictrict(value)
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 
@@ -291,33 +314,38 @@ const Bill = () => {
       to_ward_code: `${toWardCode}`,
       service_id: 53321
     };
-
-    try {
-      const response = await axios.post(
-        'https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/leadtime',
-        values,
-        {
-          headers: {
-            token: '0f082cbe-5110-11ee-a59f-a260851ba65c',
-            shop_id: '4534109'
+    console.log(toDistrictId, toWardCode)
+    if (toDistrictId && toWardCode) {
+      console.log(toDistrictId, toWardCode)
+      try {
+        const response = await axios.post(
+          'https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/leadtime',
+          values,
+          {
+            headers: {
+              token: '0f082cbe-5110-11ee-a59f-a260851ba65c',
+              shop_id: '4534109'
+            }
           }
-        }
-      );
+        );
 
-      const leadtimeTimestamp = response.data.data.leadtime;
-      const leadtimeMoment = moment.unix(leadtimeTimestamp);
-      const formattedDateTime = leadtimeMoment.format('DD/MM/YYYY');
+        const leadtimeTimestamp = response.data.data.leadtime;
+        const leadtimeMoment = moment.unix(leadtimeTimestamp);
+        const formattedDateTime = leadtimeMoment.format('DD/MM/YYYY');
 
-      setLeadtime(`${formattedDateTime}`);
-    } catch (error) {
-      console.log(error);
+        setLeadtime(`${formattedDateTime}`);
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 
+  //  tỏng giá tiền
   const totalPrice = productDetails.reduce((total, product) => {
     return total + product.productDetail.price * product.quantity;
   }, 0);
 
+  // phí ship
   const handleShippingFee = async (insuranceValue, toDistrictId, toWardCode) => {
     const values = {
       service_id: 53321,
@@ -331,31 +359,28 @@ const Bill = () => {
       weight: 1000,
       width: 15
     };
-
-    try {
-      const response = await axios.post(
-        'https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee',
-        values,
-        {
-          headers: {
-            token: '0f082cbe-5110-11ee-a59f-a260851ba65c',
-            shop_id: '4534109'
+    if (insuranceValue && toDistrictId && toWardCode) {
+      console.log(12321231)
+      try {
+        const response = await axios.post(
+          'https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee',
+          values,
+          {
+            headers: {
+              token: '0f082cbe-5110-11ee-a59f-a260851ba65c',
+              shop_id: '4534109'
+            }
           }
-        }
-      );
+        );
 
-      setShippingFee(response.data.data.total);
-    } catch (error) {
-      console.log(error);
+        setShippingFee(response.data.data.total);
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 
-  // tính phí vận chuyển && tính ngày giao hàng
-  if (switchChange) {
-    handleShippingFee(totalPrice, selectedDictrict, selectedWard);
-    handleShippingOrderLeadtime(selectedDictrict, selectedWard)
-  }
-
+  // switch bán tại quầy hoặc online
   const handleChangSwitch = (checked) => {
     setSwitchChange(checked);
     if (!checked) {
@@ -365,26 +390,32 @@ const Bill = () => {
     } else {
       setBilType('Online')
     }
-
   };
 
+  // mở modal product
   const showModal = (index) => {
     const newModalVisible = [...modalVisible];
     newModalVisible[index] = true;
     setModalVisible(newModalVisible);
   };
 
+  // đóng modal product
   const handleCancel = (index) => {
     const newModalVisible = [...modalVisible];
     newModalVisible[index] = false;
     setModalVisible(newModalVisible);
   };
 
+  // chuyển tab
+  const [billCodeAdd, setBilCodeAdd] = useState('')
   const onChange = (newActiveKey) => {
+    setBilCodeAdd(newActiveKey);
     setCartId(newActiveKey);
     setActiveKey(newActiveKey);
+    setActiveTab(newActiveKey)
   };
 
+  // gen mã hóa đơn
   function generateRandomBillCode() {
     let result = "";
     const characters = "ABCDEF0123456789";
@@ -397,6 +428,7 @@ const Bill = () => {
     return "HD_" + result;
   }
 
+  // thêm mới tab
   const add = () => {
     if (items.length >= 5) {
       notification.error({
@@ -425,6 +457,7 @@ const Bill = () => {
     }
   };
 
+  // xóa tab
   const remove = (targetKey) => {
     let newActiveKey = activeKey;
     localStorage.removeItem(targetKey);
@@ -447,6 +480,7 @@ const Bill = () => {
     setActiveKey(newActiveKey);
   };
 
+  const [activeTab, setActiveTab] = useState(null);
   const onEdit = (targetKey, action) => {
     if (action === "add") {
       add();
@@ -455,28 +489,57 @@ const Bill = () => {
     }
   };
 
+
+  // tính phí vận chuyển && tính ngày giao hàng
+  if (switchChange && address.length < 0) {
+    handleShippingFee(totalPrice, selectedDictrict, selectedWard);
+    handleShippingOrderLeadtime(selectedDictrict, selectedWard)
+  }
+
+  // hiển thị danh sách sản phẩm trong giỏ hàng
   const getProductDetails = () => {
     var cart = JSON.parse(localStorage.getItem(cartId));
     var productDetails = cart.productDetails;
     setProductDetails(productDetails);
+    setAccount(cart.account)
   };
+
+  const getListAddressByUsername = (username) => {
+    axios.get(`http://localhost:8080/api/admin/bill/customer/${username}/address`)
+      .then((response) => {
+        setAddress(response.data)
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+  }
 
 
   useEffect(() => {
+    getListAddressByUsername(account?.username)
     fetchProvinces();
+    handleProvinceChange(address[0]?.city);
+    handleDistrictChange(address[0]?.district);
+    if (address.length >= 0) {
+      console.log(address[0]?.district, address[0]?.ward, " ::::")
+      handleShippingOrderLeadtime(address[0]?.district, address[0]?.ward)
+      handleShippingFee(totalPrice, address[0]?.district, address[0]?.ward)
+    }
     getProductDetails();
     initializeModalStates();
-  }, [cartId, render]);
-
-
+  }, [cartId, render, account?.username, address[0]?.city, address[0]?.district]);
 
   const [billType, setBilType] = useState('In-store')
+  const [note, setNote] = useState("")
   const handleCreateBill = () => {
     const bill = {
+      billCode: billCodeAdd,
+      accountId: account?.username,
       price: totalPrice,
       priceReduce: null,
       billType: billType,
       status: 'watting',
+      note: note,
       lstBillDetailRequest: [],
     };
 
@@ -494,14 +557,17 @@ const Bill = () => {
       }
     }
     console.log(bill)
-
-    axios.post(`http://localhost:8080/api/admin/bill`, bill)
-      .then(response => {
-        navigate(`/admin/counter-sales/${response.data.id}/timeline`)
-      })
-      .catch((error) => {
-        console.log(error)
-      })
+    const confirmed = window.confirm("Bạn có chắc chắn muốn thanh toán?");
+    if (confirmed) {
+      axios.post(`http://localhost:8080/api/admin/bill`, bill)
+        .then(response => {
+          navigate(`/admin/counter-sales/${response.data.id}/timeline`)
+          remove(activeTab);
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    }
   }
 
   return (
@@ -532,7 +598,7 @@ const Bill = () => {
                     className={styles.blackDivider}
                     style={{ marginTop: "10px" }}
                   />
-                  <Table dataSource={productDetails} columns={columns} />
+                  <Table dataSource={productDetails} columns={columns} pagination={false} />
                   <ModalProduct
                     visible={modalVisible[index]}
                     onCancel={() => handleCancel(index)}
@@ -566,16 +632,27 @@ const Bill = () => {
                   />
                   <Row>
                     <Col span={6}>
-                      <h3>Tên khách hàng</h3>
+                      {account && <>
+                        <span><b>Tên tài khoản:</b> {account.username}</span>
+                        <br />
+                        <span><b>Tên khách hàng: </b> {account.fullname}</span>
+                        <br />
+                        <span><b>Email: </b> {account.email}</span>
+                        <br />
+                        <span><b>Giới tính: </b>{account.gender === true ? "Nam" : "Nữ"}</span>
+                      </>
+                      }
+                      {!account && <>
+                        <span><b>Tên tài khoản:</b> Khách lẻ</span>
+                      </>}
                     </Col>
                     <Col span={12}>
-                      <Tag
-                        color="gray"
-                        style={{ borderRadius: "15px", padding: "2px 6px" }}
-                      >
-                        Khách lẻ
-                      </Tag>
-
+                      <Button
+                        icon={<DeleteOutlined />}
+                        danger
+                        key={1}
+                        onClick={() => handleDeleteAccount()}
+                      ></Button>
                     </Col>
                   </Row>
                 </div>
@@ -594,13 +671,13 @@ const Bill = () => {
                             <span>
                               <b style={{ color: "red" }}>*</b> Họ và tên
                             </span>
-                            <Input placeholder="nhập họ và tên" />
+                            <Input placeholder="nhập họ và tên" value={account?.username} />
                           </Col>
                           <Col span={10} style={{ marginLeft: "40px" }}>
                             <span>
                               <b style={{ color: "red" }}>*</b> Số điện thoại
                             </span>
-                            <Input placeholder="nhập số điện thoại" />
+                            <Input placeholder="nhập số điện thoại" value={account?.phoneNumber} />
                           </Col>
                         </Row>
                       )}
@@ -614,16 +691,18 @@ const Bill = () => {
                             <Select
                               style={{ width: 200 }}
                               onChange={handleProvinceChange}
+                              value={address[0]?.city ? Number(address[0]?.city) : null}
                             >
-                              {provinces && provinces.map((province) => (
-                                <Select.Option
-                                  label={province.ProvinceName}
-                                  key={province.ProvinceID}
-                                  value={province.ProvinceID}
-                                >
-                                  {province.ProvinceName}
-                                </Select.Option>
-                              ))}
+                              {provinces &&
+                                provinces.map((province) => (
+                                  <Select.Option
+                                    label={province.ProvinceName}
+                                    key={province.ProvinceID}
+                                    value={province.ProvinceID}
+                                  >
+                                    {province.ProvinceName}
+                                  </Select.Option>
+                                ))}
                             </Select>
                           </Col>
                           <Col span={7}>
@@ -634,6 +713,7 @@ const Bill = () => {
                             <Select
                               style={{ width: 200 }}
                               onChange={handleDistrictChange}
+                              value={address[0]?.district ? Number(address[0]?.district) : null}
                             >
                               {districts && districts.map((district) => (
                                 <Select.Option
@@ -652,6 +732,7 @@ const Bill = () => {
                             <br />
                             <Select style={{ width: 200 }}
                               onChange={handleWardChange}
+                              value={address[0]?.ward}
                             >
                               {wards && wards.map((ward) => (
                                 <Select.Option
@@ -669,7 +750,7 @@ const Bill = () => {
                         <Row>
                           <Col span={16}>
                             <span>Địa chỉ cụ thể</span>
-                            <Input placeholder="Nhập địa chỉ cụ thể" />
+                            <Input placeholder="Nhập địa chỉ cụ thể" value={address[0]?.descriptionDetail} />
                           </Col>
                           <Col span={6} style={{ marginLeft: "30px" }}>
                             <img
@@ -717,13 +798,12 @@ const Bill = () => {
                           <span style={{ fontSize: "16px", display: "block" }}>
                             Tổng số tiền
                           </span>
-                          {!switchChange && <>
-                            <span style={{ fontSize: "16px", display: "block" }}>
-                              Khách cần trả
-                            </span>
-                            <span style={{ fontSize: "16px", display: "block" }}>
-                              Tiền thừa trả khách
-                            </span></>}
+                          <span style={{ fontSize: "16px", display: "block" }}>
+                            Số tiền khách trả
+                          </span>
+                          <span style={{ fontSize: "16px", display: "block" }}>
+                            Tiền thừa trả khách
+                          </span>
                         </Col>
                         <Col span={12}>
                           {/* tiền hàng */}
@@ -758,21 +838,20 @@ const Bill = () => {
                               currency: 'VND'
                             })}
                           </span>
-                          {!switchChange && <>
-                            {/* khách cần trả */}
-                            <input type="number" className={styles.input}
-                              onChange={(e) => setRemainAmount(e.target.value - totalPrice)
-                              }
-                            />
-                            {/* tiền thừa */}
-                            <span style={{ fontSize: "16px", display: "block" }}>
-                              {remainAmount.toLocaleString('vi-VN', {
-                                style: 'currency',
-                                currency: 'VND'
-                              })}
-                            </span></>}
+                          {/* khách cần trả */}
+                          <input type="number" className={styles.input}
+                            onChange={(e) => setRemainAmount(e.target.value - totalPrice - shippingFee)
+                            }
+                          />
+                          {/* tiền thừa */}
+                          <span style={{ fontSize: "16px", display: "block" }}>
+                            {remainAmount.toLocaleString('vi-VN', {
+                              style: 'currency',
+                              currency: 'VND'
+                            })}
+                          </span>
                         </Col>
-                        <TextArea rows={3} placeholder="ghi chú ..." style={{ margin: '10px 0' }} />
+                        <TextArea onChange={(e) => setNote(e.target.value)} rows={3} placeholder="ghi chú ..." style={{ margin: '10px 0' }} />
                         <div style={{ marginTop: "20px" }}>
                           <div className={styles.buttonGroup}>
                             <Button

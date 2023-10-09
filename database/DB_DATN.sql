@@ -1,4 +1,4 @@
-﻿﻿USE MASTER;
+﻿USE MASTER;
 
 CREATE DATABASE DATN_DB_MS;
 
@@ -271,13 +271,14 @@ CREATE TABLE address_detail(
 
 CREATE TABLE bill(
     id                  BIGINT IDENTITY PRIMARY KEY,
-    bill_code           UNIQUE VARCHAR(20),
+    bill_code           VARCHAR(20) UNIQUE,
     account_id          VARCHAR(100) FOREIGN KEY(account_id) REFERENCES account(username),
     date_of_receipt     DATETIME,
     completion_date     DATETIME,
     price               DECIMAL,
     price_reduce        DECIMAL,
     bill_type           VARCHAR(50),
+    note                NVARCHAR(200),
     status              VARCHAR(50),
     created_at          DATETIME,
     updated_at          DATETIME,

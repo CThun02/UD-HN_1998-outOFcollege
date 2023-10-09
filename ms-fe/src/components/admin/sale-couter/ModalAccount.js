@@ -5,11 +5,16 @@ import { useState } from 'react';
 import { useEffect } from 'react';
 
 const ModalAccount = ({ visible, onCancel, cartId, render }) => {
+    const [renderThis, setRenderThis] = useState(null);
     var cart = JSON.parse(localStorage.getItem(cartId));
+
     const add = (value) => {
         cart.account = value;
-        localStorage.setItem(cartId, JSON.stringify(cart))
+        localStorage.setItem(cartId, JSON.stringify(cart));
+        render(Math.random)
+        console.log(onCancel())
     }
+
     const columns = [
         {
             title: 'Tên',
@@ -41,6 +46,7 @@ const ModalAccount = ({ visible, onCancel, cartId, render }) => {
             }
         },
     ]
+
     const [data, setData] = useState([])
     useEffect(() => {
         axios.get(`http://localhost:8080/api/admin/bill/customer`)
@@ -50,14 +56,17 @@ const ModalAccount = ({ visible, onCancel, cartId, render }) => {
             .catch((error) => {
                 console.log(error)
             })
-    }, [])
+    }, [renderThis])
     return (
         <div>
             <Modal
                 title="Tìm kiếm khách hàng"
                 key={cartId}
                 open={visible}
-                onCancel={onCancel}
+                onCancel={() => {
+                    onCancel();
+                    setRenderThis(visible);
+                }}
                 footer={null}
                 width={1000}
             >

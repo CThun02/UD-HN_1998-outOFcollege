@@ -41,6 +41,11 @@ public class BillController {
         return ResponseEntity.ok(billService.getListCustomer());
     }
 
+    @GetMapping("/customer/{username}/address")
+    public ResponseEntity<?> getListAddressByUserName(@PathVariable("username") String username) {
+        return ResponseEntity.ok(billService.getListAddressByUserName(username));
+    }
+
     @PutMapping()
     public ResponseEntity<?> updateBill() {
         return ResponseEntity.ok("");

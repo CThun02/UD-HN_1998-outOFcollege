@@ -31,14 +31,14 @@ public interface TimeLineRepo extends JpaRepository<Timeline, Long> {
     List<TimeLineResponse> getTimeLineByBillId(@Param("billId") Long id);
 
     @Query("SELECT new com.fpoly.ooc.responce.timeline.TimelineProductResponse(" +
-            "   pd.product.imgDefault, pd.product.productName, bd.quantity, bd.price, pd.size.sizeName, pd.color.colorName," +
+            "   pd.product.imgDefault, pd.product.productName, bd.quantity, bd.price, pd.size.sizeName, pd.color.colorCode," +
             "   pd.button.buttonName, pd.collar.collarTypeName, pd.material.materialName, pd.sleeve.sleeveName, pd.shirtTail.shirtTailTypeName )" +
             "FROM ProductDetail pd " +
             "   JOIN BillDetail bd ON bd.productDetail.id = pd.id " +
             "WHERE bd.bill.id = :billId")
     List<TimelineProductResponse> getTimelineProductByBillId(@Param("billId") Long id);
 
-    @Query("SELECT new com.fpoly.ooc.responce.bill.BillInfoResponse(b.id, b.billType, ac.fullName, ac.numberPhone, " +
+    @Query("SELECT new com.fpoly.ooc.responce.bill.BillInfoResponse(b.id, b.billCode, b.billType, ac.fullName, ac.numberPhone, " +
             "   ac.email, add.descriptionDetail +  ' ' + add.ward + ' ' + add.district + ' ' + add.city) " +
             "FROM Bill b " +
             "   LEFT JOIN Account ac ON ac.username = b.account.username " +

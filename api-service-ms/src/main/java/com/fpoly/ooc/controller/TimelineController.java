@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/admin/timeline")
 @CrossOrigin("*")
-public class TimeLineController {
+public class TimelineController {
 
     @Autowired
     private TimeLineService timeLineService;

@@ -30,6 +30,10 @@ public class BillRequest {
 
     private String status;
 
+    private String note;
+
+    private String billCode;
+
     private List<BillDetailRequest> lstBillDetailRequest;
 
     private List<PaymentDetailRequest> lstPaymentDetailRequest;

@@ -15,6 +15,8 @@ public class GetListCustomer {
 
     private String fullname;
 
+    private String phoneNumber;
+
     private String email;
 
     private Boolean gender;

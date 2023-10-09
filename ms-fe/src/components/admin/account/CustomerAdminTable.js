@@ -49,18 +49,6 @@ function CustomerTable(props) {
     }
   };
 
-  const url = async (urlImg) => {
-    if (urlImg !== null && urlImg !== undefined && urlImg !== "") {
-      await getDownloadURL(ref(saveImage, urlImg))
-        .then((url) => {
-          console.log(url);
-          return url;
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-  };
   const handleOpenSecondModal = async (customer) => {
     navigate(
       `/admin/${roleId === 1 ? "employee" : "customer"}/detail/${customer}`
@@ -96,7 +84,7 @@ function CustomerTable(props) {
             render: (_, image) => (
               <>
                 <img
-                  src={url(image.image)}
+                  src={image.image}
                   className={style.picture}
                   alt="Avatar"
                   style={{ width: "50px", height: "50px" }}

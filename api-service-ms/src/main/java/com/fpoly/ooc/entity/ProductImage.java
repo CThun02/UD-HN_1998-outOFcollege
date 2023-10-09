@@ -20,7 +20,10 @@ public class ProductImage extends BaseEntity{
     @JoinColumn(name = "product_id")
     private Product product;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "color_id")
+    private Color color;
+
     @Column(name = "path")
     private String path;
-
 }

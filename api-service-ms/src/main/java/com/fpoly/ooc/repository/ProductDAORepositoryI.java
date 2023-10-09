@@ -19,8 +19,9 @@ public interface ProductDAORepositoryI extends JpaRepository<Product, Long> {
             "  AND (o.pattern.id = ?3 OR ?3 IS NULL)" +
             "  AND (o.form.id = ?4 OR ?4 IS NULL) " +
             " AND (o.status=?5 or ?5 is NULL)" +
-            " group by o.id, o.productName, o.status, o.imgDefault, o.brand, o.category," +
-            " o.pattern, o.form, o.description, o.productCode")
+            "group by o.id, o.productName, o.status, o.imgDefault, o.brand, o.category," +
+            " o.pattern, o.form, o.description, o.productCode, o.createdAt  " +
+            "order by o.createdAt desc ")
     public List<ProductTableResponse> getProductFilterByCom(Long brandId, Long categoryId, Long patternId, Long formId, String status);
 
     @Query("Select o.id as id, o.productCode as productCode, o.productName as productName, o.status as status, " +
@@ -29,7 +30,8 @@ public interface ProductDAORepositoryI extends JpaRepository<Product, Long> {
             "count(od) as quantity from Product o left join ProductDetail od on " +
             "od.product.id = o.id where o.status=?1 or o.status =?2" +
            " group by o.id, o.productName, o.status, o.imgDefault, o.brand, o.category," +
-            " o.pattern, o.form, o.description, o.productCode")
+            " o.pattern, o.form, o.description, o.productCode, o.createdAt  " +
+            "order by o.createdAt desc ")
     public List<ProductTableResponse> getProductsTable(String status1, String status2);
 
     @Query("Select o.id as id, o.productCode as productCode, o.productName as productName, o.status as status, " +

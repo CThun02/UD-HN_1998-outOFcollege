@@ -1,39 +1,46 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SockJsClient from "react-stomp";
 const SOCKET_URL = "http://localhost:8080/ms-app/";
 
 function SockJs({ setValues, connectTo }) {
   const [isConnected, setIsConnected] = useState(false);
+  const [isDelayed, setIsDelayed] = useState(false);
 
-  let onConnected = () => {
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setIsDelayed(true);
+    }, 2000);
+
+    return () => clearTimeout(timeout);
+  }, []);
+
+  const onConnected = () => {
     console.log("Connected!!");
-    console.log("Connected To: ", connectTo);
     setIsConnected(true);
   };
 
-  let onDisConnected = () => {
+  const onDisConnected = () => {
     console.log("Disconnected!!");
     setIsConnected(false);
   };
 
-  let onMessageReceived = (msg) => {
-    setTimeout(() => {
-      if (isConnected) {
-        console.log("New Message: ", msg);
-        setValues(msg);
-      }
-    }, 2000);
+  const onMessageReceived = (msg) => {
+    if (isConnected) {
+      setValues(msg);
+    }
   };
 
   return (
-    <SockJsClient
-      url={SOCKET_URL}
-      topics={[`/topic/${connectTo}`]}
-      onConnect={onConnected}
-      onDisconnect={onDisConnected}
-      onMessage={(msg) => onMessageReceived(msg)}
-      debug={false}
-    />
+    <>
+      <SockJsClient
+        url={SOCKET_URL}
+        topics={[`/topic/${connectTo}`]}
+        onConnect={onConnected}
+        onDisconnect={onDisConnected}
+        onMessage={(msg) => onMessageReceived(msg)}
+        debug={false}
+      />
+    </>
   );
 }
 

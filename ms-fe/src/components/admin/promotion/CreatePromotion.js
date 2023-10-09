@@ -45,15 +45,27 @@ const validationSchema = Yup.object().shape({
   promotionMethod: Yup.string(),
   promotionValue: Yup.string()
     .required("* Giá trị giảm không được bỏ trống")
-    .matches(/^[0-9,]+$/, "Sai định dạng"),
+    .matches(/^[0-9,]+$/, "Sai định dạng")
+    .test(
+      "promotion-value",
+      "* Giá trị không được vượt quá 100%",
+      function (promotionValue) {
+        const { promotionMethod } = this.parent;
+        if (promotionValue && promotionMethod !== "vnd") {
+          return promotionValue < 100;
+        }
+        return true;
+      }
+    ),
   startDate: Yup.date()
     .required("* Ngày bắt đầu không được bỏ trống")
     .test(
       "start-date-current",
       "* Ngày bắt đầu phải lớn hơn ngày hiện tại",
       function (startDate) {
+        const { status } = this.parent;
         const currentDate = new Date();
-        if (startDate) {
+        if (startDate && status !== "ACTIVE") {
           return startDate > currentDate;
         }
         return true;
@@ -70,11 +82,10 @@ const validationSchema = Yup.object().shape({
           const timeStartDate = moment(startDate).format("HH:mm:ss");
           const timeEndDate = moment(endDate).format("HH:mm:ss");
           const time = moment(timeStartDate, "HH:mm:ss").add(29, "minutes");
-
-          console.log("timeEndDate: ", timeEndDate);
-          console.log("time: ", moment(time).format("HH:mm:ss"));
           return (
-            endDate > startDate && timeEndDate > moment(time).format("HH:mm:ss")
+            endDate > startDate ||
+            (endDate > startDate &&
+              timeEndDate > moment(time).format("HH:mm:ss"))
           );
         }
         return true;
@@ -338,7 +349,10 @@ function CreatePromotion() {
                               name="promotionName"
                               value={values.promotionName}
                               zIndex={true}
-                              disabled={values.status === "INACTIVE"}
+                              disabled={
+                                values.status === "INACTIVE" ||
+                                values.status === "CANCEL"
+                              }
                             >
                               <Input
                                 size="large"
@@ -354,7 +368,10 @@ function CreatePromotion() {
                                     ? "error"
                                     : "success"
                                 }
-                                disabled={values.status === "INACTIVE"}
+                                disabled={
+                                  values.status === "INACTIVE" ||
+                                  values.status === "CANCEL"
+                                }
                               />
                               {touched.promotionName && (
                                 <div className={styles.errors}>
@@ -379,7 +396,8 @@ function CreatePromotion() {
                               optionType="button"
                               disabled={
                                 values.status === "ACTIVE" ||
-                                values.status === "INACTIVE"
+                                values.status === "INACTIVE" ||
+                                values.status === "CANCEL"
                               }
                             />
                           </Col>
@@ -391,7 +409,8 @@ function CreatePromotion() {
                               zIndex={true}
                               disabled={
                                 values.status === "ACTIVE" ||
-                                values.status === "INACTIVE"
+                                values.status === "INACTIVE" ||
+                                values.status === "CANCEL"
                               }
                             >
                               <Input
@@ -411,7 +430,8 @@ function CreatePromotion() {
                                 onBlur={handleBlur}
                                 disabled={
                                   values.status === "ACTIVE" ||
-                                  values.status === "INACTIVE"
+                                  values.status === "INACTIVE" ||
+                                  values.status === "CANCEL"
                                 }
                                 status={
                                   (touched.promotionValue &&
@@ -439,7 +459,8 @@ function CreatePromotion() {
                               value={values.startDate}
                               disabled={
                                 values.status === "ACTIVE" ||
-                                values.status === "INACTIVE"
+                                values.status === "INACTIVE" ||
+                                values.status === "CANCEL"
                               }
                             >
                               <DatePicker
@@ -460,7 +481,8 @@ function CreatePromotion() {
                                 onBlur={handleBlur}
                                 disabled={
                                   values.status === "ACTIVE" ||
-                                  values.status === "INACTIVE"
+                                  values.status === "INACTIVE" ||
+                                  values.status === "CANCEL"
                                 }
                                 status={
                                   (touched.startDate && errors.startDate) ||
@@ -486,7 +508,10 @@ function CreatePromotion() {
                               label="Ngày kết thúc"
                               name="endDate"
                               value={values.endDate}
-                              disabled={values.status === "INACTIVE"}
+                              disabled={
+                                values.status === "INACTIVE" ||
+                                values.status === "CANCEL"
+                              }
                             >
                               <DatePicker
                                 name="endDate"
@@ -510,7 +535,10 @@ function CreatePromotion() {
                                     ? "error"
                                     : "success"
                                 }
-                                disabled={values.status === "INACTIVE"}
+                                disabled={
+                                  values.status === "INACTIVE" ||
+                                  values.status === "CANCEL"
+                                }
                                 showTime={{
                                   defaultValue: dayjs("00:00:00", "HH:mm:ss"),
                                 }}
@@ -534,7 +562,10 @@ function CreatePromotion() {
                               type="primary"
                               htmlType="submit"
                               disabled={
-                                values.status === "INACTIVE" || products.length
+                                values.status === "INACTIVE" ||
+                                values.status === "CANCEL"
+                                  ? true
+                                  : products.length
                                   ? false
                                   : true
                               }

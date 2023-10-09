@@ -2,6 +2,7 @@ package com.fpoly.ooc.job;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fpoly.ooc.constant.Const;
+import com.fpoly.ooc.entity.Voucher;
 import com.fpoly.ooc.responce.promotion.PromotionProductResponse;
 import com.fpoly.ooc.responce.voucher.VoucherResponse;
 import com.fpoly.ooc.service.interfaces.PromotionService;
@@ -54,21 +55,9 @@ public class MsJobService {
 
         try {
             voucherService.findAllNoFilter().forEach(e -> {
-                if(!e.getStatus().equals(Const.STATUS_CANCEL)) {
-                    if (dateNow.isBefore(e.getStartDate()) && e.getStartDate().isBefore(e.getEndDate())
-                            && !Objects.equals(e.getStatus(), Const.STATUS_UPCOMING)) {
-                        e.setStatus(Const.STATUS_UPCOMING);
-                    }
-
-                    if (dateNow.isAfter(e.getStartDate()) && dateNow.isBefore(e.getEndDate())
-                            && !e.getStatus().equals(Const.STATUS_ACTIVE)) {
-                        e.setStatus(Const.STATUS_ACTIVE);
-                    }
-
-                    if (dateNow.isAfter(e.getEndDate()) && e.getStartDate().isBefore(e.getEndDate())
-                            && !e.getStatus().equals(Const.STATUS_INACTIVE)) {
-                        e.setStatus(Const.STATUS_INACTIVE);
-                    }
+                if (!e.getStatus().equals(Const.STATUS_CANCEL)) {
+                    String status = isCheckDateTime(dateNow, e.getStartDate(), e.getEndDate(), e.getStatus());
+                    e.setStatus(status);
 
                     voucherService.updateStatus(e.getVoucherCode(), e.getStatus());
                 }
@@ -77,7 +66,7 @@ public class MsJobService {
             List<VoucherResponse> vouchersCurrent = voucherService.findAllNoFilter();
             Boolean isCheckDifferent = isValidArrayDifferent(vouchers, vouchersCurrent);
 
-            if(isCheckDifferent) {
+            if (isCheckDifferent) {
                 String vouchersJson = objectMapper.writeValueAsString(vouchersCurrent);
                 kafkaTemplate.send(Const.TOPIC_VOUCHER, vouchersJson);
             }
@@ -96,22 +85,9 @@ public class MsJobService {
 
         try {
             promotionService.findAllPromotionProductResponse().forEach(e -> {
-                if(!e.getStatus().equals(Const.STATUS_CANCEL)) {
-                    if (dateNow.isBefore(e.getStartDate()) && e.getStartDate().isBefore(e.getEndDate())
-                            && !Objects.equals(e.getStatus(), Const.STATUS_UPCOMING)) {
-                        e.setStatus(Const.STATUS_UPCOMING);
-                    }
-
-                    if (dateNow.isAfter(e.getStartDate()) && dateNow.isBefore(e.getEndDate())
-                            && !e.getStatus().equals(Const.STATUS_ACTIVE)) {
-                        e.setStatus(Const.STATUS_ACTIVE);
-                    }
-
-                    if (dateNow.isAfter(e.getEndDate()) && e.getStartDate().isBefore(e.getEndDate())
-                            && !e.getStatus().equals(Const.STATUS_INACTIVE)) {
-                        e.setStatus(Const.STATUS_INACTIVE);
-                    }
-
+                if (!e.getStatus().equals(Const.STATUS_CANCEL)) {
+                    String status = isCheckDateTime(dateNow, e.getStartDate(), e.getEndDate(), e.getStatus());
+                    e.setStatus(status);
                     promotionService.updateStatus(e.getPromotionCode(), e.getStatus());
                 }
             });
@@ -119,7 +95,7 @@ public class MsJobService {
             List<PromotionProductResponse> promotionsCurrent = promotionService.findAllPromotionProductResponse();
             Boolean isCheckDifferent = isValidArrayDifferent(promotions, promotionsCurrent);
 
-            if(isCheckDifferent) {
+            if (isCheckDifferent) {
                 String promotionsJson = objectMapper.writeValueAsString(promotionsCurrent);
                 kafkaTemplate.send(Const.TOPIC_PROMOTION, promotionsJson);
             }
@@ -131,7 +107,7 @@ public class MsJobService {
     }
 
     private Boolean isValidArrayDifferent(List<?> list, List<?> listCurrent) {
-        if(list.size() != listCurrent.size()) {
+        if (list.size() != listCurrent.size()) {
             return true;
         }
 
@@ -139,12 +115,27 @@ public class MsJobService {
             Object object1 = list.get(i);
             Object object2 = listCurrent.get(i);
 
-            if(!Objects.equals(object1, object2)) {
+            if (!Objects.equals(object1, object2)) {
                 return true;
             }
         }
-        
+
         return false;
+    }
+
+    private String isCheckDateTime(LocalDateTime dateNow, LocalDateTime startDate, LocalDateTime endDate, String status) {
+
+        if (startDate.isBefore(endDate)) {
+            if (dateNow.isBefore(startDate)) {
+                return Const.STATUS_UPCOMING;
+            } else if (dateNow.isAfter(startDate) && dateNow.isBefore(endDate)) {
+                return Const.STATUS_ACTIVE;
+            } else {
+                return Const.STATUS_INACTIVE;
+            }
+        }
+
+        return status;
     }
 
 }

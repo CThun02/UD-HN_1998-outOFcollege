@@ -267,8 +267,7 @@ function Voucher() {
   return (
     <div className={styles.voucher}>
       {contextHolder}
-      <SockJs setValues={setVouchers} connectTo={"voucher"} />
-
+      <SockJs setValues={setVouchers} connectTo={"voucher"} />;
       <FilterVoucherAndPromotion
         searchNameOrCode={searchNameOrCode}
         setSearchNameOrCode={setSearchNameOrCode}
@@ -279,7 +278,6 @@ function Voucher() {
         status={searchStatus}
         setStatus={setSearchStatus}
       />
-
       <div className={styles.content}>
         <Space style={{ width: "100%" }} direction="vertical" size={16}>
           <Row>
@@ -327,9 +325,9 @@ function Voucher() {
                       voucher.objectUse === "all" ? "Tất cả" : "Thành viên",
                     startAndEndDate: [
                       `${moment(voucher.startDate).format(
-                        "HH:mm:ss DD/MM/YYYY"
+                        "HH:mm DD/MM/YYYY"
                       )} - ${moment(voucher.endDate).format(
-                        "HH:mm:ss DD/MM/YYYY"
+                        "HH:mm DD/MM/YYYY"
                       )}`,
                       voucher.status === "ACTIVE"
                         ? "Đang diễn ra"

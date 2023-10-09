@@ -43,22 +43,23 @@ const optionsobjectUse = [
 ];
 
 const validationSchema = Yup.object().shape({
-  voucherName: Yup.string()
-    .required("* Tên voucher không được bỏ trống.")
-    .matches(/^[a-zA-Z0-9 ]+$/, "* Tên voucher không được chứa kí tự đặc biệt"),
+  voucherName: Yup.string().required("* Tên voucher không được bỏ trống."),
   voucherMethod: Yup.string(),
   voucherValue: Yup.string()
     .required("* Giá trị giảm không được bỏ trống")
-    .matches(/^[0-9,]+$/, "Sai định dạng"),
-  voucherValueMax: Yup.string().when(
-    "voucherMethod",
-    (voucherMethod, schema) => {
-      if (voucherMethod && voucherMethod[0] === "%") {
-        return schema.required("* Giá trị giảm tối đa không được bỏ trống");
+    .matches(/^[0-9,]+$/, "Sai định dạng")
+    .test(
+      "voucher-value",
+      "* Giá trị không được vượt quá 100%",
+      function (voucherValue) {
+        const { voucherMethod } = this.parent;
+        if (voucherValue && voucherMethod !== "vnd") {
+          return voucherValue < 100;
+        }
+        return true;
       }
-      return schema;
-    }
-  ),
+    ),
+  voucherValueMax: Yup.string().matches(/^[0-9,]+$/, "Sai định dạng"),
   limitQuantity: Yup.string()
     .required("* Số lượng giới hạn không được bỏ trống")
     .matches(/^[0-9,]+$/, "Sai định dạng"),
@@ -71,8 +72,9 @@ const validationSchema = Yup.object().shape({
       "start-date-current",
       "* Ngày bắt đầu phải lớn hơn ngày hiện tại",
       function (startDate) {
+        const { status } = this.parent;
         const currentDate = new Date();
-        if (startDate) {
+        if (startDate && status !== "ACTIVE") {
           return startDate > currentDate;
         }
         return true;
@@ -89,11 +91,10 @@ const validationSchema = Yup.object().shape({
           const timeStartDate = moment(startDate).format("HH:mm:ss");
           const timeEndDate = moment(endDate).format("HH:mm:ss");
           const time = moment(timeStartDate, "HH:mm:ss").add(29, "minutes");
-
-          console.log("timeEndDate: ", timeEndDate);
-          console.log("time: ", moment(time).format("HH:mm:ss"));
           return (
-            endDate > startDate && timeEndDate > moment(time).format("HH:mm:ss")
+            endDate > startDate ||
+            (endDate > startDate &&
+              timeEndDate > moment(time).format("HH:mm:ss"))
           );
         }
         return true;
@@ -203,15 +204,25 @@ function SaveVoucher() {
             }
           );
 
-          const differentList = usernames.reduce(
-            (result, item) =>
-              usernamesCurrent.some((el) => el.username !== item.username)
-                ? [...result, item]
-                : result,
-            []
-          );
+          const differentList = usernames.reduce((result, item) => {
+            if (
+              Array.isArray(usernamesCurrent) &&
+              usernamesCurrent.length > 0
+            ) {
+              if (
+                usernamesCurrent.some((el) => el.username !== item.username)
+              ) {
+                return [...result, item];
+              }
+            } else {
+              return [...result, item];
+            }
+            return result;
+          }, []);
 
           console.log("Values: ", differentList);
+          console.log("usernamesCurrent: ", usernamesCurrent);
+          console.log("usernames: ", usernames);
 
           setIsLoading(true);
           if (voucher) {
@@ -431,7 +442,10 @@ function SaveVoucher() {
                                   name="voucherNameCurrent"
                                   value={values.voucherNameCurrent}
                                   zIndex={true}
-                                  disabled={values.status === "INACTIVE"}
+                                  disabled={
+                                    values.status === "INACTIVE" ||
+                                    values.status === "CANCEL"
+                                  }
                                 >
                                   <Input
                                     size="large"
@@ -452,7 +466,10 @@ function SaveVoucher() {
                                         ? "error"
                                         : "success"
                                     }
-                                    disabled={values.status === "INACTIVE"}
+                                    disabled={
+                                      values.status === "INACTIVE" ||
+                                      values.status === "CANCEL"
+                                    }
                                   />
                                   {touched.voucherNameCurrent && (
                                     <div className={styles.errors}>
@@ -523,9 +540,9 @@ function SaveVoucher() {
                                 value={values.voucherMethod}
                                 optionType="button"
                                 disabled={
-                                  values.status === "INACTIVE"
-                                    ? true
-                                    : values.status === "ACTIVE"
+                                  values.status === "INACTIVE" ||
+                                  values.status === "ACTIVE" ||
+                                  values.status === "CANCEL"
                                 }
                               />
                             </Col>
@@ -537,9 +554,9 @@ function SaveVoucher() {
                                   value={values.voucherValue}
                                   zIndex={true}
                                   disabled={
-                                    values.status === "INACTIVE"
-                                      ? true
-                                      : values.status === "ACTIVE"
+                                    values.status === "INACTIVE" ||
+                                    values.status === "ACTIVE" ||
+                                    values.status === "CANCEL"
                                   }
                                 >
                                   <Input
@@ -563,9 +580,9 @@ function SaveVoucher() {
                                         : ""
                                     }
                                     disabled={
-                                      values.status === "INACTIVE"
-                                        ? true
-                                        : values.status === "ACTIVE"
+                                      values.status === "INACTIVE" ||
+                                      values.status === "ACTIVE" ||
+                                      values.status === "CANCEL"
                                     }
                                   />
                                 </FloatingLabels>
@@ -585,9 +602,9 @@ function SaveVoucher() {
                                     value={values.voucherValue}
                                     zIndex={true}
                                     disabled={
-                                      values.status === "INACTIVE"
-                                        ? true
-                                        : values.status === "ACTIVE"
+                                      values.status === "INACTIVE" ||
+                                      values.status === "ACTIVE" ||
+                                      values.status === "CANCEL"
                                     }
                                   >
                                     <Input
@@ -611,9 +628,9 @@ function SaveVoucher() {
                                           : ""
                                       }
                                       disabled={
-                                        values.status === "INACTIVE"
-                                          ? true
-                                          : values.status === "ACTIVE"
+                                        values.status === "INACTIVE" ||
+                                        values.status === "ACTIVE" ||
+                                        values.status === "CANCEL"
                                       }
                                     />
                                   </FloatingLabels>
@@ -632,9 +649,9 @@ function SaveVoucher() {
                                     value={values.voucherValueMax}
                                     zIndex={true}
                                     disabled={
-                                      values.status === "INACTIVE"
-                                        ? true
-                                        : values.status === "ACTIVE"
+                                      values.status === "INACTIVE" ||
+                                      values.status === "ACTIVE" ||
+                                      values.status === "CANCEL"
                                     }
                                   >
                                     <Input
@@ -658,18 +675,18 @@ function SaveVoucher() {
                                           : ""
                                       }
                                       disabled={
-                                        values.status === "INACTIVE"
-                                          ? true
-                                          : values.status === "ACTIVE"
+                                        values.status === "INACTIVE" ||
+                                        values.status === "ACTIVE" ||
+                                        values.status === "CANCEL"
                                       }
                                     />
                                   </FloatingLabels>
-                                  {/* {touched?.voucherValueMax(
-                                  <div className={styles.errors}>
-                                    {errors.voucherValueMax}
-                                    {errorsServer.voucherValueMax}
-                                  </div>
-                                )} */}
+                                  {touched?.voucherValueMax && (
+                                    <div className={styles.errors}>
+                                      {errors.voucherValueMax}
+                                      {errorsServer.voucherValueMax}
+                                    </div>
+                                  )}
                                 </Col>
                               </>
                             )}
@@ -683,9 +700,9 @@ function SaveVoucher() {
                                 value={values.limitQuantity}
                                 zIndex={true}
                                 disabled={
-                                  values.status === "INACTIVE"
-                                    ? true
-                                    : values.status === "ACTIVE"
+                                  values.status === "INACTIVE" ||
+                                  values.status === "ACTIVE" ||
+                                  values.status === "CANCEL"
                                 }
                               >
                                 <Input
@@ -708,9 +725,9 @@ function SaveVoucher() {
                                       : ""
                                   }
                                   disabled={
-                                    values.status === "INACTIVE"
-                                      ? true
-                                      : values.status === "ACTIVE"
+                                    values.status === "INACTIVE" ||
+                                    values.status === "ACTIVE" ||
+                                    values.status === "CANCEL"
                                   }
                                 />
                               </FloatingLabels>
@@ -729,9 +746,9 @@ function SaveVoucher() {
                                 value={values.voucherCondition}
                                 zIndex={true}
                                 disabled={
-                                  values.status === "INACTIVE"
-                                    ? true
-                                    : values.status === "ACTIVE"
+                                  values.status === "INACTIVE" ||
+                                  values.status === "ACTIVE" ||
+                                  values.status === "CANCEL"
                                 }
                               >
                                 <Input
@@ -755,9 +772,9 @@ function SaveVoucher() {
                                       : ""
                                   }
                                   disabled={
-                                    values.status === "INACTIVE"
-                                      ? true
-                                      : values.status === "ACTIVE"
+                                    values.status === "INACTIVE" ||
+                                    values.status === "ACTIVE" ||
+                                    values.status === "CANCEL"
                                   }
                                 />
                               </FloatingLabels>
@@ -777,9 +794,9 @@ function SaveVoucher() {
                                 name="endDate"
                                 value={values.startDate}
                                 disabled={
-                                  values.status === "INACTIVE"
-                                    ? true
-                                    : values.status === "ACTIVE"
+                                  values.status === "INACTIVE" ||
+                                  values.status === "ACTIVE" ||
+                                  values.status === "CANCEL"
                                 }
                               >
                                 <DatePicker
@@ -802,9 +819,9 @@ function SaveVoucher() {
                                       : ""
                                   }
                                   disabled={
-                                    values.status === "INACTIVE"
-                                      ? true
-                                      : values.status === "ACTIVE"
+                                    values.status === "INACTIVE" ||
+                                    values.status === "ACTIVE" ||
+                                    values.status === "CANCEL"
                                   }
                                   showTime={{
                                     defaultValue: dayjs("00:00:00", "HH:mm:ss"),
@@ -823,7 +840,10 @@ function SaveVoucher() {
                                 label="Ngày kết thúc"
                                 name="endDate"
                                 value={values.endDate}
-                                disabled={values.status === "INACTIVE"}
+                                disabled={
+                                  values.status === "INACTIVE" ||
+                                  values.status === "CANCEL"
+                                }
                               >
                                 <DatePicker
                                   name="endDate"
@@ -844,7 +864,10 @@ function SaveVoucher() {
                                       ? "error"
                                       : ""
                                   }
-                                  disabled={values.status === "INACTIVE"}
+                                  disabled={
+                                    values.status === "INACTIVE" ||
+                                    values.status === "CANCEL"
+                                  }
                                   showTime={{
                                     defaultValue: dayjs("00:00:00", "HH:mm:ss"),
                                   }}
@@ -869,9 +892,9 @@ function SaveVoucher() {
                                   name="status"
                                   value={values.objectUse}
                                   disabled={
-                                    values.status === "INACTIVE"
-                                      ? true
-                                      : values.status === "ACTIVE"
+                                    values.status === "INACTIVE" ||
+                                    values.status === "ACTIVE" ||
+                                    values.status === "CANCEL"
                                   }
                                 >
                                   <Select
@@ -887,9 +910,9 @@ function SaveVoucher() {
                                     placeholder={null}
                                     size="large"
                                     disabled={
-                                      values.status === "INACTIVE"
-                                        ? true
-                                        : values.status === "ACTIVE"
+                                      values.status === "INACTIVE" ||
+                                      values.status === "ACTIVE" ||
+                                      values.status === "CANCEL"
                                     }
                                   />
                                 </FloatingLabels>
@@ -902,6 +925,7 @@ function SaveVoucher() {
                                     );
                                     console.log("values: ", e.target.checked);
                                   }}
+                                  disabled={code}
                                 >
                                   Gửi mã giảm giá cho khách hàng
                                 </Checkbox>
@@ -927,7 +951,10 @@ function SaveVoucher() {
                                   type="primary"
                                   htmlType="submit"
                                   size="large"
-                                  disabled={values.status === "INACTIVE"}
+                                  disabled={
+                                    values.status === "INACTIVE" ||
+                                    values.status === "CANCEL"
+                                  }
                                 >
                                   Xác nhận
                                 </Button>
@@ -950,6 +977,10 @@ function SaveVoucher() {
                                     icon={<PlusOutlined />}
                                     onClick={() => setIsLoadingModal(true)}
                                     size="large"
+                                    disabled={
+                                      values.status === "INACTIVE" ||
+                                      values.status === "CANCEL"
+                                    }
                                   >
                                     Chọn khách hàng
                                   </Button>

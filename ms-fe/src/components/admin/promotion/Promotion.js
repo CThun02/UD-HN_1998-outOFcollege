@@ -262,9 +262,7 @@ function Promotion() {
         status={status}
         setStatus={setStatus}
       />
-
-      <SockJs setValues={setPromotions} connectTo="promotion" />
-
+      <SockJs setValues={setPromotions} connectTo="promotion" />;
       <div className={styles.content}>
         <Space style={{ width: "100%" }} direction="vertical" size={16}>
           <Row>
@@ -307,10 +305,8 @@ function Promotion() {
                 )} ${promotion.promotionMethod === "vnd" ? "VND" : "%"}`,
                 startAndEndDate: [
                   `${moment(promotion.startDate).format(
-                    "HH:mm:ss DD/MM/YYYY"
-                  )} - ${moment(promotion.endDate).format(
-                    "HH:mm:ss DD/MM/YYYY"
-                  )}`,
+                    "HH:mm DD/MM/YYYY"
+                  )} - ${moment(promotion.endDate).format("HH:mm DD/MM/YYYY")}`,
                   promotion.status === "ACTIVE"
                     ? "Đang diễn ra"
                     : promotion.status === "INACTIVE"

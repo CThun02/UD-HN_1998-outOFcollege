@@ -271,7 +271,11 @@ const ProductDetails = (props) => {
         >
           <Row>
             <Col span={6}>
-              <img src={url} width={"100%"} alt={"Not loading"} />
+              <img
+                src={product.imgDefault || url}
+                width={"100%"}
+                alt={"Not loading"}
+              />
             </Col>
             <Col span={18}>
               <Row style={{ marginLeft: "12px" }}>

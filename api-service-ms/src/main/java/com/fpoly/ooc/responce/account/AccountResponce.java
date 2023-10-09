@@ -23,7 +23,7 @@ public class AccountResponce {
 
     private Boolean gender;
 
-    private LocalDateTime creatAt;
+    private LocalDateTime createdAt;
 
     private String status;
 

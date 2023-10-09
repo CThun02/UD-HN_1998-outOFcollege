@@ -47,5 +47,10 @@ public class ProductImageService implements ProductImageServiceI {
         return repo.getProductImageByProductIdAndColorId(productId, colorId);
     }
 
+    @Override
+    public List<ProductImageResponse> getProductImageByProductId(Long productId) {
+        return repo.getProductImageByProductId(productId);
+    }
+
 
 }

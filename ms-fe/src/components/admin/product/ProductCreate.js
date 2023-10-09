@@ -1,5 +1,21 @@
-import { CloseOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
-import { Col, Row, Form, Input, Select, Button, message, Space } from "antd";
+import {
+  CheckCircleTwoTone,
+  CloseOutlined,
+  EditOutlined,
+  PlusOutlined,
+} from "@ant-design/icons";
+import {
+  Col,
+  Row,
+  Form,
+  Input,
+  Select,
+  Button,
+  message,
+  Space,
+  notification,
+  Popconfirm,
+} from "antd";
 import TextArea from "antd/es/input/TextArea";
 import React, { useEffect, useRef, useState } from "react";
 import styles from "./ProductCreate.module.css";
@@ -179,6 +195,13 @@ const ProductCreate = (props) => {
             handleSetProduct("formId", " ");
             handleSetProduct("description", " ");
             renderIndex(res.data);
+            setTimeout(() => {
+              notification.open({
+                message: "Notification",
+                description: "Thêm mới sản phẩm thành công",
+                icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
+              });
+            }, 3000);
           }, 2000);
         })
         .catch((err) => {
@@ -204,9 +227,11 @@ const ProductCreate = (props) => {
         .then((res) => {
           messageApi.loading("Vui lòng chờ!", 2);
           setTimeout(() => {
-            messageApi.success("Chỉnh sửa thành công!", 2);
-            closeFrame("productCreate", "productCreateFrame");
-            renderIndex(res.data);
+            notification.open({
+              message: "Notification",
+              description: "Chỉnh sửa sản phẩm thành công",
+              icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
+            });
           }, 2000);
         })
         .catch((err) => {
@@ -229,6 +254,7 @@ const ProductCreate = (props) => {
           handleSetProduct("categoryId", response.data.category.id);
           handleSetProduct("patternId", response.data.pattern.id);
           handleSetProduct("formId", response.data.form.id);
+          handleSetProduct("imgDefault", response.data.imgDefault);
           handleSetProduct("description", response.data.description);
         });
     }
@@ -499,15 +525,22 @@ const ProductCreate = (props) => {
             <br />
             <br />
             <div>
-              <Button
-                className={styles.product__createConfirm}
-                loading={false}
-                onClick={() => {
-                  !isUpdate ? createProduct() : updateProduct();
-                }}
+              <Popconfirm
+                title="Thêm mới sản phẩm"
+                description="Chắc chắn thêm mới sản phẩm!"
+                onConfirm={() =>
+                  !isUpdate ? createProduct() : updateProduct()
+                }
+                okText="Yes"
+                cancelText="No"
               >
-                Xác nhận
-              </Button>
+                <Button
+                  className={styles.product__createConfirm}
+                  loading={false}
+                >
+                  Xác nhận
+                </Button>
+              </Popconfirm>
             </div>
           </Col>
         </Row>

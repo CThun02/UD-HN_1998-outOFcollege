@@ -1,6 +1,9 @@
 package com.fpoly.ooc.service.impl;
 
+import com.fpoly.ooc.constant.Const;
+import com.fpoly.ooc.constant.ErrorCodeConfig;
 import com.fpoly.ooc.entity.*;
+import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.ProductDAORepositoryI;
 import com.fpoly.ooc.repository.ProductDetailDAORepositoryI;
 import com.fpoly.ooc.responce.product.ProductDetailResponse;
@@ -26,7 +29,7 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
     @Override
     public ProductDetail update(ProductDetail productDetail) {
         ProductDetail productDetailtCheck = this.getOne(productDetail.getId());
-        if(productDetailtCheck != null){
+        if (productDetailtCheck != null) {
             productDetailtCheck = repo.save(productDetail);
         }
         return productDetailtCheck;
@@ -36,12 +39,13 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
     public Boolean delete(Long id) {
         boolean deleted = false;
         ProductDetail productDetail = this.getOne(id);
-        if(productDetail!=null){
+        if (productDetail != null) {
             repo.delete(productDetail);
             deleted = true;
         }
         return deleted;
     }
+
     @Override
     public ProductDetail getOne(Long id) {
         return repo.findById(id).get();
@@ -65,7 +69,7 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
     @Override
     public ProductDetailResponse getOneByIdCom(Long productId, Long idButton, Long idMaterial, Long idShirtTail, Long idSleeve, Long idCollar, Long idColor, Long idSize) {
         return repo.getOneByIdCom(productId, idButton, idMaterial, idShirtTail,
-                idSleeve,  idCollar, idColor, idSize);
+                idSleeve, idCollar, idColor, idSize);
     }
 
     @Override
@@ -75,9 +79,9 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
 
     @Override
     public List<ProductDetailResponse> searchByCodeOrName(String keyWords) {
-        keyWords = "%"+keyWords+"%";
+        keyWords = "%" + keyWords + "%";
         Optional<List<ProductDetailResponse>> values = Optional.of(repo.searchProductDetailByProductName(keyWords));
-        if(values.get().isEmpty()){
+        if (values.get().isEmpty()) {
             values = Optional.of(repo.searchProductDetailByProductCode(keyWords));
         }
         return values.orElse(null);
@@ -116,5 +120,23 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
     @Override
     public List<Long> getSleevesBydIdPro(Long productId) {
         return repo.getSleevesBydIdPro(productId);
+    }
+
+    public ProductDetail findById(Long id) {
+        ProductDetail productDetail = repo.findById(id).orElseThrow(() ->
+                new NotFoundException(ErrorCodeConfig.getMessage(Const.PRODUCT_DETAIL_NOT_FOUND)));
+        return productDetail;
+    }
+
+    @Override
+    public Integer updateProductDetailsByCom(Long productId, Long idButton, Long idMaterial, Long idShirtTail,
+                                             Long idSleeve, Long idCollar, Long idColor, Long idSize, String status) {
+        return repo.updateProductDetailsByCom(productId, idButton, idMaterial, idShirtTail, idSleeve, idCollar, idColor,
+                idSize, status);
+    }
+
+    @Override
+    public List<Long> findAllResponseProduct(Long idPromotion) {
+        return repo.findAllByIdPromotion(idPromotion);
     }
 }

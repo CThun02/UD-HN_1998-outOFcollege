@@ -32,9 +32,7 @@ public class VoucherAccountServiceImpl implements VoucherAccountService {
                 voucherAccountConditionDTO.getVoucher().getId(),
                 voucherAccountConditionDTO.getUsername())
         ) {
-            throw new NotFoundException(ErrorCodeConfig.getFormatMessage(
-                    Const.VOUCHER_USED_BY_USER,
-                    voucherAccountConditionDTO.getUsername()));
+            return null;
         }
 
         VoucherAccount voucherAccount = getVoucherAccount(voucherAccountConditionDTO);

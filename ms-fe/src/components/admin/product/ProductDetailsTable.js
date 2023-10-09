@@ -12,7 +12,12 @@ import {
   StarFilled,
 } from "@ant-design/icons";
 import { saveImage } from "../../../config/FireBase";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import {
+  ref,
+  uploadBytes,
+  getDownloadURL,
+  deleteObject,
+} from "firebase/storage";
 import Modal from "antd/es/modal/Modal";
 import { useNavigate } from "react-router-dom";
 
@@ -22,6 +27,7 @@ const ProductDetailsTable = (props) => {
   const [messageApi, contextHolder] = message.useMessage();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [render, setRender] = useState(null);
+  const [productImages, setProductImages] = useState([]);
   const navigate = useNavigate();
   const showModal = () => {
     setIsModalOpen(true);
@@ -32,6 +38,14 @@ const ProductDetailsTable = (props) => {
   const isUpdate = props.isUpdate;
   var product = props.product;
   var colorsCreate = props.colorsCreate;
+  const [imgDefault, setImgDefault] = useState(product.imgDefault);
+  const [productImage, setProductImage] = useState({
+    id: null,
+    productId: product.id,
+    colorId: "",
+    path: "",
+    status: "ACTIVE",
+  });
   const [productDetail, setProductDetail] = useState({
     productId: product.id,
     buttonId: " ",
@@ -87,15 +101,16 @@ const ProductDetailsTable = (props) => {
       }
     }
   }
-
   function createImgageDetail(productName, colorName, imgs) {
     for (let i = 0; i < imgs.length; i++) {
       if (i === 4) {
         break;
       }
-      const defaultName = imgs[i].default === true ? "Default" : "";
       const currentTimeInMillis = new Date().getTime();
-      const filename = currentTimeInMillis + colorName + defaultName;
+      const filename = currentTimeInMillis + colorName;
+      const color = colorsCreate.filter(
+        (color) => color.label === colorName
+      )[0];
       const imgRef = ref(
         saveImage,
         `products/${productName}/${colorName}/${filename}`
@@ -105,7 +120,16 @@ const ProductDetailsTable = (props) => {
           return getDownloadURL(imgRef);
         })
         .then((url) => {
-          if (url.includes("Default")) {
+          let productImageCreate = { ...productImage };
+          productImageCreate.colorId = color.key;
+          productImageCreate.path = url;
+          axios
+            .post(api + "product/createProductImg", productImageCreate)
+            .then((res) => {})
+            .catch((err) => {
+              console.log(err);
+            });
+          if (imgs[i].default === true) {
             let productUpdate = {
               id: product.id,
               productCode: product.productCode,
@@ -160,8 +184,8 @@ const ProductDetailsTable = (props) => {
         if (!replaced) {
           imgList.push(save);
           imgList[0].files[0].default = true;
-          props.setImgDefault(imgList[0].imgs[0]);
         }
+        props.setImgDefault(imgList[0].imgs[0]);
         setRender(Math.random());
         return;
       }
@@ -181,37 +205,123 @@ const ProductDetailsTable = (props) => {
     };
 
     loadImage(0); // Bắt đầu tải ảnh từ index 0
-    console.log(imgList);
+  }
+  function addProductImage(color, img) {
+    let images = productImages.filter(
+      (item) => item.color.colorName === color.label
+    );
+
+    if (images.length < 4) {
+      const currentTimeInMillis = new Date().getTime();
+      const colorName = color.label.replaceAll(" ", "_");
+      const productName = product.productName.replaceAll(" ", "_");
+      const filename = currentTimeInMillis + colorName;
+      const imgRef = ref(
+        saveImage,
+        `products/${productName}/${colorName}/${filename}`
+      );
+      uploadBytes(imgRef, img)
+        .then(() => {
+          return getDownloadURL(imgRef);
+        })
+        .then((url) => {
+          let productImageCreate = { ...productImage };
+          productImageCreate.colorId = color.key;
+          productImageCreate.path = url;
+          axios
+            .post(api + "product/createProductImg", productImageCreate)
+            .then((res) => {
+              message.success("Thêm ảnh thành công!", 2);
+              props.render(Math.random());
+              setRender(Math.random());
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        });
+    } else {
+      message.error("Mỗi màu sắc tối đa 4 hình ảnh!", 2);
+    }
   }
 
-  function deleteImageDetail(colorName, index) {
-    let imgEmpty = true;
-    for (let i = 0; i < imgList.length; i++) {
-      if (imgList[i].colorName === colorName) {
-        imgList[i].imgs.splice(index, 1);
-        imgList[i].files.splice(index, 1);
-        if (imgList[i].imgs.length !== 0 && imgEmpty) {
-          imgEmpty = false;
-          props.setImgDefault(imgList[i].imgs[0]);
-          setDefaultImg(colorName, index);
+  function deleteImageDetail(colorName, index, productImage) {
+    if (isUpdate) {
+      const refImage = ref(saveImage, productImage.path);
+      if (imgDefault === productImage.path) {
+        message.warning("Không thể xóa ảnh mặc định!", 2);
+      } else {
+        deleteObject(refImage)
+          .then(() => {})
+          .catch((err) => {
+            console.log(err);
+            message.error("Đã xảy ra lỗi! Vui lòng thử lại sau", 2);
+          });
+        axios
+          .delete(api + "product/deleteProductImage?id=" + productImage.id)
+          .then(() => {
+            message.success("Xóa ảnh thành công!", 2);
+            props.render(Math.random());
+            setRender(Math.random());
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
+    } else {
+      let imgEmpty = true;
+      for (let i = 0; i < imgList.length; i++) {
+        if (imgList[i].colorName === colorName) {
+          imgList[i].imgs.splice(index, 1);
+          imgList[i].files.splice(index, 1);
+          if (imgList[i].imgs.length !== 0 && imgEmpty) {
+            imgEmpty = false;
+            props.setImgDefault(imgList[i].imgs[0]);
+            setDefaultImg(colorName, index);
+          }
+          setRender(Math.random());
+          break;
         }
-        setRender(Math.random());
-        break;
       }
     }
   }
 
-  function setDefaultImg(colorName, index) {
-    for (let i = 0; i < imgList.length; i++) {
-      if (imgList[i].colorName === colorName) {
-        imgList[i].files[index].default = true;
-        props.setImgDefault(imgList[i].imgs[index]);
+  function setDefaultImg(colorName, index, path) {
+    if (isUpdate) {
+      if (path !== null) {
+        setImgDefault(path);
+        let productUpdate = {
+          id: product.id,
+          productCode: product.productCode,
+          productName: product.productName,
+          brandId: product.brand.id,
+          categoryId: product.category.id,
+          formId: product.form.id,
+          patternId: product.pattern.id,
+          description: product.description,
+          status: product.status,
+          imgDefault: path,
+        };
+        axios
+          .put(api + "product/update", productUpdate)
+          .then((response) => {
+            message.success("Đặt ảnh mặc định thành công!", 2);
+            props.render(Math.random());
+            setRender(Math.random());
+          })
+          .catch((err) => console.log(err));
       }
-      for (let j = 0; j < imgList[i].files.length; j++) {
-        if (j === index && imgList[i].colorName === colorName) {
-          continue;
+    } else {
+      for (let i = 0; i < imgList.length; i++) {
+        if (imgList[i].colorName === colorName) {
+          imgList[i].files[index].default = true;
+          props.setImgDefault(imgList[i].imgs[index]);
         }
-        imgList[i].files[j].default = false;
+        for (let j = 0; j < imgList[i].files.length; j++) {
+          if (j === index && imgList[i].colorName === colorName) {
+            continue;
+          }
+          imgList[i].files[j].default = false;
+        }
       }
     }
     setRender(Math.random());
@@ -227,6 +337,7 @@ const ProductDetailsTable = (props) => {
   }
 
   function createProductDetails() {
+    handleCancel();
     for (let detail of props.productDetails) {
       let productDetailCreate = { ...productDetail };
       productDetailCreate.productId = product.id;
@@ -257,7 +368,7 @@ const ProductDetailsTable = (props) => {
     setTimeout(() => {
       notification.open({
         message: "Notification",
-        description: "Thêm mới sản phẩm thành công",
+        description: "Thêm mới các chi tiết sản phẩm thành công",
         icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
       });
       setTimeout(() => {
@@ -324,6 +435,7 @@ const ProductDetailsTable = (props) => {
                   2
                 );
               }
+              props.render(Math.random());
               setRender(Math.random());
             }, 500);
           })
@@ -381,6 +493,16 @@ const ProductDetailsTable = (props) => {
     renderProductDetails();
   }
   useEffect(() => {
+    if (isUpdate) {
+      axios
+        .get(api + "product/getProductImageByProductId?productId=" + product.id)
+        .then((response) => {
+          setProductImages(response.data);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [product.id, render]);
   return (
@@ -402,43 +524,45 @@ const ProductDetailsTable = (props) => {
                 <div className={styles.product__DetailsColorTable}>
                   <span style={{ backgroundColor: color.value }}></span>
                   <p>{color.label}</p>
-                  <Button
-                    style={{
-                      marginLeft: "auto",
-                      border: "none",
-                      boxShadow: "none",
-                    }}
-                  >
-                    {isDeleted ? (
-                      <ReloadOutlined
-                        onClick={() =>
-                          deleteOrReloadByColor(
-                            props.productDetailsUpdate.filter((record) => {
-                              return (
-                                Number(record.color.id) === Number(color.key)
-                              );
-                            }),
-                            "update"
-                          )
-                        }
-                        style={{ fontSize: "24px" }}
-                      />
-                    ) : (
-                      <DeleteFilled
-                        onClick={() =>
-                          deleteOrReloadByColor(
-                            props.productDetailsUpdate.filter((record) => {
-                              return (
-                                Number(record.color.id) === Number(color.key)
-                              );
-                            }),
-                            "delete"
-                          )
-                        }
-                        style={{ fontSize: "24px" }}
-                      />
-                    )}
-                  </Button>
+                  {isUpdate ? (
+                    <Button
+                      style={{
+                        marginLeft: "auto",
+                        border: "none",
+                        boxShadow: "none",
+                      }}
+                    >
+                      {isDeleted ? (
+                        <ReloadOutlined
+                          onClick={() =>
+                            deleteOrReloadByColor(
+                              props.productDetailsUpdate.filter((record) => {
+                                return (
+                                  Number(record.color.id) === Number(color.key)
+                                );
+                              }),
+                              "update"
+                            )
+                          }
+                          style={{ fontSize: "24px" }}
+                        />
+                      ) : (
+                        <DeleteFilled
+                          onClick={() =>
+                            deleteOrReloadByColor(
+                              props.productDetailsUpdate.filter((record) => {
+                                return (
+                                  Number(record.color.id) === Number(color.key)
+                                );
+                              }),
+                              "delete"
+                            )
+                          }
+                          style={{ fontSize: "24px" }}
+                        />
+                      )}
+                    </Button>
+                  ) : null}
                 </div>
               </h2>
               <Table
@@ -454,11 +578,13 @@ const ProductDetailsTable = (props) => {
                         <input
                           type="file"
                           onChange={(event) => {
-                            uploadImage(
-                              product.productName.replaceAll(" ", "_"),
-                              color.label.replaceAll(" ", "_"),
-                              event.target.files
-                            );
+                            isUpdate
+                              ? addProductImage(color, event.target.files[0])
+                              : uploadImage(
+                                  product.productName.replaceAll(" ", "_"),
+                                  color.label.replaceAll(" ", "_"),
+                                  event.target.files
+                                );
                           }}
                           multiple={true}
                           id={color.label}
@@ -631,48 +757,99 @@ const ProductDetailsTable = (props) => {
 
               <div style={{ margin: "16px 30px" }}>
                 <Row>
-                  {imgList &&
-                    imgList.map((object, index) => {
-                      if (object.colorName === color.label) {
-                        return (
-                          object.imgs &&
-                          object.imgs.map((img, index) => {
-                            return (
-                              <Col span={6} key={index}>
-                                <div style={{ margin: "20px 40px" }}>
-                                  <Card
-                                    hoverable
-                                    cover={<img alt="example" src={img} />}
-                                    actions={[
-                                      <DeleteFilled
-                                        onClick={() => {
-                                          deleteImageDetail(color.label, index);
-                                        }}
-                                        key="delete"
-                                      />,
-                                      <StarFilled
-                                        key="setDefault"
-                                        className={styles.defaultImage}
-                                        onClick={() => {
-                                          setDefaultImg(color.label, index);
-                                        }}
-                                        style={
-                                          object.files[index].default === true
-                                            ? { color: "rgb(192, 192, 76) " }
-                                            : {}
-                                        }
-                                      />,
-                                    ]}
-                                  ></Card>
-                                </div>
-                              </Col>
-                            );
-                          })
-                        );
-                      } else {
-                        return null;
-                      }
-                    })}
+                  {!isUpdate
+                    ? imgList &&
+                      imgList.map((object, index) => {
+                        if (object.colorName === color.label) {
+                          return (
+                            object.imgs &&
+                            object.imgs.map((img, index) => {
+                              return (
+                                <Col span={6} key={index}>
+                                  <div style={{ margin: "20px 40px" }}>
+                                    <Card
+                                      hoverable
+                                      cover={<img alt="example" src={img} />}
+                                      actions={[
+                                        <DeleteFilled
+                                          onClick={() => {
+                                            deleteImageDetail(
+                                              color.label,
+                                              index
+                                            );
+                                          }}
+                                          key="delete"
+                                        />,
+                                        <StarFilled
+                                          key="setDefault"
+                                          className={styles.defaultImage}
+                                          onClick={() => {
+                                            setDefaultImg(color.label, index);
+                                          }}
+                                          style={
+                                            object.files[index].default === true
+                                              ? { color: "rgb(192, 192, 76) " }
+                                              : {}
+                                          }
+                                        />,
+                                      ]}
+                                    ></Card>
+                                  </div>
+                                </Col>
+                              );
+                            })
+                          );
+                        } else {
+                          return null;
+                        }
+                      })
+                    : productImages &&
+                      productImages.map((object, index) => {
+                        if (object.color.colorName === color.label) {
+                          return (
+                            <Col span={6} key={index}>
+                              <div style={{ margin: "20px 40px" }}>
+                                <Card
+                                  hoverable
+                                  cover={
+                                    <img alt="example" src={object.path} />
+                                  }
+                                  actions={[
+                                    <DeleteFilled
+                                      onClick={() => {
+                                        deleteImageDetail(
+                                          color.label,
+                                          "",
+                                          object
+                                        );
+                                      }}
+                                      key="delete"
+                                    />,
+                                    <StarFilled
+                                      key="setDefault"
+                                      className={styles.defaultImage}
+                                      onClick={() => {
+                                        setDefaultImg(
+                                          color.lable,
+                                          "",
+                                          object.path
+                                        );
+                                      }}
+                                      style={
+                                        object.path === product.imgDefault
+                                          ? { color: "rgb(192, 192, 76) " }
+                                          : {}
+                                      }
+                                    />,
+                                  ]}
+                                ></Card>
+                              </div>
+                            </Col>
+                          );
+                        } else {
+                          return null;
+                        }
+                      })}
                 </Row>
               </div>
             </div>
@@ -683,7 +860,7 @@ const ProductDetailsTable = (props) => {
           <Modal
             title="Thêm mới các chi tiết sản phẩm?"
             open={isModalOpen}
-            onOk={createProductDetails}
+            onOk={(event) => createProductDetails(event)}
             onCancel={handleCancel}
             icon={<CheckCircleTwoTone twoToneColor="#52c41a" />}
           >

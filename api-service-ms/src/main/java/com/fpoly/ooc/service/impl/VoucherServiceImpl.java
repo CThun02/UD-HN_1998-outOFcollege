@@ -2,6 +2,7 @@ package com.fpoly.ooc.service.impl;
 
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
+import com.fpoly.ooc.dto.EmailDetails;
 import com.fpoly.ooc.dto.VoucherAccountConditionDTO;
 import com.fpoly.ooc.dto.VoucherAndPromotionConditionDTO;
 import com.fpoly.ooc.entity.Voucher;
@@ -82,12 +83,13 @@ public class VoucherServiceImpl implements VoucherService {
             } else {
                 voucher.setObjectUse(voucherRequest.getObjectUse());
             }
-            result = emailService.sendSimpleMail(voucherRequest.getEmailDetails());
+            result = emailService.sendSimpleMail(voucherRequest.getEmailDetails(), voucher.getId());
         }
 
-        Voucher dbVoucher = voucherRepository.save(voucher);
         log.info("Email: " + result);
         log.info("Data: " + voucherRequest);
+
+        Voucher dbVoucher = voucherRepository.save(voucher);
 
         if (result != null && result.equals("ERROR")) {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.SEND_EMAIL_ERROR));
@@ -161,6 +163,11 @@ public class VoucherServiceImpl implements VoucherService {
         }
     }
 
+    @Override
+    public Boolean isCheckAccountOwnerVoucher(Long idVoucher, String username) {
+        return voucherRepository.isCheckAccountOwnerVoucher(idVoucher, username);
+    }
+
     private VoucherRequest convertVoucher(Voucher voucher) {
 
         return VoucherRequest.builder()
@@ -185,13 +192,10 @@ public class VoucherServiceImpl implements VoucherService {
 
         Voucher voucher = new Voucher();
 
-        log.info("name: " + request.getVoucherName());
-        log.info("nameCurrent: " + request.getVoucherNameCurrent());
-
         if (request.getVoucherName().equalsIgnoreCase(request.getVoucherNameCurrent())) {
             voucher.setVoucherName(request.getVoucherName());
         } else {
-            if (StringUtils.isNotBlank(request.getVoucherNameCurrent())) {
+            if (StringUtils.isNotEmpty(request.getVoucherNameCurrent())) {
                 Optional<Voucher> voucherOptional = voucherRepository.findVoucherByVoucherName(request.getVoucherNameCurrent());
 
                 if (voucherOptional.isPresent()) {
@@ -199,8 +203,9 @@ public class VoucherServiceImpl implements VoucherService {
                 } else {
                     voucher.setVoucherName(request.getVoucherNameCurrent());
                 }
+            } else {
+                voucher.setVoucherName(request.getVoucherName());
             }
-            voucher.setVoucherName(request.getVoucherName());
         }
 
         Double voucherValue = convertBigDecimal(request.getVoucherValue());
@@ -235,7 +240,6 @@ public class VoucherServiceImpl implements VoucherService {
         }
 
         LocalDateTime dateNow = LocalDateTime.now();
-
         switch (request.getStatus()) {
             case "":
             case "UPCOMING":
@@ -255,18 +259,11 @@ public class VoucherServiceImpl implements VoucherService {
                 if (request.getStartDate().isAfter(request.getEndDate())) {
                     throw new NotFoundException(ErrorCodeConfig.getMessage(Const.END_DATE_LESS_START_DATE), "endDate");
                 }
-
-                voucher.setStartDate(request.getStartDate());
-                voucher.setEndDate(request.getEndDate());
-                voucher.setStatus(Const.STATUS_UPCOMING);
-
                 break;
             case "ACTIVE":
                 if (request.getStartDate().isAfter(request.getEndDate())) {
                     throw new NotFoundException(ErrorCodeConfig.getMessage(Const.END_DATE_LESS_START_DATE), "endDate");
                 }
-
-                voucher.setEndDate(request.getEndDate());
                 break;
             default:
                 throw new NotFoundException(ErrorCodeConfig.getMessage(Const.STATUS_INVALID), "status");
@@ -284,6 +281,10 @@ public class VoucherServiceImpl implements VoucherService {
         voucher.setLimitQuantity(request.getLimitQuantity());
         voucher.setVoucherCondition(request.getVoucherCondition());
         voucher.setIsSendEmail(request.getIsCheckSendEmail());
+
+        voucher.setStartDate(request.getStartDate());
+        voucher.setEndDate(request.getEndDate());
+        voucher.setStatus(Const.STATUS_UPCOMING);
 
         return voucher;
     }

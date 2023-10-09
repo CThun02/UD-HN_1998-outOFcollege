@@ -29,5 +29,10 @@ public interface ProductDetailServiceI {
     public List<Long> getCollarsBydIdPro(Long productId);
     public List<Long> getButtonsBydIdPro(Long productId);
     public List<Long> getSleevesBydIdPro(Long productId);
+    ProductDetail findById(Long id);
+    public Integer updateProductDetailsByCom(Long productId, Long idButton, Long idMaterial,
+                                             Long idShirtTail, Long idSleeve, Long idCollar,
+                                             Long idColor, Long idSize, String status);
+    List<Long> findAllResponseProduct(Long idPromotion);
 
 }

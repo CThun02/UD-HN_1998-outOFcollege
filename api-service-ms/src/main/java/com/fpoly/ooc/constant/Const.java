@@ -27,6 +27,13 @@ public class Const {
     public static final String SEND_EMAIL_ERROR = "SEND_EMAIL_ERROR";
     public static final String VOUCHER_USED_BY_USER = "VOUCHER_USED_BY_USER";
     public static final String USER_NOT_FOUND = "USER_NOT_FOUND";
+    public static final String PROMOTION_NAME_NOT_FOUND = "PROMOTION_NAME_NOT_FOUND";
+    public static final String PROMOTION_METHOD_NOT_FOUND = "PROMOTION_METHOD_NOT_FOUND";
+    public static final String PROMOTION_VALUE_NOT_FOUND = "PROMOTION_VALUE_NOT_FOUND";
+    public static final String START_DATE_NOT_FOUND = "START_DATE_NOT_FOUND";
+    public static final String END_DATE_NOT_FOUND = "END_DATE_NOT_FOUND";
+    public static final String DATE_NOT_FOUND = "DATE_NOT_FOUND";
+    public static final String PRODUCT_DETAIL_NOT_FOUND = "PRODUCT_DETAIL_NOT_FOUND";
 
 
     //ErrorCode

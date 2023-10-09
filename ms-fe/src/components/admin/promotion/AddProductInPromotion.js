@@ -2,10 +2,15 @@ import { useState } from "react";
 
 import styles from "./AddProductInPromotion.module.css";
 import { Button, Col, Row, Space } from "antd";
-import { PlusOutlined, UnorderedListOutlined } from "@ant-design/icons";
+import { PlusOutlined } from "@ant-design/icons";
 import ModalAddProductList from "./ModalAddProductList";
 
-function AddProductInPromotion({ products, setProducts }) {
+function AddProductInPromotion({
+  products,
+  setProducts,
+  setFieldValue,
+  values,
+}) {
   // list product
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingProducts, setIsLoadingProducts] = useState(false);
@@ -67,6 +72,8 @@ function AddProductInPromotion({ products, setProducts }) {
                 setIsLoadingModal={setModalOpen}
                 products={products}
                 setProducts={setProducts}
+                setFieldValue={setFieldValue}
+                values={values}
               />
             </Col>
           </Row>

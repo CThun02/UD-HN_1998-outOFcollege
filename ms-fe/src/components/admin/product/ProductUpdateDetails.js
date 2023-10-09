@@ -1,5 +1,9 @@
-import { EditOutlined, PlusSquareOutlined } from "@ant-design/icons";
-import { Button, Col, Row, Select, message } from "antd";
+import {
+  CheckCircleTwoTone,
+  EditOutlined,
+  PlusSquareOutlined,
+} from "@ant-design/icons";
+import { Button, Col, Row, Select, message, notification } from "antd";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -27,7 +31,7 @@ const ProductUpdateDetails = () => {
   const [materialsUpdate, setMaterialsUpdate] = useState([]);
   const [sleevesUpdate, setSleevesUpdate] = useState([]);
   const [shirtTailsUpdate, setshirtTailsUpdate] = useState([]);
-  const [render, setRender] = useState(1);
+  const [render, setRender] = useState(null);
   var productDetailsDisplay = [];
   const [product, setProduct] = useState({
     productId: null,
@@ -42,6 +46,215 @@ const ProductUpdateDetails = () => {
   const [productDetails, setProductDetails] = useState([]);
   var colorUpdatesDisplay = [];
   //functions
+  function deleteDetailsProduct(
+    buttonId,
+    materialId,
+    shirtTailId,
+    sleeveId,
+    collarId,
+    colorId,
+    sizeId
+  ) {
+    axios
+      .put(
+        api +
+          "product/updateProductDetailsByCom?productId=" +
+          productId +
+          "&buttonId=" +
+          buttonId +
+          "&materialId=" +
+          materialId +
+          "&shirtTailId=" +
+          shirtTailId +
+          "&sleeveId=" +
+          sleeveId +
+          "&collarId=" +
+          collarId +
+          "&colorId=" +
+          colorId +
+          "&sizeId=" +
+          sizeId +
+          "&status=DELETED"
+      )
+      .then((res) => {
+        setRender(Math.random());
+        setTimeout(() => {
+          notification.open({
+            message: "Notification",
+            description: "Xóa các chi tiết sản phẩm thành công",
+            icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
+          });
+        }, 2000);
+      });
+  }
+  function updateDetailsProduct(comAdd, value) {
+    message.loading("loading!", 2);
+    var buttonsCreate = buttonsUpdate,
+      collarsCreate = collarsUpdate,
+      materialsCreate = materialsUpdate,
+      sleevesCreate = sleevesUpdate,
+      shirtTailsCreate = shirtTailsUpdate,
+      sizesCreate = sizesUpdate,
+      colorsCreate = colorsUpdate;
+    switch (true) {
+      case comAdd.includes("button"):
+        buttonsCreate = [];
+        if (value.length < buttonsUpdate.length) {
+          let buttonId = buttonsUpdate.filter(
+            (button) => !value.includes(button)
+          );
+          deleteDetailsProduct(buttonId, "", "", "", "", "", "");
+          return;
+        } else if (value.length === buttonsUpdate.length) {
+          buttonsCreate = buttonsUpdate;
+        } else {
+          for (let button of buttonsUpdate) {
+            for (let buttonCreate of value) {
+              if (button !== buttonCreate) {
+                buttonsCreate.push(buttonCreate);
+              }
+            }
+          }
+        }
+        break;
+      case comAdd.includes("collar"):
+        collarsCreate = [];
+        if (value.length < collarsUpdate.length) {
+        } else if (value.length === collarsUpdate.length) {
+          collarsCreate = collarsUpdate;
+        } else {
+          for (let collar of collarsUpdate) {
+            for (let collarCreate of value) {
+              if (collar !== collarCreate) {
+                collarsCreate.push(collarCreate);
+              }
+            }
+          }
+        }
+        break;
+      case comAdd.includes("material"):
+        materialsCreate = [];
+        if (value.length < materialsUpdate.length) {
+        } else if (value.length === materialsUpdate.length) {
+          materialsCreate = materialsUpdate;
+        } else {
+          for (let material of materialsUpdate) {
+            for (let materialCreate of value) {
+              if (material !== materialCreate) {
+                materialsCreate.push(materialCreate);
+              }
+            }
+          }
+        }
+        break;
+      case comAdd.includes("sleeve"):
+        sleevesCreate = [];
+        if (value.length < sleevesUpdate.length) {
+        } else if (value.length === sleevesUpdate.length) {
+          sleevesCreate = sleevesUpdate;
+        } else {
+          for (let sleeve of sleevesUpdate) {
+            for (let sleeveCreate of value) {
+              if (sleeve !== sleeveCreate) {
+                sleevesCreate.push(sleeveCreate);
+              }
+            }
+          }
+        }
+        break;
+      case comAdd.includes("shirtTail"):
+        shirtTailsCreate = [];
+        if (value.length < shirtTailsUpdate.length) {
+        } else if (value.length === shirtTailsUpdate.length) {
+          shirtTailsCreate = shirtTailsUpdate;
+        } else {
+          for (let shirtTail of shirtTailsUpdate) {
+            for (let shirtTailCreate of value) {
+              if (shirtTail !== shirtTailCreate) {
+                shirtTailsCreate.push(shirtTailCreate);
+              }
+            }
+          }
+        }
+        break;
+      case comAdd.includes("size"):
+        sizesCreate = [];
+        if (value.length < sizesUpdate.length) {
+        } else if (value.length === sizesUpdate.length) {
+          sizesCreate = sizesUpdate;
+        } else {
+          for (let size of sizesUpdate) {
+            for (let sizeCreate of value) {
+              if (size !== sizeCreate) {
+                sizesCreate.push(sizeCreate);
+              }
+            }
+          }
+        }
+        break;
+      case comAdd.includes("color"):
+        colorsCreate = [];
+        if (value.length < colorsUpdate.length) {
+        } else if (value.length === colorsUpdate.length) {
+          colorsCreate = colorsUpdate;
+        } else {
+          for (let color of colorsUpdate) {
+            for (let colorCreate of value) {
+              if (color !== colorCreate) {
+                colorsCreate.push(colorCreate);
+              }
+            }
+          }
+        }
+        break;
+      default:
+        console.log("error");
+        break;
+    }
+    for (let button of buttonsCreate) {
+      for (let collar of collarsCreate) {
+        for (let material of materialsCreate) {
+          for (let sleeve of sleevesCreate) {
+            for (let shirtTail of shirtTailsCreate) {
+              for (let size of sizesCreate) {
+                for (let color of colorsCreate) {
+                  let productDetail = {
+                    productId: product.id,
+                    buttonId: button,
+                    materialId: material,
+                    collarId: collar,
+                    sleeveId: sleeve,
+                    sizeId: size,
+                    colorId: color,
+                    shirtTailId: shirtTail,
+                    status: "ACTIVE",
+                    price: 200000,
+                    quantity: 1,
+                  };
+                  axios
+                    .post(api + "product/createDetail", productDetail)
+                    .then((res) => {})
+                    .catch((err) => {
+                      message.error("Đã xảy ra lỗi vui lòng thử lại sau!", 2);
+                      console.log(err);
+                      return;
+                    });
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    setTimeout(() => {
+      notification.open({
+        message: "Notification",
+        description: "Thêm mới các chi tiết sản phẩm thành công",
+        icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
+      });
+    }, 2000);
+    setRender(Math.random());
+  }
   useEffect(() => {
     axios
       .get(api + "product/getProductEdit?productId=" + productId)
@@ -155,6 +368,7 @@ const ProductUpdateDetails = () => {
       )
       .then((response) => {
         setMaterialsUpdate(response.data);
+        console.log(response.data);
       })
       .catch((error) => {
         console.log(error);
@@ -211,7 +425,7 @@ const ProductUpdateDetails = () => {
       .catch((error) => {
         console.log(error);
       });
-  }, [render]);
+  }, [productId, render]);
 
   return (
     <>
@@ -296,7 +510,7 @@ const ProductUpdateDetails = () => {
               </Col>
             </Row>
           </Col>
-          <Col span={14} className={styles.product__createDetails}>
+          <Col span={14} className={styles.product__updateDetails}>
             <h2>
               <PlusSquareOutlined /> Chi tiết sản phẩm
             </h2>
@@ -312,6 +526,7 @@ const ProductUpdateDetails = () => {
                     placeholder="Button"
                     mode="multiple"
                     value={buttonsUpdate}
+                    onChange={(event) => updateDetailsProduct("button", event)}
                   >
                     {buttons &&
                       buttons.map((item) => {
@@ -336,7 +551,9 @@ const ProductUpdateDetails = () => {
                     style={{ width: "100%" }}
                     placeholder="Material"
                     mode="multiple"
-                    onChange={(event, record) => {}}
+                    onChange={(event) =>
+                      updateDetailsProduct("material", event)
+                    }
                     value={materialsUpdate}
                   >
                     {materials &&
@@ -362,8 +579,8 @@ const ProductUpdateDetails = () => {
                     style={{ width: "100%" }}
                     placeholder="Collar"
                     mode="multiple"
+                    onChange={(event) => updateDetailsProduct("collar", event)}
                     value={collarsUpdate}
-                    onChange={(event, record) => {}}
                   >
                     {collars &&
                       collars.map((item) => {
@@ -389,7 +606,7 @@ const ProductUpdateDetails = () => {
                     placeholder="Sleeve"
                     mode="multiple"
                     value={sleevesUpdate}
-                    onChange={(event, record) => {}}
+                    onChange={(event) => updateDetailsProduct("sleeve", event)}
                   >
                     {sleeves &&
                       sleeves.map((item) => {
@@ -414,7 +631,9 @@ const ProductUpdateDetails = () => {
                     style={{ width: "100%" }}
                     placeholder="Shirt tail"
                     mode="multiple"
-                    onChange={(event, record) => {}}
+                    onChange={(event) =>
+                      updateDetailsProduct("shirtTail", event)
+                    }
                     value={shirtTailsUpdate}
                   >
                     {shirtTails &&
@@ -450,7 +669,7 @@ const ProductUpdateDetails = () => {
                         .toLowerCase()
                         .localeCompare((optionB?.label ?? "").toLowerCase())
                     }
-                    onChange={(event, record) => {}}
+                    onChange={(event) => updateDetailsProduct("size", event)}
                   >
                     {sizes &&
                       sizes.map((item) => {
@@ -485,7 +704,7 @@ const ProductUpdateDetails = () => {
                         .toLowerCase()
                         .localeCompare((optionB?.label ?? "").toLowerCase())
                     }
-                    onChange={(event, record) => {}}
+                    onChange={(event) => updateDetailsProduct("color", event)}
                   >
                     {colors &&
                       colors.map((item) => {
@@ -520,7 +739,6 @@ const ProductUpdateDetails = () => {
           </Col>
         </Row>
       </div>
-
       {productId !== null &&
       colorUpdatesDisplay.length > 0 &&
       productDetails.length > 0 ? (

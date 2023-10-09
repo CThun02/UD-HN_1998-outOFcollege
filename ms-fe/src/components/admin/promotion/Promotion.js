@@ -2,17 +2,20 @@ import {
   Button,
   Col,
   Drawer,
+  Modal,
   Pagination,
   Row,
   Space,
   Spin,
   Table,
   Tag,
+  notification,
 } from "antd";
 import FilterpromotionAndPromotion from "../../element/filter/FilterVoucherAndPromotion";
 
 import styles from "./Promotion.module.css";
 import {
+  DeleteOutlined,
   EditOutlined,
   EyeOutlined,
   PlusOutlined,
@@ -22,80 +25,16 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import moment from "moment";
-
-const columns = [
-  {
-    title: "STT",
-    dataIndex: "stt",
-    key: "stt",
-  },
-  {
-    title: "Mã",
-    dataIndex: "promotionCode",
-    key: "promotionCode",
-    render: (code) => <Link to={"/admin/promotion/detail"}>{code}</Link>,
-  },
-  {
-    title: "Tên",
-    dataIndex: "promotionName",
-    key: "promotionName",
-  },
-  {
-    title: "Số lượng sản phẩm",
-    dataIndex: "productQuantity",
-    key: "productQuantity",
-  },
-  {
-    title: "Giá trị",
-    dataIndex: "promotionValue",
-    key: "promotionValue",
-  },
-  {
-    title: "Thời gian",
-    dataIndex: "startAndEndDate",
-    key: "startAndEndDate",
-    render: (object) => {
-      let color =
-        object[1] === "Đang diễn ra"
-          ? "geekblue"
-          : object[1] === "Sắp diễn ra"
-          ? "green"
-          : "Đã kết thúc"
-          ? "red"
-          : null;
-      return (
-        <Space direction="vertical">
-          <div style={{ width: "auto", display: "flex" }}>
-            <Tag color={color}>{object[1]}</Tag>
-          </div>
-          {object[0]}
-        </Space>
-      );
-    },
-  },
-  {
-    title: "Thao tác",
-    dataIndex: "action",
-    key: "action",
-    render: (_) => (
-      <Space size="middle">
-        <Link to={"/admin/promotion/detail"}>
-          <EyeOutlined />
-        </Link>
-
-        <Link to={"/admin/promotion/update"}>
-          <EditOutlined />
-        </Link>
-      </Space>
-    ),
-  },
-];
+import { useContext } from "react";
+import { NotificationContext } from "../../element/notification/Notification";
 
 const baseUrl = "http://localhost:8080/api/admin/promotion-product/";
+const basePromotionUrl = "http://localhost:8080/api/admin/promotion/";
 
 function Promotion() {
   const [promotions, setPromotions] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isRender, setIsRender] = useState("");
 
   //paging
   const [totalElements, setTotalElements] = useState(1);
@@ -107,6 +46,121 @@ function Promotion() {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [status, setStatus] = useState(null);
+
+  const { successMessage, clearNotification, context } =
+    useContext(NotificationContext);
+  const [apiNotification, contextHolder] = notification.useNotification();
+
+  const columns = [
+    {
+      title: "STT",
+      dataIndex: "stt",
+      key: "stt",
+    },
+    {
+      title: "Mã",
+      dataIndex: "promotionCode",
+      key: "promotionCode",
+      render: (code) => <Link to={"/admin/promotion/detail"}>{code}</Link>,
+    },
+    {
+      title: "Tên",
+      dataIndex: "promotionName",
+      key: "promotionName",
+    },
+    {
+      title: "Số lượng sản phẩm",
+      dataIndex: "productQuantity",
+      key: "productQuantity",
+    },
+    {
+      title: "Giá trị",
+      dataIndex: "promotionValue",
+      key: "promotionValue",
+    },
+    {
+      title: "Thời gian",
+      dataIndex: "startAndEndDate",
+      key: "startAndEndDate",
+      render: (object) => {
+        let color =
+          object[1] === "Đang diễn ra"
+            ? "geekblue"
+            : object[1] === "Sắp diễn ra"
+            ? "green"
+            : "Đã kết thúc"
+            ? "red"
+            : null;
+        return (
+          <Space direction="vertical">
+            <div style={{ width: "auto", display: "flex" }}>
+              <Tag color={color}>{object[1]}</Tag>
+            </div>
+            {object[0]}
+          </Space>
+        );
+      },
+    },
+    {
+      title: "Thao tác",
+      dataIndex: "action",
+      key: "action",
+      render: (object) => (
+        <Space size="middle">
+          <Link to={`/admin/promotion/detail/${object[0]}`}>
+            <Button className={styles.iconButton}>
+              <EyeOutlined />
+            </Button>
+          </Link>
+          <Button
+            className={styles.iconButton}
+            disabled={object[1] === "INACTIVE"}
+            onClick={() => handleDeleted(object)}
+          >
+            <DeleteOutlined />
+          </Button>
+        </Space>
+      ),
+    },
+  ];
+
+  useEffect(
+    function () {
+      let isCheck = true;
+
+      async function notification() {
+        if (successMessage && isCheck === true && context === "promotion") {
+          // Hiển thị thông báo thành công ở đây
+          console.log(successMessage);
+          apiNotification.success({
+            message: `Success`,
+            description: `${successMessage}`,
+          });
+          // Xóa thông báo sau khi đã hiển thị
+          clearNotification();
+        }
+      }
+
+      return () => {
+        notification(true);
+        isCheck = false;
+      };
+    },
+    [successMessage, clearNotification, apiNotification, context]
+  );
+
+  function handleDeleted(value) {
+    try {
+      axios
+        .get(basePromotionUrl + "update-status/" + value[0])
+        .then((res) => {
+          setIsRender(res.data);
+        })
+        .catch((err) => console.log("Error: ", err));
+    } catch (err) {
+      console.log("Err");
+    }
+  }
 
   function handlePageSize(current, size) {
     setPageNo(current);
@@ -163,11 +217,16 @@ function Promotion() {
 
       getPromotions();
     },
-    [codeOrName, startDate, endDate, status, pageNo, pageSize]
+    [codeOrName, startDate, endDate, status, pageNo, pageSize, isRender]
   );
+
+  const calculateStt = (index) => {
+    return (pageNo - 1) * pageSize + index + 1;
+  };
 
   return (
     <div className={styles.promotion}>
+      {contextHolder}
       <FilterpromotionAndPromotion
         searchNameOrCode={codeOrName}
         setSearchNameOrCode={setCodeOrName}
@@ -209,8 +268,8 @@ function Promotion() {
             <Table
               columns={columns}
               dataSource={promotions.map((promotion, index) => ({
-                key: promotion.promotionProductId,
-                stt: index,
+                key: promotion.promotionCode,
+                stt: calculateStt(index),
                 promotionCode: promotion.promotionCode,
                 promotionName: promotion.promotionName,
                 productQuantity: promotion.productQuantity,
@@ -229,6 +288,7 @@ function Promotion() {
                     ? "Sắp diễn ra"
                     : null,
                 ],
+                action: [promotion.promotionCode, promotion.status],
               }))}
               className={styles.table}
               pagination={false}

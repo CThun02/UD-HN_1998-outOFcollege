@@ -34,6 +34,10 @@ function AddProductInPromotion({
                     ghost
                     icon={<PlusOutlined />}
                     onClick={() => setModalOpen(true)}
+                    disabled={
+                      values?.status === "INACTIVE" ||
+                      values?.status === "CANCEL"
+                    }
                   >
                     Thêm sản phẩm
                   </Button>
@@ -63,6 +67,9 @@ function AddProductInPromotion({
                   ghost
                   icon={<PlusOutlined />}
                   onClick={() => setModalOpen(true)}
+                  disabled={
+                    values?.status === "INACTIVE" || values?.status === "CANCEL"
+                  }
                 >
                   Thêm sản phẩm
                 </Button>

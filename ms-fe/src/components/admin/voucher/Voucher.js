@@ -10,11 +10,13 @@ import {
   Tag,
   Spin,
   notification,
+  Modal,
 } from "antd";
 import FilterVoucherAndPromotion from "../../element/filter/FilterVoucherAndPromotion";
 import { Link } from "react-router-dom";
 import {
   DeleteOutlined,
+  ExclamationCircleFilled,
   EyeOutlined,
   PlusOutlined,
   UnorderedListOutlined,
@@ -24,10 +26,12 @@ import React, { useContext, useEffect, useState } from "react";
 import numeral from "numeral";
 import axios from "axios";
 import moment from "moment";
-
 import { NotificationContext } from "../../element/notification/Notification";
+import SockJs from "../../../service/SockJs";
 
 const baseUrl = "http://localhost:8080/api/admin/vouchers/";
+
+const { confirm } = Modal;
 
 function Voucher() {
   // filter
@@ -63,16 +67,34 @@ function Voucher() {
   }
 
   function handleDelete(value) {
-    try {
-      axios
-        .put(baseUrl + "update/" + value[0])
-        .then((res) => {
-          setReload(res.data);
-        })
-        .catch((err) => console.log("Exception: ", err));
-    } catch (err) {
-      console.log("Error: ", err);
-    }
+    confirm({
+      title: "Xác nhận",
+      icon: <ExclamationCircleFilled />,
+      content: "Bạn có chắc là hủy voucher này không?",
+
+      onOk() {
+        async function changeStatusVoucher() {
+          try {
+            await axios
+              .put(baseUrl + "update/" + value[0])
+              .then((res) => {
+                apiNotification.success({
+                  message: `Success`,
+                  description: `Thao tác thành công`,
+                });
+                setReload(res.data);
+              })
+              .catch((err) => console.log("Exception: ", err));
+          } catch (err) {
+            console.log("Error: ", err);
+          }
+        }
+        changeStatusVoucher();
+      },
+      onCancel() {
+        console.log("Cancel");
+      },
+    });
   }
 
   useEffect(
@@ -111,7 +133,6 @@ function Voucher() {
             filter
           );
 
-          console.log("filer: ", filter);
           const data = await res.data;
 
           setTotalElements(data.totalElements);
@@ -144,7 +165,6 @@ function Voucher() {
       async function notification() {
         if (successMessage && isCheck === true && context === "voucher") {
           // Hiển thị thông báo thành công ở đây
-          console.log(successMessage);
           apiNotification.success({
             message: `Success`,
             description: `${successMessage}`,
@@ -233,7 +253,7 @@ function Voucher() {
           <Button
             onClick={() => handleDelete(object)}
             className={styles.iconButton}
-            disabled={object[1] === "INACTIVE"}
+            disabled={object[1] === "INACTIVE" || object[1] === "CANCEL"}
           >
             <DeleteOutlined />
           </Button>
@@ -244,6 +264,8 @@ function Voucher() {
 
   return (
     <div className={styles.voucher}>
+      {contextHolder}
+      <SockJs setValues={setVouchers} connectTo={"voucher"} />;
       <FilterVoucherAndPromotion
         searchNameOrCode={searchNameOrCode}
         setSearchNameOrCode={setSearchNameOrCode}
@@ -254,10 +276,7 @@ function Voucher() {
         status={searchStatus}
         setStatus={setSearchStatus}
       />
-
       <div className={styles.content}>
-        {contextHolder}
-
         <Space style={{ width: "100%" }} direction="vertical" size={16}>
           <Row>
             <Col span={20}>
@@ -304,14 +323,18 @@ function Voucher() {
                       voucher.objectUse === "all" ? "Tất cả" : "Thành viên",
                     startAndEndDate: [
                       `${moment(voucher.startDate).format(
-                        "DD/MM/YYYY"
-                      )} - ${moment(voucher.endDate).format("DD/MM/YYYY")}`,
+                        "HH:mm DD/MM/YYYY"
+                      )} - ${moment(voucher.endDate).format(
+                        "HH:mm DD/MM/YYYY"
+                      )}`,
                       voucher.status === "ACTIVE"
                         ? "Đang diễn ra"
                         : voucher.status === "INACTIVE"
                         ? "Đã kết thúc"
                         : voucher.status === "UPCOMING"
                         ? "Sắp diễn ra"
+                        : voucher.status === "CANCEL"
+                        ? "Đã hủy"
                         : null,
                     ],
                     action: [voucher.voucherCode, voucher.status],

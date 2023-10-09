@@ -41,7 +41,6 @@ public class MsJobService {
 
     @PostConstruct
     private void construct() {
-
         jobScheduler.scheduleRecurrently(Cron.every15seconds(),
                 this::isCheckTimeStartDateAndEndDateVoucher);
         jobScheduler.scheduleRecurrently(Cron.every15seconds(),

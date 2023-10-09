@@ -1,47 +1,52 @@
-import { useState, useEffect } from "react";
-import SockJsClient from "react-stomp";
+import { useEffect } from "react";
+import { useState } from "react";
+import SockJS from "sockjs-client/dist/sockjs";
+import { over } from "stompjs";
+
 const SOCKET_URL = "http://localhost:8080/ms-app/";
 
 function SockJs({ setValues, connectTo }) {
-  const [isConnected, setIsConnected] = useState(false);
-  const [isDelayed, setIsDelayed] = useState(false);
+  const [stompClient, setStompClient] = useState();
+  const [connected, setConnected] = useState(false);
 
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      setIsDelayed(true);
-    }, 2000);
+  const connect = () => {
+    const sock = new SockJS(SOCKET_URL);
+    const temp = over(sock);
+    setStompClient(temp);
 
-    return () => clearTimeout(timeout);
-  }, []);
-
-  const onConnected = () => {
-    console.log("Connected!!");
-    setIsConnected(true);
+    temp.connect({}, onConnect, onError);
   };
 
-  const onDisConnected = () => {
-    console.log("Disconnected!!");
-    setIsConnected(false);
+  const onError = (err) => {
+    console.log(err);
+  };
+
+  const onConnect = () => {
+    setConnected(true);
   };
 
   const onMessageReceived = (msg) => {
-    if (isConnected) {
-      setValues(msg);
-    }
+    setValues(JSON.parse(msg.body));
   };
 
-  return (
-    <>
-      <SockJsClient
-        url={SOCKET_URL}
-        topics={[`/topic/${connectTo}`]}
-        onConnect={onConnected}
-        onDisconnect={onDisConnected}
-        onMessage={(msg) => onMessageReceived(msg)}
-        debug={false}
-      />
-    </>
-  );
+  useEffect(function () {
+    if (connected && stompClient.connected) {
+      const subcription = stompClient.subscribe(
+        "/topic/" + connectTo,
+        onMessageReceived
+      );
+
+      console.log("topic: ", "/topic/" + connectTo);
+
+      return () => {
+        subcription.unsubscribe();
+      };
+    }
+  });
+
+  useEffect(() => {
+    connect();
+  }, []);
 }
 
 export default SockJs;

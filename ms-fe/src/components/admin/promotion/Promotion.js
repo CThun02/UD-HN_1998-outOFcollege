@@ -134,7 +134,6 @@ function Promotion() {
       async function notification() {
         if (successMessage && isCheck === true && context === "promotion") {
           // Hiển thị thông báo thành công ở đây
-          console.log(successMessage);
           apiNotification.success({
             message: `Success`,
             description: `${successMessage}`,

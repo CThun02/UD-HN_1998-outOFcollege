@@ -133,7 +133,6 @@ function Voucher() {
             filter
           );
 
-          console.log("filer: ", filter);
           const data = await res.data;
 
           setTotalElements(data.totalElements);
@@ -166,7 +165,6 @@ function Voucher() {
       async function notification() {
         if (successMessage && isCheck === true && context === "voucher") {
           // Hiển thị thông báo thành công ở đây
-          console.log(successMessage);
           apiNotification.success({
             message: `Success`,
             description: `${successMessage}`,

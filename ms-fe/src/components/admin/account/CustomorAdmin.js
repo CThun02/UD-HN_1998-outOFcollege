@@ -9,6 +9,7 @@ import styles from "./AccountForm.module.css";
 const CustomerAddminIndex = function (props) {
   const { Option } = Select;
   const [value, setValue] = useState(1);
+  const [searchKeyword, setSearchKeyword] = useState("");
 
   const navigate = useNavigate();
   const handleAddAccount = () => {
@@ -17,7 +18,6 @@ const CustomerAddminIndex = function (props) {
 
   let roleId = props.roleId;
   const onChange = (e) => {
-    console.log("radio checked", e.target.value);
     setValue(e.target.value);
   };
 
@@ -32,11 +32,15 @@ const CustomerAddminIndex = function (props) {
       </Select>
     );
   };
+
+  const handleSearch = (e) => {
+    setSearchKeyword(e.target.value);
+  };
+
   const handleFormSubmit = () => {
-    // Thực hiện các hành động sau khi form gửi thành công
-    // Ví dụ: cập nhật lại dữ liệu, hiển thị thông báo thành công, vv.
     console.log("Form submitted successfully!");
   };
+
   useEffect(() => {
     console.log("render");
   }, [roleId]);
@@ -59,6 +63,7 @@ const CustomerAddminIndex = function (props) {
               <Input
                 placeholder="Nhập từ khóa để tìm kiếm"
                 prefix={<SearchOutlined />}
+                onChange={handleSearch}
               />
             </Row>
           </Col>
@@ -84,10 +89,14 @@ const CustomerAddminIndex = function (props) {
           </Col>
         </Row>
         <div className={style.customerTable}>
-          <CustomerTable roleId={roleId}></CustomerTable>
+          <CustomerTable
+            roleId={roleId}
+            searchKeyword={searchKeyword}
+          ></CustomerTable>
         </div>
       </div>
     </div>
   );
 };
+
 export default CustomerAddminIndex;

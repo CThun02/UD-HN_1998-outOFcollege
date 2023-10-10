@@ -78,10 +78,7 @@ public class VoucherServiceImpl implements VoucherService {
                     throw new NotFoundException(ErrorCodeConfig.getMessage(Const.SEND_EMAIL_ERROR));
                 }
 
-                voucher.setObjectUse(voucherRequest.getObjectUse());
                 voucherRequest.getEmailDetails().setRecipient(emails);
-            } else {
-                voucher.setObjectUse(voucherRequest.getObjectUse());
             }
             result = emailService.sendSimpleMail(voucherRequest.getEmailDetails(), voucher.getId());
         }
@@ -299,6 +296,7 @@ public class VoucherServiceImpl implements VoucherService {
         voucher.setLimitQuantity(request.getLimitQuantity());
         voucher.setVoucherCondition(request.getVoucherCondition());
         voucher.setIsSendEmail(request.getIsCheckSendEmail());
+        voucher.setObjectUse(request.getObjectUse());
 
         voucher.setStartDate(request.getStartDate());
         voucher.setEndDate(request.getEndDate());

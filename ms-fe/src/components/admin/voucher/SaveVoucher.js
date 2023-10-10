@@ -70,12 +70,11 @@ const validationSchema = Yup.object().shape({
     .required("* Ngày bắt đầu không được bỏ trống")
     .test(
       "start-date-current",
-      "* Ngày bắt đầu phải lớn hơn ngày hiện tại",
+      "* Ngày bắt đầu phải lớn hơn ngày hiện tại tối thiểu 10 phút",
       function (startDate) {
         const { status } = this.parent;
-        const currentDate = new Date();
         if (startDate && status !== "ACTIVE") {
-          return startDate > currentDate;
+          return startDate > dayjs().add(10, "minute");
         }
         return true;
       }
@@ -88,14 +87,7 @@ const validationSchema = Yup.object().shape({
       function (endDate) {
         const { startDate } = this.parent;
         if (startDate && endDate) {
-          const timeStartDate = moment(startDate).format("HH:mm:ss");
-          const timeEndDate = moment(endDate).format("HH:mm:ss");
-          const time = moment(timeStartDate, "HH:mm:ss").add(29, "minutes");
-          return (
-            endDate > startDate ||
-            (endDate > startDate &&
-              timeEndDate > moment(time).format("HH:mm:ss"))
-          );
+          return endDate > dayjs(startDate).add(30, "minute");
         }
         return true;
       }
@@ -113,42 +105,12 @@ const validationSchema = Yup.object().shape({
     ),
 });
 
-const range = (start, end) => {
-  const result = [];
-  for (let i = start; i < end; i++) {
-    result.push(i);
-  }
-  return result;
-};
-
-const rangeFunction = (start) => {
-  const result = [];
-  for (let i = start; i >= 0; i--) {
-    result.push(i);
-  }
-  return result;
-};
-
-const disabledDateTime = (current) => {
-  const currentDate = moment(new Date()).format("DD/MM/YYYY");
-  const selectedDate = moment(current).format("DD/MM/YYYY");
-
-  if (selectedDate > currentDate) {
-    return {
-      disabledHours: () => range(0, 24).splice(0, moment().hour()),
-      disabledMinutes: () => rangeFunction(moment().minute()),
-    };
-  }
-
-  return {};
-};
-
 //date
 dayjs.extend(customParseFormat);
 const dateFormat = "HH:mm:ss DD/MM/YYYY";
 
 function disabledDate(current) {
-  return current && current < dayjs().endOf("day");
+  return current && current <= moment(dayjs());
 }
 
 const { confirm } = Modal;
@@ -802,7 +764,6 @@ function SaveVoucher() {
                                 <DatePicker
                                   name="startDate"
                                   disabledDate={disabledDate}
-                                  disabledTime={disabledDateTime}
                                   format={dateFormat}
                                   size="large"
                                   placeholder={null}
@@ -848,7 +809,6 @@ function SaveVoucher() {
                                 <DatePicker
                                   name="endDate"
                                   disabledDate={disabledDate}
-                                  disabledTime={disabledDateTime}
                                   format={dateFormat}
                                   size="large"
                                   placeholder={null}
@@ -925,7 +885,12 @@ function SaveVoucher() {
                                     );
                                     console.log("values: ", e.target.checked);
                                   }}
-                                  disabled={code}
+                                  disabled={
+                                    values.status === "INACTIVE" ||
+                                    values.status === "ACTIVE" ||
+                                    values.status === "CANCEL" ||
+                                    values.status === "ACTIVE"
+                                  }
                                 >
                                   Gửi mã giảm giá cho khách hàng
                                 </Checkbox>

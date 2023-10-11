@@ -48,7 +48,7 @@ public class VoucherController {
 
     @PutMapping("/update/{code}")
     public ResponseEntity<?> updateStatus(@PathVariable("code") String code) {
-        return ResponseEntity.ok().body(voucherService.updateStatus(code));
+        return ResponseEntity.ok().body(voucherService.updateStatus(code).getVoucherCode());
     }
 
     @GetMapping("/{code}")

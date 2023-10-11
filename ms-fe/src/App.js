@@ -20,6 +20,7 @@ import AccountForm from "./components/admin/account/AccountForm";
 import CustomerAdmin from "./components/admin/account/CustomorAdmin";
 import DetailForm from "./components/admin/account/DetailForm";
 import ProductDetails from "./components/admin/product/ProductDetails";
+import ProductUpdateDetails from "./components/admin/product/ProductUpdateDetails";
 function App() {
   const [message, setMessage] = useState("");
 
@@ -74,8 +75,8 @@ function App() {
                         element={<ProductCreateDetails />}
                       />
                       <Route
-                        path={"update-details"}
-                        element={<ProductCreateDetails />}
+                        path={"update-details/:productId"}
+                        element={<ProductUpdateDetails />}
                       />
                       {/* ví dụ path= san-pham/hien-thi ->  
                     <Route path="hien-thi" element="el" />
@@ -100,6 +101,10 @@ function App() {
                     <Route path="promotion">
                       <Route index element={<Promotion />} />
                       <Route path="create" element={<CreatePromotion />} />
+                      <Route
+                        path="detail/:code"
+                        element={<CreatePromotion />}
+                      />
                     </Route>
                     <Route path="category" element="category"></Route>
                     <Route path="brand" element="brand"></Route>

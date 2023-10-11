@@ -41,3 +41,7 @@
   border-radius: 4px;
   text-align: center;
 }
+
+.defaultImage:hover {
+  color: rgb(192, 192, 76) !important;
+}

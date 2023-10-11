@@ -28,4 +28,16 @@ public interface VoucherRepository extends JpaRepository<Voucher, Long> {
     Optional<Voucher> findVoucherByVoucherName(String voucherName);
 
     Optional<Voucher> findVoucherByVoucherCode(String code);
+
+    @Query("select new java.lang.Boolean((COUNT(*) > 0)) from VoucherAccount va " +
+            "where va.voucherAccount.id = :idVoucher and va.accountVoucher.username = :username")
+    Boolean isCheckAccountOwnerVoucher(Long idVoucher, String username);
+
+    @Query("select new com.fpoly.ooc.responce.voucher.VoucherResponse(" +
+            "v.id, v.voucherCode, v.voucherName, v.voucherValue, v.voucherValueMax, v.voucherMethod, " +
+            "v.limitQuantity, v.startDate, v.endDate, v.status, v.objectUse) " +
+            "from Voucher v " +
+            "order by v.createdAt desc ")
+    List<VoucherResponse> findAllVoucherResponseNoCondition();
+
 }

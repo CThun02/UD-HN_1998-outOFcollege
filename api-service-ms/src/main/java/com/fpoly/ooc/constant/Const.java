@@ -5,9 +5,9 @@ public class Const {
 
     // status
     public static final String STATUS_ACTIVE = "ACTIVE";
-
     public static final String STATUS_INACTIVE = "INACTIVE";
     public static final String STATUS_UPCOMING = "UPCOMING";
+    public static final String STATUS_CANCEL = "CANCEL";
 
     //error code
     public static final String CODE_NOT_FOUND = "CODE_NOT_FOUND";
@@ -27,10 +27,23 @@ public class Const {
     public static final String SEND_EMAIL_ERROR = "SEND_EMAIL_ERROR";
     public static final String VOUCHER_USED_BY_USER = "VOUCHER_USED_BY_USER";
     public static final String USER_NOT_FOUND = "USER_NOT_FOUND";
+    public static final String PROMOTION_NAME_NOT_FOUND = "PROMOTION_NAME_NOT_FOUND";
+    public static final String PROMOTION_METHOD_NOT_FOUND = "PROMOTION_METHOD_NOT_FOUND";
+    public static final String PROMOTION_VALUE_NOT_FOUND = "PROMOTION_VALUE_NOT_FOUND";
+    public static final String START_DATE_NOT_FOUND = "START_DATE_NOT_FOUND";
+    public static final String END_DATE_NOT_FOUND = "END_DATE_NOT_FOUND";
+    public static final String DATE_NOT_FOUND = "DATE_NOT_FOUND";
+    public static final String PRODUCT_DETAIL_NOT_FOUND = "PRODUCT_DETAIL_NOT_FOUND";
 
 
     //ErrorCode
     public static final String HTTP_ERROR_CODE = "BAD_REQUEST";
+
+    //kafka
+    public static final String KAFKA_SERVER = "localhost:9092";
+    public static final String KAFKA_GROUP_ID = "group-id";
+    public static final String TOPIC_VOUCHER = "voucher-cronjob";
+    public static final String TOPIC_PROMOTION = "promotion-cronjob";
 
 
 }

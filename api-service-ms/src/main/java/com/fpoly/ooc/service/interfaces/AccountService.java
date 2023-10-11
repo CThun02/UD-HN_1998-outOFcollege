@@ -2,6 +2,7 @@ package com.fpoly.ooc.service.interfaces;
 
 import com.fpoly.ooc.dto.CustomerConditionDTO;
 import com.fpoly.ooc.entity.Account;
+import com.fpoly.ooc.entity.AddressDetail;
 import com.fpoly.ooc.request.account.AccountRequest;
 import com.fpoly.ooc.responce.account.AccountDetailResponce;
 import com.fpoly.ooc.responce.account.AccountResponce;
@@ -18,6 +19,9 @@ public interface AccountService {
     Account save(AccountRequest request);
 
     Account update(AccountRequest request,String username);
+
+    List<AddressDetail> getAddressDetailsByUsername(String username);
+
 
     AccountDetailResponce detail(String userName);
 

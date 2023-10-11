@@ -12,8 +12,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class PromotionProductResponse {
 
-    private Long promotionProductId;
-
     private String promotionCode;
 
     private String promotionName;
@@ -26,7 +24,7 @@ public class PromotionProductResponse {
 
     private BigDecimal promotionValueMax;
 
-    private String promotionCondition;
+    private BigDecimal promotionCondition;
 
     private LocalDateTime startDate;
 

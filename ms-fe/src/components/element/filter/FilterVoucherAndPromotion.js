@@ -31,6 +31,11 @@ options.push({
   value: "UPCOMING",
 });
 
+options.push({
+  label: "Đã hủy",
+  value: "CANCEL",
+});
+
 dayjs.extend(customParseFormat);
 
 const dateFormat = "DD/MM/YYYY";
@@ -63,7 +68,7 @@ function FilterVoucherAndPromotion({
 
   function handleSetStatus(value) {
     console.log(`selected ${value}`);
-    setStatus(value);
+    setStatus(() => value);
   }
 
   return (

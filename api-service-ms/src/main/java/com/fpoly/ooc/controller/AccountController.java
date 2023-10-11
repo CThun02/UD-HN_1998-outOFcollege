@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
+
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -29,6 +29,13 @@ public class AccountController {
     @GetMapping("viewAll")
     public ResponseEntity<?> phanTrang(@RequestParam(name = "page", defaultValue = "0") Integer pageNo, @RequestParam Long roleId) {
         return ResponseEntity.ok(service.phanTrang(pageNo, 5, roleId));
+    }
+
+    //Viết một phương thức mới Lấy dữ liệu address detail với usename
+    // => trả về list address detail(account, address)
+    @GetMapping("address-detail/{username}")
+    public ResponseEntity<?> getAddressDetailsByUsername(@PathVariable String username) {
+        return ResponseEntity.ok(service.getAddressDetailsByUsername(username));
     }
 
     @GetMapping("detail/{username}")

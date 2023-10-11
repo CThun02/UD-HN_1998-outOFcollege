@@ -1,5 +1,21 @@
-import { CloseOutlined, PlusOutlined } from "@ant-design/icons";
-import { Col, Row, Form, Input, Select, Button, message, Space } from "antd";
+import {
+  CheckCircleTwoTone,
+  CloseOutlined,
+  EditOutlined,
+  PlusOutlined,
+} from "@ant-design/icons";
+import {
+  Col,
+  Row,
+  Form,
+  Input,
+  Select,
+  Button,
+  message,
+  Space,
+  notification,
+  Popconfirm,
+} from "antd";
 import TextArea from "antd/es/input/TextArea";
 import React, { useEffect, useRef, useState } from "react";
 import styles from "./ProductCreate.module.css";
@@ -11,7 +27,6 @@ import axios from "axios";
 const ProductCreate = (props) => {
   const api = "http://localhost:8080/api/admin/";
   const [messageApi, contextHolder] = message.useMessage();
-  const formRef = useRef();
   const [brands, setBrands] = useState([]);
   const [brandCreate, setBrandCreate] = useState("");
   const [categories, setCategories] = useState([]);
@@ -21,16 +36,19 @@ const ProductCreate = (props) => {
   const [patterns, setPatterns] = useState([]);
   const [patternCreate, setPatternCreate] = useState("");
   const renderIndex = props.render;
+  const isUpdate = props.isUpdate;
   const [render, setRender] = useState(null);
   const [product, setProduct] = useState({
+    id: "1",
+    productCode: "1",
     productName: " ",
     brandId: " ",
     categoryId: " ",
     patternId: " ",
     formId: " ",
     description: " ",
+    status: "ACTIVE",
   });
-
   //function
 
   function handleSetProduct(field, value) {
@@ -170,7 +188,6 @@ const ProductCreate = (props) => {
           setTimeout(() => {
             messageApi.success("Thêm mới thành công!", 2);
             closeFrame("productCreate", "productCreateFrame");
-            formRef.current.resetFields();
             handleSetProduct("productName", " ");
             handleSetProduct("brandId", " ");
             handleSetProduct("categoryId", " ");
@@ -178,6 +195,43 @@ const ProductCreate = (props) => {
             handleSetProduct("formId", " ");
             handleSetProduct("description", " ");
             renderIndex(res.data);
+            setTimeout(() => {
+              notification.open({
+                message: "Notification",
+                description: "Thêm mới sản phẩm thành công",
+                icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
+              });
+            }, 3000);
+          }, 2000);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      messageApi.error("Vui lòng nhập đầy đủ các trường");
+    }
+  }
+
+  function updateProduct() {
+    for (let key in product) {
+      if (isString(product[key])) {
+        if (product[key].trim() === "") {
+          handleSetProduct(key, product[key].trim());
+        }
+      }
+    }
+    let check = isFormInputEmpty(product);
+    if (!check) {
+      axios
+        .put(api + "product/update", product)
+        .then((res) => {
+          messageApi.loading("Vui lòng chờ!", 2);
+          setTimeout(() => {
+            notification.open({
+              message: "Notification",
+              description: "Chỉnh sửa sản phẩm thành công",
+              icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
+            });
           }, 2000);
         })
         .catch((err) => {
@@ -189,6 +243,21 @@ const ProductCreate = (props) => {
   }
 
   useEffect(() => {
+    if (isUpdate) {
+      axios
+        .get(api + "product/getProductEdit?productId=" + props.productId)
+        .then((response) => {
+          handleSetProduct("id", response.data.id);
+          handleSetProduct("productCode", response.data.productCode);
+          handleSetProduct("productName", response.data.productName);
+          handleSetProduct("brandId", response.data.brand.id);
+          handleSetProduct("categoryId", response.data.category.id);
+          handleSetProduct("patternId", response.data.pattern.id);
+          handleSetProduct("formId", response.data.form.id);
+          handleSetProduct("imgDefault", response.data.imgDefault);
+          handleSetProduct("description", response.data.description);
+        });
+    }
     axios
       .get(api + "brand")
       .then((res) => {
@@ -221,7 +290,7 @@ const ProductCreate = (props) => {
       .catch((error) => {
         console.log(error);
       });
-  }, []);
+  }, [isUpdate]);
 
   return (
     <div id="productCreate" className={`${styles.product__create} d-none`}>
@@ -235,227 +304,244 @@ const ProductCreate = (props) => {
           </Button>
         </div>
         <h2>
-          <PlusOutlined /> Thêm sản phẩm
+          {!isUpdate ? (
+            <>
+              <PlusOutlined /> Thêm sản phẩm
+            </>
+          ) : (
+            <>
+              <EditOutlined /> Chỉnh sửa sản phẩm
+            </>
+          )}
         </h2>
         <br />
         <Row>
           <Col span={24}>
-            <Form ref={formRef}>
+            <div className="m-5">
               <span>Tên sản phẩm</span>
-              <Form.Item name="productName">
-                <Input
-                  placeholder="Product name"
-                  onBlur={(event) =>
-                    handleSetProduct("productName", event.target.value)
-                  }
-                  status={product.productName === "" ? "error" : ""}
-                ></Input>
-              </Form.Item>
-              <Row>
-                <Col span={12}>
-                  <div className={styles.product__createSelect}>
-                    <span>Thương hiệu</span>
-                    <Form.Item name="brand">
-                      <Select
-                        showSearch
-                        onChange={(event) => handleSetProduct("brandId", event)}
-                        placeholder="Brand"
-                        status={product.brandId === "" ? "error" : ""}
-                      >
-                        <Select.Option value={""}>
-                          <Space.Compact style={{ width: "100%" }}>
-                            <Input
-                              placeholder="Add new brand"
-                              size="small"
-                              onClick={(event) => {
-                                handleCustomOptionClick(event);
-                              }}
-                              value={brandCreate}
-                              onChange={(event) => {
-                                setBrandCreate(event.target.value);
-                              }}
-                            />
-                            <Button
-                              onClick={(event) => {
-                                createBrand(event);
-                              }}
-                            >
-                              <PlusOutlined />
-                            </Button>
-                          </Space.Compact>
-                        </Select.Option>
-                        {brands &&
-                          brands.map((item) => {
-                            return (
-                              <Select.Option value={item.id} key={item.id}>
-                                {item.brandName}
-                              </Select.Option>
-                            );
-                          })}
-                      </Select>
-                    </Form.Item>
-                  </div>
-                </Col>
-                <Col span={12}>
-                  <div className={styles.product__createSelect}>
-                    <span>Loại sản phẩm</span>
-                    <Form.Item name="category">
-                      <Select
-                        showSearch
-                        onChange={(event) =>
-                          handleSetProduct("categoryId", event)
-                        }
-                        placeholder="Category"
-                        status={product.categoryId === "" ? "error" : ""}
-                      >
-                        <Select.Option value={""}>
-                          <Space.Compact style={{ width: "100%" }}>
-                            <Input
-                              placeholder="Add new category"
-                              size="small"
-                              onClick={(event) => {
-                                handleCustomOptionClick(event);
-                              }}
-                              value={categoryCreate}
-                              onChange={(event) => {
-                                setCategoryCreate(event.target.value);
-                              }}
-                            />
-                            <Button
-                              onClick={(event) => {
-                                createCategory(event);
-                              }}
-                            >
-                              <PlusOutlined />
-                            </Button>
-                          </Space.Compact>
-                        </Select.Option>
-                        {categories &&
-                          categories.map((item) => {
-                            return (
-                              <Select.Option value={item.id} key={item.id}>
-                                {item.categoryName}
-                              </Select.Option>
-                            );
-                          })}
-                      </Select>
-                    </Form.Item>
-                  </div>
-                </Col>
-                <Col span={12}>
-                  <div className={styles.product__createSelect}>
-                    <span>Hoạt tiết</span>
-                    <Form.Item name="pattern">
-                      <Select
-                        showSearch
-                        onChange={(event) =>
-                          handleSetProduct("patternId", event)
-                        }
-                        placeholder="Pattern"
-                        status={product.patternId === "" ? "error" : ""}
-                      >
-                        <Select.Option value={""}>
-                          <Space.Compact style={{ width: "100%" }}>
-                            <Input
-                              placeholder="Add new pattern"
-                              size="small"
-                              onClick={(event) => {
-                                handleCustomOptionClick(event);
-                              }}
-                              value={patternCreate}
-                              onChange={(event) => {
-                                setPatternCreate(event.target.value);
-                              }}
-                            />
-                            <Button
-                              onClick={(event) => {
-                                createPattern(event);
-                              }}
-                            >
-                              <PlusOutlined />
-                            </Button>
-                          </Space.Compact>
-                        </Select.Option>
-                        {patterns &&
-                          patterns.map((item) => {
-                            return (
-                              <Select.Option value={item.id} key={item.id}>
-                                {item.patternName}
-                              </Select.Option>
-                            );
-                          })}
-                      </Select>
-                    </Form.Item>
-                  </div>
-                </Col>
-                <Col span={12}>
-                  <div className={styles.product__createSelect}>
-                    <span>Dáng áo</span>
-                    <Form.Item name="form">
-                      <Select
-                        showSearch
-                        onChange={(event) => handleSetProduct("formId", event)}
-                        placeholder="form"
-                        status={product.formId === "" ? "error" : ""}
-                      >
-                        <Select.Option value={""}>
-                          <Space.Compact style={{ width: "100%" }}>
-                            <Input
-                              placeholder="Add new form"
-                              size="small"
-                              onClick={(event) => {
-                                handleCustomOptionClick(event);
-                              }}
-                              value={formCreate}
-                              onChange={(event) => {
-                                setFormCreate(event.target.value);
-                              }}
-                            />
-                            <Button
-                              onClick={(event) => {
-                                createForm(event);
-                              }}
-                            >
-                              <PlusOutlined />
-                            </Button>
-                          </Space.Compact>
-                        </Select.Option>
-                        {forms &&
-                          forms.map((item) => {
-                            return (
-                              <Select.Option value={item.id} key={item.id}>
-                                {item.formName}
-                              </Select.Option>
-                            );
-                          })}
-                      </Select>
-                    </Form.Item>
-                  </div>
-                </Col>
-              </Row>
+              <Input
+                placeholder="Product name"
+                onChange={(event) =>
+                  handleSetProduct("productName", event.target.value)
+                }
+                value={product.productName}
+                status={product.productName === "" ? "error" : ""}
+              ></Input>
+            </div>
+            <Row>
+              <Col span={12}>
+                <div className={styles.product__createSelect}>
+                  <span>Thương hiệu</span>
+                  <br />
+                  <Select
+                    showSearch
+                    style={{ width: "100%" }}
+                    onChange={(event) => handleSetProduct("brandId", event)}
+                    placeholder="Brand"
+                    status={product.brandId === "" ? "error" : ""}
+                    value={product.brandId}
+                  >
+                    <Select.Option value={"add"}>
+                      <Space.Compact style={{ width: "100%" }}>
+                        <Input
+                          placeholder="Add new brand"
+                          size="small"
+                          onClick={(event) => {
+                            handleCustomOptionClick(event);
+                          }}
+                          value={brandCreate}
+                          onChange={(event) => {
+                            setBrandCreate(event.target.value);
+                          }}
+                        />
+                        <Button
+                          onClick={(event) => {
+                            createBrand(event);
+                          }}
+                        >
+                          <PlusOutlined />
+                        </Button>
+                      </Space.Compact>
+                    </Select.Option>
+                    {brands &&
+                      brands.map((item) => {
+                        return (
+                          <Select.Option value={item.id} key={item.id}>
+                            {item.brandName}
+                          </Select.Option>
+                        );
+                      })}
+                  </Select>
+                </div>
+              </Col>
+              <Col span={12}>
+                <div className={styles.product__createSelect}>
+                  <span>Loại sản phẩm</span>
+                  <br />
+                  <Select
+                    showSearch
+                    style={{ width: "100%" }}
+                    onChange={(event) => handleSetProduct("categoryId", event)}
+                    placeholder="Category"
+                    status={product.categoryId === "" ? "error" : ""}
+                    value={product.categoryId}
+                  >
+                    <Select.Option value={"add"}>
+                      <Space.Compact style={{ width: "100%" }}>
+                        <Input
+                          placeholder="Add new category"
+                          size="small"
+                          onClick={(event) => {
+                            handleCustomOptionClick(event);
+                          }}
+                          value={categoryCreate}
+                          onChange={(event) => {
+                            setCategoryCreate(event.target.value);
+                          }}
+                        />
+                        <Button
+                          onClick={(event) => {
+                            createCategory(event);
+                          }}
+                        >
+                          <PlusOutlined />
+                        </Button>
+                      </Space.Compact>
+                    </Select.Option>
+                    {categories &&
+                      categories.map((item) => {
+                        return (
+                          <Select.Option value={item.id} key={item.id}>
+                            {item.categoryName}
+                          </Select.Option>
+                        );
+                      })}
+                  </Select>
+                </div>
+              </Col>
+              <Col span={12}>
+                <div className={styles.product__createSelect}>
+                  <span>Hoạt tiết</span>
+                  <br />
+                  <Select
+                    showSearch
+                    style={{ width: "100%" }}
+                    onChange={(event) => handleSetProduct("patternId", event)}
+                    placeholder="Pattern"
+                    status={product.patternId === "" ? "error" : ""}
+                    value={product.patternId}
+                  >
+                    <Select.Option value={"add"}>
+                      <Space.Compact style={{ width: "100%" }}>
+                        <Input
+                          placeholder="Add new pattern"
+                          size="small"
+                          onClick={(event) => {
+                            handleCustomOptionClick(event);
+                          }}
+                          value={patternCreate}
+                          onChange={(event) => {
+                            setPatternCreate(event.target.value);
+                          }}
+                        />
+                        <Button
+                          onClick={(event) => {
+                            createPattern(event);
+                          }}
+                        >
+                          <PlusOutlined />
+                        </Button>
+                      </Space.Compact>
+                    </Select.Option>
+                    {patterns &&
+                      patterns.map((item) => {
+                        return (
+                          <Select.Option value={item.id} key={item.id}>
+                            {item.patternName}
+                          </Select.Option>
+                        );
+                      })}
+                  </Select>
+                </div>
+              </Col>
+              <Col span={12}>
+                <div className={styles.product__createSelect}>
+                  <span>Dáng áo</span>
+                  <br />
+                  <Select
+                    showSearch
+                    style={{ width: "100%" }}
+                    onChange={(event) => handleSetProduct("formId", event)}
+                    placeholder="form"
+                    status={product.formId === "" ? "error" : ""}
+                    value={product.formId}
+                  >
+                    <Select.Option value={"add"}>
+                      <Space.Compact style={{ width: "100%" }}>
+                        <Input
+                          placeholder="Add new form"
+                          size="small"
+                          onClick={(event) => {
+                            handleCustomOptionClick(event);
+                          }}
+                          value={formCreate}
+                          onChange={(event) => {
+                            setFormCreate(event.target.value);
+                          }}
+                        />
+                        <Button
+                          onClick={(event) => {
+                            createForm(event);
+                          }}
+                        >
+                          <PlusOutlined />
+                        </Button>
+                      </Space.Compact>
+                    </Select.Option>
+                    {forms &&
+                      forms.map((item) => {
+                        return (
+                          <Select.Option value={item.id} key={item.id}>
+                            {item.formName}
+                          </Select.Option>
+                        );
+                      })}
+                  </Select>
+                </div>
+              </Col>
+            </Row>
+            <div className="m-5">
               <span>Mô tả</span>
-              <Form.Item name="description">
-                <TextArea
-                  placeholder="Description"
-                  allowClear
-                  onBlur={(event) =>
-                    handleSetProduct("description", event.target.value)
-                  }
-                  status={product.description === "" ? "error" : ""}
-                />
-              </Form.Item>
-              <Form.Item>
+              <TextArea
+                value={product.description}
+                placeholder="Description"
+                allowClear
+                onChange={(event) =>
+                  handleSetProduct("description", event.target.value)
+                }
+                status={product.description === "" ? "error" : ""}
+              />
+            </div>
+            <br />
+            <br />
+            <div>
+              <Popconfirm
+                title="Thêm mới sản phẩm"
+                description="Chắc chắn thêm mới sản phẩm!"
+                onConfirm={() =>
+                  !isUpdate ? createProduct() : updateProduct()
+                }
+                okText="Yes"
+                cancelText="No"
+              >
                 <Button
                   className={styles.product__createConfirm}
                   loading={false}
-                  onClick={() => {
-                    createProduct();
-                  }}
                 >
                   Xác nhận
                 </Button>
-              </Form.Item>
-            </Form>
+              </Popconfirm>
+            </div>
           </Col>
         </Row>
       </div>

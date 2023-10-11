@@ -7,6 +7,8 @@ import com.fpoly.ooc.responce.voucher.VoucherResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 public interface VoucherService {
 
     Page<VoucherResponse> findAllVoucher(Pageable pageable, VoucherAndPromotionConditionDTO voucherConditionDTO);
@@ -15,10 +17,16 @@ public interface VoucherService {
 
     Voucher updateStatus(String code);
 
+    Voucher updateStatus(String code, String status);
+
     VoucherRequest findVoucherRequestById(Long id);
 
     Voucher findVoucherById(Long id);
 
     VoucherRequest findByVoucherCode(String code);
+
+    Boolean isCheckAccountOwnerVoucher(Long idVoucher, String username);
+
+    List<VoucherResponse> findAllNoFilter();
 
 }

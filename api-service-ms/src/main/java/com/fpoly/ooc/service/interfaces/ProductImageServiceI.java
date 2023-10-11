@@ -2,6 +2,7 @@ package com.fpoly.ooc.service.interfaces;
 
 import com.fpoly.ooc.entity.Product;
 import com.fpoly.ooc.entity.ProductImage;
+import com.fpoly.ooc.responce.product.ProductImageResponse;
 
 import java.util.List;
 
@@ -11,7 +12,6 @@ public interface ProductImageServiceI {
     public void delete(ProductImage productImage);
     public List<ProductImage> getAll();
     public ProductImage getOne(Long id);
-    public List<ProductImage> getProductImagesByProduct(Product product);
-    public ProductImage getProductImagesByProductAndPath(Product product, String path);
-
+    public List<ProductImageResponse> getProductImageByProductIdAndColorId(Long productId, Long colorId);
+    public List<ProductImageResponse> getProductImageByProductId(Long productId);
 }

@@ -88,37 +88,37 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
     }
 
     @Override
-    public List<Long> getColorsBydIdPro(Long productId) {
+    public List<Color> getColorsBydIdPro(Long productId) {
         return repo.getColorsBydIdPro(productId);
     }
 
     @Override
-    public List<Long> getSizesBydIdPro(Long productId) {
+    public List<Size> getSizesBydIdPro(Long productId) {
         return repo.getSizesBydIdPro(productId);
     }
 
     @Override
-    public List<Long> getShirtTailsBydIdPro(Long productId) {
+    public List<ShirtTailType> getShirtTailsBydIdPro(Long productId) {
         return repo.getShirtTailsBydIdPro(productId);
     }
 
     @Override
-    public List<Long> getMaterialsBydIdPro(Long productId) {
+    public List<Material> getMaterialsBydIdPro(Long productId) {
         return repo.getMaterialsBydIdPro(productId);
     }
 
     @Override
-    public List<Long> getCollarsBydIdPro(Long productId) {
+    public List<CollarType> getCollarsBydIdPro(Long productId) {
         return repo.getCollarsBydIdPro(productId);
     }
 
     @Override
-    public List<Long> getButtonsBydIdPro(Long productId) {
+    public List<ButtonType> getButtonsBydIdPro(Long productId) {
         return repo.getButtonsBydIdPro(productId);
     }
 
     @Override
-    public List<Long> getSleevesBydIdPro(Long productId) {
+    public List<SleeveType> getSleevesBydIdPro(Long productId) {
         return repo.getSleevesBydIdPro(productId);
     }
 

@@ -5,15 +5,24 @@ import { Menu } from "antd";
 import {
   AuditOutlined,
   BookOutlined,
+  DingtalkOutlined,
+  DownOutlined,
   EuroCircleOutlined,
   FontSizeOutlined,
+  FullscreenOutlined,
+  HighlightOutlined,
   LineChartOutlined,
+  LoginOutlined,
   OrderedListOutlined,
+  PauseOutlined,
   PicCenterOutlined,
   PieChartOutlined,
+  PlayCircleOutlined,
   SafetyCertificateOutlined,
   ShopOutlined,
   ShoppingCartOutlined,
+  SlidersOutlined,
+  StrikethroughOutlined,
   UserAddOutlined,
   UsergroupAddOutlined,
   UserSwitchOutlined,
@@ -45,6 +54,33 @@ const SideBar = () => {
         break;
       case "thuongHieu":
         navigate(href + "brand");
+        break;
+      case "hoaTiet":
+        navigate(href + "pattern");
+        break;
+      case "dangAo":
+        navigate(href + "form");
+        break;
+      case "nutAo":
+        navigate(href + "button");
+        break;
+      case "coAo":
+        navigate(href + "collar");
+        break;
+      case "tayAo":
+        navigate(href + "sleeve");
+        break;
+      case "duoiAo":
+        navigate(href + "shirtTail");
+        break;
+      case "chatLieu":
+        navigate(href + "material");
+        break;
+      case "kichCo":
+        navigate(href + "size");
+        break;
+      case "mauSac":
+        navigate(href + "color");
         break;
       case "nhanVien":
         navigate(href + "employee");
@@ -102,7 +138,7 @@ const SideBar = () => {
                 key: "sanPham",
                 children: [
                   {
-                    label: "Sản phẩm chi tiết",
+                    label: "Sản phẩm",
                     icon: <PicCenterOutlined />,
                     key: "sanPhamChiTiet",
                   },
@@ -115,6 +151,51 @@ const SideBar = () => {
                     label: "Thương hiệu",
                     icon: <FontSizeOutlined />,
                     key: "thuongHieu",
+                  },
+                  {
+                    label: "Hoạ tiết",
+                    icon: <SlidersOutlined />,
+                    key: "hoaTiet",
+                  },
+                  {
+                    label: "Dáng áo",
+                    icon: <StrikethroughOutlined />,
+                    key: "dangAo",
+                  },
+                  {
+                    label: "Nút áo",
+                    icon: <PlayCircleOutlined />,
+                    key: "nutAo",
+                  },
+                  {
+                    label: "Cổ áo",
+                    icon: <PauseOutlined />,
+                    key: "coAo",
+                  },
+                  {
+                    label: "Tay áo",
+                    icon: <DingtalkOutlined />,
+                    key: "tayAo",
+                  },
+                  {
+                    label: "Đuôi áo",
+                    icon: <DownOutlined />,
+                    key: "duoiAo",
+                  },
+                  {
+                    label: "Chất liệu",
+                    icon: <LoginOutlined />,
+                    key: "chatLieu",
+                  },
+                  {
+                    label: "Kích cỡ",
+                    icon: <FullscreenOutlined />,
+                    key: "kichCo",
+                  },
+                  {
+                    label: "Màu sắc",
+                    icon: <HighlightOutlined />,
+                    key: "mauSac",
                   },
                 ],
               },

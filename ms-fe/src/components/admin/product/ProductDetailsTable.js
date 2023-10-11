@@ -38,6 +38,7 @@ const ProductDetailsTable = (props) => {
   const isUpdate = props.isUpdate;
   var product = props.product;
   var colorsCreate = props.colorsCreate;
+  var productDetailsDisplay = getProductDetailsDisplay();
   const [imgDefault, setImgDefault] = useState(product.imgDefault);
   const [productImage, setProductImage] = useState({
     id: null,
@@ -56,7 +57,7 @@ const ProductDetailsTable = (props) => {
     colorId: " ",
     shirtTailId: " ",
     price: 200000,
-    quantity: 1,
+    quantity: 10,
     status: "ACTIVE",
   });
   function renderProductDetails() {
@@ -100,6 +101,58 @@ const ProductDetailsTable = (props) => {
         props.productDetails.push(productDetailDisplay);
       }
     }
+  }
+  function getProductDetailsDisplay() {
+    let allProductDetailsCopy = [...props.productDetails];
+    let uniQueProductDetails = [];
+
+    for (let i = 0; i < allProductDetailsCopy.length; i++) {
+      let productDetails = [allProductDetailsCopy[i]];
+      let j = i + 1;
+
+      while (j < allProductDetailsCopy.length) {
+        if (
+          allProductDetailsCopy[i].button.id ===
+            allProductDetailsCopy[j].button.id &&
+          allProductDetailsCopy[i].material.id ===
+            allProductDetailsCopy[j].material.id &&
+          allProductDetailsCopy[i].sleeve.id ===
+            allProductDetailsCopy[j].sleeve.id &&
+          allProductDetailsCopy[i].collar.id ===
+            allProductDetailsCopy[j].collar.id &&
+          allProductDetailsCopy[i].shirtTail.id ===
+            allProductDetailsCopy[j].shirtTail.id &&
+          allProductDetailsCopy[i].color.id ===
+            allProductDetailsCopy[j].color.id &&
+          allProductDetailsCopy[i].size.id === allProductDetailsCopy[j].size.id
+        ) {
+          // Nếu các thuộc tính giống nhau, bỏ qua
+          j++;
+        } else if (
+          allProductDetailsCopy[i].button.id ===
+            allProductDetailsCopy[j].button.id &&
+          allProductDetailsCopy[i].material.id ===
+            allProductDetailsCopy[j].material.id &&
+          allProductDetailsCopy[i].sleeve.id ===
+            allProductDetailsCopy[j].sleeve.id &&
+          allProductDetailsCopy[i].collar.id ===
+            allProductDetailsCopy[j].collar.id &&
+          allProductDetailsCopy[i].shirtTail.id ===
+            allProductDetailsCopy[j].shirtTail.id &&
+          allProductDetailsCopy[i].color.id ===
+            allProductDetailsCopy[j].color.id
+        ) {
+          // Nếu các thuộc tính trừ size giống nhau, thêm vào productDetails và loại bỏ khỏi mảng
+          productDetails.push(allProductDetailsCopy.splice(j, 1)[0]);
+        } else {
+          j++;
+        }
+      }
+
+      uniQueProductDetails.push(productDetails);
+    }
+
+    return uniQueProductDetails;
   }
   function createImgageDetail(productName, colorName, imgs) {
     for (let i = 0; i < imgs.length; i++) {
@@ -421,6 +474,7 @@ const ProductDetailsTable = (props) => {
             productDetailUpdate
           )
           .then((res) => {
+            console.log(res.data);
             message.loading("loading!", 0.5);
             setTimeout(() => {
               if (field === "quantity" || field === "price") {
@@ -489,8 +543,9 @@ const ProductDetailsTable = (props) => {
       setRender(Math.random());
     }, 2000);
   }
-  if (props.productDetails.length === 0) {
+  if (props.productDetails.length === 0 || productDetailsDisplay.length === 0) {
     renderProductDetails();
+    getProductDetailsDisplay();
   }
   useEffect(() => {
     if (isUpdate) {
@@ -508,22 +563,24 @@ const ProductDetailsTable = (props) => {
   return (
     <>
       {contextHolder}
-      {colorsCreate &&
-        colorsCreate.map((color, index) => {
+      {productDetailsDisplay &&
+        productDetailsDisplay.map((productDetails, index) => {
           let isDeleted = true;
-          props.productDetails.filter((record) => {
-            if (Number(record.color.id) === Number(color.key)) {
-              if (record.status === "ACTIVE") {
-                isDeleted = false;
-              }
+          productDetails.filter((record) => {
+            if (record.status === "ACTIVE") {
+              isDeleted = false;
             }
           });
           return (
             <div className={styles.product__DetailsTable} key={index}>
               <h2 style={{ marginBottom: "20px" }}>
                 <div className={styles.product__DetailsColorTable}>
-                  <span style={{ backgroundColor: color.value }}></span>
-                  <p>{color.label}</p>
+                  <span
+                    style={{
+                      backgroundColor: productDetails[0].color.code,
+                    }}
+                  ></span>
+                  <p>{productDetails[0].color.name}</p>
                   {isUpdate ? (
                     <Button
                       style={{
@@ -538,7 +595,8 @@ const ProductDetailsTable = (props) => {
                             deleteOrReloadByColor(
                               props.productDetailsUpdate.filter((record) => {
                                 return (
-                                  Number(record.color.id) === Number(color.key)
+                                  Number(record.color.id) ===
+                                  Number(productDetails.key)
                                 );
                               }),
                               "update"
@@ -552,7 +610,8 @@ const ProductDetailsTable = (props) => {
                             deleteOrReloadByColor(
                               props.productDetailsUpdate.filter((record) => {
                                 return (
-                                  Number(record.color.id) === Number(color.key)
+                                  Number(record.color.id) ===
+                                  Number(productDetails.key)
                                 );
                               }),
                               "delete"
@@ -565,6 +624,25 @@ const ProductDetailsTable = (props) => {
                   ) : null}
                 </div>
               </h2>
+              <p>
+                {"[" +
+                  "Nút: " +
+                  productDetails[0].button.name +
+                  " - " +
+                  "Chất liệu: " +
+                  productDetails[0].material.name +
+                  " - " +
+                  "Tay áo: " +
+                  productDetails[0].sleeve.name +
+                  " - " +
+                  "Cổ áo: " +
+                  productDetails[0].collar.name +
+                  " - " +
+                  "Đuôi áo: " +
+                  productDetails[0].shirtTail.name +
+                  "]"}
+              </p>
+              <br />
               <Table
                 pagination={{ pageSize: 5 }}
                 footer={() => {
@@ -579,18 +657,21 @@ const ProductDetailsTable = (props) => {
                           type="file"
                           onChange={(event) => {
                             isUpdate
-                              ? addProductImage(color, event.target.files[0])
+                              ? addProductImage(
+                                  productDetails,
+                                  event.target.files[0]
+                                )
                               : uploadImage(
                                   product.productName.replaceAll(" ", "_"),
-                                  color.label.replaceAll(" ", "_"),
+                                  productDetails.label.replaceAll(" ", "_"),
                                   event.target.files
                                 );
                           }}
                           multiple={true}
-                          id={color.label}
+                          id={productDetails.label}
                           style={{ display: "none" }}
                         />
-                        <label htmlFor={color.label}>
+                        <label htmlFor={productDetails.label}>
                           <AreaChartOutlined
                             className={styles.product__updateCreateButton}
                           />
@@ -600,15 +681,11 @@ const ProductDetailsTable = (props) => {
                   );
                 }}
                 dataSource={
-                  props.productDetails &&
-                  props.productDetails
-                    .filter((record) => {
-                      return Number(record.color.id) === Number(color.key);
-                    })
-                    .map((record) => ({
-                      ...record,
-                      key: record.id.toString(),
-                    }))
+                  productDetails &&
+                  productDetails.map((record) => ({
+                    ...record,
+                    key: record.id.toString(),
+                  }))
                 }
               >
                 <Table.Column
@@ -617,57 +694,45 @@ const ProductDetailsTable = (props) => {
                   render={(text, record, index) => index + 1}
                 />
                 <Table.Column
-                  key="button"
-                  title="Nút áo"
+                  key="productName"
+                  title="Tên sản phẩm"
                   render={(text, record) => {
-                    if (Number(record.color.id) === Number(color.key)) {
-                      return record.button.name;
-                    }
+                    return product.productName;
                   }}
                 />
                 <Table.Column
-                  key="material"
-                  title="Chất liệu"
+                  key="brand"
+                  title="Thương hiệu"
                   render={(text, record) => {
-                    if (Number(record.color.id) === Number(color.key)) {
-                      return record.material.name;
-                    }
+                    return product.brand.brandName;
                   }}
                 />
                 <Table.Column
-                  key="collar"
-                  title="Cổ áo"
+                  key="category"
+                  title="Loại sản phẩm"
                   render={(text, record) => {
-                    if (Number(record.color.id) === Number(color.key)) {
-                      return record.collar.name;
-                    }
+                    return product.category.categoryName;
                   }}
                 />
                 <Table.Column
-                  key="sleeve"
-                  title="Tay áo"
+                  key="pattern"
+                  title="Họa tiết"
                   render={(text, record) => {
-                    if (Number(record.color.id) === Number(color.key)) {
-                      return record.sleeve.name;
-                    }
+                    return product.pattern.patternName;
                   }}
                 />
                 <Table.Column
-                  key="shirtTail"
-                  title="Đuôi áo"
+                  key="form"
+                  title="Dáng áo"
                   render={(text, record) => {
-                    if (Number(record.color.id) === Number(color.key)) {
-                      return record.shirtTail.name;
-                    }
+                    return product.form.formName;
                   }}
                 />
                 <Table.Column
                   key="size"
                   title="Kích cỡ"
                   render={(text, record) => {
-                    if (Number(record.color.id) === Number(color.key)) {
-                      return record.size.name;
-                    }
+                    return record.size.name;
                   }}
                 />
                 <Table.Column
@@ -675,27 +740,25 @@ const ProductDetailsTable = (props) => {
                   title="Số lượng"
                   width={200}
                   render={(text, record, index) => {
-                    if (Number(record.color.id) === Number(color.key)) {
-                      return (
-                        <Input
-                          type={"number"}
-                          id={`quantity${record.id}`}
-                          onBlur={(event) => {
-                            isUpdate
-                              ? updateProductDetail(
-                                  "quantity",
-                                  event.target.value,
-                                  record.id
-                                )
-                              : (props.productDetails[record.id].quantity =
-                                  event.target.value);
-                          }}
-                          disabled={record.status === "DELETED"}
-                          defaultValue={10}
-                          style={{ textAlign: "center" }}
-                        />
-                      );
-                    }
+                    return (
+                      <Input
+                        type={"number"}
+                        id={`quantity${record.id}`}
+                        onBlur={(event) => {
+                          isUpdate
+                            ? updateProductDetail(
+                                "quantity",
+                                event.target.value,
+                                record.id
+                              )
+                            : (props.productDetails[record.id].quantity =
+                                event.target.value);
+                        }}
+                        disabled={record.status === "DELETED"}
+                        defaultValue={record.quantity}
+                        style={{ textAlign: "center" }}
+                      />
+                    );
                   }}
                 />
                 <Table.Column
@@ -703,54 +766,51 @@ const ProductDetailsTable = (props) => {
                   title="Giá"
                   width={200}
                   render={(text, record, index) => {
-                    if (Number(record.color.id) === Number(color.key)) {
-                      return (
-                        <Input
-                          type={"number"}
-                          id={`price${record.id}`}
-                          onBlur={(event) => {
-                            isUpdate
-                              ? updateProductDetail(
-                                  "price",
-                                  event.target.value,
-                                  record.id
-                                )
-                              : (props.productDetails[record.id].price =
-                                  event.target.value);
-                          }}
-                          disabled={record.status === "DELETED"}
-                          defaultValue={200000}
-                          style={{ textAlign: "center" }}
-                        />
-                      );
-                    }
+                    return (
+                      <Input
+                        type={"number"}
+                        id={`price${record.id}`}
+                        onBlur={(event) => {
+                          isUpdate
+                            ? updateProductDetail(
+                                "price",
+                                event.target.value,
+                                record.id
+                              )
+                            : (props.productDetails[record.id].price =
+                                event.target.value);
+                        }}
+                        disabled={record.status === "DELETED"}
+                        defaultValue={record.price}
+                        style={{ textAlign: "center" }}
+                      />
+                    );
                   }}
                 />
                 <Table.Column
                   key="action"
                   title="Thao Tác"
+                  width={100}
                   render={(text, record, index) => {
-                    if (Number(record.color.id) === Number(color.key)) {
-                      return (
-                        <Button
-                          onClick={(event) => {
-                            isUpdate
-                              ? updateProductDetail(
-                                  "status",
-                                  record.status,
-                                  record.id
-                                )
-                              : deleteProductDetail(record.id, event.target);
-                          }}
-                        >
-                          {record.status === "ACTIVE" ? (
-                            <DeleteFilled />
-                          ) : (
-                            <ReloadOutlined />
-                          )}
-                        </Button>
-                      );
-                    }
+                    return (
+                      <Button
+                        onClick={(event) => {
+                          isUpdate
+                            ? updateProductDetail(
+                                "status",
+                                record.status,
+                                record.id
+                              )
+                            : deleteProductDetail(record.id, event.target);
+                        }}
+                      >
+                        {record.status === "ACTIVE" ? (
+                          <DeleteFilled />
+                        ) : (
+                          <ReloadOutlined />
+                        )}
+                      </Button>
+                    );
                   }}
                 />
               </Table>
@@ -760,7 +820,7 @@ const ProductDetailsTable = (props) => {
                   {!isUpdate
                     ? imgList &&
                       imgList.map((object, index) => {
-                        if (object.colorName === color.label) {
+                        if (object.colorName === productDetails.label) {
                           return (
                             object.imgs &&
                             object.imgs.map((img, index) => {
@@ -774,7 +834,7 @@ const ProductDetailsTable = (props) => {
                                         <DeleteFilled
                                           onClick={() => {
                                             deleteImageDetail(
-                                              color.label,
+                                              productDetails.label,
                                               index
                                             );
                                           }}
@@ -784,7 +844,10 @@ const ProductDetailsTable = (props) => {
                                           key="setDefault"
                                           className={styles.defaultImage}
                                           onClick={() => {
-                                            setDefaultImg(color.label, index);
+                                            setDefaultImg(
+                                              productDetails.label,
+                                              index
+                                            );
                                           }}
                                           style={
                                             object.files[index].default === true
@@ -805,7 +868,7 @@ const ProductDetailsTable = (props) => {
                       })
                     : productImages &&
                       productImages.map((object, index) => {
-                        if (object.color.colorName === color.label) {
+                        if (object.color.colorName === productDetails.label) {
                           return (
                             <Col span={6} key={index}>
                               <div style={{ margin: "20px 40px" }}>
@@ -818,7 +881,7 @@ const ProductDetailsTable = (props) => {
                                     <DeleteFilled
                                       onClick={() => {
                                         deleteImageDetail(
-                                          color.label,
+                                          productDetails.label,
                                           "",
                                           object
                                         );
@@ -830,7 +893,7 @@ const ProductDetailsTable = (props) => {
                                       className={styles.defaultImage}
                                       onClick={() => {
                                         setDefaultImg(
-                                          color.lable,
+                                          productDetails.lable,
                                           "",
                                           object.path
                                         );

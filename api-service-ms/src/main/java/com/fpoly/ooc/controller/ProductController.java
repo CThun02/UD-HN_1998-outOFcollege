@@ -170,24 +170,6 @@ public class ProductController {
             ProductDetail productDetail = request.dto();
             productDetail.setStatus(Const.STATUS_ACTIVE);
             productDetail = productDetailService.create(productDetail);
-        }else {
-            ProductDetail productDetail = ProductDetail.builder()
-                    .id(productDetailResponse.getId())
-                    .product(productDetailResponse.getProduct())
-                    .button(productDetailResponse.getButton())
-                    .material(productDetailResponse.getMaterial())
-                    .collar(productDetailResponse.getCollar())
-                    .sleeve(productDetailResponse.getSleeve())
-                    .size(productDetailResponse.getSize())
-                    .color(productDetailResponse.getColor())
-                    .shirtTail(productDetailResponse.getShirtTail())
-                    .price(productDetailResponse.getPrice())
-                    .descriptionDetail(productDetailResponse.getDescriptionDetail())
-                    .quantity(productDetailResponse.getQuantity())
-                    .build();
-            productDetail.setStatus(Const.STATUS_ACTIVE);
-            productDetail.setDeletedAt(null);
-            productDetail = productDetailService.update(productDetail);
         }
         return ResponseEntity.ok(productDetailResponse);
 

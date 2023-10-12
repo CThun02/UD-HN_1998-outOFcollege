@@ -39,7 +39,7 @@ public interface TimeLineRepo extends JpaRepository<Timeline, Long> {
     List<TimelineProductResponse> getTimelineProductByBillId(@Param("billId") Long id);
 
     @Query("SELECT new com.fpoly.ooc.responce.bill.BillInfoResponse(b.id, b.billCode, b.billType, ac.fullName, ac.numberPhone, " +
-            "   ac.email, add.descriptionDetail +  ' ' + add.ward + ' ' + add.district + ' ' + add.city) " +
+            "   ac.email, b.createdAt, add.descriptionDetail +  ' ' + add.ward + ' ' + add.district + ' ' + add.city) " +
             "FROM Bill b " +
             "   LEFT JOIN Account ac ON ac.username = b.account.username " +
             "   LEFT JOIN AddressDetail ad ON ad.accountAddress.username = ac.username " +

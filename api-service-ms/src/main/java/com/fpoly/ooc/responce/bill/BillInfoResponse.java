@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -22,6 +24,8 @@ public class BillInfoResponse {
     private String phoneNumber;
 
     private String email;
+
+    private LocalDateTime createdDate;
 
     private String address;
 

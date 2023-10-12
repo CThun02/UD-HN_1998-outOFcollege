@@ -11,7 +11,6 @@ import {
   Select,
   InputNumber,
   notification,
-  Modal,
 } from "antd";
 import React, { useEffect, useState } from "react";
 import styles from "./Bill.module.css";
@@ -21,7 +20,6 @@ import {
   CloseCircleOutlined,
   DeleteOutlined,
   DollarOutlined,
-  SearchOutlined,
   SwapOutlined,
 } from "@ant-design/icons";
 import axios from "axios";
@@ -30,8 +28,9 @@ import TextArea from "antd/es/input/TextArea";
 import moment from "moment/moment";
 import { useNavigate } from "react-router-dom";
 import ModalAccount from "./ModalAccount";
-import { FaMapMarkerAlt } from "react-icons/fa";
 import ModalAddress from "./ModalAddress";
+import Big from "big.js";
+import { object } from "yup";
 
 const Bill = () => {
   var initialItems = [];
@@ -204,7 +203,8 @@ const Bill = () => {
     localStorage.setItem(cartId, JSON.stringify(cart));
     setSelectedAddress(0);
     setShippingFee(0);
-    setLeadtime(null)
+    console.log(`phis ship`, shippingFee)
+    setLeadtime(null);
     setRendered(cart);
   }
 
@@ -230,7 +230,7 @@ const Bill = () => {
   const [account, setAccount] = useState(null);
   const [address, setAddress] = useState([])
   const [showAddress, setShowAddress] = useState([]);
-  const [selectedAddress, setSelectedAddress] = useState(0)
+  const [selectedAddress, setSelectedAddress] = useState(1)
   const navigate = useNavigate();
 
   const handleShowModalAccount = (index) => {
@@ -284,6 +284,7 @@ const Bill = () => {
   };
 
   const handleProvinceChange = async (value) => {
+    console.log(value)
     if (value) {
       await axios
         .get(
@@ -329,7 +330,6 @@ const Bill = () => {
   }
 
   const handleShippingOrderLeadtime = (toDistrictId, toWardCode) => {
-    console.log(`object`, toDistrictId, toWardCode)
     const values = {
       from_district_id: 3440,
       from_ward_code: '13010',
@@ -411,7 +411,6 @@ const Bill = () => {
     setSwitchChange(visible);
     if (!checked) {
       setBilType('In-store')
-      setShippingFee(0)
       visible[index] = false;
     } else {
       setBilType('Online')
@@ -532,8 +531,9 @@ const Bill = () => {
   useEffect(() => {
     getListAddressByUsername(account?.username)
     fetchProvinces();
-    handleProvinceChange(address[0]?.city);
-    handleDistrictChange(address[0]?.district);
+
+    handleProvinceChange(address[selectedAddress]?.city);
+    handleDistrictChange(address[selectedAddress]?.district);
     if (address.length > 0) {
       handleShippingOrderLeadtime(address[selectedAddress]?.district, address[selectedAddress]?.ward)
       handleShippingFee(totalPrice, address[selectedAddress]?.district, address[selectedAddress]?.ward)
@@ -544,7 +544,8 @@ const Bill = () => {
 
   const [billType, setBilType] = useState('In-store')
   const [note, setNote] = useState("")
-  const handleCreateBill = () => {
+
+  const handleCreateBill = (index) => {
     const bill = {
       billCode: activeKey,
       accountId: account?.username,
@@ -556,21 +557,25 @@ const Bill = () => {
       lstBillDetailRequest: [],
     };
 
-    if (selectedButton == null) {
-      return console.log('chưa chọn hình thức thanh toán')
-    }
-
-    if (remainAmount < (shippingFee + totalPrice)) {
-      return console.log('không nạp đủ tiền')
-    }
-
+    console.log(`remain `, remainAmount)
+    // let priceAndFee = 0;
+    // if (switchChange[index] && account !== null) {
+    //   priceAndFee = shippingFee + totalPrice
+    // } else {
+    //   priceAndFee = totalPrice;
+    // }
+    // console.log(`tổng tiền: ${priceAndFee}`)
     if (productDetails.length <= 0) {
       return notification.error({
         message: "Thông báo",
         description: "Không có sản phẩm nào trong giỏ hàng.",
         duration: 2,
       });
-    } else {
+    }
+    else if (selectedButton == null) {
+      return console.log('chưa chọn hình thức thanh toán')
+    }
+    else {
       for (let i = 0; i < productDetails.length; i++) {
         const billDetail = {
           productDetailId: productDetails[i].productDetail.id,
@@ -597,7 +602,10 @@ const Bill = () => {
     //       });
     //   }
     // })
-    console.log(activeKey)
+  }
+
+  const test = () => {
+    console.log(remainAmount)
   }
 
   return (
@@ -749,16 +757,18 @@ const Bill = () => {
                           <Select
                             style={{ width: 200 }}
                             onChange={handleDistrictChange}
-                            value={address[selectedAddress]?.district ? Number(address[selectedAddress]?.district) : undefined}
+                            value={address[0]?.district ? Number(address[selectedAddress]?.district) : undefined}
                           >
-                            {districts && districts.map((district) => (
-                              <Select.Option
-                                key={district.DistrictID}
-                                value={district.DistrictID}
-                              >
-                                {district.DistrictName}
-                              </Select.Option>
-                            ))}
+                            {districts && districts.map((district) => {
+                              return (
+                                <Select.Option
+                                  key={district.DistrictID}
+                                  value={Number(district.DistrictID)}
+                                >
+                                  {district.DistrictName}
+                                </Select.Option>
+                              )
+                            })}
                           </Select>
                         </Col>
                         <Col span={7}>
@@ -817,8 +827,8 @@ const Bill = () => {
                       <Row style={{ marginTop: "10px" }}>
                         <Col span={12}>
                           <span style={{ fontSize: "16px", width: '200%', display: "block" }}>
-                            Tiền hàng
-                            <span style={{ marginLeft: '134px' }}>
+                            Thành tiền
+                            <span style={{ marginLeft: '117px' }}>
                               {totalPrice.toLocaleString('vi-VN', {
                                 style: 'currency',
                                 currency: 'VND',
@@ -827,15 +837,15 @@ const Bill = () => {
                           </span>
                           <span style={{ fontSize: "16px", width: '200%', display: "block" }}>
                             Giảm giá
-                            <span style={{ marginLeft: '142px' }}>
+                            <span style={{ marginLeft: '130px' }}>
                               0 đ
                             </span>
                           </span>
-                          {(switchChange[index] && account) &&
+                          {switchChange[index] &&
                             <>
                               <span style={{ fontSize: "16px", width: '200%', display: "block" }}>
-                                Phí ship
-                                <span style={{ marginLeft: '150px' }}>
+                                Phí vận chuyển
+                                <span style={{ marginLeft: '87px' }}>
                                   {shippingFee?.toLocaleString('vi-VN', {
                                     style: 'currency',
                                     currency: 'VND'
@@ -845,34 +855,48 @@ const Bill = () => {
 
                             </>}
                           <span style={{ fontSize: "16px", width: '200%', display: "block" }}>
-                            Tổng số tiền
-                            <span
-                              style={{
-                                color: "red",
-                                marginLeft: '117px'
-                              }}
-                            >
-                              {(totalPrice + shippingFee).toLocaleString('vi-VN', {
-                                style: 'currency',
-                                currency: 'VND'
-                              })}
-                            </span>
-                          </span>
-                          {!switchChange[index] && <>
-                            <span style={{ fontSize: "16px", width: '200%', display: "block" }}>
-                              Số tiền khách trả
-                              <input type="number" className={styles.input}
-                                onChange={(e) => setRemainAmount(e.target.value - totalPrice - shippingFee)
-                                } />
-                            </span>
-                            <span style={{ fontSize: "16px", width: '200%', display: "block" }}>
-                              Tiền thừa trả khách
-                              <span style={{ marginLeft: '72px' }}>
-                                {remainAmount.toLocaleString('vi-VN', {
+                            Tổng cộng
+                            {switchChange[index] && account !== null ? (
+                              <span
+                                style={{
+                                  color: "red",
+                                  marginLeft: '117px'
+                                }}
+                              >
+                                {(totalPrice + shippingFee).toLocaleString('vi-VN', {
                                   style: 'currency',
                                   currency: 'VND'
                                 })}
                               </span>
+                            ) : (
+                              <span
+                                style={{
+                                  color: "red",
+                                  marginLeft: '117px'
+                                }}
+                              >
+                                {totalPrice.toLocaleString('vi-VN', {
+                                  style: 'currency',
+                                  currency: 'VND'
+                                })}
+                              </span>
+                            )}
+                          </span>
+                          {!switchChange[index] && <>
+                            <span style={{ fontSize: "16px", width: '200%', display: "block" }}>
+                              Số tiền khách trả
+                              <input type="number"
+                                className={styles.input}
+                                onChange={(e) => setRemainAmount(e.target.value)} />
+                            </span>
+                            <span style={{ fontSize: "16px", width: '200%', display: "block" }}>
+                              Tiền thừa trả khách
+                              {/* <span style={{ marginLeft: '59px' }}>
+                                {remainAmount.toLocaleString('vi-VN', {
+                                  style: 'currency',
+                                  currency: 'VND'
+                                })}
+                              </span> */}
                             </span>
                           </>}
                         </Col>
@@ -906,7 +930,7 @@ const Bill = () => {
                         <div style={{ marginTop: "20px" }}>
                           <Button
                             type="primary"
-                            onClick={() => handleCreateBill()}
+                            onClick={() => handleCreateBill(index)}
                             style={{ width: "380px", height: "40px" }}
                           >
                             Xác nhận thanh toán

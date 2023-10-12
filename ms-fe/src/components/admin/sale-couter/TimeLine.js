@@ -120,6 +120,7 @@ const BillTimeLine = () => {
         {
             title: 'Sản phẩm',
             key: 'product',
+            width: 500,
             render: (_, record, index) => {
                 return (
                     <Row>
@@ -141,19 +142,19 @@ const BillTimeLine = () => {
                                 />
                             </div>
                         </Col>
-                        <Col span={18}>
-                            <h6 className={styles.fixH6}>
-                                {record.productName} {" - "}
-                                <span className={styles.optionColor}>
-                                    <span
-                                        style={{
-                                            backgroundColor: record.productColor,
-                                        }}
-                                    ></span>
-                                    {record.productColor}
-                                </span>
-                            </h6>
+                        <Col span={12}>
                             <div style={{ textAlign: "left", marginLeft: 20 }}>
+                                <h6 >
+                                    {record.productName} {" - "}
+                                    <span className={styles.optionColor}>
+                                        <span
+                                            style={{
+                                                backgroundColor: record.productColor,
+                                            }}
+                                        ></span>
+                                        {record.productColor}
+                                    </span>
+                                </h6>
                                 <span style={{ fontWeight: 500, marginRight: 20 }}>
                                     Kích cỡ: {record.productSize}
                                 </span>
@@ -189,16 +190,6 @@ const BillTimeLine = () => {
             dataIndex: 'productPrice',
             key: 'productPrice',
         },
-        {
-            title: 'Thao tác',
-            key: 'action',
-            render: (_, record) => {
-                return <Button
-                    icon={<DeleteOutlined />}
-                    danger
-                ></Button>
-            }
-        }
     ]
     console.log('bill type', billInfo.billType)
     return (
@@ -224,11 +215,11 @@ const BillTimeLine = () => {
                                         )}
                                         title={data.status === '0' ? 'Đã hủy'
                                             : data.status === '1'
-                                                ? 'Tạo hóa đơn'
+                                                ? 'Chờ xác nhận'
                                                 : data.status === '2'
-                                                    ? 'Xác nhận đặt hàng'
+                                                    ? 'Đã xác nhận'
                                                     : data.status === '3'
-                                                        ? 'Đã giao cho đơn vị vận chuyển' : 'Giao hàng thành công'}
+                                                        ? 'Đã đóng gói & đang được giao' : 'Giao hàng thành công'}
                                         subtitle={moment(data.createdDate)
                                             .format("DD/MM/YYYY HH:MM")}
                                     />
@@ -246,7 +237,7 @@ const BillTimeLine = () => {
                                         ) : (
                                             FaRegCheckCircle
                                         )}
-                                        title={data.status === '1' ? 'Tạo hóa đơn' : data.status === '2' ? 'Thanh toán thành công' : data.status === '0' ? 'Đã hủy' : ''}
+                                        title={data.status === '1' ? 'Chờ xác nhận' : data.status === '2' ? 'Thanh toán thành công' : data.status === '0' ? 'Đã hủy' : ''}
                                         subtitle={moment(data.createdDate)
                                             .format("DD/MM/YYYY HH:MM")}
                                     />
@@ -337,47 +328,28 @@ const BillTimeLine = () => {
                         <Row>
                             <Col span={12}>
                                 <span className={styles.span}>Mã đơn hàng</span>
-                                <span className={styles.span}>Loại đơn hàng</span>
-                                <span className={styles.span}>Trạng thái </span>
+                                <span className={styles.span}>HÌnh thức thanh toán</span>
+                                <span className={styles.span}>Ngày đặt hàng</span>
+                                <span className={styles.span}>Phương thức thanh toán</span>
+                                <span className={styles.span}>Hình thức giao hàng </span>
                                 <span style={{ fontSize: '16px', display: 'block' }}>Ngày nhận hàng dự kiến</span>
                             </Col>
                             <Col span={12}>
                                 <div style={{ display: 'flex', alignItems: 'center', width: '10px', margin: '20px 0 20px 0' }}>
                                     <SpanBorder child={billInfo.billCode} color={'#1677ff'} />
                                 </div>
-                                <div style={{ display: 'flex', alignItems: 'center', width: '10px', marginBottom: '20px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', width: '10px', margin: '20px 0 20px 0' }}>
                                     <SpanBorder child={billInfo.billType} color={'#1677ff'} />
                                 </div>
                                 <div style={{ display: 'flex', alignItems: 'center', width: '10px', marginBottom: '20px' }}>
-                                    {
-                                        billInfo.billType === 'Online' && <SpanBorder
-                                            child={timelines[timelines.length - 1]?.status === '0'
-                                                ? 'Đã hủy'
-                                                : timelines[timelines.length - 1]?.status === '1'
-                                                    ? 'Đang chờ'
-                                                    : timelines[timelines.length - 1]?.status === '2'
-                                                        ? 'Xác nhận thông tin'
-                                                        : timelines[timelines.length - 1]?.status === '3'
-                                                            ? 'Đã giao cho đơn vị vận chuyển' :
-                                                            timelines[timelines.length - 1] === '4' ? 'Giao hàng thành công' : '#'}
-                                            color={timelines[timelines.length - 1]?.status === '0' ? '#FF0000' : '#00cc00'} />
-                                    }
-                                    {
-                                        billInfo.billType === 'In-store' && <SpanBorder
-                                            child={timelines[timelines.length - 1]?.status === '0'
-                                                ? 'Đã hủy'
-                                                : timelines[timelines.length - 1]?.status === '1'
-                                                    ? 'Đang chờ'
-                                                    : timelines[timelines.length - 1]?.status === '2'
-                                                        ? 'Thanh toán thành công'
-                                                        : '#'}
-                                            color={timelines[timelines.length - 1]?.status === '0' ? '#FF0000' : '#00cc00'} />
-                                    }
+                                    <SpanBorder child={moment(billInfo.createdDate).format('HH:MM  DD/MM/YYYY')} color={'#1677ff'} />
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', width: '10px', marginBottom: '20px' }}>
+                                    <SpanBorder child={'Thanh toán khi nhận hàng'} color={'#1677ff'} />
                                 </div>
                                 <div style={{ display: 'flex', alignItems: 'center', width: '50px' }}>
                                     {billInfo.billType === "Online" && (
-                                        <SpanBorder child={moment(timelines[0]?.completionDate)
-                                            .format('HH:MM  DD/MM/YYYY')} color={'gray'} />
+                                        <SpanBorder child={'Giao hàng tại nhà'} color={'gray'} />
                                     )}
                                     {billInfo.billType !== "Online" && "__"}
                                 </div>
@@ -403,7 +375,7 @@ const BillTimeLine = () => {
                 </Row>
             </section>
 
-            <section className={styles.background} style={{ marginTop: '20px' }}>
+            {/* <section className={styles.background} style={{ marginTop: '20px' }}>
                 <Row>
                     <Col span={12}>
                         <h2>Lịch sử thanh toán</h2>
@@ -414,7 +386,7 @@ const BillTimeLine = () => {
                 </Row>
                 <Divider className={styles.blackDivider} style={{ marginTop: '10px' }} />
                 <Table columns={columns} dataSource={[timelines[0]]} pagination={false} />
-            </section>
+            </section> */}
 
             <section className={styles.background} style={{ marginTop: '20px' }}>
                 <Row>
@@ -431,21 +403,43 @@ const BillTimeLine = () => {
                     pagination={false}
 
                 />
-                <Row className={styles.timeLineEnd}>
-                    <Col span={12}>
-                        <span className={styles.span}>Tổng tiền hàng</span>
-                        <span className={styles.span}>Giảm giá</span>
-                        <span className={styles.span}>Phí vận chuyển</span>
-                        <span className={styles.span}>Tổng cộng</span>
-                    </Col>
-                    <Col span={12}  >
-                        <span className={styles.span}>{timelines[0]?.totalPrice}</span>
-                        <span className={styles.span}>0đ</span>
-                        <span className={styles.span}>0d</span>
-                        <span style={{ fontSize: '16px', display: 'block', color: '#FF0000' }}>{timelines[0]?.totalPrice}đ</span>
-                    </Col>
-                </Row>
-            </section>
+                <div className={styles.timeLineEnd}>
+                    <span className={styles.span} >
+                        <span style={{ width: '198px', display: 'inline-block' }}>
+                            Thành tiền:
+                        </span>
+                        <span>
+                            {timelines[0]?.totalPrice.toLocaleString('vi-VN', {
+                                style: 'currency',
+                                currency: 'VND'
+                            })}
+                        </span>
+                    </span>
+                    <span className={styles.span}>
+                        <span style={{ width: '200px', display: 'inline-block' }}>
+                            Giảm giá:
+                        </span>
+                        <span >
+                            0đ
+                        </span>
+                    </span>
+                    <span className={styles.span}>
+                        <span style={{ width: '200px', display: 'inline-block' }}>
+                            Phí vận chuyển:
+                        </span>
+                        <span >
+                            0đ
+                        </span>
+                    </span>
+                    <b className={styles.span} >
+                        <span style={{ width: '200px', display: 'inline-block' }}>Tổng cộng: </span>
+                        <span style={{ fontSize: '16px', color: '#FF0000' }}>{timelines[0]?.totalPrice
+                            .toLocaleString('vi-VN', {
+                                style: 'currency',
+                                currency: 'VND'
+                            })}</span></b>
+                </div>
+            </section >
         </>
     );
 };

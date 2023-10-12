@@ -10,23 +10,12 @@ const ModalProduct = ({ visible, onCancel, cartId, render }) => {
   var cart = JSON.parse(localStorage.getItem(cartId));
   let productDetailsCreate = cart.productDetails;
   function action() {
-    cart = { productDetails: productDetailsCreate, timeStart: now() };
+    cart = { productDetails: productDetailsCreate, timeStart: now(), account: cart.account };
     localStorage.setItem(cartId, JSON.stringify(cart));
     render(productDetailsCreate);
-    setRenderThis(productDetailsCreate);
+    // setRenderThis(productDetailsCreate);
     onCancel();
   }
-
-  useEffect(() => {
-    // axios
-    //   .get("http://localhost:8080/api/admin/bill/product")
-    //   .then((response) => {
-    //     setData(response.data);
-    //   })
-    //   .catch((error) => {
-    //     console.log(error);
-    //   });
-  }, [cartId, renderThis]);
 
   return (
     <>
@@ -36,7 +25,7 @@ const ModalProduct = ({ visible, onCancel, cartId, render }) => {
         open={visible}
         onCancel={() => {
           onCancel();
-          setRenderThis(visible);
+          // setRenderThis(visible);
         }}
         className={styles.modalSize}
         footer={null}

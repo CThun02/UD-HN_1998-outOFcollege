@@ -50,6 +50,7 @@ const ModalAddress = ({ isModalOpen, handleOk, handleCancel, username, render, s
     const handleSelectAddress = (index) => {
         selected(index);
         handleCancel();
+        render(Math.random)
     }
 
     return (

@@ -18,19 +18,20 @@ const ModalDetail = ({ isModalOpen, handleOk, handleCancel, timelineDetail, bill
             render: (status) => {
                 if (billType === 'In-store') {
                     return status === '1'
-                        ? 'Tạo hóa đơn'
+                        ? 'Chờ xác nhận'
                         : status === '2'
                             ? 'Thanh toán thành công'
                             : status === '0' ? 'Đã hủy'
                                 : ''
                 } else {
                     return status === '1'
-                        ? 'Tạo hóa đơn'
+                        ? 'Chờ xác nhận'
                         : status === '2'
-                            ? 'Xác nhận thông tin'
-                            : status === '3' ? 'Đã giao cho đơn vị vận chuyển'
-                                : status === '0' ? 'Đã hủy'
-                                    : ''
+                            ? 'Chờ xác nhận'
+                            : status === '3' ? 'Đã giao đóng gói & đang được giao'
+                                : status === '4' ? 'Giao hàng thành công' :
+                                    status === '0' ? 'Đã hủy'
+                                        : '#'
                 }
             }
         },

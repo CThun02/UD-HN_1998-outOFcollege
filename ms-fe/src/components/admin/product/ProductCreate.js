@@ -523,8 +523,7 @@ const ProductCreate = (props) => {
               />
             </div>
             <br />
-            <br />
-            <div>
+            <div style={{ textAlign: "center" }}>
               <Popconfirm
                 title="Thêm mới sản phẩm"
                 description="Chắc chắn thêm mới sản phẩm!"
@@ -542,6 +541,7 @@ const ProductCreate = (props) => {
                 </Button>
               </Popconfirm>
             </div>
+            <br />
           </Col>
         </Row>
       </div>

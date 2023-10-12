@@ -39,9 +39,28 @@ const ProductIndex = () => {
       },
     },
     {
+      key: "8",
+      title: "Ảnh",
+      dataIndex: "imgDefault",
+      width: 100,
+      render: (imgDefault) => {
+        return (
+          <>
+            <img
+              alt="example"
+              width={"100%"}
+              style={{ boxShadow: "rgba(100, 100, 111, 0.2) 0px 7px 29px 0px" }}
+              src={imgDefault}
+            />
+          </>
+        );
+      },
+    },
+    {
       key: "2",
       title: "Mã sản phẩm",
       dataIndex: "productCode",
+      width: 200,
     },
     {
       key: "3",
@@ -50,40 +69,9 @@ const ProductIndex = () => {
     },
     {
       key: "4",
-      title: "Thương hiệu",
-      dataIndex: "brand.brandName",
-      render: (index, record) => {
-        return record.brand.brandName;
-      },
-    },
-    {
-      key: "5",
-      title: "Loại sản phẩm",
-      dataIndex: "category.categoryName",
-      render: (index, record) => {
-        return record.category.categoryName;
-      },
-    },
-    {
-      key: "5",
-      title: "Họa tiết",
-      dataIndex: "pattern.patternName",
-      render: (index, record) => {
-        return record.pattern.patternName;
-      },
-    },
-    {
-      key: "6",
-      title: "Dáng áo",
-      dataIndex: "form.formName",
-      render: (index, record) => {
-        return record.form.formName;
-      },
-    },
-    {
-      key: "4",
       title: "Số lượng",
       dataIndex: "quantity",
+      width: 150,
     },
     {
       key: "6",
@@ -105,6 +93,7 @@ const ProductIndex = () => {
       key: "7",
       title: "Thao tác",
       dataIndex: "id",
+      width: 150,
       render: (id) => (
         <>
           <Link to={`/admin/product/details/${id}`}>
@@ -218,155 +207,6 @@ const ProductIndex = () => {
             <TableOutlined /> Danh sách sản phẩm
           </h2>
           <Row className={styles.produt__filterSelects}>
-            <Col span={6}>
-              <div style={{ margin: "0 8px 8px 8px" }}>
-                <span style={{ fontWeight: "500" }}>Thương Hiệu</span>
-                <Select
-                  showSearch
-                  optionFilterProp="children"
-                  filterOption={(input, option) =>
-                    (option?.label ?? "").includes(input)
-                  }
-                  filterSort={(optionA, optionB) =>
-                    (optionA?.label ?? "")
-                      .toLowerCase()
-                      .localeCompare((optionB?.label ?? "").toLowerCase())
-                  }
-                  bordered={false}
-                  className={styles.produt__filterSelectsChildren}
-                  onChange={(event) => {
-                    console.log(event);
-                    brand = event;
-                    filterProductByCom();
-                  }}
-                  defaultValue={""}
-                >
-                  <Select.Option key={""} value={""}>
-                    Tất cả
-                  </Select.Option>
-                  {brands &&
-                    brands.map((item) => {
-                      return (
-                        <Select.Option
-                          key={item.id}
-                          value={item.id}
-                          label={item.brandName}
-                        >
-                          {item.brandName}
-                        </Select.Option>
-                      );
-                    })}
-                </Select>
-              </div>
-            </Col>
-            <Col span={6}>
-              <div style={{ margin: "0 8px 8px 8px" }}>
-                <span style={{ fontWeight: "500" }}>Loại sản phẩm</span>
-                <Select
-                  showSearch
-                  optionFilterProp="children"
-                  filterOption={(input, option) =>
-                    (option?.label ?? "").includes(input)
-                  }
-                  filterSort={(optionA, optionB) =>
-                    (optionA?.label ?? "")
-                      .toLowerCase()
-                      .localeCompare((optionB?.label ?? "").toLowerCase())
-                  }
-                  bordered={false}
-                  className={styles.produt__filterSelectsChildren}
-                  onChange={(event) => {
-                    category = event;
-                    filterProductByCom();
-                  }}
-                  defaultValue={""}
-                >
-                  <Select.Option key={""} value={""}>
-                    Tất cả
-                  </Select.Option>
-                  {categories &&
-                    categories.map((item) => {
-                      return (
-                        <Select.Option key={item.id} value={item.id}>
-                          {item.categoryName}
-                        </Select.Option>
-                      );
-                    })}
-                </Select>
-              </div>
-            </Col>
-            <Col span={6}>
-              <div style={{ margin: "0 8px 8px 8px" }}>
-                <span style={{ fontWeight: "500" }}>Họa tiết</span>
-                <Select
-                  showSearch
-                  optionFilterProp="children"
-                  filterOption={(input, option) =>
-                    (option?.label ?? "").includes(input)
-                  }
-                  filterSort={(optionA, optionB) =>
-                    (optionA?.label ?? "")
-                      .toLowerCase()
-                      .localeCompare((optionB?.label ?? "").toLowerCase())
-                  }
-                  bordered={false}
-                  className={styles.produt__filterSelectsChildren}
-                  onChange={(event) => {
-                    pattern = event;
-                    filterProductByCom();
-                  }}
-                  defaultValue={""}
-                >
-                  <Select.Option key={""} value={""}>
-                    Tất cả
-                  </Select.Option>
-                  {patterns &&
-                    patterns.map((item) => {
-                      return (
-                        <Select.Option key={item.id} value={item.id}>
-                          {item.patternName}
-                        </Select.Option>
-                      );
-                    })}
-                </Select>
-              </div>
-            </Col>
-            <Col span={6}>
-              <div style={{ margin: "0 8px 8px 8px" }}>
-                <span style={{ fontWeight: "500" }}>Dáng áo</span>
-                <Select
-                  showSearch
-                  optionFilterProp="children"
-                  filterOption={(input, option) =>
-                    (option?.label ?? "").includes(input)
-                  }
-                  filterSort={(optionA, optionB) =>
-                    (optionA?.label ?? "")
-                      .toLowerCase()
-                      .localeCompare((optionB?.label ?? "").toLowerCase())
-                  }
-                  bordered={false}
-                  className={styles.produt__filterSelectsChildren}
-                  onChange={(event) => {
-                    form = event;
-                    filterProductByCom();
-                  }}
-                  defaultValue={""}
-                >
-                  <Select.Option key={""} value={""}>
-                    Tất cả
-                  </Select.Option>
-                  {forms &&
-                    forms.map((item) => {
-                      return (
-                        <Select.Option key={item.id} value={item.id}>
-                          {item.formName}
-                        </Select.Option>
-                      );
-                    })}
-                </Select>
-              </div>
-            </Col>
             <Col span={12}>
               <div className={styles.filter__status}>
                 <span style={{ fontWeight: "500", marginRight: "16px" }}>
@@ -419,7 +259,7 @@ const ProductIndex = () => {
                 }))
               }
               pagination={{ pageSize: 5 }}
-              scroll={{ y: 330 }}
+              scroll={{ y: 500 }}
             />
           </div>
         </div>

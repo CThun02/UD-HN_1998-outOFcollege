@@ -39,14 +39,5 @@ public class Product extends BaseEntity {
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private  Brand brand;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "pattern_id")
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    private Pattern pattern;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "form_id")
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    private Form form;
 
 }

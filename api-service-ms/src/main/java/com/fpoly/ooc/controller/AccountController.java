@@ -31,8 +31,6 @@ public class AccountController {
         return ResponseEntity.ok(service.phanTrang(pageNo, 5, roleId));
     }
 
-    //Viết một phương thức mới Lấy dữ liệu address detail với usename
-    // => trả về list address detail(account, address)
     @GetMapping("address-detail/{username}")
     public ResponseEntity<?> getAddressDetailsByUsername(@PathVariable String username) {
         return ResponseEntity.ok(service.getAddressDetailsByUsername(username));

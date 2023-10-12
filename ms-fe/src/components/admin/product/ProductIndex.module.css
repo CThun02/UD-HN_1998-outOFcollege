@@ -1,13 +1,10 @@
 .product__index {
-  background-color: #fff;
-  background-color: #fff;
-  border: 1px solid #edf2f9;
-  border-radius: 4px 4px 0 0;
-  min-height: 100%;
 }
 /* filter */
 .product__filter {
-  border-bottom: 1px solid #edf2f9;
+  background-color: #fff;
+  border: 1px solid #edf2f9;
+  border-radius: 4px;
   padding: 10px 20px 10px 20px;
 }
 
@@ -62,8 +59,11 @@
 
 /* table */
 .product__table {
+  margin-top: 25px;
+  background-color: #fff;
+  border: 1px solid #edf2f9;
+  border-radius: 4px;
   padding: 20px 20px 10px 20px;
-  border-radius: 0 0 4px 4px;
 }
 
 .product__tableProducts {
@@ -94,8 +94,7 @@ tr th {
 }
 
 .product__button {
-  border: none;
-  box-shadow: none;
+  border: 1px solid #edf2f9;
 }
 
 .product__button:hover {

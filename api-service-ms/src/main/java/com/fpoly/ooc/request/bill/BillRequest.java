@@ -16,6 +16,8 @@ public class BillRequest {
 
     private Long id;
 
+    private Long paymentDetailId;
+
     private String accountId;
 
     private LocalDateTime dateOfReceipt;

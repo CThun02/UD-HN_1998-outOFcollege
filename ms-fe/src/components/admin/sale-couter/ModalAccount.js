@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { useEffect } from 'react';
 
 const ModalAccount = ({ visible, onCancel, cartId, render }) => {
+    const [loading, setLoadding] = useState(true);
     const [renderThis, setRenderThis] = useState(null);
     var cart = JSON.parse(localStorage.getItem(cartId));
 
@@ -51,7 +52,8 @@ const ModalAccount = ({ visible, onCancel, cartId, render }) => {
     useEffect(() => {
         axios.get(`http://localhost:8080/api/admin/bill/customer`)
             .then((response) => {
-                setData(response.data)
+                setData(response.data);
+                setLoadding(false)
             })
             .catch((error) => {
                 console.log(error)
@@ -70,7 +72,7 @@ const ModalAccount = ({ visible, onCancel, cartId, render }) => {
                 footer={null}
                 width={1000}
             >
-                <Table pagination={false} columns={columns} dataSource={data} />
+                <Table pagination={false} columns={columns} dataSource={data} loading={loading} />
             </Modal>
         </div>
     )

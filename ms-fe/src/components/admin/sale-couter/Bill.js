@@ -3,7 +3,6 @@ import {
   Button,
   Table,
   Space,
-  Tag,
   Divider,
   Row,
   Col,
@@ -12,12 +11,14 @@ import {
   Select,
   InputNumber,
   notification,
+  Modal,
 } from "antd";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./Bill.module.css";
 import ModalProduct from "./ModalProduct";
 import logoGhn from "../../../Assets/img/logo/logo_ghn.png";
 import {
+  CloseCircleOutlined,
   DeleteOutlined,
   DollarOutlined,
   SearchOutlined,
@@ -29,6 +30,8 @@ import TextArea from "antd/es/input/TextArea";
 import moment from "moment/moment";
 import { useNavigate } from "react-router-dom";
 import ModalAccount from "./ModalAccount";
+import { FaMapMarkerAlt } from "react-icons/fa";
+import ModalAddress from "./ModalAddress";
 
 const Bill = () => {
   var initialItems = [];
@@ -54,7 +57,7 @@ const Bill = () => {
         JSON.stringify({
           timeStart: now(),
           productDetails: [],
-          account: {}
+          account: null
         })
       );
     }
@@ -199,6 +202,9 @@ const Bill = () => {
     let cart = JSON.parse(localStorage.getItem(cartId));
     delete cart.account;
     localStorage.setItem(cartId, JSON.stringify(cart));
+    setSelectedAddress(0);
+    setShippingFee(0);
+    setLeadtime(null)
     setRendered(cart);
   }
 
@@ -206,7 +212,7 @@ const Bill = () => {
     initialItems.length === 0 ? null : initialItems[0].key
   );
   const [items, setItems] = useState(initialItems);
-  const [switchChange, setSwitchChange] = useState(false);
+  const [switchChange, setSwitchChange] = useState([]);
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
@@ -221,8 +227,10 @@ const Bill = () => {
   const [selectedDictrict, setSelectedDictrict] = useState(null);
   const [selectedWard, setSelectedWard] = useState(null)
   const [selectedButton, setSelectedButton] = useState(null);
-  const [account, setAccount] = useState({});
+  const [account, setAccount] = useState(null);
   const [address, setAddress] = useState([])
+  const [showAddress, setShowAddress] = useState([]);
+  const [selectedAddress, setSelectedAddress] = useState(0)
   const navigate = useNavigate();
 
   const handleShowModalAccount = (index) => {
@@ -236,6 +244,19 @@ const Bill = () => {
     newModalVisible[index] = false;
     setModalAccountVisible(newModalVisible);
   }
+
+  const handleShowModalAddress = (index) => {
+    const visible = [...showAddress]
+    visible[index] = true;
+    setShowAddress(visible)
+  }
+
+  const handleCancelAddress = (index) => {
+    const visible = [...showAddress]
+    visible[index] = false;
+    setShowAddress(visible)
+  }
+
   const handleButtonClick = (button) => {
     if (selectedButton === button) {
       setSelectedButton(null);
@@ -243,6 +264,7 @@ const Bill = () => {
       setSelectedButton(button);
     }
   };
+
   const fetchProvinces = async () => {
     await axios
       .get(
@@ -306,19 +328,19 @@ const Bill = () => {
     setSelectedWard(value)
   }
 
-  const handleShippingOrderLeadtime = async (toDistrictId, toWardCode) => {
+  const handleShippingOrderLeadtime = (toDistrictId, toWardCode) => {
+    console.log(`object`, toDistrictId, toWardCode)
     const values = {
       from_district_id: 3440,
       from_ward_code: '13010',
-      to_district_id: toDistrictId,
+      to_district_id: Number(toDistrictId),
       to_ward_code: `${toWardCode}`,
       service_id: 53321
     };
-    console.log(toDistrictId, toWardCode)
-    if (toDistrictId && toWardCode) {
-      console.log(toDistrictId, toWardCode)
-      try {
-        const response = await axios.post(
+
+    if (account !== null && toDistrictId && toWardCode) {
+      axios
+        .post(
           'https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/leadtime',
           values,
           {
@@ -327,16 +349,17 @@ const Bill = () => {
               shop_id: '4534109'
             }
           }
-        );
+        )
+        .then(response => {
+          const leadtimeTimestamp = response.data.data.leadtime;
+          const leadtimeMoment = moment.unix(leadtimeTimestamp);
+          const formattedDateTime = leadtimeMoment.format('DD/MM/YYYY');
 
-        const leadtimeTimestamp = response.data.data.leadtime;
-        const leadtimeMoment = moment.unix(leadtimeTimestamp);
-        const formattedDateTime = leadtimeMoment.format('DD/MM/YYYY');
-
-        setLeadtime(`${formattedDateTime}`);
-      } catch (error) {
-        console.log(error);
-      }
+          setLeadtime(`${formattedDateTime}`);
+        })
+        .catch(error => {
+          console.log(error);
+        });
     }
   };
 
@@ -346,23 +369,23 @@ const Bill = () => {
   }, 0);
 
   // phí ship
-  const handleShippingFee = async (insuranceValue, toDistrictId, toWardCode) => {
+  const handleShippingFee = (insuranceValue, toDistrictId, toWardCode) => {
     const values = {
       service_id: 53321,
       insurance_value: insuranceValue,
       coupon: null,
       from_district_id: 3440,
-      to_district_id: toDistrictId,
+      to_district_id: Number(toDistrictId),
       to_ward_code: toWardCode,
       height: 15,
       length: 15,
       weight: 1000,
       width: 15
     };
-    if (insuranceValue && toDistrictId && toWardCode) {
-      console.log(12321231)
-      try {
-        const response = await axios.post(
+
+    if (account !== null && insuranceValue && toDistrictId && toWardCode) {
+      axios
+        .post(
           'https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee',
           values,
           {
@@ -371,22 +394,25 @@ const Bill = () => {
               shop_id: '4534109'
             }
           }
-        );
-
-        setShippingFee(response.data.data.total);
-      } catch (error) {
-        console.log(error);
-      }
+        )
+        .then(response => {
+          setShippingFee(response.data.data.total);
+        })
+        .catch(error => {
+          console.log(error);
+        });
     }
   };
 
   // switch bán tại quầy hoặc online
-  const handleChangSwitch = (checked) => {
-    setSwitchChange(checked);
+  const handleChangSwitch = (checked, index) => {
+    const visible = [...switchChange];
+    visible[index] = true;
+    setSwitchChange(visible);
     if (!checked) {
-      setShippingFee(0);
-      setLeadtime(null)
       setBilType('In-store')
+      setShippingFee(0)
+      visible[index] = false;
     } else {
       setBilType('Online')
     }
@@ -407,12 +433,9 @@ const Bill = () => {
   };
 
   // chuyển tab
-  const [billCodeAdd, setBilCodeAdd] = useState('')
   const onChange = (newActiveKey) => {
-    setBilCodeAdd(newActiveKey);
     setCartId(newActiveKey);
     setActiveKey(newActiveKey);
-    setActiveTab(newActiveKey)
   };
 
   // gen mã hóa đơn
@@ -448,7 +471,7 @@ const Bill = () => {
         JSON.stringify({
           timeStart: now(),
           productDetails: [],
-          account: {}
+          account: null
         })
       );
       setItems(newPanes);
@@ -480,7 +503,6 @@ const Bill = () => {
     setActiveKey(newActiveKey);
   };
 
-  const [activeTab, setActiveTab] = useState(null);
   const onEdit = (targetKey, action) => {
     if (action === "add") {
       add();
@@ -488,13 +510,6 @@ const Bill = () => {
       remove(targetKey);
     }
   };
-
-
-  // tính phí vận chuyển && tính ngày giao hàng
-  if (switchChange && address.length < 0) {
-    handleShippingFee(totalPrice, selectedDictrict, selectedWard);
-    handleShippingOrderLeadtime(selectedDictrict, selectedWard)
-  }
 
   // hiển thị danh sách sản phẩm trong giỏ hàng
   const getProductDetails = () => {
@@ -514,16 +529,14 @@ const Bill = () => {
       })
   }
 
-
   useEffect(() => {
     getListAddressByUsername(account?.username)
     fetchProvinces();
     handleProvinceChange(address[0]?.city);
     handleDistrictChange(address[0]?.district);
-    if (address.length >= 0) {
-      console.log(address[0]?.district, address[0]?.ward, " ::::")
-      handleShippingOrderLeadtime(address[0]?.district, address[0]?.ward)
-      handleShippingFee(totalPrice, address[0]?.district, address[0]?.ward)
+    if (address.length > 0) {
+      handleShippingOrderLeadtime(address[selectedAddress]?.district, address[selectedAddress]?.ward)
+      handleShippingFee(totalPrice, address[selectedAddress]?.district, address[selectedAddress]?.ward)
     }
     getProductDetails();
     initializeModalStates();
@@ -533,7 +546,7 @@ const Bill = () => {
   const [note, setNote] = useState("")
   const handleCreateBill = () => {
     const bill = {
-      billCode: billCodeAdd,
+      billCode: activeKey,
       accountId: account?.username,
       price: totalPrice,
       priceReduce: null,
@@ -543,8 +556,20 @@ const Bill = () => {
       lstBillDetailRequest: [],
     };
 
+    if (selectedButton == null) {
+      return console.log('chưa chọn hình thức thanh toán')
+    }
+
+    if (remainAmount < (shippingFee + totalPrice)) {
+      return console.log('không nạp đủ tiền')
+    }
+
     if (productDetails.length <= 0) {
-      return console.log('không có sản phẩm')
+      return notification.error({
+        message: "Thông báo",
+        description: "Không có sản phẩm nào trong giỏ hàng.",
+        duration: 2,
+      });
     } else {
       for (let i = 0; i < productDetails.length; i++) {
         const billDetail = {
@@ -557,17 +582,22 @@ const Bill = () => {
       }
     }
     console.log(bill)
-    const confirmed = window.confirm("Bạn có chắc chắn muốn thanh toán?");
-    if (confirmed) {
-      axios.post(`http://localhost:8080/api/admin/bill`, bill)
-        .then(response => {
-          navigate(`/admin/counter-sales/${response.data.id}/timeline`)
-          remove(activeTab);
-        })
-        .catch((error) => {
-          console.log(error)
-        })
-    }
+    // Modal.confirm({
+    //   title: 'Xác nhận thanh toán',
+    //   content: 'Bạn có chắc chắn muốn thanh toán?',
+    //   onOk() {
+    //     axios
+    //       .post('http://localhost:8080/api/admin/bill', bill)
+    //       .then((response) => {
+    //         navigate(`/admin/counter-sales/${response.data.id}/timeline`);
+    //         remove(activeTab);
+    //       })
+    //       .catch((error) => {
+    //         console.log(error);
+    //       });
+    //   }
+    // })
+    console.log(activeKey)
   }
 
   return (
@@ -582,41 +612,42 @@ const Bill = () => {
         {items &&
           items.map((item, index) => {
             return (
-              <Tabs.TabPane key={item.key} tab={item.label}>
+              <Tabs.TabPane key={item.key} tab={item.label} items={item}>
                 <div className={styles.tabContent}>
-                  <div className={styles.cartContainer}>
-                    <h2>Giỏ hàng</h2>
-                    <Button
-                      type="primary"
-                      className={styles.addButton}
-                      onClick={() => showModal(index)}
-                    >
-                      Thêm giỏ hàng
-                    </Button>
-                  </div>
-                  <Divider
-                    className={styles.blackDivider}
-                    style={{ marginTop: "10px" }}
-                  />
-                  <Table dataSource={productDetails} columns={columns} pagination={false} />
-                  <ModalProduct
-                    visible={modalVisible[index]}
-                    onCancel={() => handleCancel(index)}
-                    cartId={cartId}
-                    render={setRendered}
-                  />
-                </div>
-                <div className={styles.lstAccount}>
                   <Row>
                     <Col span={12}>
-                      <h2>Tài khoản</h2>
+                      <h2>Giỏ hàng</h2>
+                    </Col>
+                    <Col span={12}>
+                      <Button
+                        className={styles.addButton}
+                        onClick={() => showModal(index)}
+                        style={{ color: "blue" }}
+                      >
+                        Thêm giỏ hàng
+                      </Button>
+                      <ModalProduct
+                        visible={modalVisible[index]}
+                        onCancel={() => handleCancel(index)}
+                        cartId={cartId}
+                        render={setRendered}
+                      />
+                    </Col>
+                  </Row>
+                  <Divider
+                    className={styles.blackDivider}
+                    style={{ marginTop: "3px" }}
+                  />
+                  <Table dataSource={productDetails} columns={columns} pagination={false} />
+
+                </div>
+
+                <div className={styles.infoPayment}>
+                  <Row>
+                    <Col span={12}>
+                      <h2>Thông tin thanh toán</h2>
                     </Col>
                     <Col span={12} style={{ textAlign: "right" }}>
-                      <Input
-                        prefix={<SearchOutlined />}
-                        placeholder="tìm kiếm tài khoản"
-                        style={{ width: "200px", marginRight: "20px" }}
-                      />
                       <Button style={{ color: "blue" }} onClick={() => handleShowModalAccount(index)}>Chọn tài khoản</Button>
                       <ModalAccount
                         visible={modalAccountVisible[index]}
@@ -628,143 +659,145 @@ const Bill = () => {
                   </Row>
                   <Divider
                     className={styles.blackDivider}
-                    style={{ marginTop: "10px" }}
-                  />
-                  <Row>
-                    <Col span={6}>
-                      {account && <>
-                        <span><b>Tên tài khoản:</b> {account.username}</span>
-                        <br />
-                        <span><b>Tên khách hàng: </b> {account.fullname}</span>
-                        <br />
-                        <span><b>Email: </b> {account.email}</span>
-                        <br />
-                        <span><b>Giới tính: </b>{account.gender === true ? "Nam" : "Nữ"}</span>
-                      </>
-                      }
-                      {!account && <>
-                        <span><b>Tên tài khoản:</b> Khách lẻ</span>
-                      </>}
-                    </Col>
-                    <Col span={12}>
-                      <Button
-                        icon={<DeleteOutlined />}
-                        danger
-                        key={1}
-                        onClick={() => handleDeleteAccount()}
-                      ></Button>
-                    </Col>
-                  </Row>
-                </div>
-
-                <div className={styles.infoPayment}>
-                  <h2 style={{ textAlign: "left" }}>Thông tin thanh toán</h2>
-                  <Divider
-                    className={styles.blackDivider}
                     style={{ marginTop: "3px" }}
                   />
                   <Row>
                     <Col span={16}>
-                      {switchChange && (
-                        <Row>
-                          <Col span={10}>
-                            <span>
-                              <b style={{ color: "red" }}>*</b> Họ và tên
-                            </span>
-                            <Input placeholder="nhập họ và tên" value={account?.username} />
-                          </Col>
-                          <Col span={10} style={{ marginLeft: "40px" }}>
-                            <span>
-                              <b style={{ color: "red" }}>*</b> Số điện thoại
-                            </span>
-                            <Input placeholder="nhập số điện thoại" value={account?.phoneNumber} />
-                          </Col>
-                        </Row>
-                      )}
-                      {switchChange && (
-                        <Row style={{ margin: "40px 0" }}>
-                          <Col span={7}>
-                            <span>
-                              <b style={{ color: "red" }}>*</b> Tỉnh/thành phố
-                            </span>
-                            <br />
-                            <Select
-                              style={{ width: 200 }}
-                              onChange={handleProvinceChange}
-                              value={address[0]?.city ? Number(address[0]?.city) : null}
-                            >
-                              {provinces &&
-                                provinces.map((province) => (
-                                  <Select.Option
-                                    label={province.ProvinceName}
-                                    key={province.ProvinceID}
-                                    value={province.ProvinceID}
-                                  >
-                                    {province.ProvinceName}
-                                  </Select.Option>
-                                ))}
-                            </Select>
-                          </Col>
-                          <Col span={7}>
-                            <span>
-                              <b style={{ color: "red" }}>*</b> Quận/huyện
-                            </span>
-                            <br />
-                            <Select
-                              style={{ width: 200 }}
-                              onChange={handleDistrictChange}
-                              value={address[0]?.district ? Number(address[0]?.district) : null}
-                            >
-                              {districts && districts.map((district) => (
+                      <Row style={{ marginBottom: '20px' }}>
+                        <Col span={6} style={{ marginTop: '2px' }}>
+                          {account && (
+                            <>
+                              <span style={{ display: 'block', width: '200px' }}>
+                                <b>Tên khách hàng: </b> {account.fullname}
+                              </span>
+                            </>
+                          )}
+                          {!account && (
+                            <>
+                              <span><b>Tên tài khoản:</b> Khách lẻ</span>
+                            </>
+                          )}
+                        </Col>
+                        <Col span={12} >
+                          {account &&
+                            <Button
+                              icon={<CloseCircleOutlined />}
+                              danger
+                              style={{ marginLeft: '2%', border: 'none' }}
+                              onClick={() => handleDeleteAccount()}
+                            ></Button>
+                          }
+                          {
+                            account &&
+                            <Button
+                              style={{ marginLeft: '50px' }}
+                              onClick={() => handleShowModalAddress(index)}
+                            >Chọn địa chỉ</Button>
+                          }
+                          <ModalAddress
+                            isModalOpen={showAddress[index]}
+                            handleCancel={() => handleCancelAddress(index)}
+                            cartId={cartId}
+                            render={setRendered}
+                            username={account?.username}
+                            selected={setSelectedAddress}
+                          />
+                        </Col>
+                      </Row>
+                      <Row>
+                        <Col span={10}>
+                          <span>
+                            <b style={{ color: "red" }}>*</b> Họ và tên
+                          </span>
+                          <Input placeholder="nhập họ và tên" value={account?.username} />
+                        </Col>
+                        <Col span={10} style={{ marginLeft: "40px" }}>
+                          <span>
+                            <b style={{ color: "red" }}>*</b> Số điện thoại
+                          </span>
+                          <Input placeholder="nhập số điện thoại" value={account?.phoneNumber} />
+                        </Col>
+                      </Row>
+                      <Row style={{ margin: "40px 0" }}>
+                        <Col span={7}>
+                          <span>
+                            <b style={{ color: "red" }}>*</b> Tỉnh/thành phố
+                          </span>
+                          <br />
+                          <Select
+                            style={{ width: 200 }}
+                            onChange={handleProvinceChange}
+                            value={address[0]?.city ? Number(address[selectedAddress]?.city) : undefined}
+                          >
+                            {provinces &&
+                              provinces.map((province) => (
                                 <Select.Option
-                                  key={district.DistrictID}
-                                  value={district.DistrictID}
+                                  label={province.ProvinceName}
+                                  key={province.ProvinceID}
+                                  value={province.ProvinceID}
                                 >
-                                  {district.DistrictName}
+                                  {province.ProvinceName}
                                 </Select.Option>
                               ))}
-                            </Select>
-                          </Col>
-                          <Col span={7}>
-                            <span>
-                              <b style={{ color: "red" }}>*</b> Phường/xã
-                            </span>
-                            <br />
-                            <Select style={{ width: 200 }}
-                              onChange={handleWardChange}
-                              value={address[0]?.ward}
-                            >
-                              {wards && wards.map((ward) => (
-                                <Select.Option
-                                  key={ward.WardCode}
-                                  value={ward.WardCode}
-                                >
-                                  {ward.WardName}
-                                </Select.Option>
-                              ))}
-                            </Select>
-                          </Col>
-                        </Row>
-                      )}
-                      {switchChange && (
-                        <Row>
-                          <Col span={16}>
-                            <span>Địa chỉ cụ thể</span>
-                            <Input placeholder="Nhập địa chỉ cụ thể" value={address[0]?.descriptionDetail} />
-                          </Col>
-                          <Col span={6} style={{ marginLeft: "30px" }}>
-                            <img
-                              src={logoGhn}
-                              alt="an sẽ"
-                              style={{ width: "90px", height: "80px" }}
-                            />
-                          </Col>
-                          <h3>Ngày giao hàng dự kiến: {leadtime || ''}</h3>
-                        </Row>
-                      )}
+                          </Select>
+                        </Col>
+                        <Col span={7}>
+                          <span>
+                            <b style={{ color: "red" }}>*</b> Quận/huyện
+                          </span>
+                          <br />
+                          <Select
+                            style={{ width: 200 }}
+                            onChange={handleDistrictChange}
+                            value={address[selectedAddress]?.district ? Number(address[selectedAddress]?.district) : undefined}
+                          >
+                            {districts && districts.map((district) => (
+                              <Select.Option
+                                key={district.DistrictID}
+                                value={district.DistrictID}
+                              >
+                                {district.DistrictName}
+                              </Select.Option>
+                            ))}
+                          </Select>
+                        </Col>
+                        <Col span={7}>
+                          <span>
+                            <b style={{ color: "red" }}>*</b> Phường/xã
+                          </span>
+                          <br />
+                          <Select style={{ width: 200 }}
+                            onChange={handleWardChange}
+                            value={address[selectedAddress]?.ward}
+                          >
+                            {wards && wards.map((ward) => (
+                              <Select.Option
+                                key={ward.WardCode}
+                                value={ward.WardCode}
+                              >
+                                {ward.WardName}
+                              </Select.Option>
+                            ))}
+                          </Select>
+                        </Col>
+                      </Row>
+                      <Row>
+                        <Col span={16}>
+                          <span>Địa chỉ cụ thể</span>
+                          <Input placeholder="Nhập địa chỉ cụ thể" value={address[selectedAddress]?.descriptionDetail} />
+                        </Col>
+                        <Col span={6} style={{ marginLeft: "30px" }}>
+                          <img
+                            src={logoGhn}
+                            alt="an sẽ"
+                            style={{ width: "90px", height: "80px" }}
+                          />
+                        </Col>
+                        {(switchChange[index] && account) && <h3>Ngày giao hàng dự kiến: {leadtime || ''}</h3>}
+                      </Row>
                     </Col>
                     <Col span={8}>
-                      <Switch onChange={handleChangSwitch} />
+                      <Switch onChange={(e) => handleChangSwitch(e, index)} />
                       <span style={{ marginLeft: "5px" }}>Giao hàng</span>
                       <br />
                       <Input
@@ -783,95 +816,88 @@ const Bill = () => {
                       </Button>
                       <Row style={{ marginTop: "10px" }}>
                         <Col span={12}>
-                          <span style={{ fontSize: "16px", display: "block" }}>
+                          <span style={{ fontSize: "16px", width: '200%', display: "block" }}>
                             Tiền hàng
+                            <span style={{ marginLeft: '134px' }}>
+                              {totalPrice.toLocaleString('vi-VN', {
+                                style: 'currency',
+                                currency: 'VND',
+                              })}
+                            </span>
                           </span>
-                          <span style={{ fontSize: "16px", display: "block" }}>
+                          <span style={{ fontSize: "16px", width: '200%', display: "block" }}>
                             Giảm giá
+                            <span style={{ marginLeft: '142px' }}>
+                              0 đ
+                            </span>
                           </span>
-                          {switchChange &&
+                          {(switchChange[index] && account) &&
                             <>
-                              <span style={{ fontSize: "16px", display: "block" }}>
+                              <span style={{ fontSize: "16px", width: '200%', display: "block" }}>
                                 Phí ship
+                                <span style={{ marginLeft: '150px' }}>
+                                  {shippingFee?.toLocaleString('vi-VN', {
+                                    style: 'currency',
+                                    currency: 'VND'
+                                  })}
+                                </span>
                               </span>
+
                             </>}
-                          <span style={{ fontSize: "16px", display: "block" }}>
+                          <span style={{ fontSize: "16px", width: '200%', display: "block" }}>
                             Tổng số tiền
-                          </span>
-                          <span style={{ fontSize: "16px", display: "block" }}>
-                            Số tiền khách trả
-                          </span>
-                          <span style={{ fontSize: "16px", display: "block" }}>
-                            Tiền thừa trả khách
-                          </span>
-                        </Col>
-                        <Col span={12}>
-                          {/* tiền hàng */}
-                          <span style={{ fontSize: "16px", display: "block" }}>
-                            {totalPrice.toLocaleString('vi-VN', {
-                              style: 'currency',
-                              currency: 'VND',
-                            })}
-                          </span>
-                          {/* giảm giá */}
-                          <span style={{ fontSize: "16px", display: "block" }}>
-                            0
-                          </span>
-                          {/* phí ship */}
-                          {switchChange && <>
-                            <span style={{ fontSize: "16px", display: "block" }}>
-                              {shippingFee?.toLocaleString('vi-VN', {
+                            <span
+                              style={{
+                                color: "red",
+                                marginLeft: '117px'
+                              }}
+                            >
+                              {(totalPrice + shippingFee).toLocaleString('vi-VN', {
                                 style: 'currency',
                                 currency: 'VND'
                               })}
-                            </span></>}
-                          {/* tổng tiền */}
-                          <span
-                            style={{
-                              color: "red",
-                              fontSize: "16px",
-                              display: "block",
-                            }}
-                          >
-                            {(totalPrice + (shippingFee || 0)).toLocaleString('vi-VN', {
-                              style: 'currency',
-                              currency: 'VND'
-                            })}
+                            </span>
                           </span>
-                          {/* khách cần trả */}
-                          <input type="number" className={styles.input}
-                            onChange={(e) => setRemainAmount(e.target.value - totalPrice - shippingFee)
-                            }
-                          />
-                          {/* tiền thừa */}
-                          <span style={{ fontSize: "16px", display: "block" }}>
-                            {remainAmount.toLocaleString('vi-VN', {
-                              style: 'currency',
-                              currency: 'VND'
-                            })}
-                          </span>
+                          {!switchChange[index] && <>
+                            <span style={{ fontSize: "16px", width: '200%', display: "block" }}>
+                              Số tiền khách trả
+                              <input type="number" className={styles.input}
+                                onChange={(e) => setRemainAmount(e.target.value - totalPrice - shippingFee)
+                                } />
+                            </span>
+                            <span style={{ fontSize: "16px", width: '200%', display: "block" }}>
+                              Tiền thừa trả khách
+                              <span style={{ marginLeft: '72px' }}>
+                                {remainAmount.toLocaleString('vi-VN', {
+                                  style: 'currency',
+                                  currency: 'VND'
+                                })}
+                              </span>
+                            </span>
+                          </>}
                         </Col>
+
                         <TextArea onChange={(e) => setNote(e.target.value)} rows={3} placeholder="ghi chú ..." style={{ margin: '10px 0' }} />
                         <div style={{ marginTop: "20px" }}>
                           <div className={styles.buttonGroup}>
                             <Button
-                              className={`${styles.cashButton} ${selectedButton === 'money' ? styles.selected : ''}`}
+                              className={`${styles.cashButton} ${selectedButton === 1 ? styles.selected : ''}`}
                               icon={<DollarOutlined />}
-                              onClick={() => handleButtonClick('money')}
+                              onClick={() => handleButtonClick(1)}
                             >
                               Tiền
                             </Button>
                             <Button
                               style={{ margin: "0 10px" }}
-                              className={`${styles.cashButton} ${selectedButton === 'transfer' ? styles.selected : ''}`}
+                              className={`${styles.cashButton} ${selectedButton === 2 ? styles.selected : ''}`}
                               icon={<SwapOutlined />}
-                              onClick={() => handleButtonClick('transfer')}
+                              onClick={() => handleButtonClick(2)}
                             >
                               Chuyển khoản
                             </Button>
                             <Button
-                              className={`${styles.cashButton} ${selectedButton === 'both' ? styles.selected : ''}`}
-                              onClick={() => handleButtonClick('both')}
+                              className={`${styles.cashButton} ${selectedButton === 3 ? styles.selected : ''}`}
+                              onClick={() => handleButtonClick(3)}
                             >
                               Cả hai
                             </Button>

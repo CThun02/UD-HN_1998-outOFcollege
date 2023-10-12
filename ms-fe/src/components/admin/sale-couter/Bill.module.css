@@ -12,12 +12,12 @@
 }
 .bill {
   margin: 5px;
-  background-color: #ffffff;
+  /* background-color: #ffffff; */
   border-radius: 4px;
+  min-height: 100vh;
   width: auto;
   height: auto;
-  padding: 20px;
-  border: 1px solid #edf2f9;
+  /* border: 1px solid #edf2f9; */
 }
 
 .optionColor {
@@ -79,8 +79,12 @@ btn:hover {
 /* Bill.module.css */
 
 .tabContent {
-  position: relative;
-  border-bottom: 10px solid #f9fbfd;
+  border: 1px solid #edf2f9;
+  background-color: #ffffff;
+  min-height: 100px;
+  height: auto;
+  padding: 20px;
+  /* margin: 20px 0; */
 }
 
 .cartContainer {
@@ -109,6 +113,7 @@ btn:hover {
 }
 
 .infoPayment {
+  border: 1px solid #edf2f9;
   background-color: #ffffff;
   min-height: 100px;
   height: auto;
@@ -125,6 +130,8 @@ btn:hover {
   border: none;
   border-bottom: 1px solid black;
   outline: none;
+  width: 150px;
+  margin-left: 90px;
 }
 
 .input:focus {

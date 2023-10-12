@@ -1,10 +1,8 @@
 package com.fpoly.ooc.controller;
 
 import com.fpoly.ooc.request.bill.BillRequest;
-import com.fpoly.ooc.request.timeline.TimeLinerequest;
 import com.fpoly.ooc.service.interfaces.BillDetailService;
 import com.fpoly.ooc.service.interfaces.BillService;
-import com.fpoly.ooc.service.interfaces.TimeLineService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -28,22 +26,9 @@ public class BillController {
     @Autowired
     private BillService billService;
 
-    @Autowired
-    private TimeLineService timeLineService;
-
     @GetMapping("")
     public ResponseEntity<?> getAll() {
         return ResponseEntity.ok(billDetailService.getAll());
-    }
-
-    @GetMapping("/{id}/timeline")
-    public ResponseEntity<?> getAllTimeLineByBillId(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(timeLineService.getAllTimeLineByBillId(id));
-    }
-
-    @GetMapping("/{id}/product")
-    public ResponseEntity<?> getTimelineProductByBillId(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(timeLineService.getTimelineProductByBillId(id));
     }
 
     @PostMapping()
@@ -51,11 +36,14 @@ public class BillController {
         return ResponseEntity.ok(billService.createBill(request));
     }
 
-    @PostMapping("/{id}/timelines")
-    public ResponseEntity<?> createTimelineByBillId(
-            @PathVariable("id") Long id,
-            @RequestBody(required = false) TimeLinerequest request) {
-        return ResponseEntity.ok(timeLineService.createTimeLine(id, request));
+    @GetMapping("/customer")
+    public ResponseEntity<?> getListCustomer() {
+        return ResponseEntity.ok(billService.getListCustomer());
+    }
+
+    @GetMapping("/customer/{username}/address")
+    public ResponseEntity<?> getListAddressByUserName(@PathVariable("username") String username) {
+        return ResponseEntity.ok(billService.getListAddressByUserName(username));
     }
 
     @PutMapping()

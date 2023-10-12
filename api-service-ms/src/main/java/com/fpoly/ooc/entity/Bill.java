@@ -36,6 +36,9 @@ public class Bill extends BaseEntity {
     @Column(name = "id")
     private Long id;
 
+    @Column(name = "bill_code")
+    private String billCode;
+
     @Column(name = "date_of_receipt")
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime dateOfReceipt;
@@ -53,12 +56,15 @@ public class Bill extends BaseEntity {
     @Column(name = "bill_type")
     private String billType;
 
+    @Column(name = "note")
+    private String note;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id", referencedColumnName = "username")
     private Account account;
 
     @OneToMany(mappedBy = "bill")
-    private List<TimeLine> timeLine;
+    private List<Timeline> timeLine;
 
     @OneToMany(mappedBy = "bill")
     private List<PaymentDetail> lstPaymentDetail;

@@ -52,8 +52,6 @@ CREATE TABLE product(
     id                  BIGINT IDENTITY PRIMARY KEY,
     brand_id            BIGINT FOREIGN KEY(brand_id) REFERENCES brand(id),
     category_id         BIGINT FOREIGN KEY(category_id) REFERENCES category(id),
-    pattern_id          BIGINT FOREIGN KEY(pattern_id) REFERENCES pattern(id),
-    form_id             BIGINT FOREIGN KEY(form_id) REFERENCES form(id),
     product_code        NVARCHAR(50),
     product_name        NVARCHAR(50),
     img_default         VARCHAR(MAX),
@@ -148,6 +146,8 @@ CREATE TABLE size(
 CREATE TABLE product_detail(
     id                  BIGINT IDENTITY PRIMARY KEY,
     product_id          BIGINT FOREIGN KEY(product_id) REFERENCES product(id),
+	pattern_id          BIGINT FOREIGN KEY(pattern_id) REFERENCES pattern(id),
+    form_id             BIGINT FOREIGN KEY(form_id) REFERENCES form(id),
     button_id           BIGINT FOREIGN KEY(button_id) REFERENCES button_type(id),
     material_id         BIGINT FOREIGN KEY(material_id) REFERENCES material(id),
     collar_id           BIGINT FOREIGN KEY(collar_id) REFERENCES collar_type(id),

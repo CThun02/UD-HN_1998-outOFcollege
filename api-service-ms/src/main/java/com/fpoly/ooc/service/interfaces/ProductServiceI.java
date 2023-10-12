@@ -18,6 +18,6 @@ public interface ProductServiceI {
     public List<ProductTableResponse> getProductsTable(String status1, String status2);
     public ProductTableResponse getProductEdit(Long id);
     public ProductResponse getProductResponseById(Long id);
-    public List<ProductTableResponse> getProductFilterByCom(Long brandId, Long categoryId, Long patternId, Long formId, String status);
+    public List<ProductTableResponse> getProductFilterByCom(Long brandId, Long categoryId, String status);
     public List<ProductTableResponse> getProductCreateDetail(String status);
 }

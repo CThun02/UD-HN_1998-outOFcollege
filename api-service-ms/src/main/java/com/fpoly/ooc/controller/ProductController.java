@@ -48,16 +48,12 @@ public class ProductController {
     @GetMapping("/filterByCom")
     public ResponseEntity<?> filterByCom(@RequestParam Optional<Long> brandId,
                                          @RequestParam Optional<Long> categoryId,
-                                         @RequestParam Optional<Long> patternId,
-                                         @RequestParam Optional<Long> formId,
                                          @RequestParam Optional<String> status
                                          ){
         if(status.get().equals("ALL") || status.get().equals("")){
-            return ResponseEntity.ok(service.getProductFilterByCom(brandId.orElse(null), categoryId.orElse(null),
-                    patternId.orElse(null), formId.orElse(null), null));
+            return ResponseEntity.ok(service.getProductFilterByCom(brandId.orElse(null), categoryId.orElse(null),null));
         }else{
-            return ResponseEntity.ok(service.getProductFilterByCom(brandId.orElse(null), categoryId.orElse(null),
-                    patternId.orElse(null), formId.orElse(null), status.orElse(null)));
+            return ResponseEntity.ok(service.getProductFilterByCom(brandId.orElse(null), categoryId.orElse(null), status.orElse(null)));
         }
     }
 

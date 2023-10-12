@@ -18,10 +18,6 @@ public class ProductRequest{
     private Long brandId;
     @JsonProperty("categoryId")
     private Long categoryId;
-    @JsonProperty("formId")
-    private Long formId;
-    @JsonProperty("patternId")
-    private Long patternId;
     @JsonProperty("description")
     private String description;
     @JsonProperty("imgDefault")

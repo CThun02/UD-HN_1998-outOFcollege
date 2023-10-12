@@ -88,8 +88,4 @@ public class BillDetailServiceImpl implements BillDetailService {
         billDetailRepo.deleteById(id);
     }
 
-    @Override
-    public List<BillProductResponse> getAllProduct() {
-        return billRepo.getAll();
-    }
 }

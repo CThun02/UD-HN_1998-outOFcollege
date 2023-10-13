@@ -5,9 +5,9 @@ public class Const {
 
     // status
     public static final String STATUS_ACTIVE = "ACTIVE";
-
     public static final String STATUS_INACTIVE = "INACTIVE";
     public static final String STATUS_UPCOMING = "UPCOMING";
+    public static final String STATUS_CANCEL = "CANCEL";
 
     //error code
     public static final String CODE_NOT_FOUND = "CODE_NOT_FOUND";
@@ -38,6 +38,12 @@ public class Const {
 
     //ErrorCode
     public static final String HTTP_ERROR_CODE = "BAD_REQUEST";
+
+    //kafka
+    public static final String KAFKA_SERVER = "localhost:9092";
+    public static final String KAFKA_GROUP_ID = "group-id";
+    public static final String TOPIC_VOUCHER = "voucher-cronjob";
+    public static final String TOPIC_PROMOTION = "promotion-cronjob";
 
 
 }

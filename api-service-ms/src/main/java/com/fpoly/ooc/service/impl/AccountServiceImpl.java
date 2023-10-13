@@ -126,10 +126,7 @@ public class AccountServiceImpl implements AccountService {
 
         List<AddressDetail> addressDetails = account.getAddAdress();
         List<AddressDetail> addressDetailDTOs = new ArrayList<>();
-
-
-
-return null;
+        return null;
     }
 
 

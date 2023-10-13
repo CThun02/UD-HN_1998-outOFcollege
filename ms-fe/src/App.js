@@ -84,6 +84,16 @@ function App() {
                     </Route>
                     <Route path="category" element="category"></Route>
                     <Route path="brand" element="brand"></Route>
+                    <Route path="pattern" element="pattern"></Route>
+                    <Route path="form" element="form"></Route>
+                    <Route path="button" element="button"></Route>
+                    <Route path="material" element="material"></Route>
+                    <Route path="collar" element="collar"></Route>
+                    <Route path="shirtTail" element="shirtTail"></Route>
+                    <Route path="sleeve" element="sleeve"></Route>
+                    <Route path="color" element="color"></Route>
+                    <Route path="size" element="size"></Route>
+
                     {/* Voucher */}
                     <Route path="vouchers">
                       <Route index element={<Voucher message={message} />} />

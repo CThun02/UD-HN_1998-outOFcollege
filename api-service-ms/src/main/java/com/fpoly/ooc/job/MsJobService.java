@@ -43,10 +43,10 @@ public class MsJobService {
 
     @PostConstruct
     private void construct() {
-//        jobScheduler.scheduleRecurrently(Cron.every15seconds(),
-//                this::isCheckTimeStartDateAndEndDateVoucher);
-//        jobScheduler.scheduleRecurrently(Cron.every15seconds(),
-//                this::isCheckTimeStartDateAndEndDatePromotion);
+        jobScheduler.scheduleRecurrently(Cron.every15seconds(),
+                this::isCheckTimeStartDateAndEndDateVoucher);
+        jobScheduler.scheduleRecurrently(Cron.every15seconds(),
+                this::isCheckTimeStartDateAndEndDatePromotion);
     }
 
     @Job(name = "scheduled-voucher")
@@ -55,8 +55,7 @@ public class MsJobService {
 
         try {
             voucherService.findAllNoFilter().forEach(e -> {
-                if (!(e.getStatus().equals(Const.STATUS_CANCEL)
-                        || e.getStatus().equals(Const.STATUS_INACTIVE))) {
+                if (!(e.getStatus().equals(Const.STATUS_CANCEL))) {
                     String status = isCheckDateTime(e.getStartDate(), e.getEndDate());
                     voucherService.updateStatus(e.getVoucherCode(),
                             status == null ? e.getStatus() : status);
@@ -84,8 +83,7 @@ public class MsJobService {
 
         try {
             promotionService.findAllPromotionProductResponse().forEach(e -> {
-                if (!(e.getStatus().equals(Const.STATUS_CANCEL)
-                        || e.getStatus().equals(Const.STATUS_INACTIVE))) {
+                if (!(e.getStatus().equals(Const.STATUS_CANCEL))) {
                     String status = isCheckDateTime(e.getStartDate(), e.getEndDate());
                     promotionService.updateStatus(e.getPromotionCode(),
                             status == null ? e.getStatus() : status);

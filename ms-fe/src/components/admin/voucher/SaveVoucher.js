@@ -877,6 +877,7 @@ function SaveVoucher() {
                                   />
                                 </FloatingLabels>
                                 <Checkbox
+                                  style={{ marginTop: "20px" }}
                                   checked={values.isCheckSendEmail}
                                   onChange={(e) => {
                                     setFieldValue(

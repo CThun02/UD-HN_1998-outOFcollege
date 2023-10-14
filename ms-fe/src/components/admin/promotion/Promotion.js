@@ -261,7 +261,7 @@ function Promotion() {
         status={status}
         setStatus={setStatus}
       />
-      <SockJs setValues={setPromotions} connectTo="promotion" />;
+      <SockJs setValues={setPromotions} connectTo="promotion" />
       <div className={styles.content}>
         <Space style={{ width: "100%" }} direction="vertical" size={16}>
           <Row>
@@ -276,7 +276,7 @@ function Promotion() {
 
             <Col span={6}>
               <Link to="create">
-                <Button type="primary" icon={<PlusOutlined />}>
+                <Button type="primary" icon={<PlusOutlined />} size="large">
                   Tạo chương trình khuyến mại
                 </Button>
               </Link>

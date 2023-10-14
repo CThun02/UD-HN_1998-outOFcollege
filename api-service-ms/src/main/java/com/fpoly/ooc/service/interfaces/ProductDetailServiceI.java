@@ -1,8 +1,12 @@
 package com.fpoly.ooc.service.interfaces;
 
+import com.fpoly.ooc.dto.ProductDetailsDTO;
 import com.fpoly.ooc.entity.Color;
 import com.fpoly.ooc.entity.ProductDetail;
 import com.fpoly.ooc.responce.product.ProductDetailResponse;
+import com.fpoly.ooc.responce.productdetail.ProductsDetailsResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
@@ -23,6 +27,8 @@ public interface ProductDetailServiceI {
 
     ProductDetail findById(Long id);
 
-    List<Long> findAllResponseProduct(Long idPromotion);
+    List<Long> findAllIdsResponseProductDetails(Long idPromotion);
+
+    List<ProductsDetailsResponse> findListProductdetailsByListProductId(ProductDetailsDTO productDetailsDTO);
 
 }

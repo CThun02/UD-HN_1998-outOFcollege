@@ -11,6 +11,7 @@ import com.fpoly.ooc.repository.PromotionRepository;
 import com.fpoly.ooc.request.promotion.PromotionRequest;
 import com.fpoly.ooc.responce.promotion.PromotionProductResponse;
 import com.fpoly.ooc.service.interfaces.ProductDetailServiceI;
+import com.fpoly.ooc.service.interfaces.ProductServiceI;
 import com.fpoly.ooc.service.interfaces.PromotionProductDetailService;
 import com.fpoly.ooc.service.interfaces.PromotionService;
 import com.fpoly.ooc.util.PageUltil;
@@ -40,6 +41,9 @@ public class PromotionServiceImpl implements PromotionService {
     private ProductDetailServiceI productDetailService;
 
     @Autowired
+    private ProductServiceI productServiceI;
+
+    @Autowired
     private PromotionProductDetailService promotionProductDetailService;
 
     @Override
@@ -67,7 +71,7 @@ public class PromotionServiceImpl implements PromotionService {
     public Promotion saveOrUpdate(PromotionRequest promotionRequest) {
         Promotion promotion = promotionRepository.save(promotion(promotionRequest));
 
-        for (Long id : promotionRequest.getProducts()) {
+        for (Long id : promotionRequest.getProductDetailIds()) {
             ProductDetail productDetail = productDetailService.findById(id);
             PromotionProductDTO dto = new PromotionProductDTO();
             dto.setPromotion(promotion);
@@ -104,9 +108,8 @@ public class PromotionServiceImpl implements PromotionService {
         promotionRequest.setEndDate(promotion.getEndDate());
         promotionRequest.setStatus(promotion.getStatus());
 
-        promotionRequest.setProducts(productDetailService.findAllResponseProduct(promotion.getId()));
-        promotionRequest.setListProductResponse(convertProductDetailResponse(
-                productDetailService.findAllResponseProduct(promotion.getId())));
+        promotionRequest.setProductDetailIds(productDetailService.findAllIdsResponseProductDetails(promotion.getId()));
+        promotionRequest.setProductIdsResponse(productServiceI.findIdsProductsByIdPromotion(promotion.getId()));
         return promotionRequest;
     }
 
@@ -254,36 +257,6 @@ public class PromotionServiceImpl implements PromotionService {
         return RandomStringUtils.random(15, true, true).toUpperCase();
     }
 
-    private List<ProductDetail> convertProductDetailResponse(List<Long> idProducts) {
-        List<ProductDetail> responses = new ArrayList<>();
 
-        for (Long id : idProducts) {
-            ProductDetail productDetail = productDetailService.findById(id);
-            ProductDetail newProductDetail = new ProductDetail();
-
-            newProductDetail.setId(productDetail.getId());
-            newProductDetail.setProduct(productDetail.getProduct());
-            newProductDetail.setButton(productDetail.getButton());
-            newProductDetail.setMaterial(productDetail.getMaterial());
-            newProductDetail.setCollar(productDetail.getCollar());
-            newProductDetail.setSleeve(productDetail.getSleeve());
-            newProductDetail.setSize(productDetail.getSize());
-            newProductDetail.setColor(productDetail.getColor());
-            newProductDetail.setShirtTail(productDetail.getShirtTail());
-            newProductDetail.setPrice(productDetail.getPrice());
-            newProductDetail.setQuantity(productDetail.getQuantity());
-            newProductDetail.setDescriptionDetail(productDetail.getDescriptionDetail());
-            newProductDetail.setStatus(productDetail.getStatus());
-            newProductDetail.setCreatedAt(productDetail.getCreatedAt());
-            newProductDetail.setCreatedBy(productDetail.getCreatedBy());
-            newProductDetail.setUpdatedAt(productDetail.getUpdatedAt());
-            newProductDetail.setUpdatedBy(productDetail.getUpdatedBy());
-            newProductDetail.setDeletedAt(productDetail.getDeletedAt());
-
-            responses.add(newProductDetail);
-        }
-
-        return responses;
-    }
 
 }

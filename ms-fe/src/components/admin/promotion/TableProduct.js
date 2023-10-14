@@ -101,9 +101,14 @@ function TableProduct({ productsId, setProductsId, values, status }) {
           key: e.productId,
           product: e.productName,
           sellQuantity: e.sellQuantity,
-          price: `${numeral(e.minPrice).format("0,0")}đ - ${numeral(
-            e.maxPrice
-          ).format("0,0")}đ`,
+          price: `${
+            e.minPrice === e.maxPrice
+              ? numeral(e.maxPrice).format("0,0") + "đ"
+              : numeral(e.minPrice).format("0,0") +
+                "đ" -
+                numeral(e.maxPrice).format("0,0") +
+                "đ"
+          }`,
           quantity: e.quantityProduct,
         }))}
         pagination={false}

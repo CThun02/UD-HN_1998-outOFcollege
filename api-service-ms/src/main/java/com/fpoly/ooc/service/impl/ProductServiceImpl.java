@@ -84,8 +84,8 @@ public class ProductServiceImpl implements ProductServiceI {
     }
 
     @Override
-    public List<ProductTableResponse> getProductFilterByCom(Long brandId, Long categoryId, Long patternId, Long formId, String status) {
-        return repo.getProductFilterByCom(brandId, categoryId, patternId, formId, status);
+    public List<ProductTableResponse> getProductFilterByCom(Long brandId, Long categoryId, String status) {
+        return repo.getProductFilterByCom(brandId, categoryId, status);
     }
 
     @Override

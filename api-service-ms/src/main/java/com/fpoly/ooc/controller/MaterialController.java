@@ -16,27 +16,26 @@ public class MaterialController {
     private MaterialServiceI service;
 
     @GetMapping("")
-    public List<Material> data(){
+    public List<Material> data() {
         return service.findAll();
     }
 
     @PostMapping("create")
-    public ResponseEntity<?>create(Material material){
+    public ResponseEntity<?> create(@RequestBody Material material) {
         return ResponseEntity.ok(service.create(material));
     }
 
     @PutMapping("edit/{id}")
-    public ResponseEntity<?>update(@RequestParam Long id){
-        Material material = service.getOne(id);
-        return ResponseEntity.ok(service.update(material));
+    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody Material material) {
+
+        return ResponseEntity.ok(service.update(material,id));
     }
 
     @DeleteMapping("delete/{id}")
-    public ResponseEntity<?>delete(@RequestParam Long id){
+    public ResponseEntity<?> delete(@PathVariable Long id) {
         Material material = service.getOne(id);
         service.delete(material.getId());
         return ResponseEntity.ok("Ok");
+
     }
-
-
-}
+    }

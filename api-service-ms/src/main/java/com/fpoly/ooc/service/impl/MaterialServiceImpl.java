@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class MaterialServiceImpl implements MaterialServiceI {
@@ -22,12 +23,15 @@ public class MaterialServiceImpl implements MaterialServiceI {
     }
 
     @Override
-    public Material update(Material material) {
-        Material brandCheck = this.getOne(material.getId());
-        if(brandCheck==null){
-            return null;
-        }
-        return repo.save(material);
+    public Material update(Material material, Long id) {
+
+        Optional<Material> optionalMaterial = repo.findById(id);
+
+       return optionalMaterial.map(o->{
+           o.setMaterialName(material.getMaterialName());
+           o.setStatus(material.getStatus());
+           return repo.save(o);
+       }).orElse(null);
     }
 
     @Override

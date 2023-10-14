@@ -18,6 +18,4 @@ public interface BillDetailService {
 
     void deleteBill(Long id);
 
-    List<BillProductResponse> getAllProduct();
-
 }

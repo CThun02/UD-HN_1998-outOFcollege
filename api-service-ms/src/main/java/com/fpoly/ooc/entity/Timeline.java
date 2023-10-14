@@ -23,7 +23,7 @@ import lombok.Setter;
 @Builder
 @Entity
 @Table(name = "time_line")
-public class TimeLine extends BaseEntity{
+public class Timeline extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

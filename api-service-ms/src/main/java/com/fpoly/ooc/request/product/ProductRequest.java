@@ -18,10 +18,6 @@ public class ProductRequest{
     private Long brandId;
     @JsonProperty("categoryId")
     private Long categoryId;
-    @JsonProperty("formId")
-    private Long formId;
-    @JsonProperty("patternId")
-    private Long patternId;
     @JsonProperty("description")
     private String description;
     @JsonProperty("imgDefault")
@@ -31,8 +27,8 @@ public class ProductRequest{
 
     public Product dto(){
         Product product = Product.builder().id(id).productCode(productCode).productName(productName)
-                .brand(Brand.builder().id(brandId).build()).form(Form.builder().id(formId).build())
-                .category(Category.builder().id(categoryId).build()).pattern(Pattern.builder().id(patternId).build())
+                .brand(Brand.builder().id(brandId).build())
+                .category(Category.builder().id(categoryId).build())
                 .description(description).imgDefault((imgDefault)).build();
         product.setStatus(status);
         return product;

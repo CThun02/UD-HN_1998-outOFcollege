@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ColorServiceImpl implements ColorServiceI {
@@ -19,18 +20,20 @@ public class ColorServiceImpl implements ColorServiceI {
     }
 
     @Override
-    public Color update(Color color) {
-        Color colorCheck = this.getOne(color.getId());
-        if(colorCheck==null){
-            return null;
-        }
-        return repo.save(color);
+    public Color update(Color color, Long id) {
+        Optional<Color> optional = repo.findById(id);
+
+        return optional.map(o->{
+            o.setColorName(color.getColorName());
+            o.setStatus(color.getStatus());
+            return repo.save(o);
+        }).orElse(null);
     }
 
     @Override
     public Boolean delete(Long id) {
         Color colorCheck = this.getOne(id);
-        if(colorCheck==null){
+        if (colorCheck == null) {
             return false;
         }
         repo.delete(colorCheck);

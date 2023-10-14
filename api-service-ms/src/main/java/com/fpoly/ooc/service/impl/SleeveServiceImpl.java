@@ -1,14 +1,13 @@
 package com.fpoly.ooc.service.impl;
 
-import com.fpoly.ooc.entity.Brand;
 import com.fpoly.ooc.entity.SleeveType;
-import com.fpoly.ooc.repository.BrandDAORepository;
 import com.fpoly.ooc.repository.SleeveDAORepository;
 import com.fpoly.ooc.service.interfaces.SleeveServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class SleeveServiceImpl implements SleeveServiceI {
@@ -21,12 +20,14 @@ public class SleeveServiceImpl implements SleeveServiceI {
     }
 
     @Override
-    public SleeveType update(SleeveType sleeveType) {
-        SleeveType sleeveTypeCheck = this.getOne(sleeveType.getId());
-        if(sleeveTypeCheck==null){
-            return null;
-        }
-        return repo.save(sleeveType);
+    public SleeveType update(SleeveType sleeveType, Long id) {
+        Optional<SleeveType> optional = repo.findById(id);
+
+        return optional.map(o->{
+            o.setSleeveName(sleeveType.getSleeveName());
+            o.setStatus(sleeveType.getStatus());
+            return repo.save(o);
+        }).orElse(null);
     }
 
     @Override

@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface ButtonTypeServiceI {
     public ButtonType create(ButtonType buttonType);
-    public ButtonType update(ButtonType buttonType);
+    public ButtonType update(ButtonType buttonType, Long id);
     public Boolean delete(Long id);
     public List<ButtonType> findAll();
     public ButtonType getOne(Long id);

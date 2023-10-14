@@ -21,18 +21,18 @@ public class ShirtTailTypeController {
     }
 
     @PostMapping("create")
-    public ResponseEntity<?> create(ShirtTailType shirtTailType) {
+    public ResponseEntity<?> create(@RequestBody ShirtTailType shirtTailType) {
         return ResponseEntity.ok(service.create(shirtTailType));
     }
 
     @PutMapping("edit/{id}")
-    public ResponseEntity<?> update(@RequestParam Long id) {
-        ShirtTailType shirtTailType = service.getOne(id);
-        return ResponseEntity.ok(service.update(shirtTailType));
+    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody ShirtTailType shirtTailType) {
+
+        return ResponseEntity.ok(service.update(shirtTailType, id));
     }
 
     @DeleteMapping("delete/{id}")
-    public ResponseEntity<?> delete(@RequestParam Long id) {
+    public ResponseEntity<?> delete(@PathVariable Long id) {
         ShirtTailType shirtTailType = service.getOne(id);
         service.delete(shirtTailType.getId());
         return ResponseEntity.ok("Ok");

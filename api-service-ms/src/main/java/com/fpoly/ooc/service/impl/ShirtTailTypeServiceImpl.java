@@ -1,15 +1,13 @@
 package com.fpoly.ooc.service.impl;
 
-import com.fpoly.ooc.entity.Material;
 import com.fpoly.ooc.entity.ShirtTailType;
-import com.fpoly.ooc.repository.MaterialDAORepository;
 import com.fpoly.ooc.repository.ShirtTailTypeDAORepository;
-import com.fpoly.ooc.service.interfaces.MaterialServiceI;
 import com.fpoly.ooc.service.interfaces.ShirtTailTypeServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ShirtTailTypeServiceImpl implements ShirtTailTypeServiceI {
@@ -22,12 +20,14 @@ public class ShirtTailTypeServiceImpl implements ShirtTailTypeServiceI {
     }
 
     @Override
-    public ShirtTailType update(ShirtTailType shirtTailType) {
-        ShirtTailType brandCheck = this.getOne(shirtTailType.getId());
-        if(brandCheck==null){
-            return null;
-        }
-        return repo.save(shirtTailType);
+    public ShirtTailType update(ShirtTailType shirtTailType, Long id) {
+        Optional<ShirtTailType> optional = repo.findById(id);
+
+        return optional.map(o->{
+            o.setShirtTailTypeName(shirtTailType. getShirtTailTypeName());
+            o.setStatus(shirtTailType.getStatus());
+            return repo.save(o);
+        }).orElse(null);
     }
 
     @Override

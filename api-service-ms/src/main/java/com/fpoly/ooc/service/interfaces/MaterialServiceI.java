@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface MaterialServiceI {
     public Material create(Material material);
-    public Material update(Material material);
+    public Material update(Material material,Long id);
     public Boolean delete(Long id);
     public List<Material> findAll();
     public Material getOne(Long id);

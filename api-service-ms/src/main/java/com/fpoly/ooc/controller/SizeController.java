@@ -16,23 +16,23 @@ public class SizeController {
     private SizeServiceI service;
 
     @GetMapping("")
-    public List<Size> data(){
+    public List<Size> data() {
         return service.findAll();
     }
 
     @PostMapping("create")
-    public ResponseEntity<?> create(Size size){
+    public ResponseEntity<?> create(@RequestBody  Size size) {
         return ResponseEntity.ok(service.create(size));
     }
 
     @PutMapping("edit/{id}")
-    public ResponseEntity<?>update(@RequestParam Long id){
-        Size size = service.getOne(id);
-        return ResponseEntity.ok(service.update(size));
+    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody Size size) {
+
+        return ResponseEntity.ok(service.update(size, id));
     }
 
     @DeleteMapping("delete/{id}")
-    public ResponseEntity<?>delete(@RequestParam Long id){
+    public ResponseEntity<?> delete(@PathVariable Long id) {
         Size size = service.getOne(id);
         service.delete(size.getId());
         return ResponseEntity.ok("Ok");

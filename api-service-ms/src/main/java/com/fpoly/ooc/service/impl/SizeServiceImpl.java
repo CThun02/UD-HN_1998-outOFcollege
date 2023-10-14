@@ -1,15 +1,13 @@
 package com.fpoly.ooc.service.impl;
 
-import com.fpoly.ooc.entity.Pattern;
 import com.fpoly.ooc.entity.Size;
-import com.fpoly.ooc.repository.PatternDAORepository;
 import com.fpoly.ooc.repository.SizeDAORepository;
-import com.fpoly.ooc.service.interfaces.PatternServiceI;
 import com.fpoly.ooc.service.interfaces.SizeServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class SizeServiceImpl implements SizeServiceI {
@@ -22,12 +20,14 @@ public class SizeServiceImpl implements SizeServiceI {
     }
 
     @Override
-    public Size update(Size size) {
-        Size sizeCheck = this.getOne(size.getId());
-        if(sizeCheck==null){
-            return null;
-        }
-        return repo.save(size);
+    public Size update(Size size, Long id) {
+        Optional<Size> optional = repo.findById(id);
+
+        return optional.map(o->{
+            o.setSizeName(size.getSizeName());
+            o.setStatus(size.getStatus());
+            return repo.save(o);
+        }).orElse(null);
     }
 
     @Override

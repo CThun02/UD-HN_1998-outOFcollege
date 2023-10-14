@@ -1,6 +1,7 @@
 import {
   EditFilled,
   EyeFilled,
+  FilterFilled,
   PlusOutlined,
   SearchOutlined,
   TableOutlined,
@@ -39,36 +40,34 @@ const ProductIndex = () => {
       },
     },
     {
-      key: "8",
-      title: "Ảnh",
-      dataIndex: "imgDefault",
-      width: 100,
-      render: (imgDefault) => {
-        return (
-          <>
-            <img
-              alt="example"
-              width={"100%"}
-              style={{ boxShadow: "rgba(100, 100, 111, 0.2) 0px 7px 29px 0px" }}
-              src={imgDefault}
-            />
-          </>
-        );
-      },
-    },
-    {
       key: "2",
       title: "Mã sản phẩm",
       dataIndex: "productCode",
-      width: 200,
     },
     {
       key: "3",
       title: "Tên sản phẩm",
       dataIndex: "productName",
+      width: 300,
     },
     {
       key: "4",
+      title: "Loại sản phẩm",
+      dataIndex: "category",
+      render: (category) => {
+        return category.categoryName;
+      },
+    },
+    {
+      key: "5",
+      title: "Thương hiệu",
+      dataIndex: "brand",
+      render: (brand) => {
+        return brand.brandName;
+      },
+    },
+    {
+      key: "5",
       title: "Số lượng",
       dataIndex: "quantity",
       width: 150,
@@ -100,7 +99,7 @@ const ProductIndex = () => {
             <Button className={styles.product__button}>
               <EyeFilled />
             </Button>
-          </Link>
+          </Link>{" "}
           <Link to={`/admin/product/update-details/${id}`}>
             <Button className={styles.product__button}>
               <EditFilled />
@@ -204,10 +203,10 @@ const ProductIndex = () => {
       <div className={styles.product__index}>
         <div className={styles.product__filter}>
           <h2>
-            <TableOutlined /> Danh sách sản phẩm
+            <FilterFilled /> Bộ lọc
           </h2>
           <Row className={styles.produt__filterSelects}>
-            <Col span={12}>
+            <Col span={24}>
               <div className={styles.filter__status}>
                 <span style={{ fontWeight: "500", marginRight: "16px" }}>
                   Trạng Thái
@@ -226,27 +225,30 @@ const ProductIndex = () => {
                 </Radio.Group>
               </div>
             </Col>
-            <Col span={24} className={styles.filter__search}>
-              <Row>
-                <Col span={12}>
-                  <Input
-                    className={styles.filter_inputSearch}
-                    placeholder="Nhập mã, tên sản phẩm"
-                    prefix={<SearchOutlined />}
-                  />
-                </Col>
-                <Col span={12}>
-                  <Link to={"/admin/product/create-details"}>
-                    <Button className={styles.product_tableButtonCreate}>
-                      <PlusOutlined />
-                    </Button>
-                  </Link>
-                </Col>
-              </Row>
+            <br />
+            <Col span={12}>
+              <Input
+                className={styles.filter_inputSearch}
+                placeholder="Nhập mã, tên sản phẩm"
+                prefix={<SearchOutlined />}
+              />
             </Col>
           </Row>
         </div>
         <div className={styles.product__table}>
+          <h2>
+            <TableOutlined /> Danh sách sản phẩm
+          </h2>
+          <Row className={styles.filter__search}>
+            <Col span={24}>
+              <Link to={"/admin/product/create-details"}>
+                <Button className={styles.product_tableButtonCreate}>
+                  <PlusOutlined />
+                </Button>
+              </Link>
+            </Col>
+          </Row>
+          <br />
           <div className={styles.product__tableProducts}>
             <Table
               columns={columns}
@@ -258,9 +260,15 @@ const ProductIndex = () => {
                   key: index,
                 }))
               }
-              pagination={{ pageSize: 5 }}
-              scroll={{ y: 500 }}
+              pagination={{
+                showSizeChanger: true,
+                pageSizeOptions: [5, 10, 15, 20],
+                defaultPageSize: 5,
+                showLessItems: true,
+                style: { marginRight: "10px" },
+              }}
             />
+            <br />
           </div>
         </div>
       </div>

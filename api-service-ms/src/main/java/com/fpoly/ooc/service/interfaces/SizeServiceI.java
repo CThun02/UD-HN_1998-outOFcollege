@@ -6,8 +6,12 @@ import java.util.List;
 
 public interface SizeServiceI {
     public Size create(Size size);
-    public Size update(Size size);
+
+    public Size update(Size size, Long id);
+
     public Boolean delete(Long id);
+
     public List<Size> findAll();
+
     public Size getOne(Long id);
 }

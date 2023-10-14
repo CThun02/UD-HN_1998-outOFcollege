@@ -20,18 +20,17 @@ public class ColorController {
         return service.findAll();
     }
     @PostMapping("create")
-    public ResponseEntity<?> create(Color color){
+    public ResponseEntity<?> create(@RequestBody Color color){
         return ResponseEntity.ok(service.create(color));
     }
 
     @PutMapping("edit/{id}")
-    public ResponseEntity<?>update(@RequestParam Long id){
-        Color color = service.getOne(id);
-        return ResponseEntity.ok(service.update(color));
+    public ResponseEntity<?>update(@PathVariable Long id, @RequestBody Color color){
+        return ResponseEntity.ok(service.update(color,id));
     }
 
     @DeleteMapping("delete/{id}")
-    public ResponseEntity<?>delete(@RequestParam Long id){
+    public ResponseEntity<?>delete(@PathVariable Long id){
         Color color = service.getOne(id);
         service.delete(color.getId());
         return ResponseEntity.ok("Ok");

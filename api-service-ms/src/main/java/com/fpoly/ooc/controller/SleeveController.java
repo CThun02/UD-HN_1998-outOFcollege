@@ -26,13 +26,13 @@ public class SleeveController {
     }
 
     @PutMapping("edit/{id}")
-    public ResponseEntity<?> update(@RequestParam Long id) {
-        SleeveType sleeveType = service.getOne(id);
-        return ResponseEntity.ok(service.update(sleeveType));
+    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody SleeveType sleeveType) {
+
+        return ResponseEntity.ok(service.update(sleeveType, id));
     }
 
     @DeleteMapping("delete/{id}")
-    public ResponseEntity<?> delete(@RequestParam Long id) {
+    public ResponseEntity<?> delete(@PathVariable Long id) {
         SleeveType sleeveType = service.getOne(id);
         service.delete(sleeveType.getId());
         return ResponseEntity.ok("Ok");

@@ -1,4 +1,4 @@
-.material {
+.category {
   margin: 25px;
   background-color: white;
   padding: 20px 20px;
@@ -8,7 +8,7 @@
 .inputCommon {
   padding: 0px 100px;
 }
-.customerTable {
+.categoryTable {
   margin-top: 20px;
 }
 .btnCRUD {

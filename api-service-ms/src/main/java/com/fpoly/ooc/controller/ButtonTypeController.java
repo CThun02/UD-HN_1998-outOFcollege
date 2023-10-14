@@ -21,18 +21,18 @@ public class ButtonTypeController {
     }
 
     @PostMapping("create")
-    public ResponseEntity<?> create(ButtonType buttonType) {
+    public ResponseEntity<?> create(@RequestBody ButtonType buttonType) {
         return ResponseEntity.ok(service.create(buttonType));
     }
 
     @PutMapping("edit/{id}")
-    public ResponseEntity<?> update(@RequestParam Long id) {
-        ButtonType buttonType = service.getOne(id);
-        return ResponseEntity.ok(service.update(buttonType));
+    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody ButtonType buttonType) {
+
+        return ResponseEntity.ok(service.update(buttonType, id));
     }
 
     @DeleteMapping("delete/{id}")
-    public ResponseEntity<?> delete(@RequestParam Long id) {
+    public ResponseEntity<?> delete(@PathVariable Long id) {
         ButtonType buttonType = service.getOne(id);
         service.delete(buttonType.getId());
         return ResponseEntity.ok("Ok");

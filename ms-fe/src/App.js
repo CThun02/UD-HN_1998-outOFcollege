@@ -9,7 +9,6 @@ import Promotion from "./components/admin/promotion/Promotion";
 import CreatePromotion from "./components/admin/promotion/CreatePromotion";
 import Voucher from "./components/admin/voucher/Voucher";
 import Bill from "./components/admin/sale-couter/Bill";
-import CreateBill from "./components/admin/sale-couter/CreateBill";
 import ProductDetailsByProductId from "./components/admin/product/ProductDetailsByProductId";
 import ProductCreateDetails from "./components/admin/product/ProductCreateDetails";
 import BillTimeLine from "./components/admin/sale-couter/TimeLine";
@@ -22,6 +21,11 @@ import DetailForm from "./components/admin/account/DetailForm";
 import ProductDetails from "./components/admin/product/ProductDetails";
 import ProductUpdateDetails from "./components/admin/product/ProductUpdateDetails";
 import MaterialAdmin from "./components/admin/material/MaterialAdmin";
+import CollorAdmin from "./components/admin/collor/ColorAdmin";
+import SleeveAdmin from "./components/admin/sleeve/SleeveAdmin";
+import SizeAdmin from "./components/admin/size/SizeAdmin";
+import ButtonAdmin from "./components/admin/buttontype/ButtonAdmin";
+import ShirtailAdmin from "./components/admin/shirtailtype/ShirtTypeAdmin";
 function App() {
   const [message, setMessage] = useState("");
 
@@ -48,7 +52,6 @@ function App() {
                     {/* Tại quầy */}
                     <Route path="counter-sales">
                       <Route index element={<Bill />}></Route>
-                      <Route path="bill" element={<CreateBill />}></Route>
                       <Route
                         path=":billId/timeline"
                         element={<BillTimeLine />}
@@ -88,13 +91,13 @@ function App() {
                     <Route path="brand" element="brand"></Route>
                     <Route path="pattern" element="pattern"></Route>
                     <Route path="form" element="form"></Route>
-                    <Route path="button" element="button"></Route>
+                    <Route path="button" element={<ButtonAdmin />}></Route>
                     <Route path="material" element={<MaterialAdmin />} />
                     <Route path="collar" element="collar"></Route>
-                    <Route path="shirtTail" element="shirtTail"></Route>
-                    <Route path="sleeve" element="sleeve"></Route>
-                    <Route path="color" element="color"></Route>
-                    <Route path="size" element="size"></Route>
+                    <Route path="shirtTail" element={<ShirtailAdmin />}></Route>
+                    <Route path="sleeve" element={<SleeveAdmin />}></Route>
+                    <Route path="color" element={<CollorAdmin />}></Route>
+                    <Route path="size" element={<SizeAdmin />}></Route>
 
                     {/* Voucher */}
                     <Route path="vouchers">

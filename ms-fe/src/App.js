@@ -21,6 +21,7 @@ import CustomerAdmin from "./components/admin/account/CustomorAdmin";
 import DetailForm from "./components/admin/account/DetailForm";
 import ProductDetails from "./components/admin/product/ProductDetails";
 import ProductUpdateDetails from "./components/admin/product/ProductUpdateDetails";
+import MaterialAdmin from "./components/admin/material/MaterialAdmin";
 function App() {
   const [message, setMessage] = useState("");
 
@@ -82,12 +83,13 @@ function App() {
                     <Route path="hien-thi" element="el" />
                     */}
                     </Route>
+                    {/*Chất liệu */}
                     <Route path="category" element="category"></Route>
                     <Route path="brand" element="brand"></Route>
                     <Route path="pattern" element="pattern"></Route>
                     <Route path="form" element="form"></Route>
                     <Route path="button" element="button"></Route>
-                    <Route path="material" element="material"></Route>
+                    <Route path="material" element={<MaterialAdmin />} />
                     <Route path="collar" element="collar"></Route>
                     <Route path="shirtTail" element="shirtTail"></Route>
                     <Route path="sleeve" element="sleeve"></Route>

@@ -188,6 +188,7 @@ VALUES
 ('user4', 4, 'ACTIVE', '2023-09-12', '2023-09-12', N'Admin', N'Admin', NULL),
 ('user5', 5, 'ACTIVE', '2023-09-15', '2023-09-15', N'Admin', N'Admin', NULL);
 select * from address_detail
+
 INSERT INTO bill (account_id, date_of_receipt, completion_date, price, price_reduce, bill_type,note, status, created_at, updated_at, created_by, updated_by, deleted_at)
 VALUES 
 ('user1', '2023-09-01', '2023-09-05', 100.00, 10.00, 'Online', 'Completed','ABC', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL),
@@ -199,16 +200,17 @@ select * from bill
 
 INSERT INTO delivery_note (bill_id, address_id, name, number_phone, createtion_date, ship_date, date_of_receipt, ship_price, status, created_at, updated_at, created_by, updated_by, deleted_at)
 VALUES 
-(6, 1, N'John Doe', N'1234567890', '2023-09-01', '2023-09-05', '2023-09-10', 10.99, 'Delivered', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL),
+(1, 1, N'John Doe', N'1234567890', '2023-09-01', '2023-09-05', '2023-09-10', 10.99, 'Delivered', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL),
 (2, 2, N'Jane Smith', N'9876543210', '2023-09-05', '2023-09-10', '2023-09-15', 8.99, 'In Transit', '2023-09-05', '2023-09-05', N'Admin', N'Admin', NULL),
 (3, 3, N'Michael Johnson', N'5555555555', '2023-09-10', '2023-09-15', '2023-09-20', 12.99, 'Pending', '2023-09-10', '2023-09-10', N'Admin', N'Admin', NULL),
 (4, 4, N'Sarah Williams', N'1111111111', '2023-09-12', '2023-09-17', '2023-09-22', 9.99, 'Delivered', '2023-09-12', '2023-09-12', N'Admin', N'Admin', NULL),
 (5, 5, N'David Brown', N'9999999999', '2023-09-15', '2023-09-20', '2023-09-25', 11.99, 'In Transit', '2023-09-15', '2023-09-15', N'Admin', N'Admin', NULL);
 select * from delivery_note
+select * from bill
 
 INSERT INTO time_line (bill_id, note, status, created_at, updated_at, created_by, updated_by, deleted_at)
 VALUES 
-(6, N'Order placed', 'Processing', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL),
+(1, N'Order placed', 'Processing', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL),
 (2, N'Preparing for shipment', 'Processing', '2023-09-02', '2023-09-02', N'Admin', N'Admin', NULL),
 (3, N'Shipped', 'In Transit', '2023-09-03', '2023-09-03', N'Admin', N'Admin', NULL),
 (5, N'Out for delivery', 'In Transit', '2023-09-04', '2023-09-04', N'Admin', N'Admin', NULL),
@@ -217,7 +219,7 @@ select * from time_line
 
 INSERT INTO payment_detail (bill_id, payment_id, price, date, status, created_at, updated_at, created_by, updated_by, deleted_at)
 VALUES 
-(6, 1, 50.00, '2023-09-01', 'Paid', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL),
+(1, 1, 50.00, '2023-09-01', 'Paid', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL),
 (2, 2, 75.00, '2023-09-05', 'Paid', '2023-09-05', '2023-09-05', N'Admin', N'Admin', NULL),
 (3, 3, 100.00, '2023-09-10', 'Pending', '2023-09-10', '2023-09-10', N'Admin', N'Admin', NULL),
 (4, 4, 60.00, '2023-09-12', 'Paid', '2023-09-12', '2023-09-12', N'Admin', N'Admin', NULL),
@@ -235,7 +237,7 @@ select * from voucher_account
 
 INSERT INTO voucher_history (bill_id, voucher_code, price_reduce, status, created_at, updated_at, created_by, updated_by, deleted_at)
 VALUES 
-(6, 'VOUCHER001', 10.00, 'Applied', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL),
+(1, 'VOUCHER001', 10.00, 'Applied', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL),
 (2, 'VOUCHER002', 5.00, 'Applied', '2023-09-05', '2023-09-05', N'Admin', N'Admin', NULL),
 (3, 'VOUCHER003', 0.00, 'Not Applied', '2023-09-10', '2023-09-10', N'Admin', N'Admin', NULL),
 (4, 'VOUCHER004', 8.00, 'Applied', '2023-09-12', '2023-09-12', N'Admin', N'Admin', NULL),
@@ -271,7 +273,7 @@ select * from favorites_list_detail
 
 INSERT INTO bill_detail (bill_id, product_detail_id, price, quantity, status, created_at, updated_at, created_by, updated_by, deleted_at)
 VALUES 
-(6, 1, 50.00, 2, 'ACTIVE', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL),
+(1, 1, 50.00, 2, 'ACTIVE', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL),
 (2, 2, 75.00, 1, 'ACTIVE', '2023-09-05', '2023-09-05', N'Admin', N'Admin', NULL),
 (3, 3, 100.00, 3, 'ACTIVE', '2023-09-10', '2023-09-10', N'Admin', N'Admin', NULL),
 (4, 4, 60.00, 2,  'ACTIVE', '2023-09-12', '2023-09-12', N'Admin', N'Admin', NULL),

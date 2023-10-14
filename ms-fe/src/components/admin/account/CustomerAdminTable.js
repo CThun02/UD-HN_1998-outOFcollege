@@ -4,7 +4,7 @@ import QRScanner from "./QRScanner";
 import { useNavigate, useParams } from "react-router-dom";
 import DetailForm from "./DetailForm";
 import { Table, Space, Pagination, Button, Row, Col, Form, Modal } from "antd";
-import { EyeOutlined, FileOutlined } from "@ant-design/icons";
+import { FileOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import style from "./styles/Customerlndex.module.css";
 import { saveImage } from "../../../config/FireBase";

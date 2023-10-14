@@ -3,10 +3,8 @@ package com.fpoly.ooc.controller;
 import com.fpoly.ooc.entity.Color;
 import com.fpoly.ooc.service.interfaces.ColorServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -20,5 +18,22 @@ public class ColorController {
     @GetMapping("")
     public List<Color> data(){
         return service.findAll();
+    }
+    @PostMapping("create")
+    public ResponseEntity<?> create(Color color){
+        return ResponseEntity.ok(service.create(color));
+    }
+
+    @PutMapping("edit/{id}")
+    public ResponseEntity<?>update(@RequestParam Long id){
+        Color color = service.getOne(id);
+        return ResponseEntity.ok(service.update(color));
+    }
+
+    @DeleteMapping("delete/{id}")
+    public ResponseEntity<?>delete(@RequestParam Long id){
+        Color color = service.getOne(id);
+        service.delete(color.getId());
+        return ResponseEntity.ok("Ok");
     }
 }

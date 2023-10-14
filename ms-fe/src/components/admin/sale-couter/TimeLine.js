@@ -9,45 +9,9 @@ import ModalDetail from './ModalDetail';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import moment from 'moment/moment';
-import { DeleteColumnOutlined, DeleteOutlined } from '@ant-design/icons';
 
-const BillTimeLine = () => {
-    const columns = [
-        {
-            title: 'Mã giao dịch',
-            key: 'code',
-        },
-        {
-            title: 'Loại giao dịch',
-            dataIndex: 'type',
-            key: 'type',
-        },
-        {
-            title: 'Phương thức thanh toán',
-            dataIndex: 'paymentName',
-            key: 'paymentName',
-        },
-        {
-            title: 'Trạng thái',
-            dataIndex: 'billStatus',
-            key: 'billStatus',
-        },
-        {
-            title: 'Thời gian',
-            dataIndex: 'completionDate',
-            key: 'completionDate',
-        },
-        {
-            title: 'Số tiền',
-            dataIndex: 'totalPrice',
-            key: 'totalPrice',
-        },
-        {
-            title: 'Người xác nhận',
-            dataIndex: 'createdBy',
-            key: 'createdBy',
-        },
-    ];
+const BillTimeLine = (addId) => {
+
     const [isModalConfirm, setIsModalConfirm] = useState(false);
     const [isModalDetail, setIsModalDetail] = useState(false);
     const [timelines, setTimelines] = useState([]);
@@ -106,7 +70,12 @@ const BillTimeLine = () => {
             .catch((error) => {
                 console.log(error)
             })
-        axios.get(`http://localhost:8080/api/admin/timeline/${billId}/info`)
+        axios.get(`http://localhost:8080/api/admin/timeline/${billId}/info`,
+            {
+                params: {
+                    addId: addId,
+                }
+            })
             .then((response) => {
                 setBillInfo(response.data)
             })
@@ -191,7 +160,6 @@ const BillTimeLine = () => {
             key: 'productPrice',
         },
     ]
-    console.log('bill type', billInfo.billType)
     return (
         <>
             <section className={styles.background}>

@@ -5,12 +5,23 @@ import com.fpoly.ooc.entity.Bill;
 import com.fpoly.ooc.request.bill.BillRequest;
 import com.fpoly.ooc.responce.account.AccountResponce;
 import com.fpoly.ooc.responce.account.GetListCustomer;
+import com.fpoly.ooc.responce.bill.BillManagementResponse;
+import org.springframework.data.domain.Page;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface BillService {
 
     Bill createBill(BillRequest request);
+
+    Page<BillManagementResponse> getAllBillManagement(Integer pageNo,
+                                                      Integer size,
+                                                      String billCode,
+                                                      LocalDateTime startDate,
+                                                      LocalDateTime endDate,
+                                                      String status,
+                                                      String billType);
 
     void deleteBill(Long id);
 

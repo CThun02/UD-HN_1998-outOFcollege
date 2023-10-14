@@ -11,6 +11,7 @@ import {
   Select,
   InputNumber,
   notification,
+  Modal,
 } from "antd";
 import React, { useEffect, useState } from "react";
 import styles from "./Bill.module.css";
@@ -29,8 +30,7 @@ import moment from "moment/moment";
 import { useNavigate } from "react-router-dom";
 import ModalAccount from "./ModalAccount";
 import ModalAddress from "./ModalAddress";
-import Big from "big.js";
-import { object } from "yup";
+
 
 const Bill = () => {
   var initialItems = [];
@@ -284,7 +284,6 @@ const Bill = () => {
   };
 
   const handleProvinceChange = async (value) => {
-    console.log(value)
     if (value) {
       await axios
         .get(
@@ -544,7 +543,8 @@ const Bill = () => {
 
   const [billType, setBilType] = useState('In-store')
   const [note, setNote] = useState("")
-
+  const [fullname, setFullname] = useState('')
+  const [phoneNumber, setPhoneNumber] = useState('')
   const handleCreateBill = (index) => {
     const bill = {
       billCode: activeKey,
@@ -558,13 +558,12 @@ const Bill = () => {
     };
 
     console.log(`remain `, remainAmount)
-    // let priceAndFee = 0;
-    // if (switchChange[index] && account !== null) {
-    //   priceAndFee = shippingFee + totalPrice
-    // } else {
-    //   priceAndFee = totalPrice;
-    // }
-    // console.log(`tổng tiền: ${priceAndFee}`)
+    let priceAndFee = 0;
+    if (switchChange[index] && account !== null) {
+      priceAndFee = shippingFee + totalPrice
+    } else {
+      priceAndFee = totalPrice;
+    }
     if (productDetails.length <= 0) {
       return notification.error({
         message: "Thông báo",
@@ -572,8 +571,11 @@ const Bill = () => {
         duration: 2,
       });
     }
-    else if (selectedButton == null) {
+    else if (!switchChange[index] && selectedButton == null) {
       return console.log('chưa chọn hình thức thanh toán')
+    }
+    else if (!switchChange[index] && remainAmount < 0) {
+      return console.log('Tiền không đụ')
     }
     else {
       for (let i = 0; i < productDetails.length; i++) {
@@ -595,7 +597,7 @@ const Bill = () => {
     //       .post('http://localhost:8080/api/admin/bill', bill)
     //       .then((response) => {
     //         navigate(`/admin/counter-sales/${response.data.id}/timeline`);
-    //         remove(activeTab);
+    //         remove(activeKey);
     //       })
     //       .catch((error) => {
     //         console.log(error);
@@ -885,25 +887,35 @@ const Bill = () => {
                           {!switchChange[index] && <>
                             <span style={{ fontSize: "16px", width: '200%', display: "block" }}>
                               Số tiền khách trả
-                              <input type="number"
-                                className={styles.input}
-                                onChange={(e) => setRemainAmount(e.target.value)} />
+                              {
+                                switchChange[index] && account !== null ? (
+                                  <input type="number"
+                                    className={styles.input}
+                                    onChange={(e) => setRemainAmount(e.target.value - totalPrice - shippingFee)} />
+                                ) : (
+                                  <input type="number"
+                                    className={styles.input}
+                                    onChange={(e) => setRemainAmount(e.target.value - totalPrice)} />
+                                )
+                              }
                             </span>
                             <span style={{ fontSize: "16px", width: '200%', display: "block" }}>
                               Tiền thừa trả khách
-                              {/* <span style={{ marginLeft: '59px' }}>
-                                {remainAmount.toLocaleString('vi-VN', {
-                                  style: 'currency',
-                                  currency: 'VND'
-                                })}
-                              </span> */}
+                              <span style={{ marginLeft: '59px' }}>
+                                <span style={{ color: "red" }}>
+                                  {(remainAmount).toLocaleString('vi-VN', {
+                                    style: 'currency',
+                                    currency: 'VND'
+                                  })}
+                                </span>
+                              </span>
                             </span>
                           </>}
                         </Col>
 
                         <TextArea onChange={(e) => setNote(e.target.value)} rows={3} placeholder="ghi chú ..." style={{ margin: '10px 0' }} />
                         <div style={{ marginTop: "20px" }}>
-                          <div className={styles.buttonGroup}>
+                          {!switchChange[index] && <div className={styles.buttonGroup}>
                             <Button
                               className={`${styles.cashButton} ${selectedButton === 1 ? styles.selected : ''}`}
                               icon={<DollarOutlined />}
@@ -925,7 +937,7 @@ const Bill = () => {
                             >
                               Cả hai
                             </Button>
-                          </div>
+                          </div>}
                         </div>
                         <div style={{ marginTop: "20px" }}>
                           <Button

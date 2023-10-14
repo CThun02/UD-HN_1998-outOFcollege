@@ -18,6 +18,8 @@ public class BillRequest {
 
     private Long paymentDetailId;
 
+    private Long addressId;
+
     private String accountId;
 
     private LocalDateTime dateOfReceipt;
@@ -35,6 +37,14 @@ public class BillRequest {
     private String note;
 
     private String billCode;
+
+    private String fullname;
+
+    private String phoneNumber;
+
+    private LocalDateTime shipDate;
+
+    private BigDecimal shipPrice;
 
     private List<BillDetailRequest> lstBillDetailRequest;
 

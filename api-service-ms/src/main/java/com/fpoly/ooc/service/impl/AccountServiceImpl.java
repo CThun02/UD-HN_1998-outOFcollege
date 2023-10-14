@@ -167,14 +167,24 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Page<AccountVoucher> findAccountVoucher(CustomerConditionDTO customerConditionDTO, Pageable pageable) {
+        Boolean gender = true;
+
+        if(customerConditionDTO.getGender().equals("false")) {
+            gender = false;
+        }
+
+        if(customerConditionDTO.getGender().equals("all")) {
+            gender = null;
+        }
+
         List<AccountVoucher> accountVoucherList = accountRepository.customerAccountList(
                 StringUtils.isEmpty(customerConditionDTO.getSearchText())
-                        ? null : "%" + customerConditionDTO.getSearchText() + "%", customerConditionDTO.getGender());
+                        ? null : "%" + customerConditionDTO.getSearchText() + "%", gender);
         accountVoucherList.forEach((e) -> log.info("Data: " + e));
 
         return page(accountRepository.customerAccountList(
                 StringUtils.isEmpty(customerConditionDTO.getSearchText()) ? null : "%" + customerConditionDTO.getSearchText() + "%",
-                customerConditionDTO.getGender()
+                gender
         ), pageable);
     }
 

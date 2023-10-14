@@ -1,7 +1,21 @@
 import { DeleteOutlined } from "@ant-design/icons";
-import { Button, Divider, Modal, Pagination, Space, Spin, Table } from "antd";
+import {
+  Button,
+  Col,
+  Divider,
+  Input,
+  Modal,
+  Pagination,
+  Row,
+  Select,
+  Space,
+  Spin,
+  Table,
+} from "antd";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import FloatingLabels from "../../element/FloatingLabels/FloatingLabels";
+import styles from "./ModalAddCustomer.module.css";
 
 const columns = [
   {
@@ -36,6 +50,12 @@ const columns = [
   },
 ];
 
+const options = [
+  { label: "Nam", value: true },
+  { label: "Nữ", value: false },
+  { label: "Tất cả", value: "all" },
+];
+
 const baseCustomersUrl = "http://localhost:8080/api/admin/account/";
 
 function ModalAddCustomer({
@@ -51,7 +71,9 @@ function ModalAddCustomer({
   const [pageNo, setPageNo] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const [totalElements, setTotalElements] = useState(5);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [searchText, setSearchText] = useState("");
+  const [gender, setGender] = useState("all");
 
   const [selectedRows, setSelectedRows] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -68,6 +90,7 @@ function ModalAddCustomer({
   useEffect(
     function () {
       async function getCustomers() {
+        const filterCustomer = { searchText, gender };
         await axios
           .post(
             `${
@@ -81,10 +104,7 @@ function ModalAddCustomer({
                   pageSize
                 : baseCustomersUrl + "voucher"
             }`,
-            {
-              searchText: "user",
-              gender: true,
-            }
+            filterCustomer
           )
           .then((res) => {
             setTotalElements(res.data.totalElements);
@@ -98,7 +118,7 @@ function ModalAddCustomer({
 
       getCustomers();
     },
-    [pageNo, pageSize]
+    [pageNo, pageSize, gender, searchText]
   );
 
   useEffect(
@@ -185,6 +205,45 @@ function ModalAddCustomer({
             <>
               <Divider />
 
+              <Row>
+                <Col span={6}>
+                  <FloatingLabels
+                    label="Search...."
+                    name="searchText"
+                    value={searchText}
+                    zIndex={true}
+                  >
+                    <Input
+                      size="large"
+                      name="searchText"
+                      onChange={(e) => setSearchText(e.target.value)}
+                      value={searchText}
+                      allowClear
+                    />
+                  </FloatingLabels>
+                </Col>
+                <Col span={1}></Col>
+                <Col span={4}>
+                  <FloatingLabels
+                    label="Search...."
+                    name="gender"
+                    value={gender}
+                    zIndex={true}
+                  >
+                    <Select
+                      name="gender"
+                      className={styles.selectedItem}
+                      onChange={(e) => setGender(e)}
+                      options={options}
+                      value={gender}
+                      style={{ width: "100%" }}
+                      placeholder={null}
+                      size="large"
+                    />
+                  </FloatingLabels>
+                </Col>
+              </Row>
+
               <Space style={{ width: "100%" }} direction="vertical" size={12}>
                 <>
                   <Space
@@ -258,7 +317,9 @@ function ModalAddCustomer({
         ""
       )}
 
-      {values?.objectUse === "member" && values?.voucherId ? (
+      {values?.objectUse === "member" &&
+      values?.voucherId &&
+      values?.usernames.length ? (
         <Space style={{ width: "100%" }} direction="vertical" size={12}>
           <Table
             style={{ width: "100%" }}

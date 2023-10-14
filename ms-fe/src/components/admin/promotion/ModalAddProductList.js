@@ -3,7 +3,6 @@ import { useState } from "react";
 import ProductDetails from "../product/ProductDetails";
 import { DeleteOutlined, ExclamationCircleFilled } from "@ant-design/icons";
 import axios from "axios";
-import confirm from "antd/es/modal/confirm";
 
 const columns = [
   {
@@ -62,6 +61,8 @@ const columns = [
     key: "warehouse",
   },
 ];
+
+const confirm = Modal;
 
 const baseUrl = "http://localhost:8080/api/admin/promotion-product/";
 
@@ -158,7 +159,7 @@ function ModalAddProductList({
   return (
     <>
       {contextHolder}
-      <Modal
+      {/* <Modal
         width={1000}
         title="Chọn sản phẩm"
         centered
@@ -195,7 +196,7 @@ function ModalAddProductList({
             }))}
             pagination={false}
           />
-          {/* <Pagination
+           <Pagination
                 defaultCurrent={pageNo}
                 total={totalElements}
                 showSizeChanger={true}
@@ -203,9 +204,15 @@ function ModalAddProductList({
                 pageSizeOptions={["5", "10", "20", "50", "100"]}
                 onShowSizeChange={handlePageSize}
                 onChange={(page) => setPageNo(page)}
-              /> */}
+              /> 
         </Space>
       ) : null}
+      */}
+
+      <ProductDetails
+        action={action}
+        productDetailsCreate={productDetailsCreate}
+      />
     </>
   );
 }

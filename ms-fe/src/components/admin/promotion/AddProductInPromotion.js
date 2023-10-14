@@ -27,22 +27,6 @@ function AddProductInPromotion({
                   <h2>Sản phẩm khuyến mại</h2>
                 </Space>
               </Col>
-              {products.length ? (
-                <Col span={4}>
-                  <Button
-                    type="primary"
-                    ghost
-                    icon={<PlusOutlined />}
-                    onClick={() => setModalOpen(true)}
-                    disabled={
-                      values?.status === "INACTIVE" ||
-                      values?.status === "CANCEL"
-                    }
-                  >
-                    Thêm sản phẩm
-                  </Button>
-                </Col>
-              ) : null}
             </Row>
             <Row>
               <Col span={24}>
@@ -60,29 +44,14 @@ function AddProductInPromotion({
           </Space>
 
           <Row>
-            <Col span={24}>
-              {products.length ? null : (
-                <Button
-                  type="primary"
-                  ghost
-                  icon={<PlusOutlined />}
-                  onClick={() => setModalOpen(true)}
-                  disabled={
-                    values?.status === "INACTIVE" || values?.status === "CANCEL"
-                  }
-                >
-                  Thêm sản phẩm
-                </Button>
-              )}
-              <ModalAddProductList
-                isLoadingModal={modalOpen}
-                setIsLoadingModal={setModalOpen}
-                products={products}
-                setProducts={setProducts}
-                setFieldValue={setFieldValue}
-                values={values}
-              />
-            </Col>
+            <ModalAddProductList
+              isLoadingModal={modalOpen}
+              setIsLoadingModal={setModalOpen}
+              products={products}
+              setProducts={setProducts}
+              setFieldValue={setFieldValue}
+              values={values}
+            />
           </Row>
         </Space>
       </div>

@@ -119,6 +119,7 @@ function CreatePromotion() {
   const [onDeleteProductDetailIds, setOnDeleteProductDetailIds] = useState([]);
   const [productsId, setProductsId] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [status, setStatus] = useState(null);
 
   function handleChangeNumber(value) {
     const formattedValue = numeral(value).format("0,0");
@@ -254,6 +255,7 @@ function CreatePromotion() {
             ref.current.setFieldValue("productsDetailsIdDb", productDetailIds);
             setProductsDetailsId(productDetailIds);
             setProductsId(productIdsResponse);
+            setStatus(status);
           });
         }
         getPromotion();
@@ -573,6 +575,7 @@ function CreatePromotion() {
                     productsId={productsId}
                     setProductsId={setProductsId}
                     values={ref.current?.values}
+                    status={status}
                   />
                 </Col>
               </Row>
@@ -586,6 +589,7 @@ function CreatePromotion() {
           setProductsDetailsId={setProductsDetailsId}
           values={ref.current?.values}
           setOnDeleteProductDetailIds={setOnDeleteProductDetailIds}
+          status={status}
         />
       </Spin>
     </>

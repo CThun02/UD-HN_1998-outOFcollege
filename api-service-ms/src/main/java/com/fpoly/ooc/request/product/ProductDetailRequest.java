@@ -32,6 +32,8 @@ public class ProductDetailRequest {
     private Integer quantity;
     @JsonProperty("descriptionDetail")
     private String descriptionDetail;
+    @JsonProperty("status")
+    private String status;
 
     public ProductDetail dto(){
         ProductDetail productDetail = ProductDetail.builder().id(id).product(Product.builder().id(productId).build())
@@ -40,6 +42,7 @@ public class ProductDetailRequest {
                 .shirtTail(ShirtTailType.builder().id(shirtTailId).build()).size(Size.builder().id(sizeId).build())
                 .color(Color.builder().id(colorId).build()).color(Color.builder().id(colorId).build()).price(price)
                 .quantity(quantity).descriptionDetail(descriptionDetail).build();
+        productDetail.setStatus(status);
         return productDetail;
     }
 }

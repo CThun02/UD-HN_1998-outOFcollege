@@ -39,7 +39,7 @@ const columns = [
 const baseUrl = "http://localhost:8080/api/admin/product";
 const baseUrlProductDetail = "http://localhost:8080/api/admin/product";
 
-function TableProduct({ productsId, setProductsId, values }) {
+function TableProduct({ productsId, setProductsId, values, status }) {
   const [data, setData] = useState([]);
 
   //paging
@@ -67,6 +67,9 @@ function TableProduct({ productsId, setProductsId, values }) {
   const rowSelection = {
     selectedRowKeys,
     onChange: handleOnChange,
+    getCheckboxProps: (record) => ({
+      disabled: status === "INACTIVE" || status === "CANCEL" ? true : false,
+    }),
   };
 
   useEffect(
@@ -80,7 +83,6 @@ function TableProduct({ productsId, setProductsId, values }) {
 
   useEffect(() => {
     async function getProducts() {
-      console.log("also: ", values);
       const res = await axios.get(baseUrl + "/promotion");
 
       setData(res.data.content);

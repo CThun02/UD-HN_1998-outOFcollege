@@ -121,20 +121,18 @@ select * from payment
 
 INSERT INTO role (role_name, status, created_at, updated_at, created_by, updated_by, deleted_at)
 VALUES
-(N'Admin', 'ACTIVE', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL),
-(N'User', 'ACTIVE', '2023-09-15', '2023-09-15', N'Admin', N'Admin', NULL),
-(N'Admin', 'ACTIVE', '2023-10-01', '2023-10-01', N'Admin', N'Admin', NULL),
-(N'User', 'ACTIVE', '2023-09-10', '2023-09-10', N'Admin', N'Admin', NULL),
-(N'Admin', 'ACTIVE', '2023-09-20', '2023-09-20', N'Admin', N'Admin', NULL);
+(N'EMPLOYEE', 'ACTIVE', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL),
+(N'CUSTOMER', 'ACTIVE', '2023-09-15', '2023-09-15', N'Admin', N'Admin', NULL),
+(N'ADMIN', 'ACTIVE', '2023-10-01', '2023-10-01', N'Admin', N'Admin', NULL)
 select * from role
 
-INSERT INTO product (brand_id, category_id, pattern_id, form_id, product_code, product_name, description, status, created_at, updated_at, created_by, updated_by, deleted_at)
+INSERT INTO product (brand_id, category_id, product_code, product_name, description, status, created_at, updated_at, created_by, updated_by, deleted_at)
 VALUES
-(1, 1, 1, 1, N'P001', N'Shirt A', N'This is a stylish shirt.', 'ACTIVE', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL),
-(2, 1, 2, 2, N'P002', N'Shirt B', N'This shirt offers great comfort.', 'ACTIVE', '2023-09-15', '2023-09-15', N'Admin', N'Admin', NULL),
-(3, 2, 3, 3, N'P003', N'Pants A', N'These pants are suitable for any occasion.', 'ACTIVE', '2023-10-01', '2023-10-01', N'Admin', N'Admin', NULL),
-(2, 2, 4, 5, N'P004', N'Pants B', N'These pants are made of high-quality fabric.', 'ACTIVE', '2023-09-10', '2023-09-10', N'Admin', N'Admin', NULL),
-(4, 3, 5, 4, N'P005', N'Shoes A', N'These shoes provide excellent support.', 'ACTIVE', '2023-09-20', '2023-09-20', N'Admin', N'Admin', NULL);
+(1, 1, N'P001', N'Shirt A', N'This is a stylish shirt.', 'ACTIVE', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL),
+(2, 2, N'P002', N'Shirt B', N'This shirt offers great comfort.', 'ACTIVE', '2023-09-15', '2023-09-15', N'Admin', N'Admin', NULL),
+(3, 3, N'P003', N'Pants A', N'These pants are suitable for any occasion.', 'ACTIVE', '2023-10-01', '2023-10-01', N'Admin', N'Admin', NULL),
+(4, 5, N'P004', N'Pants B', N'These pants are made of high-quality fabric.', 'ACTIVE', '2023-09-10', '2023-09-10', N'Admin', N'Admin', NULL),
+(5, 4, N'P005', N'Shoes A', N'These shoes provide excellent support.', 'ACTIVE', '2023-09-20', '2023-09-20', N'Admin', N'Admin', NULL);
 select * from product
 
 INSERT INTO voucher (voucher_code, voucher_name, start_date, end_date, voucher_value, voucher_value_max, voucher_method, voucher_condition, limit_quantity, status, created_at, updated_at, created_by, updated_by, deleted_at, private)
@@ -190,13 +188,13 @@ VALUES
 ('user4', 4, 'ACTIVE', '2023-09-12', '2023-09-12', N'Admin', N'Admin', NULL),
 ('user5', 5, 'ACTIVE', '2023-09-15', '2023-09-15', N'Admin', N'Admin', NULL);
 select * from address_detail
-INSERT INTO bill (account_id, date_of_receipt, completion_date, price, price_reduce, bill_type, status, created_at, updated_at, created_by, updated_by, deleted_at)
+INSERT INTO bill (account_id, date_of_receipt, completion_date, price, price_reduce, bill_type, note, status, created_at, updated_at, created_by, updated_by, deleted_at)
 VALUES 
-('user1', '2023-09-01', '2023-09-05', 100.00, 10.00, 'Online', 'Completed', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL),
-('user2', '2023-09-05', '2023-09-10', 150.00, 15.00, 'In-store', 'Completed', '2023-09-05', '2023-09-05', N'Admin', N'Admin', NULL),
-('user3', '2023-09-10', '2023-09-15', 200.00, 20.00, 'Online', 'Pending', '2023-09-10', '2023-09-10', N'Admin', N'Admin', NULL),
-('user4', '2023-09-12', '2023-09-17', 120.00, 12.00, 'In-store', 'Completed', '2023-09-12', '2023-09-12', N'Admin', N'Admin', NULL),
-('user5', '2023-09-15', '2023-09-20', 180.00, 18.00, 'Online', 'Pending', '2023-09-15', '2023-09-15', N'Admin', N'Admin', NULL);
+('user1', '2023-09-01', '2023-09-05', 100.00, 10.00, 'Online', 'note', 'Completed', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL),
+('user2', '2023-09-05', '2023-09-10', 150.00, 15.00, 'In-store', 'note', 'Completed', '2023-09-05', '2023-09-05', N'Admin', N'Admin', NULL),
+('user3', '2023-09-10', '2023-09-15', 200.00, 20.00, 'Online', 'note', 'Pending', '2023-09-10', '2023-09-10', N'Admin', N'Admin', NULL),
+('user4', '2023-09-12', '2023-09-17', 120.00, 12.00, 'In-store', 'note', 'Completed', '2023-09-12', '2023-09-12', N'Admin', N'Admin', NULL),
+('user5', '2023-09-15', '2023-09-20', 180.00, 18.00, 'Online', 'note', 'Pending', '2023-09-15', '2023-09-15', N'Admin', N'Admin', NULL);
 select * from bill
 
 INSERT INTO delivery_note (bill_id, address_id, name, number_phone, createtion_date, ship_date, date_of_receipt, ship_price, status, created_at, updated_at, created_by, updated_by, deleted_at)
@@ -244,13 +242,13 @@ VALUES
 (5, 'VOUCHER005', 0.00, 'Not Applied', '2023-09-15', '2023-09-15', N'Admin', N'Admin', NULL);
 select * from voucher_history
 
-INSERT INTO product_detail (product_id, button_id, material_id, collar_id, sleeve_id, size_id, color_id, shirt_tail_id, price, quantity, description_detail, status, created_at, updated_at, created_by, updated_by, deleted_at)
+INSERT INTO product_detail (product_id, button_id, pattern_id, form_id, material_id, collar_id, sleeve_id, size_id, color_id, shirt_tail_id, price, quantity, description_detail, status, created_at, updated_at, created_by, updated_by, deleted_at)
 VALUES 
-(1, 1, 1, 1, 1, 1, 1, 1, 50.00, 10, N'Soft and comfortable fabric', 'ACTIVE', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL),
-(2, 2, 2, 2, 2, 2, 2, 2, 75.00, 15, N'Stylish and trendy design', 'ACTIVE', '2023-09-05', '2023-09-05', N'Admin', N'Admin', NULL),
-(3, 3, 3, 3, 3, 3, 3, 3, 100.00, 20, N'High-quality material', 'ACTIVE', '2023-09-10', '2023-09-10', N'Admin', N'Admin', NULL),
-(4, 4, 4, 4, 4, 4, 4, 4, 60.00, 12, N'Classic and elegant design', 'ACTIVE', '2023-09-12', '2023-09-12', N'Admin', N'Admin', NULL),
-(5, 5, 5, 5, 5, 5, 5, 5, 90.00, 8, N'Various color options available', 'ACTIVE', '2023-09-15', '2023-09-15', N'Admin', N'Admin', NULL);
+(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 50.00, 10, N'Soft and comfortable fabric', 'ACTIVE', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL),
+(2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 75.00, 15, N'Stylish and trendy design', 'ACTIVE', '2023-09-05', '2023-09-05', N'Admin', N'Admin', NULL),
+(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 100.00, 20, N'High-quality material', 'ACTIVE', '2023-09-10', '2023-09-10', N'Admin', N'Admin', NULL),
+(4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 60.00, 12, N'Classic and elegant design', 'ACTIVE', '2023-09-12', '2023-09-12', N'Admin', N'Admin', NULL),
+(5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 90.00, 8, N'Various color options available', 'ACTIVE', '2023-09-15', '2023-09-15', N'Admin', N'Admin', NULL);
 select * from product_detail
 
 INSERT INTO promotion_product_detail (promotion_id, product_detail_id, percent_reduce, money_after, status, created_at, updated_at, created_by, updated_by, deleted_at)
@@ -262,15 +260,6 @@ VALUES
 (5, 5, 30.00, 63.00, 'ACTIVE', '2023-09-15', '2023-09-15', N'Admin', N'Admin', NULL);
 select * from promotion_product_detail
 
-INSERT INTO product_image (product_detail_id, status, created_at, updated_at, created_by, updated_by, deleted_at)
-VALUES 
-(1, 'ACTIVE', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL),
-(2, 'ACTIVE', '2023-09-05', '2023-09-05', N'Admin', N'Admin', NULL),
-(3, 'ACTIVE', '2023-09-10', '2023-09-10', N'Admin', N'Admin', NULL),
-(4, 'ACTIVE', '2023-09-12', '2023-09-12', N'Admin', N'Admin', NULL),
-(5, 'ACTIVE', '2023-09-15', '2023-09-15', N'Admin', N'Admin', NULL);
-select * from product_image
-
 INSERT INTO favorites_list_detail (favorite_list_id, product_detail_id, status, created_at, updated_at, created_by, updated_by, deleted_at)
 VALUES 
 (1, 1, 'ACTIVE', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL),
@@ -280,13 +269,13 @@ VALUES
 (5, 5, 'ACTIVE', '2023-09-15', '2023-09-15', N'Admin', N'Admin', NULL);
 select * from favorites_list_detail
 
-INSERT INTO bill_detail (bill_id, product_detail_id, price, quantity, note, status, created_at, updated_at, created_by, updated_by, deleted_at)
+INSERT INTO bill_detail (bill_id, product_detail_id, price, quantity, status, created_at, updated_at, created_by, updated_by, deleted_at)
 VALUES 
-(1, 1, 50.00, 2, N'No special notes', 'ACTIVE', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL),
-(2, 2, 75.00, 1, N'Wrap as a gift', 'ACTIVE', '2023-09-05', '2023-09-05', N'Admin', N'Admin', NULL),
-(3, 3, 100.00, 3, N'Deliver to customer address', 'ACTIVE', '2023-09-10', '2023-09-10', N'Admin', N'Admin', NULL),
-(4, 4, 60.00, 2, N'Express shipping requested', 'ACTIVE', '2023-09-12', '2023-09-12', N'Admin', N'Admin', NULL),
-(5, 5, 90.00, 1, N'Customer requested color: Blue', 'ACTIVE', '2023-09-15', '2023-09-15', N'Admin', N'Admin', NULL);
+(1, 1, 50.00, 2, 'ACTIVE', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL),
+(2, 2, 75.00, 1, 'ACTIVE', '2023-09-05', '2023-09-05', N'Admin', N'Admin', NULL),
+(3, 3, 100.00, 3, 'ACTIVE', '2023-09-10', '2023-09-10', N'Admin', N'Admin', NULL),
+(4, 4, 60.00, 2, 'ACTIVE', '2023-09-12', '2023-09-12', N'Admin', N'Admin', NULL),
+(5, 5, 90.00, 1, 'ACTIVE', '2023-09-15', '2023-09-15', N'Admin', N'Admin', NULL);
 select * from bill_detail
 
 INSERT INTO cart_detail (cart_id, product_detail_id, quantity, status, created_at, updated_at, created_by, updated_by, deleted_at)

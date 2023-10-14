@@ -1,13 +1,16 @@
 package com.fpoly.ooc.repository;
 
-import com.fpoly.ooc.entity.Color;
-import com.fpoly.ooc.entity.ProductDetail;
+import com.fpoly.ooc.entity.*;
 import com.fpoly.ooc.responce.product.ProductDetailResponse;
 import com.fpoly.ooc.responce.productdetail.ProductsDetailsResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -15,13 +18,34 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
     @Query("select pd.id as id, pd.product as product, pd.button as button, pd.material as material" +
             ", pd.collar as collar, pd.sleeve as sleeve, pd.size as size, pd.color as color" +
             ", pd.shirtTail as shirtTail, pd.price as price, pd.quantity as quantity," +
-            "pd.descriptionDetail as descriptionDetail from ProductDetail pd where  pd.product.id=?1")
+            "pd.descriptionDetail as descriptionDetail, pd.status as status from ProductDetail pd where  pd.product.id=?1")
     public List<ProductDetailResponse> getProductDetailsByIdProduct(Long idPro);
 
     @Query("select distinct pd.product as product, pd.button as button, pd.material as material, pd.shirtTail as shirtTail" +
             ", pd.collar as collar, pd.sleeve as sleeve, pd.descriptionDetail as descriptionDetail from ProductDetail " +
-            "pd where  pd.product.id=?1 and pd.status=?2")
+            "pd where  pd.product.id=?1 and (pd.status=?2 or ?2 is null)")
     public List<ProductDetailResponse> getProductDetailsTableByIdProduct(Long idPro, String status);
+
+    @Query("select distinct pd.color from ProductDetail pd where pd.product.id=?1")
+    public List<Color> getColorsBydIdPro(Long productId);
+
+    @Query("select distinct pd.size from ProductDetail pd  where pd.product.id=?1")
+    public List<Size> getSizesBydIdPro(Long productId);
+
+    @Query("select distinct pd.shirtTail from ProductDetail pd  where pd.product.id=?1")
+    public List<ShirtTailType> getShirtTailsBydIdPro(Long productId);
+
+    @Query("select distinct pd.material from ProductDetail pd  where pd.product.id=?1")
+    public List<Material> getMaterialsBydIdPro(Long productId);
+
+    @Query("select distinct pd.collar from ProductDetail pd  where pd.product.id=?1")
+    public List<CollarType> getCollarsBydIdPro(Long productId);
+
+    @Query("select distinct pd.button from ProductDetail pd  where pd.product.id=?1")
+    public List<ButtonType> getButtonsBydIdPro(Long productId);
+
+    @Query("select distinct pd.sleeve from ProductDetail pd  where pd.product.id=?1")
+    public List<SleeveType> getSleevesBydIdPro(Long productId);
 
     @Query("select pd.id as id, pd.product as product, pd.button as button, pd.material as material" +
             ", pd.collar as collar, pd.sleeve as sleeve, pd.size as size, pd.color as color"+
@@ -65,6 +89,17 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
             ", pd.price AS price, pd.quantity AS quantity, pd.descriptionDetail AS descriptionDetail" +
             " FROM ProductDetail pd")
     public List<ProductDetailResponse> getAll();
+
+    @Transactional
+    @Modifying
+    @Query("update ProductDetail  pd set pd.status = ?9, pd.deletedAt = current_timestamp WHERE (pd.product.id = ?1 OR ?1 IS NULL) " +
+            "AND (pd.button.id = ?2 OR ?2 IS NULL) AND (pd.material.id = ?3 OR ?3 IS NULL) " +
+            "AND (pd.shirtTail.id = ?4 OR ?4 IS NULL) AND (pd.sleeve.id = ?5 OR ?5 IS NULL) " +
+            "AND (pd.collar.id = ?6 OR ?6 IS NULL) AND (pd.color.id = ?7 OR ?7 IS NULL) " +
+            "AND (pd.size.id = ?8 OR ?8 IS NULL)")
+    public Integer updateProductDetailsByCom(Long productId, Long idButton, Long idMaterial,
+                                                                   Long idShirtTail, Long idSleeve, Long idCollar,
+                                                                   Long idColor, Long idSize, String status);
 
     @Query("SELECT new java.lang.Long(pd.id) " +
             " FROM ProductDetail pd " +

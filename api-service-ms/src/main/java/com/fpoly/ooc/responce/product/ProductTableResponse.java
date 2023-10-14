@@ -14,8 +14,6 @@ public interface ProductTableResponse {
     String getImgDefault();
     Brand getBrand();
     Category getCategory();
-    Pattern getPattern();
-    Form getForm();
     Integer getQuantity();
     String getStatus();
     String getDescription();

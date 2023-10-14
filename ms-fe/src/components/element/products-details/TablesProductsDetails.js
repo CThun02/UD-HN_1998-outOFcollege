@@ -64,6 +64,8 @@ function TablesProductsDetails({
   setProductsDetailsId,
   values,
   setOnDeleteProductDetailIds,
+  productsId,
+  status,
 }) {
   const [selectedRows, setSelectedRows] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -77,16 +79,23 @@ function TablesProductsDetails({
   const rowSelection = {
     selectedRowKeys,
     onChange: handleOnChangeRow,
-    selections: [Table.SELECTION_ALL, Table.SELECTION_NONE],
+    selections:
+      status === "INACTIVE" || status === "CANCEL"
+        ? null
+        : [(Table.SELECTION_ALL, Table.SELECTION_NONE)],
+    getCheckboxProps: (record) => ({
+      disabled: status === "INACTIVE" || status === "CANCEL" ? true : false,
+    }),
   };
 
   useEffect(
     function () {
+      console.log("values: ", values);
       if (values?.promotionId) {
         setSelectedRowKeys(productsDetailsId);
       }
     },
-    [values, productsDetailsId]
+    [values, productsDetailsId, productsId]
   );
 
   function handleOnSelect(record, isSelected, selectedRows, nativeEvent) {

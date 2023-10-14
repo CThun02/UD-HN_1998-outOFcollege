@@ -9,7 +9,6 @@ import Promotion from "./components/admin/promotion/Promotion";
 import CreatePromotion from "./components/admin/promotion/CreatePromotion";
 import Voucher from "./components/admin/voucher/Voucher";
 import Bill from "./components/admin/sale-couter/Bill";
-import CreateBill from "./components/admin/sale-couter/CreateBill";
 import ProductDetailsByProductId from "./components/admin/product/ProductDetailsByProductId";
 import ProductCreateDetails from "./components/admin/product/ProductCreateDetails";
 import BillTimeLine from "./components/admin/sale-couter/TimeLine";
@@ -20,6 +19,7 @@ import AccountForm from "./components/admin/account/AccountForm";
 import CustomerAdmin from "./components/admin/account/CustomorAdmin";
 import DetailForm from "./components/admin/account/DetailForm";
 import ProductDetails from "./components/admin/product/ProductDetails";
+import ProductUpdateDetails from "./components/admin/product/ProductUpdateDetails";
 function App() {
   const [message, setMessage] = useState("");
 
@@ -46,7 +46,6 @@ function App() {
                     {/* Tại quầy */}
                     <Route path="counter-sales">
                       <Route index element={<Bill />}></Route>
-                      <Route path="bill" element={<CreateBill />}></Route>
                       <Route
                         path=":billId/timeline"
                         element={<BillTimeLine />}
@@ -74,8 +73,8 @@ function App() {
                         element={<ProductCreateDetails />}
                       />
                       <Route
-                        path={"update-details"}
-                        element={<ProductCreateDetails />}
+                        path={"update-details/:productId"}
+                        element={<ProductUpdateDetails />}
                       />
                       {/* ví dụ path= san-pham/hien-thi ->  
                     <Route path="hien-thi" element="el" />
@@ -83,6 +82,15 @@ function App() {
                     </Route>
                     <Route path="category" element="category"></Route>
                     <Route path="brand" element="brand"></Route>
+                    <Route path="pattern" element="pattern"></Route>
+                    <Route path="form" element="form"></Route>
+                    <Route path="button" element="button"></Route>
+                    <Route path="material" element="material"></Route>
+                    <Route path="collar" element="collar"></Route>
+                    <Route path="shirtTail" element="shirtTail"></Route>
+                    <Route path="sleeve" element="sleeve"></Route>
+                    <Route path="color" element="color"></Route>
+                    <Route path="size" element="size"></Route>
 
                     {/* Voucher */}
                     <Route path="vouchers">

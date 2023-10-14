@@ -10,6 +10,7 @@ function ProductsDetails({
   productsDetailsId,
   values,
   setOnDeleteProductDetailIds,
+  status,
 }) {
   const [productsDetails, setProductsDetails] = useState([]);
 
@@ -29,6 +30,8 @@ function ProductsDetails({
               setProductsDetailsId={setProductsDetailsId}
               values={values}
               setOnDeleteProductDetailIds={setOnDeleteProductDetailIds}
+              productsId={productsId}
+              status={status}
             />
           </Space>
         </div>

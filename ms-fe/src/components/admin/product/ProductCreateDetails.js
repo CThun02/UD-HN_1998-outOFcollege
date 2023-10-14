@@ -1,8 +1,4 @@
-import {
-  EyeOutlined,
-  PlusOutlined,
-  PlusSquareOutlined,
-} from "@ant-design/icons";
+import { PlusOutlined, PlusSquareOutlined } from "@ant-design/icons";
 import { Button, Col, message, Row, Select } from "antd";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
@@ -31,6 +27,7 @@ const ProductCreateDetails = (props) => {
   const [shirtTailsCreate, setshirtTailsCreate] = useState([]);
   const [productList, setProductList] = useState(null);
   const [render, setRender] = useState(1);
+  const [imgDefault, setImgDefault] = useState("");
   const [product, setProduct] = useState({
     productId: null,
     productName: "",
@@ -53,6 +50,7 @@ const ProductCreateDetails = (props) => {
     price: 200000,
     quantity: 1,
   });
+  var productDetailsCreate = renderProductDetails();
 
   //fucntion
   function handleSetProductDetail(field, value) {
@@ -65,6 +63,72 @@ const ProductCreateDetails = (props) => {
   function selectProduct(index) {
     setProduct(productList[index]);
     handleSetProductDetail("productId", productList[index].id);
+  }
+
+  function renderProductDetails() {
+    let list = [];
+    if (
+      buttonsCreate.length > 0 &&
+      materialsCreate.length > 0 &&
+      collarsCreate.length > 0 &&
+      shirtTailsCreate.length > 0 &&
+      sleevesCreate.length > 0 &&
+      colorsCreate.length > 0 &&
+      sizesCreate.length > 0
+    ) {
+      var index = 0;
+      for (let button of buttonsCreate) {
+        for (let material of materialsCreate) {
+          for (let collar of collarsCreate) {
+            for (let sleeve of sleevesCreate) {
+              for (let shirtTail of shirtTailsCreate) {
+                for (let size of sizesCreate) {
+                  for (let color of colorsCreate) {
+                    let productDetailDisplay = {
+                      id: index++,
+                      button: {
+                        id: button.key,
+                        name: button.label,
+                      },
+                      material: {
+                        id: material.key,
+                        name: material.label,
+                      },
+                      collar: {
+                        id: collar.key,
+                        name: collar.label,
+                      },
+                      shirtTail: {
+                        id: shirtTail.key,
+                        name: shirtTail.label,
+                      },
+                      sleeve: {
+                        id: sleeve.key,
+                        name: sleeve.label,
+                      },
+                      size: {
+                        id: size.key,
+                        name: size.label,
+                      },
+                      color: {
+                        id: color.key,
+                        code: color.value,
+                        name: color.label,
+                      },
+                      quantity: 10,
+                      price: 200000,
+                      status: "ACTIVE",
+                    };
+                    list.push(productDetailDisplay);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    return list;
   }
 
   useEffect(() => {
@@ -142,7 +206,7 @@ const ProductCreateDetails = (props) => {
         <Row>
           <Col span={10} className={styles.product__Form}>
             <h2>
-              <EyeOutlined /> Sản phẩm
+              <PlusOutlined /> Thêm mới sản phẩm
             </h2>
             <br />
             <Row>
@@ -150,7 +214,7 @@ const ProductCreateDetails = (props) => {
                 <div className={styles.product__FormImg}>
                   <img
                     src={
-                      product.imgDefault ||
+                      imgDefault ||
                       "https://lh3.googleusercontent.com/EbXw8rOdYxOGdXEFjgNP8lh-YAuUxwhOAe2jhrz3sgqvPeMac6a6tHvT35V6YMbyNvkZL4R_a2hcYBrtfUhLvhf-N2X3OB9cvH4uMw=w1064-v0"
                     }
                     height={240}
@@ -490,22 +554,13 @@ const ProductCreateDetails = (props) => {
         </Row>
       </div>
       {product.productId !== null &&
-      buttonsCreate.length > 0 &&
-      materialsCreate.length > 0 &&
-      collarsCreate.length > 0 &&
-      shirtTailsCreate.length > 0 &&
-      sleevesCreate.length > 0 &&
       colorsCreate.length > 0 &&
-      sizesCreate.length > 0 ? (
+      productDetailsCreate.length > 0 ? (
         <ProductDetailsTable
           product={product}
-          buttonsCreate={buttonsCreate}
-          materialsCreate={materialsCreate}
-          collarsCreate={collarsCreate}
-          shirtTailsCreate={shirtTailsCreate}
-          sleevesCreate={sleevesCreate}
           colorsCreate={colorsCreate}
-          sizesCreate={sizesCreate}
+          productDetails={productDetailsCreate}
+          setImgDefault={setImgDefault}
         />
       ) : null}
     </>

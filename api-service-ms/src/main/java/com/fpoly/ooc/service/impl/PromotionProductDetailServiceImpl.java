@@ -33,7 +33,7 @@ public class PromotionProductDetailServiceImpl implements PromotionProductDetail
 
         PromotionProduct promotionProduct = validation(dto);
 
-        if(promotionProduct == null) {
+        if (promotionProduct == null) {
             return null;
         }
 
@@ -44,11 +44,11 @@ public class PromotionProductDetailServiceImpl implements PromotionProductDetail
     public void deletePromotionProduct(DeleteProductDetailInPromotionDTO dto) {
         List<Long> ids = promotionProductDetailRepository.findIdPromotionProduct(dto.getProductDetailIds(), dto.getPromotionId());
 
-        if(ids == null) {
+        if (ids == null) {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND));
         }
 
-        for (Long id: ids) {
+        for (Long id : ids) {
             promotionProductDetailRepository.deleteById(id);
         }
     }
@@ -79,16 +79,11 @@ public class PromotionProductDetailServiceImpl implements PromotionProductDetail
 
         Double priceProduct = convertBigDecimal(productDetail.getPrice());
         Double promotionValue = convertBigDecimal(promotion.getPromotionValue());
-        Double promotionValueMax = convertBigDecimal(promotion.getPromotionMaxValue());
         Double valuePercent = (priceProduct * promotionValue) / 100;
         double moneyAfter = 0d;
 
         if (promotion.getPromotionMethod().equals("%")) {
-            if (valuePercent > promotionValueMax) {
-                moneyAfter = priceProduct - promotionValueMax;
-            } else {
-                moneyAfter = priceProduct - valuePercent;
-            }
+            moneyAfter = priceProduct - valuePercent;
         } else {
             moneyAfter = priceProduct - promotionValue;
         }

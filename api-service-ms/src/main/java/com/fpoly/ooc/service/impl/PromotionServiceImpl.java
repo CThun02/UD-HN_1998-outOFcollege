@@ -103,7 +103,6 @@ public class PromotionServiceImpl implements PromotionService {
         promotionRequest.setPromotionName(promotion.getPromotionName());
         promotionRequest.setPromotionMethod(promotion.getPromotionMethod());
         promotionRequest.setPromotionValue(promotion.getPromotionValue());
-        promotionRequest.setPromotionValueMax(promotion.getPromotionMaxValue());
         promotionRequest.setStartDate(promotion.getStartDate());
         promotionRequest.setEndDate(promotion.getEndDate());
         promotionRequest.setStatus(promotion.getStatus());
@@ -236,7 +235,6 @@ public class PromotionServiceImpl implements PromotionService {
         promotion.setPromotionName(request.getPromotionName());
         promotion.setPromotionMethod(request.getPromotionMethod());
         promotion.setPromotionValue(request.getPromotionValue());
-        promotion.setPromotionMaxValue(request.getPromotionValueMax());
         promotion.setStartDate(request.getStartDate());
         promotion.setEndDate(request.getEndDate());
         promotion.setStatus(Const.STATUS_UPCOMING);

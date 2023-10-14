@@ -188,13 +188,13 @@ VALUES
 ('user4', 4, 'ACTIVE', '2023-09-12', '2023-09-12', N'Admin', N'Admin', NULL),
 ('user5', 5, 'ACTIVE', '2023-09-15', '2023-09-15', N'Admin', N'Admin', NULL);
 select * from address_detail
-INSERT INTO bill (account_id, date_of_receipt, completion_date, price, price_reduce, bill_type, note, status, created_at, updated_at, created_by, updated_by, deleted_at)
+INSERT INTO bill (account_id, date_of_receipt, completion_date, price, price_reduce, bill_type, note, status, created_at, updated_at, created_by, updated_by, deleted_at, bill_code)
 VALUES 
-('user1', '2023-09-01', '2023-09-05', 100.00, 10.00, 'Online', 'note', 'Completed', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL),
-('user2', '2023-09-05', '2023-09-10', 150.00, 15.00, 'In-store', 'note', 'Completed', '2023-09-05', '2023-09-05', N'Admin', N'Admin', NULL),
-('user3', '2023-09-10', '2023-09-15', 200.00, 20.00, 'Online', 'note', 'Pending', '2023-09-10', '2023-09-10', N'Admin', N'Admin', NULL),
-('user4', '2023-09-12', '2023-09-17', 120.00, 12.00, 'In-store', 'note', 'Completed', '2023-09-12', '2023-09-12', N'Admin', N'Admin', NULL),
-('user5', '2023-09-15', '2023-09-20', 180.00, 18.00, 'Online', 'note', 'Pending', '2023-09-15', '2023-09-15', N'Admin', N'Admin', NULL);
+('user1', '2023-09-01', '2023-09-05', 100.00, 10.00, 'Online', 'note', 'Completed', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL, 'HD123456'),
+('user2', '2023-09-05', '2023-09-10', 150.00, 15.00, 'In-store', 'note', 'Completed', '2023-09-05', '2023-09-05', N'Admin', N'Admin', NULL, 'HD1234567'),
+('user3', '2023-09-10', '2023-09-15', 200.00, 20.00, 'Online', 'note', 'Pending', '2023-09-10', '2023-09-10', N'Admin', N'Admin', NULL, 'HD1234568'),
+('user4', '2023-09-12', '2023-09-17', 120.00, 12.00, 'In-store', 'note', 'Completed', '2023-09-12', '2023-09-12', N'Admin', N'Admin', NULL, 'HD1234569'),
+('user5', '2023-09-15', '2023-09-20', 180.00, 18.00, 'Online', 'note', 'Pending', '2023-09-15', '2023-09-15', N'Admin', N'Admin', NULL, 'HD12345610');
 select * from bill
 
 INSERT INTO delivery_note (bill_id, address_id, name, number_phone, createtion_date, ship_date, date_of_receipt, ship_price, status, created_at, updated_at, created_by, updated_by, deleted_at)

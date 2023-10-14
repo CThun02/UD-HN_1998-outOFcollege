@@ -1,12 +1,12 @@
 ﻿USE DATN_DB_MS;
 
-INSERT INTO promotion (promotion_code, promotion_name, promotion_value, start_date, end_date, promotion_max_value, promotion_method, promotion_condition, status, created_at, updated_at, created_by, updated_by, deleted_at)
+INSERT INTO promotion (promotion_code, promotion_name, promotion_value, start_date, end_date, promotion_method, promotion_condition, status, created_at, updated_at, created_by, updated_by, deleted_at)
 VALUES
-('PROMO001', N'Giảm giá 10%', 10, '2023-09-01', '2023-09-30', 100, 'Discount', 50, 'ACTIVE', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL),
-('PROMO002', N'Giảm giá 20%', 20, '2023-09-15', '2023-10-15', 200, 'Discount', 100, 'ACTIVE', '2023-09-15', '2023-09-15', N'Admin', N'Admin', NULL),
-('PROMO003', N'Free shipping', NULL, '2023-10-01', '2023-12-31', NULL, 'Shipping', 0, 'ACTIVE', '2023-10-01', '2023-10-01', N'Admin', N'Admin', NULL),
-('PROMO004', N'Giảm giá 15%', 15, '2023-09-10', '2023-10-10', 150, 'Discount', 75,'ACTIVE', '2023-09-10', '2023-09-10', N'Admin', N'Admin', NULL),
-('PROMO005', N'Miễn phí 1 sản phẩm', NULL, '2023-09-20', '2023-09-30', NULL, 'FreeItem', 0, 'ACTIVE', '2023-09-20', '2023-09-20', N'Admin', N'Admin', NULL);
+('PROMO001', N'Giảm giá 10%', 10, '2023-09-01', '2023-09-30', 'Discount', 50, 'ACTIVE', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL),
+('PROMO002', N'Giảm giá 20%', 20, '2023-09-15', '2023-10-15', 'Discount', 100, 'ACTIVE', '2023-09-15', '2023-09-15', N'Admin', N'Admin', NULL),
+('PROMO003', N'Free shipping', NULL, '2023-10-01', '2023-12-31', 'Shipping', 0, 'ACTIVE', '2023-10-01', '2023-10-01', N'Admin', N'Admin', NULL),
+('PROMO004', N'Giảm giá 15%', 15, '2023-09-10', '2023-10-10', 'Discount', 75,'ACTIVE', '2023-09-10', '2023-09-10', N'Admin', N'Admin', NULL),
+('PROMO005', N'Miễn phí 1 sản phẩm', NULL, '2023-09-20', '2023-09-30', 'FreeItem', 0, 'ACTIVE', '2023-09-20', '2023-09-20', N'Admin', N'Admin', NULL);
 
 select * from promotion
 

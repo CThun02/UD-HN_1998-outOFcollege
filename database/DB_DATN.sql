@@ -203,6 +203,7 @@ CREATE TABLE promotion_product_detail(
     promotion_id         BIGINT FOREIGN KEY(promotion_id) REFERENCES promotion(id),
     product_detail_id   BIGINT FOREIGN KEY(product_detail_id) REFERENCES product_detail(id),
     percent_reduce      DECIMAL,
+    money_reduce		DECIMAL,
 	method_reduce		VARCHAR(10),
     money_after         DECIMAL,
     status              VARCHAR(50),

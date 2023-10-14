@@ -51,7 +51,7 @@ const columns = [
   },
   {
     key: "quantity",
-    dataIndex: "quntity",
+    dataIndex: "quantity",
     title: "Số lượng",
     width: 110,
   },
@@ -74,7 +74,7 @@ function TablesProductsDetails({
   function handleOnChangeRow(key, row) {
     setSelectedRowKeys(key);
     setSelectedRows(row);
-    setProductsDetailsId(key);
+    // setProductsDetailsId(key);
   }
 
   const rowSelection = {
@@ -91,8 +91,7 @@ function TablesProductsDetails({
 
   useEffect(
     function () {
-      console.log("values: ", values);
-      if (values?.promotionId) {
+      if (values) {
         setSelectedRowKeys(productsDetailsId);
       }
     },
@@ -105,17 +104,14 @@ function TablesProductsDetails({
       setOnDeleteProductDetailIds(arraysIds);
     }
 
-    const data = arrays.map((e) => ({ ...e, record }));
-
-    setArrays(selectedRows);
-    console.log("arrays: ", data);
-    console.log("arrays record: ", record);
+    const { key } = record;
+    setProductsDetailsId((prevData) => [...prevData, key]);
   }
 
   return (
     <div>
       <span>
-        Đã chọn: <strong>{`${selectedRowKeys.length} sản phẩm`}</strong>
+        Đã chọn: <strong>{`${productsDetailsId.length} sản phẩm`}</strong>
       </span>
       <div>
         <Space style={{ width: "100%" }} direction="vertical" size={12}>

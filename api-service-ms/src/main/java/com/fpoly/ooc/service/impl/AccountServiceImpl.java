@@ -177,13 +177,9 @@ public class AccountServiceImpl implements AccountService {
             gender = null;
         }
 
-        List<AccountVoucher> accountVoucherList = accountRepository.customerAccountList(
-                StringUtils.isEmpty(customerConditionDTO.getSearchText())
-                        ? null : "%" + customerConditionDTO.getSearchText() + "%", gender);
-        accountVoucherList.forEach((e) -> log.info("Data: " + e));
-
         return page(accountRepository.customerAccountList(
-                StringUtils.isEmpty(customerConditionDTO.getSearchText()) ? null : "%" + customerConditionDTO.getSearchText() + "%",
+                StringUtils.isEmpty(customerConditionDTO.getSearchText())
+                        ? null : "%" + customerConditionDTO.getSearchText().toLowerCase() + "%",
                 gender
         ), pageable);
     }

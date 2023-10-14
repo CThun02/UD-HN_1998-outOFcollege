@@ -78,6 +78,13 @@ function ModalAddCustomer({
   const [selectedRows, setSelectedRows] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
+  const [pageNoTable, setPageNoTable] = useState(1);
+  const [pageSizeTable, setPageSizeTable] = useState(5);
+
+  const calculateSttTable = (index) => {
+    return (pageNoTable - 1) * pageSizeTable + index + 1;
+  };
+
   const calculateStt = (index) => {
     return (pageNo - 1) * pageSize + index + 1;
   };
@@ -128,12 +135,22 @@ function ModalAddCustomer({
         values?.objectUse === "member" &&
         !customers.length
       ) {
-        setSelectedRowKeys(values?.usernames.map((user) => user.username));
+        setSelectedRowKeys((prevData) => [
+          ...prevData,
+          ...values?.usernames.map((user) => user.username),
+        ]);
+
         setSelectedRows(values?.usernames);
       }
     },
     [values, customers]
   );
+
+  function handleOnSelected(record, isSelected, selectedRows, nativeEvent) {
+    setSelectedRows((prevData) => [...prevData, record]);
+    const { username } = record;
+    setSelectedRowKeys((prevData) => [...prevData, username]);
+  }
 
   function handleOnOk() {
     setCustomers(selectedRows);
@@ -146,8 +163,8 @@ function ModalAddCustomer({
   }
 
   function handleOnChange(selectedRowKeys, selectedRows) {
-    setSelectedRows(selectedRows);
-    setSelectedRowKeys(selectedRowKeys);
+    // setSelectedRows(selectedRows);
+    // setSelectedRowKeys(selectedRowKeys);
   }
 
   function handleDeleted(value) {
@@ -227,7 +244,7 @@ function ModalAddCustomer({
                   <FloatingLabels
                     label="Search...."
                     name="gender"
-                    value={gender}
+                    value={true}
                     zIndex={true}
                   >
                     <Select
@@ -256,6 +273,7 @@ function ModalAddCustomer({
                       rowSelection={{
                         type: rowSelection,
                         ...rowSelection,
+                        onSelect: handleOnSelected,
                       }}
                       columns={columns}
                       dataSource={customersVoucher.map((customer, index) => ({
@@ -293,7 +311,7 @@ function ModalAddCustomer({
             columns={[...columns, values.voucherId ? "" : newColumns]}
             dataSource={customers?.map((customer, index) => ({
               key: customer.username,
-              stt: calculateStt(index),
+              stt: calculateSttTable(index),
               username: customer.username,
               fullName: customer.fullName,
               gender: customer.gender ? "Nam" : "Nữ",
@@ -301,10 +319,10 @@ function ModalAddCustomer({
               phoneNumber: customer.phoneNumber,
               action: customer,
             }))}
-            pagination={false}
+            // pagination={false}
           />
           {/* <Pagination
-            defaultCurrent={pageNo}
+            defaultCurrent={pageNoTable}
             total={totalElements}
             showSizeChanger={true}
             pageSize={pageSize}
@@ -333,7 +351,7 @@ function ModalAddCustomer({
               email: customer.email,
               phoneNumber: customer.phoneNumber,
             }))}
-            pagination={false}
+            // pagination={false}
           />
         </Space>
       ) : null}

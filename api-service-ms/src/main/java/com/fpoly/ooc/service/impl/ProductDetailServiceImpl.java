@@ -57,24 +57,10 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
     }
 
     @Override
-    public List<ProductDetailResponse> getProductDetailsByIdProduct(Long idPro) {
-        return repo.getProductDetailsByIdProduct(idPro);
-    }
-
-    @Override
-    public List<ProductDetailResponse> getProductDetailsTableByIdProduct(Long idPro, String status) {
-        return repo.getProductDetailsTableByIdProduct(idPro, status);
-    }
-
-    @Override
-    public ProductDetailResponse getOneByIdCom(Long productId, Long idButton, Long idMaterial, Long idShirtTail, Long idSleeve, Long idCollar, Long idColor, Long idSize) {
-        return repo.getOneByIdCom(productId, idButton, idMaterial, idShirtTail,
-                idSleeve, idCollar, idColor, idSize);
-    }
-
-    @Override
-    public List<ProductDetailResponse> filterProductDetailsByIdCom(Long productId, Long idButton, Long idMaterial, Long idShirtTail, Long idSleeve, Long idCollar, Long idColor, Long idSize) {
-        return repo.filterProductDetailsByIdCom(productId, idButton, idMaterial, idShirtTail, idSleeve, idCollar, idColor, idSize);
+    public List<ProductDetailResponse> filterProductDetailsByIdCom(Long productId, Long idButton, Long idMaterial,
+                                                                   Long idShirtTail, Long idSleeve, Long idCollar,
+                                                                   Long idColor, Long idSize, Long patternId, Long formId) {
+        return repo.filterProductDetailsByIdCom(productId, idButton, idMaterial, idShirtTail, idSleeve, idCollar, idColor, idSize, patternId, formId);
     }
 
     @Override
@@ -85,41 +71,6 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
             values = Optional.of(repo.searchProductDetailByProductCode(keyWords));
         }
         return values.orElse(null);
-    }
-
-    @Override
-    public List<Color> getColorsBydIdPro(Long productId) {
-        return repo.getColorsBydIdPro(productId);
-    }
-
-    @Override
-    public List<Size> getSizesBydIdPro(Long productId) {
-        return repo.getSizesBydIdPro(productId);
-    }
-
-    @Override
-    public List<ShirtTailType> getShirtTailsBydIdPro(Long productId) {
-        return repo.getShirtTailsBydIdPro(productId);
-    }
-
-    @Override
-    public List<Material> getMaterialsBydIdPro(Long productId) {
-        return repo.getMaterialsBydIdPro(productId);
-    }
-
-    @Override
-    public List<CollarType> getCollarsBydIdPro(Long productId) {
-        return repo.getCollarsBydIdPro(productId);
-    }
-
-    @Override
-    public List<ButtonType> getButtonsBydIdPro(Long productId) {
-        return repo.getButtonsBydIdPro(productId);
-    }
-
-    @Override
-    public List<SleeveType> getSleevesBydIdPro(Long productId) {
-        return repo.getSleevesBydIdPro(productId);
     }
 
     public ProductDetail findById(Long id) {

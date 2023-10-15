@@ -2,12 +2,11 @@ import React, { useState, useEffect } from "react";
 import styles from "./AccountForm.module.css";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import dayjs from "dayjs";
 import {
   Row,
   Col,
-  Space,
   Avatar,
-  Form,
   Input,
   Radio,
   Select,
@@ -18,24 +17,18 @@ import {
   message,
   notification,
   Modal,
+  Tooltip,
+  Switch,
 } from "antd";
-import {
-  UserOutlined,
-  FormOutlined,
-  CheckCircleTwoTone,
-} from "@ant-design/icons";
+import { FormOutlined, CheckCircleTwoTone } from "@ant-design/icons";
 import { useParams } from "react-router-dom";
-import moment from "moment/moment";
-import { getDownloadURL, ref } from "firebase/storage";
-import { saveImage } from "../../../config/FireBase";
-const { Option } = Select;
-const { Panel } = Collapse;
 const DetailForm = (props) => {
   const navigate = useNavigate();
   var roleId = props.roleId;
   const [data, setData] = useState({
     username: "",
     fullName: "",
+    image: "",
     dob: "",
     gender: "",
     numberPhone: "",
@@ -45,75 +38,39 @@ const DetailForm = (props) => {
   });
 
   const [messageApi, contextHolder] = message.useMessage();
-  const [imageUrl, setImageUrl] = useState(null);
   const [imageFile, setImageFile] = useState(null);
   const [districts, setDistricts] = useState([]);
   const [provinces, setProvinces] = useState([]);
   const [wards, setWards] = useState([]);
   const { username } = useParams();
-  const [updatedData, setUpdatedData] = useState({});
-
+  const [address, setAddress] = useState([]);
   const { Panel } = Collapse;
   const handlePanelChange = (key) => {
     console.log("Expanded panel keys:", key);
   };
-  console.log("đây là ", data.fullName);
+  const handleSetAccount = (field, value) => {
+    setData((account) => ({
+      ...account,
+      [field]: value,
+    }));
+  };
   const handleUpload = (file) => {
     // Xử lý file ảnh tải lên và set state imageUrl
     // Thực hiện mã xử lý tải lên của bạn ở đây
     setImageFile(file);
     // Giả sử server trả về URL của ảnh đã tải lên
     const imageUrl = URL.createObjectURL(file);
-    setImageUrl(imageUrl);
+    handleSetAccount("image", imageUrl);
   };
 
-  //viết hàm lấy dữ liệu address detail
-  //Lấy dữ liệu của account là bất kì đối tượng account nào nằm trong addressdetail
-  //ex: setData(addressdetail[0].account)
-  //tạo tiếp một useState mới lưu trữ address lấy từ addressDetail
-  //dùng for cho address detail sau đó push adressdetail[i].address vào mảng adress
-  useEffect(() => {
-    fetchCustomerData();
-    const fetchProvinces = async () => {
-      try {
-        const response = await axios.get(
-          "https://online-gateway.ghn.vn/shiip/public-api/master-data/province",
-          {
-            headers: {
-              "Content-Type": "application/json",
-              token: "0f082cbe-5110-11ee-a59f-a260851ba65c",
-            },
-          }
-        );
-
-        const provincesData = response.data.data;
-        console.log(response);
-        setProvinces(provincesData);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    fetchProvinces();
-    fetchDistricts(data.city);
-    fetchWard(data.district);
-  }, [data.city, data.district, username]);
   const fetchCustomerData = async () => {
     axios
       .get(`http://localhost:8080/api/admin/account/detail/${username}`)
       .then((response) => {
         setData(response.data);
-        console.log(response.data);
-        getDownloadURL(ref(saveImage, response.data.image))
-          .then((url) => {
-            console.log(url);
-            setImageUrl(url);
-          })
-          .catch((err) => {
-            console.log(err);
-          });
+        setAddress(response.data.accountAddress);
       })
       .catch((err) => console.log(err));
-    console.log(data);
   };
   const fetchDistricts = async (value) => {
     await axios
@@ -133,6 +90,7 @@ const DetailForm = (props) => {
       });
   };
   const fetchWard = async (value) => {
+    console.log("loop");
     await axios
       .get(
         `https://online-gateway.ghn.vn/shiip/public-api/master-data/ward?district_id=${value}`,
@@ -170,7 +128,6 @@ const DetailForm = (props) => {
             `http://localhost:8080/api/admin/account/update/${data.username}`,
             data
           );
-          console.log("Dữ liệu đã được cập nhật thành công!");
           messageApi.loading("loading", 2);
           setTimeout(() => {
             notification.open({
@@ -180,7 +137,6 @@ const DetailForm = (props) => {
               } thành công`,
               icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
             });
-            navigate("/admin/employee");
           }, 2000);
         } catch (error) {
           console.error(error);
@@ -191,6 +147,28 @@ const DetailForm = (props) => {
       },
     });
   };
+  useEffect(() => {
+    fetchCustomerData();
+    const fetchProvinces = async () => {
+      try {
+        const response = await axios.get(
+          "https://online-gateway.ghn.vn/shiip/public-api/master-data/province",
+          {
+            headers: {
+              "Content-Type": "application/json",
+              token: "0f082cbe-5110-11ee-a59f-a260851ba65c",
+            },
+          }
+        );
+
+        const provincesData = response.data.data;
+        setProvinces(provincesData);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchProvinces();
+  }, []);
   return (
     <div className={styles.container}>
       <Row style={{ marginBottom: "25px" }}>
@@ -203,249 +181,264 @@ const DetailForm = (props) => {
       </Row>
       <Row>
         <Col span={8}>
-          <Form initialValues={data}>
-            <Col span={24}>
-              <Form.Item className={styles.formContainer}>
-                <Space wrap size={16}>
-                  <div className={styles.avatarContainer}>
-                    <Avatar
-                      size={200}
-                      src={data.image}
-                      icon={<UserOutlined />}
-                    />
-                  </div>
-                  <Upload
-                    name="avatar"
-                    showUploadList={false}
-                    beforeUpload={handleUpload}
-                  >
-                    <Button>+</Button>
-                  </Upload>
-                </Space>
-              </Form.Item>
-            </Col>
-            <Col span={24}>
-              <div className={styles.email}>
-                <span>Username</span>
-
-                <Input type="text" name="username" value={data.username} />
-              </div>
-            </Col>
-            <Col span={24}>
-              <div className={styles.email}>
-                <span>Mã định danh</span>
-
-                <Input type="text" name="idNo" value={data.idNo} />
-              </div>
-            </Col>
-            <Col span={24}>
-              <div className={styles.email}>
-                <span>Tên nhân viên</span>
-
-                <Input
-                  value={data.fullName}
-                  onChange={(event) => {
-                    handleChange("fullName", event.target.value);
-                  }}
-                />
-              </div>
-            </Col>
-            <Col span={24}>
-              <div className={styles.email}>
-                <span>Ngày sinh</span>
-
-                <DatePicker
-                  style={{ width: "100%" }}
-                  value={moment(data.dob, "YYYY-MM-DD")}
-                  onChange={(event) => {
-                    handleChange("dob", event.target.value);
-                  }}
-                />
-              </div>
-            </Col>
-            <Col span={24}>
-              <div className={styles.email}>
-                <span>Giới Tính</span>
-
-                <Radio.Group
-                  value={data.gender}
-                  onChange={(event) => {
-                    handleChange("gender", event.target.value);
-                  }}
-                >
-                  <Radio value={true}>Nam</Radio>
-                  <Radio value={false}>Nữ</Radio>
-                </Radio.Group>
-              </div>
-            </Col>
-            <Col span={24}>
-              <div className={styles.email}>
-                <span>Email</span>
-                <Input
-                  value={data.email}
-                  onChange={(event) => {
-                    handleChange("emailr", event.target.value);
-                  }}
-                />
-              </div>
-            </Col>
-            <Col span={24}>
-              <div className={styles.sdt}>
-                <span>Số điện thoại</span>
-
-                <Input
-                  value={data.numberPhone}
-                  onChange={(event) => {
-                    handleChange("numberPhone", event.target.value);
-                  }}
-                />
-              </div>
-            </Col>
-
-            <Button
-              className={styles.sdt1}
-              type="primary"
-              onClick={handleUpdate}
+          <Col span={24} style={{ textAlign: "center" }}>
+            <Upload
+              name="avatar"
+              showUploadList={false}
+              beforeUpload={handleUpload}
             >
-              Cập nhật
-            </Button>
-          </Form>
+              <Tooltip placement="left" title={"click to upload avatar"}>
+                <Avatar
+                  className={styles.avatarContainer}
+                  size={160}
+                  src={
+                    data.image === "none" ||
+                    data.image === "" ||
+                    data.image === null ||
+                    data.image === undefined
+                      ? "https://img.freepik.com/premium-vector/camera-with-plus-sign-icon_625445-191.jpg?w=2000"
+                      : data.image
+                  }
+                />
+              </Tooltip>
+            </Upload>
+          </Col>
+          <Col span={24}>
+            <div className="m-5">
+              <span>Username</span>
+              <Input type="text" name="username" value={data.username} />
+            </div>
+          </Col>
+          <Col span={24}>
+            <div className="m-5">
+              <span>Mã định danh</span>
+              <Input type="text" name="idNo" value={data.idNo} />
+            </div>
+          </Col>
+          <Col span={24}>
+            <div className="m-5">
+              <span>Tên nhân viên</span>
+              <Input
+                value={data.fullName}
+                onChange={(event) => {
+                  handleChange("fullName", event.target.value);
+                }}
+              />
+            </div>
+          </Col>
+          <Col span={24}>
+            <div className="m-5">
+              <span>Ngày sinh</span>
+              <DatePicker
+                style={{ width: "100%" }}
+                value={dayjs(data.dob)}
+                onChange={(event) => {
+                  handleChange("dob", event);
+                }}
+              />
+            </div>
+          </Col>
+          <Col span={24}>
+            <div className="m-5">
+              <span>Giới Tính: </span>
+              <Radio.Group
+                value={data.gender}
+                onChange={(event) => {
+                  handleChange("gender", event.target.value);
+                }}
+              >
+                <Radio value={true}>Nam</Radio>
+                <Radio value={false}>Nữ</Radio>
+              </Radio.Group>
+            </div>
+          </Col>
+          <Col span={24}>
+            <div className="m-5">
+              <span>Email</span>
+              <Input
+                value={data.email}
+                onChange={(event) => {
+                  handleChange("email", event.target.value);
+                }}
+              />
+            </div>
+          </Col>
+          <Col span={24}>
+            <div className="m-5">
+              <span>Số điện thoại</span>
+              <Input
+                value={data.numberPhone}
+                onChange={(event) => {
+                  handleChange("numberPhone", event.target.value);
+                }}
+              />
+            </div>
+          </Col>
+
+          <Button className="m-5" type="primary" onClick={handleUpdate}>
+            Cập nhật
+          </Button>
         </Col>
         <Col span={16}>
-          <Collapse onChange={handlePanelChange} defaultActiveKey={["1"]}>
-            <Panel header="Địa Chỉ" key="1">
-              <Form className={styles.form1}>
-                <Row>
-                  <Col span={12}>
-                    <div className={styles.ten1}>
-                      <span>Tên nhân viên</span>
-
-                      <Input value={data.fullName} />
-                    </div>
-                  </Col>
-                  <Col span={12}>
-                    <div className={styles.ten1}>
-                      <span>Số điện thoại</span>
-
-                      <Input value={data.numberPhone} />
-                    </div>
-                  </Col>
-                </Row>
-                <Col span={24}>
-                  <div className={styles.email}>
-                    <span>Địa chỉ chi tiết</span>
-
-                    <Input value={data.descriptionDetail} />
-                  </div>
-                </Col>
-                <Row>
-                  <Col span={8}>
-                    <div className={styles.thanhpho}>
-                      <span>Tỉnh/Thành phố</span>
-                      <Form.Item>
-                        <Select
-                          value={Number(data.city)}
-                          showSearch
-                          onChange={fetchDistricts}
-                          optionFilterProp="children"
-                          filterOption={(input, option) =>
-                            (option?.label ?? "").includes(input)
-                          }
-                          filterSort={(optionA, optionB) =>
-                            (optionA?.label ?? "")
-                              .toLowerCase()
-                              .localeCompare(
-                                (optionB?.label ?? "").toLowerCase()
-                              )
-                          }
-                        >
-                          {provinces.map((province) => (
-                            <Select.Option
-                              key={province.ProvinceID}
-                              value={province.ProvinceID}
-                              label={province.ProvinceName}
+          <Collapse
+            className="m-5"
+            onChange={handlePanelChange}
+            defaultActiveKey={[0]}
+          >
+            {address &&
+              address.map((item, index) => {
+                return (
+                  <Panel
+                    header={
+                      <h5>
+                        {data.fullName +
+                          ": " +
+                          item.ward +
+                          ", " +
+                          item.district +
+                          ", " +
+                          item.city}
+                      </h5>
+                    }
+                    key={index}
+                  >
+                    <Switch defaultChecked={index === 0} />
+                    <Col span={24}>
+                      <div className="m-5">
+                        <h6>Địa chỉ chi tiết</h6>
+                        <Input defaultValue={item.descriptionDetail} />
+                      </div>
+                    </Col>
+                    <Col span={24}>
+                      <Row>
+                        <Col span={8}>
+                          <div className="m-5">
+                            <h6>Tỉnh/Thành phố</h6>
+                            <Select
+                              defaultValue={item.city}
+                              showSearch
+                              style={{ width: "100%" }}
+                              size="medium"
+                              onChange={(event) => {
+                                fetchDistricts(
+                                  event.substring(event.indexOf("|") + 1)
+                                );
+                              }}
+                              optionFilterProp="children"
+                              filterOption={(input, option) =>
+                                (option?.label ?? "").includes(input)
+                              }
+                              filterSort={(optionA, optionB) =>
+                                (optionA?.label ?? "")
+                                  .toLowerCase()
+                                  .localeCompare(
+                                    (optionB?.label ?? "").toLowerCase()
+                                  )
+                              }
                             >
-                              {province.ProvinceName}
-                            </Select.Option>
-                          ))}
-                        </Select>
-                      </Form.Item>
-                    </div>
-                  </Col>
-                  <Col span={8}>
-                    <div className={styles.quan}>
-                      <span>Quận/huyện</span>
-                      <Form.Item>
-                        <Select
-                          value={Number(data.district)}
-                          showSearch
-                          onChange={fetchWard}
-                          optionFilterProp="children"
-                          filterOption={(input, option) =>
-                            (option?.label ?? "").includes(input)
-                          }
-                          filterSort={(optionA, optionB) =>
-                            (optionA?.label ?? "")
-                              .toLowerCase()
-                              .localeCompare(
-                                (optionB?.label ?? "").toLowerCase()
-                              )
-                          }
-                        >
-                          {districts.map((district) => (
-                            <Select.Option
-                              label={district.DistrictName}
-                              key={district.DistrictID}
-                              value={district.DistrictID}
+                              {provinces &&
+                                provinces.map((province) => (
+                                  <Select.Option
+                                    key={province.ProvinceID}
+                                    value={
+                                      province.ProvinceName +
+                                      "|" +
+                                      province.ProvinceID
+                                    }
+                                    label={province.ProvinceName}
+                                  >
+                                    {province.ProvinceName}
+                                  </Select.Option>
+                                ))}
+                            </Select>
+                          </div>
+                        </Col>
+                        <Col span={8}>
+                          <div className="m-5">
+                            <h6>Quận/huyện</h6>
+                            <Select
+                              defaultValue={item.district}
+                              showSearch
+                              style={{ width: "100%" }}
+                              size="medium"
+                              onChange={(event) => {
+                                fetchWard(
+                                  event.substring(event.indexOf("|") + 1)
+                                );
+                              }}
+                              optionFilterProp="children"
+                              filterOption={(input, option) =>
+                                (option?.label ?? "").includes(input)
+                              }
+                              filterSort={(optionA, optionB) =>
+                                (optionA?.label ?? "")
+                                  .toLowerCase()
+                                  .localeCompare(
+                                    (optionB?.label ?? "").toLowerCase()
+                                  )
+                              }
                             >
-                              {district.DistrictName}
-                            </Select.Option>
-                          ))}
-                        </Select>
-                      </Form.Item>
-                    </div>
-                  </Col>
-                  <Col span={8}>
-                    <div className={styles.ten1}>
-                      <span>Xã/Phường/Thị trấn</span>
-                      <Form.Item>
-                        <Select
-                          value={data.ward}
-                          showSearch
-                          optionFilterProp="children"
-                          filterOption={(input, option) =>
-                            (option?.label ?? "").includes(input)
-                          }
-                          filterSort={(optionA, optionB) =>
-                            (optionA?.label ?? "")
-                              .toLowerCase()
-                              .localeCompare(
-                                (optionB?.label ?? "").toLowerCase()
-                              )
-                          }
-                        >
-                          {wards.map((ward) => (
-                            <Select.Option
-                              label={ward.WardName}
-                              key={ward.WardCode}
-                              value={ward.WardCode}
+                              {districts &&
+                                districts.map((district) => (
+                                  <Select.Option
+                                    label={district.DistrictName}
+                                    key={district.DistrictID}
+                                    value={
+                                      district.DistrictName +
+                                      "|" +
+                                      district.DistrictID
+                                    }
+                                  >
+                                    {district.DistrictName}
+                                  </Select.Option>
+                                ))}
+                            </Select>
+                          </div>
+                        </Col>
+                        <Col span={8}>
+                          <div className="m-5">
+                            <h6>Xã/Phường/Thị trấn</h6>
+                            <Select
+                              defaultValue={item.ward}
+                              showSearch
+                              style={{ width: "100%" }}
+                              size="medium"
+                              optionFilterProp="children"
+                              filterOption={(input, option) =>
+                                (option?.label ?? "").includes(input)
+                              }
+                              filterSort={(optionA, optionB) =>
+                                (optionA?.label ?? "")
+                                  .toLowerCase()
+                                  .localeCompare(
+                                    (optionB?.label ?? "").toLowerCase()
+                                  )
+                              }
                             >
-                              {ward.WardName}
-                            </Select.Option>
-                          ))}
-                        </Select>
-                      </Form.Item>
-                    </div>
-                  </Col>
-                </Row>
+                              {wards &&
+                                wards.map((ward) => (
+                                  <Select.Option
+                                    label={ward.WardName}
+                                    key={ward.WardCode}
+                                    value={ward.WardName}
+                                  >
+                                    {ward.WardName}
+                                  </Select.Option>
+                                ))}
+                            </Select>
+                          </div>
+                        </Col>
+                      </Row>
+                    </Col>
 
-                <Button
-                  type="primary"
-                  className={styles.formContainer}
-                  icon={<FormOutlined />}
-                ></Button>
-              </Form>
-            </Panel>
+                    <div className="m-5">
+                      <Button type="primary">
+                        <FormOutlined /> Xác nhận
+                      </Button>
+                    </div>
+                  </Panel>
+                );
+              })}
           </Collapse>
         </Col>
       </Row>

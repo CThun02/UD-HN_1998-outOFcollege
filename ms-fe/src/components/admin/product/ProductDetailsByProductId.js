@@ -28,8 +28,6 @@ const ProductDetails = (props) => {
     productCode: "",
     productName: "",
     brand: {},
-    pattern: {},
-    form: {},
     category: {},
     description: "",
   });
@@ -287,14 +285,6 @@ const ProductDetails = (props) => {
                   <span style={{ fontWeight: 500 }}>Loại sản phẩm</span>
                   <p>{product.category.categoryName}</p>
                 </Col>
-                <Col span={12} style={{ marginBottom: "16px" }}>
-                  <span style={{ fontWeight: 500 }}>Họa tiết</span>
-                  <p>{product.pattern.patternName}</p>
-                </Col>
-                <Col span={12} style={{ marginBottom: "16px" }}>
-                  <span style={{ fontWeight: 500 }}>form</span>
-                  <p>{product.form.formName}</p>
-                </Col>
               </Row>
             </Col>
             <Col span={24} style={{ marginBottom: "20px" }}>
@@ -319,6 +309,7 @@ const ProductDetails = (props) => {
                 </span>
                 <Select
                   showSearch
+                  maxTagCount={"responsive"}
                   optionFilterProp="children"
                   filterOption={(input, option) =>
                     (option?.label ?? "").includes(input)
@@ -363,6 +354,7 @@ const ProductDetails = (props) => {
                 </span>
                 <Select
                   showSearch
+                  maxTagCount={"responsive"}
                   optionFilterProp="children"
                   filterOption={(input, option) =>
                     (option?.label ?? "").includes(input)
@@ -407,6 +399,7 @@ const ProductDetails = (props) => {
                 </span>
                 <Select
                   showSearch
+                  maxTagCount={"responsive"}
                   optionFilterProp="children"
                   filterOption={(input, option) =>
                     (option?.label ?? "").includes(input)
@@ -451,6 +444,7 @@ const ProductDetails = (props) => {
                 </span>
                 <Select
                   showSearch
+                  maxTagCount={"responsive"}
                   optionFilterProp="children"
                   filterOption={(input, option) =>
                     (option?.label ?? "").includes(input)
@@ -541,6 +535,7 @@ const ProductDetails = (props) => {
                     </span>
                     <Select
                       showSearch
+                      maxTagCount={"responsive"}
                       optionFilterProp="children"
                       filterOption={(input, option) =>
                         (option?.label ?? "").includes(input)
@@ -584,6 +579,7 @@ const ProductDetails = (props) => {
                       Màu sắc
                     </span>
                     <Select
+                      maxTagCount={"responsive"}
                       showSearch
                       optionFilterProp="children"
                       filterOption={(input, option) =>

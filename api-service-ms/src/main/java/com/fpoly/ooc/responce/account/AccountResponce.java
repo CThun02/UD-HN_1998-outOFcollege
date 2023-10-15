@@ -14,17 +14,12 @@ import java.time.LocalDateTime;
 @Setter
 @Builder
 public class AccountResponce {
-
     private String username;
-
     private String image;
-
     private String fullName;
-
     private Boolean gender;
-
-    private LocalDateTime createdAt;
-
+    private String phoneNumber;
+    private String email;
     private String status;
 
 

@@ -19,8 +19,14 @@ import { NotificationProvider } from "./components/element/notification/Notifica
 import AccountForm from "./components/admin/account/AccountForm";
 import CustomerAdmin from "./components/admin/account/CustomorAdmin";
 import DetailForm from "./components/admin/account/DetailForm";
-import ProductDetails from "./components/admin/product/ProductDetails";
+
 import ProductUpdateDetails from "./components/admin/product/ProductUpdateDetails";
+
+import PatternAdmin from "./components/admin/pattern/PatternAdmin";
+import CategoryAdmin from "./components/admin/category/CategoryAdmin";
+import BrandAdmin from "./components/admin/brand/BrandAdmin";
+import FormAdmin from "./components/admin/form/FormAdmin";
+import CollarAdmin from "./components/admin/collar/CollarAdmin";
 function App() {
   const [message, setMessage] = useState("");
 
@@ -82,8 +88,26 @@ function App() {
                     <Route path="hien-thi" element="el" />
                     */}
                     </Route>
-                    <Route path="category" element="category"></Route>
-                    <Route path="brand" element="brand"></Route>
+
+                    {/*sanpham chi tiet */}
+
+                    <Route path="pattern" element={<PatternAdmin />}></Route>
+                    <Route
+                      path="category"
+                      element={<CategoryAdmin></CategoryAdmin>}
+                    ></Route>
+                    <Route
+                      path="brand"
+                      element={<BrandAdmin></BrandAdmin>}
+                    ></Route>
+                    <Route
+                      path="form"
+                      element={<FormAdmin></FormAdmin>}
+                    ></Route>
+                    <Route
+                      path="collar"
+                      element={<CollarAdmin></CollarAdmin>}
+                    ></Route>
 
                     {/* Voucher */}
                     <Route path="vouchers">

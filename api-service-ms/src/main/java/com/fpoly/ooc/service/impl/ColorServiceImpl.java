@@ -16,6 +16,7 @@ public class ColorServiceImpl implements ColorServiceI {
 
     @Override
     public Color create(Color color) {
+
         return repo.save(color);
     }
 
@@ -24,6 +25,7 @@ public class ColorServiceImpl implements ColorServiceI {
         Optional<Color> optional = repo.findById(id);
 
         return optional.map(o->{
+            o.setColorCode(color.getColorCode());
             o.setColorName(color.getColorName());
             o.setStatus(color.getStatus());
             return repo.save(o);

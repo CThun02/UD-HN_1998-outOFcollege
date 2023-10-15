@@ -73,7 +73,7 @@ const CollorTable = function (props) {
         console.log(response.data);
       })
       .catch((err) => console.log(err));
-  }, []);
+  }, [props.renderTable]);
 
   const handleUpdate = () => {
     axios

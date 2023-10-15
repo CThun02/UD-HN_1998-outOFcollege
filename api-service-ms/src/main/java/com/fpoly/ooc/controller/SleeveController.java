@@ -1,5 +1,6 @@
 package com.fpoly.ooc.controller;
 
+import com.fpoly.ooc.entity.ShirtTailType;
 import com.fpoly.ooc.entity.SleeveType;
 import com.fpoly.ooc.service.interfaces.SleeveServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,7 @@ public class SleeveController {
     }
 
     @PostMapping("create")
-    public ResponseEntity<?> create(SleeveType sleeveType) {
+    public ResponseEntity<?> create(@RequestBody SleeveType sleeveType) {
         return ResponseEntity.ok(service.create(sleeveType));
     }
 

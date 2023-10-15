@@ -1,5 +1,6 @@
 package com.fpoly.ooc.controller;
 
+import com.fpoly.ooc.entity.ButtonType;
 import com.fpoly.ooc.entity.Color;
 import com.fpoly.ooc.service.interfaces.ColorServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/admin/color")
+    @RequestMapping("/api/admin/color")
 @CrossOrigin("*")
 public class ColorController {
     @Autowired
@@ -20,7 +21,7 @@ public class ColorController {
         return service.findAll();
     }
     @PostMapping("create")
-    public ResponseEntity<?> create(@RequestBody Color color){
+    public ResponseEntity<?> create(@RequestBody Color color) {
         return ResponseEntity.ok(service.create(color));
     }
 

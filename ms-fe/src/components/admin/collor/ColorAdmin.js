@@ -1,6 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Select, Input, Row, Col, Form, DatePicker, Modal, Button } from "antd";
+import {
+  Select,
+  Input,
+  Row,
+  Col,
+  Form,
+  DatePicker,
+  Modal,
+  Button,
+  ColorPicker,
+} from "antd";
 import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
 import CollorTable from "./CollorTable";
 import styles from "../categorystyles/CategoryStyles.module.css";
@@ -8,6 +18,8 @@ import axios from "axios";
 const { Option } = Select;
 
 const CollorAdmin = function () {
+  const [render, setRender] = useState();
+
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   const handleAdd = () => {
@@ -26,12 +38,15 @@ const CollorAdmin = function () {
         // Xử lý thành công
         console.log("Thêm thành công");
         setIsModalVisible(false);
+        setRender(Math.random);
       })
       .catch((error) => {
         // Xử lý lỗi
         console.error("Lỗi khi thêm dữ liệu", error);
       });
   };
+
+  useEffect(() => {}, [render]);
   return (
     <div className={styles.category}>
       <div className={styles.radiusFrame}>
@@ -57,7 +72,7 @@ const CollorAdmin = function () {
           </Col>
         </Row>
         <div className={styles.categoryTable}>
-          <CollorTable></CollorTable>
+          <CollorTable renderTable={render}></CollorTable>
         </div>
         <Modal
           title="Thêm Màu Sắc"
@@ -76,7 +91,7 @@ const CollorAdmin = function () {
                 },
               ]}
             >
-              <Input />
+              <ColorPicker showText />
             </Form.Item>
             <Form.Item
               name="colorName"

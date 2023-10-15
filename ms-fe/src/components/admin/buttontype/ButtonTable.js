@@ -20,7 +20,7 @@ const ButtonTable = function (props) {
 
   const [showModal, setShowModal] = useState(false);
   const [selectedData, setSelectedData] = useState(null);
-
+  const [render, setRender] = useState();
   const [selectedItem, setSelectedItem] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [buttonName, setButtonName] = useState("");
@@ -63,6 +63,19 @@ const ButtonTable = function (props) {
       .catch((err) => console.log(err));
   };
 
+  const handleUpdate = () => {
+    axios
+      .put(`http://localhost:8080/api/admin/button/edit/${id}`, {
+        buttonName,
+      })
+      .then((response) => {
+        // Đóng modal
+        setShowDetailsModal(false);
+        setRender(Math.random);
+      })
+      .catch((err) => console.log(err));
+  };
+
   useEffect(() => {
     axios
       .get(`http://localhost:8080/api/admin/button`)
@@ -71,41 +84,12 @@ const ButtonTable = function (props) {
         console.log(response.data);
       })
       .catch((err) => console.log(err));
-  }, []);
-
-  const handleUpdate = () => {
-    axios
-      .put(`http://localhost:8080/api/admin/button/edit/${id}`, {
-        buttonName,
-        status,
-        createdAt: selectedItem?.createdAt,
-        createdBy,
-      })
-      .then((response) => {
-        // Cập nhật lại danh sách dữ liệu sau khi cập nhật thành công
-        const updatedData = data.map((item) => {
-          if (item.id === id) {
-            return {
-              ...item,
-              buttonName,
-              status,
-              createdAt: selectedItem?.createdAt,
-              createdBy,
-            };
-          }
-          return item;
-        });
-        setData(updatedData);
-        // Đóng modal
-        setShowDetailsModal(false);
-      })
-      .catch((err) => console.log(err));
-  };
-
+  }, [props.renderTable, render]);
   return (
     <div>
       {console.log(data)}
       <Table
+        pagination={{ pageSize: 5 }}
         dataSource={data}
         columns={[
           {
@@ -165,41 +149,15 @@ const ButtonTable = function (props) {
         onCancel={() => setShowDetailsModal(false)}
         footer={null}
       >
-        <p>
-          STT <Input value={id} onChange={(e) => setid(e.target.value)} />
-        </p>
-        <br></br>
-        <p>
-          Kiểu_Cúc_Áo
+        <br />
+        <div>
+          <h6>Kiểu Cúc Áo</h6>
           <Input
             value={buttonName}
             onChange={(e) => setButtonName(e.target.value)}
           />
-        </p>
-        <br></br>
-        <p>
-          Trạng_Thái
-          <Input value={status} onChange={(e) => setStatus(e.target.value)} />
-        </p>
-        <br></br>
-        <p>
-          Ngày_tạo
-          <br></br>
-          <DatePicker
-            value={moment(selectedItem?.createdAt)}
-            format="DD/MM/YYYY"
-            onChange={(date, dateString) => handleDateChange(dateString)}
-          />
-        </p>
-        <br></br>
-        <p>
-          Người_Tạo
-          <Input
-            value={createdBy}
-            onChange={(e) => setStatus(e.target.value)}
-          />
-        </p>
-        <br></br>
+        </div>
+        <br />
         <Button type="primary" onClick={handleUpdate}>
           Update
         </Button>

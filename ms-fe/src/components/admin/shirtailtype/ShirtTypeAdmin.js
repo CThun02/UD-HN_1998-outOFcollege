@@ -72,7 +72,7 @@ const ShirtTailAdmin = function () {
               rules={[
                 {
                   required: true,
-                  message: "Vui lòng nhập tên thể loại",
+                  message: "Vui lòng nhập kiểu đuôi áo",
                 },
               ]}
             >

@@ -72,7 +72,7 @@ const CollorAdmin = function () {
               rules={[
                 {
                   required: true,
-                  message: "Vui lòng nhập tên thể loại",
+                  message: "Vui lòng nhập mã màu sắc",
                 },
               ]}
             >
@@ -84,7 +84,7 @@ const CollorAdmin = function () {
               rules={[
                 {
                   required: true,
-                  message: "Vui lòng nhập tên thể loại",
+                  message: "Vui lòng nhập màu sắc",
                 },
               ]}
             >

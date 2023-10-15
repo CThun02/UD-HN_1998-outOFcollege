@@ -27,6 +27,34 @@ const ShirtTypeTable = function (props) {
   const [status, setStatus] = useState("");
   const [id, setid] = useState("");
   const [createdBy, setCreatedBy] = useState("");
+  const handleUpdate = () => {
+    axios
+      .put(`http://localhost:8080/api/admin/shirt-tail/edit/${id}`, {
+        shirtTailTypeName,
+        status,
+        createdAt: selectedItem?.createdAt,
+        createdBy,
+      })
+      .then((response) => {
+        // Cập nhật lại danh sách dữ liệu sau khi cập nhật thành công
+        const updatedData = data.map((item) => {
+          if (item.id === id) {
+            return {
+              ...item,
+              shirtTailTypeName,
+              status,
+              createdAt: selectedItem?.createdAt,
+              createdBy,
+            };
+          }
+          return item;
+        });
+        setData(updatedData);
+        // Đóng modal
+        setShowDetailsModal(false);
+      })
+      .catch((err) => console.log(err));
+  };
 
   const handleDetails = (item) => {
     setSelectedItem(item);
@@ -173,7 +201,9 @@ const ShirtTypeTable = function (props) {
           />
         </p>
         <br></br>
-        <Button type="primary">Update</Button>
+        <Button type="primary" onClick={handleUpdate}>
+          Update
+        </Button>
       </Modal>
       <Modal
         title="Xác nhận xoá"

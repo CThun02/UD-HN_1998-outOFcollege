@@ -71,7 +71,7 @@ const MaterialAdmin = function () {
               rules={[
                 {
                   required: true,
-                  message: "Vui lòng nhập tên thể loại",
+                  message: "Vui lòng nhập tên chất loại",
                 },
               ]}
             >

@@ -73,6 +73,35 @@ const MaterialTable = function (props) {
       .catch((err) => console.log(err));
   }, []);
 
+  const handleUpdate = () => {
+    axios
+      .put(`http://localhost:8080/api/admin/material/edit/${id}`, {
+        materialName,
+        status,
+        createdAt: selectedItem?.createdAt,
+        createdBy,
+      })
+      .then((response) => {
+        // Cập nhật lại danh sách dữ liệu sau khi cập nhật thành công
+        const updatedData = data.map((item) => {
+          if (item.id === id) {
+            return {
+              ...item,
+              materialName,
+              status,
+              createdAt: selectedItem?.createdAt,
+              createdBy,
+            };
+          }
+          return item;
+        });
+        setData(updatedData);
+        // Đóng modal
+        setShowDetailsModal(false);
+      })
+      .catch((err) => console.log(err));
+  };
+
   return (
     <div>
       {console.log(data)}
@@ -171,7 +200,9 @@ const MaterialTable = function (props) {
           />
         </p>
         <br></br>
-        <Button type="primary">Update</Button>
+        <Button type="primary" onClick={handleUpdate}>
+          Update
+        </Button>
       </Modal>
       <Modal
         title="Xác nhận xoá"

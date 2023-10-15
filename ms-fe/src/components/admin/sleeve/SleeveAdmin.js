@@ -60,7 +60,7 @@ const SleeveAdmin = function () {
           <SleeveTable></SleeveTable>
         </div>
         <Modal
-          title="Thêm SleeveType"
+          title="Thêm Kiểu Tay Áo"
           visible={isModalVisible}
           onCancel={handleCancel}
           footer={null}
@@ -68,11 +68,11 @@ const SleeveAdmin = function () {
           <Form onFinish={handleSubmit}>
             <Form.Item
               name="sleeveName"
-              label="SleeveType"
+              label="Kiểu tay áo"
               rules={[
                 {
                   required: true,
-                  message: "Vui lòng nhập tên thể loại",
+                  message: "Vui lòng nhập kiểu tay áo",
                 },
               ]}
             >
@@ -106,7 +106,7 @@ const SleeveAdmin = function () {
               <DatePicker />
             </Form.Item>
             <Form.Item
-              name="createdBy"
+              name="creator"
               label="Người Tạo"
               rules={[
                 {

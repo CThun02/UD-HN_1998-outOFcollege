@@ -60,7 +60,7 @@ const ButtonAdmin = function () {
           <ButtonTable></ButtonTable>
         </div>
         <Modal
-          title="Thêm Thể Loại"
+          title="Thêm Kiểu Cúc Áo"
           visible={isModalVisible}
           onCancel={handleCancel}
           footer={null}
@@ -72,7 +72,7 @@ const ButtonAdmin = function () {
               rules={[
                 {
                   required: true,
-                  message: "Vui lòng nhập tên thể loại",
+                  message: "Vui lòng nhập kiểu cúc áo",
                 },
               ]}
             >

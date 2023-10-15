@@ -188,7 +188,6 @@ CREATE TABLE promotion(
     promotion_value      DECIMAL,
     start_date          DATETIME,
     end_date            DATETIME,
-    promotion_max_value  DECIMAL,
     promotion_method     VARCHAR(30),
     promotion_condition  DECIMAL,
     status              VARCHAR(50),
@@ -204,6 +203,8 @@ CREATE TABLE promotion_product_detail(
     promotion_id         BIGINT FOREIGN KEY(promotion_id) REFERENCES promotion(id),
     product_detail_id   BIGINT FOREIGN KEY(product_detail_id) REFERENCES product_detail(id),
     percent_reduce      DECIMAL,
+    money_reduce		DECIMAL,
+	method_reduce		VARCHAR(10),
     money_after         DECIMAL,
     status              VARCHAR(50),
     created_at          DATETIME,
@@ -279,11 +280,7 @@ CREATE TABLE bill(
     price               DECIMAL,
     price_reduce        DECIMAL,
     bill_type           VARCHAR(50),
-<<<<<<< HEAD
-    note                NVARCHAR(200),
-=======
     note                NVARCHAR(MAX),
->>>>>>> test
     status              VARCHAR(50),
     created_at          DATETIME,
     updated_at          DATETIME,

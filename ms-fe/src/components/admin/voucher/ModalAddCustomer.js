@@ -1,7 +1,21 @@
 import { DeleteOutlined } from "@ant-design/icons";
-import { Button, Divider, Modal, Pagination, Space, Spin, Table } from "antd";
+import {
+  Button,
+  Col,
+  Divider,
+  Input,
+  Modal,
+  Pagination,
+  Row,
+  Select,
+  Space,
+  Spin,
+  Table,
+} from "antd";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import FloatingLabels from "../../element/FloatingLabels/FloatingLabels";
+import styles from "./ModalAddCustomer.module.css";
 
 const columns = [
   {
@@ -36,6 +50,12 @@ const columns = [
   },
 ];
 
+const options = [
+  { label: "Nam", value: true },
+  { label: "Nữ", value: false },
+  { label: "Tất cả", value: "all" },
+];
+
 const baseCustomersUrl = "http://localhost:8080/api/admin/account/";
 
 function ModalAddCustomer({
@@ -51,10 +71,19 @@ function ModalAddCustomer({
   const [pageNo, setPageNo] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const [totalElements, setTotalElements] = useState(5);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [searchText, setSearchText] = useState("");
+  const [gender, setGender] = useState("all");
 
   const [selectedRows, setSelectedRows] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+
+  const [pageNoTable, setPageNoTable] = useState(1);
+  const [pageSizeTable, setPageSizeTable] = useState(5);
+
+  const calculateSttTable = (index) => {
+    return (pageNoTable - 1) * pageSizeTable + index + 1;
+  };
 
   const calculateStt = (index) => {
     return (pageNo - 1) * pageSize + index + 1;
@@ -68,6 +97,7 @@ function ModalAddCustomer({
   useEffect(
     function () {
       async function getCustomers() {
+        const filterCustomer = { searchText, gender };
         await axios
           .post(
             `${
@@ -81,10 +111,7 @@ function ModalAddCustomer({
                   pageSize
                 : baseCustomersUrl + "voucher"
             }`,
-            {
-              searchText: "user",
-              gender: true,
-            }
+            filterCustomer
           )
           .then((res) => {
             setTotalElements(res.data.totalElements);
@@ -98,7 +125,7 @@ function ModalAddCustomer({
 
       getCustomers();
     },
-    [pageNo, pageSize]
+    [pageNo, pageSize, gender, searchText]
   );
 
   useEffect(
@@ -108,12 +135,22 @@ function ModalAddCustomer({
         values?.objectUse === "member" &&
         !customers.length
       ) {
-        setSelectedRowKeys(values?.usernames.map((user) => user.username));
+        setSelectedRowKeys((prevData) => [
+          ...prevData,
+          ...values?.usernames.map((user) => user.username),
+        ]);
+
         setSelectedRows(values?.usernames);
       }
     },
     [values, customers]
   );
+
+  function handleOnSelected(record, isSelected, selectedRows, nativeEvent) {
+    setSelectedRows((prevData) => [...prevData, record]);
+    const { username } = record;
+    setSelectedRowKeys((prevData) => [...prevData, username]);
+  }
 
   function handleOnOk() {
     setCustomers(selectedRows);
@@ -126,8 +163,8 @@ function ModalAddCustomer({
   }
 
   function handleOnChange(selectedRowKeys, selectedRows) {
-    setSelectedRows(selectedRows);
-    setSelectedRowKeys(selectedRowKeys);
+    // setSelectedRows(selectedRows);
+    // setSelectedRowKeys(selectedRowKeys);
   }
 
   function handleDeleted(value) {
@@ -185,6 +222,45 @@ function ModalAddCustomer({
             <>
               <Divider />
 
+              <Row>
+                <Col span={6}>
+                  <FloatingLabels
+                    label="Search...."
+                    name="searchText"
+                    value={searchText}
+                    zIndex={true}
+                  >
+                    <Input
+                      size="large"
+                      name="searchText"
+                      onChange={(e) => setSearchText(e.target.value)}
+                      value={searchText}
+                      allowClear
+                    />
+                  </FloatingLabels>
+                </Col>
+                <Col span={1}></Col>
+                <Col span={4}>
+                  <FloatingLabels
+                    label="Search...."
+                    name="gender"
+                    value={true}
+                    zIndex={true}
+                  >
+                    <Select
+                      name="gender"
+                      className={styles.selectedItem}
+                      onChange={(e) => setGender(e)}
+                      options={options}
+                      value={gender}
+                      style={{ width: "100%" }}
+                      placeholder={null}
+                      size="large"
+                    />
+                  </FloatingLabels>
+                </Col>
+              </Row>
+
               <Space style={{ width: "100%" }} direction="vertical" size={12}>
                 <>
                   <Space
@@ -197,6 +273,7 @@ function ModalAddCustomer({
                       rowSelection={{
                         type: rowSelection,
                         ...rowSelection,
+                        onSelect: handleOnSelected,
                       }}
                       columns={columns}
                       dataSource={customersVoucher.map((customer, index) => ({
@@ -234,7 +311,7 @@ function ModalAddCustomer({
             columns={[...columns, values.voucherId ? "" : newColumns]}
             dataSource={customers?.map((customer, index) => ({
               key: customer.username,
-              stt: calculateStt(index),
+              stt: calculateSttTable(index),
               username: customer.username,
               fullName: customer.fullName,
               gender: customer.gender ? "Nam" : "Nữ",
@@ -242,10 +319,10 @@ function ModalAddCustomer({
               phoneNumber: customer.phoneNumber,
               action: customer,
             }))}
-            pagination={false}
+            // pagination={false}
           />
           {/* <Pagination
-            defaultCurrent={pageNo}
+            defaultCurrent={pageNoTable}
             total={totalElements}
             showSizeChanger={true}
             pageSize={pageSize}
@@ -258,7 +335,9 @@ function ModalAddCustomer({
         ""
       )}
 
-      {values?.objectUse === "member" && values?.voucherId ? (
+      {values?.objectUse === "member" &&
+      values?.voucherId &&
+      values?.usernames.length ? (
         <Space style={{ width: "100%" }} direction="vertical" size={12}>
           <Table
             style={{ width: "100%" }}
@@ -272,7 +351,7 @@ function ModalAddCustomer({
               email: customer.email,
               phoneNumber: customer.phoneNumber,
             }))}
-            pagination={false}
+            // pagination={false}
           />
         </Space>
       ) : null}

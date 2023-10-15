@@ -19,7 +19,9 @@ public interface AccountRepository extends JpaRepository<Account, String> {
             "FROM Account a where a.role.id=?1")
     Page<AccountResponce> phanTrang(Pageable pageable, Long roleId);
 
-    @Query(value = "select email from account", nativeQuery = true)
+    @Query(value = "select email from account " +
+            "left join role on account.role_id = role.id " +
+            "where role_name = 'CUSTOMER' ", nativeQuery = true)
     List<String> emailAccountList();
 
     @Query(name = "Account.customerAccountList", nativeQuery = true)

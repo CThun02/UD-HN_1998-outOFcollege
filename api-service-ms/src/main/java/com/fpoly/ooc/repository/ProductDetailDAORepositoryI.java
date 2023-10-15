@@ -2,9 +2,11 @@ package com.fpoly.ooc.repository;
 
 import com.fpoly.ooc.entity.*;
 import com.fpoly.ooc.responce.product.ProductDetailResponse;
+import com.fpoly.ooc.responce.productdetail.ProductsDetailsResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -104,5 +106,16 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
             "left join PromotionProduct pp on pd.id = pp.productDetailId.id " +
             "left join Promotion p on p.id = pp.promotion.id " +
             "where p.id = ?1")
-    public List<Long> findAllByIdPromotion(Long promotionId);
+    List<Long> findAllByIdPromotion(Long promotionId);
+
+    @Query(name = "ProductDetail.getProductDetailsTableByConditionDTO", nativeQuery = true)
+    List<ProductsDetailsResponse> getProductDetailsTableByConditionDTO(List<Long> idProducts,
+                                                                       Long idButtons,
+                                                                       Long idMaterials,
+                                                                       Long idCollars,
+                                                                       Long idSleeves,
+                                                                       Long idShirtTailTypes,
+                                                                       Long idSizes,
+                                                                       Long idColors,
+                                                                       String searchText);
 }

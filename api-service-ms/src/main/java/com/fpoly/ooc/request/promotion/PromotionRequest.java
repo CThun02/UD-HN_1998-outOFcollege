@@ -49,8 +49,8 @@ public class PromotionRequest {
 
     private String status;
 
-    private List<Long> products;
+    private List<Long> productDetailIds;
 
-    private List<ProductDetail> listProductResponse;
+    private List<Long> productIdsResponse;
 
 }

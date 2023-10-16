@@ -18,7 +18,7 @@ public interface AccountService {
 
     Account save(AccountRequest request);
 
-    Account update(AccountRequest request,String username);
+    Account update(AccountRequest request, String username);
 
     List<AddressDetail> getAddressDetailsByUsername(String username);
 
@@ -32,5 +32,8 @@ public interface AccountService {
     Page<AccountVoucher> findAccountVoucher(CustomerConditionDTO customerConditionDTO, Pageable pageable);
 
     Account findByUsername(String username);
+
+    List<AccountDetailResponce> getAllCustomer();
+
 
 }

@@ -21,7 +21,7 @@ public class TimelineController {
     private TimeLineService timeLineService;
 
     @GetMapping("/{id}/info")
-    public ResponseEntity<?> getBillInfoByBillId(@PathVariable("id") Long id){
+    public ResponseEntity<?> getBillInfoByBillId(@PathVariable("id") Long id) {
         return ResponseEntity.ok(timeLineService.getBillInfoByBillId(id));
     }
 

@@ -8,8 +8,11 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface AddressDetailRepository extends JpaRepository<AddressDetail,Long> {
+public interface AddressDetailRepository extends JpaRepository<AddressDetail, Long> {
     @Query("select ad from AddressDetail ad where ad.accountAddress.username=?1")
     public List<AddressDetail> getAddressDetailByUserName(String userName);
+
+    @Query("select ad from AddressDetail ad where ad.accountAddress.role.id = 2")
+    List<AddressDetail> getAllCustomer();
 
 }

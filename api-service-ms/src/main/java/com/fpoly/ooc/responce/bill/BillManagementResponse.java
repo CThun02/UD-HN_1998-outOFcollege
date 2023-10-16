@@ -1,7 +1,6 @@
 package com.fpoly.ooc.responce.bill;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,31 +10,22 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-public class BillInfoResponse {
+public class BillManagementResponse {
 
     private Long billId;
 
     private String billCode;
 
-    private String billType;
-
-    private String fullName;
-
-    private String phoneNumber;
+    private Long totalQuantity;
 
     private BigDecimal totalPrice;
 
-    private BigDecimal priceReduce;
-
-    private BigDecimal shipPrice;
-
-    private LocalDateTime shipDate;
-
-    private String paymentName;
+    private String fullname;
 
     private LocalDateTime createdDate;
 
-    private String address;
+    private String billType;
+
+    private String status;
 
 }

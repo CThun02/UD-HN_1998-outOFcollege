@@ -134,7 +134,7 @@ public class AccountServiceImpl implements AccountService {
                 .email(account.getEmail())
                 .numberPhone(account.getNumberPhone())
                 .build();
-        accountDetailResponce.setAccountAddress(accountAddressDetails.stream().map(ad-> ad.getAddressDetail()).collect(Collectors.toList()));
+        accountDetailResponce.setAccountAddress(accountAddressDetails.stream().map(ad -> ad.getAddressDetail()).collect(Collectors.toList()));
         return accountDetailResponce;
 
     }
@@ -153,11 +153,11 @@ public class AccountServiceImpl implements AccountService {
     public Page<AccountVoucher> findAccountVoucher(CustomerConditionDTO customerConditionDTO, Pageable pageable) {
         Boolean gender = true;
 
-        if(customerConditionDTO.getGender().equals("false")) {
+        if (customerConditionDTO.getGender().equals("false")) {
             gender = false;
         }
 
-        if(customerConditionDTO.getGender().equals("all")) {
+        if (customerConditionDTO.getGender().equals("all")) {
             gender = null;
         }
 
@@ -172,6 +172,35 @@ public class AccountServiceImpl implements AccountService {
     public Account findByUsername(String username) {
         return accountRepository.findById(username).orElseThrow(() ->
                 new NotFoundException(ErrorCodeConfig.getMessage(Const.USER_NOT_FOUND)));
+    }
+
+    @Override
+    public List<AccountDetailResponce> getAllCustomer() {
+        List<AddressDetail> accountAddressDetails = addressDetailService.getAllCustomer();
+        List<AccountDetailResponce> lstAccountDetailResponces = new ArrayList<>();
+        for (AddressDetail addressDetail : accountAddressDetails) {
+            Account account = addressDetail.getAccountAddress();
+            AccountDetailResponce accountDetailResponce = AccountDetailResponce.builder()
+                    .image(account.getAvatar())
+                    .username(account.getUsername())
+                    .idNo(account.getIdNo())
+                    .fullName(account.getFullName())
+                    .dob(account.getDob())
+                    .gender(account.getGender())
+                    .email(account.getEmail())
+                    .numberPhone(account.getNumberPhone())
+                    .build();
+
+            List<Address> accountAddressList = accountAddressDetails.stream()
+                    .filter(ad -> ad.getAccountAddress().equals(account))
+                    .map(ad -> ad.getAddressDetail())
+                    .collect(Collectors.toList());
+
+            accountDetailResponce.setAccountAddress(accountAddressList);
+            lstAccountDetailResponces.add(accountDetailResponce);
+        }
+
+        return lstAccountDetailResponces;
     }
 
     private Page<AccountVoucher> page(List<AccountVoucher> inputList, Pageable pageable) {

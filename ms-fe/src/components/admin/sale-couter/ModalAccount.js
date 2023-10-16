@@ -4,22 +4,24 @@ import React from 'react'
 import { useState } from 'react';
 import { useEffect } from 'react';
 
-const ModalAccount = ({ visible, onCancel, cartId, render }) => {
+const ModalAccount = ({ visible, onCancel, cartId, render, address, phoneNumber }) => {
     const [loading, setLoadding] = useState(true);
     const [renderThis, setRenderThis] = useState(null);
     var cart = JSON.parse(localStorage.getItem(cartId));
 
     const add = (value) => {
         cart.account = value;
+        address(value.accountAddress.filter(address => address.defaultaddress === true)[0])
+        console.log(value.accountAddress)
         localStorage.setItem(cartId, JSON.stringify(cart));
         render(Math.random)
-        console.log(onCancel())
+        onCancel()
     }
 
     const columns = [
         {
             title: 'Tên',
-            dataIndex: 'fullname',
+            dataIndex: 'fullName',
             key: 'fullname'
         },
         {
@@ -50,7 +52,7 @@ const ModalAccount = ({ visible, onCancel, cartId, render }) => {
 
     const [data, setData] = useState([])
     useEffect(() => {
-        axios.get(`http://localhost:8080/api/admin/bill/customer`)
+        axios.get(`http://localhost:8080/api/admin/account/getAllCustomer`)
             .then((response) => {
                 setData(response.data);
                 setLoadding(false)

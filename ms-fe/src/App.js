@@ -19,6 +19,7 @@ import AccountForm from "./components/admin/account/AccountForm";
 import CustomerAdmin from "./components/admin/account/CustomorAdmin";
 import DetailForm from "./components/admin/account/DetailForm";
 import ProductUpdateDetails from "./components/admin/product/ProductUpdateDetails";
+import BillManagement from "./components/admin/sale-couter/BillManagement";
 function App() {
   const [message, setMessage] = useState("");
 
@@ -52,7 +53,7 @@ function App() {
                     </Route>
 
                     {/* Đơn hàng */}
-                    <Route path="order" element="order"></Route>
+                    <Route path="order" element={<BillManagement />} ></Route>
 
                     {/* Thu chi */}
 

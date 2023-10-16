@@ -94,4 +94,9 @@ public class AccountController {
         return ResponseEntity.ok(service.findAccountVoucher(customerConditionDTO, PageRequest.of(pageNo, pageSize)));
     }
 
+    @GetMapping("/getAllCustomer")
+    public ResponseEntity<?> getAllCustomer(){
+        return ResponseEntity.ok(service.getAllCustomer());
+    }
+
 }

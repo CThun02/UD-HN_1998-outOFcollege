@@ -1,4 +1,4 @@
-﻿use master
+﻿﻿use master
 
 create database DATN_DB_MS
 
@@ -169,8 +169,7 @@ CREATE TABLE product_detail(
 
 CREATE TABLE product_image(
     id                  BIGINT IDENTITY PRIMARY KEY,
-    product_id			BIGINT FOREIGN KEY(product_id) REFERENCES product(id) ,
-    color_id			BIGINT FOREIGN KEY(color_id) REFERENCES color(id) ,
+    product_detail_id   BIGINT FOREIGN KEY(product_detail_id) REFERENCES product_detail(id) ,
     path                VARCHAR(MAX),
     status              VARCHAR(50),
     created_at          DATETIME,
@@ -330,6 +329,7 @@ CREATE TABLE bill_detail(
     product_detail_id   BIGINT FOREIGN KEY(product_detail_id) REFERENCES product_detail(id),
     price               DECIMAL,
     quantity            INT,
+    note                NVARCHAR(MAX),
     status              VARCHAR(50),
     created_at          DATETIME,
     updated_at          DATETIME,

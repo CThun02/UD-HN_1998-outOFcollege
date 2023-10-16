@@ -150,3 +150,9 @@ btn:hover {
 .cashButton.selected {
   border-color: #00f;
 }
+
+.error {
+  margin-left: 50%;
+  color: red;
+  display: block;
+}

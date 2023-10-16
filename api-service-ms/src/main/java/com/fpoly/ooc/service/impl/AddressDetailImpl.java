@@ -9,7 +9,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class AddressDetailImpl implements AddressDetailService{
+public class AddressDetailImpl implements AddressDetailService
+{
 
     @Autowired
     private AddressDetailRepository repo;
@@ -22,5 +23,10 @@ public class AddressDetailImpl implements AddressDetailService{
     @Override
     public AddressDetail create(AddressDetail addressDetail) {
         return repo.save(addressDetail);
+    }
+
+    @Override
+    public List<AddressDetail> getAllCustomer() {
+        return repo.getAllCustomer();
     }
 }

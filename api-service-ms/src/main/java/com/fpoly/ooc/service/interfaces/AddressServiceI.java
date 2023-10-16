@@ -1,7 +1,7 @@
 package com.fpoly.ooc.service.interfaces;
 
 import com.fpoly.ooc.entity.Address;
-import com.fpoly.ooc.entity.Brand;
+import com.fpoly.ooc.entity.AddressDetail;
 
 import java.util.List;
 

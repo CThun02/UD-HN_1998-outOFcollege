@@ -260,13 +260,13 @@ const ProductCreateDetails = () => {
     messageApi.loading("Đang tải", 1);
     if (patternCreate.trim() !== "") {
       axios
-        .post(api + "pattern?patternName=" + patternCreate, null)
+        .post(api + "pattern?categoryName=" + patternCreate, null)
         .then((res) => {
           setTimeout(() => {
             if (res.data === "") {
               messageApi.error("Họa tiết đã tồn tại!", 1);
             } else {
-              messageApi.success("Thêm hoạt tiết thành công!", 1);
+              messageApi.success("Thêm hoạ tiết thành công!", 1);
               setRender(res.data);
             }
             setPatternCreate(" ");

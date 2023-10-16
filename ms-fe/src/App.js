@@ -53,7 +53,7 @@ function App() {
                     </Route>
 
                     {/* Đơn hàng */}
-                    <Route path="order" element={<BillManagement />} ></Route>
+                    <Route path="order" element={<BillManagement />}></Route>
 
                     {/* Thu chi */}
 

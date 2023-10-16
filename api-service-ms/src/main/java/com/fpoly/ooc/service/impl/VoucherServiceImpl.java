@@ -183,6 +183,14 @@ public class VoucherServiceImpl implements VoucherService {
         return voucherRepository.findAllVoucherResponseNoCondition();
     }
 
+    @Override
+    public List<VoucherResponse> findAllVoucherResponseDisplayModalUsing(String username, BigDecimal priceBill) {
+        return voucherRepository.findAllDisplayModalUsingVoucher(
+                StringUtils.isBlank(username) ? null : username,
+                String.valueOf(priceBill).equals("-1") ? null : priceBill
+        );
+    }
+
     private VoucherRequest convertVoucher(Voucher voucher) {
 
         return VoucherRequest.builder()

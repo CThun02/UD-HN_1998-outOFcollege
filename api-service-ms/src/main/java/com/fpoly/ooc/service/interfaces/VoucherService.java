@@ -7,6 +7,7 @@ import com.fpoly.ooc.responce.voucher.VoucherResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface VoucherService {
@@ -28,5 +29,7 @@ public interface VoucherService {
     Boolean isCheckAccountOwnerVoucher(Long idVoucher, String username);
 
     List<VoucherResponse> findAllNoFilter();
+
+    List<VoucherResponse> findAllVoucherResponseDisplayModalUsing(String username, BigDecimal priceBill);
 
 }

@@ -24,8 +24,6 @@ import com.fpoly.ooc.responce.account.GetListCustomer;
 import com.fpoly.ooc.responce.bill.BillManagementResponse;
 import com.fpoly.ooc.service.interfaces.BillService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -78,7 +76,7 @@ public class BillServiceImpl implements BillService {
                     .price(billDetailRequest.getPrice())
                     .quantity(billDetailRequest.getQuantity())
                     .note("null")
-                    .status("unpaid")
+                    .status("UNPAID")
                     .build();
             billDetailRepo.save(billDetail);
         }
@@ -109,13 +107,13 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
-    public Page<BillManagementResponse> getAllBillManagement(Integer pageNo, Integer size,
-                                                             String billCode,
-                                                             LocalDateTime startDate,
-                                                             LocalDateTime endDate,
-                                                             String status,
-                                                             String billType) {
-        return billRepo.getAllBillManagement(PageRequest.of(pageNo, size), billCode,
+    public List<BillManagementResponse> getAllBillManagement(
+            String billCode,
+            LocalDateTime startDate,
+            LocalDateTime endDate,
+            String status,
+            String billType) {
+        return billRepo.getAllBillManagement(billCode,
                 startDate, endDate, status, billType);
     }
 

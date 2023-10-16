@@ -3,19 +3,8 @@ import { Button, Modal, Table } from 'antd'
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 
-const ModalAddress = ({ isModalOpen, handleOk, handleCancel, username, render, selected, selectedAddress }) => {
+const ModalAddress = ({ isModalOpen, handleOk, handleCancel, address, render, selectedAddress }) => {
 
-    const [data, setData] = useState([])
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        axios.get(`http://localhost:8080/api/admin/bill/customer/${username}/address`)
-            .then((response) => {
-                setData(response.data);
-                setLoading(false)
-            })
-            .catch((error) => console.log(error))
-    }, [username])
 
     const columns = [
         {
@@ -40,16 +29,18 @@ const ModalAddress = ({ isModalOpen, handleOk, handleCancel, username, render, s
             render: (_, record, index) => {
                 return (
                     <div>
-                        <Button onClick={() => handleSelectAddress(record.id, index)}>Chọn</Button>
+                        <Button onClick={() => handleSelectAddress(record)}>Chọn</Button>
                     </div>
                 )
             }
         },
     ]
 
-    const handleSelectAddress = (id, index) => {
-        selected(index);
-        selectedAddress(id)
+    const handleSelectAddress = (record) => {
+        // selected(index);
+        console.log(`object`, address)
+        selectedAddress(record)
+        console.log(`record`, record)
         handleCancel();
         render(Math.random)
     }
@@ -65,9 +56,8 @@ const ModalAddress = ({ isModalOpen, handleOk, handleCancel, username, render, s
             >
                 <Table
                     columns={columns}
-                    dataSource={data}
+                    dataSource={address}
                     pagination={false}
-                    loading={loading}
                     closeIcon />
             </Modal>
         </div>

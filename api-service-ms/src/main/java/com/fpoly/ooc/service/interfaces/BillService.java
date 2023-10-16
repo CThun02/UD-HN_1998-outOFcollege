@@ -16,8 +16,7 @@ public interface BillService {
 
     Bill createBill(BillRequest request);
 
-    Page<BillManagementResponse> getAllBillManagement(Integer pageNo,
-                                                      Integer size,
+    List<BillManagementResponse> getAllBillManagement(
                                                       String billCode,
                                                       LocalDateTime startDate,
                                                       LocalDateTime endDate,

@@ -26,6 +26,7 @@ function SockJs({ setValues, connectTo }) {
   };
 
   const onMessageReceived = (msg) => {
+    console.log("New Message Received!!");
     setValues(JSON.parse(msg.body));
   };
 
@@ -35,8 +36,6 @@ function SockJs({ setValues, connectTo }) {
         "/topic/" + connectTo,
         onMessageReceived
       );
-
-      console.log("topic: ", "/topic/" + connectTo);
 
       return () => {
         subcription.unsubscribe();

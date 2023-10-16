@@ -100,13 +100,14 @@ function FilterVoucherAndPromotion({
         </Row>
 
         <Row>
-          <Col span={4}>
+          <Col span={5}>
             <FloatingLabels
               label="Ngày bắt đầu"
               name="startDate"
               value={startDate}
             >
               <DatePicker
+                style={{ width: "90%" }}
                 format={dateFormat}
                 size="large"
                 placeholder={null}
@@ -115,13 +116,14 @@ function FilterVoucherAndPromotion({
               />
             </FloatingLabels>
           </Col>
-          <Col span={4}>
+          <Col span={5}>
             <FloatingLabels
               label="Ngày kết thúc"
               name="endDate"
               value={endDate}
             >
               <DatePicker
+                style={{ width: "90%" }}
                 format={dateFormat}
                 size="large"
                 placeholder={null}
@@ -131,7 +133,7 @@ function FilterVoucherAndPromotion({
               />
             </FloatingLabels>
           </Col>
-          <Col span={4}>
+          <Col span={5}>
             <Space style={{ width: "100%" }} direction="vertical">
               <FloatingLabels label="Trạng thái" name="status" value={"status"}>
                 <Select

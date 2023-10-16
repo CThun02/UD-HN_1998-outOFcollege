@@ -10,6 +10,7 @@ import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import moment from 'moment';
 import numeral from 'numeral';
+import { CheckCircleOutlined } from '@ant-design/icons';
 
 const BillTimeLine = (addId) => {
 
@@ -192,7 +193,7 @@ const BillTimeLine = (addId) => {
                                         ) : data.status === '3' ? (
                                             FaTruck
                                         ) : (
-                                            FaTimes
+                                            CheckCircleOutlined
                                         )}
                                         title={data.status === '0' ? 'Đã hủy'
                                             : data.status === '1'
@@ -253,7 +254,7 @@ const BillTimeLine = (addId) => {
                         </>
                     )}
                     {console.log('timeline', timelines.length)}
-                    {billInfo.billType !== 'In-store' && (timelines.length !== 3 && timelines.length !== 4) && timelines[timelines.length - 1]?.status !== '0' && (
+                    {billInfo.billType !== 'In-store' && (timelines.length !== 4 && timelines.length !== 5) && timelines[timelines.length - 1]?.status !== '0' && (
                         <>
                             <Button
                                 type="primary"
@@ -326,11 +327,11 @@ const BillTimeLine = (addId) => {
                                     <SpanBorder child={moment(billInfo.createdDate).format('HH:MM  DD/MM/YYYY')} color={'#1677ff'} />
                                 </div>
                                 <div style={{ display: 'flex', alignItems: 'center', width: '10px', marginBottom: '20px' }}>
-                                    <SpanBorder child={'Thanh toán khi nhận hàng'} color={'#1677ff'} />
+                                    <SpanBorder child={'__'} color={'#1677ff'} />
                                 </div>
                                 <div style={{ display: 'flex', alignItems: 'center', width: '50px' }}>
                                     {billInfo.billType === "Online" && (
-                                        <SpanBorder child={'Giao hàng tại nhà'} color={'gray'} />
+                                        <SpanBorder child={'__'} color={'gray'} />
                                     )}
                                     {billInfo.billType !== "Online" && "__"}
                                 </div>
@@ -350,7 +351,7 @@ const BillTimeLine = (addId) => {
                             <Col span={12}>
                                 <span className={styles.span}>{billInfo.fullName || 'khách lẻ'}</span>
                                 <span className={styles.span}>{billInfo.phoneNumber || '__'}</span>
-                                <span style={{ fontSize: '16px', display: 'block' }}>{billInfo.address || '__'}</span>
+                                <span style={{ fontSize: '16px', display: 'block' }}>{billInfo?.address?.replace(/[0-9|-]/g, "") || '__'}</span>
                             </Col>
                         </Row>
                     </Col>

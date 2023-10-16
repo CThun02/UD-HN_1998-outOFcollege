@@ -1,8 +1,8 @@
-﻿USE MASTER;
+﻿﻿use master
 
-CREATE DATABASE DATN_DB_MS;
+create database DATN_DB_MS
 
-USE DATN_DB_MS;
+use DATN_DB_MS
 
 CREATE TABLE brand(
     id                  BIGINT IDENTITY PRIMARY KEY,
@@ -52,8 +52,6 @@ CREATE TABLE product(
     id                  BIGINT IDENTITY PRIMARY KEY,
     brand_id            BIGINT FOREIGN KEY(brand_id) REFERENCES brand(id),
     category_id         BIGINT FOREIGN KEY(category_id) REFERENCES category(id),
-    pattern_id          BIGINT FOREIGN KEY(pattern_id) REFERENCES pattern(id),
-    form_id             BIGINT FOREIGN KEY(form_id) REFERENCES form(id),
     product_code        NVARCHAR(50),
     product_name        NVARCHAR(50),
     img_default         VARCHAR(MAX),
@@ -148,6 +146,8 @@ CREATE TABLE size(
 CREATE TABLE product_detail(
     id                  BIGINT IDENTITY PRIMARY KEY,
     product_id          BIGINT FOREIGN KEY(product_id) REFERENCES product(id),
+	pattern_id          BIGINT FOREIGN KEY(pattern_id) REFERENCES pattern(id),
+    form_id             BIGINT FOREIGN KEY(form_id) REFERENCES form(id),
     button_id           BIGINT FOREIGN KEY(button_id) REFERENCES button_type(id),
     material_id         BIGINT FOREIGN KEY(material_id) REFERENCES material(id),
     collar_id           BIGINT FOREIGN KEY(collar_id) REFERENCES collar_type(id),
@@ -187,7 +187,6 @@ CREATE TABLE promotion(
     promotion_value      DECIMAL,
     start_date          DATETIME,
     end_date            DATETIME,
-    promotion_max_value  DECIMAL,
     promotion_method     VARCHAR(30),
     promotion_condition  DECIMAL,
     status              VARCHAR(50),
@@ -203,6 +202,8 @@ CREATE TABLE promotion_product_detail(
     promotion_id         BIGINT FOREIGN KEY(promotion_id) REFERENCES promotion(id),
     product_detail_id   BIGINT FOREIGN KEY(product_detail_id) REFERENCES product_detail(id),
     percent_reduce      DECIMAL,
+    money_reduce		DECIMAL,
+	method_reduce		VARCHAR(10),
     money_after         DECIMAL,
     status              VARCHAR(50),
     created_at          DATETIME,
@@ -244,11 +245,15 @@ CREATE TABLE account(
 
 CREATE TABLE address(
     id                  BIGINT IDENTITY PRIMARY KEY,
+	fullName			NVARCHAR(100),
+	SDT					VARCHAR(15),
+	EMAIL				VARCHAR(200),
     city                NVARCHAR(100),
     district            NVARCHAR(100),
     ward                NVARCHAR(100),
     street              NVARCHAR(100),
     description_detail  NVARCHAR(MAX),
+	defaultaddress		BIT,
     status              VARCHAR(50),
     created_at          DATETIME,
     updated_at          DATETIME,
@@ -278,7 +283,7 @@ CREATE TABLE bill(
     price               DECIMAL,
     price_reduce        DECIMAL,
     bill_type           VARCHAR(50),
-    note                NVARCHAR(200),
+    note                NVARCHAR(MAX),
     status              VARCHAR(50),
     created_at          DATETIME,
     updated_at          DATETIME,

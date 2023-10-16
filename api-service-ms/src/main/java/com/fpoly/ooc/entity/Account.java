@@ -28,22 +28,23 @@ import java.util.List;
 
 @NamedNativeQuery(
         name = "Account.customerAccountList",
-        query = "select account.username     as 'username',\n" +
-                "       account.full_name    as 'fullName',\n" +
-                "       account.gender       as 'gender',\n" +
-                "       account.email        as 'email',\n" +
-                "       account.phone_number as 'phoneNumber'\n" +
-                "from account\n" +
-                "         left join role on account.role_id = role.id\n" +
-                "where role.role_name = 'CUSTOMER' " +
-                "and account.status = 'ACTIVE'\n" +
-                "and (?1 is null\n" +
-                "    or account.username like ?1\n" +
-                "    or account.full_name like ?1\n" +
-                "    or account.email like ?1\n" +
-                "    or account.phone_number like ?1\n" +
-                "    )\n" +
-                "and (?2 is null or account.gender = ?2)\n",
+        query = """
+                select account.username     as 'username',
+                       account.full_name    as 'fullName',
+                       account.gender       as 'gender',
+                       account.email        as 'email',
+                       account.phone_number as 'phoneNumber'
+                from account
+                         left join role on account.role_id = role.id
+                where role.role_name = 'CUSTOMER' and account.status = 'ACTIVE'
+                and (?1 is null
+                    or lower(account.username) like ?1
+                    or lower(account.full_name) like ?1
+                    or lower(account.email) like ?1
+                    or lower(account.phone_number) like ?1
+                    )
+                and (?2 is null or account.gender = ?2)
+                """,
         resultSetMapping = "Mapping.AccountVoucher"
 )
 
@@ -105,7 +106,7 @@ public class Account extends BaseEntity{
     private Role role;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "accountAddress")
+    @OneToMany(mappedBy = "accountAddress", fetch = FetchType.LAZY)
     private List<AddressDetail> addAdress;
 
 }

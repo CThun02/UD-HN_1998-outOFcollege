@@ -2,21 +2,13 @@ package com.fpoly.ooc.repository;
 
 import com.fpoly.ooc.entity.Address;
 import com.fpoly.ooc.entity.Bill;
-import com.fpoly.ooc.responce.account.AccountResponce;
 import com.fpoly.ooc.responce.account.GetListCustomer;
-import com.fpoly.ooc.responce.bill.BillInfoResponse;
 import com.fpoly.ooc.responce.bill.BillManagementResponse;
-import com.fpoly.ooc.responce.bill.BillProductResponse;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -46,12 +38,12 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
             "   AND (:billType IS NULL OR b.billType LIKE %:billType%) " +
             "GROUP BY b.id, b.billCode, b.price, a.fullName, b.createdAt, b.billType, b.status " +
             "ORDER BY b.createdAt DESC ")
-    Page<BillManagementResponse> getAllBillManagement(Pageable pageable,
-                                                      @Param("billCode") String billCode,
-                                                      @Param("startDate") LocalDateTime startDate,
-                                                      @Param("endDate") LocalDateTime endDate,
-                                                      @Param("status") String status,
-                                                      @Param("billType") String billType);
+    List<BillManagementResponse> getAllBillManagement(
+            @Param("billCode") String billCode,
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate,
+            @Param("status") String status,
+            @Param("billType") String billType);
 
     @Modifying
     @Query("UPDATE Bill b SET b.status = :status WHERE b.id = :id")

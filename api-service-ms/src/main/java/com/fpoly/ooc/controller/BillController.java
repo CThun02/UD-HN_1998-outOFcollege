@@ -1,6 +1,5 @@
 package com.fpoly.ooc.controller;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fpoly.ooc.dto.BillStatusDTO;
 import com.fpoly.ooc.request.bill.BillRequest;
 import com.fpoly.ooc.service.interfaces.BillService;
@@ -33,8 +32,6 @@ public class BillController {
 
     @GetMapping("")
     public ResponseEntity<?> getAllBillManagement(
-            @RequestParam(name = "pageNo", defaultValue = "0") Integer pageNo,
-            @RequestParam(name = "size", defaultValue = "5") Integer size,
             @RequestParam(value = "billCode", required = false) String billCode,
             @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Optional<LocalDate> startDate,
             @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Optional<LocalDate> endDate,
@@ -43,7 +40,7 @@ public class BillController {
         LocalDateTime startDateTime = startDate.map(date -> LocalDateTime.of(date, LocalTime.MIN)).orElse(null);
         LocalDateTime endDateTime = endDate.map(date -> LocalDateTime.of(date, LocalTime.MAX)).orElse(null);
 
-        return ResponseEntity.ok(billService.getAllBillManagement(pageNo, size, billCode, startDateTime, endDateTime, status, billType));
+        return ResponseEntity.ok(billService.getAllBillManagement(billCode, startDateTime, endDateTime, status, billType));
     }
 
     @PostMapping()

@@ -14,11 +14,11 @@ import java.util.List;
 
 public interface AccountService {
 
-    Page<AccountResponce> phanTrang(Integer pageNo, Integer size, Long roleId);
+    List<AccountResponce> getAllByRoleid(Long roleId);
 
     Account save(AccountRequest request);
 
-    Account update(AccountRequest request,String username);
+    Account update(AccountRequest request, String username);
 
     List<AddressDetail> getAddressDetailsByUsername(String username);
 
@@ -32,5 +32,8 @@ public interface AccountService {
     Page<AccountVoucher> findAccountVoucher(CustomerConditionDTO customerConditionDTO, Pageable pageable);
 
     Account findByUsername(String username);
+
+    List<AccountDetailResponce> getAllCustomer();
+
 
 }

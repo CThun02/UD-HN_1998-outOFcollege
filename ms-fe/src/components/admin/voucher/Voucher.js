@@ -265,7 +265,7 @@ function Voucher() {
   return (
     <div className={styles.voucher}>
       {contextHolder}
-      <SockJs setValues={setVouchers} connectTo={"voucher"} />;
+      <SockJs setValues={setVouchers} connectTo={"voucher"} />
       <FilterVoucherAndPromotion
         searchNameOrCode={searchNameOrCode}
         setSearchNameOrCode={setSearchNameOrCode}
@@ -291,8 +291,8 @@ function Voucher() {
             <Col span={4}>
               <>
                 <Link to="/admin/vouchers/save">
-                  <Button type="primary" icon={<PlusOutlined />}>
-                    Tạo voucher
+                  <Button type="primary" icon={<PlusOutlined />} size="large">
+                    Tạo mã giảm giá
                   </Button>
                 </Link>
               </>

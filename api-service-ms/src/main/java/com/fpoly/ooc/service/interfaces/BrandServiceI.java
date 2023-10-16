@@ -9,5 +9,4 @@ public interface BrandServiceI {
     public List<Brand> findAll();
     public Brand getOne(Long id);
     public Brand findFirstByBrandName(String brandName);
-
 }

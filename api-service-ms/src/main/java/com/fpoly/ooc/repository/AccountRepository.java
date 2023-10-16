@@ -15,11 +15,14 @@ import java.util.List;
 @Repository
 public interface AccountRepository extends JpaRepository<Account, String> {
 
-    @Query("SELECT new com.fpoly.ooc.responce.account.AccountResponce(a.username,a.avatar, a.fullName, a.gender, a.createdAt,a.status)" +
+    @Query("SELECT new com.fpoly.ooc.responce.account.AccountResponce(a.username,a.avatar, a.fullName, a.gender," +
+            " a.numberPhone, a.email,a.status)" +
             "FROM Account a where a.role.id=?1")
-    Page<AccountResponce> phanTrang(Pageable pageable, Long roleId);
+    List<AccountResponce> getAllByRoleId(Long roleId);
 
-    @Query(value = "select email from account", nativeQuery = true)
+    @Query(value = "select email from account " +
+            "left join role on account.role_id = role.id " +
+            "where role_name = 'CUSTOMER' ", nativeQuery = true)
     List<String> emailAccountList();
 
     @Query(name = "Account.customerAccountList", nativeQuery = true)

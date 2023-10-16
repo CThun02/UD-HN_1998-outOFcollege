@@ -1,8 +1,13 @@
 package com.fpoly.ooc.controller;
 
 import com.fpoly.ooc.dto.CustomerConditionDTO;
+import com.fpoly.ooc.entity.Account;
+import com.fpoly.ooc.entity.Address;
+import com.fpoly.ooc.entity.AddressDetail;
 import com.fpoly.ooc.request.account.AccountRequest;
 import com.fpoly.ooc.service.interfaces.AccountService;
+import com.fpoly.ooc.service.interfaces.AddressDetailService;
+import com.fpoly.ooc.service.interfaces.AddressServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
@@ -23,16 +28,22 @@ import org.springframework.web.bind.annotation.RestController;
 @CrossOrigin("*")
 public class AccountController {
 
-    @Autowired
     private AccountService service;
+    private AddressServiceI addressService;
+    private AddressDetailService addressDetailService;
 
-    @GetMapping("viewAll")
-    public ResponseEntity<?> phanTrang(@RequestParam(name = "page", defaultValue = "0") Integer pageNo, @RequestParam Long roleId) {
-        return ResponseEntity.ok(service.phanTrang(pageNo, 5, roleId));
+    @Autowired
+    public AccountController(AccountService service, AddressServiceI addressService, AddressDetailService addressDetailService) {
+        this.service = service;
+        this.addressService = addressService;
+        this.addressDetailService = addressDetailService;
     }
 
-    //Viết một phương thức mới Lấy dữ liệu address detail với usename
-    // => trả về list address detail(account, address)
+    @GetMapping("/viewAll")
+    public ResponseEntity<?> getAllByRoleid(@RequestParam Long roleId) {
+        return ResponseEntity.ok(service.getAllByRoleid(roleId));
+    }
+
     @GetMapping("address-detail/{username}")
     public ResponseEntity<?> getAddressDetailsByUsername(@PathVariable String username) {
         return ResponseEntity.ok(service.getAddressDetailsByUsername(username));
@@ -54,6 +65,19 @@ public class AccountController {
         return ResponseEntity.ok(service.update(request, username));
     }
 
+    @PutMapping("/updateAdress")
+    public ResponseEntity<?> updateAdress(@RequestBody Address address) {
+        return ResponseEntity.ok(addressService.update(address));
+    }
+
+    @PutMapping("/createAddress")
+    public ResponseEntity<?> createAddress(@RequestBody Address address, @RequestParam String userName) {
+        Address addressCreate = addressService.create(address);
+        AddressDetail addressDetailCreate = AddressDetail.builder().accountAddress(Account.builder().username(userName).build())
+                .addressDetail(Address.builder().id(addressCreate.getId()).build()).build();
+        return ResponseEntity.ok(addressDetailService.create(addressDetailCreate));
+    }
+
     @DeleteMapping("delete/{id}")
     public ResponseEntity<?> delete(@PathVariable String id) {
         service.remove(id);
@@ -68,6 +92,11 @@ public class AccountController {
     ) {
 
         return ResponseEntity.ok(service.findAccountVoucher(customerConditionDTO, PageRequest.of(pageNo, pageSize)));
+    }
+
+    @GetMapping("/getAllCustomer")
+    public ResponseEntity<?> getAllCustomer(){
+        return ResponseEntity.ok(service.getAllCustomer());
     }
 
 }

@@ -1,11 +1,14 @@
 package com.fpoly.ooc.responce.account;
 
 
+import com.fpoly.ooc.entity.Address;
+import com.fpoly.ooc.entity.AddressDetail;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import java.util.List;
 
 import java.util.Date;
 
@@ -16,30 +19,15 @@ import java.util.Date;
 @Setter
 @Builder
 public class AccountDetailResponce {
-
     private String image;
-
     private String username;
-
     private String idNo;
-
     private String fullName;
-
     private Date dob;
-
     private Boolean gender;
-
     private String email;
-
     private String numberPhone;
-
-    private String descriptionDetail;
-
-    private String city;
-
-    private String district;
-
-    private String ward;
+    private List<Address> accountAddress;
 
 
 }

@@ -19,11 +19,9 @@ const BillManagement = () => {
     const [endDate, setEndDate] = useState('');
     const [status, setStatus] = useState('');
     const [billType, setBilType] = useState('');
-    const [totalData, setTotalData] = useState(0);
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [pageSize, setPageSize] = useState(5);
 
     const onRangeChange = (dates, dateStrings) => {
         if (dates) {
@@ -103,6 +101,11 @@ const BillManagement = () => {
             title: 'Trạng thái',
             dataIndex: 'status',
             key: 'status',
+            render: (status) => {
+                return status === 'ACTIVE' ? 'Chưa thanh toán'
+                    : status === 'Cancel' ? 'Đã hủy'
+                        : 'Đã thanh toán'
+            }
         },
         {
             title: 'Thao tác',
@@ -120,8 +123,6 @@ const BillManagement = () => {
     const fetchData = () => {
         setLoading(true);
         const params = {
-            pageNo: currentPage - 1,
-            size: pageSize,
             billCode: billCode,
             startDate: startDate,
             endDate: endDate,
@@ -134,8 +135,7 @@ const BillManagement = () => {
                 params: params
             })
             .then((response) => {
-                setData(response.data.content);
-                setTotalData(response.data.totalElements);
+                setData(response.data);
                 setLoading(false);
             })
             .catch((error) => {
@@ -144,15 +144,9 @@ const BillManagement = () => {
             });
     };
 
-    const handleTableChange = (page, size) => {
-        setCurrentPage(page);
-        setPageSize(size);
-        window.history.pushState(null, null, `/admin/order?pageNo=${page}&size=${size}`);
-    };
-
     useEffect(() => {
         fetchData();
-    }, [currentPage, pageSize, billCode, startDate, endDate, status, billType]);
+    }, [billCode, startDate, endDate, status, billType]);
 
     return (
         <div>
@@ -180,10 +174,10 @@ const BillManagement = () => {
                                 setStatus(e);
                                 setCurrentPage(1);
                             }}
-                            defaultValue={'all'}
+                            defaultValue={''}
                         >
-                            <Select.Option value={'all'}>Tất cả</Select.Option>
-                            <Select.Option value={'unpaid'}>Chưa thanh toán</Select.Option>
+                            <Select.Option value={''}>Tất cả</Select.Option>
+                            <Select.Option value={'active'}>Chưa thanh toán</Select.Option>
                             <Select.Option value={'paid'}>Đã thanh toán</Select.Option>
                             <Select.Option value={'cancel'}>Đã huỷ</Select.Option>
                         </Select>
@@ -212,17 +206,13 @@ const BillManagement = () => {
                     columns={columns}
                     loading={loading}
                     loadingIndicator={<div>Loading...</div>}
-                    pagination={false}
-                />
-                <Pagination
-                    style={{ marginTop: '10px' }}
-                    current={currentPage}
-                    total={totalData}
-                    showSizeChanger
-                    pageSize={pageSize}
-                    pageSizeOptions={['5', '10', '20', '50', '100']}
-                    onShowSizeChange={handleTableChange}
-                    onChange={handleTableChange}
+                    pagination={{
+                        showSizeChanger: true,
+                        pageSizeOptions: [5, 10, 15, 20],
+                        defaultPageSize: 5,
+                        showLessItems: true,
+                        style: { marginRight: "10px" },
+                    }}
                 />
             </section>
         </div>

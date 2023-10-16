@@ -13,9 +13,5 @@ public class CustomerConditionDTO {
 
     private String searchText;
 
-    private Boolean gender;
-
-    public void setGender(Boolean gender) {
-        this.gender = Objects.requireNonNullElse(gender, true);
-    }
+    private String gender;
 }

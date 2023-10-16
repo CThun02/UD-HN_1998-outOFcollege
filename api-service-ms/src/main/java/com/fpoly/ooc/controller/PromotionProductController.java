@@ -1,5 +1,6 @@
 package com.fpoly.ooc.controller;
 
+import com.fpoly.ooc.dto.DeleteProductDetailInPromotionDTO;
 import com.fpoly.ooc.dto.VoucherAndPromotionConditionDTO;
 import com.fpoly.ooc.entity.PromotionProduct;
 import com.fpoly.ooc.service.interfaces.PromotionProductDetailService;
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin/promotion-product")
@@ -36,11 +39,10 @@ public class PromotionProductController {
                 .pageAll(voucherAndPromotionConditionDTO, PageRequest.of(pageNo, pageSize)));
     }
 
-    @DeleteMapping("/delete")
+    @PostMapping("/delete")
     public ResponseEntity<?> deleteByIdPromotionAndIdProductDetail(
-            @RequestParam("idPromotion") Long idPromotion,
-            @RequestParam("idProductDetail") Long idProductDetail) {
-        promotionProductDetailService.deletePromotionProduct(idPromotion, idProductDetail);
+            @RequestBody DeleteProductDetailInPromotionDTO dto) {
+        promotionProductDetailService.deletePromotionProduct(dto);
 
         return ResponseEntity.ok("Done");
     }

@@ -18,7 +18,6 @@ import FloatingLabels from "../../element/FloatingLabels/FloatingLabels";
 import numeral from "numeral";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
-import AddProductInPromotion from "./AddProductInPromotion";
 import { EditOutlined, ExclamationCircleFilled } from "@ant-design/icons";
 import { Formik } from "formik";
 import * as Yup from "yup";
@@ -26,11 +25,13 @@ import axios from "axios";
 import moment from "moment";
 import { useContext } from "react";
 import { NotificationContext } from "../../element/notification/Notification";
+import TableProduct from "./TableProduct";
+import ProductsDetails from "../../element/products-details/ProductsDetails";
 
 const { confirm } = Modal;
 
 function disabledDate(current) {
-  return current && current <= dayjs().endOf("day");
+  return current && current < moment(dayjs());
 }
 
 const options = [
@@ -61,12 +62,11 @@ const validationSchema = Yup.object().shape({
     .required("* Ngày bắt đầu không được bỏ trống")
     .test(
       "start-date-current",
-      "* Ngày bắt đầu phải lớn hơn ngày hiện tại",
+      "* Ngày bắt đầu phải lớn hơn ngày hiện tại tối thiểu 10 phút",
       function (startDate) {
         const { status } = this.parent;
-        const currentDate = new Date();
         if (startDate && status !== "ACTIVE") {
-          return startDate > currentDate;
+          return startDate > dayjs().add(9, "minute");
         }
         return true;
       }
@@ -79,14 +79,7 @@ const validationSchema = Yup.object().shape({
       function (endDate) {
         const { startDate } = this.parent;
         if (startDate && endDate) {
-          const timeStartDate = moment(startDate).format("HH:mm:ss");
-          const timeEndDate = moment(endDate).format("HH:mm:ss");
-          const time = moment(timeStartDate, "HH:mm:ss").add(29, "minutes");
-          return (
-            endDate > startDate ||
-            (endDate > startDate &&
-              timeEndDate > moment(time).format("HH:mm:ss"))
-          );
+          return endDate > dayjs(startDate).add(29, "minute");
         }
         return true;
       }
@@ -104,41 +97,13 @@ const validationSchema = Yup.object().shape({
     ),
 });
 
-const range = (start, end) => {
-  const result = [];
-  for (let i = start; i < end; i++) {
-    result.push(i);
-  }
-  return result;
-};
-
-const rangeFunction = (start) => {
-  const result = [];
-  for (let i = start; i >= 0; i--) {
-    result.push(i);
-  }
-  return result;
-};
-
-const disabledDateTime = (current) => {
-  const currentDate = moment(new Date()).format("DD/MM/YYYY");
-  const selectedDate = moment(current).format("DD/MM/YYYY");
-
-  if (selectedDate > currentDate) {
-    return {
-      disabledHours: () => range(0, 24).splice(0, moment().hour()),
-      disabledMinutes: () => rangeFunction(moment().minute()),
-    };
-  }
-
-  return {};
-};
-
 dayjs.extend(customParseFormat);
 
 const dateFormat = "HH:mm:ss DD/MM/YYYY";
 
 const baseUrl = "http://localhost:8080/api/admin/promotion/";
+const baseUrlPromotionProduct =
+  "http://localhost:8080/api/admin/promotion-product/";
 
 function CreatePromotion() {
   const ref = useRef();
@@ -150,8 +115,11 @@ function CreatePromotion() {
   const { code } = useParams();
 
   // products
-  const [products, setProducts] = useState([]);
+  const [productsDetailsId, setProductsDetailsId] = useState([]);
+  const [onDeleteProductDetailIds, setOnDeleteProductDetailIds] = useState([]);
+  const [productsId, setProductsId] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [status, setStatus] = useState(null);
 
   function handleChangeNumber(value) {
     const formattedValue = numeral(value).format("0,0");
@@ -174,9 +142,22 @@ function CreatePromotion() {
         async function savePromotion() {
           const promotion = ref.current?.values;
 
-          const idListProductDetails = products.map(
-            (item) => item.productDetail.id
-          );
+          console.log("ids: ", productsDetailsId);
+
+          if (promotion.promotionId) {
+            async function deleteProductDetail() {
+              const dto = {
+                promotionId: promotion.promotionId,
+                productDetailIds: onDeleteProductDetailIds,
+              };
+              await axios
+                .post(baseUrlPromotionProduct + "delete", dto)
+                .then((res) => console.log(res))
+                .catch((e) => console.log("deleteError: ", e));
+            }
+
+            deleteProductDetail();
+          }
 
           setIsLoading(true);
           if (promotion) {
@@ -202,7 +183,7 @@ function CreatePromotion() {
                   : "",
                 promotionName: promotion?.promotionName,
                 promotionNameCurrent: promotion?.promotionNameCurrent,
-                products: idListProductDetails,
+                productDetailIds: productsDetailsId,
               })
               .then(() => {
                 setIsLoading(false);
@@ -250,12 +231,9 @@ function CreatePromotion() {
               startDate,
               endDate,
               status,
-              listProductResponse,
+              productDetailIds,
+              productIdsResponse,
             } = res.data;
-
-            const data = listProductResponse.map((item) => ({
-              productDetail: item,
-            }));
 
             ref.current.setFieldValue("promotionId", promotionId);
             ref.current.setFieldValue("promotionCode", promotionCode);
@@ -274,9 +252,10 @@ function CreatePromotion() {
               dayjs(moment(endDate).format(dateFormat), dateFormat)
             );
             ref.current.setFieldValue("status", status);
-            ref.current.setFieldValue("products", data);
-            ref.current.setFieldValue("productsCurrent", data);
-            setProducts(data);
+            ref.current.setFieldValue("productsDetailsIdDb", productDetailIds);
+            setProductsDetailsId(productDetailIds);
+            setProductsId(productIdsResponse);
+            setStatus(status);
           });
         }
         getPromotion();
@@ -308,286 +287,309 @@ function CreatePromotion() {
                 </Col>
               </Row>
 
-              <Col span={16}>
-                <Formik
-                  initialValues={{
-                    promotionId: "",
-                    promotionCode: "",
-                    promotionName: "",
-                    promotionNameCurrent: "",
-                    promotionMethod: "vnd",
-                    promotionValue: "",
-                    startDate: "",
-                    endDate: "",
-                    status: "",
-                    products: [],
-                    productsCurrent: [],
-                  }}
-                  onSubmit={handleOnSubmit}
-                  validationSchema={validationSchema}
-                  innerRef={ref}
-                >
-                  {({
-                    handleBlur,
-                    handleSubmit,
-                    handleChange,
-                    setFieldValue,
-                    values,
-                    errors,
-                    touched,
-                  }) => (
-                    <Form layout="vertical" onFinish={handleSubmit}>
-                      <Space
-                        style={{ width: "100%" }}
-                        size={18}
-                        direction="vertical"
-                      >
-                        <Row gutter={16}>
-                          <Col span={24}>
-                            <FloatingLabels
-                              label="Tên chương trình khuyến mại"
-                              name="promotionName"
-                              value={values.promotionName}
-                              zIndex={true}
-                              disabled={
-                                values.status === "INACTIVE" ||
-                                values.status === "CANCEL"
-                              }
-                            >
-                              <Input
-                                size="large"
+              <Row>
+                <Col span={10}>
+                  <Formik
+                    initialValues={{
+                      promotionId: "",
+                      promotionCode: "",
+                      promotionName: "",
+                      promotionNameCurrent: "",
+                      promotionMethod: "vnd",
+                      promotionValue: "",
+                      startDate: "",
+                      endDate: "",
+                      status: "",
+                      productsDetailsIdDb: [],
+                    }}
+                    onSubmit={handleOnSubmit}
+                    validationSchema={validationSchema}
+                    innerRef={ref}
+                  >
+                    {({
+                      handleBlur,
+                      handleSubmit,
+                      handleChange,
+                      setFieldValue,
+                      values,
+                      errors,
+                      touched,
+                    }) => (
+                      <Form layout="vertical" onFinish={handleSubmit}>
+                        <Space
+                          style={{ width: "100%" }}
+                          size={18}
+                          direction="vertical"
+                        >
+                          <Input
+                            style={{ display: "none" }}
+                            name="promotionId"
+                            value={values.promotionId}
+                          />
+                          <Input
+                            style={{ display: "none" }}
+                            name="promotionCode"
+                            value={values.promotionCode}
+                          />
+
+                          <Row gutter={16}>
+                            <Col span={24}>
+                              <FloatingLabels
+                                label="Tên chương trình khuyến mại"
                                 name="promotionName"
-                                allowClear
                                 value={values.promotionName}
-                                onChange={handleChange}
-                                onBlur={handleBlur}
-                                status={
-                                  (touched.promotionName &&
-                                    errors.promotionName) ||
-                                  errorsServer?.promotionName
-                                    ? "error"
-                                    : "success"
-                                }
+                                zIndex={true}
                                 disabled={
                                   values.status === "INACTIVE" ||
                                   values.status === "CANCEL"
                                 }
-                              />
-                              {touched.promotionName && (
-                                <div className={styles.errors}>
-                                  {errors.promotionName}
-                                  {errorsServer.promotionName}
-                                </div>
-                              )}
-                            </FloatingLabels>
-                          </Col>
-                        </Row>
-                        <Row gutter={16}>
-                          <Col span={4}>
-                            <Radio.Group
-                              className={styles.radioGroup}
-                              style={{ width: "100%" }}
-                              size="large"
-                              options={options}
-                              onChange={(e) =>
-                                setFieldValue("promotionMethod", e.target.value)
-                              }
-                              value={values.promotionMethod}
-                              optionType="button"
-                              disabled={
-                                values.status === "ACTIVE" ||
-                                values.status === "INACTIVE" ||
-                                values.status === "CANCEL"
-                              }
-                            />
-                          </Col>
-                          <Col span={20}>
-                            <FloatingLabels
-                              label="Giá trị khuyến mại"
-                              name="voucherValue"
-                              value={values.promotionValue}
-                              zIndex={true}
-                              disabled={
-                                values.status === "ACTIVE" ||
-                                values.status === "INACTIVE" ||
-                                values.status === "CANCEL"
-                              }
-                            >
-                              <Input
-                                name="promotionValue"
+                              >
+                                <Input
+                                  size="large"
+                                  name="promotionName"
+                                  allowClear
+                                  value={values.promotionName}
+                                  onChange={handleChange}
+                                  onBlur={handleBlur}
+                                  status={
+                                    (touched.promotionName &&
+                                      errors.promotionName) ||
+                                    errorsServer?.promotionName
+                                      ? "error"
+                                      : "success"
+                                  }
+                                  disabled={
+                                    values.status === "INACTIVE" ||
+                                    values.status === "CANCEL"
+                                  }
+                                />
+                                {touched.promotionName && (
+                                  <div className={styles.errors}>
+                                    {errors.promotionName}
+                                    {errorsServer.promotionName}
+                                  </div>
+                                )}
+                              </FloatingLabels>
+                            </Col>
+                          </Row>
+                          <Row gutter={16}>
+                            <Col span={7}>
+                              <Radio.Group
+                                className={styles.radioGroup}
+                                style={{ width: "100%" }}
                                 size="large"
-                                suffix={
-                                  values.promotionMethod === "vnd" ? "VND" : "%"
-                                }
-                                allowClear
-                                value={values.promotionValue}
+                                options={options}
                                 onChange={(e) =>
                                   setFieldValue(
-                                    "promotionValue",
-                                    handleChangeNumber(e.target.value)
+                                    "promotionMethod",
+                                    e.target.value
                                   )
                                 }
-                                onBlur={handleBlur}
+                                value={values.promotionMethod}
+                                optionType="button"
                                 disabled={
                                   values.status === "ACTIVE" ||
                                   values.status === "INACTIVE" ||
                                   values.status === "CANCEL"
                                 }
-                                status={
-                                  (touched.promotionValue &&
-                                    errors.promotionValue) ||
-                                  errorsServer?.promotionValue
-                                    ? "error"
-                                    : "success"
-                                }
                               />
-                              {touched.promotionValue && (
-                                <div className={styles.errors}>
-                                  {errors.promotionValue}
-                                  {errorsServer.promotionValue}
-                                </div>
-                              )}
-                            </FloatingLabels>
-                          </Col>
-                        </Row>
+                            </Col>
+                            <Col span={17}>
+                              <FloatingLabels
+                                label="Giá trị khuyến mại"
+                                name="voucherValue"
+                                value={values.promotionValue}
+                                zIndex={true}
+                                disabled={
+                                  values.status === "ACTIVE" ||
+                                  values.status === "INACTIVE" ||
+                                  values.status === "CANCEL"
+                                }
+                              >
+                                <Input
+                                  name="promotionValue"
+                                  size="large"
+                                  suffix={
+                                    values.promotionMethod === "vnd"
+                                      ? "VND"
+                                      : "%"
+                                  }
+                                  allowClear
+                                  value={values.promotionValue}
+                                  onChange={(e) =>
+                                    setFieldValue(
+                                      "promotionValue",
+                                      handleChangeNumber(e.target.value)
+                                    )
+                                  }
+                                  onBlur={handleBlur}
+                                  disabled={
+                                    values.status === "ACTIVE" ||
+                                    values.status === "INACTIVE" ||
+                                    values.status === "CANCEL"
+                                  }
+                                  status={
+                                    (touched.promotionValue &&
+                                      errors.promotionValue) ||
+                                    errorsServer?.promotionValue
+                                      ? "error"
+                                      : "success"
+                                  }
+                                />
+                                {touched.promotionValue && (
+                                  <div className={styles.errors}>
+                                    {errors.promotionValue}
+                                    {errorsServer.promotionValue}
+                                  </div>
+                                )}
+                              </FloatingLabels>
+                            </Col>
+                          </Row>
 
-                        <Row gutter={16}>
-                          <Col span={12}>
-                            <FloatingLabels
-                              label="Ngày bắt đầu"
-                              name="startDate"
-                              value={values.startDate}
-                              disabled={
-                                values.status === "ACTIVE" ||
-                                values.status === "INACTIVE" ||
-                                values.status === "CANCEL"
-                              }
-                            >
-                              <DatePicker
+                          <Row gutter={16}>
+                            <Col span={24}>
+                              <FloatingLabels
+                                label="Ngày bắt đầu"
                                 name="startDate"
-                                disabledDate={disabledDate}
-                                disabledTime={disabledDateTime}
-                                format={dateFormat}
-                                size="large"
-                                placeholder={null}
-                                style={{ width: "100%" }}
                                 value={values.startDate}
-                                onChange={(date, dateString) =>
-                                  setFieldValue(
-                                    "startDate",
-                                    handleDateChange(date, dateString)
-                                  )
-                                }
-                                onBlur={handleBlur}
                                 disabled={
                                   values.status === "ACTIVE" ||
                                   values.status === "INACTIVE" ||
                                   values.status === "CANCEL"
                                 }
-                                status={
-                                  (touched.startDate && errors.startDate) ||
-                                  errorsServer?.startDate
-                                    ? "error"
-                                    : "success"
-                                }
-                                showTime={{
-                                  defaultValue: dayjs("00:00:00", "HH:mm:ss"),
-                                }}
-                              />
-                              {touched.startDate && (
-                                <div className={styles.errors}>
-                                  {errors.startDate}
-                                  {errorsServer.startDate}
-                                </div>
-                              )}
-                            </FloatingLabels>
-                          </Col>
-
-                          <Col span={12}>
-                            <FloatingLabels
-                              label="Ngày kết thúc"
-                              name="endDate"
-                              value={values.endDate}
-                              disabled={
-                                values.status === "INACTIVE" ||
-                                values.status === "CANCEL"
-                              }
-                            >
-                              <DatePicker
+                              >
+                                <DatePicker
+                                  name="startDate"
+                                  disabledDate={disabledDate}
+                                  format={dateFormat}
+                                  size="large"
+                                  placeholder={null}
+                                  style={{ width: "100%" }}
+                                  value={values.startDate}
+                                  onChange={(date, dateString) =>
+                                    setFieldValue(
+                                      "startDate",
+                                      handleDateChange(date, dateString)
+                                    )
+                                  }
+                                  onBlur={handleBlur}
+                                  disabled={
+                                    values.status === "ACTIVE" ||
+                                    values.status === "INACTIVE" ||
+                                    values.status === "CANCEL"
+                                  }
+                                  status={
+                                    (touched.startDate && errors.startDate) ||
+                                    errorsServer?.startDate
+                                      ? "error"
+                                      : "success"
+                                  }
+                                  showTime={{
+                                    defaultValue: dayjs("00:00:00", "HH:mm:ss"),
+                                  }}
+                                />
+                                {touched.startDate && (
+                                  <div className={styles.errors}>
+                                    {errors.startDate}
+                                    {errorsServer.startDate}
+                                  </div>
+                                )}
+                              </FloatingLabels>
+                            </Col>
+                          </Row>
+                          <Row>
+                            <Col span={24}>
+                              <FloatingLabels
+                                label="Ngày kết thúc"
                                 name="endDate"
-                                disabledDate={disabledDate}
-                                disabledTime={disabledDateTime}
-                                format={dateFormat}
-                                size="large"
-                                placeholder={null}
-                                style={{ width: "100%" }}
                                 value={values.endDate}
-                                onChange={(date, dateString) =>
-                                  setFieldValue(
-                                    "endDate",
-                                    handleDateChange(date, dateString)
-                                  )
-                                }
-                                onBlur={handleBlur}
-                                status={
-                                  (touched.endDate && errors.endDate) ||
-                                  errorsServer?.endDate
-                                    ? "error"
-                                    : "success"
-                                }
                                 disabled={
                                   values.status === "INACTIVE" ||
                                   values.status === "CANCEL"
                                 }
-                                showTime={{
-                                  defaultValue: dayjs("00:00:00", "HH:mm:ss"),
-                                }}
-                              />
-                              {touched.endDate && (
-                                <div className={styles.errors}>
-                                  {errors.endDate}
-                                  {errorsServer.endDate}
-                                </div>
-                              )}
-                            </FloatingLabels>
-                          </Col>
-                        </Row>
+                              >
+                                <DatePicker
+                                  name="endDate"
+                                  disabledDate={disabledDate}
+                                  format={dateFormat}
+                                  size="large"
+                                  placeholder={null}
+                                  style={{ width: "100%" }}
+                                  value={values.endDate}
+                                  onChange={(date, dateString) =>
+                                    setFieldValue(
+                                      "endDate",
+                                      handleDateChange(date, dateString)
+                                    )
+                                  }
+                                  onBlur={handleBlur}
+                                  status={
+                                    (touched.endDate && errors.endDate) ||
+                                    errorsServer?.endDate
+                                      ? "error"
+                                      : "success"
+                                  }
+                                  disabled={
+                                    values.status === "INACTIVE" ||
+                                    values.status === "CANCEL"
+                                  }
+                                  showTime={{
+                                    defaultValue: dayjs("00:00:00", "HH:mm:ss"),
+                                  }}
+                                />
+                                {touched.endDate && (
+                                  <div className={styles.errors}>
+                                    {errors.endDate}
+                                    {errorsServer.endDate}
+                                  </div>
+                                )}
+                              </FloatingLabels>
+                            </Col>
+                          </Row>
+                          <Row>
+                            <Space>
+                              <Link to="/admin/promotion">
+                                <Button>Hủy</Button>
+                              </Link>
+                              <Button
+                                type="primary"
+                                htmlType="submit"
+                                disabled={
+                                  values.status === "INACTIVE" ||
+                                  values.status === "CANCEL"
+                                }
+                              >
+                                Xác nhận
+                              </Button>
+                            </Space>
+                          </Row>
+                        </Space>
+                      </Form>
+                    )}
+                  </Formik>
+                </Col>
 
-                        <Row>
-                          <Space>
-                            <Link to="/admin/promotion">
-                              <Button>Hủy</Button>
-                            </Link>
-                            <Button
-                              type="primary"
-                              htmlType="submit"
-                              disabled={
-                                values.status === "INACTIVE" ||
-                                values.status === "CANCEL"
-                                  ? true
-                                  : products.length
-                                  ? false
-                                  : true
-                              }
-                            >
-                              Xác nhận
-                            </Button>
-                          </Space>
-                        </Row>
-                      </Space>
-                    </Form>
-                  )}
-                </Formik>
-              </Col>
+                <Col span={1}></Col>
+                <Col span={13}>
+                  <TableProduct
+                    productsId={productsId}
+                    setProductsId={setProductsId}
+                    values={ref.current?.values}
+                    status={status}
+                  />
+                </Col>
+              </Row>
             </Space>
           </div>
         </div>
 
-        <AddProductInPromotion
-          products={products}
-          setProducts={setProducts}
-          setFieldValue={ref.current?.setFieldValue}
+        <ProductsDetails
+          productsId={productsId}
+          productsDetailsId={productsDetailsId}
+          setProductsDetailsId={setProductsDetailsId}
           values={ref.current?.values}
+          setOnDeleteProductDetailIds={setOnDeleteProductDetailIds}
+          status={status}
         />
       </Spin>
     </>

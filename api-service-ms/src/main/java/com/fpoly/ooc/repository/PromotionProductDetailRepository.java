@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface PromotionProductDetailRepository extends JpaRepository<PromotionProduct, Long> {
 
@@ -16,9 +18,9 @@ public interface PromotionProductDetailRepository extends JpaRepository<Promotio
                                             @Param("idPromotion") Long promotion);
 
     @Query("select new java.lang.Long(pp.id) from PromotionProduct pp " +
-            "where pp.productDetailId.id = :idProductDetail " +
+            "where pp.productDetailId.id in :idProductDetail " +
             "and pp.promotion.id = :idPromotion ")
-    Long findIdPromotionProduct(@Param("idProductDetail") Long idProductDetail,
+    List<Long> findIdPromotionProduct(@Param("idProductDetail") List<Long> idProductDetail,
                                             @Param("idPromotion") Long promotion);
 
 }

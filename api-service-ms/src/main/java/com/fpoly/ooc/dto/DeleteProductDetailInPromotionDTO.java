@@ -4,14 +4,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Objects;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CustomerConditionDTO {
+public class DeleteProductDetailInPromotionDTO {
 
-    private String searchText;
+    private Long promotionId;
 
-    private String gender;
+    private List<Long> productDetailIds;
+
 }

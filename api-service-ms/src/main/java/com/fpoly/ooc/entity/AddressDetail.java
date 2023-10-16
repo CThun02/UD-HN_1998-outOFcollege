@@ -37,5 +37,4 @@ public class AddressDetail extends BaseEntity{
     @JoinColumn(name = "account_id", referencedColumnName = "username")
     private Account accountAddress;
 
-
 }

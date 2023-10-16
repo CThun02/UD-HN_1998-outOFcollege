@@ -22,6 +22,7 @@ import {
 } from "antd";
 import { FormOutlined, CheckCircleTwoTone } from "@ant-design/icons";
 import { useParams } from "react-router-dom";
+import TextArea from "antd/es/input/TextArea";
 const DetailForm = (props) => {
   const navigate = useNavigate();
   var roleId = props.roleId;
@@ -230,6 +231,7 @@ const DetailForm = (props) => {
             <div className="m-5">
               <span>Ngày sinh</span>
               <DatePicker
+                allowClear={false}
                 style={{ width: "100%" }}
                 value={dayjs(data.dob)}
                 onChange={(event) => {
@@ -291,7 +293,7 @@ const DetailForm = (props) => {
                   <Panel
                     header={
                       <h5>
-                        {data.fullName +
+                        {item.fullName +
                           ": " +
                           item.ward +
                           ", " +
@@ -302,140 +304,159 @@ const DetailForm = (props) => {
                     }
                     key={index}
                   >
-                    <Switch defaultChecked={index === 0} />
-                    <Col span={24}>
+                    <Switch defaultChecked={item.defaultaddress} />
+                    <Row>
+                      <Col span={8}>
+                        <div className="m-5">
+                          <h6>Họ và tên</h6>
+                          <Input defaultValue={item.fullName} />
+                        </div>
+                      </Col>
+                      <Col span={8}>
+                        <div className="m-5">
+                          <h6>Số điện thoại</h6>
+                          <Input defaultValue={item.sdt} />
+                        </div>
+                      </Col>
+                      <Col span={8}>
+                        <div className="m-5">
+                          <h6>Email</h6>
+                          <Input defaultValue={item.email} />
+                        </div>
+                      </Col>
+                      <Col span={24}>
+                        <div className="m-5">
+                          <h6>Địa chỉ chi tiết</h6>
+                          <TextArea defaultValue={item.descriptionDetail} />
+                        </div>
+                      </Col>
+                      <Col span={24}>
+                        <Row>
+                          <Col span={8}>
+                            <div className="m-5">
+                              <h6>Tỉnh/Thành phố</h6>
+                              <Select
+                                defaultValue={item.city}
+                                showSearch
+                                style={{ width: "100%" }}
+                                size="medium"
+                                onChange={(event) => {
+                                  fetchDistricts(
+                                    event.substring(event.indexOf("|") + 1)
+                                  );
+                                }}
+                                optionFilterProp="children"
+                                filterOption={(input, option) =>
+                                  (option?.label ?? "").includes(input)
+                                }
+                                filterSort={(optionA, optionB) =>
+                                  (optionA?.label ?? "")
+                                    .toLowerCase()
+                                    .localeCompare(
+                                      (optionB?.label ?? "").toLowerCase()
+                                    )
+                                }
+                              >
+                                {provinces &&
+                                  provinces.map((province) => (
+                                    <Select.Option
+                                      key={province.ProvinceID}
+                                      value={
+                                        province.ProvinceName +
+                                        "|" +
+                                        province.ProvinceID
+                                      }
+                                      label={province.ProvinceName}
+                                    >
+                                      {province.ProvinceName}
+                                    </Select.Option>
+                                  ))}
+                              </Select>
+                            </div>
+                          </Col>
+                          <Col span={8}>
+                            <div className="m-5">
+                              <h6>Quận/huyện</h6>
+                              <Select
+                                defaultValue={item.district}
+                                showSearch
+                                style={{ width: "100%" }}
+                                size="medium"
+                                onChange={(event) => {
+                                  fetchWard(
+                                    event.substring(event.indexOf("|") + 1)
+                                  );
+                                }}
+                                optionFilterProp="children"
+                                filterOption={(input, option) =>
+                                  (option?.label ?? "").includes(input)
+                                }
+                                filterSort={(optionA, optionB) =>
+                                  (optionA?.label ?? "")
+                                    .toLowerCase()
+                                    .localeCompare(
+                                      (optionB?.label ?? "").toLowerCase()
+                                    )
+                                }
+                              >
+                                {districts &&
+                                  districts.map((district) => (
+                                    <Select.Option
+                                      label={district.DistrictName}
+                                      key={district.DistrictID}
+                                      value={
+                                        district.DistrictName +
+                                        "|" +
+                                        district.DistrictID
+                                      }
+                                    >
+                                      {district.DistrictName}
+                                    </Select.Option>
+                                  ))}
+                              </Select>
+                            </div>
+                          </Col>
+                          <Col span={8}>
+                            <div className="m-5">
+                              <h6>Xã/Phường/Thị trấn</h6>
+                              <Select
+                                defaultValue={item.ward}
+                                showSearch
+                                style={{ width: "100%" }}
+                                size="medium"
+                                optionFilterProp="children"
+                                filterOption={(input, option) =>
+                                  (option?.label ?? "").includes(input)
+                                }
+                                filterSort={(optionA, optionB) =>
+                                  (optionA?.label ?? "")
+                                    .toLowerCase()
+                                    .localeCompare(
+                                      (optionB?.label ?? "").toLowerCase()
+                                    )
+                                }
+                              >
+                                {wards &&
+                                  wards.map((ward) => (
+                                    <Select.Option
+                                      label={ward.WardName}
+                                      key={ward.WardCode}
+                                      value={ward.WardName}
+                                    >
+                                      {ward.WardName}
+                                    </Select.Option>
+                                  ))}
+                              </Select>
+                            </div>
+                          </Col>
+                        </Row>
+                      </Col>
                       <div className="m-5">
-                        <h6>Địa chỉ chi tiết</h6>
-                        <Input defaultValue={item.descriptionDetail} />
+                        <Button type="primary">
+                          <FormOutlined /> Xác nhận
+                        </Button>
                       </div>
-                    </Col>
-                    <Col span={24}>
-                      <Row>
-                        <Col span={8}>
-                          <div className="m-5">
-                            <h6>Tỉnh/Thành phố</h6>
-                            <Select
-                              defaultValue={item.city}
-                              showSearch
-                              style={{ width: "100%" }}
-                              size="medium"
-                              onChange={(event) => {
-                                fetchDistricts(
-                                  event.substring(event.indexOf("|") + 1)
-                                );
-                              }}
-                              optionFilterProp="children"
-                              filterOption={(input, option) =>
-                                (option?.label ?? "").includes(input)
-                              }
-                              filterSort={(optionA, optionB) =>
-                                (optionA?.label ?? "")
-                                  .toLowerCase()
-                                  .localeCompare(
-                                    (optionB?.label ?? "").toLowerCase()
-                                  )
-                              }
-                            >
-                              {provinces &&
-                                provinces.map((province) => (
-                                  <Select.Option
-                                    key={province.ProvinceID}
-                                    value={
-                                      province.ProvinceName +
-                                      "|" +
-                                      province.ProvinceID
-                                    }
-                                    label={province.ProvinceName}
-                                  >
-                                    {province.ProvinceName}
-                                  </Select.Option>
-                                ))}
-                            </Select>
-                          </div>
-                        </Col>
-                        <Col span={8}>
-                          <div className="m-5">
-                            <h6>Quận/huyện</h6>
-                            <Select
-                              defaultValue={item.district}
-                              showSearch
-                              style={{ width: "100%" }}
-                              size="medium"
-                              onChange={(event) => {
-                                fetchWard(
-                                  event.substring(event.indexOf("|") + 1)
-                                );
-                              }}
-                              optionFilterProp="children"
-                              filterOption={(input, option) =>
-                                (option?.label ?? "").includes(input)
-                              }
-                              filterSort={(optionA, optionB) =>
-                                (optionA?.label ?? "")
-                                  .toLowerCase()
-                                  .localeCompare(
-                                    (optionB?.label ?? "").toLowerCase()
-                                  )
-                              }
-                            >
-                              {districts &&
-                                districts.map((district) => (
-                                  <Select.Option
-                                    label={district.DistrictName}
-                                    key={district.DistrictID}
-                                    value={
-                                      district.DistrictName +
-                                      "|" +
-                                      district.DistrictID
-                                    }
-                                  >
-                                    {district.DistrictName}
-                                  </Select.Option>
-                                ))}
-                            </Select>
-                          </div>
-                        </Col>
-                        <Col span={8}>
-                          <div className="m-5">
-                            <h6>Xã/Phường/Thị trấn</h6>
-                            <Select
-                              defaultValue={item.ward}
-                              showSearch
-                              style={{ width: "100%" }}
-                              size="medium"
-                              optionFilterProp="children"
-                              filterOption={(input, option) =>
-                                (option?.label ?? "").includes(input)
-                              }
-                              filterSort={(optionA, optionB) =>
-                                (optionA?.label ?? "")
-                                  .toLowerCase()
-                                  .localeCompare(
-                                    (optionB?.label ?? "").toLowerCase()
-                                  )
-                              }
-                            >
-                              {wards &&
-                                wards.map((ward) => (
-                                  <Select.Option
-                                    label={ward.WardName}
-                                    key={ward.WardCode}
-                                    value={ward.WardName}
-                                  >
-                                    {ward.WardName}
-                                  </Select.Option>
-                                ))}
-                            </Select>
-                          </div>
-                        </Col>
-                      </Row>
-                    </Col>
-
-                    <div className="m-5">
-                      <Button type="primary">
-                        <FormOutlined /> Xác nhận
-                      </Button>
-                    </div>
+                    </Row>
                   </Panel>
                 );
               })}

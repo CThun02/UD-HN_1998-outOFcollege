@@ -30,29 +30,29 @@ import java.time.LocalDateTime;
 
 @NamedNativeQuery(
         name = "PromotionProduct.findAllPromotionProduct",
-        query = "select p.promotion_code      as 'promotionCode',\n" +
-                "       p.promotion_name      as 'promotionName',\n" +
-                "       COUNT(pd.id)          as 'productQuantity',\n" +
-                "       p.promotion_method    as 'promotionMethod',\n" +
-                "       p.promotion_value     as 'promotionValue',\n" +
-                "       p.promotion_max_value as 'promotionMaxValue',\n" +
-                "       p.promotion_condition as 'promotionCondition',\n" +
-                "       p.start_date          as 'startDate',\n" +
-                "       p.end_date            as 'endDate',\n" +
-                "       p.status              as 'status'\n" +
-                "from promotion_product_detail ppd\n" +
-                "         left join promotion p on ppd.promotion_id = p.id\n" +
-                "         left join product_detail pd on pd.id = ppd.product_detail_id\n" +
-                "where (?1 is null\n" +
-                "    or p.promotion_code like ?1\n" +
-                "    or p.promotion_name like ?1)\n" +
-                "  and (?2 is null or p.start_date >= ?2)\n" +
-                "  and (?3 is null or p.end_date <= ?3)\n" +
-                "  and (?4 is null or p.status = ?4)\n" +
-                "group by p.promotion_code, p.promotion_name, p.promotion_method,\n" +
-                "         p.promotion_value, p.promotion_max_value, p.promotion_condition,\n" +
-                "         p.start_date, p.end_date, p.status, p.created_at \n " +
-                "order by p.created_at desc ",
+        query = """
+                select p.promotion_code      as 'promotionCode',
+                       p.promotion_name      as 'promotionName',
+                       COUNT(pd.id)          as 'productQuantity',
+                       p.promotion_method    as 'promotionMethod',
+                       p.promotion_value     as 'promotionValue',
+                       p.promotion_condition as 'promotionCondition',
+                       p.start_date          as 'startDate',
+                       p.end_date            as 'endDate',
+                       p.status              as 'status'
+                from promotion_product_detail ppd
+                         left join promotion p on ppd.promotion_id = p.id
+                         left join product_detail pd on pd.id = ppd.product_detail_id
+                where (?1 is null
+                    or p.promotion_code like ?1
+                    or p.promotion_name like ?1)
+                  and (?2 is null or p.start_date >= ?2)
+                  and (?3 is null or p.end_date <= ?3)
+                  and (?4 is null or p.status = ?4)
+                group by p.promotion_code, p.promotion_name, p.promotion_method,
+                         p.promotion_value, p.promotion_condition,
+                         p.start_date, p.end_date, p.status, p.created_at\s
+                 order by p.created_at desc\s""",
         resultSetMapping = "Mapping.PromotionProductResponse"
 )
 
@@ -66,7 +66,6 @@ import java.time.LocalDateTime;
                         @ColumnResult(name = "productQuantity", type = Integer.class),
                         @ColumnResult(name = "promotionMethod", type = String.class),
                         @ColumnResult(name = "promotionValue", type = BigDecimal.class),
-                        @ColumnResult(name = "promotionMaxValue", type = BigDecimal.class),
                         @ColumnResult(name = "promotionCondition", type = BigDecimal.class),
                         @ColumnResult(name = "startDate", type = LocalDateTime.class),
                         @ColumnResult(name = "endDate", type = LocalDateTime.class),

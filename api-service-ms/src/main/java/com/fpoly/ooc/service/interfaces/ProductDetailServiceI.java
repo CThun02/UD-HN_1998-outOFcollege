@@ -1,7 +1,9 @@
 package com.fpoly.ooc.service.interfaces;
 
-import com.fpoly.ooc.entity.*;
+import com.fpoly.ooc.dto.ProductDetailsDTO;
+import com.fpoly.ooc.entity.ProductDetail;
 import com.fpoly.ooc.responce.product.ProductDetailResponse;
+import com.fpoly.ooc.responce.productdetail.ProductsDetailsResponse;
 import java.util.List;
 public interface ProductDetailServiceI {
     public ProductDetail create(ProductDetail productDetail);
@@ -14,9 +16,9 @@ public interface ProductDetailServiceI {
                                                                    Long idColor, Long idSize, Long patternId, Long formId);
     public List<ProductDetailResponse> searchByCodeOrName(String keyWords);
     ProductDetail findById(Long id);
+    List<Long> findAllIdsResponseProductDetails(Long idPromotion);
+    List<ProductsDetailsResponse> findListProductdetailsByListProductId(ProductDetailsDTO productDetailsDTO);
     public Integer updateProductDetailsByCom(Long productId, Long idButton, Long idMaterial,
                                              Long idShirtTail, Long idSleeve, Long idCollar,
                                              Long idColor, Long idSize, String status);
-    List<Long> findAllResponseProduct(Long idPromotion);
-
 }

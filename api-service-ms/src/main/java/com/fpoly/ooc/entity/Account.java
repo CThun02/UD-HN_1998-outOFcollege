@@ -106,7 +106,7 @@ public class Account extends BaseEntity{
     private Role role;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "accountAddress")
+    @OneToMany(mappedBy = "accountAddress", fetch = FetchType.LAZY)
     private List<AddressDetail> addAdress;
 
 }

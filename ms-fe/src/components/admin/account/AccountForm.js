@@ -411,10 +411,7 @@ const MyForm = (props) => {
                           fetchDistricts(
                             event.substring(event.indexOf("|") + 1)
                           );
-                          handleSetAccountScan(
-                            "city",
-                            event.substring(0, event.indexOf("|"))
-                          );
+                          handleSetAccountScan("city", event);
                         }}
                         optionFilterProp="children"
                         filterOption={(input, option) =>
@@ -453,10 +450,7 @@ const MyForm = (props) => {
                         size="medium"
                         onChange={(event) => {
                           fetchWard(event.substring(event.indexOf("|") + 1));
-                          handleSetAccountScan(
-                            "district",
-                            event.substring(0, event.indexOf("|"))
-                          );
+                          handleSetAccountScan("district", event);
                         }}
                         optionFilterProp="children"
                         filterOption={(input, option) =>
@@ -512,7 +506,7 @@ const MyForm = (props) => {
                             <Select.Option
                               label={ward.WardName}
                               key={ward.WardCode}
-                              value={ward.WardName}
+                              value={ward.WardName + "|" + ward.WardCode}
                             >
                               {ward.WardName}
                             </Select.Option>

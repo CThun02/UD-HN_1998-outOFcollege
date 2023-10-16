@@ -1,8 +1,13 @@
 package com.fpoly.ooc.controller;
 
 import com.fpoly.ooc.dto.CustomerConditionDTO;
+import com.fpoly.ooc.entity.Account;
+import com.fpoly.ooc.entity.Address;
+import com.fpoly.ooc.entity.AddressDetail;
 import com.fpoly.ooc.request.account.AccountRequest;
 import com.fpoly.ooc.service.interfaces.AccountService;
+import com.fpoly.ooc.service.interfaces.AddressDetailService;
+import com.fpoly.ooc.service.interfaces.AddressServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
@@ -23,8 +28,16 @@ import org.springframework.web.bind.annotation.RestController;
 @CrossOrigin("*")
 public class AccountController {
 
-    @Autowired
     private AccountService service;
+    private AddressServiceI addressService;
+    private AddressDetailService addressDetailService;
+
+    @Autowired
+    public AccountController(AccountService service, AddressServiceI addressService, AddressDetailService addressDetailService) {
+        this.service = service;
+        this.addressService = addressService;
+        this.addressDetailService = addressDetailService;
+    }
 
     @GetMapping("/viewAll")
     public ResponseEntity<?> getAllByRoleid(@RequestParam Long roleId) {
@@ -50,6 +63,19 @@ public class AccountController {
     @PutMapping("update/{username}")
     public ResponseEntity<?> update(@PathVariable String username, @RequestBody AccountRequest request) {
         return ResponseEntity.ok(service.update(request, username));
+    }
+
+    @PutMapping("/updateAdress")
+    public ResponseEntity<?> updateAdress(@RequestBody Address address) {
+        return ResponseEntity.ok(addressService.update(address));
+    }
+
+    @PutMapping("/createAddress")
+    public ResponseEntity<?> createAddress(@RequestBody Address address, @RequestParam String userName) {
+        Address addressCreate = addressService.create(address);
+        AddressDetail addressDetailCreate = AddressDetail.builder().accountAddress(Account.builder().username(userName).build())
+                .addressDetail(Address.builder().id(addressCreate.getId()).build()).build();
+        return ResponseEntity.ok(addressDetailService.create(addressDetailCreate));
     }
 
     @DeleteMapping("delete/{id}")

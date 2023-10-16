@@ -19,6 +19,7 @@ import {
   Modal,
   Tooltip,
   Switch,
+  Pagination,
 } from "antd";
 import { FormOutlined, CheckCircleTwoTone } from "@ant-design/icons";
 import { useParams } from "react-router-dom";
@@ -46,12 +47,49 @@ const DetailForm = (props) => {
   const { username } = useParams();
   const [address, setAddress] = useState([]);
   const { Panel } = Collapse;
-  const handlePanelChange = (key) => {
-    console.log("Expanded panel keys:", key);
-  };
+  const handlePanelChange = (key) => {};
+  const [panelIndex, setPanelIndex] = useState(0);
+  const [currenIndex, setCurrenIndex] = useState(1);
+  const [render, setRender] = useState(2);
+  const [addressCreate, setAddressCreate] = useState({
+    id: " ",
+    fullName: " ",
+    sdt: " ",
+    email: " ",
+    city: " ",
+    district: " ",
+    ward: " ",
+    descriptionDetail: " ",
+    defaultaddress: null,
+    status: "ACTIVE",
+  });
+  const [addressUpdate, setAddressUpdate] = useState({
+    id: " ",
+    fullName: " ",
+    sdt: " ",
+    email: " ",
+    city: " ",
+    district: " ",
+    ward: " ",
+    descriptionDetail: " ",
+    defaultaddress: null,
+    status: "ACTIVE",
+  });
   const handleSetAccount = (field, value) => {
     setData((account) => ({
       ...account,
+      [field]: value,
+    }));
+  };
+  const handleSetAddressUpdate = (field, value) => {
+    setAddressUpdate((addressUpdate) => ({
+      ...addressUpdate,
+      [field]: value,
+    }));
+  };
+  const handleSetAddressCreate = (field, value) => {
+    setAddressCreate((addressCreate) => ({
+      ...addressCreate,
       [field]: value,
     }));
   };
@@ -64,12 +102,26 @@ const DetailForm = (props) => {
     handleSetAccount("image", imageUrl);
   };
 
+  const handleChangePagePanel = (index) => {
+    setPanelIndex(index - 1);
+    setCurrenIndex(index);
+    setAddressUpdate(address[index - 1]);
+    document.getElementById(index - 1).classList.remove("d-none");
+    for (let i = 0; i < address.length; i++) {
+      if (i === index - 1) {
+        continue;
+      }
+      document.getElementById(i).classList.add("d-none");
+    }
+  };
+
   const fetchCustomerData = async () => {
     axios
       .get(`http://localhost:8080/api/admin/account/detail/${username}`)
       .then((response) => {
         setData(response.data);
         setAddress(response.data.accountAddress);
+        setAddressUpdate(response.data.accountAddress[0]);
       })
       .catch((err) => console.log(err));
   };
@@ -148,6 +200,42 @@ const DetailForm = (props) => {
       },
     });
   };
+
+  const handleUpdateAdress = () => {
+    messageApi.loading("loading", 2);
+    axios
+      .put(
+        "http://localhost:8080/api/admin/account/updateAdress",
+        addressUpdate
+      )
+      .then(() => {
+        setTimeout(() => {
+          messageApi.success("Chỉnh sửa địa chỉ thành công!", 2);
+        }, 2000);
+      })
+      .catch(() => {
+        messageApi.error("Chỉnh sửa địa chỉ Thất bại!", 2);
+      });
+  };
+
+  const handleCreateAddress = () => {
+    messageApi.loading("loading", 2);
+    axios
+      .put(
+        "http://localhost:8080/api/admin/account/createAddress?userName=" +
+          data.username,
+        addressCreate
+      )
+      .then((res) => {
+        setTimeout(() => {
+          messageApi.success("Thêm mới địa chỉ thành công!", 2);
+          setRender(Math.random);
+        }, 2000);
+      })
+      .catch(() => {
+        messageApi.error("Thêm mới địa chỉ Thất bại!", 2);
+      });
+  };
   useEffect(() => {
     fetchCustomerData();
     const fetchProvinces = async () => {
@@ -169,9 +257,10 @@ const DetailForm = (props) => {
       }
     };
     fetchProvinces();
-  }, []);
+  }, [render]);
   return (
     <div className={styles.container}>
+      {contextHolder}
       <Row style={{ marginBottom: "25px" }}>
         <Col span={8}>
           <h2>Thông tin {Number(roleId) === 1 ? "nhân viên" : "khách hàng"}</h2>
@@ -284,24 +373,17 @@ const DetailForm = (props) => {
         <Col span={16}>
           <Collapse
             className="m-5"
+            activeKey={[panelIndex]}
             onChange={handlePanelChange}
-            defaultActiveKey={[0]}
+            size="small"
           >
             {address &&
               address.map((item, index) => {
                 return (
                   <Panel
-                    header={
-                      <h5>
-                        {item.fullName +
-                          ": " +
-                          item.ward +
-                          ", " +
-                          item.district +
-                          ", " +
-                          item.city}
-                      </h5>
-                    }
+                    id={index}
+                    className={index === panelIndex ? "" : "d-none"}
+                    header={<h5>{item.fullName}</h5>}
                     key={index}
                   >
                     <Switch defaultChecked={item.defaultaddress} />
@@ -309,25 +391,54 @@ const DetailForm = (props) => {
                       <Col span={8}>
                         <div className="m-5">
                           <h6>Họ và tên</h6>
-                          <Input defaultValue={item.fullName} />
+                          <Input
+                            defaultValue={item.fullName}
+                            onChange={(event) => {
+                              handleSetAddressUpdate(
+                                "fullName",
+                                event.target.value
+                              );
+                            }}
+                          />
                         </div>
                       </Col>
                       <Col span={8}>
                         <div className="m-5">
                           <h6>Số điện thoại</h6>
-                          <Input defaultValue={item.sdt} />
+                          <Input
+                            defaultValue={item.sdt}
+                            onChange={(event) => {
+                              handleSetAddressUpdate("sdt", event.target.value);
+                            }}
+                          />
                         </div>
                       </Col>
                       <Col span={8}>
                         <div className="m-5">
                           <h6>Email</h6>
-                          <Input defaultValue={item.email} />
+                          <Input
+                            defaultValue={item.email}
+                            onChange={(event) => {
+                              handleSetAddressUpdate(
+                                "email",
+                                event.target.value
+                              );
+                            }}
+                          />
                         </div>
                       </Col>
                       <Col span={24}>
                         <div className="m-5">
                           <h6>Địa chỉ chi tiết</h6>
-                          <TextArea defaultValue={item.descriptionDetail} />
+                          <TextArea
+                            defaultValue={item.descriptionDetail}
+                            onChange={(event) => {
+                              handleSetAddressUpdate(
+                                "descriptionDetail",
+                                event.target.value
+                              );
+                            }}
+                          />
                         </div>
                       </Col>
                       <Col span={24}>
@@ -336,7 +447,14 @@ const DetailForm = (props) => {
                             <div className="m-5">
                               <h6>Tỉnh/Thành phố</h6>
                               <Select
-                                defaultValue={item.city}
+                                defaultValue={
+                                  item.city.includes("|")
+                                    ? item.city.substring(
+                                        0,
+                                        item.city.indexOf("|")
+                                      )
+                                    : item.city
+                                }
                                 showSearch
                                 style={{ width: "100%" }}
                                 size="medium"
@@ -344,6 +462,7 @@ const DetailForm = (props) => {
                                   fetchDistricts(
                                     event.substring(event.indexOf("|") + 1)
                                   );
+                                  handleSetAddressUpdate("city", event);
                                 }}
                                 optionFilterProp="children"
                                 filterOption={(input, option) =>
@@ -378,7 +497,14 @@ const DetailForm = (props) => {
                             <div className="m-5">
                               <h6>Quận/huyện</h6>
                               <Select
-                                defaultValue={item.district}
+                                defaultValue={
+                                  item.district.includes("|")
+                                    ? item.district.substring(
+                                        0,
+                                        item.district.indexOf("|")
+                                      )
+                                    : item.district
+                                }
                                 showSearch
                                 style={{ width: "100%" }}
                                 size="medium"
@@ -386,6 +512,7 @@ const DetailForm = (props) => {
                                   fetchWard(
                                     event.substring(event.indexOf("|") + 1)
                                   );
+                                  handleSetAddressUpdate("district", event);
                                 }}
                                 optionFilterProp="children"
                                 filterOption={(input, option) =>
@@ -420,7 +547,17 @@ const DetailForm = (props) => {
                             <div className="m-5">
                               <h6>Xã/Phường/Thị trấn</h6>
                               <Select
-                                defaultValue={item.ward}
+                                defaultValue={
+                                  item.ward.includes("|")
+                                    ? item.ward.substring(
+                                        0,
+                                        item.ward.indexOf("|")
+                                      )
+                                    : item.ward
+                                }
+                                onChange={(event) => {
+                                  handleSetAddressUpdate("ward", event);
+                                }}
                                 showSearch
                                 style={{ width: "100%" }}
                                 size="medium"
@@ -441,7 +578,9 @@ const DetailForm = (props) => {
                                     <Select.Option
                                       label={ward.WardName}
                                       key={ward.WardCode}
-                                      value={ward.WardName}
+                                      value={
+                                        ward.WardName + "|" + ward.WardCode
+                                      }
                                     >
                                       {ward.WardName}
                                     </Select.Option>
@@ -452,7 +591,12 @@ const DetailForm = (props) => {
                         </Row>
                       </Col>
                       <div className="m-5">
-                        <Button type="primary">
+                        <Button
+                          type="primary"
+                          onClick={() => {
+                            handleUpdateAdress();
+                          }}
+                        >
                           <FormOutlined /> Xác nhận
                         </Button>
                       </div>
@@ -461,6 +605,197 @@ const DetailForm = (props) => {
                 );
               })}
           </Collapse>
+          <div style={{ textAlign: "end" }}>
+            <Pagination
+              current={currenIndex}
+              showLessItems
+              pageSize={1}
+              onChange={handleChangePagePanel}
+              total={address.length}
+            />
+          </div>
+          <div style={{ marginTop: "12px" }}>
+            <Collapse className="m-5" onChange={handlePanelChange} size="small">
+              <Panel header={<h5>Thêm mới địa chỉ</h5>} key={1}>
+                <Row>
+                  <Col span={8}>
+                    <div className="m-5">
+                      <h6>Họ và tên</h6>
+                      <Input
+                        onChange={(event) => {
+                          handleSetAddressCreate(
+                            "fullName",
+                            event.target.value
+                          );
+                        }}
+                      />
+                    </div>
+                  </Col>
+                  <Col span={8}>
+                    <div className="m-5">
+                      <h6>Số điện thoại</h6>
+                      <Input
+                        onChange={(event) => {
+                          handleSetAddressCreate("sdt", event.target.value);
+                        }}
+                      />
+                    </div>
+                  </Col>
+                  <Col span={8}>
+                    <div className="m-5">
+                      <h6>Email</h6>
+                      <Input
+                        onChange={(event) => {
+                          handleSetAddressCreate("email", event.target.value);
+                        }}
+                      />
+                    </div>
+                  </Col>
+                  <Col span={24}>
+                    <div className="m-5">
+                      <h6>Địa chỉ chi tiết</h6>
+                      <TextArea
+                        onChange={(event) => {
+                          handleSetAddressCreate(
+                            "descriptionDetail",
+                            event.target.value
+                          );
+                        }}
+                      />
+                    </div>
+                  </Col>
+                  <Col span={24}>
+                    <Row>
+                      <Col span={8}>
+                        <div className="m-5">
+                          <h6>Tỉnh/Thành phố</h6>
+                          <Select
+                            showSearch
+                            style={{ width: "100%" }}
+                            size="medium"
+                            onChange={(event) => {
+                              fetchDistricts(
+                                event.substring(event.indexOf("|") + 1)
+                              );
+                              handleSetAddressCreate("city", event);
+                            }}
+                            optionFilterProp="children"
+                            filterOption={(input, option) =>
+                              (option?.label ?? "").includes(input)
+                            }
+                            filterSort={(optionA, optionB) =>
+                              (optionA?.label ?? "")
+                                .toLowerCase()
+                                .localeCompare(
+                                  (optionB?.label ?? "").toLowerCase()
+                                )
+                            }
+                          >
+                            {provinces &&
+                              provinces.map((province) => (
+                                <Select.Option
+                                  key={province.ProvinceID}
+                                  value={
+                                    province.ProvinceName +
+                                    "|" +
+                                    province.ProvinceID
+                                  }
+                                  label={province.ProvinceName}
+                                >
+                                  {province.ProvinceName}
+                                </Select.Option>
+                              ))}
+                          </Select>
+                        </div>
+                      </Col>
+                      <Col span={8}>
+                        <div className="m-5">
+                          <h6>Quận/huyện</h6>
+                          <Select
+                            showSearch
+                            style={{ width: "100%" }}
+                            size="medium"
+                            onChange={(event) => {
+                              fetchWard(
+                                event.substring(event.indexOf("|") + 1)
+                              );
+                              handleSetAddressCreate("district", event);
+                            }}
+                            optionFilterProp="children"
+                            filterOption={(input, option) =>
+                              (option?.label ?? "").includes(input)
+                            }
+                            filterSort={(optionA, optionB) =>
+                              (optionA?.label ?? "")
+                                .toLowerCase()
+                                .localeCompare(
+                                  (optionB?.label ?? "").toLowerCase()
+                                )
+                            }
+                          >
+                            {districts &&
+                              districts.map((district) => (
+                                <Select.Option
+                                  label={district.DistrictName}
+                                  key={district.DistrictID}
+                                  value={
+                                    district.DistrictName +
+                                    "|" +
+                                    district.DistrictID
+                                  }
+                                >
+                                  {district.DistrictName}
+                                </Select.Option>
+                              ))}
+                          </Select>
+                        </div>
+                      </Col>
+                      <Col span={8}>
+                        <div className="m-5">
+                          <h6>Xã/Phường/Thị trấn</h6>
+                          <Select
+                            showSearch
+                            style={{ width: "100%" }}
+                            size="medium"
+                            optionFilterProp="children"
+                            filterOption={(input, option) =>
+                              (option?.label ?? "").includes(input)
+                            }
+                            filterSort={(optionA, optionB) =>
+                              (optionA?.label ?? "")
+                                .toLowerCase()
+                                .localeCompare(
+                                  (optionB?.label ?? "").toLowerCase()
+                                )
+                            }
+                            onChange={(event) => {
+                              handleSetAddressCreate("ward", event);
+                            }}
+                          >
+                            {wards &&
+                              wards.map((ward) => (
+                                <Select.Option
+                                  label={ward.WardName}
+                                  key={ward.WardCode}
+                                  value={ward.WardName + "|" + ward.WardCode}
+                                >
+                                  {ward.WardName}
+                                </Select.Option>
+                              ))}
+                          </Select>
+                        </div>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <div className="m-5">
+                    <Button type="primary" onClick={handleCreateAddress}>
+                      <FormOutlined /> Xác nhận
+                    </Button>
+                  </div>
+                </Row>
+              </Panel>
+            </Collapse>
+          </div>
         </Col>
       </Row>
     </div>

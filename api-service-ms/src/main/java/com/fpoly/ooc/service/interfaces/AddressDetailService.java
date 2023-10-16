@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface AddressDetailService {
     List<AddressDetail> getAddressDetailsByUsername(String username);
+    public AddressDetail create(AddressDetail addressDetail);
 }

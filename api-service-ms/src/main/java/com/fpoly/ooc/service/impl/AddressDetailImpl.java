@@ -18,4 +18,9 @@ public class AddressDetailImpl implements AddressDetailService{
     public List<AddressDetail> getAddressDetailsByUsername(String username) {
         return repo.getAddressDetailByUserName(username);
     }
+
+    @Override
+    public AddressDetail create(AddressDetail addressDetail) {
+        return repo.save(addressDetail);
+    }
 }

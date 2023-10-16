@@ -1,8 +1,8 @@
-﻿USE MASTER;
+﻿use master
 
-CREATE DATABASE DATN_DB_MS;
+create database DATN_DB_MS
 
-USE DATN_DB_MS;
+use DATN_DB_MS
 
 CREATE TABLE brand(
     id                  BIGINT IDENTITY PRIMARY KEY,
@@ -246,11 +246,15 @@ CREATE TABLE account(
 
 CREATE TABLE address(
     id                  BIGINT IDENTITY PRIMARY KEY,
+	fullName			NVARCHAR(100),
+	SDT					VARCHAR(15),
+	EMAIL				VARCHAR(200),
     city                NVARCHAR(100),
     district            NVARCHAR(100),
     ward                NVARCHAR(100),
     street              NVARCHAR(100),
     description_detail  NVARCHAR(MAX),
+	defaultaddress		BIT,
     status              VARCHAR(50),
     created_at          DATETIME,
     updated_at          DATETIME,

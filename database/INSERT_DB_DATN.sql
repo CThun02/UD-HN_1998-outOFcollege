@@ -171,16 +171,16 @@ VALUES
 ('user5', 'InACTIVE', '2023-09-15', '2023-09-15', N'Admin', N'Admin', NULL);
 select * from favorites_list
 
-INSERT INTO address (city, district, ward, street, description_detail, status, created_at, updated_at, created_by, updated_by, deleted_at)
+INSERT INTO address (fullname, sdt, email, city, district, ward, street, description_detail, defaultaddress, status, created_at, updated_at, created_by, updated_by, deleted_at)
 VALUES 
-(N'Hanoi', N'Hoan Kiem', N'Hang Bong', N'123 Street', N'Description for address 1', 'ACTIVE', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL),
-(N'Ho Chi Minh City', N'District 1', N'Ben Nghe', N'456 Street', N'Description for address 2', 'ACTIVE', '2023-09-05', '2023-09-05', N'Admin', N'Admin', NULL),
-(N'Da Nang', N'Hai Chau', N'Thanh Khe Dong', N'789 Street', N'Description for address 3', 'ACTIVE', '2023-09-10', '2023-09-10', N'Admin', N'Admin', NULL),
-(N'Hanoi', N'Dong Da', N'Thanh Cong', N'987 Street', N'Description for address 4', 'ACTIVE', '2023-09-12', '2023-09-12', N'Admin', N'Admin', NULL),
-(N'Ho Chi Minh City', N'District 2', N'An Phu', N'321 Street', N'Description for address 5', 'ACTIVE', '2023-09-15', '2023-09-15', N'Admin', N'Admin', NULL);
+(N'alex hoa', '0971968257', 'and.cmv@gmail.com', N'Hanoi', N'Hoan Kiem', N'Hang Bong', N'123 Street', N'Description for address 1', 1, 'ACTIVE', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL),
+(N'alex hoa', '0971968257', 'and.cmv@gmail.com', N'Ho Chi Minh City', N'District 1', N'Ben Nghe', N'456 Street', N'Description for address 2', 1, 'ACTIVE', '2023-09-05', '2023-09-05', N'Admin', N'Admin', NULL),
+(N'alex hoa', '0971968257', 'and.cmv@gmail.com', N'Da Nang', N'Hai Chau', N'Thanh Khe Dong', N'789 Street', N'Description for address 3', 1, 'ACTIVE', '2023-09-10', '2023-09-10', N'Admin', N'Admin', NULL),
+(N'alex hoa', '0971968257', 'and.cmv@gmail.com', N'Hanoi', N'Dong Da', N'Thanh Cong', N'987 Street', N'Description for address 4', 1, 'ACTIVE', '2023-09-12', '2023-09-12', N'Admin', N'Admin', NULL),
+(N'alex hoa', '0971968257', 'and.cmv@gmail.com', N'Ho Chi Minh City', N'District 2', N'An Phu', N'321 Street', N'Description for address 5', 1, 'ACTIVE', '2023-09-15', '2023-09-15', N'Admin', N'Admin', NULL);
 select * from address
 
-INSERT INTO address_detail (account_id, address_id, status, created_at, updated_at, created_by, updated_by, deleted_at)
+INSERT INTO address_detail (account_id, address_id,  status, created_at, updated_at, created_by, updated_by, deleted_at)
 VALUES 
 ('user1', 1, 'ACTIVE', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL),
 ('user2', 2, 'ACTIVE', '2023-09-05', '2023-09-05', N'Admin', N'Admin', NULL),

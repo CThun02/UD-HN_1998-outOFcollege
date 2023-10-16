@@ -1,95 +1,82 @@
 .formContainer {
- 
-
-   text-align: center;
-   
-  }
-  .container{
-    /* margin-top: 25px;
-  margin-bottom: 25px;
-  margin-left: 25px;
-  margin-right: 25px; */
-    background-color: white;
-    padding: 20px;
-border: 1px solid #edf2f9;
-border-radius: 4px;
-  }
-  .ten{
-    /* padding: 12px;
-    width: 100%; */
-    
-  }
-  .create{
-    text-align: center  ; 
-   
-}
-.cmnd{
-  margin-right: 10px;
-
-}
-.email{
-  margin-right: 25px;
-  margin-top: 20px;
-
-}
-  
-.sdt{
-
-  margin-right: 25px;
-  margin-top: 20px;
-}
-.sdt1{
-text-align: center;
-  margin-right: 25px;
-  margin-top: 20px;
-}
-.ten1{
-  margin-right: 25px;
-}
-.thanhpho{
-
-  margin-right: 10px;
-
-}
-.quan{
-
-  margin-right: 10px;
-
-}.duong{
-  margin-right: 10px;
-}
-.tt{
-
-  margin-top: 5px;
-  
-}
-.form1{
-margin-bottom: 30px;
-
-}
-
-
-.duong{
-  margin-bottom: 60px;
-}
-/* .qrcodeContainer {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.qrcode {
-  width: 100px;
-  height: 100px;
-} */
-.avatarContainer {
-  margin-top: 20px;
-  width: 140px;
-  height: 140px;
-  border-radius: 50%;
-  overflow: hidden;
   display: flex;
   justify-content: center;
-  align-items: center;
+  margin-bottom: 0;
+}
+
+.container {
+  background-color: white;
+  padding: 20px;
+  border: 1px solid #edf2f9;
+  border-radius: 4px;
+}
+.ten {
+  /* padding: 12px;
+    width: 100%; */
+}
+.create {
+  text-align: center;
+}
+.cmnd {
+  margin-right: 10px;
+}
+.email {
+  margin-right: 25px;
+  margin-top: 20px;
+}
+
+.sdt {
+  margin-right: 25px;
+  margin-top: 20px;
+}
+.sdt1 {
+  text-align: center;
+  margin-right: 25px;
+  margin-top: 20px;
+}
+.ten1 {
+  margin-right: 25px;
+}
+.thanhpho {
+  margin-right: 10px;
+}
+.quan {
+  margin-right: 10px;
+}
+.duong {
+  margin-right: 10px;
+}
+.tt {
+  margin-top: 5px;
+}
+.form1 {
+  margin-bottom: 30px;
+}
+.avatarContainer {
+  cursor: pointer;
+  border-radius: 50%;
+  overflow: hidden;
   border: 1px solid #ccc;
   box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+}
+
+.btnUpload {
+  cursor: pointer;
+  border-radius: 50%;
+  border: 1px solid #ccc;
+  padding: 10px;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
+
+.btnQR {
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background-color: #1677ff;
+  color: white;
+  padding: 4px;
 }

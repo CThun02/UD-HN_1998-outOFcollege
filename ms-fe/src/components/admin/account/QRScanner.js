@@ -15,11 +15,10 @@ function QRScanner(props) {
     });
 
     html5QrCodeScanner.render(success, error);
-
+    console.log(html5QrCodeScanner);
     function success(result) {
       html5QrCodeScanner.clear();
       setScanResult(result);
-      console.log(result);
       props.onScan(result); // Gọi hàm callback onScan và truyền kết quả quét QR code
     }
 

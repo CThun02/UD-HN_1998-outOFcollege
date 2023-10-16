@@ -1,7 +1,12 @@
 package com.fpoly.ooc.service.impl;
 
+import com.fpoly.ooc.constant.Const;
+import com.fpoly.ooc.constant.ErrorCodeConfig;
 import com.fpoly.ooc.entity.ButtonType;
+import com.fpoly.ooc.entity.Color;
+import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.ButtonTypeDAORepository;
+import com.fpoly.ooc.request.buttontype.ButtonTypeRequest;
 import com.fpoly.ooc.service.interfaces.ButtonTypeServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -48,5 +53,13 @@ public class ButtonTypeServiceImpl implements ButtonTypeServiceI {
     @Override
     public ButtonType getOne(Long id) {
         return repo.findById(id).orElse(null);
+    }
+
+    @Override
+    public ButtonType updateStatus(ButtonTypeRequest request, Long id) {
+        ButtonType buttonType = repo.findById(id).orElseThrow(() ->
+                new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND)));
+        buttonType.setStatus(request.getStatus());
+        return repo.save(buttonType);
     }
 }

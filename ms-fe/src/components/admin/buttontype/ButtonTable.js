@@ -1,15 +1,6 @@
 import React from "react";
 import { FormOutlined, DeleteFilled } from "@ant-design/icons";
-import moment from "moment";
-import {
-  Table,
-  Space,
-  Pagination,
-  Button,
-  Modal,
-  Input,
-  DatePicker,
-} from "antd";
+import { Table, Space, Button, Switch, Modal, Input, message } from "antd";
 import { useEffect, useState } from "react";
 import styles from "../categorystyles/CategoryStyles.module.css";
 import axios from "axios";
@@ -17,32 +8,20 @@ import axios from "axios";
 const ButtonTable = function (props) {
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-
+  const [messageApi, contextHolder] = message.useMessage();
   const [showModal, setShowModal] = useState(false);
   const [selectedData, setSelectedData] = useState(null);
   const [render, setRender] = useState();
   const [selectedItem, setSelectedItem] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [buttonName, setButtonName] = useState("");
-  const [status, setStatus] = useState("");
   const [id, setid] = useState("");
-  const [createdBy, setCreatedBy] = useState("");
 
   const handleDetails = (item) => {
     setSelectedItem(item);
     setid(item?.id);
     setButtonName(item?.buttonName);
-    setStatus(item?.status);
-    setCreatedBy(item?.createdBy);
     setShowDetailsModal(true);
-  };
-
-  const handleDateChange = (dateString) => {
-    // Cập nhật trạng thái ngày tạo
-    setSelectedItem((prevItem) => ({
-      ...prevItem,
-      createdAt: dateString,
-    }));
   };
 
   const handleDelete = (id) => {
@@ -61,6 +40,28 @@ const ButtonTable = function (props) {
         setShowModal(false);
       })
       .catch((err) => console.log(err));
+  };
+
+  const handleUpdateStatus = (id, statusUpdate) => {
+    let mess = statusUpdate ? "Đang hoạt động" : "Ngưng hoạt động";
+
+    const updatedStatusValue = statusUpdate ? "ACTIVE" : "INACTIVE"; // Cập nhật trạng thái dựa trên giá trị của statusUpdate
+
+    axios
+      .put(`http://localhost:8080/api/admin/button/updateStatus/${id}`, {
+        status: updatedStatusValue,
+      })
+      .then((response) => {
+        setRender(Math.random);
+        if (statusUpdate) {
+          messageApi.success(mess, 2);
+        } else {
+          messageApi.error(mess, 2);
+        }
+      })
+      .catch((error) => {
+        messageApi.error(`Cập nhật trạng thái thất bại`, 2);
+      });
   };
 
   const handleUpdate = () => {
@@ -87,9 +88,16 @@ const ButtonTable = function (props) {
   }, [props.renderTable, render]);
   return (
     <div>
+      {contextHolder}
       {console.log(data)}
       <Table
-        pagination={{ pageSize: 5 }}
+        pagination={{
+          showSizeChanger: true,
+          pageSizeOptions: [5, 10, 15, 20],
+          defaultPageSize: 5,
+          showLessItems: true,
+          style: { marginRight: "10px" },
+        }}
         dataSource={data}
         columns={[
           {
@@ -107,9 +115,20 @@ const ButtonTable = function (props) {
             key: "buttonName",
           },
           {
+            key: "status",
             title: "Trạng thái",
             dataIndex: "status",
-            key: "status",
+            width: 150,
+            render: (status, record) => (
+              <>
+                <Switch
+                  onChange={(checked) => {
+                    handleUpdateStatus(record.id, checked);
+                  }}
+                  checked={status === "ACTIVE"}
+                />
+              </>
+            ),
           },
           {
             title: "Ngày tạo",
@@ -144,7 +163,7 @@ const ButtonTable = function (props) {
         ]}
       />
       <Modal
-        title="Chi tiết"
+        title="Cúc áo"
         visible={showDetailsModal}
         onCancel={() => setShowDetailsModal(false)}
         footer={null}

@@ -19,7 +19,8 @@ const { Option } = Select;
 
 const CollorAdmin = function () {
   const [render, setRender] = useState();
-
+  const [colorCode, setColorCode] = useState("");
+  const [colorName, setColorName] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   const handleAdd = () => {
@@ -30,7 +31,13 @@ const CollorAdmin = function () {
     setIsModalVisible(false);
   };
 
-  const handleSubmit = (values) => {
+  const handleSubmit = () => {
+    const values = {
+      status: "ACTIVE",
+      colorCode: colorCode,
+      colorName: colorName,
+    };
+
     // Gọi API để thêm dữ liệu
     axios
       .post("http://localhost:8080/api/admin/color/create", values)
@@ -44,6 +51,7 @@ const CollorAdmin = function () {
         // Xử lý lỗi
         console.error("Lỗi khi thêm dữ liệu", error);
       });
+    console.log(values);
   };
 
   useEffect(() => {}, [render]);
@@ -82,7 +90,7 @@ const CollorAdmin = function () {
         >
           <Form onFinish={handleSubmit}>
             <Form.Item
-              name="colorCode"
+              value="colorCode"
               label="Color Code"
               rules={[
                 {
@@ -91,10 +99,14 @@ const CollorAdmin = function () {
                 },
               ]}
             >
-              <ColorPicker showText />
+              <ColorPicker
+                color={colorCode}
+                showText
+                onChange={(e) => setColorCode(e.toHexString())}
+              />
             </Form.Item>
             <Form.Item
-              name="colorName"
+              value="colorName"
               label="Color Name"
               rules={[
                 {
@@ -103,46 +115,7 @@ const CollorAdmin = function () {
                 },
               ]}
             >
-              <Input />
-            </Form.Item>
-            <Form.Item
-              name="status"
-              label="Trạng Thái"
-              rules={[
-                {
-                  required: true,
-                  message: "Vui lòng chọn trạng thái",
-                },
-              ]}
-            >
-              <Select>
-                <Option value="active">Hoạt động</Option>
-                <Option value="inactive">Không hoạt động</Option>
-              </Select>
-            </Form.Item>
-            <Form.Item
-              name="createdDate"
-              label="Ngày Tạo"
-              rules={[
-                {
-                  required: true,
-                  message: "Vui lòng chọn ngày tạo",
-                },
-              ]}
-            >
-              <DatePicker />
-            </Form.Item>
-            <Form.Item
-              name="createdBy"
-              label="Người Tạo"
-              rules={[
-                {
-                  required: true,
-                  message: "Vui lòng nhập người tạo",
-                },
-              ]}
-            >
-              <Input />
+              <Input onChange={(e) => setColorName(e.target.value)} />
             </Form.Item>
             <Form.Item>
               <Button type="primary" htmlType="submit">

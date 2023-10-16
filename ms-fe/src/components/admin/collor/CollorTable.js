@@ -1,14 +1,14 @@
 import React from "react";
 import { FormOutlined, DeleteFilled } from "@ant-design/icons";
-import moment from "moment";
 import {
   Table,
   Space,
-  Pagination,
   Button,
   Modal,
+  Switch,
   Input,
-  DatePicker,
+  ColorPicker,
+  message,
 } from "antd";
 import { useEffect, useState } from "react";
 import styles from "../categorystyles/CategoryStyles.module.css";
@@ -17,17 +17,16 @@ import axios from "axios";
 const CollorTable = function (props) {
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-
+  const [messageApi, contextHolder] = message.useMessage();
   const [showModal, setShowModal] = useState(false);
   const [selectedData, setSelectedData] = useState(null);
-
+  const [render, setRender] = useState();
   const [selectedItem, setSelectedItem] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [collorName, setCollorName] = useState("");
   const [colorCode, setColorCode] = useState("");
   const [status, setStatus] = useState("");
   const [id, setid] = useState("");
-  const [createdBy, setCreatedBy] = useState("");
 
   const handleDetails = (item) => {
     setSelectedItem(item);
@@ -35,16 +34,7 @@ const CollorTable = function (props) {
     setColorCode(item?.colorCode);
     setCollorName(item?.colorName);
     setStatus(item?.status);
-    setCreatedBy(item?.createdBy);
     setShowDetailsModal(true);
-  };
-
-  const handleDateChange = (dateString) => {
-    // Cập nhật trạng thái ngày tạo
-    setSelectedItem((prevItem) => ({
-      ...prevItem,
-      createdAt: dateString,
-    }));
   };
 
   const handleDelete = (id) => {
@@ -65,6 +55,43 @@ const CollorTable = function (props) {
       .catch((err) => console.log(err));
   };
 
+  const handleUpdateStatus = (id, statusUpdate) => {
+    let mess = statusUpdate ? "Đang hoạt động" : "Ngưng hoạt động";
+
+    const updatedStatusValue = statusUpdate ? "ACTIVE" : "INACTIVE"; // Cập nhật trạng thái dựa trên giá trị của statusUpdate
+
+    axios
+      .put(`http://localhost:8080/api/admin/color/updateStatus/${id}`, {
+        status: updatedStatusValue,
+      })
+      .then((response) => {
+        setRender(Math.random);
+        if (statusUpdate) {
+          messageApi.success(mess, 2);
+        } else {
+          messageApi.error(mess, 2);
+        }
+      })
+      .catch((error) => {
+        messageApi.error(`Cập nhật trạng thái thất bại`, 2);
+      });
+  };
+
+  const handleUpdate = () => {
+    axios
+      .put(`http://localhost:8080/api/admin/color/edit/${id}`, {
+        colorCode: colorCode,
+        colorName: collorName,
+      })
+      .then((response) => {
+        setShowDetailsModal(false);
+        setRender(Math.random);
+      })
+      .catch((err) => console.log(err));
+    console.log(colorCode);
+    console.log(collorName);
+  };
+
   useEffect(() => {
     axios
       .get(`http://localhost:8080/api/admin/color`)
@@ -73,43 +100,20 @@ const CollorTable = function (props) {
         console.log(response.data);
       })
       .catch((err) => console.log(err));
-  }, [props.renderTable]);
-
-  const handleUpdate = () => {
-    axios
-      .put(`http://localhost:8080/api/admin/color/edit/${id}`, {
-        colorCode,
-        collorName,
-        status,
-        createdAt: selectedItem?.createdAt,
-        createdBy,
-      })
-      .then((response) => {
-        // Cập nhật lại danh sách dữ liệu sau khi cập nhật thành công
-        const updatedData = data.map((item) => {
-          if (item.id === id) {
-            return {
-              ...item,
-              colorCode,
-              collorName,
-              status,
-              createdAt: selectedItem?.createdAt,
-              createdBy,
-            };
-          }
-          return item;
-        });
-        setData(updatedData);
-        // Đóng modal
-        setShowDetailsModal(false);
-      })
-      .catch((err) => console.log(err));
-  };
+  }, [props.renderTable, render]);
 
   return (
     <div>
+      {contextHolder}
       {console.log(data)}
       <Table
+        pagination={{
+          showSizeChanger: true,
+          pageSizeOptions: [5, 10, 15, 20],
+          defaultPageSize: 5,
+          showLessItems: true,
+          style: { marginRight: "10px" },
+        }}
         dataSource={data}
         columns={[
           {
@@ -131,9 +135,20 @@ const CollorTable = function (props) {
             key: "colorName",
           },
           {
+            key: "status",
             title: "Trạng thái",
             dataIndex: "status",
-            key: "status",
+            width: 150,
+            render: (status, record) => (
+              <>
+                <Switch
+                  onChange={(checked) => {
+                    handleUpdateStatus(record.id, checked);
+                  }}
+                  checked={status === "ACTIVE"}
+                />
+              </>
+            ),
           },
           {
             title: "Ngày tạo",
@@ -168,53 +183,28 @@ const CollorTable = function (props) {
         ]}
       />
       <Modal
-        title="Chi tiết"
+        title="Màu Sắc"
         visible={showDetailsModal}
         onCancel={() => setShowDetailsModal(false)}
         footer={null}
       >
-        <p>
-          STT <Input value={id} onChange={(e) => setid(e.target.value)} />
-        </p>
         <br></br>
-        <p>
-          Mã_Màu_Sắc
-          <Input
-            value={colorCode}
-            onChange={(e) => setCollorName(e.target.value)}
+        <div>
+          <h6>Mã màu sắc</h6>
+          <ColorPicker
+            showText
+            color={colorCode}
+            onChange={(e) => setColorCode(e.toHexString())}
           />
-        </p>
+        </div>
         <br></br>
-        <p>
-          Tên_Màu_Sắc
+        <div>
+          <h6>Tên Màu Sắc</h6>
           <Input
             value={collorName}
             onChange={(e) => setCollorName(e.target.value)}
           />
-        </p>
-        <br></br>
-        <p>
-          Trạng_Thái
-          <Input value={status} onChange={(e) => setStatus(e.target.value)} />
-        </p>
-        <br></br>
-        <p>
-          Ngày_tạo
-          <br></br>
-          <DatePicker
-            value={moment(selectedItem?.createdAt)}
-            format="DD/MM/YYYY"
-            onChange={(date, dateString) => handleDateChange(dateString)}
-          />
-        </p>
-        <br></br>
-        <p>
-          Người_Tạo
-          <Input
-            value={createdBy}
-            onChange={(e) => setStatus(e.target.value)}
-          />
-        </p>
+        </div>
         <br></br>
         <Button type="primary" onClick={handleUpdate}>
           Update

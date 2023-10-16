@@ -9,7 +9,7 @@ const { Option } = Select;
 
 const SleeveAdmin = function () {
   const [isModalVisible, setIsModalVisible] = useState(false);
-
+  const [render, setRender] = useState();
   const handleAdd = () => {
     setIsModalVisible(true);
   };
@@ -19,6 +19,7 @@ const SleeveAdmin = function () {
   };
 
   const handleSubmit = (values) => {
+    values.status = "ACTIVE";
     // Gọi API để thêm dữ liệu
     axios
       .post("http://localhost:8080/api/admin/sleeve/create", values)
@@ -26,12 +27,16 @@ const SleeveAdmin = function () {
         // Xử lý thành công
         console.log("Thêm thành công");
         setIsModalVisible(false);
+        setRender(Math.random);
       })
       .catch((error) => {
         // Xử lý lỗi
         console.error("Lỗi khi thêm dữ liệu", error);
       });
   };
+
+  useEffect(() => {}, [render]);
+
   return (
     <div className={styles.category}>
       <div className={styles.radiusFrame}>
@@ -57,7 +62,7 @@ const SleeveAdmin = function () {
           </Col>
         </Row>
         <div className={styles.categoryTable}>
-          <SleeveTable></SleeveTable>
+          <SleeveTable renderTable={render}></SleeveTable>
         </div>
         <Modal
           title="Thêm Kiểu Tay Áo"
@@ -73,45 +78,6 @@ const SleeveAdmin = function () {
                 {
                   required: true,
                   message: "Vui lòng nhập kiểu tay áo",
-                },
-              ]}
-            >
-              <Input />
-            </Form.Item>
-            <Form.Item
-              name="status"
-              label="Trạng Thái"
-              rules={[
-                {
-                  required: true,
-                  message: "Vui lòng chọn trạng thái",
-                },
-              ]}
-            >
-              <Select>
-                <Option value="active">Hoạt động</Option>
-                <Option value="inactive">Không hoạt động</Option>
-              </Select>
-            </Form.Item>
-            <Form.Item
-              name="createdDate"
-              label="Ngày Tạo"
-              rules={[
-                {
-                  required: true,
-                  message: "Vui lòng chọn ngày tạo",
-                },
-              ]}
-            >
-              <DatePicker />
-            </Form.Item>
-            <Form.Item
-              name="creator"
-              label="Người Tạo"
-              rules={[
-                {
-                  required: true,
-                  message: "Vui lòng nhập người tạo",
                 },
               ]}
             >

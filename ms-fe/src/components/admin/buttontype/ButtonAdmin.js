@@ -5,7 +5,6 @@ import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
 import ButtonTable from "./ButtonTable";
 import styles from "../categorystyles/CategoryStyles.module.css";
 import axios from "axios";
-const { Option } = Select;
 
 const ButtonAdmin = function () {
   const [isModalVisible, setIsModalVisible] = useState(false);

@@ -2,6 +2,7 @@ package com.fpoly.ooc.controller;
 
 import com.fpoly.ooc.entity.ButtonType;
 import com.fpoly.ooc.entity.Color;
+import com.fpoly.ooc.request.color.ColorRequest;
 import com.fpoly.ooc.service.interfaces.ColorServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +31,10 @@ public class ColorController {
         return ResponseEntity.ok(service.update(color,id));
     }
 
+    @PutMapping("updateStatus/{id}")
+    public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestBody ColorRequest request){
+        return ResponseEntity.ok(service.updateStatus(request, id).getId());
+    }
     @DeleteMapping("delete/{id}")
     public ResponseEntity<?>delete(@PathVariable Long id){
         Color color = service.getOne(id);

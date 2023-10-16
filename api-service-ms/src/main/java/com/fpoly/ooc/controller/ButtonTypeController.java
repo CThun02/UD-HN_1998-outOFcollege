@@ -1,6 +1,7 @@
 package com.fpoly.ooc.controller;
 
 import com.fpoly.ooc.entity.ButtonType;
+import com.fpoly.ooc.request.buttontype.ButtonTypeRequest;
 import com.fpoly.ooc.service.interfaces.ButtonTypeServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,11 @@ public class ButtonTypeController {
     public ResponseEntity<?> update(@PathVariable Long id, @RequestBody ButtonType buttonType) {
 
         return ResponseEntity.ok(service.update(buttonType, id));
+    }
+
+    @PutMapping("updateStatus/{id}")
+    public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestBody ButtonTypeRequest request) {
+        return ResponseEntity.ok(service.updateStatus(request, id).getId());
     }
 
     @DeleteMapping("delete/{id}")

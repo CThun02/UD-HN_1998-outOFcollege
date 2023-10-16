@@ -1,15 +1,6 @@
 import React from "react";
 import { FormOutlined, DeleteFilled } from "@ant-design/icons";
-import moment from "moment";
-import {
-  Table,
-  Space,
-  Pagination,
-  Button,
-  Modal,
-  Input,
-  DatePicker,
-} from "antd";
+import { Table, Space, Button, Modal, Input, Switch, message } from "antd";
 import { useEffect, useState } from "react";
 import styles from "../categorystyles/CategoryStyles.module.css";
 import axios from "axios";
@@ -17,10 +8,10 @@ import axios from "axios";
 const MaterialTable = function (props) {
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-
+  const [messageApi, contextHolder] = message.useMessage();
   const [showModal, setShowModal] = useState(false);
   const [selectedData, setSelectedData] = useState(null);
-
+  const [render, setRender] = useState();
   const [selectedItem, setSelectedItem] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [materialName, setMaterialName] = useState("");
@@ -35,14 +26,6 @@ const MaterialTable = function (props) {
     setStatus(item?.status);
     setCreatedBy(item?.createdBy);
     setShowDetailsModal(true);
-  };
-
-  const handleDateChange = (dateString) => {
-    // Cập nhật trạng thái ngày tạo
-    setSelectedItem((prevItem) => ({
-      ...prevItem,
-      createdAt: dateString,
-    }));
   };
 
   const handleDelete = (id) => {
@@ -63,6 +46,41 @@ const MaterialTable = function (props) {
       .catch((err) => console.log(err));
   };
 
+  const handleUpdate = () => {
+    axios
+      .put(`http://localhost:8080/api/admin/material/edit/${id}`, {
+        materialName,
+      })
+      .then((response) => {
+        // Đóng modal
+        setShowDetailsModal(false);
+        setRender(Math.random);
+      })
+      .catch((err) => console.log(err));
+  };
+
+  const handleUpdateStatus = (id, statusUpdate) => {
+    let mess = statusUpdate ? "Đang hoạt động" : "Ngưng hoạt động";
+
+    const updatedStatusValue = statusUpdate ? "ACTIVE" : "INACTIVE"; // Cập nhật trạng thái dựa trên giá trị của statusUpdate
+
+    axios
+      .put(`http://localhost:8080/api/admin/material/updateStatus/${id}`, {
+        status: updatedStatusValue,
+      })
+      .then((response) => {
+        setRender(Math.random);
+        if (statusUpdate) {
+          messageApi.success(mess, 2);
+        } else {
+          messageApi.error(mess, 2);
+        }
+      })
+      .catch((error) => {
+        messageApi.error(`Cập nhật trạng thái thất bại`, 2);
+      });
+  };
+
   useEffect(() => {
     axios
       .get(`http://localhost:8080/api/admin/material`)
@@ -71,41 +89,14 @@ const MaterialTable = function (props) {
         console.log(response.data);
       })
       .catch((err) => console.log(err));
-  }, []);
-
-  const handleUpdate = () => {
-    axios
-      .put(`http://localhost:8080/api/admin/material/edit/${id}`, {
-        materialName,
-        status,
-        createdAt: selectedItem?.createdAt,
-        createdBy,
-      })
-      .then((response) => {
-        // Cập nhật lại danh sách dữ liệu sau khi cập nhật thành công
-        const updatedData = data.map((item) => {
-          if (item.id === id) {
-            return {
-              ...item,
-              materialName,
-              status,
-              createdAt: selectedItem?.createdAt,
-              createdBy,
-            };
-          }
-          return item;
-        });
-        setData(updatedData);
-        // Đóng modal
-        setShowDetailsModal(false);
-      })
-      .catch((err) => console.log(err));
-  };
+  }, [props.renderTable, render]);
 
   return (
     <div>
+      {contextHolder}
       {console.log(data)}
       <Table
+        pagination={{ pageSize: 5 }}
         dataSource={data}
         columns={[
           {
@@ -123,9 +114,20 @@ const MaterialTable = function (props) {
             key: "materialName",
           },
           {
+            key: "status",
             title: "Trạng thái",
             dataIndex: "status",
-            key: "status",
+            width: 150,
+            render: (status, record) => (
+              <>
+                <Switch
+                  onChange={(checked) => {
+                    handleUpdateStatus(record.id, checked);
+                  }}
+                  checked={status === "ACTIVE"}
+                />
+              </>
+            ),
           },
           {
             title: "Ngày tạo",
@@ -160,45 +162,19 @@ const MaterialTable = function (props) {
         ]}
       />
       <Modal
-        title="Chi tiết"
+        title="Chất liệu"
         visible={showDetailsModal}
         onCancel={() => setShowDetailsModal(false)}
         footer={null}
       >
-        <p>
-          STT <Input value={id} onChange={(e) => setid(e.target.value)} />
-        </p>
         <br></br>
-        <p>
-          Tên_Chất_Liệu
+        <div>
+          <h6>Tên Chất Liệu</h6>
           <Input
             value={materialName}
             onChange={(e) => setMaterialName(e.target.value)}
           />
-        </p>
-        <br></br>
-        <p>
-          Trạng_Thái
-          <Input value={status} onChange={(e) => setStatus(e.target.value)} />
-        </p>
-        <br></br>
-        <p>
-          Ngày_tạo
-          <br></br>
-          <DatePicker
-            value={moment(selectedItem?.createdAt)}
-            format="DD/MM/YYYY"
-            onChange={(date, dateString) => handleDateChange(dateString)}
-          />
-        </p>
-        <br></br>
-        <p>
-          Người_Tạo
-          <Input
-            value={createdBy}
-            onChange={(e) => setStatus(e.target.value)}
-          />
-        </p>
+        </div>
         <br></br>
         <Button type="primary" onClick={handleUpdate}>
           Update

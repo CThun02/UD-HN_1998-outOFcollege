@@ -1,6 +1,7 @@
 package com.fpoly.ooc.controller;
 
 import com.fpoly.ooc.entity.Size;
+import com.fpoly.ooc.request.size.SizeRequest;
 import com.fpoly.ooc.service.interfaces.SizeServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,11 @@ public class SizeController {
     public ResponseEntity<?> update(@PathVariable Long id, @RequestBody Size size) {
 
         return ResponseEntity.ok(service.update(size, id));
+    }
+
+    @PutMapping("updateStatus/{id}")
+    public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestBody SizeRequest request) {
+        return ResponseEntity.ok(service.updateStatus(request, id).getId());
     }
 
     @DeleteMapping("delete/{id}")

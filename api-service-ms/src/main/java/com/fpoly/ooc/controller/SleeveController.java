@@ -1,7 +1,7 @@
 package com.fpoly.ooc.controller;
 
-import com.fpoly.ooc.entity.ShirtTailType;
 import com.fpoly.ooc.entity.SleeveType;
+import com.fpoly.ooc.request.sleevetype.SleeveTypeRequest;
 import com.fpoly.ooc.service.interfaces.SleeveServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +30,11 @@ public class SleeveController {
     public ResponseEntity<?> update(@PathVariable Long id, @RequestBody SleeveType sleeveType) {
 
         return ResponseEntity.ok(service.update(sleeveType, id));
+    }
+
+    @PutMapping("updateStatus/{id}")
+    public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestBody SleeveTypeRequest request) {
+        return ResponseEntity.ok(service.updateStatus(request, id).getId());
     }
 
     @DeleteMapping("delete/{id}")

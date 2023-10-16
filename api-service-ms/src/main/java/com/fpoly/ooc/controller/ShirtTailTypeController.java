@@ -1,6 +1,7 @@
 package com.fpoly.ooc.controller;
 
 import com.fpoly.ooc.entity.ShirtTailType;
+import com.fpoly.ooc.request.shirttailtype.ShirtTailTypeRequest;
 import com.fpoly.ooc.service.interfaces.ShirtTailTypeServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,11 @@ public class ShirtTailTypeController {
     public ResponseEntity<?> update(@PathVariable Long id, @RequestBody ShirtTailType shirtTailType) {
 
         return ResponseEntity.ok(service.update(shirtTailType, id));
+    }
+
+    @PutMapping("updateStatus/{id}")
+    public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestBody ShirtTailTypeRequest request) {
+        return ResponseEntity.ok(service.updateStatus(request, id).getId());
     }
 
     @DeleteMapping("delete/{id}")

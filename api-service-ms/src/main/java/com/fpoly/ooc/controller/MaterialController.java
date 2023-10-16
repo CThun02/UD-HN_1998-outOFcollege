@@ -1,6 +1,7 @@
 package com.fpoly.ooc.controller;
 
 import com.fpoly.ooc.entity.Material;
+import com.fpoly.ooc.request.material.MaterialRequest;
 import com.fpoly.ooc.service.interfaces.MaterialServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -27,8 +28,12 @@ public class MaterialController {
 
     @PutMapping("edit/{id}")
     public ResponseEntity<?> update(@PathVariable Long id, @RequestBody Material material) {
+        return ResponseEntity.ok(service.update(material, id));
+    }
 
-        return ResponseEntity.ok(service.update(material,id));
+    @PutMapping("updateStatus/{id}")
+    public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestBody MaterialRequest request) {
+        return ResponseEntity.ok(service.updateStatus(request, id).getId());
     }
 
     @DeleteMapping("delete/{id}")
@@ -38,4 +43,4 @@ public class MaterialController {
         return ResponseEntity.ok("Ok");
 
     }
-    }
+}

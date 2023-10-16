@@ -18,6 +18,8 @@ var buttonId = "",
   collarId = "",
   sleeveId = "",
   shirtTailId = "",
+  patternId = "",
+  formId = "",
   sizeId = "",
   colorId = "";
 const ProductDetails = (props) => {
@@ -40,6 +42,8 @@ const ProductDetails = (props) => {
   const [materials, setMaterials] = useState(null);
   const [sleeves, setSleeves] = useState(null);
   const [shirtTails, setshirtTails] = useState(null);
+  const [patterns, setPatterns] = useState(null);
+  const [forms, setForms] = useState(null);
   const [productDetails, setProductDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -94,6 +98,22 @@ const ProductDetails = (props) => {
       },
     },
     {
+      key: "pattern",
+      dataIndex: "pattern",
+      title: "Hoạt tiết",
+      render: (text, record, index) => {
+        return record.pattern.patternName;
+      },
+    },
+    {
+      key: "form",
+      dataIndex: "form",
+      title: "Dáng áo",
+      render: (text, record, index) => {
+        return record.form.formName;
+      },
+    },
+    {
       key: "size",
       dataIndex: "size",
       title: "Kích cỡ",
@@ -120,7 +140,7 @@ const ProductDetails = (props) => {
       dataIndex: "quantity",
       title: "Số lượng",
       render: (text, record, index) => {
-        return record.quantity;
+        return <Input defaultValue={record.quantity} />;
       },
     },
     {
@@ -128,7 +148,7 @@ const ProductDetails = (props) => {
       dataIndex: "price",
       title: "Giá",
       render: (text, record, index) => {
-        return record.price;
+        return <Input defaultValue={record.price} />;
       },
     },
   ];
@@ -250,13 +270,29 @@ const ProductDetails = (props) => {
       .catch((error) => {
         console.log(error);
       });
+    axios
+      .get(api + "pattern")
+      .then((response) => {
+        setPatterns(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    axios
+      .get(api + "form")
+      .then((response) => {
+        setForms(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }, []);
   return (
     <>
       {contextHolder}
       <div className={styles.productDetails}>
         <h2>
-          <FilePptOutlined /> Sản phẩm
+          <FilePptOutlined /> Chỉnh sửa sản phẩm
         </h2>
         <Button type="primary" onClick={showModal}>
           <EyeOutlined />
@@ -268,15 +304,8 @@ const ProductDetails = (props) => {
           footer={null}
         >
           <Row>
-            <Col span={6}>
-              <img
-                src={product.imgDefault || url}
-                width={"100%"}
-                alt={"Not loading"}
-              />
-            </Col>
             <Col span={18}>
-              <Row style={{ marginLeft: "12px" }}>
+              <Row>
                 <Col span={12} style={{ marginBottom: "16px" }}>
                   <span style={{ fontWeight: 500 }}>Thương hiệu</span>
                   <p>{product.brand.brandName}</p>
@@ -476,53 +505,192 @@ const ProductDetails = (props) => {
                 </Select>
               </div>
             </Col>
-            <Col span={18} offset={3}>
+            <Col span={6}>
+              <div style={{ margin: "0 8px 24px 8px" }}>
+                <span
+                  style={{
+                    fontWeight: "500",
+                    display: "block",
+                    textAlign: "center",
+                  }}
+                >
+                  Họa tiết
+                </span>
+                <Select
+                  showSearch
+                  optionFilterProp="children"
+                  filterOption={(input, option) =>
+                    (option?.label ?? "").includes(input)
+                  }
+                  filterSort={(optionA, optionB) =>
+                    (optionA?.label ?? "")
+                      .toLowerCase()
+                      .localeCompare((optionB?.label ?? "").toLowerCase())
+                  }
+                  bordered={false}
+                  onChange={(event) => {
+                    patternId = event;
+                    filter();
+                  }}
+                  defaultValue={""}
+                  style={{ borderBottom: "1px solid black", width: "100%" }}
+                >
+                  <Select.Option key={"ALL"} value={""}>
+                    Tất cả
+                  </Select.Option>
+                  {patterns &&
+                    patterns.map((item) => {
+                      return (
+                        <Select.Option key={item.id} value={item.id}>
+                          {item.patternName}
+                        </Select.Option>
+                      );
+                    })}
+                </Select>
+              </div>
+            </Col>
+            <Col span={6}>
+              <div style={{ margin: "0 8px 24px 8px" }}>
+                <span
+                  style={{
+                    fontWeight: "500",
+                    display: "block",
+                    textAlign: "center",
+                  }}
+                >
+                  Đuôi áo
+                </span>
+                <Select
+                  showSearch
+                  optionFilterProp="children"
+                  filterOption={(input, option) =>
+                    (option?.label ?? "").includes(input)
+                  }
+                  filterSort={(optionA, optionB) =>
+                    (optionA?.label ?? "")
+                      .toLowerCase()
+                      .localeCompare((optionB?.label ?? "").toLowerCase())
+                  }
+                  bordered={false}
+                  onChange={(event) => {
+                    shirtTailId = event;
+                    filter();
+                  }}
+                  defaultValue={""}
+                  style={{ borderBottom: "1px solid black", width: "100%" }}
+                >
+                  <Select.Option key={"ALL"} value={""}>
+                    Tất cả
+                  </Select.Option>
+                  {shirtTails &&
+                    shirtTails.map((item) => {
+                      return (
+                        <Select.Option key={item.id} value={item.id}>
+                          {item.shirtTailTypeName}
+                        </Select.Option>
+                      );
+                    })}
+                </Select>
+              </div>
+            </Col>
+            <Col span={6}>
+              <div style={{ margin: "0 8px 24px 8px" }}>
+                <span
+                  style={{
+                    fontWeight: "500",
+                    display: "block",
+                    textAlign: "center",
+                  }}
+                >
+                  Dáng áo
+                </span>
+                <Select
+                  showSearch
+                  maxTagCount={"responsive"}
+                  optionFilterProp="children"
+                  filterOption={(input, option) =>
+                    (option?.label ?? "").includes(input)
+                  }
+                  filterSort={(optionA, optionB) =>
+                    (optionA?.label ?? "")
+                      .toLowerCase()
+                      .localeCompare((optionB?.label ?? "").toLowerCase())
+                  }
+                  bordered={false}
+                  onChange={(event) => {
+                    formId = event;
+                    filter();
+                  }}
+                  defaultValue={""}
+                  style={{ borderBottom: "1px solid black", width: "100%" }}
+                >
+                  <Select.Option key={"ALL"} value={""}>
+                    Tất cả
+                  </Select.Option>
+                  {forms &&
+                    forms.map((item) => {
+                      return (
+                        <Select.Option key={item.id} value={item.id}>
+                          {item.formName}
+                        </Select.Option>
+                      );
+                    })}
+                </Select>
+              </div>
+            </Col>
+            <Col span={6}>
+              <div style={{ margin: "0 8px 24px 8px" }}>
+                <span
+                  style={{
+                    fontWeight: "500",
+                    display: "block",
+                    textAlign: "center",
+                  }}
+                >
+                  Màu sắc
+                </span>
+                <Select
+                  maxTagCount={"responsive"}
+                  showSearch
+                  optionFilterProp="children"
+                  filterOption={(input, option) =>
+                    (option?.label ?? "").includes(input)
+                  }
+                  filterSort={(optionA, optionB) =>
+                    (optionA?.label ?? "")
+                      .toLowerCase()
+                      .localeCompare((optionB?.label ?? "").toLowerCase())
+                  }
+                  bordered={false}
+                  onChange={(event) => {
+                    colorId = event;
+                    filter();
+                  }}
+                  defaultValue={""}
+                  style={{ borderBottom: "1px solid black", width: "100%" }}
+                >
+                  <Select.Option key={"ALL"} value={""}>
+                    Tất cả
+                  </Select.Option>
+                  {colors &&
+                    colors.map((item) => {
+                      return (
+                        <Select.Option key={item.id}>
+                          <div className={styles.optionColor}>
+                            <span
+                              style={{ backgroundColor: item.colorCode }}
+                            ></span>
+                            {item.colorName}
+                          </div>
+                        </Select.Option>
+                      );
+                    })}
+                </Select>
+              </div>
+            </Col>
+            <Col span={24}>
               <Row>
-                <Col span={8}>
-                  <div style={{ margin: "0 8px 24px 8px" }}>
-                    <span
-                      style={{
-                        fontWeight: "500",
-                        display: "block",
-                        textAlign: "center",
-                      }}
-                    >
-                      Đuôi áo
-                    </span>
-                    <Select
-                      showSearch
-                      optionFilterProp="children"
-                      filterOption={(input, option) =>
-                        (option?.label ?? "").includes(input)
-                      }
-                      filterSort={(optionA, optionB) =>
-                        (optionA?.label ?? "")
-                          .toLowerCase()
-                          .localeCompare((optionB?.label ?? "").toLowerCase())
-                      }
-                      bordered={false}
-                      onChange={(event) => {
-                        shirtTailId = event;
-                        filter();
-                      }}
-                      defaultValue={""}
-                      style={{ borderBottom: "1px solid black", width: "100%" }}
-                    >
-                      <Select.Option key={"ALL"} value={""}>
-                        Tất cả
-                      </Select.Option>
-                      {shirtTails &&
-                        shirtTails.map((item) => {
-                          return (
-                            <Select.Option key={item.id} value={item.id}>
-                              {item.shirtTailTypeName}
-                            </Select.Option>
-                          );
-                        })}
-                    </Select>
-                  </div>
-                </Col>
-                <Col span={8}>
+                <Col span={6} offset={9}>
                   <div style={{ margin: "0 8px 24px 8px" }}>
                     <span
                       style={{
@@ -567,56 +735,6 @@ const ProductDetails = (props) => {
                     </Select>
                   </div>
                 </Col>
-                <Col span={8}>
-                  <div style={{ margin: "0 8px 24px 8px" }}>
-                    <span
-                      style={{
-                        fontWeight: "500",
-                        display: "block",
-                        textAlign: "center",
-                      }}
-                    >
-                      Màu sắc
-                    </span>
-                    <Select
-                      maxTagCount={"responsive"}
-                      showSearch
-                      optionFilterProp="children"
-                      filterOption={(input, option) =>
-                        (option?.label ?? "").includes(input)
-                      }
-                      filterSort={(optionA, optionB) =>
-                        (optionA?.label ?? "")
-                          .toLowerCase()
-                          .localeCompare((optionB?.label ?? "").toLowerCase())
-                      }
-                      bordered={false}
-                      onChange={(event) => {
-                        colorId = event;
-                        filter();
-                      }}
-                      defaultValue={""}
-                      style={{ borderBottom: "1px solid black", width: "100%" }}
-                    >
-                      <Select.Option key={"ALL"} value={""}>
-                        Tất cả
-                      </Select.Option>
-                      {colors &&
-                        colors.map((item) => {
-                          return (
-                            <Select.Option key={item.id}>
-                              <div className={styles.optionColor}>
-                                <span
-                                  style={{ backgroundColor: item.colorCode }}
-                                ></span>
-                                {item.colorName}
-                              </div>
-                            </Select.Option>
-                          );
-                        })}
-                    </Select>
-                  </div>
-                </Col>
               </Row>
             </Col>
           </Row>
@@ -628,6 +746,11 @@ const ProductDetails = (props) => {
             scroll={{ y: 500 }}
             loading={loading}
           />
+          <div style={{ marginTop: "30px", textAlign: "center" }}>
+            <Button type="primary" onClick={() => {}}>
+              Xác nhận
+            </Button>
+          </div>
         </div>
       </div>
     </>

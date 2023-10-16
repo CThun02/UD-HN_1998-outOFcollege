@@ -133,6 +133,11 @@ const MyForm = (props) => {
   };
 
   const onFinish = async () => {
+    for (let key in accountScan) {
+      if (typeof accountScan[key] === "string") {
+        handleSetAccountScan(key, accountScan[key].trim());
+      }
+    }
     let check = isFormInputEmpty(accountScan);
     messageApi.loading("loading", 2);
     if (!check) {

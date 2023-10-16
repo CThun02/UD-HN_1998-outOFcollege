@@ -72,6 +72,10 @@ public class AccountServiceImpl implements AccountService {
         Account createAccount = accountRepository.save(account);
 
         Address address = Address.builder()
+                .fullName(request.getFullName())
+                .sdt(request.getNumberPhone())
+                .email(request.getEmail())
+                .defaultaddress(true)
                 .city(request.getCity())
                 .descriptionDetail(request.getDescriptionDetail())
                 .district(request.getDistrict())

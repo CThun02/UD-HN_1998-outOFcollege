@@ -13,6 +13,8 @@ public interface ProductDetailResponse {
     public Material getMaterial();
     public CollarType getCollar();
     public SleeveType getSleeve();
+    public Pattern getPattern();
+    public Form getForm();
     public Size getSize();
     public Color getColor();
     public ShirtTailType getShirtTail();

@@ -10,9 +10,11 @@ import com.fpoly.ooc.responce.bill.BillProductResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -50,5 +52,9 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
                                                       @Param("endDate") LocalDateTime endDate,
                                                       @Param("status") String status,
                                                       @Param("billType") String billType);
+
+    @Modifying
+    @Query("UPDATE Bill b SET b.status = :status WHERE b.id = :id")
+    Integer update(@Param("status") String status, @Param("id") Long id);
 
 }

@@ -1,6 +1,7 @@
 package com.fpoly.ooc.controller;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fpoly.ooc.dto.BillStatusDTO;
 import com.fpoly.ooc.request.bill.BillRequest;
 import com.fpoly.ooc.service.interfaces.BillService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,15 +61,16 @@ public class BillController {
         return ResponseEntity.ok(billService.getListAddressByUserName(username));
     }
 
-    @PutMapping()
-    public ResponseEntity<?> updateBill() {
-        return ResponseEntity.ok("");
-    }
-
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteBill(@PathVariable("id") Long id) {
         billService.deleteBill(id);
         return ResponseEntity.ok().body("Xóa thành công");
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateBillStatus(@PathVariable("id") Long id,
+                                              @RequestBody BillStatusDTO dto) {
+        return ResponseEntity.ok(billService.updateBillStatus(dto, id));
     }
 
 }

@@ -16,16 +16,15 @@ public interface TimeLineRepo extends JpaRepository<Timeline, Long> {
 
     @Query("SELECT DISTINCT new com.fpoly.ooc.responce.timeline.TimeLineResponse(t.id, t.bill.id, t.note, t.status, " +
             "   t.createdAt, t.createdBy, t.bill.billType, p.paymentName, b.status, b.completionDate, b.price, " +
-            "   acc.fullName, acc.numberPhone, acc.email, " +
+            "   dn.name, dn.phoneNumber, " +
             "   add.descriptionDetail + ' ' + add.ward + ' ' + add.district + ' ' + add.city )" +
             "FROM Timeline t " +
-            "JOIN Bill b ON t.bill.id = b.id " +
-            "JOIN BillDetail bd ON bd.bill.id = b.id " +
-            "LEFT JOIN Account acc ON acc.username = b.account.username " +
-            "LEFT JOIN AddressDetail ad ON ad.accountAddress.username = acc.username " +
-            "LEFT JOIN Address add ON add.id = ad.addressDetail.id " +
-            "JOIN PaymentDetail pd ON pd.bill.id = b.id " +
-            "JOIN Payment p ON p.id = pd.payment.id " +
+            "   LEFT JOIN Bill b ON t.bill.id = b.id " +
+            "   LEFT JOIN BillDetail bd ON bd.bill.id = b.id " +
+            "   LEFT JOIN DeliveryNote dn ON dn.bill.id = b.id " +
+            "   LEFT JOIN Address add ON add.id = dn.address.id " +
+            "   LEFT JOIN PaymentDetail pd ON pd.bill.id = b.id " +
+            "   LEFT JOIN Payment p ON p.id = pd.payment.id " +
             "WHERE b.id = :billId " +
             "ORDER BY t.id")
     List<TimeLineResponse> getTimeLineByBillId(@Param("billId") Long id);
@@ -38,12 +37,13 @@ public interface TimeLineRepo extends JpaRepository<Timeline, Long> {
             "WHERE bd.bill.id = :billId")
     List<TimelineProductResponse> getTimelineProductByBillId(@Param("billId") Long id);
 
-    @Query("SELECT new com.fpoly.ooc.responce.bill.BillInfoResponse(b.id, b.billCode, b.billType, ac.fullName, ac.numberPhone, " +
-            "   ac.email, b.createdAt, add.descriptionDetail +  ' ' + add.ward + ' ' + add.district + ' ' + add.city) " +
+    @Query("SELECT new com.fpoly.ooc.responce.bill.BillInfoResponse(b.id, b.billCode, b.billType, dn.name, dn.phoneNumber, " +
+            "    b.price, b.priceReduce, dn.shipPrice, dn.shipDate, pd.payment.paymentName, b.createdAt, " +
+            "    add.descriptionDetail +  ' ' + add.ward + ' ' + add.district + ' ' + add.city) " +
             "FROM Bill b " +
-            "   LEFT JOIN Account ac ON ac.username = b.account.username " +
-            "   LEFT JOIN AddressDetail ad ON ad.accountAddress.username = ac.username " +
-            "   LEFT JOIN Address add ON add.id = ad.addressDetail.id " +
+            "   LEFT JOIN DeliveryNote dn ON b.id = dn.bill.id   " +
+            "   LEFT JOIN Address add ON add.id = dn.address.id " +
+            "   LEFT JOIN PaymentDetail pd ON pd.bill.id = b.id " +
             "WHERE b.id = :billId")
     BillInfoResponse getBillInfoByIdBillId(@Param("billId") Long id);
 

@@ -1,9 +1,11 @@
 package com.fpoly.ooc.request.bill;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fpoly.ooc.request.payment.PaymentDetailRequest;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -42,6 +44,7 @@ public class BillRequest {
 
     private String phoneNumber;
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime shipDate;
 
     private BigDecimal shipPrice;

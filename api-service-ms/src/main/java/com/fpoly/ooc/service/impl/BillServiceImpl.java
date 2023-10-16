@@ -2,6 +2,7 @@ package com.fpoly.ooc.service.impl;
 
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
+import com.fpoly.ooc.dto.BillStatusDTO;
 import com.fpoly.ooc.entity.Account;
 import com.fpoly.ooc.entity.Address;
 import com.fpoly.ooc.entity.Bill;
@@ -49,6 +50,8 @@ public class BillServiceImpl implements BillService {
     @Autowired
     private DeliveryNoteRepo deliveryNoteRepo;
 
+
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Bill createBill(BillRequest request) {
         Account accountBuilder = null;
@@ -75,7 +78,7 @@ public class BillServiceImpl implements BillService {
                     .price(billDetailRequest.getPrice())
                     .quantity(billDetailRequest.getQuantity())
                     .note("null")
-                    .status("wating")
+                    .status("unpaid")
                     .build();
             billDetailRepo.save(billDetail);
         }
@@ -88,13 +91,12 @@ public class BillServiceImpl implements BillService {
 
         DeliveryNote deliveryNote = DeliveryNote.builder()
                 .bill(bill)
-                .address(Address.builder().id(request.getAddressId()).build())
+                .address(request.getAddressId() == null ? null :
+                        Address.builder().id(request.getAddressId()).build())
                 .name(request.getFullname())
                 .phoneNumber(request.getPhoneNumber())
-                .shipDate(request.getShipDate())
                 .shipPrice(request.getShipPrice())
                 .build();
-
         deliveryNoteRepo.save(deliveryNote);
 
         Timeline timeline = new Timeline();
@@ -131,6 +133,13 @@ public class BillServiceImpl implements BillService {
     @Override
     public List<GetListCustomer> getListCustomer() {
         return billRepo.getListCustomer();
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public Integer updateBillStatus(BillStatusDTO dto, Long id) {
+        billRepo.update(dto.getStatus(), id);
+        return 1;
     }
 
     @Override

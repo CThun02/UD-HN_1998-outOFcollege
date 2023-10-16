@@ -1,5 +1,6 @@
 package com.fpoly.ooc.service.interfaces;
 
+import com.fpoly.ooc.dto.BillStatusDTO;
 import com.fpoly.ooc.entity.Address;
 import com.fpoly.ooc.entity.Bill;
 import com.fpoly.ooc.request.bill.BillRequest;
@@ -26,6 +27,8 @@ public interface BillService {
     void deleteBill(Long id);
 
     List<GetListCustomer> getListCustomer();
+
+    Integer updateBillStatus(BillStatusDTO dto, Long id);
 
     List<Address> getListAddressByUserName(String username);
 

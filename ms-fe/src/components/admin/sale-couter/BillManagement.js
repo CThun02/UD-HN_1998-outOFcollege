@@ -183,9 +183,9 @@ const BillManagement = () => {
                             defaultValue={'all'}
                         >
                             <Select.Option value={'all'}>Tất cả</Select.Option>
-                            <Select.Option value={''}>Chờ xác nhận</Select.Option>
-                            <Select.Option value={''}>Đã thanh toán</Select.Option>
-                            <Select.Option value={''}>Đã huỷ</Select.Option>
+                            <Select.Option value={'unpaid'}>Chưa thanh toán</Select.Option>
+                            <Select.Option value={'paid'}>Đã thanh toán</Select.Option>
+                            <Select.Option value={'cancel'}>Đã huỷ</Select.Option>
                         </Select>
                     </span>
                     <span >Loại hóa đơn

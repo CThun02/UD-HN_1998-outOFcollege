@@ -4,16 +4,19 @@ import React from 'react'
 import { useState } from 'react';
 import { useEffect } from 'react';
 
-const ModalAccount = ({ visible, onCancel, cartId, render }) => {
+const ModalAccount = ({ visible, onCancel, cartId, render, addressId, fullname, phoneNumber }) => {
     const [loading, setLoadding] = useState(true);
     const [renderThis, setRenderThis] = useState(null);
     var cart = JSON.parse(localStorage.getItem(cartId));
 
     const add = (value) => {
         cart.account = value;
+        fullname(value.fullname);
+        phoneNumber(value.phoneNumber)
+        console.log(value)
         localStorage.setItem(cartId, JSON.stringify(cart));
         render(Math.random)
-        console.log(onCancel())
+        onCancel()
     }
 
     const columns = [

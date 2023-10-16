@@ -8,7 +8,8 @@ import SpanBorder from './SpanBorder';
 import ModalDetail from './ModalDetail';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
-import moment from 'moment/moment';
+import moment from 'moment';
+import numeral from 'numeral';
 
 const BillTimeLine = (addId) => {
 
@@ -19,6 +20,9 @@ const BillTimeLine = (addId) => {
     const [timelinePoduct, setTimelinesPoduct] = useState([]);
     const [billInfo, setBillInfo] = useState({});
     const { billId } = useParams();
+
+    //
+
 
     // tạo mới timeline
     const handleCreateTimeline = async (note, stauts) => {
@@ -33,6 +37,18 @@ const BillTimeLine = (addId) => {
             })
     }
 
+    const handleUpdateBillStatus = (status) => {
+        axios.put(`http://localhost:8080/api/admin/bill/${billId}`, {
+            status: status
+        })
+            .then((response) => {
+                console.log(response)
+            })
+            .catch((error) => {
+                console.log(error)
+            });
+    }
+
     const showModalConfirm = () => {
         setIsModalConfirm(true);
     };
@@ -43,8 +59,10 @@ const BillTimeLine = (addId) => {
 
     const handleOkConFirm = (note) => {
         handleCreateTimeline(note, action === 'cancel' ? '0' : null);
+        if (billInfo.billType === "In-store") {
+            handleUpdateBillStatus(action === 'cancel' ? 'cancel' : 'paid');
+        }
         setIsModalConfirm(false);
-        console.log('ahihi' + action)
     };
 
     const showModalDetail = () => {
@@ -70,21 +88,16 @@ const BillTimeLine = (addId) => {
             .catch((error) => {
                 console.log(error)
             })
-        axios.get(`http://localhost:8080/api/admin/timeline/${billId}/info`,
-            {
-                params: {
-                    addId: addId,
-                }
-            })
+        axios.get(`http://localhost:8080/api/admin/timeline/${billId}/info`)
             .then((response) => {
                 setBillInfo(response.data)
+                console.log(response.data)
             })
             .catch((error) => {
                 console.log(error)
             })
     }, [billId])
 
-    console.log('d', timelinePoduct?.imgDefault)
     const columnProduct = [
         {
             title: 'Sản phẩm',
@@ -240,7 +253,7 @@ const BillTimeLine = (addId) => {
                         </>
                     )}
                     {console.log('timeline', timelines.length)}
-                    {billInfo.billType !== 'In-store' && (timelines.length !== 3 && timelines.length !== 4) && (
+                    {billInfo.billType !== 'In-store' && (timelines.length !== 3 && timelines.length !== 4) && timelines[timelines.length - 1]?.status !== '0' && (
                         <>
                             <Button
                                 type="primary"
@@ -296,7 +309,7 @@ const BillTimeLine = (addId) => {
                         <Row>
                             <Col span={12}>
                                 <span className={styles.span}>Mã đơn hàng</span>
-                                <span className={styles.span}>HÌnh thức thanh toán</span>
+                                <span className={styles.span}>HÌnh thức mùa hàng</span>
                                 <span className={styles.span}>Ngày đặt hàng</span>
                                 <span className={styles.span}>Phương thức thanh toán</span>
                                 <span className={styles.span}>Hình thức giao hàng </span>
@@ -321,6 +334,9 @@ const BillTimeLine = (addId) => {
                                     )}
                                     {billInfo.billType !== "Online" && "__"}
                                 </div>
+                                <div style={{ display: 'flex', alignItems: 'center', width: '50px', marginTop: '20px' }}>
+                                    {billInfo?.shipDate || '__'}
+                                </div>
                             </Col>
                         </Row>
                     </Col>
@@ -329,13 +345,11 @@ const BillTimeLine = (addId) => {
                             <Col span={8}>
                                 <span className={styles.span}>Tên khách hàng</span>
                                 <span className={styles.span}>Số diện thoại</span>
-                                <span className={styles.span}>Email</span>
                                 <span className={styles.span}>Địa chỉ</span>
                             </Col>
                             <Col span={12}>
                                 <span className={styles.span}>{billInfo.fullName || 'khách lẻ'}</span>
                                 <span className={styles.span}>{billInfo.phoneNumber || '__'}</span>
-                                <span className={styles.span}>{billInfo.email || '__'}</span>
                                 <span style={{ fontSize: '16px', display: 'block' }}>{billInfo.address || '__'}</span>
                             </Col>
                         </Row>
@@ -377,10 +391,7 @@ const BillTimeLine = (addId) => {
                             Thành tiền:
                         </span>
                         <span>
-                            {timelines[0]?.totalPrice.toLocaleString('vi-VN', {
-                                style: 'currency',
-                                currency: 'VND'
-                            })}
+                            {numeral(billInfo.totalPrice).format('0,0') + 'đ'}
                         </span>
                     </span>
                     <span className={styles.span}>
@@ -388,24 +399,22 @@ const BillTimeLine = (addId) => {
                             Giảm giá:
                         </span>
                         <span >
-                            0đ
+                            {numeral(billInfo.priceReduce)?.format('0,0') + 'đ'}
                         </span>
                     </span>
-                    <span className={styles.span}>
-                        <span style={{ width: '200px', display: 'inline-block' }}>
-                            Phí vận chuyển:
-                        </span>
-                        <span >
-                            0đ
-                        </span>
-                    </span>
+                    {billInfo.billType === 'Online' && <>
+                        <span className={styles.span}>
+                            <span style={{ width: '200px', display: 'inline-block' }}>
+                                Phí vận chuyển:
+                            </span>
+                            <span >
+                                {numeral(billInfo.shipPrice)?.format('0,0') + 'đ'}
+                            </span>
+                        </span></>}
                     <b className={styles.span} >
                         <span style={{ width: '200px', display: 'inline-block' }}>Tổng cộng: </span>
-                        <span style={{ fontSize: '16px', color: '#FF0000' }}>{timelines[0]?.totalPrice
-                            .toLocaleString('vi-VN', {
-                                style: 'currency',
-                                currency: 'VND'
-                            })}</span></b>
+                        <span style={{ fontSize: '16px', color: '#FF0000' }}>{
+                            numeral(billInfo.totalPrice + billInfo?.shipPrice).format(0, 0) + 'đ'}</span></b>
                 </div>
             </section >
         </>

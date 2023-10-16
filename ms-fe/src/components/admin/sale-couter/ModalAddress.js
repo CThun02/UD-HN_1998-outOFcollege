@@ -3,7 +3,7 @@ import { Button, Modal, Table } from 'antd'
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 
-const ModalAddress = ({ isModalOpen, handleOk, handleCancel, username, render, selected }) => {
+const ModalAddress = ({ isModalOpen, handleOk, handleCancel, username, render, selected, selectedAddress }) => {
 
     const [data, setData] = useState([])
     const [loading, setLoading] = useState(true);
@@ -40,15 +40,16 @@ const ModalAddress = ({ isModalOpen, handleOk, handleCancel, username, render, s
             render: (_, record, index) => {
                 return (
                     <div>
-                        <Button onClick={() => handleSelectAddress(index)}>Chọn</Button>
+                        <Button onClick={() => handleSelectAddress(record.id, index)}>Chọn</Button>
                     </div>
                 )
             }
         },
     ]
 
-    const handleSelectAddress = (index) => {
+    const handleSelectAddress = (id, index) => {
         selected(index);
+        selectedAddress(id)
         handleCancel();
         render(Math.random)
     }

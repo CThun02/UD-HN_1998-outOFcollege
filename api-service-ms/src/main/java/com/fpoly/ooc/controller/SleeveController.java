@@ -1,12 +1,11 @@
 package com.fpoly.ooc.controller;
 
 import com.fpoly.ooc.entity.SleeveType;
+import com.fpoly.ooc.request.sleevetype.SleeveTypeRequest;
 import com.fpoly.ooc.service.interfaces.SleeveServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -18,7 +17,30 @@ public class SleeveController {
     private SleeveServiceI service;
 
     @GetMapping("")
-    public List<SleeveType> data(){
+    public List<SleeveType> data() {
         return service.findAll();
+    }
+
+    @PostMapping("create")
+    public ResponseEntity<?> create(@RequestBody SleeveType sleeveType) {
+        return ResponseEntity.ok(service.create(sleeveType));
+    }
+
+    @PutMapping("edit/{id}")
+    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody SleeveType sleeveType) {
+
+        return ResponseEntity.ok(service.update(sleeveType, id));
+    }
+
+    @PutMapping("updateStatus/{id}")
+    public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestBody SleeveTypeRequest request) {
+        return ResponseEntity.ok(service.updateStatus(request, id).getId());
+    }
+
+    @DeleteMapping("delete/{id}")
+    public ResponseEntity<?> delete(@PathVariable Long id) {
+        SleeveType sleeveType = service.getOne(id);
+        service.delete(sleeveType.getId());
+        return ResponseEntity.ok("Ok");
     }
 }

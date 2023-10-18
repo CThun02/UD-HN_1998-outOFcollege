@@ -1,5 +1,3 @@
-package com.fpoly.ooc.job;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.dto.VoucherAndPromotionConditionDTO;

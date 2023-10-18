@@ -8,7 +8,7 @@ import java.util.List;
 public interface MaterialServiceI {
     public Material create(Material material);
 
-    public Material update(Material material, Long id);
+    public Material update( Material material,Long id);
 
     public Boolean delete(Long id);
 

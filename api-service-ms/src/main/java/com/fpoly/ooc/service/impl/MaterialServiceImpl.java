@@ -25,7 +25,6 @@ public class MaterialServiceImpl implements MaterialServiceI {
 
     @Override
     public Material update(Material material, Long id) {
-
         Optional<Material> optionalMaterial = repo.findById(id);
 
         return optionalMaterial.map(o -> {

@@ -25,6 +25,11 @@ import SleeveAdmin from "./components/admin/sleeve/SleeveAdmin";
 import SizeAdmin from "./components/admin/size/SizeAdmin";
 import ButtonAdmin from "./components/admin/buttontype/ButtonAdmin";
 import ShirtailAdmin from "./components/admin/shirtailtype/ShirtTypeAdmin";
+import PatternAdmin from "./components/admin/pattern/PatternAdmin";
+import CategoryAdmin from "./components/admin/category/CategoryAdmin";
+import BrandAdmin from "./components/admin/brand/BrandAdmin";
+import FormAdmin from "./components/admin/form/FormAdmin";
+import CollarAdmin from "./components/admin/collar/CollarAdmin";
 import BillManagement from "./components/admin/sale-couter/BillManagement";
 function App() {
   const [message, setMessage] = useState("");
@@ -48,7 +53,6 @@ function App() {
                     {/* hiển thị mặc định khi vào admin là trang thống kê */}
                     <Route index element="statistical" />
                     <Route path="statistical" element="statistical"></Route>
-
                     {/* Tại quầy */}
                     <Route path="counter-sales">
                       <Route index element={<Bill />}></Route>
@@ -57,12 +61,9 @@ function App() {
                         element={<BillTimeLine />}
                       ></Route>
                     </Route>
-
                     {/* Đơn hàng */}
                     <Route path="order" element={<BillManagement />}></Route>
-
                     {/* Thu chi */}
-
                     {/* ví dụ path= san-pham/hien-thi ->  
                       path="income-and-expenses"
                       element="income-and-expenses"
@@ -86,19 +87,30 @@ function App() {
                     <Route path="hien-thi" element="el" />
                     */}
                     </Route>
-                    {/*Chất liệu */}
-                    <Route path="category" element="category"></Route>
-                    <Route path="brand" element="brand"></Route>
-                    <Route path="pattern" element="pattern"></Route>
-                    <Route path="form" element="form"></Route>
                     <Route path="button" element={<ButtonAdmin />}></Route>
                     <Route path="material" element={<MaterialAdmin />} />
-                    <Route path="collar" element="collar"></Route>
+                    {/*sanpham chi tiet */}
+                    <Route path="pattern" element={<PatternAdmin />}></Route>
+                    <Route
+                      path="category"
+                      element={<CategoryAdmin></CategoryAdmin>}
+                    ></Route>
+                    <Route
+                      path="brand"
+                      element={<BrandAdmin></BrandAdmin>}
+                    ></Route>
+                    <Route
+                      path="form"
+                      element={<FormAdmin></FormAdmin>}
+                    ></Route>
+                    <Route
+                      path="collar"
+                      element={<CollarAdmin></CollarAdmin>}
+                    ></Route>
                     <Route path="shirtTail" element={<ShirtailAdmin />}></Route>
                     <Route path="sleeve" element={<SleeveAdmin />}></Route>
                     <Route path="color" element={<CollorAdmin />}></Route>
                     <Route path="size" element={<SizeAdmin />}></Route>
-
                     {/* Voucher */}
                     <Route path="vouchers">
                       <Route index element={<Voucher message={message} />} />
@@ -111,7 +123,6 @@ function App() {
                         element={<SaveVoucher setMessage={setMessage} />}
                       />
                     </Route>
-
                     {/* Promotion */}
                     <Route path="promotion">
                       <Route index element={<Promotion />} />
@@ -123,7 +134,6 @@ function App() {
                     </Route>
                     <Route path="category" element="category"></Route>
                     <Route path="brand" element="brand"></Route>
-
                     {/* Tài khoản */}
                     <Route
                       path="employee"

@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 
-import { Select, Input, Row, Col, Form, Button, Modal, DatePicker } from "antd";
+import { Input, Row, Col, Form, Button, Modal, message } from "antd";
 import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
 import FormTable from "./FormTable";
 import styles from "./FormStyle.module.css";
 import axios from "axios";
-const { Option } = Select;
+
 const FormAdmin = function () {
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [render, setRender] = useState();
 
   const handleAdd = () => {
     setIsModalVisible(true);
@@ -18,6 +19,7 @@ const FormAdmin = function () {
   };
 
   const handleSubmit = (values) => {
+    values.status = "ACTIVE";
     // Gọi API để thêm dữ liệu
     axios
       .post("http://localhost:8080/api/admin/form/create", values)
@@ -25,6 +27,8 @@ const FormAdmin = function () {
         // Xử lý thành công
         console.log("Thêm thành công");
         setIsModalVisible(false);
+        setRender(Math.random);
+        message.success("Thêm thành công");
       })
       .catch((error) => {
         // Xử lý lỗi
@@ -49,15 +53,19 @@ const FormAdmin = function () {
           </Col>
           <Col span={13} offset={1}>
             <Col span={9} offset={1}>
-              <Button className={styles.btnSeach}  onClick={handleAdd} type="primary">
-                <PlusOutlined className={styles.faPlus}/>
+              <Button
+                className={styles.btnSeach}
+                onClick={handleAdd}
+                type="primary"
+              >
+                <PlusOutlined className={styles.faPlus} />
                 <span className={styles.titleSeach}>Thêm Kiểu Dáng</span>
               </Button>
             </Col>
           </Col>
         </Row>
         <div className={styles.materialTable}>
-          <FormTable></FormTable>
+          <FormTable renderTable={render}></FormTable>
         </div>
       </div>
       <Modal
@@ -79,45 +87,7 @@ const FormAdmin = function () {
           >
             <Input />
           </Form.Item>
-          <Form.Item
-            name="status"
-            label="Trạng Thái"
-            rules={[
-              {
-                required: true,
-                message: "Vui lòng chọn trạng thái",
-              },
-            ]}
-          >
-            <Select>
-              <Option value="active">Hoạt động</Option>
-              <Option value="inactive">Không hoạt động</Option>
-            </Select>
-          </Form.Item>
-          <Form.Item
-            name="createdAt"
-            label="Ngày Tạo"
-            rules={[
-              {
-                required: true,
-                message: "Vui lòng chọn ngày tạo",
-              },
-            ]}
-          >
-            <DatePicker />
-          </Form.Item>
-          <Form.Item
-            name="createdBy"
-            label="Người Tạo"
-            rules={[
-              {
-                required: true,
-                message: "Vui lòng nhập người tạo",
-              },
-            ]}
-          >
-            <Input />
-          </Form.Item>
+
           <Form.Item>
             <Button type="primary" htmlType="submit">
               Thêm

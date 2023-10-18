@@ -1,14 +1,13 @@
 import React, { useState } from "react";
-import { Input, Row, Col, Button, Modal, Form, Select, DatePicker } from "antd";
+import { Input, Row, Col, Button, Modal, Form, message} from "antd";
 import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
 import CategoryTable from "./CategoryTable";
 import styles from "./CategoryStyle.module.css";
 import axios from "axios";
 
-const { Option } = Select;
-
 const CategoryAdmin = function () {
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [render, setRender] = useState();
 
   const handleAdd = () => {
     setIsModalVisible(true);
@@ -19,6 +18,7 @@ const CategoryAdmin = function () {
   };
 
   const handleSubmit = (values) => {
+    values.status = "ACTIVE";
     // Gọi API để thêm dữ liệu
     axios
       .post("http://localhost:8080/api/admin/category/create", values)
@@ -26,13 +26,15 @@ const CategoryAdmin = function () {
         // Xử lý thành công
         console.log("Thêm thành công");
         setIsModalVisible(false);
+        setRender(Math.random);
+        message.success("Thêm thành công");
       })
       .catch((error) => {
         // Xử lý lỗi
         console.error("Lỗi khi thêm dữ liệu", error);
       });
   };
-
+  useState(() => {}, [render]);
   return (
     <div className={styles.material}>
       <div className={styles.radiusFrame}>
@@ -50,7 +52,11 @@ const CategoryAdmin = function () {
           </Col>
           <Col span={13} offset={1}>
             <Col span={9} offset={1}>
-              <Button className={styles.btnSeach} onClick={handleAdd} type="primary">
+              <Button
+                className={styles.btnSeach}
+                onClick={handleAdd}
+                type="primary"
+              >
                 <PlusOutlined className={styles.faPlus} />
                 <span className={styles.titleSeach}>Thêm Thể Loại</span>
               </Button>
@@ -58,7 +64,7 @@ const CategoryAdmin = function () {
           </Col>
         </Row>
         <div className={styles.materialTable}>
-          <CategoryTable></CategoryTable>
+          <CategoryTable renderTable={render}></CategoryTable>
         </div>
       </div>
       <Modal
@@ -80,45 +86,7 @@ const CategoryAdmin = function () {
           >
             <Input />
           </Form.Item>
-          <Form.Item
-            name="status"
-            label="Trạng Thái"
-            rules={[
-              {
-                required: true,
-                message: "Vui lòng chọn trạng thái",
-              },
-            ]}
-          >
-            <Select>
-              <Option value="active">Hoạt động</Option>
-              <Option value="inactive">Không hoạt động</Option>
-            </Select>
-          </Form.Item>
-          <Form.Item
-            name="createdAt"
-            label="Ngày Tạo"
-            rules={[
-              {
-                required: true,
-                message: "Vui lòng chọn ngày tạo",
-              },
-            ]}
-          >
-            <DatePicker />
-          </Form.Item>
-          <Form.Item
-            name="createdBy"
-            label="Người Tạo"
-            rules={[
-              {
-                required: true,
-                message: "Vui lòng nhập người tạo",
-              },
-            ]}
-          >
-            <Input />
-          </Form.Item>
+
           <Form.Item>
             <Button type="primary" htmlType="submit">
               Thêm

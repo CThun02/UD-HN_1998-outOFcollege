@@ -50,9 +50,6 @@ public class Promotion extends BaseEntity {
     @Column(name = "end_date")
     private LocalDateTime endDate;
 
-    @Column(name = "promotion_max_value")
-    private BigDecimal promotionMaxValue;
-
     @Column(name = "promotion_method")
     private String promotionMethod;
 

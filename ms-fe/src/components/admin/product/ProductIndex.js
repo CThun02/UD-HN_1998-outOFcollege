@@ -1,6 +1,7 @@
 import {
   EditFilled,
   EyeFilled,
+  FilterFilled,
   PlusOutlined,
   SearchOutlined,
   TableOutlined,
@@ -47,43 +48,29 @@ const ProductIndex = () => {
       key: "3",
       title: "Tên sản phẩm",
       dataIndex: "productName",
+      width: 300,
     },
     {
       key: "4",
-      title: "Thương hiệu",
-      dataIndex: "brand.brandName",
-      render: (index, record) => {
-        return record.brand.brandName;
-      },
-    },
-    {
-      key: "5",
       title: "Loại sản phẩm",
-      dataIndex: "category.categoryName",
-      render: (index, record) => {
-        return record.category.categoryName;
+      dataIndex: "category",
+      render: (category) => {
+        return category.categoryName;
       },
     },
     {
       key: "5",
-      title: "Họa tiết",
-      dataIndex: "pattern.patternName",
-      render: (index, record) => {
-        return record.pattern.patternName;
+      title: "Thương hiệu",
+      dataIndex: "brand",
+      render: (brand) => {
+        return brand.brandName;
       },
     },
     {
-      key: "6",
-      title: "Dáng áo",
-      dataIndex: "form.formName",
-      render: (index, record) => {
-        return record.form.formName;
-      },
-    },
-    {
-      key: "4",
+      key: "5",
       title: "Số lượng",
       dataIndex: "quantity",
+      width: 150,
     },
     {
       key: "6",
@@ -105,13 +92,14 @@ const ProductIndex = () => {
       key: "7",
       title: "Thao tác",
       dataIndex: "id",
+      width: 150,
       render: (id) => (
         <>
           <Link to={`/admin/product/details/${id}`}>
             <Button className={styles.product__button}>
               <EyeFilled />
             </Button>
-          </Link>
+          </Link>{" "}
           <Link to={`/admin/product/update-details/${id}`}>
             <Button className={styles.product__button}>
               <EditFilled />
@@ -215,159 +203,10 @@ const ProductIndex = () => {
       <div className={styles.product__index}>
         <div className={styles.product__filter}>
           <h2>
-            <TableOutlined /> Danh sách sản phẩm
+            <FilterFilled /> Bộ lọc
           </h2>
           <Row className={styles.produt__filterSelects}>
-            <Col span={6}>
-              <div style={{ margin: "0 8px 8px 8px" }}>
-                <span style={{ fontWeight: "500" }}>Thương Hiệu</span>
-                <Select
-                  showSearch
-                  optionFilterProp="children"
-                  filterOption={(input, option) =>
-                    (option?.label ?? "").includes(input)
-                  }
-                  filterSort={(optionA, optionB) =>
-                    (optionA?.label ?? "")
-                      .toLowerCase()
-                      .localeCompare((optionB?.label ?? "").toLowerCase())
-                  }
-                  bordered={false}
-                  className={styles.produt__filterSelectsChildren}
-                  onChange={(event) => {
-                    console.log(event);
-                    brand = event;
-                    filterProductByCom();
-                  }}
-                  defaultValue={""}
-                >
-                  <Select.Option key={""} value={""}>
-                    Tất cả
-                  </Select.Option>
-                  {brands &&
-                    brands.map((item) => {
-                      return (
-                        <Select.Option
-                          key={item.id}
-                          value={item.id}
-                          label={item.brandName}
-                        >
-                          {item.brandName}
-                        </Select.Option>
-                      );
-                    })}
-                </Select>
-              </div>
-            </Col>
-            <Col span={6}>
-              <div style={{ margin: "0 8px 8px 8px" }}>
-                <span style={{ fontWeight: "500" }}>Loại sản phẩm</span>
-                <Select
-                  showSearch
-                  optionFilterProp="children"
-                  filterOption={(input, option) =>
-                    (option?.label ?? "").includes(input)
-                  }
-                  filterSort={(optionA, optionB) =>
-                    (optionA?.label ?? "")
-                      .toLowerCase()
-                      .localeCompare((optionB?.label ?? "").toLowerCase())
-                  }
-                  bordered={false}
-                  className={styles.produt__filterSelectsChildren}
-                  onChange={(event) => {
-                    category = event;
-                    filterProductByCom();
-                  }}
-                  defaultValue={""}
-                >
-                  <Select.Option key={""} value={""}>
-                    Tất cả
-                  </Select.Option>
-                  {categories &&
-                    categories.map((item) => {
-                      return (
-                        <Select.Option key={item.id} value={item.id}>
-                          {item.categoryName}
-                        </Select.Option>
-                      );
-                    })}
-                </Select>
-              </div>
-            </Col>
-            <Col span={6}>
-              <div style={{ margin: "0 8px 8px 8px" }}>
-                <span style={{ fontWeight: "500" }}>Họa tiết</span>
-                <Select
-                  showSearch
-                  optionFilterProp="children"
-                  filterOption={(input, option) =>
-                    (option?.label ?? "").includes(input)
-                  }
-                  filterSort={(optionA, optionB) =>
-                    (optionA?.label ?? "")
-                      .toLowerCase()
-                      .localeCompare((optionB?.label ?? "").toLowerCase())
-                  }
-                  bordered={false}
-                  className={styles.produt__filterSelectsChildren}
-                  onChange={(event) => {
-                    pattern = event;
-                    filterProductByCom();
-                  }}
-                  defaultValue={""}
-                >
-                  <Select.Option key={""} value={""}>
-                    Tất cả
-                  </Select.Option>
-                  {patterns &&
-                    patterns.map((item) => {
-                      return (
-                        <Select.Option key={item.id} value={item.id}>
-                          {item.patternName}
-                        </Select.Option>
-                      );
-                    })}
-                </Select>
-              </div>
-            </Col>
-            <Col span={6}>
-              <div style={{ margin: "0 8px 8px 8px" }}>
-                <span style={{ fontWeight: "500" }}>Dáng áo</span>
-                <Select
-                  showSearch
-                  optionFilterProp="children"
-                  filterOption={(input, option) =>
-                    (option?.label ?? "").includes(input)
-                  }
-                  filterSort={(optionA, optionB) =>
-                    (optionA?.label ?? "")
-                      .toLowerCase()
-                      .localeCompare((optionB?.label ?? "").toLowerCase())
-                  }
-                  bordered={false}
-                  className={styles.produt__filterSelectsChildren}
-                  onChange={(event) => {
-                    form = event;
-                    filterProductByCom();
-                  }}
-                  defaultValue={""}
-                >
-                  <Select.Option key={""} value={""}>
-                    Tất cả
-                  </Select.Option>
-                  {forms &&
-                    forms.map((item) => {
-                      return (
-                        <Select.Option key={item.id} value={item.id}>
-                          {item.formName}
-                        </Select.Option>
-                      );
-                    })}
-                </Select>
-              </div>
-            </Col>
-            <Col span={12}>
+            <Col span={24}>
               <div className={styles.filter__status}>
                 <span style={{ fontWeight: "500", marginRight: "16px" }}>
                   Trạng Thái
@@ -386,27 +225,30 @@ const ProductIndex = () => {
                 </Radio.Group>
               </div>
             </Col>
-            <Col span={24} className={styles.filter__search}>
-              <Row>
-                <Col span={12}>
-                  <Input
-                    className={styles.filter_inputSearch}
-                    placeholder="Nhập mã, tên sản phẩm"
-                    prefix={<SearchOutlined />}
-                  />
-                </Col>
-                <Col span={12}>
-                  <Link to={"/admin/product/create-details"}>
-                    <Button className={styles.product_tableButtonCreate}>
-                      <PlusOutlined />
-                    </Button>
-                  </Link>
-                </Col>
-              </Row>
+            <br />
+            <Col span={12}>
+              <Input
+                className={styles.filter_inputSearch}
+                placeholder="Nhập mã, tên sản phẩm"
+                prefix={<SearchOutlined />}
+              />
             </Col>
           </Row>
         </div>
         <div className={styles.product__table}>
+          <h2>
+            <TableOutlined /> Danh sách sản phẩm
+          </h2>
+          <Row className={styles.filter__search}>
+            <Col span={24}>
+              <Link to={"/admin/product/create-details"}>
+                <Button className={styles.product_tableButtonCreate}>
+                  <PlusOutlined />
+                </Button>
+              </Link>
+            </Col>
+          </Row>
+          <br />
           <div className={styles.product__tableProducts}>
             <Table
               columns={columns}
@@ -418,9 +260,15 @@ const ProductIndex = () => {
                   key: index,
                 }))
               }
-              pagination={{ pageSize: 5 }}
-              scroll={{ y: 330 }}
+              pagination={{
+                showSizeChanger: true,
+                pageSizeOptions: [5, 10, 15, 20],
+                defaultPageSize: 5,
+                showLessItems: true,
+                style: { marginRight: "10px" },
+              }}
             />
+            <br />
           </div>
         </div>
       </div>

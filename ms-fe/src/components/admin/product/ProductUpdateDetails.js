@@ -1,6 +1,8 @@
 import {
   CheckCircleTwoTone,
+  CloseCircleOutlined,
   EditOutlined,
+  PlusOutlined,
   PlusSquareOutlined,
 } from "@ant-design/icons";
 import { Button, Col, Row, Select, message, notification } from "antd";
@@ -12,6 +14,7 @@ import { displayFrame } from "../animations/animation";
 import "../animations/animation.css";
 import ProductCreate from "./ProductCreate";
 import ProductDetailsTable from "./ProductDetailsTable";
+import ProductUpdatesAddCom from "./ProductUpdatesAddCom";
 
 const ProductUpdateDetails = () => {
   const api = "http://localhost:8080/api/admin/";
@@ -46,14 +49,15 @@ const ProductUpdateDetails = () => {
   const [productDetails, setProductDetails] = useState([]);
   var colorUpdatesDisplay = [];
   //functions
-  function deleteDetailsProduct(
+  function updateStatusDetailsProduct(
     buttonId,
     materialId,
     shirtTailId,
     sleeveId,
     collarId,
     colorId,
-    sizeId
+    sizeId,
+    status
   ) {
     axios
       .put(
@@ -74,185 +78,247 @@ const ProductUpdateDetails = () => {
           colorId +
           "&sizeId=" +
           sizeId +
-          "&status=DELETED"
+          "&status=" +
+          status
       )
       .then((res) => {
         setRender(Math.random());
         setTimeout(() => {
           notification.open({
             message: "Notification",
-            description: "Xóa các chi tiết sản phẩm thành công",
+            description: `${
+              status === "ACTIVE" ? "Khôi phục" : "Xóa"
+            } các chi tiết sản phẩm thành công`,
             icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
           });
         }, 2000);
+      })
+      .catch((err) => {
+        console.log(err);
       });
   }
+  const checkStatus = (comName, value) => {
+    var result = false;
+    productDetails.map((item) => {
+      if (item[`${comName}`].id === value.id) {
+        if (item.status === "ACTIVE") {
+          result = true;
+        }
+      }
+    });
+    return result;
+  };
   function updateDetailsProduct(comAdd, value) {
     message.loading("loading!", 2);
-    var buttonsCreate = buttonsUpdate,
-      collarsCreate = collarsUpdate,
-      materialsCreate = materialsUpdate,
-      sleevesCreate = sleevesUpdate,
-      shirtTailsCreate = shirtTailsUpdate,
-      sizesCreate = sizesUpdate,
-      colorsCreate = colorsUpdate;
     switch (true) {
       case comAdd.includes("button"):
-        buttonsCreate = [];
-        if (value.length < buttonsUpdate.length) {
-          let buttonId = buttonsUpdate.filter(
-            (button) => !value.includes(button)
+        let button = buttonsUpdate.filter(
+          (buttonUpdate) => !value.includes(buttonUpdate.id)
+        );
+        let checkButton = checkStatus(comAdd, button[0]);
+        if (checkButton) {
+          updateStatusDetailsProduct(
+            button[0].id,
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "DELETED"
           );
-          deleteDetailsProduct(buttonId, "", "", "", "", "", "");
-          return;
-        } else if (value.length === buttonsUpdate.length) {
-          buttonsCreate = buttonsUpdate;
         } else {
-          for (let button of buttonsUpdate) {
-            for (let buttonCreate of value) {
-              if (button !== buttonCreate) {
-                buttonsCreate.push(buttonCreate);
-              }
-            }
-          }
+          updateStatusDetailsProduct(
+            button[0].id,
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "ACTIVE"
+          );
         }
         break;
       case comAdd.includes("collar"):
-        collarsCreate = [];
-        if (value.length < collarsUpdate.length) {
-        } else if (value.length === collarsUpdate.length) {
-          collarsCreate = collarsUpdate;
+        let collar = collarsUpdate.filter(
+          (collarUpdate) => !value.includes(collarUpdate.id)
+        );
+        let checkCollar = checkStatus(comAdd, collar[0]);
+        if (checkCollar) {
+          updateStatusDetailsProduct(
+            "",
+            "",
+            "",
+            "",
+            collar[0].id,
+            "",
+            "",
+            "DELETED"
+          );
         } else {
-          for (let collar of collarsUpdate) {
-            for (let collarCreate of value) {
-              if (collar !== collarCreate) {
-                collarsCreate.push(collarCreate);
-              }
-            }
-          }
+          updateStatusDetailsProduct(
+            "",
+            "",
+            "",
+            "",
+            collar[0].id,
+            "",
+            "",
+            "ACTIVE"
+          );
         }
         break;
       case comAdd.includes("material"):
-        materialsCreate = [];
-        if (value.length < materialsUpdate.length) {
-        } else if (value.length === materialsUpdate.length) {
-          materialsCreate = materialsUpdate;
+        let material = materialsUpdate.filter(
+          (materialUpdate) => !value.includes(materialUpdate.id)
+        );
+        let checkMaterial = checkStatus(comAdd, material[0]);
+        if (checkMaterial) {
+          updateStatusDetailsProduct(
+            "",
+            material[0].id,
+            "",
+            "",
+            "",
+            "",
+            "",
+            "DELETED"
+          );
         } else {
-          for (let material of materialsUpdate) {
-            for (let materialCreate of value) {
-              if (material !== materialCreate) {
-                materialsCreate.push(materialCreate);
-              }
-            }
-          }
+          updateStatusDetailsProduct(
+            "",
+            material[0].id,
+            "",
+            "",
+            "",
+            "",
+            "",
+            "ACTIVE"
+          );
         }
         break;
       case comAdd.includes("sleeve"):
-        sleevesCreate = [];
-        if (value.length < sleevesUpdate.length) {
-        } else if (value.length === sleevesUpdate.length) {
-          sleevesCreate = sleevesUpdate;
+        let sleeve = sleevesUpdate.filter(
+          (sleeveUpdate) => !value.includes(sleeveUpdate.id)
+        );
+        let checkSleeve = checkStatus(comAdd, sleeve[0]);
+        if (checkSleeve) {
+          updateStatusDetailsProduct(
+            "",
+            "",
+            "",
+            sleeve[0].id,
+            "",
+            "",
+            "",
+            "DELETED"
+          );
         } else {
-          for (let sleeve of sleevesUpdate) {
-            for (let sleeveCreate of value) {
-              if (sleeve !== sleeveCreate) {
-                sleevesCreate.push(sleeveCreate);
-              }
-            }
-          }
+          updateStatusDetailsProduct(
+            "",
+            "",
+            "",
+            sleeve[0].id,
+            "",
+            "",
+            "",
+            "ACTIVE"
+          );
         }
         break;
       case comAdd.includes("shirtTail"):
-        shirtTailsCreate = [];
-        if (value.length < shirtTailsUpdate.length) {
-        } else if (value.length === shirtTailsUpdate.length) {
-          shirtTailsCreate = shirtTailsUpdate;
+        let shirtTail = shirtTailsUpdate.filter(
+          (shirtTailUpdate) => !value.includes(shirtTailUpdate.id)
+        );
+        let checkShirtTail = checkStatus(comAdd, shirtTail[0]);
+        if (checkShirtTail) {
+          updateStatusDetailsProduct(
+            "",
+            "",
+            shirtTail[0].id,
+            "",
+            "",
+            "",
+            "",
+            "DELETED"
+          );
         } else {
-          for (let shirtTail of shirtTailsUpdate) {
-            for (let shirtTailCreate of value) {
-              if (shirtTail !== shirtTailCreate) {
-                shirtTailsCreate.push(shirtTailCreate);
-              }
-            }
-          }
+          updateStatusDetailsProduct(
+            "",
+            "",
+            shirtTail[0].id,
+            "",
+            "",
+            "",
+            "",
+            "ACTIVE"
+          );
         }
         break;
       case comAdd.includes("size"):
-        sizesCreate = [];
-        if (value.length < sizesUpdate.length) {
-        } else if (value.length === sizesUpdate.length) {
-          sizesCreate = sizesUpdate;
+        let size = sizesUpdate.filter(
+          (sizeUpdate) => !value.includes(sizeUpdate.id)
+        );
+        let checkSize = checkStatus(comAdd, size[0]);
+        if (checkSize) {
+          updateStatusDetailsProduct(
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            size[0].id,
+            "DELETED"
+          );
         } else {
-          for (let size of sizesUpdate) {
-            for (let sizeCreate of value) {
-              if (size !== sizeCreate) {
-                sizesCreate.push(sizeCreate);
-              }
-            }
-          }
+          updateStatusDetailsProduct(
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            size[0].id,
+            "ACTIVE"
+          );
         }
         break;
       case comAdd.includes("color"):
-        colorsCreate = [];
-        if (value.length < colorsUpdate.length) {
-        } else if (value.length === colorsUpdate.length) {
-          colorsCreate = colorsUpdate;
+        let color = colorsUpdate.filter(
+          (colorUpdate) => !value.includes(colorUpdate.id)
+        );
+        let checkColor = checkStatus(comAdd, color[0]);
+        if (checkColor) {
+          updateStatusDetailsProduct(
+            "",
+            "",
+            "",
+            "",
+            "",
+            color[0].id,
+            "",
+            "DELETED"
+          );
         } else {
-          for (let color of colorsUpdate) {
-            for (let colorCreate of value) {
-              if (color !== colorCreate) {
-                colorsCreate.push(colorCreate);
-              }
-            }
-          }
+          updateStatusDetailsProduct(
+            "",
+            "",
+            "",
+            "",
+            "",
+            color[0].id,
+            "",
+            "ACTIVE"
+          );
         }
         break;
       default:
         console.log("error");
         break;
     }
-    for (let button of buttonsCreate) {
-      for (let collar of collarsCreate) {
-        for (let material of materialsCreate) {
-          for (let sleeve of sleevesCreate) {
-            for (let shirtTail of shirtTailsCreate) {
-              for (let size of sizesCreate) {
-                for (let color of colorsCreate) {
-                  let productDetail = {
-                    productId: product.id,
-                    buttonId: button,
-                    materialId: material,
-                    collarId: collar,
-                    sleeveId: sleeve,
-                    sizeId: size,
-                    colorId: color,
-                    shirtTailId: shirtTail,
-                    status: "ACTIVE",
-                    price: 200000,
-                    quantity: 1,
-                  };
-                  axios
-                    .post(api + "product/createDetail", productDetail)
-                    .then((res) => {})
-                    .catch((err) => {
-                      message.error("Đã xảy ra lỗi vui lòng thử lại sau!", 2);
-                      console.log(err);
-                      return;
-                    });
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-    setTimeout(() => {
-      notification.open({
-        message: "Notification",
-        description: "Thêm mới các chi tiết sản phẩm thành công",
-        icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
-      });
-    }, 2000);
+
     setRender(Math.random());
   }
   useEffect(() => {
@@ -368,7 +434,6 @@ const ProductUpdateDetails = () => {
       )
       .then((response) => {
         setMaterialsUpdate(response.data);
-        console.log(response.data);
       })
       .catch((error) => {
         console.log(error);
@@ -429,13 +494,58 @@ const ProductUpdateDetails = () => {
 
   return (
     <>
+      {contextHolder}
       <div className={styles.productUpdateDetails}>
         <ProductCreate
           render={setRender}
           productId={productId}
           isUpdate={true}
         />
-        {contextHolder}
+        {sizes.length > 0 ? (
+          <ProductUpdatesAddCom
+            render={setRender}
+            productId={productId}
+            buttons={buttons.filter(
+              (button) =>
+                !buttonsUpdate.find(
+                  (buttonUpdate) => button.id === buttonUpdate.id
+                )
+            )}
+            materials={materials.filter(
+              (material) =>
+                !materialsUpdate.find(
+                  (materialUpdate) => material.id === materialUpdate.id
+                )
+            )}
+            sleeves={sleeves.filter(
+              (sleeve) =>
+                !sleevesUpdate.find(
+                  (sleeveUpdate) => sleeve.id === sleeveUpdate.id
+                )
+            )}
+            collars={collars.filter(
+              (collar) =>
+                !collarsUpdate.find(
+                  (collarUpdate) => collar.id === collarUpdate.id
+                )
+            )}
+            shirtTails={shirtTails.filter(
+              (shirtTail) =>
+                !shirtTailsUpdate.find(
+                  (shirtTailUpdate) => shirtTail.id === shirtTailUpdate.id
+                )
+            )}
+            sizes={sizes.filter(
+              (size) =>
+                !sizesUpdate.find((sizeUpdate) => size.id === sizeUpdate.id)
+            )}
+            colors={colors.filter(
+              (color) =>
+                !colorsUpdate.find((colorUpdate) => color.id === colorUpdate.id)
+            )}
+            isUpdate={true}
+          />
+        ) : null}
         <Row>
           <Col span={10} className={styles.product__Form}>
             <h2>
@@ -525,18 +635,28 @@ const ProductUpdateDetails = () => {
                     style={{ width: "100%" }}
                     placeholder="Button"
                     mode="multiple"
-                    value={buttonsUpdate}
+                    value={
+                      buttonsUpdate && buttonsUpdate.map((item) => item.id)
+                    }
                     onChange={(event) => updateDetailsProduct("button", event)}
                   >
-                    {buttons &&
-                      buttons.map((item) => {
+                    {buttonsUpdate &&
+                      buttonsUpdate.map((item) => {
                         return (
                           <Select.Option
                             value={item.id}
                             label={item.buttonName}
                             key={item.id}
                           >
-                            {item.buttonName}
+                            {checkStatus("button", item) ? (
+                              item.buttonName
+                            ) : (
+                              <del>
+                                <span style={{ color: "#ccc" }}>
+                                  {item.buttonName}
+                                </span>
+                              </del>
+                            )}
                           </Select.Option>
                         );
                       })}
@@ -554,17 +674,27 @@ const ProductUpdateDetails = () => {
                     onChange={(event) =>
                       updateDetailsProduct("material", event)
                     }
-                    value={materialsUpdate}
+                    value={
+                      materialsUpdate && materialsUpdate.map((item) => item.id)
+                    }
                   >
-                    {materials &&
-                      materials.map((item) => {
+                    {materialsUpdate &&
+                      materialsUpdate.map((item) => {
                         return (
                           <Select.Option
                             value={item.id}
                             label={item.materialName}
                             key={item.id}
                           >
-                            {item.materialName}
+                            {checkStatus("material", item) ? (
+                              item.materialName
+                            ) : (
+                              <del>
+                                <span style={{ color: "#ccc" }}>
+                                  {item.materialName}
+                                </span>
+                              </del>
+                            )}
                           </Select.Option>
                         );
                       })}
@@ -580,17 +710,27 @@ const ProductUpdateDetails = () => {
                     placeholder="Collar"
                     mode="multiple"
                     onChange={(event) => updateDetailsProduct("collar", event)}
-                    value={collarsUpdate}
+                    value={
+                      collarsUpdate && collarsUpdate.map((item) => item.id)
+                    }
                   >
-                    {collars &&
-                      collars.map((item) => {
+                    {collarsUpdate &&
+                      collarsUpdate.map((item) => {
                         return (
                           <Select.Option
                             value={item.id}
-                            key={item.id}
                             label={item.collarTypeName}
+                            key={item.id}
                           >
-                            {item.collarTypeName}
+                            {checkStatus("collar", item) ? (
+                              item.collarTypeName
+                            ) : (
+                              <del>
+                                <span style={{ color: "#ccc" }}>
+                                  {item.collarTypeName}
+                                </span>
+                              </del>
+                            )}
                           </Select.Option>
                         );
                       })}
@@ -605,18 +745,28 @@ const ProductUpdateDetails = () => {
                     style={{ width: "100%" }}
                     placeholder="Sleeve"
                     mode="multiple"
-                    value={sleevesUpdate}
+                    value={
+                      sleevesUpdate && sleevesUpdate.map((item) => item.id)
+                    }
                     onChange={(event) => updateDetailsProduct("sleeve", event)}
                   >
-                    {sleeves &&
-                      sleeves.map((item) => {
+                    {sleevesUpdate &&
+                      sleevesUpdate.map((item) => {
                         return (
                           <Select.Option
                             value={item.id}
                             label={item.sleeveName}
                             key={item.id}
                           >
-                            {item.sleeveName}
+                            {checkStatus("sleeve", item) ? (
+                              item.sleeveName
+                            ) : (
+                              <del>
+                                <span style={{ color: "#ccc" }}>
+                                  {item.sleeveName}
+                                </span>
+                              </del>
+                            )}
                           </Select.Option>
                         );
                       })}
@@ -634,17 +784,28 @@ const ProductUpdateDetails = () => {
                     onChange={(event) =>
                       updateDetailsProduct("shirtTail", event)
                     }
-                    value={shirtTailsUpdate}
+                    value={
+                      shirtTailsUpdate &&
+                      shirtTailsUpdate.map((item) => item.id)
+                    }
                   >
-                    {shirtTails &&
-                      shirtTails.map((item) => {
+                    {shirtTailsUpdate &&
+                      shirtTailsUpdate.map((item) => {
                         return (
                           <Select.Option
                             value={item.id}
                             label={item.shirtTailTypeName}
                             key={item.id}
                           >
-                            {item.shirtTailTypeName}
+                            {checkStatus("shirtTail", item) ? (
+                              item.shirtTailTypeName
+                            ) : (
+                              <del>
+                                <span style={{ color: "#ccc" }}>
+                                  {item.shirtTailTypeName}
+                                </span>
+                              </del>
+                            )}
                           </Select.Option>
                         );
                       })}
@@ -658,7 +819,7 @@ const ProductUpdateDetails = () => {
                     showSearch
                     style={{ width: "100%" }}
                     mode="multiple"
-                    value={sizesUpdate}
+                    value={sizesUpdate && sizesUpdate.map((color) => color.id)}
                     placeholder="size"
                     optionFilterProp="children"
                     filterOption={(input, option) =>
@@ -671,15 +832,23 @@ const ProductUpdateDetails = () => {
                     }
                     onChange={(event) => updateDetailsProduct("size", event)}
                   >
-                    {sizes &&
-                      sizes.map((item) => {
+                    {sizesUpdate &&
+                      sizesUpdate.map((item) => {
                         return (
                           <Select.Option
-                            key={item.id}
-                            label={item.sizeName}
                             value={item.id}
+                            label={item.sizeName}
+                            key={item.id}
                           >
-                            {item.sizeName}
+                            {checkStatus("size", item) ? (
+                              item.sizeName
+                            ) : (
+                              <del>
+                                <span style={{ color: "#ccc" }}>
+                                  {item.sizeName}
+                                </span>
+                              </del>
+                            )}
                           </Select.Option>
                         );
                       })}
@@ -695,7 +864,9 @@ const ProductUpdateDetails = () => {
                     mode="multiple"
                     placeholder="Color"
                     optionFilterProp="children"
-                    value={colorsUpdate}
+                    value={
+                      colorsUpdate && colorsUpdate.map((color) => color.id)
+                    }
                     filterOption={(input, option) =>
                       (option?.label ?? "").includes(input)
                     }
@@ -706,33 +877,67 @@ const ProductUpdateDetails = () => {
                     }
                     onChange={(event) => updateDetailsProduct("color", event)}
                   >
-                    {colors &&
-                      colors.map((item) => {
-                        colorsUpdate.forEach((color) => {
-                          if (color === item.id) {
-                            colorUpdatesDisplay.push({
-                              key: item.id,
-                              label: item.colorName,
-                              value: item.colorCode,
-                            });
-                          }
+                    {colorsUpdate &&
+                      colorsUpdate.map((item) => {
+                        colorUpdatesDisplay.push({
+                          key: item.id,
+                          label: item.colorName,
+                          value: item.colorCode,
                         });
                         return (
                           <Select.Option
-                            key={item.colorCode}
-                            label={item.colorName}
                             value={item.id}
+                            label={item.colorName}
+                            key={item.id}
                           >
-                            <div className={styles.optionColor}>
-                              <span
-                                style={{ backgroundColor: item.colorCode }}
-                              ></span>
-                              {item.colorName}
-                            </div>
+                            {checkStatus("color", item) ? (
+                              <div className={styles.optionColor}>
+                                <span
+                                  style={{ backgroundColor: item.colorCode }}
+                                ></span>
+                                {item.colorName}
+                              </div>
+                            ) : (
+                              <div className={styles.optionColor}>
+                                <span
+                                  style={{
+                                    backgroundColor: item.colorCode,
+                                    opacity: 0.3,
+                                  }}
+                                ></span>
+                                <del>
+                                  <span style={{ color: "#ccc" }}>
+                                    {item.colorName}
+                                  </span>
+                                </del>
+                              </div>
+                            )}
                           </Select.Option>
                         );
                       })}
                   </Select>
+                </div>
+              </Col>
+              <Col span={16}>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "end",
+                    height: "100%",
+                  }}
+                >
+                  <Button
+                    onClick={() => {
+                      displayFrame(
+                        "productUpdatesAddCom",
+                        "productUpdatesAddComFrame"
+                      );
+                    }}
+                    className={styles.product_ButtonUpdate}
+                    style={{ margin: "6px" }}
+                  >
+                    <PlusOutlined />
+                  </Button>
                 </div>
               </Col>
             </Row>

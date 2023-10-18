@@ -1,4 +1,4 @@
-﻿﻿USE MASTER;
+﻿USE MASTER;
 
 CREATE DATABASE DATN_DB_MS;
 
@@ -52,8 +52,6 @@ CREATE TABLE product(
     id                  BIGINT IDENTITY PRIMARY KEY,
     brand_id            BIGINT FOREIGN KEY(brand_id) REFERENCES brand(id),
     category_id         BIGINT FOREIGN KEY(category_id) REFERENCES category(id),
-    pattern_id          BIGINT FOREIGN KEY(pattern_id) REFERENCES pattern(id),
-    form_id             BIGINT FOREIGN KEY(form_id) REFERENCES form(id),
     product_code        NVARCHAR(50),
     product_name        NVARCHAR(50),
     img_default         VARCHAR(MAX),
@@ -148,6 +146,8 @@ CREATE TABLE size(
 CREATE TABLE product_detail(
     id                  BIGINT IDENTITY PRIMARY KEY,
     product_id          BIGINT FOREIGN KEY(product_id) REFERENCES product(id),
+	pattern_id          BIGINT FOREIGN KEY(pattern_id) REFERENCES pattern(id),
+    form_id             BIGINT FOREIGN KEY(form_id) REFERENCES form(id),
     button_id           BIGINT FOREIGN KEY(button_id) REFERENCES button_type(id),
     material_id         BIGINT FOREIGN KEY(material_id) REFERENCES material(id),
     collar_id           BIGINT FOREIGN KEY(collar_id) REFERENCES collar_type(id),
@@ -188,7 +188,6 @@ CREATE TABLE promotion(
     promotion_value      DECIMAL,
     start_date          DATETIME,
     end_date            DATETIME,
-    promotion_max_value  DECIMAL,
     promotion_method     VARCHAR(30),
     promotion_condition  DECIMAL,
     status              VARCHAR(50),
@@ -204,6 +203,8 @@ CREATE TABLE promotion_product_detail(
     promotion_id         BIGINT FOREIGN KEY(promotion_id) REFERENCES promotion(id),
     product_detail_id   BIGINT FOREIGN KEY(product_detail_id) REFERENCES product_detail(id),
     percent_reduce      DECIMAL,
+    money_reduce		DECIMAL,
+	method_reduce		VARCHAR(10),
     money_after         DECIMAL,
     status              VARCHAR(50),
     created_at          DATETIME,
@@ -272,7 +273,7 @@ CREATE TABLE address_detail(
 
 CREATE TABLE bill(
     id                  BIGINT IDENTITY PRIMARY KEY,
-    bill_code           VARCHAR(20),
+    bill_code           VARCHAR(20) UNIQUE,
     account_id          VARCHAR(100) FOREIGN KEY(account_id) REFERENCES account(username),
     date_of_receipt     DATETIME,
     completion_date     DATETIME,

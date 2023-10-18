@@ -2,18 +2,25 @@ package com.fpoly.ooc.service.impl;
 
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
+import com.fpoly.ooc.dto.ProductDetailsDTO;
 import com.fpoly.ooc.entity.*;
 import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.ProductDAORepositoryI;
 import com.fpoly.ooc.repository.ProductDetailDAORepositoryI;
 import com.fpoly.ooc.responce.product.ProductDetailResponse;
+import com.fpoly.ooc.responce.productdetail.ProductsDetailsResponse;
 import com.fpoly.ooc.service.interfaces.ProductDetailServiceI;
+import com.fpoly.ooc.util.PageUltil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -88,37 +95,37 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
     }
 
     @Override
-    public List<Long> getColorsBydIdPro(Long productId) {
+    public List<Color> getColorsBydIdPro(Long productId) {
         return repo.getColorsBydIdPro(productId);
     }
 
     @Override
-    public List<Long> getSizesBydIdPro(Long productId) {
+    public List<Size> getSizesBydIdPro(Long productId) {
         return repo.getSizesBydIdPro(productId);
     }
 
     @Override
-    public List<Long> getShirtTailsBydIdPro(Long productId) {
+    public List<ShirtTailType> getShirtTailsBydIdPro(Long productId) {
         return repo.getShirtTailsBydIdPro(productId);
     }
 
     @Override
-    public List<Long> getMaterialsBydIdPro(Long productId) {
+    public List<Material> getMaterialsBydIdPro(Long productId) {
         return repo.getMaterialsBydIdPro(productId);
     }
 
     @Override
-    public List<Long> getCollarsBydIdPro(Long productId) {
+    public List<CollarType> getCollarsBydIdPro(Long productId) {
         return repo.getCollarsBydIdPro(productId);
     }
 
     @Override
-    public List<Long> getButtonsBydIdPro(Long productId) {
+    public List<ButtonType> getButtonsBydIdPro(Long productId) {
         return repo.getButtonsBydIdPro(productId);
     }
 
     @Override
-    public List<Long> getSleevesBydIdPro(Long productId) {
+    public List<SleeveType> getSleevesBydIdPro(Long productId) {
         return repo.getSleevesBydIdPro(productId);
     }
 
@@ -136,7 +143,18 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
     }
 
     @Override
-    public List<Long> findAllResponseProduct(Long idPromotion) {
+    public List<Long> findAllIdsResponseProductDetails(Long idPromotion) {
         return repo.findAllByIdPromotion(idPromotion);
     }
+
+    @Override
+    public List<ProductsDetailsResponse> findListProductdetailsByListProductId(ProductDetailsDTO dto) {
+        return repo.getProductDetailsTableByConditionDTO(
+                dto.getIdProducts(), dto.getIdButtons(), dto.getIdMaterials(),
+                dto.getIdCollars(), dto.getIdSleeves(), dto.getIdShirtTails(),
+                dto.getIdSizes(), dto.getIdColors(),
+                StringUtils.isEmpty(dto.getSearchText()) ? null : "%" + dto.getSearchText() + "%"
+        );
+    }
+
 }

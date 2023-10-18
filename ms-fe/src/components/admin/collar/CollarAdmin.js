@@ -1,22 +1,13 @@
 import React, { useState } from "react";
-import {
-  Select,
-  Input,
-  Row,
-  Col,
-  Form,
-  Button,
-  DatePicker,
-  Modal,
-
-} from "antd";
+import { Input, Row, Col, Form, Button, Modal, message } from "antd";
 import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
 import CollarTable from "./CollarTable";
 import styles from "./CollarStyle.module.css";
 import axios from "axios";
-const { Option } = Select;
+
 const CollarAdmin = function () {
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [render, setRender] = useState();
 
   const handleAdd = () => {
     setIsModalVisible(true);
@@ -27,6 +18,7 @@ const CollarAdmin = function () {
   };
 
   const handleSubmit = (values) => {
+    values.status = "ACTIVE";
     // Gọi API để thêm dữ liệu
     axios
       .post("http://localhost:8080/api/admin/collar/create", values)
@@ -34,6 +26,8 @@ const CollarAdmin = function () {
         // Xử lý thành công
         console.log("Thêm thành công");
         setIsModalVisible(false);
+        setRender(Math.random);
+        message.success("Thêm thành công");
       })
       .catch((error) => {
         // Xử lý lỗi
@@ -58,15 +52,19 @@ const CollarAdmin = function () {
           </Col>
           <Col span={13} offset={1}>
             <Col span={9} offset={1}>
-              <Button className={styles.btnSeach} onClick={handleAdd} type="primary">
-                <PlusOutlined className={styles.faPlus}  />
+              <Button
+                className={styles.btnSeach}
+                onClick={handleAdd}
+                type="primary"
+              >
+                <PlusOutlined className={styles.faPlus} />
                 <span className={styles.titleSeach}>Thêm Cổ Áo</span>
               </Button>
             </Col>
           </Col>
         </Row>
         <div className={styles.materialTable}>
-          <CollarTable></CollarTable>
+          <CollarTable renderTable={render}></CollarTable>
         </div>
       </div>
       <Modal
@@ -77,7 +75,7 @@ const CollarAdmin = function () {
       >
         <Form onFinish={handleSubmit}>
           <Form.Item
-            name="collarName"
+            name="collarTypeName"
             label="Tên Cổ Áo"
             rules={[
               {
@@ -88,45 +86,7 @@ const CollarAdmin = function () {
           >
             <Input />
           </Form.Item>
-          <Form.Item
-            name="status"
-            label="Trạng Thái"
-            rules={[
-              {
-                required: true,
-                message: "Vui lòng chọn trạng thái",
-              },
-            ]}
-          >
-            <Select>
-              <Option value="active">Hoạt động</Option>
-              <Option value="inactive">Không hoạt động</Option>
-            </Select>
-          </Form.Item>
-          <Form.Item
-            name="createdAt"
-            label="Ngày Tạo"
-            rules={[
-              {
-                required: true,
-                message: "Vui lòng chọn ngày tạo",
-              },
-            ]}
-          >
-            <DatePicker />
-          </Form.Item>
-          <Form.Item
-            name="createdBy"
-            label="Người Tạo"
-            rules={[
-              {
-                required: true,
-                message: "Vui lòng nhập người tạo",
-              },
-            ]}
-          >
-            <Input />
-          </Form.Item>
+
           <Form.Item>
             <Button type="primary" htmlType="submit">
               Thêm

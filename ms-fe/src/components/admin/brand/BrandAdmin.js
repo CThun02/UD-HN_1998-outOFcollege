@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Input, Row, Col, Button, Form, Modal } from "antd";
+import { Input, Row, Col, Button, Form, Modal, message } from "antd";
 import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
 import BrandTable from "./BrandTable";
 import styles from "./BrandStyle.module.css";
@@ -27,6 +27,7 @@ const BrandAdmin = function () {
         console.log("Thêm thành công");
         setIsModalVisible(false);
         setRender(Math.random);
+        message.success("Thêm thành công");
       })
       .catch((error) => {
         // Xử lý lỗi

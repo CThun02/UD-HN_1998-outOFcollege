@@ -1,11 +1,12 @@
 package com.fpoly.ooc.repository;
 
-import com.fpoly.ooc.entity.Color;
-import com.fpoly.ooc.entity.ProductDetail;
+import com.fpoly.ooc.entity.*;
 import com.fpoly.ooc.responce.product.ProductDetailResponse;
+import com.fpoly.ooc.responce.productdetail.ProductsDetailsResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,26 +26,26 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
             "pd where  pd.product.id=?1 and (pd.status=?2 or ?2 is null)")
     public List<ProductDetailResponse> getProductDetailsTableByIdProduct(Long idPro, String status);
 
-    @Query("select distinct pd.color.id from ProductDetail pd where pd.product.id=?1")
-    public List<Long> getColorsBydIdPro(Long productId);
+    @Query("select distinct pd.color from ProductDetail pd where pd.product.id=?1")
+    public List<Color> getColorsBydIdPro(Long productId);
 
-    @Query("select distinct pd.size.id from ProductDetail pd  where pd.product.id=?1 and pd.status ='ACTIVE'")
-    public List<Long> getSizesBydIdPro(Long productId);
+    @Query("select distinct pd.size from ProductDetail pd  where pd.product.id=?1")
+    public List<Size> getSizesBydIdPro(Long productId);
 
-    @Query("select distinct pd.shirtTail.id from ProductDetail pd  where pd.product.id=?1 and pd.status ='ACTIVE'")
-    public List<Long> getShirtTailsBydIdPro(Long productId);
+    @Query("select distinct pd.shirtTail from ProductDetail pd  where pd.product.id=?1")
+    public List<ShirtTailType> getShirtTailsBydIdPro(Long productId);
 
-    @Query("select distinct pd.material.id from ProductDetail pd  where pd.product.id=?1 and pd.status ='ACTIVE'")
-    public List<Long> getMaterialsBydIdPro(Long productId);
+    @Query("select distinct pd.material from ProductDetail pd  where pd.product.id=?1")
+    public List<Material> getMaterialsBydIdPro(Long productId);
 
-    @Query("select distinct pd.collar.id from ProductDetail pd  where pd.product.id=?1 and pd.status ='ACTIVE'")
-    public List<Long> getCollarsBydIdPro(Long productId);
+    @Query("select distinct pd.collar from ProductDetail pd  where pd.product.id=?1")
+    public List<CollarType> getCollarsBydIdPro(Long productId);
 
-    @Query("select distinct pd.button.id from ProductDetail pd  where pd.product.id=?1 and pd.status ='ACTIVE'")
-    public List<Long> getButtonsBydIdPro(Long productId);
+    @Query("select distinct pd.button from ProductDetail pd  where pd.product.id=?1")
+    public List<ButtonType> getButtonsBydIdPro(Long productId);
 
-    @Query("select distinct pd.sleeve.id from ProductDetail pd  where pd.product.id=?1 and pd.status ='ACTIVE'")
-    public List<Long> getSleevesBydIdPro(Long productId);
+    @Query("select distinct pd.sleeve from ProductDetail pd  where pd.product.id=?1")
+    public List<SleeveType> getSleevesBydIdPro(Long productId);
 
     @Query("select pd.id as id, pd.product as product, pd.button as button, pd.material as material" +
             ", pd.collar as collar, pd.sleeve as sleeve, pd.size as size, pd.color as color"+
@@ -105,5 +106,16 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
             "left join PromotionProduct pp on pd.id = pp.productDetailId.id " +
             "left join Promotion p on p.id = pp.promotion.id " +
             "where p.id = ?1")
-    public List<Long> findAllByIdPromotion(Long promotionId);
+    List<Long> findAllByIdPromotion(Long promotionId);
+
+    @Query(name = "ProductDetail.getProductDetailsTableByConditionDTO", nativeQuery = true)
+    List<ProductsDetailsResponse> getProductDetailsTableByConditionDTO(List<Long> idProducts,
+                                                                       Long idButtons,
+                                                                       Long idMaterials,
+                                                                       Long idCollars,
+                                                                       Long idSleeves,
+                                                                       Long idShirtTailTypes,
+                                                                       Long idSizes,
+                                                                       Long idColors,
+                                                                       String searchText);
 }

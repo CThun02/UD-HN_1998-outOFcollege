@@ -9,6 +9,7 @@ import ModalDetail from './ModalDetail';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import moment from 'moment/moment';
+import { DeleteColumnOutlined, DeleteOutlined } from '@ant-design/icons';
 
 const BillTimeLine = () => {
     const columns = [
@@ -50,14 +51,15 @@ const BillTimeLine = () => {
     const [isModalConfirm, setIsModalConfirm] = useState(false);
     const [isModalDetail, setIsModalDetail] = useState(false);
     const [timelines, setTimelines] = useState([]);
-    const [action, setAction] = useState(null)
-    const [timelinePoduct, setTimelinesPoduct] = useState([])
+    const [action, setAction] = useState(null);
+    const [timelinePoduct, setTimelinesPoduct] = useState([]);
+    const [billInfo, setBillInfo] = useState({});
     const { billId } = useParams();
 
     // tạo mới timeline
     const handleCreateTimeline = async (note, stauts) => {
         const values = { note: note, status: stauts };
-        await axios.post(`http://localhost:8080/api/admin/bill/${billId}/timelines`,
+        await axios.post(`http://localhost:8080/api/admin/timeline/${billId}`,
             values)
             .then((response) => {
                 setTimelines([...timelines, response.data])
@@ -90,16 +92,23 @@ const BillTimeLine = () => {
     };
 
     useEffect(() => {
-        axios.get(`http://localhost:8080/api/admin/bill/${billId}/timeline`)
+        axios.get(`http://localhost:8080/api/admin/timeline/${billId}`)
             .then((response) => {
                 setTimelines(response.data)
             })
             .catch((error) => {
                 console.log(error)
             })
-        axios.get(`http://localhost:8080/api/admin/bill/${billId}/product`)
+        axios.get(`http://localhost:8080/api/admin/timeline/${billId}/product`)
             .then((response) => {
                 setTimelinesPoduct(response.data)
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+        axios.get(`http://localhost:8080/api/admin/timeline/${billId}/info`)
+            .then((response) => {
+                setBillInfo(response.data)
             })
             .catch((error) => {
                 console.log(error)
@@ -111,23 +120,63 @@ const BillTimeLine = () => {
         {
             title: 'Sản phẩm',
             key: 'product',
+            width: 500,
             render: (_, record, index) => {
                 return (
-                    <div style={{ display: 'flex', alignItems: 'center', fontSize: '15px' }}>
-                        <div style={{ marginLeft: '5%' }}>
-                            <img src={record.imgDefault} alt={record.productName} />
-                        </div>
-                        <div style={{ marginLeft: '30%' }}>
-                            <h3>{record.productName}</h3>
-                            <p>Size: <b>{record.productSize}</b></p>
-                            <p>Màu sắc: {record.productColor}</p>
-                            <p>Chất liệu: <b>{record.productMaterial}</b></p>
-                            <p>Cổ áo: <b>{record.productCollar}</b></p>
-                            <p>Cúc: <b>{record.productButton}</b></p>
-                            <p>Tay áo: <b>{record.productSleeve}</b></p>
-                            <p>Đuôi áo: <b>{record.productShirtTail}</b></p>
-                        </div>
-                    </div>
+                    <Row>
+                        <Col span={6}>
+                            <div
+                                style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    height: "100%",
+                                }}
+                            >
+                                <img
+                                    src={record.imgDefault === null ?
+                                        "https://vapa.vn/wp-content/uploads/2022/12/anh-3d-thien-nhien.jpeg"
+                                        : record.imgDefault
+                                    }
+                                    width={"100%"}
+                                    alt=""
+                                />
+                            </div>
+                        </Col>
+                        <Col span={12}>
+                            <div style={{ textAlign: "left", marginLeft: 20 }}>
+                                <h6 >
+                                    {record.productName} {" - "}
+                                    <span className={styles.optionColor}>
+                                        <span
+                                            style={{
+                                                backgroundColor: record.productColor,
+                                            }}
+                                        ></span>
+                                        {record.productColor}
+                                    </span>
+                                </h6>
+                                <span style={{ fontWeight: 500, marginRight: 20 }}>
+                                    Kích cỡ: {record.productSize}
+                                </span>
+                                <br />
+                                <span style={{ fontWeight: 500 }}>
+                                    Chất liệu: {record.productMaterial}
+                                </span>
+                                <br />
+                                <span style={{ fontWeight: 500 }}>
+                                    Nút áo: {record.productButton}
+                                </span>
+                                <br />
+                                <span style={{ fontWeight: 500 }}>
+                                    Cổ áo: {record.productCollar}
+                                </span>
+                                <br />
+                                <span style={{ fontWeight: 500 }}>
+                                    Đuôi áo: {record.productShirtTail}
+                                </span>
+                            </div>
+                        </Col>
+                    </Row>
                 )
             },
         },
@@ -142,53 +191,111 @@ const BillTimeLine = () => {
             key: 'productPrice',
         },
     ]
-
+    console.log('bill type', billInfo.billType)
     return (
         <>
             <section className={styles.background}>
                 <div style={{ overflowX: 'scroll' }}>
                     <div style={{ width: 'fit-content' }}>
-                        <Timeline minEvents={6} placeholder className={styles.timeLine}>
-                            {timelines && timelines.map((data) => (
-                                <TimelineEvent
-                                    color={data.status === '0' ? '#FF0000' : '#00cc00'}
-                                    icon={data.status === '1' ? (
-                                        FaRegFileAlt
-                                    ) : data.status === '0' ? (
-                                        FaTimes
-                                    ) : (
-                                        FaRegCheckCircle
-                                    )}
-                                    title={data.status === '1' ? 'Tạo hóa đơn' : data.status === '2' ? 'Thanh toán thành công' : data.status === '0' ? 'Đã hủy' : ''}
-                                    subtitle={moment(data.createdDate)
-                                        .format("DD/MM/YYYY HH:MM")}
-                                />
-                            ))}
-                        </Timeline>
+                        {billInfo?.billType === 'Online' ? (
+                            <Timeline minEvents={6} placeholder className={styles.timeLine}>
+                                {timelines && timelines.map((data) => (
+                                    <TimelineEvent
+                                        color={data.status === '0' ? '#FF0000' : '#00cc00'}
+                                        icon={data.status === '1' ? (
+                                            FaRegFileAlt
+                                        ) : data.status === '0' ? (
+                                            FaTimes
+                                        ) : data.status === '2' ? (
+                                            FaRegFileAlt
+                                        ) : data.status === '3' ? (
+                                            FaTruck
+                                        ) : (
+                                            FaTimes
+                                        )}
+                                        title={data.status === '0' ? 'Đã hủy'
+                                            : data.status === '1'
+                                                ? 'Chờ xác nhận'
+                                                : data.status === '2'
+                                                    ? 'Đã xác nhận'
+                                                    : data.status === '3'
+                                                        ? 'Đã đóng gói & đang được giao' : 'Giao hàng thành công'}
+                                        subtitle={moment(data.createdDate)
+                                            .format("DD/MM/YYYY HH:MM")}
+                                    />
+                                ))}
+                            </Timeline>
+                        ) : (
+                            <Timeline minEvents={6} placeholder className={styles.timeLine}>
+                                {timelines && timelines.map((data) => (
+                                    <TimelineEvent
+                                        color={data.status === '0' ? '#FF0000' : '#00cc00'}
+                                        icon={data.status === '1' ? (
+                                            FaRegFileAlt
+                                        ) : data.status === '0' ? (
+                                            FaTimes
+                                        ) : (
+                                            FaRegCheckCircle
+                                        )}
+                                        title={data.status === '1' ? 'Chờ xác nhận' : data.status === '2' ? 'Thanh toán thành công' : data.status === '0' ? 'Đã hủy' : ''}
+                                        subtitle={moment(data.createdDate)
+                                            .format("DD/MM/YYYY HH:MM")}
+                                    />
+                                ))}
+                            </Timeline>
+                        )}
                     </div>
                 </div>
                 <div className={styles.btnHeader} style={{ marginTop: 24 }}>
-                    {(timelines.length !== 2) && (
-                        <Button
-                            type="primary"
-                            onClick={() => {
-                                setAction('confirm');
-                                showModalConfirm()
-                            }}>
-                            Xác nhận
-                        </Button>
+                    {billInfo.billType !== 'Online' && timelines.length !== 2 && (
+                        <>
+                            <Button
+                                type="primary"
+                                onClick={() => {
+                                    setAction('confirm');
+                                    showModalConfirm();
+                                }}
+                            >
+                                Xác nhận
+                            </Button>
+                            <Button
+                                type="primary"
+                                danger
+                                style={{ margin: '0 10px' }}
+                                onClick={() => {
+                                    setAction('cancel');
+                                    showModalConfirm();
+                                }}
+                            >
+                                Hủy
+                            </Button>
+                        </>
                     )}
-                    {(timelines.length !== 2) && (
-                        <Button type='primary'
-                            danger
-                            style={{ margin: '0 10px' }}
-                            onClick={() => {
-                                setAction('cancel');
-                                showModalConfirm()
-                            }}
-                        > Hủy</Button>
+                    {console.log('timeline', timelines.length)}
+                    {billInfo.billType !== 'In-store' && (timelines.length !== 3 && timelines.length !== 4) && (
+                        <>
+                            <Button
+                                type="primary"
+                                onClick={() => {
+                                    setAction('confirm');
+                                    showModalConfirm();
+                                }}
+                            >
+                                Xác nhận
+                            </Button>
+                            <Button
+                                type="primary"
+                                danger
+                                style={{ margin: '0 10px' }}
+                                onClick={() => {
+                                    setAction('cancel');
+                                    showModalConfirm();
+                                }}
+                            >
+                                Hủy
+                            </Button>
+                        </>
                     )}
-                    {console.log(action)}
                     <ModalConfirm
                         isModalOpen={isModalConfirm}
                         handleCancel={handleCancelConfirm}
@@ -201,7 +308,7 @@ const BillTimeLine = () => {
                         Chi tiết
                     </Button>
                     <div >
-                        <ModalDetail timelineDetail={timelines} isModalOpen={isModalDetail} handleCancel={handleOkDetail} handleOk={handleOkDetail} />
+                        <ModalDetail timelineDetail={timelines} isModalOpen={isModalDetail} handleCancel={handleOkDetail} handleOk={handleOkDetail} billType={billInfo.billType} />
                     </div>
                 </div>
             </section >
@@ -221,24 +328,30 @@ const BillTimeLine = () => {
                         <Row>
                             <Col span={12}>
                                 <span className={styles.span}>Mã đơn hàng</span>
-                                <span className={styles.span}>Loại đơn hàng</span>
-                                <span className={styles.span}>Trạng thái </span>
+                                <span className={styles.span}>HÌnh thức thanh toán</span>
+                                <span className={styles.span}>Ngày đặt hàng</span>
+                                <span className={styles.span}>Phương thức thanh toán</span>
+                                <span className={styles.span}>Hình thức giao hàng </span>
                                 <span style={{ fontSize: '16px', display: 'block' }}>Ngày nhận hàng dự kiến</span>
                             </Col>
                             <Col span={12}>
                                 <div style={{ display: 'flex', alignItems: 'center', width: '10px', margin: '20px 0 20px 0' }}>
-                                    <SpanBorder child={'HD1100'} color={'#1677ff'} />
+                                    <SpanBorder child={billInfo.billCode} color={'#1677ff'} />
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', width: '10px', margin: '20px 0 20px 0' }}>
+                                    <SpanBorder child={billInfo.billType} color={'#1677ff'} />
                                 </div>
                                 <div style={{ display: 'flex', alignItems: 'center', width: '10px', marginBottom: '20px' }}>
-                                    <SpanBorder child={timelines[0]?.billType} color={'#1677ff'} />
+                                    <SpanBorder child={moment(billInfo.createdDate).format('HH:MM  DD/MM/YYYY')} color={'#1677ff'} />
                                 </div>
                                 <div style={{ display: 'flex', alignItems: 'center', width: '10px', marginBottom: '20px' }}>
-                                    <SpanBorder child={timelines[timelines.length - 1]?.status === '1' ? 'Đang chờ' : timelines[timelines.length - 1]?.status === '0' ? 'Đã hủy' : 'Thanh toán thành công'} color={timelines[timelines.length - 1]?.status === '0' ? '#FF0000' : '#00cc00'} />
+                                    <SpanBorder child={'Thanh toán khi nhận hàng'} color={'#1677ff'} />
                                 </div>
                                 <div style={{ display: 'flex', alignItems: 'center', width: '50px' }}>
-                                    <SpanBorder child={moment(timelines[0]?.completionDate)
-                                        .format('HH:MM  DD/MM/YYYY')} color={'gray'} />
-
+                                    {billInfo.billType === "Online" && (
+                                        <SpanBorder child={'Giao hàng tại nhà'} color={'gray'} />
+                                    )}
+                                    {billInfo.billType !== "Online" && "__"}
                                 </div>
                             </Col>
                         </Row>
@@ -252,17 +365,17 @@ const BillTimeLine = () => {
                                 <span className={styles.span}>Địa chỉ</span>
                             </Col>
                             <Col span={12}>
-                                <span className={styles.span}>{timelines[0]?.fullName || 'khách lẻ'}</span>
-                                <span className={styles.span}>{timelines[0]?.phoneNumber || '__'}</span>
-                                <span className={styles.span}>{timelines[0]?.email || '__'}</span>
-                                <span style={{ fontSize: '16px', display: 'block' }}>{timelines[0]?.address || '__'}</span>
+                                <span className={styles.span}>{billInfo.fullName || 'khách lẻ'}</span>
+                                <span className={styles.span}>{billInfo.phoneNumber || '__'}</span>
+                                <span className={styles.span}>{billInfo.email || '__'}</span>
+                                <span style={{ fontSize: '16px', display: 'block' }}>{billInfo.address || '__'}</span>
                             </Col>
                         </Row>
                     </Col>
                 </Row>
             </section>
 
-            <section className={styles.background} style={{ marginTop: '20px' }}>
+            {/* <section className={styles.background} style={{ marginTop: '20px' }}>
                 <Row>
                     <Col span={12}>
                         <h2>Lịch sử thanh toán</h2>
@@ -273,7 +386,7 @@ const BillTimeLine = () => {
                 </Row>
                 <Divider className={styles.blackDivider} style={{ marginTop: '10px' }} />
                 <Table columns={columns} dataSource={[timelines[0]]} pagination={false} />
-            </section>
+            </section> */}
 
             <section className={styles.background} style={{ marginTop: '20px' }}>
                 <Row>
@@ -285,22 +398,48 @@ const BillTimeLine = () => {
                     </Col>
                 </Row>
                 <Divider className={styles.blackDivider} style={{ marginTop: '10px' }} />
-                <Table columns={columnProduct} dataSource={timelinePoduct} pagination={false} />
-                <Row className={styles.timeLineEnd}>
-                    <Col span={12}>
-                        <span className={styles.span}>Tổng tiền hàng</span>
-                        <span className={styles.span}>Giảm giá</span>
-                        <span className={styles.span}>Phí vận chuyển</span>
-                        <span className={styles.span}>Tổng cộng</span>
-                    </Col>
-                    <Col span={12}  >
-                        <span className={styles.span}>{timelines[0]?.totalPrice}</span>
-                        <span className={styles.span}>0đ</span>
-                        <span className={styles.span}>0d</span>
-                        <span style={{ fontSize: '16px', display: 'block', color: '#FF0000' }}>{timelines[0]?.totalPrice}đ</span>
-                    </Col>
-                </Row>
-            </section>
+                <Table columns={columnProduct}
+                    dataSource={timelinePoduct}
+                    pagination={false}
+
+                />
+                <div className={styles.timeLineEnd}>
+                    <span className={styles.span} >
+                        <span style={{ width: '198px', display: 'inline-block' }}>
+                            Thành tiền:
+                        </span>
+                        <span>
+                            {timelines[0]?.totalPrice.toLocaleString('vi-VN', {
+                                style: 'currency',
+                                currency: 'VND'
+                            })}
+                        </span>
+                    </span>
+                    <span className={styles.span}>
+                        <span style={{ width: '200px', display: 'inline-block' }}>
+                            Giảm giá:
+                        </span>
+                        <span >
+                            0đ
+                        </span>
+                    </span>
+                    <span className={styles.span}>
+                        <span style={{ width: '200px', display: 'inline-block' }}>
+                            Phí vận chuyển:
+                        </span>
+                        <span >
+                            0đ
+                        </span>
+                    </span>
+                    <b className={styles.span} >
+                        <span style={{ width: '200px', display: 'inline-block' }}>Tổng cộng: </span>
+                        <span style={{ fontSize: '16px', color: '#FF0000' }}>{timelines[0]?.totalPrice
+                            .toLocaleString('vi-VN', {
+                                style: 'currency',
+                                currency: 'VND'
+                            })}</span></b>
+                </div>
+            </section >
         </>
     );
 };

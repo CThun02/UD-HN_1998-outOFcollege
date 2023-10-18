@@ -2,6 +2,7 @@ package com.fpoly.ooc.service.impl;
 
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
+import com.fpoly.ooc.dto.DeleteProductDetailInPromotionDTO;
 import com.fpoly.ooc.dto.PromotionProductDTO;
 import com.fpoly.ooc.entity.ProductDetail;
 import com.fpoly.ooc.entity.Promotion;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -31,7 +33,7 @@ public class PromotionProductDetailServiceImpl implements PromotionProductDetail
 
         PromotionProduct promotionProduct = validation(dto);
 
-        if(promotionProduct == null) {
+        if (promotionProduct == null) {
             return null;
         }
 
@@ -39,14 +41,16 @@ public class PromotionProductDetailServiceImpl implements PromotionProductDetail
     }
 
     @Override
-    public void deletePromotionProduct(Long idPromotion, Long idProductDetail) {
-        Long id = promotionProductDetailRepository.findIdPromotionProduct(idProductDetail, idPromotion);
+    public void deletePromotionProduct(DeleteProductDetailInPromotionDTO dto) {
+        List<Long> ids = promotionProductDetailRepository.findIdPromotionProduct(dto.getProductDetailIds(), dto.getPromotionId());
 
-        if(id == null) {
+        if (ids == null) {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND));
         }
 
-        promotionProductDetailRepository.deleteById(id);
+        for (Long id : ids) {
+            promotionProductDetailRepository.deleteById(id);
+        }
     }
 
     private PromotionProduct validation(PromotionProductDTO dto) {
@@ -75,16 +79,11 @@ public class PromotionProductDetailServiceImpl implements PromotionProductDetail
 
         Double priceProduct = convertBigDecimal(productDetail.getPrice());
         Double promotionValue = convertBigDecimal(promotion.getPromotionValue());
-        Double promotionValueMax = convertBigDecimal(promotion.getPromotionMaxValue());
         Double valuePercent = (priceProduct * promotionValue) / 100;
         double moneyAfter = 0d;
 
         if (promotion.getPromotionMethod().equals("%")) {
-            if (valuePercent > promotionValueMax) {
-                moneyAfter = priceProduct - promotionValueMax;
-            } else {
-                moneyAfter = priceProduct - valuePercent;
-            }
+            moneyAfter = priceProduct - valuePercent;
         } else {
             moneyAfter = priceProduct - promotionValue;
         }

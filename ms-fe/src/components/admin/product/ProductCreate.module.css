@@ -13,7 +13,7 @@
 
 .product__createFrame {
   width: 30%;
-  height: 65%;
+  height: auto;
   overflow: auto;
   background-color: white;
   border-radius: 4px;

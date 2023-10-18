@@ -1,7 +1,7 @@
 import React from "react";
 import { FormOutlined, DeleteFilled } from "@ant-design/icons";
 
-import { Table, Space, Button, Modal, Input, DatePicker } from "antd";
+import { Table, Space, Button, Modal, Input, message, Switch } from "antd";
 import { useEffect, useState } from "react";
 import styles from "./BrandStyle.module.css";
 import axios from "axios";
@@ -9,14 +9,13 @@ import axios from "axios";
 const BrandTable = function (props) {
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-
+  const [messageApi, contextHolder] = message.useMessage();
   const [showModal, setShowModal] = useState(false);
   const [selectedData, setSelectedData] = useState(null);
 
-  const [selectedItem, setSelectedItem] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [brandName, setBrandName] = useState("");
-  const [status, setStatus] = useState("");
+
   const [id, setid] = useState("");
 
   const [render, setRender] = useState();
@@ -33,7 +32,7 @@ const BrandTable = function (props) {
     setSelectedData(id);
   };
   const handleUpdate = () => {
-    let brand={}
+    let brand = {};
     axios
       .put(`http://localhost:8080/api/admin/brand/edit/${id}`, {
         brandName,
@@ -42,8 +41,30 @@ const BrandTable = function (props) {
         // Đóng modal
         setShowDetailsModal(false);
         setRender(Math.random);
+        message.success("Cập nhật thành công");
       })
       .catch((err) => console.log(err));
+  };
+  const handleUpdateStatus = (id, statusUpdate) => {
+    let mess = statusUpdate ? "Đang hoạt động" : "Ngưng hoạt động";
+
+    const updatedStatusValue = statusUpdate ? "ACTIVE" : "INACTIVE"; // Cập nhật trạng thái dựa trên giá trị của statusUpdate
+
+    axios
+      .put(`http://localhost:8080/api/admin/brand/update/${id}`, {
+        status: updatedStatusValue,
+      })
+      .then((response) => {
+        setRender(Math.random);
+        setTimeout(() => {
+          messageApi.success(mess, 2);
+        }, 500);
+      })
+      .catch((error) => {
+        setTimeout(() => {
+          messageApi.error(`Cập nhật trạng thái thất bại`, 2);
+        }, 500);
+      });
   };
 
   const handleConfirmDelete = () => {
@@ -74,7 +95,13 @@ const BrandTable = function (props) {
     <div>
       {console.log(data)}
       <Table
-        pagination={{ pageSize: 5 }}
+        pagination={{
+          showSizeChanger: true,
+          pageSizeOptions: [5, 10, 15, 20],
+          defaultPageSize: 5,
+          showLessItems: true,
+          style: { marginRight: "10px" },
+        }}
         dataSource={data}
         columns={[
           {
@@ -92,9 +119,20 @@ const BrandTable = function (props) {
             key: "brandName",
           },
           {
+            key: "status",
             title: "Trạng thái",
             dataIndex: "status",
-            key: "status",
+            width: 150,
+            render: (status, record) => (
+              <>
+                <Switch
+                  onChange={(checked) => {
+                    handleUpdateStatus(record.id, checked);
+                  }}
+                  checked={status === "ACTIVE"}
+                />
+              </>
+            ),
           },
           {
             title: "Ngày tạo",
@@ -154,6 +192,7 @@ const BrandTable = function (props) {
       >
         <p>Bạn có chắc chắn muốn xoá dữ liệu này?</p>
       </Modal>
+      {contextHolder}
     </div>
   );
 };

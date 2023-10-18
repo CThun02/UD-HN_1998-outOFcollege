@@ -1,6 +1,7 @@
 package com.fpoly.ooc.controller;
 
 import com.fpoly.ooc.constant.Const;
+import com.fpoly.ooc.dto.ProductDetailsDTO;
 import com.fpoly.ooc.entity.Product;
 import com.fpoly.ooc.entity.ProductDetail;
 import com.fpoly.ooc.entity.ProductImage;
@@ -13,15 +14,17 @@ import com.fpoly.ooc.service.interfaces.ProductDetailServiceI;
 import com.fpoly.ooc.service.interfaces.ProductImageServiceI;
 import com.fpoly.ooc.service.interfaces.ProductServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @RestController
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:3000/", maxAge = 3600)
 @RequestMapping("/api/admin/product")
 public class ProductController {
     private ProductServiceI service;
@@ -36,28 +39,24 @@ public class ProductController {
     }
 
     @GetMapping("/getAllProductDetail")
-    public ResponseEntity<?> getAllProductDetail(){
-            return ResponseEntity.ok(productDetailService.getAll());
+    public ResponseEntity<?> getAllProductDetail() {
+        return ResponseEntity.ok(productDetailService.getAll());
     }
 
     @GetMapping("/getProductCreateDetail")
-    public ResponseEntity<?> getProductCreateDetail(){
+    public ResponseEntity<?> getProductCreateDetail() {
         return ResponseEntity.ok(service.getProductCreateDetail("ACTIVE"));
     }
 
     @GetMapping("/filterByCom")
     public ResponseEntity<?> filterByCom(@RequestParam Optional<Long> brandId,
                                          @RequestParam Optional<Long> categoryId,
-                                         @RequestParam Optional<Long> patternId,
-                                         @RequestParam Optional<Long> formId,
                                          @RequestParam Optional<String> status
                                          ){
         if(status.get().equals("ALL") || status.get().equals("")){
-            return ResponseEntity.ok(service.getProductFilterByCom(brandId.orElse(null), categoryId.orElse(null),
-                    patternId.orElse(null), formId.orElse(null), null));
+            return ResponseEntity.ok(service.getProductFilterByCom(brandId.orElse(null), categoryId.orElse(null),null));
         }else{
-            return ResponseEntity.ok(service.getProductFilterByCom(brandId.orElse(null), categoryId.orElse(null),
-                    patternId.orElse(null), formId.orElse(null), status.orElse(null)));
+            return ResponseEntity.ok(service.getProductFilterByCom(brandId.orElse(null), categoryId.orElse(null), status.orElse(null)));
         }
     }
 
@@ -112,7 +111,7 @@ public class ProductController {
     }
 
     @GetMapping("/getProductEdit")
-    public ProductResponse getProductEdit(@RequestParam("productId")Long productId){
+    public ProductResponse getProductEdit(@RequestParam("productId") Long productId) {
         return service.getProductResponseById(productId);
     }
 
@@ -154,7 +153,7 @@ public class ProductController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> createProduct(@RequestBody ProductRequest request){
+    public ResponseEntity<?> createProduct(@RequestBody ProductRequest request) {
         Product product = request.dto();
         product.setId(null);
         product.setStatus(Const.STATUS_ACTIVE);
@@ -170,24 +169,6 @@ public class ProductController {
             ProductDetail productDetail = request.dto();
             productDetail.setStatus(Const.STATUS_ACTIVE);
             productDetail = productDetailService.create(productDetail);
-        }else {
-            ProductDetail productDetail = ProductDetail.builder()
-                    .id(productDetailResponse.getId())
-                    .product(productDetailResponse.getProduct())
-                    .button(productDetailResponse.getButton())
-                    .material(productDetailResponse.getMaterial())
-                    .collar(productDetailResponse.getCollar())
-                    .sleeve(productDetailResponse.getSleeve())
-                    .size(productDetailResponse.getSize())
-                    .color(productDetailResponse.getColor())
-                    .shirtTail(productDetailResponse.getShirtTail())
-                    .price(productDetailResponse.getPrice())
-                    .descriptionDetail(productDetailResponse.getDescriptionDetail())
-                    .quantity(productDetailResponse.getQuantity())
-                    .build();
-            productDetail.setStatus(Const.STATUS_ACTIVE);
-            productDetail.setDeletedAt(null);
-            productDetail = productDetailService.update(productDetail);
         }
         return ResponseEntity.ok(productDetailResponse);
 
@@ -200,7 +181,7 @@ public class ProductController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<?> updateProduct(@RequestBody ProductRequest request){
+    public ResponseEntity<?> updateProduct(@RequestBody ProductRequest request) {
         Product product = request.dto();
         product.setDeletedAt(null);
         return ResponseEntity.ok(service.update(product));
@@ -208,7 +189,7 @@ public class ProductController {
 
 
     @PutMapping("/updateProductStatus")
-    public ResponseEntity<?> updateProductStatus(@RequestParam Long productId, @RequestParam String status){
+    public ResponseEntity<?> updateProductStatus(@RequestParam Long productId, @RequestParam String status) {
         Product product = service.getOne(productId);
         product.setStatus(status);
         product.setDeletedAt(null);
@@ -237,4 +218,20 @@ public class ProductController {
         productImageService.delete(productImage);
         return ResponseEntity.ok("ok");
     }
+
+    @GetMapping("/promotion")
+    public ResponseEntity<?> findProductPromotion(
+            @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
+            @RequestParam(value = "pageSize", defaultValue = "5") Integer pageSize
+    ) {
+        return ResponseEntity.ok(service.findProductPromotion(PageRequest.of(pageNo, pageSize)));
+    }
+
+    @PostMapping("/by-product-details-dto")
+    public ResponseEntity<?> findProuctDetailsByListIdProduct(
+            @RequestBody ProductDetailsDTO dto
+    ) {
+        return ResponseEntity.ok(productDetailService.findListProductdetailsByListProductId(dto));
+    }
+
 }

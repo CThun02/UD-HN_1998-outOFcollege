@@ -2,11 +2,15 @@ package com.fpoly.ooc.service.impl;
 
 import com.fpoly.ooc.entity.Product;
 import com.fpoly.ooc.repository.ProductDAORepositoryI;
+import com.fpoly.ooc.responce.product.ProductDetailResponse;
+import com.fpoly.ooc.responce.product.ProductPromotionResponse;
 import com.fpoly.ooc.responce.product.ProductResponse;
 import com.fpoly.ooc.responce.product.ProductTableResponse;
 import com.fpoly.ooc.service.interfaces.ProductServiceI;
 import com.fpoly.ooc.utilities.UniqueRandomHex;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -84,8 +88,8 @@ public class ProductServiceImpl implements ProductServiceI {
     }
 
     @Override
-    public List<ProductTableResponse> getProductFilterByCom(Long brandId, Long categoryId, Long patternId, Long formId, String status) {
-        return repo.getProductFilterByCom(brandId, categoryId, patternId, formId, status);
+    public List<ProductTableResponse> getProductFilterByCom(Long brandId, Long categoryId, String status) {
+        return repo.getProductFilterByCom(brandId, categoryId, status);
     }
 
     @Override
@@ -93,4 +97,13 @@ public class ProductServiceImpl implements ProductServiceI {
         return repo.getProductCreateDetail(status);
     }
 
+    @Override
+    public Page<ProductPromotionResponse> findProductPromotion(Pageable pageable) {
+        return repo.findProductPromotion(pageable);
+    }
+
+    @Override
+    public List<Long> findIdsProductsByIdPromotion(Long idPromotion) {
+        return repo.findAllByIdPromotion(idPromotion);
+    }
 }

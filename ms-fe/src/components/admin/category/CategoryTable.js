@@ -1,14 +1,15 @@
 import React from "react";
 import { FormOutlined, DeleteFilled } from "@ant-design/icons";
-import { Table, Space, Button, Modal, Input, DatePicker } from "antd";
+import { Table, Space, Button, Modal, Input,message,Switch } from "antd";
 import { useEffect, useState } from "react";
 import styles from "./CategoryStyle.module.css";
 import axios from "axios";
-import moment from "moment";
 
-const CategoryTable = function () {
+
+const CategoryTable = function (props) {
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [messageApi, contextHolder] = message.useMessage();
 
   const [showModal, setShowModal] = useState(false);
   const [selectedData, setSelectedData] = useState(null);
@@ -16,54 +17,52 @@ const CategoryTable = function () {
   const [selectedItem, setSelectedItem] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [categoryName, setCategoryName] = useState("");
-  const [status, setStatus] = useState("");
+
   const [id, setid] = useState("");
-  const [createdBy, setCreatedBy] = useState("");
+  const [render, setRender] = useState();
 
   const handleDetails = (item) => {
     setSelectedItem(item);
     setid(item?.id);
     setCategoryName(item?.categoryName);
-    setStatus(item?.status);
-    setCreatedBy(item?.createdBy);
     setShowDetailsModal(true);
   };
 
-  const handleDateChange = (dateString) => {
-    // Cập nhật trạng thái ngày tạo
-    setSelectedItem((prevItem) => ({
-      ...prevItem,
-      createdAt: dateString,
-    }));
-  };
-
   const handleUpdate = () => {
+    let category = {};
     axios
       .put(`http://localhost:8080/api/admin/category/edit/${id}`, {
         categoryName,
-        status,
-        createdAt: selectedItem?.createdAt,
-        createdBy,
       })
       .then((response) => {
         // Cập nhật lại danh sách dữ liệu sau khi cập nhật thành công
-        const updatedData = data.map((item) => {
-          if (item.id === id) {
-            return {
-              ...item,
-              categoryName,
-              status,
-              createdAt: selectedItem?.createdAt,
-              createdBy,
-            };
-          }
-          return item;
-        });
-        setData(updatedData);
-        // Đóng modal
+
         setShowDetailsModal(false);
+        setRender(Math.random);
+        message.success("Cập nhật thành công");
       })
       .catch((err) => console.log(err));
+  };
+  const handleUpdateStatus = (id, statusUpdate) => {
+    let mess = statusUpdate ? "Đang hoạt động" : "Ngưng hoạt động";
+
+    const updatedStatusValue = statusUpdate ? "ACTIVE" : "INACTIVE"; // Cập nhật trạng thái dựa trên giá trị của statusUpdate
+
+    axios
+      .put(`http://localhost:8080/api/admin/category/update/${id}`, {
+        status: updatedStatusValue,
+      })
+      .then((response) => {
+        setRender(Math.random);
+        setTimeout(() => {
+          messageApi.success(mess, 2);
+        }, 500);
+      })
+      .catch((error) => {
+        setTimeout(() => {
+          messageApi.error(`Cập nhật trạng thái thất bại`, 2);
+        }, 500);
+      });
   };
 
   const handleDelete = (id) => {
@@ -93,12 +92,19 @@ const CategoryTable = function () {
         console.log(response.data);
       })
       .catch((err) => console.log(err));
-  }, []);
+  }, [props.renderTable, render]);
 
   return (
     <div>
       {console.log(data)}
       <Table
+           pagination={{
+            showSizeChanger: true,
+            pageSizeOptions: [5, 10, 15, 20],
+            defaultPageSize: 5,
+            showLessItems: true,
+            style: { marginRight: "10px" },
+          }}
         dataSource={data}
         columns={[
           {
@@ -115,9 +121,20 @@ const CategoryTable = function () {
             key: "categoryName",
           },
           {
+            key: "status",
             title: "Trạng thái",
             dataIndex: "status",
-            key: "status",
+            width: 150,
+            render: (status, record) => (
+              <>
+                <Switch
+                  onChange={(checked) => {
+                    handleUpdateStatus(record.id, checked);
+                  }}
+                  checked={status === "ACTIVE"}
+                />
+              </>
+            ),
           },
           {
             title: "Ngày tạo",
@@ -157,9 +174,6 @@ const CategoryTable = function () {
         onCancel={() => setShowDetailsModal(false)}
         footer={null}
       >
-        <p>
-          STT <Input value={id} onChange={(e) => setid(e.target.value)} />
-        </p>
         <br></br>
         <p>
           Tên_Loại
@@ -168,30 +182,9 @@ const CategoryTable = function () {
             onChange={(e) => setCategoryName(e.target.value)}
           />
         </p>
+
         <br></br>
-        <p>
-          Trạng_Thái
-          <Input value={status} onChange={(e) => setStatus(e.target.value)} />
-        </p>
-        <br></br>
-        <p>
-          Ngày_tạo
-          <br></br>
-          <DatePicker
-            value={moment(selectedItem?.createdAt)}
-            format="DD/MM/YYYY"
-            onChange={(date, dateString) => handleDateChange(dateString)}
-          />
-        </p>
-        <br></br>
-        <p>
-          Người_Tạo
-          <Input
-            value={createdBy}
-            onChange={(e) => setCreatedBy(e.target.value)}
-          />
-        </p>
-        <br></br>
+
         <Button className="primary" onClick={handleUpdate}>
           Update
         </Button>
@@ -205,6 +198,7 @@ const CategoryTable = function () {
       >
         <p>Bạn có chắc chắn muốn xoá dữ liệu này?</p>
       </Modal>
+      {contextHolder}
     </div>
   );
 };

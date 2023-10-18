@@ -13,7 +13,5 @@ public interface ProductResponse {
     public String getImgDefault();
     public Category getCategory();
     public Brand getBrand();
-    public Pattern getPattern();
-    public Form getForm();
     public String getStatus();
 }

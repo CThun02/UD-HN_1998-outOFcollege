@@ -14,5 +14,4 @@ public interface BrandServiceI {
     public Brand getOne(Long id);
     public Brand findFirstByBrandName(String brandName);
    Brand updateStatus(BrandRequest request, Long id);
-
 }

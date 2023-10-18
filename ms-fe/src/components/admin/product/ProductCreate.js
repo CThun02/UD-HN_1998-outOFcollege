@@ -31,10 +31,6 @@ const ProductCreate = (props) => {
   const [brandCreate, setBrandCreate] = useState("");
   const [categories, setCategories] = useState([]);
   const [categoryCreate, setCategoryCreate] = useState("");
-  const [forms, setForms] = useState([]);
-  const [formCreate, setFormCreate] = useState("");
-  const [patterns, setPatterns] = useState([]);
-  const [patternCreate, setPatternCreate] = useState("");
   const renderIndex = props.render;
   const isUpdate = props.isUpdate;
   const [render, setRender] = useState(null);
@@ -44,8 +40,6 @@ const ProductCreate = (props) => {
     productName: " ",
     brandId: " ",
     categoryId: " ",
-    patternId: " ",
-    formId: " ",
     description: " ",
     status: "ACTIVE",
   });
@@ -117,60 +111,6 @@ const ProductCreate = (props) => {
     }
   }
 
-  function createPattern(event) {
-    event.stopPropagation();
-    messageApi.loading("Đang tải", 1);
-    if (patternCreate.trim() !== "") {
-      axios
-        .post(api + "pattern?patternName=" + patternCreate, null)
-        .then((res) => {
-          setTimeout(() => {
-            if (res.data === "") {
-              messageApi.error("Họa tiết đã tồn tại!", 1);
-            } else {
-              messageApi.success("Thêm hoạt tiết thành công!", 1);
-              setRender(res.data);
-            }
-            setPatternCreate(" ");
-          }, 1000);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    } else {
-      setTimeout(() => {
-        messageApi.error("Vui lòng nhập hoạt tiết!", 1);
-      }, 1000);
-    }
-  }
-
-  function createForm(event) {
-    event.stopPropagation();
-    messageApi.loading("Đang tải", 1);
-    if (formCreate.trim() !== "") {
-      axios
-        .post(api + "form?formName=" + formCreate, null)
-        .then((res) => {
-          setTimeout(() => {
-            if (res.data === "") {
-              messageApi.error("Dáng áo đã tồn tại!", 1);
-            } else {
-              messageApi.success("Thêm dáng áo thành công!", 1);
-              setRender(res.data);
-            }
-            setFormCreate(" ");
-          }, 1000);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    } else {
-      setTimeout(() => {
-        messageApi.error("Vui lòng nhập dáng áo!", 1);
-      }, 1000);
-    }
-  }
-
   function createProduct() {
     for (let key in product) {
       if (isString(product[key])) {
@@ -187,12 +127,9 @@ const ProductCreate = (props) => {
           messageApi.loading("Vui lòng chờ!", 2);
           setTimeout(() => {
             messageApi.success("Thêm mới thành công!", 2);
-            closeFrame("productCreate", "productCreateFrame");
             handleSetProduct("productName", " ");
             handleSetProduct("brandId", " ");
             handleSetProduct("categoryId", " ");
-            handleSetProduct("patternId", " ");
-            handleSetProduct("formId", " ");
             handleSetProduct("description", " ");
             renderIndex(res.data);
             setTimeout(() => {
@@ -202,6 +139,7 @@ const ProductCreate = (props) => {
                 icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
               });
             }, 3000);
+            closeFrame("productCreate", "productCreateFrame");
           }, 2000);
         })
         .catch((err) => {
@@ -270,22 +208,6 @@ const ProductCreate = (props) => {
       .get(api + "category")
       .then((res) => {
         setCategories(res.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-    axios
-      .get(api + "pattern")
-      .then((res) => {
-        setPatterns(res.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-    axios
-      .get(api + "form")
-      .then((res) => {
-        setForms(res.data);
       })
       .catch((error) => {
         console.log(error);
@@ -413,96 +335,6 @@ const ProductCreate = (props) => {
                         return (
                           <Select.Option value={item.id} key={item.id}>
                             {item.categoryName}
-                          </Select.Option>
-                        );
-                      })}
-                  </Select>
-                </div>
-              </Col>
-              <Col span={12}>
-                <div className={styles.product__createSelect}>
-                  <span>Hoạt tiết</span>
-                  <br />
-                  <Select
-                    showSearch
-                    style={{ width: "100%" }}
-                    onChange={(event) => handleSetProduct("patternId", event)}
-                    placeholder="Pattern"
-                    status={product.patternId === "" ? "error" : ""}
-                    value={product.patternId}
-                  >
-                    <Select.Option value={"add"}>
-                      <Space.Compact style={{ width: "100%" }}>
-                        <Input
-                          placeholder="Add new pattern"
-                          size="small"
-                          onClick={(event) => {
-                            handleCustomOptionClick(event);
-                          }}
-                          value={patternCreate}
-                          onChange={(event) => {
-                            setPatternCreate(event.target.value);
-                          }}
-                        />
-                        <Button
-                          onClick={(event) => {
-                            createPattern(event);
-                          }}
-                        >
-                          <PlusOutlined />
-                        </Button>
-                      </Space.Compact>
-                    </Select.Option>
-                    {patterns &&
-                      patterns.map((item) => {
-                        return (
-                          <Select.Option value={item.id} key={item.id}>
-                            {item.patternName}
-                          </Select.Option>
-                        );
-                      })}
-                  </Select>
-                </div>
-              </Col>
-              <Col span={12}>
-                <div className={styles.product__createSelect}>
-                  <span>Dáng áo</span>
-                  <br />
-                  <Select
-                    showSearch
-                    style={{ width: "100%" }}
-                    onChange={(event) => handleSetProduct("formId", event)}
-                    placeholder="form"
-                    status={product.formId === "" ? "error" : ""}
-                    value={product.formId}
-                  >
-                    <Select.Option value={"add"}>
-                      <Space.Compact style={{ width: "100%" }}>
-                        <Input
-                          placeholder="Add new form"
-                          size="small"
-                          onClick={(event) => {
-                            handleCustomOptionClick(event);
-                          }}
-                          value={formCreate}
-                          onChange={(event) => {
-                            setFormCreate(event.target.value);
-                          }}
-                        />
-                        <Button
-                          onClick={(event) => {
-                            createForm(event);
-                          }}
-                        >
-                          <PlusOutlined />
-                        </Button>
-                      </Space.Compact>
-                    </Select.Option>
-                    {forms &&
-                      forms.map((item) => {
-                        return (
-                          <Select.Option value={item.id} key={item.id}>
-                            {item.formName}
                           </Select.Option>
                         );
                       })}

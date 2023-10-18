@@ -30,6 +30,15 @@ public class Address extends BaseEntity{
     @Column(name = "id")
     private Long id;
 
+    @Column(name = "fullName")
+    private String fullName;
+
+    @Column(name = "sdt")
+    private String sdt;
+
+    @Column(name = "email")
+    private String email;
+
     @Column(name = "city")
     private String city;
 
@@ -44,4 +53,7 @@ public class Address extends BaseEntity{
 
     @Column(name = "description_detail")
     private String descriptionDetail;
+
+    @Column(name = "defaultaddress")
+    private Boolean defaultaddress;
 }

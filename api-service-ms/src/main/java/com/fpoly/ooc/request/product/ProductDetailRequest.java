@@ -26,6 +26,10 @@ public class ProductDetailRequest {
     private Long colorId;
     @JsonProperty("shirtTailId")
     private Long shirtTailId;
+    @JsonProperty("patternId")
+    private Long patternId;
+    @JsonProperty("formId")
+    private Long formId;
     @JsonProperty("price")
     private BigDecimal price;
     @JsonProperty("quantity")
@@ -39,6 +43,7 @@ public class ProductDetailRequest {
         ProductDetail productDetail = ProductDetail.builder().id(id).product(Product.builder().id(productId).build())
                 .button(ButtonType.builder().id(buttonId).build()).material(Material.builder().id(materialId).build())
                 .collar(CollarType.builder().id(collarId).build()).sleeve(SleeveType.builder().id(sleeveId).build())
+                .pattern(Pattern.builder().id(patternId).build()).form(Form.builder().id(formId).build())
                 .shirtTail(ShirtTailType.builder().id(shirtTailId).build()).size(Size.builder().id(sizeId).build())
                 .color(Color.builder().id(colorId).build()).color(Color.builder().id(colorId).build()).price(price)
                 .quantity(quantity).descriptionDetail(descriptionDetail).build();

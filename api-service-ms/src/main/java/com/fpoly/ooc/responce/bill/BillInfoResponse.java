@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -23,7 +24,15 @@ public class BillInfoResponse {
 
     private String phoneNumber;
 
-    private String email;
+    private BigDecimal totalPrice;
+
+    private BigDecimal priceReduce;
+
+    private BigDecimal shipPrice;
+
+    private LocalDateTime shipDate;
+
+    private String paymentName;
 
     private LocalDateTime createdDate;
 

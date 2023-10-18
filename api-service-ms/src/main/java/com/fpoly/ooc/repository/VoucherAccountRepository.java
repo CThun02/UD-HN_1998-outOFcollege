@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface VoucherAccountRepository extends JpaRepository<VoucherAccount, Long> {
 
@@ -17,5 +19,8 @@ public interface VoucherAccountRepository extends JpaRepository<VoucherAccount, 
             "and voucher.id = :voucherId ")
     Boolean isCheckUserUsedVoucher(@Param("voucherId") Long voucherId,
                                    @Param("username") String username);
+
+    Optional<VoucherAccount> findVoucherAccountByAccountVoucher_UsernameAndVoucherAccount_Id(@Param("voucherId") Long voucherId,
+                                                                      @Param("username") String username);
 
 }

@@ -1,6 +1,6 @@
-import { Modal, Space } from "antd";
+import { Modal, Space, Radio } from "antd";
 import styles from "./FormUsingVoucher.module.css";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import VoucherList from "./VoucherList";
 import axios from "axios";
 import "./global.css";
@@ -17,9 +17,16 @@ function FormUsingVoucher({
 }) {
   const [vouchers, setVouchers] = useState([]);
 
-  function handleOk() {}
+  const handleOnChange = (value) => {
+    setVoucher(value);
+  };
+
+  function handleOk() {
+    setIsOpen(false);
+  }
+
   function handleCancel() {
-    setIsOpen(() => false);
+    setIsOpen(false);
   }
 
   useEffect(() => {
@@ -44,27 +51,35 @@ function FormUsingVoucher({
         }
       }
     }
-
     getVouchers();
   }, [priceBill, username]);
 
   return (
-    <div>
-      <Modal
-        title="Chọn mã giảm giá"
-        open={isOpen}
-        onOk={handleOk}
-        onCancel={handleCancel}
-        className={styles.scroll}
-        centered
-      >
-        <Space style={{ width: "100%" }} direction="vertical">
+    <Modal
+      title="Chọn mã giảm giá"
+      open={isOpen}
+      onOk={handleOk}
+      onCancel={handleCancel}
+      className={styles.scroll}
+      centered
+    >
+      <Space style={{ width: "100%" }} direction="vertical">
+        <Radio.Group
+          onChange={(e) => {
+            handleOnChange(e.target.value);
+          }}
+          value={voucher}
+        >
           {vouchers.map((data) => (
-            <VoucherList key={data.voucherId} data={data} />
+            <VoucherList
+              key={data.voucherId}
+              data={data}
+              setValue={setVoucher}
+            />
           ))}
-        </Space>
-      </Modal>
-    </div>
+        </Radio.Group>
+      </Space>
+    </Modal>
   );
 }
 

@@ -144,4 +144,10 @@ public class BillServiceImpl implements BillService {
     public List<Address> getListAddressByUserName(String username) {
         return billRepo.getListAddressByUsername(username);
     }
+
+    @Override
+    public Bill findBillByBillId(Long id) {
+        return billRepo.findById(id)
+                .orElseThrow(() -> new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND)));
+    }
 }

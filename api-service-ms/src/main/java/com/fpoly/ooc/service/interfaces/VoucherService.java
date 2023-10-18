@@ -32,4 +32,8 @@ public interface VoucherService {
 
     List<VoucherResponse> findAllVoucherResponseDisplayModalUsing(String username, BigDecimal priceBill);
 
+    Voucher findVoucherByVoucherCode(String voucherCode);
+
+    Boolean isCheckTimeUse(String voucherCode, String username);
+
 }

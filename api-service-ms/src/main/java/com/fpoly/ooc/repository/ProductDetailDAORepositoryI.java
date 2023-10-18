@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -24,10 +25,11 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
             "AND (pd.shirtTail.id = ?4 OR ?4 IS NULL) AND (pd.sleeve.id = ?5 OR ?5 IS NULL) " +
             "AND (pd.collar.id = ?6 OR ?6 IS NULL) AND (pd.color.id = ?7 OR ?7 IS NULL) " +
             "AND (pd.size.id = ?8 OR ?8 IS NULL) AND (pd.pattern.id = ?9 OR ?9 IS NULL)" +
-            "AND (pd.form.id = ?10 OR ?10 IS NULL)")
+            "AND (pd.form.id = ?10 OR ?10 IS NULL) AND ((pd.price >=?11 or ?11 IS NULL) and (pd.price<=?12 or ?12 IS NULL))")
     public List<ProductDetailResponse> filterProductDetailsByIdCom(Long productId, Long idButton, Long idMaterial,
                                                                    Long idShirtTail, Long idSleeve, Long idCollar,
-                                                                   Long idColor, Long idSize, Long patternId, Long formId);
+                                                                   Long idColor, Long idSize, Long patternId, Long formId,
+                                                                   BigDecimal minPrice, BigDecimal maxPrice);
 
     @Query("SELECT pd.id AS id, pd.product AS product, pd.button AS button" +
             ", pd.material AS material, pd.collar AS collar, pd.sleeve AS sleeve" +
@@ -49,6 +51,9 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
             ", pd.price AS price, pd.quantity AS quantity, pd.descriptionDetail AS descriptionDetail" +
             " FROM ProductDetail pd")
     public List<ProductDetailResponse> getAll();
+
+    @Query("SELECT MAX(pd.price) FROM ProductDetail pd where pd.product.id = ?1")
+    public BigDecimal getMaxPricePDByProductId(Long productId);
 
     @Transactional
     @Modifying

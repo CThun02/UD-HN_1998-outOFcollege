@@ -14,6 +14,7 @@ import {
   Collapse,
   ColorPicker,
   notification,
+  Spin,
 } from "antd";
 import Modal from "antd/es/modal/Modal";
 import axios from "axios";
@@ -47,6 +48,7 @@ const ProductCreateDetails = () => {
   const [sizesCreate, setSizesCreate] = useState([]);
   const [colorsCreate, setColorsCreate] = useState([]);
   const [productDetailsExist, setproductDetailsExist] = useState([]);
+  const [isLoading, setisLoading] = useState(false);
   const [sizeCreate, setSizeCreate] = useState({});
   const [colorCreate, setColorCreate] = useState({
     colorCode: "",
@@ -61,7 +63,6 @@ const ProductCreateDetails = () => {
   const [shirtTailCreate, setshirtTailCreate] = useState({});
   const [productList, setProductList] = useState(null);
   const [render, setRender] = useState(1);
-  const [imgDefault, setImgDefault] = useState("");
   const [modalColorOpen, setModalColorOpen] = useState(false);
   const [quantityExist, setQuantityExist] = useState(0);
   const [keyProductDetailExistActive, setKeyProductDetailActive] =
@@ -399,733 +400,750 @@ const ProductCreateDetails = () => {
   }, [render]);
   return (
     <>
-      <div className={styles.product}>
-        {contextHolder}
-        <ProductCreate render={setRender} />
-        <Modal
-          title="Thêm nhanh màu sắc"
-          centered
-          open={modalColorOpen}
-          footer={false}
-          onCancel={() => setModalColorOpen(false)}
-        >
-          <ColorPicker
-            showText
-            onChange={(event) => {
-              handleSetColorCreate("colorCode", event.toHexString());
-            }}
-          ></ColorPicker>
-          <h6>Tên màu sắc</h6>
-          <Input
-            onChange={(event) => {
-              handleSetColorCreate("colorName", event.target.value);
-            }}
-          />
-          <div style={{ textAlign: "end" }}>
-            <Button
-              style={{
-                marginTop: "16px",
-                backgroundColor: "#337CCF",
-                color: "white",
+      <Spin
+        tip="Loading..."
+        spinning={isLoading}
+        size="large"
+        style={{ width: "100%" }}
+      >
+        <div className={styles.product}>
+          {contextHolder}
+          <ProductCreate render={setRender} />
+          <Modal
+            title="Thêm nhanh màu sắc"
+            centered
+            open={modalColorOpen}
+            footer={false}
+            onCancel={() => setModalColorOpen(false)}
+          >
+            <ColorPicker
+              showText
+              onChange={(event) => {
+                handleSetColorCreate("colorCode", event.toHexString());
               }}
-            >
-              Thêm mới
-            </Button>
-          </div>
-        </Modal>
-        <h2>
-          <PlusOutlined /> Thêm mới sản phẩm
-        </h2>
-        <Row>
-          <Col offset={4} span={16} className={styles.product__Form}>
-            <br />
-            <Row>
-              <Col span={24}>
-                <div className="m-5">
-                  <h6>Tên sản phẩm</h6>
-                  <Row>
-                    <Col span={23}>
-                      <div
-                        style={{
-                          marginRight: "20px",
-                        }}
-                      >
-                        <Select
-                          showSearch
-                          style={{
-                            width: "100%",
-                          }}
-                          placeholder="Search to Select"
-                          optionFilterProp="children"
-                          filterOption={(input, option) =>
-                            (option?.label ?? "").includes(input)
-                          }
-                          size="large"
-                          filterSort={(optionA, optionB) =>
-                            (optionA?.label ?? "")
-                              .toLowerCase()
-                              .localeCompare(
-                                (optionB?.label ?? "").toLowerCase()
-                              )
-                          }
-                          onChange={(index) => {
-                            selectProduct(index);
-                          }}
-                        >
-                          {productList &&
-                            productList.map((item, index) => {
-                              return (
-                                <Select.Option
-                                  key={item.id}
-                                  label={item.productName}
-                                  value={index}
-                                >
-                                  {item.productName}
-                                </Select.Option>
-                              );
-                            })}
-                        </Select>
-                      </div>
-                    </Col>
-                    <Col span={1} style={{ paddingBottom: "8px" }}>
-                      <Button
-                        onClick={() => {
-                          displayFrame("productCreate", "productCreateFrame");
-                        }}
-                        className={styles.product_ButtonCreate}
-                      >
-                        <PlusOutlined />
-                      </Button>
-                    </Col>
-                  </Row>
-                </div>
+            ></ColorPicker>
+            <h6>Tên màu sắc</h6>
+            <Input
+              onChange={(event) => {
+                handleSetColorCreate("colorName", event.target.value);
+              }}
+            />
+            <div style={{ textAlign: "end" }}>
+              <Button
+                style={{
+                  marginTop: "16px",
+                  backgroundColor: "#337CCF",
+                  color: "white",
+                }}
+              >
+                Thêm mới
+              </Button>
+            </div>
+          </Modal>
+          <h2>
+            <PlusOutlined /> Thêm mới sản phẩm
+          </h2>
+          <Row>
+            <Col offset={4} span={16} className={styles.product__Form}>
+              <br />
+              <Row>
                 <Col span={24}>
                   <div className="m-5">
-                    <Collapse
-                      bordered={false}
-                      expandIcon={({ isActive }) => (
-                        <CaretRightOutlined rotate={isActive ? 90 : 0} />
-                      )}
-                      items={[
-                        {
-                          key: "product",
-                          style: {
-                            backgroundColor: "white",
-                            boxShadow: "rgba(0, 0, 0, 0.05) 0px 1px 2px 0px",
-                          },
-                          label: <h6>{product.productName || "Sản phẩm"}</h6>,
-                          children: (
-                            <Row>
-                              <Col span={12}>
-                                <div className="m-5">
-                                  <h6>Thương hiệu</h6>
-                                  <p>
-                                    {product.brand.brandName || "Brand Name"}
-                                  </p>
-                                </div>
-                              </Col>
-                              <Col span={12}>
-                                <div className="m-5">
-                                  <h6>Loại sản phẩm</h6>
-                                  <p>
-                                    {product.category.categoryName ||
-                                      "Category Name"}
-                                  </p>
-                                </div>
-                              </Col>
-                              <Col span={24}>
-                                <div className="m-5">
-                                  <h6>Mô tả</h6>
-                                  <p>{product.description || "Description"}</p>
-                                  <hr />
-                                </div>
-                              </Col>
-                            </Row>
-                          ),
-                        },
-                      ]}
-                    />
+                    <h6>Tên sản phẩm</h6>
+                    <Row>
+                      <Col span={23}>
+                        <div
+                          style={{
+                            marginRight: "20px",
+                          }}
+                        >
+                          <Select
+                            showSearch
+                            style={{
+                              width: "100%",
+                            }}
+                            placeholder="Search to Select"
+                            optionFilterProp="children"
+                            filterOption={(input, option) =>
+                              (option?.label ?? "").includes(input)
+                            }
+                            size="large"
+                            filterSort={(optionA, optionB) =>
+                              (optionA?.label ?? "")
+                                .toLowerCase()
+                                .localeCompare(
+                                  (optionB?.label ?? "").toLowerCase()
+                                )
+                            }
+                            onChange={(index) => {
+                              selectProduct(index);
+                            }}
+                          >
+                            {productList &&
+                              productList.map((item, index) => {
+                                return (
+                                  <Select.Option
+                                    key={item.id}
+                                    label={item.productName}
+                                    value={index}
+                                  >
+                                    {item.productName}
+                                  </Select.Option>
+                                );
+                              })}
+                          </Select>
+                        </div>
+                      </Col>
+                      <Col span={1} style={{ paddingBottom: "8px" }}>
+                        <Button
+                          onClick={() => {
+                            displayFrame("productCreate", "productCreateFrame");
+                          }}
+                          className={styles.product_ButtonCreate}
+                        >
+                          <PlusOutlined />
+                        </Button>
+                      </Col>
+                    </Row>
                   </div>
+                  <Col span={24}>
+                    <div className="m-5">
+                      <Collapse
+                        bordered={false}
+                        expandIcon={({ isActive }) => (
+                          <CaretRightOutlined rotate={isActive ? 90 : 0} />
+                        )}
+                        items={[
+                          {
+                            key: "product",
+                            style: {
+                              backgroundColor: "white",
+                              boxShadow: "rgba(0, 0, 0, 0.05) 0px 1px 2px 0px",
+                            },
+                            label: <h6>{product.productName || "Sản phẩm"}</h6>,
+                            children: (
+                              <Row>
+                                <Col span={12}>
+                                  <div className="m-5">
+                                    <h6>Thương hiệu</h6>
+                                    <p>
+                                      {product.brand.brandName || "Brand Name"}
+                                    </p>
+                                  </div>
+                                </Col>
+                                <Col span={12}>
+                                  <div className="m-5">
+                                    <h6>Loại sản phẩm</h6>
+                                    <p>
+                                      {product.category.categoryName ||
+                                        "Category Name"}
+                                    </p>
+                                  </div>
+                                </Col>
+                                <Col span={24}>
+                                  <div className="m-5">
+                                    <h6>Mô tả</h6>
+                                    <p>
+                                      {product.description || "Description"}
+                                    </p>
+                                    <hr />
+                                  </div>
+                                </Col>
+                              </Row>
+                            ),
+                          },
+                        ]}
+                      />
+                    </div>
+                  </Col>
                 </Col>
-              </Col>
-            </Row>
-          </Col>
-          <Col span={16} offset={4} className={styles.product__createDetails}>
-            <div className="m-5">
-              <Collapse
-                bordered={false}
-                defaultActiveKey={["1"]}
-                expandIcon={({ isActive }) => (
-                  <CaretRightOutlined rotate={isActive ? 90 : 0} />
-                )}
-                items={[
-                  {
-                    key: "1",
-                    label: <h6>Thành phần sản phẩm</h6>,
-                    style: {
-                      backgroundColor: "white",
-                      boxShadow: "rgba(0, 0, 0, 0.05) 0px 1px 2px 0px",
-                    },
-                    children: (
-                      <Row>
-                        <Col span={8}>
-                          <div className="m-5">
-                            <h6>Loại cúc áo</h6>
-                            <Select
-                              showSearch
-                              maxTagCount={"responsive"}
-                              placeholder="Button"
-                              className={styles.product__createDetailsSelect}
-                              onChange={(event, record) => {
-                                handleSetProductDetailCom("button", record);
-                              }}
-                              status={
-                                productDetail.buttonId === "" ? "error" : ""
-                              }
-                            >
-                              <Select.Option value={"add"}>
-                                <Space.Compact>
-                                  <Input
-                                    placeholder="Add new button"
-                                    size="small"
-                                    onClick={(event) => {
-                                      handleCustomOptionClick(event);
-                                    }}
-                                    onChange={(event) => {
-                                      setButtonCreate(event.target.value);
-                                    }}
-                                  />
-                                  <Button
-                                    onClick={(event) => {
-                                      event.stopPropagation();
-                                    }}
-                                  >
-                                    <PlusOutlined />
-                                  </Button>
-                                </Space.Compact>
-                              </Select.Option>
-                              {buttons &&
-                                buttons.map((item) => {
-                                  return (
-                                    <Select.Option
-                                      value={item.id}
-                                      label={item.buttonName}
-                                      key={item.id}
-                                    >
-                                      {item.buttonName}
-                                    </Select.Option>
-                                  );
-                                })}
-                            </Select>
-                          </div>
-                        </Col>
-                        <Col span={8}>
-                          <div className="m-5">
-                            <h6>Chất liệu</h6>
-                            <Select
-                              showSearch
-                              maxTagCount={"responsive"}
-                              placeholder="Material"
-                              className={styles.product__createDetailsSelect}
-                              onChange={(event, record) => {
-                                handleSetProductDetailCom("material", record);
-                              }}
-                              status={
-                                productDetail.materialId === "" ? "error" : ""
-                              }
-                            >
-                              <Select.Option value={"add"}>
-                                <Space.Compact>
-                                  <Input
-                                    placeholder="Add new material"
-                                    size="small"
-                                    onClick={(event) => {
-                                      handleCustomOptionClick(event);
-                                    }}
-                                    onChange={(event) => {
-                                      setMaterialCreate(event.target.value);
-                                    }}
-                                  />
-                                  <Button
-                                    onClick={(event) => {
-                                      event.stopPropagation();
-                                    }}
-                                  >
-                                    <PlusOutlined />
-                                  </Button>
-                                </Space.Compact>
-                              </Select.Option>
-                              {materials &&
-                                materials.map((item) => {
-                                  return (
-                                    <Select.Option
-                                      value={item.id}
-                                      label={item.materialName}
-                                      key={item.id}
-                                    >
-                                      {item.materialName}
-                                    </Select.Option>
-                                  );
-                                })}
-                            </Select>
-                          </div>
-                        </Col>
-                        <Col span={8}>
-                          <div className="m-5">
-                            <h6>Cổ áo</h6>
-                            <Select
-                              showSearch
-                              maxTagCount={"responsive"}
-                              placeholder="Collar"
-                              className={styles.product__createDetailsSelect}
-                              onChange={(event, record) => {
-                                handleSetProductDetailCom("collar", record);
-                              }}
-                              status={
-                                productDetail.collarId === "" ? "error" : ""
-                              }
-                            >
-                              <Select.Option value={"add"}>
-                                <Space.Compact>
-                                  <Input
-                                    placeholder="Add new collar"
-                                    size="small"
-                                    onClick={(event) => {
-                                      handleCustomOptionClick(event);
-                                    }}
-                                    onChange={(event) => {
-                                      setCollarCreate(event.target.value);
-                                    }}
-                                  />
-                                  <Button
-                                    onClick={(event) => {
-                                      event.stopPropagation();
-                                    }}
-                                  >
-                                    <PlusOutlined />
-                                  </Button>
-                                </Space.Compact>
-                              </Select.Option>
-                              {collars &&
-                                collars.map((item) => {
-                                  return (
-                                    <Select.Option
-                                      value={item.id}
-                                      key={item.id}
-                                      label={item.collarTypeName}
-                                    >
-                                      {item.collarTypeName}
-                                    </Select.Option>
-                                  );
-                                })}
-                            </Select>
-                          </div>
-                        </Col>
-                        <Col span={8}>
-                          <div className="m-5">
-                            <h6>Tay áo</h6>
-                            <Select
-                              showSearch
-                              maxTagCount={"responsive"}
-                              placeholder="Sleeve"
-                              className={styles.product__createDetailsSelect}
-                              onChange={(event, record) => {
-                                handleSetProductDetailCom("sleeve", record);
-                              }}
-                              status={
-                                productDetail.sleeveId === "" ? "error" : ""
-                              }
-                            >
-                              <Select.Option value={"add"}>
-                                <Space.Compact>
-                                  <Input
-                                    placeholder="Add new sleeve"
-                                    size="small"
-                                    onClick={(event) => {
-                                      handleCustomOptionClick(event);
-                                    }}
-                                    onChange={(event) => {
-                                      setSleeveCreate(event.target.value);
-                                    }}
-                                  />
-                                  <Button
-                                    onClick={(event) => {
-                                      event.stopPropagation();
-                                    }}
-                                  >
-                                    <PlusOutlined />
-                                  </Button>
-                                </Space.Compact>
-                              </Select.Option>
-                              {sleeves &&
-                                sleeves.map((item) => {
-                                  return (
-                                    <Select.Option
-                                      value={item.id}
-                                      label={item.sleeveName}
-                                      key={item.id}
-                                    >
-                                      {item.sleeveName}
-                                    </Select.Option>
-                                  );
-                                })}
-                            </Select>
-                          </div>
-                        </Col>
-                        <Col span={8}>
-                          <div className="m-5">
-                            <h6>Đuôi áo</h6>
-                            <Select
-                              showSearch
-                              maxTagCount={"responsive"}
-                              placeholder="Shirt tail"
-                              className={styles.product__createDetailsSelect}
-                              onChange={(event, record) => {
-                                handleSetProductDetailCom("shirtTail", record);
-                              }}
-                              status={
-                                productDetail.shirtTailId === "" ? "error" : ""
-                              }
-                            >
-                              <Select.Option value={"add"}>
-                                <Space.Compact>
-                                  <Input
-                                    placeholder="Add new shirt tail"
-                                    size="small"
-                                    onClick={(event) => {
-                                      handleCustomOptionClick(event);
-                                    }}
-                                    onChange={(event) => {
-                                      setshirtTailCreate(event.target.value);
-                                    }}
-                                  />
-                                  <Button
-                                    onClick={(event) => {
-                                      event.stopPropagation();
-                                    }}
-                                  >
-                                    <PlusOutlined />
-                                  </Button>
-                                </Space.Compact>
-                              </Select.Option>
-                              {shirtTails &&
-                                shirtTails.map((item) => {
-                                  return (
-                                    <Select.Option
-                                      value={item.id}
-                                      label={item.shirtTailTypeName}
-                                      key={item.id}
-                                    >
-                                      {item.shirtTailTypeName}
-                                    </Select.Option>
-                                  );
-                                })}
-                            </Select>
-                          </div>
-                        </Col>
-                        <Col span={8}>
-                          <h6>Hoạ tiết</h6>
-                          <div className="m-5">
-                            <Select
-                              showSearch
-                              maxTagCount={"responsive"}
-                              style={{ width: "100%" }}
-                              onChange={(event, record) => {
-                                handleSetProductDetailCom("pattern", record);
-                              }}
-                              placeholder="Pattern"
-                              className={styles.product__createDetailsSelect}
-                            >
-                              <Select.Option value={"add"}>
-                                <Space.Compact>
-                                  <Input
-                                    placeholder="Add new pattern"
-                                    size="small"
-                                    onClick={(event) => {
-                                      handleCustomOptionClick(event);
-                                    }}
-                                    onChange={(event) => {
-                                      setPatternCreate(event.target.value);
-                                    }}
-                                  />
-                                  <Button
-                                    onClick={(event) => {
-                                      createPattern(event);
-                                    }}
-                                  >
-                                    <PlusOutlined />
-                                  </Button>
-                                </Space.Compact>
-                              </Select.Option>
-                              {patterns &&
-                                patterns.map((item) => {
-                                  return (
-                                    <Select.Option
-                                      label={item.patternName}
-                                      value={item.id}
-                                      key={item.id}
-                                    >
-                                      {item.patternName}
-                                    </Select.Option>
-                                  );
-                                })}
-                            </Select>
-                          </div>
-                        </Col>
-                        <Col span={8}>
-                          <h6>Dáng áo</h6>
-                          <div className="m-5">
-                            <Select
-                              showSearch
-                              maxTagCount={"responsive"}
-                              style={{ width: "100%" }}
-                              onChange={(event, record) => {
-                                handleSetProductDetailCom("form", record);
-                              }}
-                              placeholder="form"
-                            >
-                              <Select.Option value={"add"}>
-                                <Space.Compact>
-                                  <Input
-                                    placeholder="Add new form"
-                                    size="small"
-                                    onClick={(event) => {
-                                      handleCustomOptionClick(event);
-                                    }}
-                                    onChange={(event) => {
-                                      setFormCreate(event.target.value);
-                                    }}
-                                  />
-                                  <Button
-                                    onClick={(event) => {
-                                      createForm(event);
-                                    }}
-                                  >
-                                    <PlusOutlined />
-                                  </Button>
-                                </Space.Compact>
-                              </Select.Option>
-                              {forms &&
-                                forms.map((item) => {
-                                  return (
-                                    <Select.Option
-                                      label={item.formName}
-                                      value={item.id}
-                                      key={item.id}
-                                    >
-                                      {item.formName}
-                                    </Select.Option>
-                                  );
-                                })}
-                            </Select>
-                          </div>
-                        </Col>
-                        <Col span={8}>
-                          <div className="m-5">
-                            <h6>Kích cỡ</h6>
-                            <Select
-                              showSearch
-                              maxTagCount={"responsive"}
-                              placeholder="size"
-                              optionFilterProp="children"
-                              mode="multiple"
-                              className={styles.product__createDetailsSelect}
-                              filterOption={(input, option) =>
-                                (option?.label ?? "").includes(input)
-                              }
-                              filterSort={(optionA, optionB) =>
-                                (optionA?.label ?? "")
-                                  .toLowerCase()
-                                  .localeCompare(
-                                    (optionB?.label ?? "").toLowerCase()
-                                  )
-                              }
-                              onChange={(event, record) => {
-                                setSizesCreate(record);
-                                setRender(event);
-                              }}
-                              status={
-                                productDetail.sizeId === "" ? "error" : ""
-                              }
-                            >
-                              <Select.Option value={"add"}>
-                                <Space.Compact>
-                                  <Input
-                                    placeholder="Add new size"
-                                    size="small"
-                                    onClick={(event) => {
-                                      handleCustomOptionClick(event);
-                                    }}
-                                    onChange={(event) => {
-                                      setSizeCreate(event.target.value);
-                                    }}
-                                  />
-                                  <Button
-                                    onClick={(event) => {
-                                      event.stopPropagation();
-                                    }}
-                                  >
-                                    <PlusOutlined />
-                                  </Button>
-                                </Space.Compact>
-                              </Select.Option>
-                              {sizes &&
-                                sizes.map((item) => {
-                                  return (
-                                    <Select.Option
-                                      key={item.id}
-                                      label={item.sizeName}
-                                      value={item.id}
-                                    >
-                                      {item.sizeName}
-                                    </Select.Option>
-                                  );
-                                })}
-                            </Select>
-                          </div>
-                        </Col>
-                        <Col span={8}>
-                          <div className="m-5">
-                            <h6>Màu sắc</h6>
-                            <Select
-                              showSearch
-                              maxTagCount={"responsive"}
-                              placeholder="Color"
-                              optionFilterProp="children"
-                              mode="multiple"
-                              className={styles.product__createDetailsSelect}
-                              filterOption={(input, option) =>
-                                (option?.label ?? "").includes(input)
-                              }
-                              filterSort={(optionA, optionB) =>
-                                (optionA?.label ?? "")
-                                  .toLowerCase()
-                                  .localeCompare(
-                                    (optionB?.label ?? "").toLowerCase()
-                                  )
-                              }
-                              onChange={(event, record) => {
-                                setColorsCreate(record);
-                                setRender(event);
-                              }}
-                              status={
-                                productDetail.colorId === "" ? "error" : ""
-                              }
-                            >
-                              <Select.Option value={"add"}>
-                                <Space.Compact>
-                                  <Button
-                                    onClick={(event) => {
-                                      event.stopPropagation();
-                                      setModalColorOpen(true);
-                                    }}
-                                  >
-                                    <PlusOutlined />
-                                  </Button>
-                                </Space.Compact>
-                              </Select.Option>
-                              {colors &&
-                                colors.map((item) => {
-                                  return (
-                                    <Select.Option
-                                      key={item.id}
-                                      label={item.colorName}
-                                      value={item.colorCode}
-                                    >
-                                      <div className={styles.optionColor}>
-                                        <span
-                                          style={{
-                                            backgroundColor: item.colorCode,
-                                          }}
-                                        ></span>
-                                        {item.colorName}
-                                      </div>
-                                    </Select.Option>
-                                  );
-                                })}
-                            </Select>
-                          </div>
-                        </Col>
-                        <Col span={24}>
-                          <div className="m-5">
-                            <Collapse
-                              bordered={false}
-                              style={{
-                                backgroundColor: "rgba(253, 54, 54, 0.23)",
-                              }}
-                              items={[
-                                {
-                                  key: "1",
-                                  children: (
-                                    <div
-                                      style={{
-                                        backgroundColor: "#fff",
-                                        padding: "8px",
-                                        borderRadius: "4px",
-                                        color: "red",
+              </Row>
+            </Col>
+            <Col span={16} offset={4} className={styles.product__createDetails}>
+              <div className="m-5">
+                <Collapse
+                  bordered={false}
+                  defaultActiveKey={["1"]}
+                  expandIcon={({ isActive }) => (
+                    <CaretRightOutlined rotate={isActive ? 90 : 0} />
+                  )}
+                  items={[
+                    {
+                      key: "1",
+                      label: <h6>Thành phần sản phẩm</h6>,
+                      style: {
+                        backgroundColor: "white",
+                        boxShadow: "rgba(0, 0, 0, 0.05) 0px 1px 2px 0px",
+                      },
+                      children: (
+                        <Row>
+                          <Col span={8}>
+                            <div className="m-5">
+                              <h6>Loại cúc áo</h6>
+                              <Select
+                                showSearch
+                                maxTagCount={"responsive"}
+                                placeholder="Button"
+                                className={styles.product__createDetailsSelect}
+                                onChange={(event, record) => {
+                                  handleSetProductDetailCom("button", record);
+                                }}
+                                status={
+                                  productDetail.buttonId === "" ? "error" : ""
+                                }
+                              >
+                                <Select.Option value={"add"}>
+                                  <Space.Compact>
+                                    <Input
+                                      placeholder="Add new button"
+                                      size="small"
+                                      onClick={(event) => {
+                                        handleCustomOptionClick(event);
+                                      }}
+                                      onChange={(event) => {
+                                        setButtonCreate(event.target.value);
+                                      }}
+                                    />
+                                    <Button
+                                      onClick={(event) => {
+                                        event.stopPropagation();
                                       }}
                                     >
-                                      <h6>{product.productName}</h6>
-                                      {productDetailsExist.length === 0 ? (
-                                        <span>Không có sẵn sản phẩm nào</span>
-                                      ) : (
-                                        <span>
-                                          Dữ liệu có sẵn sẽ không được thêm
-                                        </span>
-                                      )}
-                                      {productDetailsExist &&
-                                        productDetailsExist.map((item) => {
-                                          return (
-                                            <div className={styles.optionColor}>
-                                              <span
-                                                style={{
-                                                  backgroundColor:
-                                                    item.color.colorCode,
-                                                  boxShadow:
-                                                    "rgba(0, 0, 0, 0.35) 0px 5px 15px;",
-                                                }}
-                                              ></span>
-                                              {item.color.colorName} :{" "}
-                                              {item.productDetails
-                                                .map(
-                                                  (item) => item.size.sizeName
-                                                )
-                                                .join(" ")}
-                                            </div>
-                                          );
-                                        })}
-                                    </div>
-                                  ),
-                                  label: (
-                                    <span style={{ color: "red" }}>
-                                      <b>Sản phẩm có sẵn ({quantityExist})</b>
-                                    </span>
-                                  ),
-                                },
-                              ]}
-                              defaultActiveKey={[keyProductDetailExistActive]}
-                            />
-                          </div>
-                        </Col>
-                      </Row>
-                    ),
-                  },
-                ]}
-              />
-            </div>
-          </Col>
-        </Row>
-      </div>
-      {product.productId !== null &&
-      colorsCreate.length > 0 &&
-      productDetailsCreate.length > 0 ? (
-        <ProductDetailsTable
-          product={product}
-          colorsCreate={colorsCreate}
-          productDetails={productDetailsCreate}
-          setImgDefault={setImgDefault}
-        />
-      ) : null}
+                                      <PlusOutlined />
+                                    </Button>
+                                  </Space.Compact>
+                                </Select.Option>
+                                {buttons &&
+                                  buttons.map((item) => {
+                                    return (
+                                      <Select.Option
+                                        value={item.id}
+                                        label={item.buttonName}
+                                        key={item.id}
+                                      >
+                                        {item.buttonName}
+                                      </Select.Option>
+                                    );
+                                  })}
+                              </Select>
+                            </div>
+                          </Col>
+                          <Col span={8}>
+                            <div className="m-5">
+                              <h6>Chất liệu</h6>
+                              <Select
+                                showSearch
+                                maxTagCount={"responsive"}
+                                placeholder="Material"
+                                className={styles.product__createDetailsSelect}
+                                onChange={(event, record) => {
+                                  handleSetProductDetailCom("material", record);
+                                }}
+                                status={
+                                  productDetail.materialId === "" ? "error" : ""
+                                }
+                              >
+                                <Select.Option value={"add"}>
+                                  <Space.Compact>
+                                    <Input
+                                      placeholder="Add new material"
+                                      size="small"
+                                      onClick={(event) => {
+                                        handleCustomOptionClick(event);
+                                      }}
+                                      onChange={(event) => {
+                                        setMaterialCreate(event.target.value);
+                                      }}
+                                    />
+                                    <Button
+                                      onClick={(event) => {
+                                        event.stopPropagation();
+                                      }}
+                                    >
+                                      <PlusOutlined />
+                                    </Button>
+                                  </Space.Compact>
+                                </Select.Option>
+                                {materials &&
+                                  materials.map((item) => {
+                                    return (
+                                      <Select.Option
+                                        value={item.id}
+                                        label={item.materialName}
+                                        key={item.id}
+                                      >
+                                        {item.materialName}
+                                      </Select.Option>
+                                    );
+                                  })}
+                              </Select>
+                            </div>
+                          </Col>
+                          <Col span={8}>
+                            <div className="m-5">
+                              <h6>Cổ áo</h6>
+                              <Select
+                                showSearch
+                                maxTagCount={"responsive"}
+                                placeholder="Collar"
+                                className={styles.product__createDetailsSelect}
+                                onChange={(event, record) => {
+                                  handleSetProductDetailCom("collar", record);
+                                }}
+                                status={
+                                  productDetail.collarId === "" ? "error" : ""
+                                }
+                              >
+                                <Select.Option value={"add"}>
+                                  <Space.Compact>
+                                    <Input
+                                      placeholder="Add new collar"
+                                      size="small"
+                                      onClick={(event) => {
+                                        handleCustomOptionClick(event);
+                                      }}
+                                      onChange={(event) => {
+                                        setCollarCreate(event.target.value);
+                                      }}
+                                    />
+                                    <Button
+                                      onClick={(event) => {
+                                        event.stopPropagation();
+                                      }}
+                                    >
+                                      <PlusOutlined />
+                                    </Button>
+                                  </Space.Compact>
+                                </Select.Option>
+                                {collars &&
+                                  collars.map((item) => {
+                                    return (
+                                      <Select.Option
+                                        value={item.id}
+                                        key={item.id}
+                                        label={item.collarTypeName}
+                                      >
+                                        {item.collarTypeName}
+                                      </Select.Option>
+                                    );
+                                  })}
+                              </Select>
+                            </div>
+                          </Col>
+                          <Col span={8}>
+                            <div className="m-5">
+                              <h6>Tay áo</h6>
+                              <Select
+                                showSearch
+                                maxTagCount={"responsive"}
+                                placeholder="Sleeve"
+                                className={styles.product__createDetailsSelect}
+                                onChange={(event, record) => {
+                                  handleSetProductDetailCom("sleeve", record);
+                                }}
+                                status={
+                                  productDetail.sleeveId === "" ? "error" : ""
+                                }
+                              >
+                                <Select.Option value={"add"}>
+                                  <Space.Compact>
+                                    <Input
+                                      placeholder="Add new sleeve"
+                                      size="small"
+                                      onClick={(event) => {
+                                        handleCustomOptionClick(event);
+                                      }}
+                                      onChange={(event) => {
+                                        setSleeveCreate(event.target.value);
+                                      }}
+                                    />
+                                    <Button
+                                      onClick={(event) => {
+                                        event.stopPropagation();
+                                      }}
+                                    >
+                                      <PlusOutlined />
+                                    </Button>
+                                  </Space.Compact>
+                                </Select.Option>
+                                {sleeves &&
+                                  sleeves.map((item) => {
+                                    return (
+                                      <Select.Option
+                                        value={item.id}
+                                        label={item.sleeveName}
+                                        key={item.id}
+                                      >
+                                        {item.sleeveName}
+                                      </Select.Option>
+                                    );
+                                  })}
+                              </Select>
+                            </div>
+                          </Col>
+                          <Col span={8}>
+                            <div className="m-5">
+                              <h6>Đuôi áo</h6>
+                              <Select
+                                showSearch
+                                maxTagCount={"responsive"}
+                                placeholder="Shirt tail"
+                                className={styles.product__createDetailsSelect}
+                                onChange={(event, record) => {
+                                  handleSetProductDetailCom(
+                                    "shirtTail",
+                                    record
+                                  );
+                                }}
+                                status={
+                                  productDetail.shirtTailId === ""
+                                    ? "error"
+                                    : ""
+                                }
+                              >
+                                <Select.Option value={"add"}>
+                                  <Space.Compact>
+                                    <Input
+                                      placeholder="Add new shirt tail"
+                                      size="small"
+                                      onClick={(event) => {
+                                        handleCustomOptionClick(event);
+                                      }}
+                                      onChange={(event) => {
+                                        setshirtTailCreate(event.target.value);
+                                      }}
+                                    />
+                                    <Button
+                                      onClick={(event) => {
+                                        event.stopPropagation();
+                                      }}
+                                    >
+                                      <PlusOutlined />
+                                    </Button>
+                                  </Space.Compact>
+                                </Select.Option>
+                                {shirtTails &&
+                                  shirtTails.map((item) => {
+                                    return (
+                                      <Select.Option
+                                        value={item.id}
+                                        label={item.shirtTailTypeName}
+                                        key={item.id}
+                                      >
+                                        {item.shirtTailTypeName}
+                                      </Select.Option>
+                                    );
+                                  })}
+                              </Select>
+                            </div>
+                          </Col>
+                          <Col span={8}>
+                            <h6>Hoạ tiết</h6>
+                            <div className="m-5">
+                              <Select
+                                showSearch
+                                maxTagCount={"responsive"}
+                                style={{ width: "100%" }}
+                                onChange={(event, record) => {
+                                  handleSetProductDetailCom("pattern", record);
+                                }}
+                                placeholder="Pattern"
+                                className={styles.product__createDetailsSelect}
+                              >
+                                <Select.Option value={"add"}>
+                                  <Space.Compact>
+                                    <Input
+                                      placeholder="Add new pattern"
+                                      size="small"
+                                      onClick={(event) => {
+                                        handleCustomOptionClick(event);
+                                      }}
+                                      onChange={(event) => {
+                                        setPatternCreate(event.target.value);
+                                      }}
+                                    />
+                                    <Button
+                                      onClick={(event) => {
+                                        createPattern(event);
+                                      }}
+                                    >
+                                      <PlusOutlined />
+                                    </Button>
+                                  </Space.Compact>
+                                </Select.Option>
+                                {patterns &&
+                                  patterns.map((item) => {
+                                    return (
+                                      <Select.Option
+                                        label={item.patternName}
+                                        value={item.id}
+                                        key={item.id}
+                                      >
+                                        {item.patternName}
+                                      </Select.Option>
+                                    );
+                                  })}
+                              </Select>
+                            </div>
+                          </Col>
+                          <Col span={8}>
+                            <h6>Dáng áo</h6>
+                            <div className="m-5">
+                              <Select
+                                showSearch
+                                maxTagCount={"responsive"}
+                                style={{ width: "100%" }}
+                                onChange={(event, record) => {
+                                  handleSetProductDetailCom("form", record);
+                                }}
+                                placeholder="form"
+                              >
+                                <Select.Option value={"add"}>
+                                  <Space.Compact>
+                                    <Input
+                                      placeholder="Add new form"
+                                      size="small"
+                                      onClick={(event) => {
+                                        handleCustomOptionClick(event);
+                                      }}
+                                      onChange={(event) => {
+                                        setFormCreate(event.target.value);
+                                      }}
+                                    />
+                                    <Button
+                                      onClick={(event) => {
+                                        createForm(event);
+                                      }}
+                                    >
+                                      <PlusOutlined />
+                                    </Button>
+                                  </Space.Compact>
+                                </Select.Option>
+                                {forms &&
+                                  forms.map((item) => {
+                                    return (
+                                      <Select.Option
+                                        label={item.formName}
+                                        value={item.id}
+                                        key={item.id}
+                                      >
+                                        {item.formName}
+                                      </Select.Option>
+                                    );
+                                  })}
+                              </Select>
+                            </div>
+                          </Col>
+                          <Col span={8}>
+                            <div className="m-5">
+                              <h6>Kích cỡ</h6>
+                              <Select
+                                showSearch
+                                maxTagCount={"responsive"}
+                                placeholder="size"
+                                optionFilterProp="children"
+                                mode="multiple"
+                                className={styles.product__createDetailsSelect}
+                                filterOption={(input, option) =>
+                                  (option?.label ?? "").includes(input)
+                                }
+                                filterSort={(optionA, optionB) =>
+                                  (optionA?.label ?? "")
+                                    .toLowerCase()
+                                    .localeCompare(
+                                      (optionB?.label ?? "").toLowerCase()
+                                    )
+                                }
+                                onChange={(event, record) => {
+                                  setSizesCreate(record);
+                                  setRender(event);
+                                }}
+                                status={
+                                  productDetail.sizeId === "" ? "error" : ""
+                                }
+                              >
+                                <Select.Option value={"add"}>
+                                  <Space.Compact>
+                                    <Input
+                                      placeholder="Add new size"
+                                      size="small"
+                                      onClick={(event) => {
+                                        handleCustomOptionClick(event);
+                                      }}
+                                      onChange={(event) => {
+                                        setSizeCreate(event.target.value);
+                                      }}
+                                    />
+                                    <Button
+                                      onClick={(event) => {
+                                        event.stopPropagation();
+                                      }}
+                                    >
+                                      <PlusOutlined />
+                                    </Button>
+                                  </Space.Compact>
+                                </Select.Option>
+                                {sizes &&
+                                  sizes.map((item) => {
+                                    return (
+                                      <Select.Option
+                                        key={item.id}
+                                        label={item.sizeName}
+                                        value={item.id}
+                                      >
+                                        {item.sizeName}
+                                      </Select.Option>
+                                    );
+                                  })}
+                              </Select>
+                            </div>
+                          </Col>
+                          <Col span={8}>
+                            <div className="m-5">
+                              <h6>Màu sắc</h6>
+                              <Select
+                                showSearch
+                                maxTagCount={"responsive"}
+                                placeholder="Color"
+                                optionFilterProp="children"
+                                mode="multiple"
+                                className={styles.product__createDetailsSelect}
+                                filterOption={(input, option) =>
+                                  (option?.label ?? "").includes(input)
+                                }
+                                filterSort={(optionA, optionB) =>
+                                  (optionA?.label ?? "")
+                                    .toLowerCase()
+                                    .localeCompare(
+                                      (optionB?.label ?? "").toLowerCase()
+                                    )
+                                }
+                                onChange={(event, record) => {
+                                  setColorsCreate(record);
+                                  setRender(event);
+                                }}
+                                status={
+                                  productDetail.colorId === "" ? "error" : ""
+                                }
+                              >
+                                <Select.Option value={"add"}>
+                                  <Space.Compact>
+                                    <Button
+                                      onClick={(event) => {
+                                        event.stopPropagation();
+                                        setModalColorOpen(true);
+                                      }}
+                                    >
+                                      <PlusOutlined />
+                                    </Button>
+                                  </Space.Compact>
+                                </Select.Option>
+                                {colors &&
+                                  colors.map((item) => {
+                                    return (
+                                      <Select.Option
+                                        key={item.id}
+                                        label={item.colorName}
+                                        value={item.colorCode}
+                                      >
+                                        <div className={styles.optionColor}>
+                                          <span
+                                            style={{
+                                              backgroundColor: item.colorCode,
+                                            }}
+                                          ></span>
+                                          {item.colorName}
+                                        </div>
+                                      </Select.Option>
+                                    );
+                                  })}
+                              </Select>
+                            </div>
+                          </Col>
+                          <Col span={24}>
+                            <div className="m-5">
+                              <Collapse
+                                bordered={false}
+                                style={{
+                                  backgroundColor: "rgba(253, 54, 54, 0.23)",
+                                }}
+                                items={[
+                                  {
+                                    key: "1",
+                                    children: (
+                                      <div
+                                        style={{
+                                          backgroundColor: "#fff",
+                                          padding: "8px",
+                                          borderRadius: "4px",
+                                          color: "red",
+                                        }}
+                                      >
+                                        <h6>{product.productName}</h6>
+                                        {productDetailsExist.length === 0 ? (
+                                          <span>Không có sẵn sản phẩm nào</span>
+                                        ) : (
+                                          <span>
+                                            Dữ liệu có sẵn sẽ không được thêm
+                                          </span>
+                                        )}
+                                        {productDetailsExist &&
+                                          productDetailsExist.map((item) => {
+                                            return (
+                                              <div
+                                                className={styles.optionColor}
+                                                key={item.id}
+                                              >
+                                                <span
+                                                  style={{
+                                                    backgroundColor:
+                                                      item.color.colorCode,
+                                                    boxShadow:
+                                                      "rgba(0, 0, 0, 0.35) 0px 5px 15px;",
+                                                  }}
+                                                ></span>
+                                                {item.color.colorName} :{" "}
+                                                {item.productDetails
+                                                  .map(
+                                                    (item) => item.size.sizeName
+                                                  )
+                                                  .join(" ")}
+                                              </div>
+                                            );
+                                          })}
+                                      </div>
+                                    ),
+                                    label: (
+                                      <span style={{ color: "red" }}>
+                                        <b>Sản phẩm có sẵn ({quantityExist})</b>
+                                      </span>
+                                    ),
+                                  },
+                                ]}
+                                defaultActiveKey={[keyProductDetailExistActive]}
+                              />
+                            </div>
+                          </Col>
+                        </Row>
+                      ),
+                    },
+                  ]}
+                />
+              </div>
+            </Col>
+          </Row>
+        </div>
+        {product.productId !== null &&
+        colorsCreate.length > 0 &&
+        productDetailsCreate.length > 0 ? (
+          <ProductDetailsTable
+            setLoading={setisLoading}
+            product={product}
+            colorsCreate={colorsCreate}
+            productDetails={productDetailsCreate}
+          />
+        ) : null}
+      </Spin>
     </>
   );
 };

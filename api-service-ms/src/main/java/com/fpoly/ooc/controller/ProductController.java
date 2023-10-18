@@ -18,6 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,6 +61,11 @@ public class ProductController {
         }
     }
 
+    @GetMapping("/getMaxPrice")
+    public ResponseEntity<?> getMaxPrice(@RequestParam Long productId){
+        return ResponseEntity.ok(productDetailService.getMaxPricePDByProductId(productId));
+    }
+
     @GetMapping("/filterProductDetailByIdCom")
     public ResponseEntity<?> filterProductDetailByIdCom(@RequestParam Optional<Long> productId,
                                                         @RequestParam Optional<Long> buttonId,
@@ -70,11 +76,13 @@ public class ProductController {
                                                         @RequestParam Optional<Long> patternId,
                                                         @RequestParam Optional<Long> formId,
                                                         @RequestParam Optional<Long> colorId,
-                                                        @RequestParam Optional<Long> sizeId) {
+                                                        @RequestParam Optional<Long> sizeId,
+                                                        @RequestParam Optional<BigDecimal> minPrice,
+                                                        @RequestParam Optional<BigDecimal> maxPrice) {
         return ResponseEntity.ok(productDetailService.filterProductDetailsByIdCom
                 (productId.orElse(null), buttonId.orElse(null), materialId.orElse(null), shirtTailId.orElse(null),
                         sleeveId.orElse(null), collarId.orElse(null), colorId.orElse(null), sizeId.orElse(null),
-                        patternId.orElse(null), formId.orElse(null)));
+                        patternId.orElse(null), formId.orElse(null), minPrice.orElse(null), maxPrice.orElse(null)));
     }
 
     @PutMapping("/updateProductDetailsByCom")
@@ -103,6 +111,11 @@ public class ProductController {
         return productImageService.getProductImageByProductId(productId);
     }
 
+    @GetMapping("/getProductImageDefaultByProductId")
+    public List<?> getProductImageDefaultByProductId(@RequestParam("productId")Long productId){
+        return productImageService.getProductImageDefaultByProductId(productId);
+    }
+
     @GetMapping("/getProductEdit")
     public ProductResponse getProductEdit(@RequestParam("productId") Long productId) {
         return service.getProductResponseById(productId);
@@ -120,13 +133,13 @@ public class ProductController {
     public ResponseEntity<?> createProductDetail(@RequestBody ProductDetailRequest request) {
         List<ProductDetailResponse> productDetailResponse = productDetailService.filterProductDetailsByIdCom(request.getProductId(), request.getButtonId(),
                 request.getMaterialId(), request.getShirtTailId(), request.getSleeveId(), request.getCollarId(),
-                request.getColorId(), request.getSizeId(), request.getPatternId(), request.getFormId());
+                request.getColorId(), request.getSizeId(), request.getPatternId(), request.getFormId(), null,
+                null);
         if (productDetailResponse.isEmpty()) {
             ProductDetail productDetail = request.dto();
             productDetail = productDetailService.create(productDetail);
         }
         return ResponseEntity.ok(productDetailResponse);
-
     }
 
     @PostMapping("/createProductImg")

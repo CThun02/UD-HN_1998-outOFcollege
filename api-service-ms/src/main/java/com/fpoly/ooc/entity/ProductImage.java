@@ -26,4 +26,7 @@ public class ProductImage extends BaseEntity{
 
     @Column(name = "path")
     private String path;
+
+    @Column(name = "is_default")
+    private Boolean isDefault;
 }

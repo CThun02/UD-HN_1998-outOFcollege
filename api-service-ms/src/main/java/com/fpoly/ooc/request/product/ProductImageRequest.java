@@ -20,10 +20,11 @@ public class ProductImageRequest {
     private String path;
     @JsonProperty("status")
     private String status;
-
+    @JsonProperty("isDefault")
+    private Boolean isDefault;
     public ProductImage dto(){
         ProductImage productImage = ProductImage.builder().id(id).product(Product.builder().id(productId).build())
-                .color(Color.builder().id(colorId).build()).path(path).build();
+                .color(Color.builder().id(colorId).build()).path(path).isDefault(isDefault).build();
         productImage.setStatus(status);
         return productImage;
     }

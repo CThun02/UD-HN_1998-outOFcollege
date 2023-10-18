@@ -30,6 +30,9 @@ import moment from "moment";
 import { useNavigate } from "react-router-dom";
 import ModalAccount from "./ModalAccount";
 import ModalAddress from "./ModalAddress";
+import Big from "big.js";
+import { object } from "yup";
+import FormUsingVoucher from "../../element/voucher/FormUsingVoucher";
 import numeral from "numeral";
 
 const Bill = () => {
@@ -223,6 +226,7 @@ const Bill = () => {
   const [fullname, setFullname] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [addressId, setAddressId] = useState(null);
+  const [isOpenFormVoucher, setIsOpenFormVoucher] = useState(false);
 
   // xóa tài khoản
   const handleDeleteAccount = () => {
@@ -911,10 +915,14 @@ const Bill = () => {
                           marginTop: "10px",
                           marginLeft: "10px",
                         }}
-                        className={styles.font}
+                        onClick={() => setIsOpenFormVoucher(true)}
                       >
                         Chọn mã giảm giá
                       </Button>
+                      <FormUsingVoucher
+                        isOpen={isOpenFormVoucher}
+                        setIsOpen={setIsOpenFormVoucher}
+                      />
                       <Row style={{ marginTop: "10px" }}>
                         <Col span={12}>
                           <span

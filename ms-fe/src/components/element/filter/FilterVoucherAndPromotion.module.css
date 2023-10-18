@@ -1,0 +1,25 @@
+.filter {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 4px;
+}
+
+.input {
+  border-radius: 0;
+  box-shadow: none;
+  border: none;
+  border-bottom: 1px solid #ccc;
+}
+
+.input:focus {
+  box-shadow: none;
+}
+
+.color {
+  color: #000000e0;
+}
+
+.selectedItem div {
+  height: 2.9rem !important;
+  align-items: center;
+}

@@ -1,7 +1,10 @@
 package com.fpoly.ooc.service.impl;
 
+import com.fpoly.ooc.entity.Brand;
 import com.fpoly.ooc.entity.Material;
-import com.fpoly.ooc.repository.MaterialDAORepositoryI;
+import com.fpoly.ooc.repository.BrandDAORepository;
+import com.fpoly.ooc.repository.MaterialDAORepository;
+import com.fpoly.ooc.service.interfaces.BrandServiceI;
 import com.fpoly.ooc.service.interfaces.MaterialServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,9 +14,8 @@ import java.util.Optional;
 
 @Service
 public class MaterialServiceImpl implements MaterialServiceI {
-
     @Autowired
-    private MaterialDAORepositoryI repo;
+    private MaterialDAORepository repo;
 
     @Override
     public Material create(Material material) {
@@ -21,33 +23,34 @@ public class MaterialServiceImpl implements MaterialServiceI {
     }
 
     @Override
-    public Material update(Material material) {
-        Material materialCheck = this.getOne(material.getId());
-        if(materialCheck != null){
-            materialCheck = repo.save(material);
-        }
-        return materialCheck;
+    public Material update(Material material, Long id) {
+
+        Optional<Material> material1 = repo.findById(id);
+        return material1.map(o -> {
+            o.setMaterialName(material.getMaterialName());
+
+            return repo.save(o);
+        }).orElse(null);
+
     }
 
     @Override
     public Boolean delete(Long id) {
-        boolean deleted = false;
-        Material material = this.getOne(id);
-        if(material!=null){
-            repo.delete(material);
-            deleted = true;
+        Material materialCheck = this.getOne(id);
+        if (materialCheck == null) {
+            return false;
         }
-        return deleted;
+        repo.delete(materialCheck);
+        return true;
     }
 
     @Override
-    public List<Material> getAll() {
+    public List<Material> findAll() {
         return repo.findAll();
     }
 
     @Override
     public Material getOne(Long id) {
-        Optional<Material> materialOptional = repo.findById(id);
-        return materialOptional.orElse(null);
+        return repo.findById(id).orElse(null);
     }
 }

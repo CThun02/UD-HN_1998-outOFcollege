@@ -1,0 +1,44 @@
+.floatLabel {
+  position: relative;
+  /* margin-bottom: 12px; */
+}
+
+.label {
+  color: #737070;
+  font-size: 1rem;
+  font-weight: normal;
+  position: absolute;
+  pointer-events: none;
+  left: 30px;
+  top: 10px;
+  transition: 0.2s ease all;
+}
+
+.labelFloat {
+  padding: 0 6px;
+  color: #737070;
+  left: 20px;
+  top: -12px;
+  font-size: 14px;
+  background: #fff;
+}
+
+.disabled {
+  background-image: linear-gradient(
+    to bottom,
+    white 50%,
+    rgba(0, 0, 0, 0.04) 50%
+  );
+}
+
+.zIndex {
+  z-index: 11;
+}
+
+.floatLabel input {
+  height: 2rem;
+}
+
+.floatLabel div div input {
+  height: 2rem !important;
+}

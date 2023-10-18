@@ -1,29 +1,36 @@
 package com.fpoly.ooc.request.product;
 
-import com.fpoly.ooc.entity.Brand;
-import com.fpoly.ooc.entity.Category;
-import com.fpoly.ooc.entity.Product;
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fpoly.ooc.entity.*;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-
 
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class ProductRequest {
+public class ProductRequest{
+    @JsonProperty("id")
     private Long id;
-    private Long brandId;
-    private Long categoryId;
-    private String productCode;
+    @JsonProperty("productName")
     private String productName;
+    @JsonProperty("productCode")
+    private String productCode;
+    @JsonProperty("brandId")
+    private Long brandId;
+    @JsonProperty("categoryId")
+    private Long categoryId;
+    @JsonProperty("description")
     private String description;
+    @JsonProperty("imgDefault")
+    private String imgDefault;
+    @JsonProperty("status")
+    private String status;
 
     public Product dto(){
-        return new Product(id, productCode, productName, description, "Active",
-                Category.builder().id(categoryId).build(), Brand.builder().id(brandId).build());
+        Product product = Product.builder().id(id).productCode(productCode).productName(productName)
+                .brand(Brand.builder().id(brandId).build())
+                .category(Category.builder().id(categoryId).build())
+                .description(description).imgDefault((imgDefault)).build();
+        product.setStatus(status);
+        return product;
     }
 }

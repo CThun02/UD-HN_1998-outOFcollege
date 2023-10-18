@@ -1,13 +1,14 @@
 package com.fpoly.ooc.controller;
 
-import com.fpoly.ooc.entity.Voucher;
+import com.fpoly.ooc.dto.VoucherAndPromotionConditionDTO;
 import com.fpoly.ooc.request.voucher.VoucherRequest;
 import com.fpoly.ooc.service.interfaces.VoucherService;
+import jakarta.validation.Valid;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,46 +16,56 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
+
 @RestController
-@RequestMapping("/admin/api/voucher")
+@RequestMapping("/api/admin/vouchers")
+@CrossOrigin(origins = "http://localhost:3000/", maxAge = 3600)
 public class VoucherController {
 
     @Autowired
     private VoucherService voucherService;
 
-    @GetMapping("/find-all")
+    @PostMapping("/")
     public ResponseEntity<?> findAllVoucher(
-            @RequestParam(value = "pageNo", defaultValue = "0") int pageNo,
-            @RequestParam(value = "pageSize", defaultValue = "5") int pageSize
-    ) {
-
-        return ResponseEntity.ok(
-                voucherService.pageAllVoucher(PageRequest.of(pageNo, pageSize)));
+            @RequestParam(value = "pageNo",defaultValue = "0") int pageNo,
+            @RequestParam(value = "pageSize",defaultValue = "5  ") int pageSize,
+            @RequestBody VoucherAndPromotionConditionDTO voucherConditionDTO
+            ) {
+        return ResponseEntity.ok()
+                .body(voucherService.findAllVoucher(PageRequest.of(pageNo, pageSize), voucherConditionDTO));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteById(@PathVariable("id") Long id) {
+    @PostMapping("/add")
+    public ResponseEntity<?> createVoucher(@Valid @RequestBody VoucherRequest request) {
 
-        voucherService.delete(id);
-
-        VoucherRequest voucherRequest = voucherService.findVoucherById(id);
-
-        return ResponseEntity.ok(voucherRequest != null ? "Delete Done" : "Error");
+        return ResponseEntity.ok().body(voucherService.saveOrUpdate(request));
     }
 
-    @PutMapping("/save")
-    public ResponseEntity<?> updateVoucher(@RequestBody VoucherRequest request) {
-
-        return ResponseEntity.ok(voucherService.saveOrUpdate(request));
+    @PutMapping("/update")
+    public ResponseEntity<?> updateVoucher(@Valid @RequestBody VoucherRequest request) {
+        return ResponseEntity.ok().body(voucherService.saveOrUpdate(request));
     }
 
-    @PostMapping("/save")
-    public ResponseEntity<?> addVoucher(@RequestBody VoucherRequest request) {
+    @PutMapping("/update/{code}")
+    public ResponseEntity<?> updateStatus(@PathVariable("code") String code) {
+        return ResponseEntity.ok().body(voucherService.updateStatus(code).getVoucherCode());
+    }
 
-        return ResponseEntity.ok(voucherService.saveOrUpdate(request));
+    @GetMapping("/{code}")
+    public ResponseEntity<?> findByCode(@PathVariable("code") String code) {
+
+        return ResponseEntity.ok().body(voucherService.findByVoucherCode(code));
+    }
+
+    @GetMapping("/display-modal-using")
+    public ResponseEntity<?> displayModalUsingVoucher(
+            @RequestParam(value = "username", defaultValue = "", required = false) String username,
+            @RequestParam(value = "priceBill", defaultValue = "-1", required = false) BigDecimal priceBill
+            ) {
+        return ResponseEntity.ok(voucherService.findAllVoucherResponseDisplayModalUsing(username, priceBill));
     }
 
 }

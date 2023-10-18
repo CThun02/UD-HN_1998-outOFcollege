@@ -1,0 +1,15 @@
+.promotion {
+  border-radius: 4px;
+}
+
+.content {
+  margin-top: 25px;
+  height: calc(100vh - 70px);
+  overflow: auto;
+  background-color: #fff;
+  padding: 20px;
+}
+
+.color {
+  color: #000000e0;
+}

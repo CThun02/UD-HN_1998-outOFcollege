@@ -1,17 +1,31 @@
 package com.fpoly.ooc.repository;
 
 import com.fpoly.ooc.entity.Account;
-import com.fpoly.ooc.responce.AccountResponce;
+import com.fpoly.ooc.responce.account.AccountResponce;
+import com.fpoly.ooc.responce.account.AccountVoucher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-@Repository
-public interface AccountRepository extends JpaRepository<Account, Long> {
+import java.util.List;
 
-    @Query("SELECT new com.fpoly.ooc.responce.AccountResponce(acc.avatar,acc.fullName,acc.gender,acc.createAt,acc.status)" +
-            "FROM Account acc join acc.role r")
-    Page<AccountResponce> phanTrang(Pageable pageable);
+@Repository
+public interface AccountRepository extends JpaRepository<Account, String> {
+
+    @Query("SELECT new com.fpoly.ooc.responce.account.AccountResponce(a.username,a.avatar, a.fullName, a.gender," +
+            " a.numberPhone, a.email,a.status)" +
+            "FROM Account a where a.role.id=?1")
+    List<AccountResponce> getAllByRoleId(Long roleId);
+
+    @Query(value = "select email from account " +
+            "left join role on account.role_id = role.id " +
+            "where role_name = 'CUSTOMER' ", nativeQuery = true)
+    List<String> emailAccountList();
+
+    @Query(name = "Account.customerAccountList", nativeQuery = true)
+    List<AccountVoucher> customerAccountList(String username, Boolean gender);
+
 }

@@ -1,22 +1,20 @@
 package com.fpoly.ooc.service.impl;
 
-import com.fpoly.ooc.entity.ShirtTailType;
+import com.fpoly.ooc.entity.Pattern;
 import com.fpoly.ooc.entity.Size;
-import com.fpoly.ooc.repository.ShirtTailTypeDAORepositoryI;
-import com.fpoly.ooc.repository.SizeDAORepositoryI;
-import com.fpoly.ooc.service.interfaces.ShirtTailTypeServiceI;
-import com.fpoly.ooc.service.interfaces.SizeTypeServiceI;
+import com.fpoly.ooc.repository.PatternDAORepository;
+import com.fpoly.ooc.repository.SizeDAORepository;
+import com.fpoly.ooc.service.interfaces.PatternServiceI;
+import com.fpoly.ooc.service.interfaces.SizeServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
-public class SizeServiceImpl implements SizeTypeServiceI {
-
+public class SizeServiceImpl implements SizeServiceI {
     @Autowired
-    private SizeDAORepositoryI repo;
+    private SizeDAORepository repo;
 
     @Override
     public Size create(Size size) {
@@ -26,31 +24,29 @@ public class SizeServiceImpl implements SizeTypeServiceI {
     @Override
     public Size update(Size size) {
         Size sizeCheck = this.getOne(size.getId());
-        if(sizeCheck != null){
-            sizeCheck = repo.save(size);
+        if(sizeCheck==null){
+            return null;
         }
-        return sizeCheck;
+        return repo.save(size);
     }
 
     @Override
     public Boolean delete(Long id) {
-        boolean deleted = false;
-        Size shirtTailType = this.getOne(id);
-        if(shirtTailType!=null){
-            repo.delete(shirtTailType);
-            deleted = true;
+        Size sizeCheck = this.getOne(id);
+        if(sizeCheck==null){
+            return false;
         }
-        return deleted;
+        repo.delete(sizeCheck);
+        return true;
     }
 
     @Override
-    public List<Size> getAll() {
+    public List<Size> findAll() {
         return repo.findAll();
     }
 
     @Override
     public Size getOne(Long id) {
-        Optional<Size> sizeOptional = repo.findById(id);
-        return sizeOptional.orElse(null);
+        return repo.findById(id).orElse(null);
     }
 }

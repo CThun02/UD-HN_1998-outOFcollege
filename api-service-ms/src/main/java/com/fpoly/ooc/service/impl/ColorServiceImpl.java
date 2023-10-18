@@ -1,53 +1,49 @@
 package com.fpoly.ooc.service.impl;
 
 import com.fpoly.ooc.entity.Color;
-import com.fpoly.ooc.repository.ColorDAORepositoryI;
+import com.fpoly.ooc.repository.ColorDAORepository;
 import com.fpoly.ooc.service.interfaces.ColorServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ColorServiceImpl implements ColorServiceI {
-
     @Autowired
-    private ColorDAORepositoryI repo;
+    private ColorDAORepository repo;
 
     @Override
-    public Color create(Color brand) {
-        return repo.save(brand);
+    public Color create(Color color) {
+        return repo.save(color);
     }
 
     @Override
-    public Color update(Color color ) {
+    public Color update(Color color) {
         Color colorCheck = this.getOne(color.getId());
-        if(colorCheck != null){
-            colorCheck = repo.save(color);
+        if(colorCheck==null){
+            return null;
         }
-        return colorCheck;
+        return repo.save(color);
     }
 
     @Override
-    public Boolean delete(String id) {
-        boolean deleted = false;
-        Color color = this.getOne(id);
-        if(color!=null){
-            repo.delete(color);
-            deleted = true;
+    public Boolean delete(Long id) {
+        Color colorCheck = this.getOne(id);
+        if(colorCheck==null){
+            return false;
         }
-        return deleted;
+        repo.delete(colorCheck);
+        return true;
     }
 
     @Override
-    public List<Color> getAll() {
+    public List<Color> findAll() {
         return repo.findAll();
     }
 
     @Override
-    public Color getOne(String id) {
-        Optional<Color> colorOptional = repo.findById(id);
-        return colorOptional.orElse(null);
+    public Color getOne(Long id) {
+        return repo.findById(id).orElse(null);
     }
 }

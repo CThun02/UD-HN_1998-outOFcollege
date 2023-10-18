@@ -1,0 +1,65 @@
+.background {
+  padding: 50px;
+  height: auto;
+  background-color: #ffffff;
+  border: 1px solid #edf2f9;
+  border-radius: 4px;
+}
+
+.blackDivider {
+  background-color: black;
+  height: 1px;
+}
+
+.span {
+  font-size: 16px;
+  display: block;
+  margin: 20px 0;
+}
+
+.timeLineEnd {
+  margin-top: 20px;
+  margin-left: 800px;
+}
+
+/* YourComponent.css */
+
+.btnHeader {
+  position: relative;
+}
+
+.btnWarning {
+  position: absolute;
+  right: 10px;
+  background-color: #f0ad4e;
+  color: #fff;
+  border-color: #eea236;
+  border: none;
+}
+
+.btnWarning:hover,
+.btnWarning:focus {
+  background-color: #ec971f;
+  border-color: #eea236;
+  border: none;
+  color: #fff !important;
+  opacity: 1 !important;
+}
+
+.timeLine {
+  width: 15% !important;
+}
+
+.optionColor {
+  display: inline-block;
+}
+
+.optionColor span {
+  padding: 2px 12px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.fixH6 {
+  margin-left: -530px;
+}

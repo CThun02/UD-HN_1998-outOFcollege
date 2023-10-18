@@ -1,16 +1,18 @@
 package com.fpoly.ooc.service.impl;
 
-import com.fpoly.ooc.entity.ProductDetail;
-import com.fpoly.ooc.entity.Size;
+import com.fpoly.ooc.constant.Const;
+import com.fpoly.ooc.constant.ErrorCodeConfig;
+import com.fpoly.ooc.dto.ProductDetailsDTO;
+import com.fpoly.ooc.entity.*;
+import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.ProductDetailDAORepositoryI;
-import com.fpoly.ooc.responce.product.ProductDetailColorResponse;
 import com.fpoly.ooc.responce.product.ProductDetailResponse;
-import com.fpoly.ooc.responce.product.ProductDetailSizeResponse;
+import com.fpoly.ooc.responce.productdetail.ProductsDetailsResponse;
 import com.fpoly.ooc.service.interfaces.ProductDetailServiceI;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,50 +22,24 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
     private ProductDetailDAORepositoryI repo;
 
     @Override
-    public ProductDetailResponse getProductDetail(Long id) {
-        return repo.getProductDetail(id);
-    }
-
-    @Override
-    public List<ProductDetailSizeResponse> getProductDetailColorSizeByIdP(Long id) {
-        List<Size> sizes = repo.getSizeIdByProductId(id);
-        List<ProductDetailSizeResponse> productDetailSizeResponses = new ArrayList<>();
-        for (Size size: sizes){
-            List<ProductDetailColorResponse> productDetailColorResponse = repo.getProductDetailColorSizeByIdPAndSizeId(id, size.getId());
-            ProductDetailSizeResponse productDetailSizeResponse = ProductDetailSizeResponse.builder().sizeId(size.getId()).sizeName(size.getSizeName())
-                    .listColor(productDetailColorResponse).build();
-            productDetailSizeResponses.add(productDetailSizeResponse);
-        }
-        return productDetailSizeResponses;
-    }
-
-    @Override
-    public ProductDetailSizeResponse getProductDetailColorSizeByIdPNIdSize(Long id, Long idSize) {
-        List<ProductDetailColorResponse> productDetailColorResponse = repo.getProductDetailColorSizeByIdPAndSizeId(id, idSize);
-        ProductDetailSizeResponse productDetailSizeResponse = ProductDetailSizeResponse.builder().sizeId(idSize)
-                .listColor(productDetailColorResponse).build();
-        return productDetailSizeResponse;
-    }
-
-    @Override
     public ProductDetail create(ProductDetail productDetail) {
         return repo.save(productDetail);
     }
 
     @Override
     public ProductDetail update(ProductDetail productDetail) {
-        ProductDetail productDetailCheck = this.getOne(productDetail.getId());
-        if(productDetailCheck != null){
-            productDetailCheck = repo.save(productDetail);
+        ProductDetail productDetailtCheck = this.getOne(productDetail.getId());
+        if (productDetailtCheck != null) {
+            productDetailtCheck = repo.save(productDetail);
         }
-        return productDetailCheck;
+        return productDetailtCheck;
     }
 
     @Override
     public Boolean delete(Long id) {
         boolean deleted = false;
         ProductDetail productDetail = this.getOne(id);
-        if(productDetail!=null){
+        if (productDetail != null) {
             repo.delete(productDetail);
             deleted = true;
         }
@@ -71,18 +47,58 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
     }
 
     @Override
-    public List<ProductDetailResponse> getAllProductDetailResponse() {
-        return repo.getAllProductDetail();
-    }
-
-    @Override
     public ProductDetail getOne(Long id) {
-        Optional<ProductDetail> productDetailOptional = repo.findById(id);
-        return productDetailOptional.orElse(null);
+        return repo.findById(id).get();
     }
 
     @Override
-    public List<ProductDetail> getProductDetailsByIdPro(Long id) {
-        return repo.getProductDetailByIdPro(id);
+    public List<ProductDetailResponse> getAll() {
+        return repo.getAll();
     }
+
+    @Override
+    public List<ProductDetailResponse> filterProductDetailsByIdCom(Long productId, Long idButton, Long idMaterial,
+                                                                   Long idShirtTail, Long idSleeve, Long idCollar,
+                                                                   Long idColor, Long idSize, Long patternId, Long formId) {
+        return repo.filterProductDetailsByIdCom(productId, idButton, idMaterial, idShirtTail, idSleeve, idCollar, idColor, idSize, patternId, formId);
+    }
+
+    @Override
+    public List<ProductDetailResponse> searchByCodeOrName(String keyWords) {
+        keyWords = "%" + keyWords + "%";
+        Optional<List<ProductDetailResponse>> values = Optional.of(repo.searchProductDetailByProductName(keyWords));
+        if (values.get().isEmpty()) {
+            values = Optional.of(repo.searchProductDetailByProductCode(keyWords));
+        }
+        return values.orElse(null);
+    }
+
+    public ProductDetail findById(Long id) {
+        ProductDetail productDetail = repo.findById(id).orElseThrow(() ->
+                new NotFoundException(ErrorCodeConfig.getMessage(Const.PRODUCT_DETAIL_NOT_FOUND)));
+        return productDetail;
+    }
+
+    @Override
+    public Integer updateProductDetailsByCom(Long productId, Long idButton, Long idMaterial, Long idShirtTail,
+                                             Long idSleeve, Long idCollar, Long idColor, Long idSize, String status) {
+        return repo.updateProductDetailsByCom(productId, idButton, idMaterial, idShirtTail, idSleeve, idCollar, idColor,
+                idSize, status);
+    }
+
+    @Override
+    public List<Long> findAllIdsResponseProductDetails(Long idPromotion) {
+        return repo.findAllByIdPromotion(idPromotion);
+    }
+
+    @Override
+    public List<ProductsDetailsResponse> findListProductdetailsByListProductId(ProductDetailsDTO dto) {
+        return repo.getProductDetailsTableByConditionDTO(
+                dto.getIdProducts(), dto.getIdButtons(), dto.getIdMaterials(),
+                dto.getIdCollars(), dto.getIdSleeves(), dto.getIdShirtTails(),
+                dto.getIdSizes(), dto.getIdColors(),
+                StringUtils.isEmpty(dto.getSearchText()) ? null : "%" + dto.getSearchText() + "%"
+        );
+    }
+
 }

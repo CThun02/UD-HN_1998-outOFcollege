@@ -1,0 +1,29 @@
+.createPromotion {
+  margin-bottom: 20px;
+}
+
+.content {
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 4px;
+}
+
+.color {
+  color: #000000e0;
+}
+
+.radioGroup {
+  height: 3rem;
+}
+
+.radioGroup label {
+  height: 100% !important;
+}
+
+.radioGroup span {
+  line-height: 3rem;
+}
+
+.errors {
+  color: red;
+}

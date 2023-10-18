@@ -1,0 +1,23 @@
+package com.fpoly.ooc.exception;
+
+public class NotFoundException extends RuntimeException {
+
+    private String field;
+
+    public NotFoundException(String message) {
+        super(message);
+    }
+
+    public NotFoundException(String message, String field) {
+        super(message);
+        this.field = field;
+    }
+
+    public NotFoundException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public String getField() {
+        return field;
+    }
+}

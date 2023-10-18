@@ -39,6 +39,8 @@ public class VoucherResponse {
 
     private String objectUse;
 
+    private BigDecimal voucherCondition;
+
 }
 
 

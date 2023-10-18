@@ -25,7 +25,6 @@ import { FormOutlined, CheckCircleTwoTone } from "@ant-design/icons";
 import { useParams } from "react-router-dom";
 import TextArea from "antd/es/input/TextArea";
 const DetailForm = (props) => {
-  const navigate = useNavigate();
   var roleId = props.roleId;
   const [data, setData] = useState({
     username: "",

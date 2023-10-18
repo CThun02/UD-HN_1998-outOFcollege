@@ -1,12 +1,19 @@
 package com.fpoly.ooc.service.impl;
 
+import com.fpoly.ooc.constant.Const;
+import com.fpoly.ooc.constant.ErrorCodeConfig;
+import com.fpoly.ooc.entity.Form;
+import com.fpoly.ooc.entity.Material;
 import com.fpoly.ooc.entity.Pattern;
+import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.PatternDAORepository;
+import com.fpoly.ooc.request.pattern.PatternRequest;
 import com.fpoly.ooc.service.interfaces.PatternServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PatternServiceImpl implements PatternServiceI {
@@ -19,12 +26,15 @@ public class PatternServiceImpl implements PatternServiceI {
     }
 
     @Override
-    public Pattern update(Pattern pattern) {
-        Pattern patternCheck = this.getOne(pattern.getId());
-        if(patternCheck==null){
-            return null;
-        }
-        return repo.save(pattern);
+    public Pattern update(Pattern pattern, Long id) {
+
+        Optional<Pattern> material1 = repo.findById(id);
+        return material1.map(o -> {
+            o.setPatternName(pattern.getPatternName());
+
+            return repo.save(o);
+        }).orElse(null);
+
     }
 
     @Override
@@ -50,5 +60,13 @@ public class PatternServiceImpl implements PatternServiceI {
     @Override
     public Pattern findFirstByPatternName(String patternName) {
         return repo.findFirstByPatternName(patternName);
+    }
+
+    @Override
+    public Pattern updateStatus(PatternRequest request, Long id) {
+        Pattern pattern = repo.findById(id).orElseThrow(() ->
+                new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND)));
+        pattern.setStatus(request.getStatus());
+        return repo.save(pattern);
     }
 }

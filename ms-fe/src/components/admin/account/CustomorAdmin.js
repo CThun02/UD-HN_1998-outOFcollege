@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Select, Input, Row, Col, Radio, Button } from "antd";
-import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
+import { Input, Row, Col, Radio, Button } from "antd";
+import {
+  SearchOutlined,
+  PlusOutlined,
+  TableOutlined,
+  FilterFilled,
+} from "@ant-design/icons";
 import CustomerTable from "./CustomerAdminTable";
-import style from "./styles/Customerlndex.module.css";
-import styles from "./AccountForm.module.css";
+import styles from "./styles/CustomerIndex.module.css";
 
 const CustomerAddminIndex = function (props) {
-  const { Option } = Select;
   const [value, setValue] = useState(1);
 
   const navigate = useNavigate();
@@ -21,33 +24,15 @@ const CustomerAddminIndex = function (props) {
     setValue(e.target.value);
   };
 
-  const MySelect = () => {
-    return (
-      <Select defaultValue="option1" style={{ width: 200 }}>
-        <Option value="option1" defaultValue disable>
-          Trạng thái
-        </Option>
-        <Option value="option2">Hoạt động</Option>
-        <Option value="option3">Ngưng hoạt động</Option>
-      </Select>
-    );
-  };
-  const handleFormSubmit = () => {
-    // Thực hiện các hành động sau khi form gửi thành công
-    // Ví dụ: cập nhật lại dữ liệu, hiển thị thông báo thành công, vv.
-    console.log("Form submitted successfully!");
-  };
-  useEffect(() => {
-    console.log("render");
-  }, [roleId]);
+  useEffect(() => {}, [roleId]);
 
   return (
-    <div className={style.customer}>
-      <div className={style.radiusFrame}>
-        <Row className={style.titleTB}>
+    <div className={styles.customer}>
+      <div className={styles.radiusFrame}>
+        <Row className={styles.titleTB}>
           <h3>Danh Sách {roleId === 1 ? "nhân viên" : "khách hàng"}</h3>
         </Row>
-        <Row className={style.adminMenu}>
+        <Row className={styles.adminMenu}>
           <Col span={10}>
             <Row>
               <p>Nhập tên nhân viên , email, số điện thoại</p>
@@ -59,27 +44,66 @@ const CustomerAddminIndex = function (props) {
               />
             </Row>
           </Col>
-          <Col span={13} offset={1}>
-            <p>Trạng thái</p>
-            <Row>
-              <Col span={14}>
-                <Radio.Group onChange={onChange} value={value}>
-                  <Radio value={1}>Tất cả</Radio>
-                  <Radio value={2}>Hoạt động</Radio>
-                  <Radio value={3}>Không hoạt động</Radio>
-                </Radio.Group>
-              </Col>
-              <Col span={9} offset={1}>
-                <Button className={style.btnSeach} onClick={handleAddAccount}>
-                  <PlusOutlined className={style.faPlus} />
-                  <span className={style.titleSeach}>Thêm Nhân Viên</span>
-                </Button>
-              </Col>
-            </Row>
-          </Col>
         </Row>
-        <div className={style.customerTable}>
-          <CustomerTable roleId={roleId}></CustomerTable>
+        <Col span={13} offset={1}>
+          <p>Trạng thái</p>
+          <Row>
+            <Col span={14}>
+              <Radio.Group onChange={onChange} value={value}>
+                <Radio value={1}>Tất cả</Radio>
+                <Radio value={2}>Hoạt động</Radio>
+                <Radio value={3}>Không hoạt động</Radio>
+              </Radio.Group>
+            </Col>
+            <Col span={9} offset={1}>
+              <Button className={styles.btnSeach} onClick={handleAddAccount}>
+                <PlusOutlined className={styles.faPlus} />
+                <span className={styles.titleSeach}>Thêm Nhân Viên</span>
+              </Button>
+            </Col>
+          </Row>
+        </Col>
+        <div className={styles.customer}>
+          <h2>
+            <FilterFilled /> Bộ lọc
+          </h2>
+          <Row className={`${styles.adminMenu} m-5`}>
+            <Col span={14} className="m-5">
+              <span>
+                <b>Trạng thái</b>
+              </span>
+              {"  "}
+              <Radio.Group onChange={onChange} value={value}>
+                <Radio value={1}>Tất cả</Radio>
+                <Radio value={"ACTIVE"}>Hoạt động</Radio>
+                <Radio value={"INACTIVE"}>Ngưng hoạt động</Radio>
+              </Radio.Group>
+            </Col>
+            <Col span={12} style={{ marginTop: "20px" }}>
+              <Input
+                className={styles.filter_inputSearch}
+                placeholder="Nhập mã tên để tìm kiếm"
+                prefix={<SearchOutlined />}
+              />
+            </Col>
+          </Row>
+        </div>
+        <div className={styles.customer} style={{ marginTop: "20px" }}>
+          <h2>
+            <TableOutlined /> Danh Sách{" "}
+            {roleId === 1 ? "nhân viên" : "khách hàng"}
+          </h2>
+          <div>
+            <div className="m-5" style={{ textAlign: "end" }}>
+              <Button
+                onClick={handleAddAccount}
+                className={styles.account__Create}
+              >
+                <PlusOutlined />
+              </Button>
+            </div>
+            <CustomerTable roleId={roleId}></CustomerTable>
+          </div>
         </div>
       </div>
     </div>

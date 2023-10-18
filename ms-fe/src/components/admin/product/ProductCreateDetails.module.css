@@ -8,7 +8,6 @@
 .product__Form,
 .product__createDetails {
   padding: 10px 20px;
-  border-right: 1px solid #edf2f9;
 }
 
 .product__FormImg {
@@ -39,9 +38,9 @@
 }
 
 .product_ButtonCreate {
-  font-size: 12px;
-  width: 32px;
-  height: 32px;
+  font-size: 16px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   border: 1px solid #edf2f9;
   display: flex;

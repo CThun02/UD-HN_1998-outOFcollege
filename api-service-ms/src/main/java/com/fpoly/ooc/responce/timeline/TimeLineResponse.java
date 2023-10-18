@@ -38,8 +38,6 @@ public class TimeLineResponse {
 
     private String phoneNumber;
 
-    private String email;
-
-    private String address;
+     private String address;
 
 }

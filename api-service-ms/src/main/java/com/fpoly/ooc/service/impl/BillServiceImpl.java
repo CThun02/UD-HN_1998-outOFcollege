@@ -2,10 +2,12 @@ package com.fpoly.ooc.service.impl;
 
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
+import com.fpoly.ooc.dto.BillStatusDTO;
 import com.fpoly.ooc.entity.Account;
 import com.fpoly.ooc.entity.Address;
 import com.fpoly.ooc.entity.Bill;
 import com.fpoly.ooc.entity.BillDetail;
+import com.fpoly.ooc.entity.DeliveryNote;
 import com.fpoly.ooc.entity.Payment;
 import com.fpoly.ooc.entity.PaymentDetail;
 import com.fpoly.ooc.entity.ProductDetail;
@@ -13,12 +15,13 @@ import com.fpoly.ooc.entity.Timeline;
 import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.BillDetailRepo;
 import com.fpoly.ooc.repository.BillRepo;
+import com.fpoly.ooc.repository.DeliveryNoteRepo;
 import com.fpoly.ooc.repository.PaymentDetailRepo;
 import com.fpoly.ooc.repository.TimeLineRepo;
 import com.fpoly.ooc.request.bill.BillDetailRequest;
 import com.fpoly.ooc.request.bill.BillRequest;
-import com.fpoly.ooc.responce.account.AccountResponce;
 import com.fpoly.ooc.responce.account.GetListCustomer;
+import com.fpoly.ooc.responce.bill.BillManagementResponse;
 import com.fpoly.ooc.service.interfaces.BillService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -42,6 +45,11 @@ public class BillServiceImpl implements BillService {
     @Autowired
     private TimeLineRepo timeLineRepo;
 
+    @Autowired
+    private DeliveryNoteRepo deliveryNoteRepo;
+
+
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Bill createBill(BillRequest request) {
         Account accountBuilder = null;
@@ -68,7 +76,7 @@ public class BillServiceImpl implements BillService {
                     .price(billDetailRequest.getPrice())
                     .quantity(billDetailRequest.getQuantity())
                     .note("null")
-                    .status("wating")
+                    .status("UNPAID")
                     .build();
             billDetailRepo.save(billDetail);
         }
@@ -79,6 +87,16 @@ public class BillServiceImpl implements BillService {
                 .build();
         paymentDetailRepo.save(paymentDetail);
 
+        DeliveryNote deliveryNote = DeliveryNote.builder()
+                .bill(bill)
+                .address(request.getAddressId() == null ? null :
+                        Address.builder().id(request.getAddressId()).build())
+                .name(request.getFullname())
+                .phoneNumber(request.getPhoneNumber())
+                .shipPrice(request.getShipPrice())
+                .build();
+        deliveryNoteRepo.save(deliveryNote);
+
         Timeline timeline = new Timeline();
         timeline.setBill(bill);
         timeline.setNote("Tạo đơn hàng");
@@ -86,6 +104,17 @@ public class BillServiceImpl implements BillService {
         timeLineRepo.save(timeline);
 
         return bill;
+    }
+
+    @Override
+    public List<BillManagementResponse> getAllBillManagement(
+            String billCode,
+            LocalDateTime startDate,
+            LocalDateTime endDate,
+            String status,
+            String billType) {
+        return billRepo.getAllBillManagement(billCode,
+                startDate, endDate, status, billType);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -102,6 +131,13 @@ public class BillServiceImpl implements BillService {
     @Override
     public List<GetListCustomer> getListCustomer() {
         return billRepo.getListCustomer();
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public Integer updateBillStatus(BillStatusDTO dto, Long id) {
+        billRepo.update(dto.getStatus(), id);
+        return 1;
     }
 
     @Override

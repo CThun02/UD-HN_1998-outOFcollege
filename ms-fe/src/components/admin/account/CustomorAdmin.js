@@ -12,7 +12,6 @@ import styles from "./styles/CustomerIndex.module.css";
 
 const CustomerAddminIndex = function (props) {
   const [value, setValue] = useState(1);
-  const [searchKeyword, setSearchKeyword] = useState("");
 
   const navigate = useNavigate();
   const handleAddAccount = () => {
@@ -21,8 +20,10 @@ const CustomerAddminIndex = function (props) {
 
   let roleId = props.roleId;
   const onChange = (e) => {
+    console.log("radio checked", e.target.value);
     setValue(e.target.value);
   };
+
   useEffect(() => {}, [roleId]);
 
   return (
@@ -72,5 +73,4 @@ const CustomerAddminIndex = function (props) {
     </>
   );
 };
-
 export default CustomerAddminIndex;

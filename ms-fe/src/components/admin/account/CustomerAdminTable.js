@@ -73,7 +73,7 @@ function CustomerTable(props) {
             ),
           },
           {
-            title: "Tên Nhân Viên",
+            title: "Tên Khách Hàng",
             dataIndex: "fullName",
             key: "username",
           },

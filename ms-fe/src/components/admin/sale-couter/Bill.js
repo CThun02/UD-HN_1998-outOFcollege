@@ -75,6 +75,13 @@ const Bill = () => {
   const updateQuantity = (record, index, value) => {
     let cart = JSON.parse(localStorage.getItem(cartId));
     let productDetails = cart.productDetails;
+    if (value > 99) {
+      notification.warning({
+        message: 'Thông báo',
+        description: 'Chỉ được mua 100 sản phẩm',
+        duration: 1
+      });
+    }
     productDetails[index].quantity = value;
     cart.productDetails = productDetails;
     localStorage.setItem(cartId, JSON.stringify(cart));
@@ -158,6 +165,7 @@ const Bill = () => {
         return (
           <InputNumber
             min={1}
+            max={100}
             value={record.quantity}
             onChange={(value) => updateQuantity(record, index, value)}
           />
@@ -381,6 +389,7 @@ const Bill = () => {
       insurance_value: insuranceValue,
       coupon: null,
       from_district_id: 3440,
+      from_ward_code: "13010",
       to_district_id: Number(toDistrictId),
       to_ward_code: toWardCode,
       height: 15,
@@ -562,8 +571,7 @@ const Bill = () => {
   const [symbol, setSymbol] = useState("In-store")
   const [note, setNote] = useState("")
   const [priceReduce, setPriceReduce] = useState(null)
-  const [showConfirm, setShowConfirm] = useState(false)
-
+  const [amountPaid, setAmountPaid] = useState(0)
 
   const handleCreateBill = (index) => {
 
@@ -572,6 +580,7 @@ const Bill = () => {
       accountId: account?.username,
       price: totalPrice,
       priceReduce: priceReduce,
+      amountPaid: amountPaid,
       billType: 'In-Store',
       symbol: symbol,
       status: 'unpaid',
@@ -587,6 +596,7 @@ const Bill = () => {
     };
 
 
+    console.log(remainAmount, 'remain')
     if (productDetails.length <= 0) {
       return notification.error({
         message: "Thông báo",
@@ -643,14 +653,20 @@ const Bill = () => {
 
 
   const [inputError, setInputError] = useState('');
-  const handleChangeInput = (e) => {
+  const handleChangeInput = (e, index) => {
     const inputValue = e.target.value;
-    const calculatedValue = inputValue - totalPrice;
+    let calculatedValue = 0;
+    if (switchChange[index]) {
+      calculatedValue = inputValue - totalPrice - shippingFee;
+    } else {
+      calculatedValue = inputValue - totalPrice
+    }
+    setRemainAmount(calculatedValue);
     numeral(inputValue).format('0,0')
     if (calculatedValue < 0) {
       setInputError('Số tiền không đủ');
     } else {
-      setRemainAmount(calculatedValue);
+      setAmountPaid(inputValue)
       setInputError('');
     }
   };
@@ -856,7 +872,7 @@ const Bill = () => {
                       </Row>
                     </Col>
                     <Col span={8}>
-                      <Switch onChange={(e) => handleChangSwitch(e, index)} disabled={account !== undefined ? false : true} />
+                      <Switch onChange={(e) => handleChangSwitch(e, index)} />
                       <span style={{ marginLeft: "5px" }}>Giao hàng</span>
                       <br />
                       <Input
@@ -934,19 +950,17 @@ const Bill = () => {
 
                           {selectedButton !== 2 && <span style={{ fontSize: "16px", width: '200%', display: "block" }}>
                             Số tiền khách trả
-                            {
-                              switchChange[index] ? (
-                                <input type="number"
-                                  className={styles.input}
-                                  onChange={(e) => setRemainAmount(e.target.value - totalPrice - shippingFee)} />
-                              ) : (
-                                <input type="number"
-                                  className={styles.input}
-                                  onChange={handleChangeInput} />
-                              )
-                            }
+                            <input type="number"
+                              className={styles.input}
+                              onChange={(e) => handleChangeInput(e, index)} />
                             {inputError && <span className={styles.error}>{inputError}</span>}
                           </span>}
+
+                          {selectedButton === 2 && <Input
+                            placeholder="Nhập mã giao dịch"
+                            size="large"
+                            onChange={(e) => setTransactionCode(e.target.value)}
+                            style={{ margin: '10px 0', width: '380px' }} />}
                           {selectedButton !== 2 && <span style={{ fontSize: "16px", width: '200%', display: "block" }}>
                             Tiền thừa trả khách
                             <span style={{ marginLeft: '59px' }}>
@@ -988,11 +1002,7 @@ const Bill = () => {
                         </div>
                         <div style={{ marginTop: "20px" }}>
 
-                          {selectedButton === 2 && <Input
-                            placeholder="Nhập mã giao dịch"
-                            size="large"
-                            onChange={(e) => setTransactionCode(e.target.value)}
-                            style={{ marginBottom: '10px', width: '380px' }} />}
+
                           <Button
                             type="primary"
                             onClick={() => handleCreateBill(index)}

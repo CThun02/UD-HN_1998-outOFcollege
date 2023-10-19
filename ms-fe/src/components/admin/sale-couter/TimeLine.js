@@ -1,7 +1,7 @@
 import { Button, Col, Divider, Row, Table } from 'antd';
 import { useEffect, useState } from 'react';
 import { Timeline, TimelineEvent } from '@mailtop/horizontal-timeline';
-import { FaBug, FaRegCheckCircle, FaRegFileAlt, FaTimes, FaTruck } from 'react-icons/fa';
+import { FaRegCheckCircle, FaRegFileAlt, FaTimes, FaTruck } from 'react-icons/fa';
 import styles from './TimeLine.module.css'
 import ModalConfirm from './ModalConfirm';
 import SpanBorder from './SpanBorder';
@@ -297,9 +297,6 @@ const BillTimeLine = (addId) => {
                     <Col span={12}>
                         <h2>Thông tin đơn hàng</h2>
                     </Col>
-                    <Col span={12} style={{ textAlign: 'right' }}>
-                        <Button type='primary'>Cập nhật</Button>
-                    </Col>
                 </Row>
                 <Divider className={styles.blackDivider} style={{ marginTop: '10px' }} />
                 <Row>
@@ -378,9 +375,6 @@ const BillTimeLine = (addId) => {
                 <Row>
                     <Col span={12}>
                         <h2>Sản phẩm đã mua</h2>
-                    </Col>
-                    <Col span={12} style={{ textAlign: 'right' }}>
-                        <Button type='primary'>Thêm sản phẩm</Button>
                     </Col>
                 </Row>
                 <Divider className={styles.blackDivider} style={{ marginTop: '10px' }} />

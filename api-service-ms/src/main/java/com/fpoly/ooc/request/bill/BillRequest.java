@@ -36,6 +36,8 @@ public class BillRequest {
 
     private BigDecimal priceReduce;
 
+    private BigDecimal amountPaid;
+
     private String billType;
 
     private String status;

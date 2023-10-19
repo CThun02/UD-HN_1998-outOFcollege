@@ -56,6 +56,9 @@ public class Bill extends BaseEntity {
     @Column(name = "price_reduce")
     private BigDecimal priceReduce;
 
+    @Column(name = "amount_paid")
+    private BigDecimal amountPaid;
+
     @Column(name = "bill_type")
     private String billType;
 

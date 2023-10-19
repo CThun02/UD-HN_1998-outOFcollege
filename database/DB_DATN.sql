@@ -283,6 +283,7 @@ CREATE TABLE bill(
     completion_date     DATETIME,
     price               DECIMAL,
     price_reduce        DECIMAL,
+    amount_paid         DECIMAL,
     bill_type           VARCHAR(50),
     symbol              VARCHAR(50),
     note                NVARCHAR(MAX),

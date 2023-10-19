@@ -62,6 +62,7 @@ public class BillServiceImpl implements BillService {
                 .account(accountBuilder)
                 .priceReduce(request.getPriceReduce())
                 .price(request.getPrice())
+                .amountPaid(request.getAmountPaid())
                 .billType(request.getBillType())
                 .transactionCode(request.getTransactionCode())
                 .symbol(request.getSymbol())

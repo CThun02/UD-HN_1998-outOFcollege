@@ -26,6 +26,8 @@ public class BillManagementResponse {
 
     private String billType;
 
+    private String symbol;
+
     private String status;
 
 }

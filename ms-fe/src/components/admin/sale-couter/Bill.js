@@ -31,6 +31,8 @@ import { useNavigate } from "react-router-dom";
 import ModalAccount from "./ModalAccount";
 import ModalAddress from "./ModalAddress";
 import numeral from "numeral";
+import ModalConfirm from "./ModalConfirm";
+import Confirm from "../confirm/Confirm";
 
 
 const Bill = () => {
@@ -221,10 +223,8 @@ const Bill = () => {
   const [address, setAddress] = useState({})
   const [showAddress, setShowAddress] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState({})
+  const [transactionCode, setTransactionCode] = useState('')
   const navigate = useNavigate();
-  const [fullname, setFullname] = useState('')
-  const [phoneNumber, setPhoneNumber] = useState('')
-  const [addressId, setAddressId] = useState(null)
 
 
   // xóa tài khoản 
@@ -234,7 +234,6 @@ const Bill = () => {
     localStorage.setItem(cartId, JSON.stringify(cart));
     setSelectedAddress({});
     setShippingFee(0);
-    setAddressId(null)
     setLeadtime(null);
     setRendered(Math.random);
   }
@@ -417,7 +416,7 @@ const Bill = () => {
       const visible = [...switchChange];
       visible[index] = checked;
       setSwitchChange(visible);
-      setBillType(checked ? 'Online' : 'In-store');
+      setSymbol(checked ? 'Online' : 'In-store');
     } else {
       notification.error({
         message: 'Lỗi',
@@ -545,29 +544,27 @@ const Bill = () => {
     fetchProvinces();
 
     console.log(address)
-    if (selectedAddress.city) {
-      const city = selectedAddress?.city
-        .substring(1 + selectedAddress.city.indexOf("|"))
+    if (selectedAddress?.city) {
+      const city = selectedAddress?.city.substring(1 + selectedAddress.city.indexOf("|"))
       const district = selectedAddress?.district.substring(1 + selectedAddress.district.indexOf("|"))
       const ward = selectedAddress?.ward.substring(1 + selectedAddress.ward.indexOf("|"))
 
       handleProvinceChange(city);
       handleDistrictChange(district);
-      handleShippingOrderLeadtime(
-        district,
-        ward)
+      handleShippingOrderLeadtime(district, ward)
       handleShippingFee(totalPrice, district, ward);
     }
-
-    console.log(`ship`, shippingFee)
 
     getProductDetails();
     initializeModalStates();
   }, [cartId, render, account?.username]);
 
-  const [billType, setBillType] = useState('In-store')
+  const [symbol, setSymbol] = useState("In-store")
   const [note, setNote] = useState("")
   const [priceReduce, setPriceReduce] = useState(null)
+  const [showConfirm, setShowConfirm] = useState(false)
+
+
   const handleCreateBill = (index) => {
 
     const bill = {
@@ -575,18 +572,20 @@ const Bill = () => {
       accountId: account?.username,
       price: totalPrice,
       priceReduce: priceReduce,
-      billType: billType,
+      billType: 'In-Store',
+      symbol: symbol,
       status: 'unpaid',
       note: note,
+      paymentDetailId: selectedButton,
       lstBillDetailRequest: [],
       addressId: selectedAddress?.id,
-      fullname: selectedAddress.fullName,
+      fullname: selectedAddress?.fullName,
       phoneNumber: selectedAddress.numberPhone,
       shipDate: switchChange[index] === true ? leadtime : null,
       shipPrice: switchChange[index] === true ? shippingFee : null,
+      transactionCode: selectedButton === 2 ? transactionCode : null,
     };
 
-    console.log(remainAmount)
 
     if (productDetails.length <= 0) {
       return notification.error({
@@ -598,8 +597,8 @@ const Bill = () => {
     else if (selectedButton == null) {
       return console.log('chưa chọn hình thức thanh toán')
     }
-    else if ((remainAmount < 0 || isNaN(remainAmount))) {
-      return setInputError('Tiền không đụ')
+    else if (selectedButton !== 2 && (remainAmount < 0 || isNaN(remainAmount))) {
+      return setInputError('Tiền không đủ')
     }
     else {
       for (let i = 0; i < productDetails.length; i++) {
@@ -611,6 +610,7 @@ const Bill = () => {
 
         bill.lstBillDetailRequest.push(billDetail);
       }
+
       Modal.confirm({
         title: 'Xác nhận thanh toán',
         content: 'Bạn có chắc chắn muốn thanh toán?',
@@ -618,7 +618,18 @@ const Bill = () => {
           axios
             .post('http://localhost:8080/api/admin/bill', bill)
             .then((response) => {
-              navigate(`/admin/counter-sales/${response.data.id}/timeline`);
+              if (response.data.symbol === 'In-store') {
+                axios.put(`http://localhost:8080/api/admin/bill/${response.data.id}`, {
+                  status: 'PAID'
+                })
+                  .then((response) => {
+                    console.log(response)
+                  })
+                  .catch((error) => {
+                    console.log(error)
+                  });
+              }
+              navigate(`/admin/order`);
               remove(activeKey);
             })
             .catch((error) => {
@@ -628,8 +639,8 @@ const Bill = () => {
       })
     }
     console.log(bill)
-
   }
+
 
   const [inputError, setInputError] = useState('');
   const handleChangeInput = (e) => {
@@ -643,6 +654,7 @@ const Bill = () => {
       setInputError('');
     }
   };
+
   return (
     <>
       <Tabs
@@ -713,7 +725,7 @@ const Bill = () => {
                           {account && (
                             <>
                               <span style={{ display: 'block', width: '200px' }}>
-                                <b>Tên khách hàng: </b> {account.fullName}
+                                <b>Tên khách hàng: </b> {account?.fullName}
                               </span>
                             </>
                           )}
@@ -754,13 +766,13 @@ const Bill = () => {
                           <span>
                             <b style={{ color: "red" }}>*</b> Họ và tên
                           </span>
-                          <Input placeholder="nhập họ và tên" value={selectedAddress.fullName} />
+                          <Input placeholder="nhập họ và tên" value={selectedAddress?.fullName} />
                         </Col>
                         <Col span={10} style={{ marginLeft: "40px" }}>
                           <span>
                             <b style={{ color: "red" }}>*</b> Số điện thoại
                           </span>
-                          <Input placeholder="nhập số điện thoại" value={selectedAddress.numberPhone} />
+                          <Input placeholder="nhập số điện thoại" value={selectedAddress?.numberPhone} />
                         </Col>
                       </Row>
                       <Row style={{ margin: "40px 0" }}>
@@ -920,7 +932,7 @@ const Bill = () => {
                             )}
                           </span>
 
-                          <span style={{ fontSize: "16px", width: '200%', display: "block" }}>
+                          {selectedButton !== 2 && <span style={{ fontSize: "16px", width: '200%', display: "block" }}>
                             Số tiền khách trả
                             {
                               switchChange[index] ? (
@@ -934,8 +946,8 @@ const Bill = () => {
                               )
                             }
                             {inputError && <span className={styles.error}>{inputError}</span>}
-                          </span>
-                          <span style={{ fontSize: "16px", width: '200%', display: "block" }}>
+                          </span>}
+                          {selectedButton !== 2 && <span style={{ fontSize: "16px", width: '200%', display: "block" }}>
                             Tiền thừa trả khách
                             <span style={{ marginLeft: '59px' }}>
                               <span style={{ color: "red" }}>
@@ -945,8 +957,7 @@ const Bill = () => {
                                 })}
                               </span>
                             </span>
-                          </span>
-
+                          </span>}
                         </Col>
 
                         <TextArea onChange={(e) => setNote(e.target.value)} rows={3} placeholder="ghi chú ..." style={{ margin: '10px 0' }} />
@@ -976,6 +987,12 @@ const Bill = () => {
                           </div>
                         </div>
                         <div style={{ marginTop: "20px" }}>
+
+                          {selectedButton === 2 && <Input
+                            placeholder="Nhập mã giao dịch"
+                            size="large"
+                            onChange={(e) => setTransactionCode(e.target.value)}
+                            style={{ marginBottom: '10px', width: '380px' }} />}
                           <Button
                             type="primary"
                             onClick={() => handleCreateBill(index)}

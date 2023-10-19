@@ -18,6 +18,10 @@ public class BillInfoResponse {
 
     private String billCode;
 
+    private String transaction;
+
+    private String symbol;
+
     private String billType;
 
     private String fullName;

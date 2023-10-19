@@ -63,6 +63,8 @@ public class BillServiceImpl implements BillService {
                 .priceReduce(request.getPriceReduce())
                 .price(request.getPrice())
                 .billType(request.getBillType())
+                .transactionCode(request.getTransactionCode())
+                .symbol(request.getSymbol())
                 .note(request.getNote())
                 .billCode(request.getBillCode())
                 .completionDate(LocalDateTime.now())
@@ -83,7 +85,7 @@ public class BillServiceImpl implements BillService {
 
         PaymentDetail paymentDetail = PaymentDetail.builder()
                 .bill(bill)
-                .payment(Payment.builder().id(1L).build())
+                .payment(Payment.builder().id(request.getPaymentDetailId()).build())
                 .build();
         paymentDetailRepo.save(paymentDetail);
 
@@ -93,15 +95,18 @@ public class BillServiceImpl implements BillService {
                         Address.builder().id(request.getAddressId()).build())
                 .name(request.getFullname())
                 .phoneNumber(request.getPhoneNumber())
+                .shipDate(request.getShipDate())
                 .shipPrice(request.getShipPrice())
                 .build();
         deliveryNoteRepo.save(deliveryNote);
 
-        Timeline timeline = new Timeline();
-        timeline.setBill(bill);
-        timeline.setNote("Tạo đơn hàng");
-        timeline.setStatus("1");
-        timeLineRepo.save(timeline);
+        for (int i = 0; i < 2; i++) {
+            String n = String.valueOf((i + 1));
+            Timeline timeline = new Timeline();
+            timeline.setBill(bill);
+            timeline.setStatus(n);
+            timeLineRepo.save(timeline);
+        }
 
         return bill;
     }

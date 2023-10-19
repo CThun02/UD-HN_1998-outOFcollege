@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import styles from './BillManagement.module.css'
-import { Button, Input, Pagination, Select, Table } from 'antd'
+import { Button, Input, Pagination, Select, Table, Tag } from 'antd'
 import {
     EyeOutlined,
     SearchOutlined
@@ -94,18 +94,46 @@ const BillManagement = () => {
         },
         {
             title: 'Loại hóa đơn',
-            dataIndex: 'billType',
-            key: 'billType',
+            dataIndex: 'symbol',
+            key: 'symbol',
+            render: (object) => {
+                let color =
+                    object === "In-store"
+                        ? "geekblue"
+                        : object === "Online"
+                            ? "green" : null;
+                return (
+                    <Space direction="vertical">
+                        <div style={{ width: "auto", display: "flex" }}>
+                            <Tag color={color}>{object}</Tag>
+                        </div>
+                    </Space>
+                );
+            },
         },
         {
             title: 'Trạng thái',
             dataIndex: 'status',
             key: 'status',
-            render: (status) => {
-                return status === 'ACTIVE' ? 'Chưa thanh toán'
-                    : status === 'Cancel' ? 'Đã hủy'
-                        : 'Đã thanh toán'
-            }
+            render: (object) => {
+                let color =
+                    object === "ACTIVE"
+                        ? "geekblue"
+                        : object.toLocaleLowerCase() === "PAID".toLocaleLowerCase()
+                            ? "green"
+                            : object === "cancel"
+                                ? "red"
+                                : null;
+                return (
+                    <Space direction="vertical">
+                        <div style={{ width: "auto", display: "flex" }}>
+                            <Tag color={color}>{object === 'ACTIVE' ? 'Chưa thanh toán'
+                                : object === 'cancel' ? 'Đã hủy'
+                                    : 'Đã thanh toán'}</Tag>
+                        </div>
+                    </Space>
+                );
+            },
         },
         {
             title: 'Thao tác',

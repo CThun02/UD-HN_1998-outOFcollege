@@ -24,6 +24,10 @@ public class BillRequest {
 
     private String accountId;
 
+    private String transactionCode;
+
+    private String symbol;
+
     private LocalDateTime dateOfReceipt;
 
     private LocalDateTime completionDate;

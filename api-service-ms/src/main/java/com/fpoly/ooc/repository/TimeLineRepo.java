@@ -37,7 +37,7 @@ public interface TimeLineRepo extends JpaRepository<Timeline, Long> {
             "WHERE bd.bill.id = :billId")
     List<TimelineProductResponse> getTimelineProductByBillId(@Param("billId") Long id);
 
-    @Query("SELECT new com.fpoly.ooc.responce.bill.BillInfoResponse(b.id, b.billCode, b.billType, dn.name, dn.phoneNumber, " +
+    @Query("SELECT new com.fpoly.ooc.responce.bill.BillInfoResponse(b.id, b.billCode,b.transactionCode, b.symbol, b.billType, dn.name, dn.phoneNumber, " +
             "    b.price, b.priceReduce, dn.shipPrice, dn.shipDate, pd.payment.paymentName, b.createdAt, " +
             "    add.descriptionDetail +  ' ' + add.ward + ' ' + add.district + ' ' + add.city) " +
             "FROM Bill b " +

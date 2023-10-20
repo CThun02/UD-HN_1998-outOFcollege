@@ -39,6 +39,8 @@ public class ErrorCodeConfig {
         errors.put("DATE_NOT_FOUND", "Định dạng ngày không hợp lệ.");
         errors.put("END_DATE_NOT_FOUND", "Định dạng ngày không hợp lệ.");
         errors.put("START_DATE_NOT_FOUND", "Định dạng ngày không hợp lệ.");
+        errors.put("VOUCHER_END_OF_USE", "Hết thời gian sử dụng mã giảm giá.");
+        errors.put("VOUCHER_ACCOUNT_NOT_FOUND", "Không tìm thấy mã giảm giá với tài khoản hiện tại.");
     }
 
     public static String getMessage(String code) {

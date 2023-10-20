@@ -1,3 +1,11 @@
 .scroll div div {
   max-height: 500px;
 }
+
+.scroll div.ant-modal-content {
+  width: 600px;
+}
+
+.scroll {
+  width: 600px !important;
+}

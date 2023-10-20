@@ -104,30 +104,19 @@ public class VoucherServiceImpl implements VoucherService {
 
     @Override
     public Voucher updateStatus(String code) {
-        Optional<Voucher> voucherOptional = voucherRepository.findVoucherByVoucherCode(code);
+        Voucher voucher = findVoucherByVoucherCode(code);
+        voucher.setStatus(Const.STATUS_CANCEL);
+        voucher.setDeletedAt(LocalDateTime.now());
 
-        if (voucherOptional.isEmpty()) {
-            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.CODE_NOT_FOUND));
-        } else {
-            voucherOptional.get().setStatus(Const.STATUS_CANCEL);
-            voucherOptional.get().setDeletedAt(LocalDateTime.now());
-
-            return voucherRepository.save(voucherOptional.get());
-        }
-
+        return voucherRepository.save(voucher);
     }
 
     @Override
     public Voucher updateStatus(String code, String status) {
-        Optional<Voucher> voucherOptional = voucherRepository.findVoucherByVoucherCode(code);
+        Voucher voucher = findVoucherByVoucherCode(status);
+        voucher.setStatus(status);
 
-        if (voucherOptional.isEmpty()) {
-            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.CODE_NOT_FOUND));
-        } else {
-            voucherOptional.get().setStatus(status);
-
-            return voucherRepository.save(voucherOptional.get());
-        }
+        return voucherRepository.save(voucher);
     }
 
     @Override
@@ -164,13 +153,7 @@ public class VoucherServiceImpl implements VoucherService {
 
     @Override
     public VoucherRequest findByVoucherCode(String code) {
-        Optional<Voucher> voucherOptional = voucherRepository.findVoucherByVoucherCode(code);
-
-        if (voucherOptional.isEmpty()) {
-            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.CODE_NOT_FOUND));
-        } else {
-            return convertVoucher(voucherOptional.get());
-        }
+        return convertVoucher(findVoucherByVoucherCode(code));
     }
 
     @Override
@@ -189,6 +172,17 @@ public class VoucherServiceImpl implements VoucherService {
                 StringUtils.isBlank(username) ? null : username,
                 String.valueOf(priceBill).equals("-1") ? null : priceBill
         );
+    }
+
+    @Override
+    public Voucher findVoucherByVoucherCode(String voucherCode) {
+        return voucherRepository.findVoucherByVoucherCode(voucherCode)
+                .orElseThrow(() -> new NotFoundException(ErrorCodeConfig.getMessage(Const.CODE_NOT_FOUND)));
+    }
+
+    @Override
+    public Boolean isCheckTimeUse(String voucherCode, String username) {
+        return voucherRepository.isCheckTimeUseAndAccount(voucherCode, username);
     }
 
     private VoucherRequest convertVoucher(Voucher voucher) {

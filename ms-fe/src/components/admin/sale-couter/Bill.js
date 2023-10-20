@@ -227,6 +227,7 @@ const Bill = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [addressId, setAddressId] = useState(null);
   const [isOpenFormVoucher, setIsOpenFormVoucher] = useState(false);
+  const [voucherAdd, setVoucherAdd] = useState({});
 
   // xóa tài khoản
   const handleDeleteAccount = () => {
@@ -920,6 +921,9 @@ const Bill = () => {
                         Chọn mã giảm giá
                       </Button>
                       <FormUsingVoucher
+                        priceBill={totalPrice}
+                        voucher={voucherAdd}
+                        setVoucher={setVoucherAdd}
                         isOpen={isOpenFormVoucher}
                         setIsOpen={setIsOpenFormVoucher}
                       />
@@ -948,7 +952,26 @@ const Bill = () => {
                             }}
                           >
                             Giảm giá
-                            <span style={{ marginLeft: "130px" }}>0 đ</span>
+                            <span style={{ marginLeft: "130px" }}>
+                              {voucherAdd?.voucherValue
+                                ? voucherAdd.voucherMethod === "vnd"
+                                  ? voucherAdd?.voucherValue + "đ"
+                                  : voucherAdd?.voucherValue + "%"
+                                : "0đ"}
+                            </span>
+                            <span
+                              style={{ marginLeft: "28px", color: "green" }}
+                            >
+                              {voucherAdd.voucherName}
+                            </span>
+                            {voucherAdd.voucherId ? (
+                              <span
+                                style={{ marginLeft: "20px", color: "green" }}
+                                onClick={() => setVoucherAdd({})}
+                              >
+                                ❌
+                              </span>
+                            ) : null}
                           </span>
                           {switchChange[index] && (
                             <>

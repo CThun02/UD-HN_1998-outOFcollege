@@ -31,4 +31,6 @@ public interface BillService {
 
     List<Address> getListAddressByUserName(String username);
 
+    Bill findBillByBillId(Long id);
+
 }

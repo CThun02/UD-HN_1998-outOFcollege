@@ -1,6 +1,8 @@
 package com.fpoly.ooc.controller;
 
+import com.fpoly.ooc.entity.CollarType;
 import com.fpoly.ooc.entity.Form;
+import com.fpoly.ooc.request.form.FormRequest;
 import com.fpoly.ooc.service.interfaces.FormServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -24,5 +26,27 @@ public class FormController {
     public ResponseEntity<?> create(@RequestParam String categoryName){
         Form form = Form.builder().formName(categoryName).build();
         return ResponseEntity.ok(service.create(form));
+    }
+    @PostMapping("create")
+    public ResponseEntity<?> create(@RequestBody Form form){
+        return ResponseEntity.ok(service.create(form));
+    }
+
+    @PutMapping("edit/{id}")
+    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody Form form) {
+
+        return ResponseEntity.ok(service.update(form, id));
+    }
+
+    @PutMapping("update/{id}")
+    public ResponseEntity<?> updateStatus(@RequestBody FormRequest request,@PathVariable Long id){
+        return ResponseEntity.ok(service.updateStatus(request, id).getId());
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<?>delete(@PathVariable Long id){
+        Form form = service.getOne(id);
+        service.delete(form.getId());
+        return ResponseEntity.ok("Ok");
     }
 }

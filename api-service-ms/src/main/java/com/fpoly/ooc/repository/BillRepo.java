@@ -37,6 +37,7 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
             "   AND (b.createdAt <= :endDate OR :endDate IS NULL) " +
             "   AND (:status IS NULL OR b.status LIKE %:status%) " +
             "   AND (:billType IS NULL OR b.billType LIKE %:billType%) " +
+            "   AND (:symbol IS NULL OR b.symbol LIKE %:symbol%) " +
             "GROUP BY b.id, b.billCode, b.price, a.fullName, b.createdAt, b.billType, b.status, b.symbol " +
             "ORDER BY b.createdAt DESC ")
     List<BillManagementResponse> getAllBillManagement(
@@ -44,7 +45,8 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate,
             @Param("status") String status,
-            @Param("billType") String billType);
+            @Param("billType") String billType,
+            @Param("symbol") String symbol);
 
     @Modifying
     @Query("UPDATE Bill b SET b.status = :status WHERE b.id = :id")

@@ -176,7 +176,7 @@ const BillTimeLine = (addId) => {
             <section className={styles.background}>
                 <div style={{ overflowX: 'scroll' }}>
                     <div style={{ width: 'fit-content' }}>
-                        {billInfo?.symbol === 'Online' ? (
+                        {billInfo?.symbol !== 'received' ? (
                             <Timeline minEvents={6} placeholder className={styles.timeLine}>
                                 {timelines && timelines.map((data) => (
                                     <TimelineEvent
@@ -205,7 +205,7 @@ const BillTimeLine = (addId) => {
                                 ))}
                             </Timeline>
                         ) : (
-                            <Timeline minEvents={6} placeholder className={styles.timeLine}>
+                            <Timeline minEvents={2} placeholder className={styles.timeLine}>
                                 {timelines && timelines.map((data) => (
                                     <TimelineEvent
                                         color={data.status === '0' ? '#FF0000' : '#00cc00'}
@@ -226,7 +226,7 @@ const BillTimeLine = (addId) => {
                     </div>
                 </div>
                 <div className={styles.btnHeader} style={{ marginTop: 24 }}>
-                    {billInfo.symbol !== 'Online' && timelines.length !== 2 && (
+                    {billInfo?.symbol === 'Received' && timelines.length !== 2 && (
                         <>
                             <Button
                                 type="primary"
@@ -251,7 +251,7 @@ const BillTimeLine = (addId) => {
                         </>
                     )}
                     {console.log('timeline', timelines.length)}
-                    {billInfo.symbol !== 'In-store' && (timelines.length !== 4 && timelines.length !== 5) && timelines[timelines.length - 1]?.status !== '0' && (
+                    {billInfo?.symbol !== 'Received' && (timelines.length !== 4 && timelines.length !== 5) && timelines[timelines.length - 1]?.status !== '0' && (
                         <>
                             <Button
                                 type="primary"
@@ -307,7 +307,7 @@ const BillTimeLine = (addId) => {
                                 <span className={styles.span}>HÌnh thức mùa hàng</span>
                                 <span className={styles.span}>Ngày mua hàng</span>
                                 <span className={styles.span}>Mã giao dịch</span>
-                                {billInfo?.symbol === 'Online' && <>
+                                {billInfo?.symbol === 'Shipping' && <>
                                     <span className={styles.span}>Phương thức thanh toán</span>
                                     <span className={styles.span}>Hình thức giao hàng </span>
                                     <span style={{ fontSize: '16px', display: 'block' }}>Ngày nhận hàng dự kiến</span></>}
@@ -325,7 +325,7 @@ const BillTimeLine = (addId) => {
                                 <div style={{ display: 'flex', alignItems: 'center', width: '10px', marginBottom: '20px' }}>
                                     <SpanBorder child={billInfo?.transaction || '__'} color={'#1677ff'} />
                                 </div>
-                                {billInfo?.symbol === 'Online' && <>
+                                {billInfo?.symbol === 'Shiping' && <>
                                     <div style={{ display: 'flex', alignItems: 'center', width: '10px', marginBottom: '20px' }}>
                                         <SpanBorder child={billInfo?.paymentName || '__'} color={'#1677ff'} />
                                     </div>

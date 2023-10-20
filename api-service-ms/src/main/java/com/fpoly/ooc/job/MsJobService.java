@@ -1,7 +1,6 @@
-package com.fpoly.ooc.job;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fpoly.ooc.constant.Const;
+import com.fpoly.ooc.dto.VoucherAndPromotionConditionDTO;
 import com.fpoly.ooc.entity.Promotion;
 import com.fpoly.ooc.entity.Voucher;
 import com.fpoly.ooc.responce.promotion.PromotionProductResponse;
@@ -15,6 +14,8 @@ import org.jobrunr.jobs.annotations.Job;
 import org.jobrunr.scheduling.JobScheduler;
 import org.jobrunr.scheduling.cron.Cron;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -62,11 +63,12 @@ public class MsJobService {
                 }
             });
 
-            List<VoucherResponse> vouchersCurrent = voucherService.findAllNoFilter();
-            Boolean isCheckDifferent = isValidArrayDifferent(vouchers, vouchersCurrent);
+            VoucherAndPromotionConditionDTO conditionDTO = new VoucherAndPromotionConditionDTO();
+            Page<VoucherResponse> vouchersCurrent = voucherService.findAllVoucher(PageRequest.of(0, 5), conditionDTO);
+            Boolean isCheckDifferent = isValidArrayDifferent(vouchers, vouchersCurrent.getContent());
 
             if (isCheckDifferent) {
-                String vouchersJson = objectMapper.writeValueAsString(vouchersCurrent);
+                String vouchersJson = objectMapper.writeValueAsString(vouchersCurrent.getContent());
                 kafkaTemplate.send(Const.TOPIC_VOUCHER, vouchersJson);
             }
 
@@ -90,11 +92,12 @@ public class MsJobService {
                 }
             });
 
-            List<PromotionProductResponse> promotionsCurrent = promotionService.findAllPromotionProductResponse();
-            Boolean isCheckDifferent = isValidArrayDifferent(promotions, promotionsCurrent);
+            VoucherAndPromotionConditionDTO conditionDTO = new VoucherAndPromotionConditionDTO();
+            Page<PromotionProductResponse> promotionsCurrent = promotionService.pageAll(conditionDTO, PageRequest.of(0, 5));
+            Boolean isCheckDifferent = isValidArrayDifferent(promotions, promotionsCurrent.getContent());
 
             if (isCheckDifferent) {
-                String promotionsJson = objectMapper.writeValueAsString(promotionsCurrent);
+                String promotionsJson = objectMapper.writeValueAsString(promotionsCurrent.getContent());
                 kafkaTemplate.send(Const.TOPIC_PROMOTION, promotionsJson);
             }
         } catch (Exception e) {

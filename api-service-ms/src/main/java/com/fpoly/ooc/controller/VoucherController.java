@@ -4,6 +4,7 @@ import com.fpoly.ooc.dto.VoucherAndPromotionConditionDTO;
 import com.fpoly.ooc.request.voucher.VoucherRequest;
 import com.fpoly.ooc.service.interfaces.VoucherService;
 import jakarta.validation.Valid;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.math.BigDecimal;
 
 @RestController
 @RequestMapping("/api/admin/vouchers")
@@ -55,6 +58,14 @@ public class VoucherController {
     public ResponseEntity<?> findByCode(@PathVariable("code") String code) {
 
         return ResponseEntity.ok().body(voucherService.findByVoucherCode(code));
+    }
+
+    @GetMapping("/display-modal-using")
+    public ResponseEntity<?> displayModalUsingVoucher(
+            @RequestParam(value = "username", defaultValue = "", required = false) String username,
+            @RequestParam(value = "priceBill", defaultValue = "-1", required = false) BigDecimal priceBill
+            ) {
+        return ResponseEntity.ok(voucherService.findAllVoucherResponseDisplayModalUsing(username, priceBill));
     }
 
 }

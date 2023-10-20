@@ -118,9 +118,10 @@ public class BillServiceImpl implements BillService {
             LocalDateTime startDate,
             LocalDateTime endDate,
             String status,
-            String billType) {
+            String billType,
+            String symbol) {
         return billRepo.getAllBillManagement(billCode,
-                startDate, endDate, status, billType);
+                startDate, endDate, status, billType, symbol);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -149,5 +150,11 @@ public class BillServiceImpl implements BillService {
     @Override
     public List<Address> getListAddressByUserName(String username) {
         return billRepo.getListAddressByUsername(username);
+    }
+
+    @Override
+    public Bill findBillByBillId(Long id) {
+        return billRepo.findById(id)
+                .orElseThrow(() -> new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND)));
     }
 }

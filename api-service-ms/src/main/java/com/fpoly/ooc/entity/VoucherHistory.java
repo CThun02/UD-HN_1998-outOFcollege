@@ -34,10 +34,6 @@ public class VoucherHistory extends BaseEntity{
     private BigDecimal priceReduce;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "voucher_id")
-    private Voucher voucherHistory;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bill_id")
     private Bill bill;
 

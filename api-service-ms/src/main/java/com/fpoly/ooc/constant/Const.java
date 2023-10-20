@@ -8,6 +8,7 @@ public class Const {
     public static final String STATUS_INACTIVE = "INACTIVE";
     public static final String STATUS_UPCOMING = "UPCOMING";
     public static final String STATUS_CANCEL = "CANCEL";
+    public static final String STATUS_USED = "USED";
 
     //error code
     public static final String CODE_NOT_FOUND = "CODE_NOT_FOUND";
@@ -34,6 +35,8 @@ public class Const {
     public static final String END_DATE_NOT_FOUND = "END_DATE_NOT_FOUND";
     public static final String DATE_NOT_FOUND = "DATE_NOT_FOUND";
     public static final String PRODUCT_DETAIL_NOT_FOUND = "PRODUCT_DETAIL_NOT_FOUND";
+    public static final String VOUCHER_END_OF_USE = "VOUCHER_END_OF_USE";
+    public static final String VOUCHER_ACCOUNT_NOT_FOUND = "VOUCHER_ACCOUNT_NOT_FOUND";
 
 
     //ErrorCode

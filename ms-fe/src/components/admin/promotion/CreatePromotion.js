@@ -64,10 +64,10 @@ const validationSchema = Yup.object().shape({
       "start-date-current",
       "* Ngày bắt đầu phải lớn hơn ngày hiện tại tối thiểu 10 phút",
       function (startDate) {
-        const { status } = this.parent;
-        if (startDate && status !== "ACTIVE") {
-          return startDate > dayjs().add(9, "minute");
-        }
+        // const { status } = this.parent;
+        // if (startDate && status !== "ACTIVE") {
+        //   return startDate > dayjs().add(9, "minute");
+        // }
         return true;
       }
     ),

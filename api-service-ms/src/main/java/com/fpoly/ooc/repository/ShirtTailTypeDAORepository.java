@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ShirtTailTypeDAORepository extends JpaRepository<ShirtTailType, Long> {
+    ShirtTailType findFirstByShirtTailTypeName(String name);
 }

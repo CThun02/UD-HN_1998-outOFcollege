@@ -14,4 +14,6 @@ public interface ProductImageServiceI {
     public ProductImage getOne(Long id);
     public List<ProductImageResponse> getProductImageByProductIdAndColorId(Long productId, Long colorId);
     public List<ProductImageResponse> getProductImageByProductId(Long productId);
+    public List<ProductImageResponse> getProductImageDefaultByProductId(Long productId);
+
 }

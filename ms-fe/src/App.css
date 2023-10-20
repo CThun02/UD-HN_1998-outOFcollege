@@ -17,11 +17,14 @@
   margin: 5px 5px;
 }
 
-tr > th {
+thead > tr > th,
+thead > tr > td {
   background-color: #337ccf !important;
   color: #fff !important;
 }
 
+.ant-table-row-expand-icon-cell {
+}
 .ant-table-row {
   border: 1px solid #d0f1ff !important;
 }

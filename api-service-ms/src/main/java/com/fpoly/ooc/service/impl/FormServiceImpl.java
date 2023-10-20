@@ -21,7 +21,11 @@ public class FormServiceImpl implements FormServiceI {
 
     @Override
     public Form create(Form form) {
-        return repo.save(form);
+        Form formCheck = repo.findFirstByFormName(form.getFormName());
+        if(formCheck==null){
+            return repo.save(form);
+        }
+        return null;
     }
 
     @Override

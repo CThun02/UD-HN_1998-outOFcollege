@@ -21,7 +21,11 @@ public class ButtonTypeServiceImpl implements ButtonTypeServiceI {
 
     @Override
     public ButtonType create(ButtonType buttonType) {
-        return repo.save(buttonType);
+        ButtonType buttonCheck = repo.findFirstByButtonName(buttonType.getButtonName());
+        if(buttonCheck==null){
+            return repo.save(buttonType);
+        }
+        return null;
     }
 
     @Override

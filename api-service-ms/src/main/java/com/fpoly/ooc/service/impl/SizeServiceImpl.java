@@ -22,7 +22,11 @@ public class SizeServiceImpl implements SizeServiceI {
 
     @Override
     public Size create(Size size) {
-        return repo.save(size);
+        Size sizeCheck = repo.findFirstBySizeName(size.getSizeName());
+        if(sizeCheck==null){
+            return repo.save(size);
+        }
+        return null;
     }
 
     @Override

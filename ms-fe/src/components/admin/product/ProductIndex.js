@@ -99,11 +99,6 @@ const ProductIndex = () => {
             <Button className={styles.product__button}>
               <EyeFilled />
             </Button>
-          </Link>{" "}
-          <Link to={`/admin/product/update-details/${id}`}>
-            <Button className={styles.product__button}>
-              <EditFilled />
-            </Button>
           </Link>
         </>
       ),

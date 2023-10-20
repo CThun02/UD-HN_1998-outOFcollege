@@ -126,19 +126,16 @@ const ProductCreate = (props) => {
         .then((res) => {
           messageApi.loading("Vui lòng chờ!", 2);
           setTimeout(() => {
-            messageApi.success("Thêm mới thành công!", 2);
             handleSetProduct("productName", " ");
             handleSetProduct("brandId", " ");
             handleSetProduct("categoryId", " ");
             handleSetProduct("description", " ");
             renderIndex(res.data);
-            setTimeout(() => {
-              notification.open({
-                message: "Notification",
-                description: "Thêm mới sản phẩm thành công",
-                icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
-              });
-            }, 3000);
+            notification.open({
+              message: "Notification",
+              description: "Thêm mới sản phẩm thành công",
+              icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
+            });
             closeFrame("productCreate", "productCreateFrame");
           }, 2000);
         })
@@ -212,7 +209,7 @@ const ProductCreate = (props) => {
       .catch((error) => {
         console.log(error);
       });
-  }, [isUpdate]);
+  }, []);
 
   return (
     <div id="productCreate" className={`${styles.product__create} d-none`}>

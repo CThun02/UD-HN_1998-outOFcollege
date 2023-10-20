@@ -108,7 +108,7 @@ const ProductDetails = (props) => {
     form: { id: " " },
     price: 200000,
     quantity: 10,
-    QRCode: " ",
+    QRCode: "empty",
     status: "ACTIVE",
   });
   const columns = [

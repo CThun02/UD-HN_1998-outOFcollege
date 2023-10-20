@@ -57,7 +57,7 @@ const BillTimeLine = (addId) => {
 
     const handleOkConFirm = (note) => {
         handleCreateTimeline(note, action === 'cancel' ? '0' : null);
-        if (billInfo.symbol === 'Online' && timelines.length === 3) {
+        if (billInfo.symbol === 'Shipping' && timelines.length === 3 && billInfo.status !== 'Paid') {
             handleUpdateBillStatus(action === 'cancel' ? 'cancel' : 'paid');
         }
         setIsModalConfirm(false);
@@ -325,15 +325,15 @@ const BillTimeLine = (addId) => {
                                 <div style={{ display: 'flex', alignItems: 'center', width: '10px', marginBottom: '20px' }}>
                                     <SpanBorder child={billInfo?.transaction || '__'} color={'#1677ff'} />
                                 </div>
-                                {billInfo?.symbol === 'Shiping' && <>
+                                {billInfo?.symbol === 'Shipping' && <>
                                     <div style={{ display: 'flex', alignItems: 'center', width: '10px', marginBottom: '20px' }}>
                                         <SpanBorder child={billInfo?.paymentName || '__'} color={'#1677ff'} />
                                     </div>
                                     <div style={{ display: 'flex', alignItems: 'center', width: '50px' }}>
-                                        {billInfo.symbol === "Online" && (
+                                        {billInfo.symbol === "Shipping" && (
                                             <SpanBorder child={'Giao hàng tại nhà'} color={'gray'} />
                                         )}
-                                        {billInfo.symbol !== 'Online' && "__"}
+                                        {billInfo.symbol !== 'Shipping' && "__"}
                                     </div>
                                     <div style={{ display: 'flex', alignItems: 'center', width: '50px', marginTop: '20px' }}>
                                         {moment(billInfo?.shipDate).format('DD/MM/YYYY') || '__'}
@@ -347,11 +347,20 @@ const BillTimeLine = (addId) => {
                                 <span className={styles.span}>Tên khách hàng</span>
                                 <span className={styles.span}>Số diện thoại</span>
                                 <span className={styles.span}>Địa chỉ</span>
+                                <div style={{ marginTop: '42px' }}></div>
+                                <span className={styles.span} >Số tiền khách trả</span>
+                                <span className={styles.span}>Tiền thừa</span>
                             </Col>
                             <Col span={12}>
                                 <span className={styles.span}>{billInfo.fullName || 'khách lẻ'}</span>
                                 <span className={styles.span}>{billInfo.phoneNumber || '__'}</span>
-                                <span style={{ fontSize: '16px', display: 'block' }}>{billInfo?.address?.replace(/[0-9|-]/g, "") || '__'}</span>
+                                <span className={styles.span}>{billInfo?.address?.replace(/[0-9|-]/g, "") || '__'}</span>
+                                <div style={{ marginTop: '42px' }}></div>
+                                <span className={styles.span}>{billInfo.amountPaid || '__'}</span>
+                                <span className={styles.span}>
+                                    {(billInfo?.amountPaid + billInfo?.priceReduce - billInfo.shipPrice - billInfo.totalPrice
+                                    ) || '0đ'}
+                                </span>
                             </Col>
                         </Row>
                     </Col>
@@ -411,7 +420,7 @@ const BillTimeLine = (addId) => {
                     <b className={styles.span} >
                         <span style={{ width: '200px', display: 'inline-block' }}>Tổng cộng: </span>
                         <span style={{ fontSize: '16px', color: '#FF0000' }}>{
-                            numeral(billInfo.totalPrice + billInfo?.shipPrice).format(0, 0) + 'đ'}</span></b>
+                            numeral(billInfo.totalPrice + billInfo?.shipPrice - billInfo.priceReduce).format(0, 0) + 'đ'}</span></b>
                 </div>
             </section >
         </>

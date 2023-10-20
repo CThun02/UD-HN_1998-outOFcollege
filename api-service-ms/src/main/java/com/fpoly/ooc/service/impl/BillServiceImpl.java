@@ -12,12 +12,14 @@ import com.fpoly.ooc.entity.Payment;
 import com.fpoly.ooc.entity.PaymentDetail;
 import com.fpoly.ooc.entity.ProductDetail;
 import com.fpoly.ooc.entity.Timeline;
+import com.fpoly.ooc.entity.VoucherHistory;
 import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.BillDetailRepo;
 import com.fpoly.ooc.repository.BillRepo;
 import com.fpoly.ooc.repository.DeliveryNoteRepo;
 import com.fpoly.ooc.repository.PaymentDetailRepo;
 import com.fpoly.ooc.repository.TimeLineRepo;
+import com.fpoly.ooc.repository.VoucherHistoryRepository;
 import com.fpoly.ooc.request.bill.BillDetailRequest;
 import com.fpoly.ooc.request.bill.BillRequest;
 import com.fpoly.ooc.responce.account.GetListCustomer;
@@ -47,6 +49,9 @@ public class BillServiceImpl implements BillService {
 
     @Autowired
     private DeliveryNoteRepo deliveryNoteRepo;
+
+    @Autowired
+    private VoucherHistoryRepository voucherHistoryRepository;
 
 
     @Transactional(rollbackFor = Exception.class)
@@ -87,6 +92,7 @@ public class BillServiceImpl implements BillService {
         PaymentDetail paymentDetail = PaymentDetail.builder()
                 .bill(bill)
                 .payment(Payment.builder().id(request.getPaymentDetailId()).build())
+                .price(request.getPrice())
                 .build();
         paymentDetailRepo.save(paymentDetail);
 
@@ -108,6 +114,12 @@ public class BillServiceImpl implements BillService {
             timeline.setStatus(n);
             timeLineRepo.save(timeline);
         }
+
+        VoucherHistory voucherHistory = VoucherHistory.builder()
+                .bill(bill)
+                .voucherCode(request.getVoucherCode())
+                .build();
+        voucherHistoryRepository.save(voucherHistory);
 
         return bill;
     }

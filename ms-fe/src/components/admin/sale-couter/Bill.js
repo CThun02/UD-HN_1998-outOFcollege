@@ -383,11 +383,31 @@ const Bill = () => {
     }
   };
 
-  //  tỏng giá tiền
+  //  giá tiền tạm tính
   const totalPrice = productDetails.reduce((total, product) => {
     return total + product.productDetail.price * product.quantity;
   }, 0);
 
+  const voucherPrice = () => {
+    let result = totalPrice;
+    console.log(voucherAdd);
+
+    if (voucherAdd && voucherAdd.voucherMethod === 'vnd') {
+      if (result > (voucherAdd.voucherCondition ?? 0)) {
+        result -= voucherAdd.voucherValue ?? 0;
+      }
+    } else if (voucherAdd && voucherAdd.voucherMethod === '%') {
+      if (result > voucherAdd.voucherCondition) {
+        const maxDiscount = (totalPrice * (voucherAdd.voucherValueMax ?? 0)) / 100; // Giới hạn giảm giá tối đa là 50%
+        const discount = (totalPrice * (voucherAdd.voucherValue ?? 0)) / 100;
+        result -= Math.min(discount, maxDiscount);
+      }
+    } else {
+      result = totalPrice;
+    }
+
+    return result;
+  };
   // phí ship
   const handleShippingFee = (insuranceValue, toDistrictId, toWardCode) => {
     const values = {
@@ -430,7 +450,7 @@ const Bill = () => {
       const visible = [...switchChange];
       visible[index] = checked;
       setSwitchChange(visible);
-      setSymbol(checked ? 'shipping' : 'received');
+      setSymbol(checked ? 'Shipping' : 'Received');
     } else {
       notification.error({
         message: "Lỗi",
@@ -558,7 +578,6 @@ const Bill = () => {
     getListAddressByUsername(account?.username);
     fetchProvinces();
 
-    console.log(address)
     if (selectedAddress?.city) {
       const city = selectedAddress?.city.substring(1 + selectedAddress.city.indexOf("|"))
       const district = selectedAddress?.district.substring(1 + selectedAddress.district.indexOf("|"))
@@ -585,11 +604,11 @@ const Bill = () => {
       billCode: activeKey,
       accountId: account?.username,
       price: totalPrice,
-      priceReduce: priceReduce,
+      priceReduce: totalPrice - voucherPrice(),
       amountPaid: amountPaid,
       billType: 'In-Store',
       symbol: symbol,
-      status: 'unpaid',
+      status: selectedButton !== 2 ? 'Paid' : 'Unpaid',
       note: note,
       paymentDetailId: selectedButton,
       lstBillDetailRequest: [],
@@ -599,9 +618,9 @@ const Bill = () => {
       shipDate: switchChange[index] === true ? leadtime : null,
       shipPrice: switchChange[index] === true ? shippingFee : null,
       transactionCode: selectedButton === 2 ? transactionCode : null,
+      voucherCode: voucherAdd?.voucherCode
     };
 
-    console.log(remainAmount, 'remain')
     if (productDetails.length <= 0) {
       return notification.error({
         message: "Thông báo",
@@ -625,6 +644,8 @@ const Bill = () => {
 
         bill.lstBillDetailRequest.push(billDetail);
       }
+
+      console.log(voucherPrice(), `voucher`)
 
       Modal.confirm({
         title: "Xác nhận thanh toán",
@@ -655,15 +676,14 @@ const Bill = () => {
     }
   }
 
-
   const [inputError, setInputError] = useState('');
   const handleChangeInput = (e, index) => {
     const inputValue = e.target.value;
     let calculatedValue = 0;
     if (switchChange[index]) {
-      calculatedValue = inputValue - totalPrice - shippingFee;
+      calculatedValue = inputValue - voucherPrice() - shippingFee;
     } else {
-      calculatedValue = inputValue - totalPrice
+      calculatedValue = inputValue - voucherPrice()
     }
     setRemainAmount(calculatedValue);
     numeral(inputValue).format('0,0')
@@ -990,15 +1010,11 @@ const Bill = () => {
                             <span
                               style={{ marginLeft: "28px", color: "green" }}
                             >
-                              {voucherAdd.voucherName}
+                              {/* {voucherAdd.voucherName} */}
                             </span>
                             {voucherAdd.voucherId ? (
-                              <span
-                                style={{ marginLeft: "20px", color: "green" }}
-                                onClick={() => setVoucherAdd({})}
-                              >
-                                ❌
-                              </span>
+                              <bttuon style={{ marginLeft: "20px", color: "green", cursor: 'pointer' }}
+                                onClick={() => setVoucherAdd({})}>❌</bttuon>
                             ) : null}
                           </span>
                           {switchChange[index] && (
@@ -1035,7 +1051,7 @@ const Bill = () => {
                                   marginLeft: "117px",
                                 }}
                               >
-                                {(totalPrice + shippingFee).toLocaleString(
+                                {(voucherPrice() + shippingFee).toLocaleString(
                                   "vi-VN",
                                   {
                                     style: "currency",
@@ -1050,7 +1066,7 @@ const Bill = () => {
                                   marginLeft: "117px",
                                 }}
                               >
-                                {totalPrice.toLocaleString("vi-VN", {
+                                {voucherPrice().toLocaleString("vi-VN", {
                                   style: "currency",
                                   currency: "VND",
                                 })}

@@ -1,6 +1,5 @@
 package com.fpoly.ooc.request.bill;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fpoly.ooc.request.payment.PaymentDetailRequest;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -58,5 +57,7 @@ public class BillRequest {
     private List<BillDetailRequest> lstBillDetailRequest;
 
     private List<PaymentDetailRequest> lstPaymentDetailRequest;
+
+    private String voucherCode;
 
 }

@@ -34,6 +34,8 @@ public class BillInfoResponse {
 
     private BigDecimal shipPrice;
 
+    private BigDecimal amountPaid;
+
     private LocalDateTime shipDate;
 
     private String paymentName;

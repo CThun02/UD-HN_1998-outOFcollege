@@ -34,6 +34,8 @@ import Big from "big.js";
 import { object } from "yup";
 import FormUsingVoucher from "../../element/voucher/FormUsingVoucher";
 import numeral from "numeral";
+import ModalConfirm from "./ModalConfirm";
+import Confirm from "../confirm/Confirm";
 
 const Bill = () => {
   var initialItems = [];
@@ -75,6 +77,13 @@ const Bill = () => {
   const updateQuantity = (record, index, value) => {
     let cart = JSON.parse(localStorage.getItem(cartId));
     let productDetails = cart.productDetails;
+    if (value > 99) {
+      notification.warning({
+        message: 'Thông báo',
+        description: 'Chỉ được mua 100 sản phẩm',
+        duration: 1
+      });
+    }
     productDetails[index].quantity = value;
     cart.productDetails = productDetails;
     localStorage.setItem(cartId, JSON.stringify(cart));
@@ -158,6 +167,7 @@ const Bill = () => {
         return (
           <InputNumber
             min={1}
+            max={100}
             value={record.quantity}
             onChange={(value) => updateQuantity(record, index, value)}
           />
@@ -221,7 +231,8 @@ const Bill = () => {
   const [account, setAccount] = useState(null);
   const [address, setAddress] = useState({});
   const [showAddress, setShowAddress] = useState([]);
-  const [selectedAddress, setSelectedAddress] = useState({});
+  const [selectedAddress, setSelectedAddress] = useState({})
+  const [transactionCode, setTransactionCode] = useState('')
   const navigate = useNavigate();
   const [fullname, setFullname] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -355,6 +366,7 @@ const Bill = () => {
         .then((response) => {
           const leadtimeTimestamp = response.data.data.leadtime;
           const leadtimeMoment = moment.unix(leadtimeTimestamp);
+
           const formattedDateTime = leadtimeMoment.format("DD/MM/YYYY");
           console.log(`lead time`, leadtimeMoment);
           console.log(
@@ -371,11 +383,31 @@ const Bill = () => {
     }
   };
 
-  //  tỏng giá tiền
+  //  giá tiền tạm tính
   const totalPrice = productDetails.reduce((total, product) => {
     return total + product.productDetail.price * product.quantity;
   }, 0);
 
+  const voucherPrice = () => {
+    let result = totalPrice;
+    console.log(voucherAdd);
+
+    if (voucherAdd && voucherAdd.voucherMethod === 'vnd') {
+      if (result > (voucherAdd.voucherCondition ?? 0)) {
+        result -= voucherAdd.voucherValue ?? 0;
+      }
+    } else if (voucherAdd && voucherAdd.voucherMethod === '%') {
+      if (result > voucherAdd.voucherCondition) {
+        const maxDiscount = (totalPrice * (voucherAdd.voucherValueMax ?? 0)) / 100; // Giới hạn giảm giá tối đa là 50%
+        const discount = (totalPrice * (voucherAdd.voucherValue ?? 0)) / 100;
+        result -= Math.min(discount, maxDiscount);
+      }
+    } else {
+      result = totalPrice;
+    }
+
+    return result;
+  };
   // phí ship
   const handleShippingFee = (insuranceValue, toDistrictId, toWardCode) => {
     const values = {
@@ -418,7 +450,7 @@ const Bill = () => {
       const visible = [...switchChange];
       visible[index] = checked;
       setSwitchChange(visible);
-      setBillType(checked ? "Online" : "In-store");
+      setSymbol(checked ? 'Shipping' : 'Received');
     } else {
       notification.error({
         message: "Lỗi",
@@ -546,51 +578,48 @@ const Bill = () => {
     getListAddressByUsername(account?.username);
     fetchProvinces();
 
-    console.log(address);
-    if (selectedAddress.city) {
-      const city = selectedAddress?.city.substring(
-        1 + selectedAddress.city.indexOf("|")
-      );
-      const district = selectedAddress?.district.substring(
-        1 + selectedAddress.district.indexOf("|")
-      );
-      const ward = selectedAddress?.ward.substring(
-        1 + selectedAddress.ward.indexOf("|")
-      );
+    if (selectedAddress?.city) {
+      const city = selectedAddress?.city.substring(1 + selectedAddress.city.indexOf("|"))
+      const district = selectedAddress?.district.substring(1 + selectedAddress.district.indexOf("|"))
+      const ward = selectedAddress?.ward.substring(1 + selectedAddress.ward.indexOf("|"))
 
       handleProvinceChange(city);
       handleDistrictChange(district);
-      handleShippingOrderLeadtime(district, ward);
+      handleShippingOrderLeadtime(district, ward)
       handleShippingFee(totalPrice, district, ward);
     }
-
-    console.log(`ship`, shippingFee);
 
     getProductDetails();
     initializeModalStates();
   }, [cartId, render, account?.username]);
 
-  const [billType, setBillType] = useState("In-store");
-  const [note, setNote] = useState("");
-  const [priceReduce, setPriceReduce] = useState(null);
+  const [symbol, setSymbol] = useState("Received")
+  const [note, setNote] = useState("")
+  const [priceReduce, setPriceReduce] = useState(null)
+  const [amountPaid, setAmountPaid] = useState(0)
+
+
   const handleCreateBill = (index) => {
     const bill = {
       billCode: activeKey,
       accountId: account?.username,
       price: totalPrice,
-      priceReduce: priceReduce,
-      billType: billType,
-      status: "unpaid",
+      priceReduce: totalPrice - voucherPrice(),
+      amountPaid: amountPaid,
+      billType: 'In-Store',
+      symbol: symbol,
+      status: selectedButton !== 2 ? 'Paid' : 'Unpaid',
       note: note,
+      paymentDetailId: selectedButton,
       lstBillDetailRequest: [],
       addressId: selectedAddress?.id,
-      fullname: selectedAddress.fullName,
+      fullname: selectedAddress?.fullName,
       phoneNumber: selectedAddress.numberPhone,
       shipDate: switchChange[index] === true ? leadtime : null,
       shipPrice: switchChange[index] === true ? shippingFee : null,
+      transactionCode: selectedButton === 2 ? transactionCode : null,
+      voucherCode: voucherAdd?.voucherCode
     };
-
-    console.log(remainAmount);
 
     if (productDetails.length <= 0) {
       return notification.error({
@@ -598,11 +627,14 @@ const Bill = () => {
         description: "Không có sản phẩm nào trong giỏ hàng.",
         duration: 2,
       });
-    } else if (selectedButton == null) {
-      return console.log("chưa chọn hình thức thanh toán");
-    } else if (remainAmount < 0 || isNaN(remainAmount)) {
-      return setInputError("Tiền không đụ");
-    } else {
+    }
+    else if (selectedButton == null) {
+      return console.log('chưa chọn hình thức thanh toán')
+    }
+    else if (selectedButton !== 2 && (remainAmount < 0 || isNaN(remainAmount))) {
+      return setInputError('Tiền không đủ')
+    }
+    else {
       for (let i = 0; i < productDetails.length; i++) {
         const billDetail = {
           productDetailId: productDetails[i].productDetail.id,
@@ -612,6 +644,9 @@ const Bill = () => {
 
         bill.lstBillDetailRequest.push(billDetail);
       }
+
+      console.log(voucherPrice(), `voucher`)
+
       Modal.confirm({
         title: "Xác nhận thanh toán",
         content: "Bạn có chắc chắn muốn thanh toán?",
@@ -619,7 +654,18 @@ const Bill = () => {
           axios
             .post("http://localhost:8080/api/admin/bill", bill)
             .then((response) => {
-              navigate(`/admin/counter-sales/${response.data.id}/timeline`);
+              if (response.data.symbol === 'Received') {
+                axios.put(`http://localhost:8080/api/admin/bill/${response.data.id}`, {
+                  status: 'PAID'
+                })
+                  .then((response) => {
+                    console.log(response)
+                  })
+                  .catch((error) => {
+                    console.log(error)
+                  });
+              }
+              navigate(`/admin/order`);
               remove(activeKey);
             })
             .catch((error) => {
@@ -628,21 +674,29 @@ const Bill = () => {
         },
       });
     }
-    console.log(bill);
-  };
+  }
 
-  const [inputError, setInputError] = useState("");
-  const handleChangeInput = (e) => {
+  const [inputError, setInputError] = useState('');
+  const handleChangeInput = (e, index) => {
     const inputValue = e.target.value;
-    const calculatedValue = inputValue - totalPrice;
-    numeral(inputValue).format("0,0");
+    let calculatedValue = 0;
+    if (switchChange[index]) {
+      calculatedValue = inputValue - voucherPrice() - shippingFee;
+    } else {
+      calculatedValue = inputValue - voucherPrice()
+    }
+    setRemainAmount(calculatedValue);
+    numeral(inputValue).format('0,0')
+
     if (calculatedValue < 0) {
       setInputError("Số tiền không đủ");
     } else {
-      setRemainAmount(calculatedValue);
-      setInputError("");
+      setAmountPaid(inputValue)
+      setInputError('');
     }
   };
+
+
   return (
     <>
       <Tabs
@@ -720,21 +774,21 @@ const Bill = () => {
                         <Col span={6} style={{ marginTop: "2px" }}>
                           {account && (
                             <>
-                              <span
-                                style={{ display: "block", width: "200px" }}
-                              >
-                                <b>Tên khách hàng: </b> {account.fullName}
+                              <span style={{ display: 'block', width: '200px' }}>
+                                <b>Tên khách hàng: </b> {account?.fullName}
                               </span>
                             </>
                           )}
-                          {!account && (
-                            <>
-                              <span>
-                                <b>Tên tài khoản:</b> Khách lẻ
-                              </span>
-                            </>
-                          )}
-                        </Col>
+                          {
+                            !account && (
+                              <>
+                                <span>
+                                  <b>Tên tài khoản:</b> Khách lẻ
+                                </span>
+                              </>
+                            )
+                          }
+                        </Col >
                         <Col span={12}>
                           {account && (
                             <Button
@@ -761,27 +815,22 @@ const Bill = () => {
                             selectedAddress={setSelectedAddress}
                           />
                         </Col>
-                      </Row>
+                      </Row >
                       <Row>
                         <Col span={10}>
                           <span>
                             <b style={{ color: "red" }}>*</b> Họ và tên
                           </span>
-                          <Input
-                            placeholder="nhập họ và tên"
-                            value={selectedAddress.fullName}
-                          />
-                        </Col>
+                          <Input placeholder="nhập họ và tên" value={selectedAddress?.fullName} />
+                        </Col >
                         <Col span={10} style={{ marginLeft: "40px" }}>
                           <span>
                             <b style={{ color: "red" }}>*</b> Số điện thoại
                           </span>
-                          <Input
-                            placeholder="nhập số điện thoại"
-                            value={selectedAddress.numberPhone}
-                          />
-                        </Col>
-                      </Row>
+                          <Input placeholder="nhập số điện thoại" value={selectedAddress?.numberPhone} />
+
+                        </Col >
+                      </Row >
                       <Row style={{ margin: "40px 0" }}>
                         <Col span={7}>
                           <span>
@@ -794,10 +843,10 @@ const Bill = () => {
                             value={
                               selectedAddress.city
                                 ? Number(
-                                    selectedAddress?.city.substring(
-                                      1 + selectedAddress.city.indexOf("|")
-                                    )
+                                  selectedAddress?.city.substring(
+                                    1 + selectedAddress.city.indexOf("|")
                                   )
+                                )
                                 : undefined
                             }
                           >
@@ -824,10 +873,10 @@ const Bill = () => {
                             value={
                               selectedAddress.district
                                 ? Number(
-                                    selectedAddress?.district.substring(
-                                      1 + selectedAddress.district.indexOf("|")
-                                    )
+                                  selectedAddress?.district.substring(
+                                    1 + selectedAddress.district.indexOf("|")
                                   )
+                                )
                                 : undefined
                             }
                           >
@@ -855,8 +904,8 @@ const Bill = () => {
                             value={
                               selectedAddress.ward
                                 ? selectedAddress.ward.substring(
-                                    1 + selectedAddress.ward.indexOf("|")
-                                  )
+                                  1 + selectedAddress.ward.indexOf("|")
+                                )
                                 : ""
                             }
                           >
@@ -875,6 +924,7 @@ const Bill = () => {
                       <Row>
                         <Col span={16}>
                           <span>Địa chỉ cụ thể</span>
+
                           <Input
                             placeholder="Nhập địa chỉ cụ thể"
                             value={
@@ -891,6 +941,7 @@ const Bill = () => {
                             style={{ width: "90px", height: "80px" }}
                           />
                         </Col>
+
                         {switchChange[index] && account && (
                           <h3>
                             Ngày giao hàng dự kiến:{" "}
@@ -898,12 +949,9 @@ const Bill = () => {
                           </h3>
                         )}
                       </Row>
-                    </Col>
+                    </Col >
                     <Col span={8}>
-                      <Switch
-                        onChange={(e) => handleChangSwitch(e, index)}
-                        disabled={account !== undefined ? false : true}
-                      />
+                      <Switch onChange={(e) => handleChangSwitch(e, index)} />
                       <span style={{ marginLeft: "5px" }}>Giao hàng</span>
                       <br />
                       <Input
@@ -962,15 +1010,11 @@ const Bill = () => {
                             <span
                               style={{ marginLeft: "28px", color: "green" }}
                             >
-                              {voucherAdd.voucherName}
+                              {/* {voucherAdd.voucherName} */}
                             </span>
                             {voucherAdd.voucherId ? (
-                              <span
-                                style={{ marginLeft: "20px", color: "green" }}
-                                onClick={() => setVoucherAdd({})}
-                              >
-                                ❌
-                              </span>
+                              <bttuon style={{ marginLeft: "20px", color: "green", cursor: 'pointer' }}
+                                onClick={() => setVoucherAdd({})}>❌</bttuon>
                             ) : null}
                           </span>
                           {switchChange[index] && (
@@ -1007,7 +1051,7 @@ const Bill = () => {
                                   marginLeft: "117px",
                                 }}
                               >
-                                {(totalPrice + shippingFee).toLocaleString(
+                                {(voucherPrice() + shippingFee).toLocaleString(
                                   "vi-VN",
                                   {
                                     style: "currency",
@@ -1022,62 +1066,42 @@ const Bill = () => {
                                   marginLeft: "117px",
                                 }}
                               >
-                                {totalPrice.toLocaleString("vi-VN", {
+                                {voucherPrice().toLocaleString("vi-VN", {
                                   style: "currency",
                                   currency: "VND",
                                 })}
                               </span>
                             )}
                           </span>
-
-                          <span
-                            style={{
-                              fontSize: "16px",
-                              width: "200%",
-                              display: "block",
-                            }}
-                          >
-                            Số tiền khách trả
-                            {switchChange[index] ? (
-                              <input
-                                type="number"
+                          {
+                            selectedButton !== 2 && <span style={{ fontSize: "16px", width: '200%', display: "block" }}>
+                              Số tiền khách trả
+                              <input type="number"
                                 className={styles.input}
-                                onChange={(e) =>
-                                  setRemainAmount(
-                                    e.target.value - totalPrice - shippingFee
-                                  )
-                                }
-                              />
-                            ) : (
-                              <input
-                                type="number"
-                                className={styles.input}
-                                onChange={handleChangeInput}
-                              />
-                            )}
-                            {inputError && (
-                              <span className={styles.error}>{inputError}</span>
-                            )}
-                          </span>
-                          <span
-                            style={{
-                              fontSize: "16px",
-                              width: "200%",
-                              display: "block",
-                            }}
-                          >
-                            Tiền thừa trả khách
-                            <span style={{ marginLeft: "59px" }}>
-                              <span style={{ color: "red" }}>
-                                {remainAmount.toLocaleString("vi-VN", {
-                                  style: "currency",
-                                  currency: "VND",
-                                })}
-                              </span>
+                                onChange={(e) => handleChangeInput(e, index)} />
+                              {inputError && <span className={styles.error}>{inputError}</span>}
                             </span>
-                          </span>
-                        </Col>
-
+                          }
+                          {
+                            selectedButton === 2 && <Input
+                              placeholder="Nhập mã giao dịch"
+                              size="large"
+                              onChange={(e) => setTransactionCode(e.target.value)}
+                              style={{ margin: '10px 0', width: '380px' }} />
+                          }
+                          {
+                            selectedButton !== 2 && <span style={{ fontSize: "16px", width: '200%', display: "block" }}>
+                              Tiền thừa trả khách
+                              <span style={{ marginLeft: "59px" }}>
+                                <span style={{ color: "red" }}>
+                                  {remainAmount.toLocaleString("vi-VN", {
+                                    style: "currency",
+                                    currency: "VND",
+                                  })}
+                                </span>
+                              </span>
+                            </span >}
+                        </Col >
                         <TextArea
                           onChange={(e) => setNote(e.target.value)}
                           rows={3}
@@ -1087,9 +1111,8 @@ const Bill = () => {
                         <div style={{ marginTop: "20px" }}>
                           <div className={styles.buttonGroup}>
                             <Button
-                              className={`${styles.cashButton} ${
-                                selectedButton === 1 ? styles.selected : ""
-                              }`}
+                              className={`${styles.cashButton} ${selectedButton === 1 ? styles.selected : ""
+                                }`}
                               icon={<DollarOutlined />}
                               onClick={() => handleButtonClick(1)}
                             >
@@ -1097,18 +1120,16 @@ const Bill = () => {
                             </Button>
                             <Button
                               style={{ margin: "0 10px" }}
-                              className={`${styles.cashButton} ${
-                                selectedButton === 2 ? styles.selected : ""
-                              }`}
+                              className={`${styles.cashButton} ${selectedButton === 2 ? styles.selected : ""
+                                }`}
                               icon={<SwapOutlined />}
                               onClick={() => handleButtonClick(2)}
                             >
                               Chuyển khoản
                             </Button>
                             <Button
-                              className={`${styles.cashButton} ${
-                                selectedButton === 3 ? styles.selected : ""
-                              }`}
+                              className={`${styles.cashButton} ${selectedButton === 3 ? styles.selected : ""
+                                }`}
                               onClick={() => handleButtonClick(3)}
                             >
                               Cả hai
@@ -1116,6 +1137,8 @@ const Bill = () => {
                           </div>
                         </div>
                         <div style={{ marginTop: "20px" }}>
+
+
                           <Button
                             type="primary"
                             onClick={() => handleCreateBill(index)}
@@ -1124,14 +1147,14 @@ const Bill = () => {
                             Xác nhận thanh toán
                           </Button>
                         </div>
-                      </Row>
-                    </Col>
-                  </Row>
-                </div>
-              </Tabs.TabPane>
+                      </Row >
+                    </Col >
+                  </Row >
+                </div >
+              </Tabs.TabPane >
             );
           })}
-      </Tabs>
+      </Tabs >
     </>
   );
 };

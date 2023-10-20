@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import styles from './BillManagement.module.css'
-import { Button, Input, Pagination, Select, Table } from 'antd'
+import { Button, Input, Select, Table, Tag, TreeSelect } from 'antd'
 import {
     EyeOutlined,
     SearchOutlined
@@ -18,16 +18,15 @@ const BillManagement = () => {
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
     const [status, setStatus] = useState('');
-    const [billType, setBilType] = useState('');
+    const [billType, setBillType] = useState('');
+    const [symbol, setSymbol] = useState('');
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1);
 
     const onRangeChange = (dates, dateStrings) => {
         if (dates) {
             setStartDate(dateStrings[0])
             setEndDate(dateStrings[1])
-            setCurrentPage(1)
         } else {
             setStartDate(null);
             setEndDate(null);
@@ -94,18 +93,46 @@ const BillManagement = () => {
         },
         {
             title: 'Loại hóa đơn',
-            dataIndex: 'billType',
-            key: 'billType',
+            dataIndex: 'symbol',
+            key: 'symbol',
+            render: (object) => {
+                let color =
+                    object.toLocaleLowerCase() === "Shipping".toLocaleLowerCase()
+                        ? "geekblue"
+                        : object.toLocaleLowerCase() === "Received".toLocaleLowerCase()
+                            ? "green" : null;
+                return (
+                    <Space direction="vertical">
+                        <div style={{ width: "auto", display: "flex" }}>
+                            <Tag color={color}>{object}</Tag>
+                        </div>
+                    </Space>
+                );
+            },
         },
         {
             title: 'Trạng thái',
             dataIndex: 'status',
             key: 'status',
-            render: (status) => {
-                return status === 'ACTIVE' ? 'Chưa thanh toán'
-                    : status === 'Cancel' ? 'Đã hủy'
-                        : 'Đã thanh toán'
-            }
+            render: (object) => {
+                let color =
+                    object === "ACTIVE"
+                        ? "geekblue"
+                        : object.toLocaleLowerCase() === "PAID".toLocaleLowerCase()
+                            ? "green"
+                            : object === "cancel"
+                                ? "red"
+                                : null;
+                return (
+                    <Space direction="vertical">
+                        <div style={{ width: "auto", display: "flex" }}>
+                            <Tag color={color}>{object === 'ACTIVE' ? 'Chưa thanh toán'
+                                : object === 'cancel' ? 'Đã hủy'
+                                    : 'Đã thanh toán'}</Tag>
+                        </div>
+                    </Space>
+                );
+            },
         },
         {
             title: 'Thao tác',
@@ -127,7 +154,8 @@ const BillManagement = () => {
             startDate: startDate,
             endDate: endDate,
             status: status,
-            billType: billType
+            billType: billType,
+            symbol: symbol
         }
         console.log(params)
         axios
@@ -144,9 +172,45 @@ const BillManagement = () => {
             });
     };
 
+    const treeData = [
+        {
+            value: '',
+            title: 'Tất cả',
+        },
+        {
+            value: 'In-store',
+            title: 'Tại quầy',
+            children: [
+                {
+                    value: 'Shipping',
+                    title: 'Giao hàng',
+                },
+                {
+                    value: 'Received',
+                    title: 'Đã nhận',
+                },
+            ],
+        },
+        {
+            value: 'Online',
+            title: 'Online',
+        },
+    ];
+
+    const [value, setValue] = useState();
+    const onChange = (newValue) => {
+        setValue(newValue)
+        if (newValue === 'Shipping' || newValue === 'Received') {
+            setBillType('In-store')
+            setSymbol(newValue)
+        } else {
+            setSymbol('')
+            setBillType(newValue)
+        }
+    };
     useEffect(() => {
         fetchData();
-    }, [billCode, startDate, endDate, status, billType]);
+    }, [billCode, startDate, endDate, status, billType, symbol]);
 
     return (
         <div>
@@ -158,7 +222,6 @@ const BillManagement = () => {
                         prefix={<SearchOutlined />}
                         onChange={(e) => {
                             setBillCode(e.target.value);
-                            setCurrentPage(1);
                         }}
                     />
                 </div>
@@ -172,7 +235,6 @@ const BillManagement = () => {
                             style={{ width: '12%', borderBottom: '1px solid #ccc' }}
                             onChange={(e) => {
                                 setStatus(e);
-                                setCurrentPage(1);
                             }}
                             defaultValue={''}
                         >
@@ -183,11 +245,10 @@ const BillManagement = () => {
                         </Select>
                     </span>
                     <span >Loại hóa đơn
-                        <Select
+                        {/* <Select
                             style={{ width: '12%', borderBottom: '1px solid #ccc' }}
                             onChange={(e) => {
-                                setBilType(e);
-                                setCurrentPage(1);
+                                setBillType(e);
                             }}
                             bordered={false}
                             defaultValue={''}
@@ -195,7 +256,24 @@ const BillManagement = () => {
                             <Select.Option value={''}>Tất cả</Select.Option>
                             <Select.Option value={'In-store'}>Tại quầy</Select.Option>
                             <Select.Option value={'Online'}>Online</Select.Option>
-                        </Select>
+                        </Select> */}
+                        <TreeSelect
+                            showSearch
+                            style={{
+                                width: '16%', borderBottom: '1px solid #ccc'
+                            }}
+                            bordered={false}
+                            value={value}
+                            dropdownStyle={{
+                                maxHeight: 500,
+                                overflow: 'auto',
+                            }}
+                            defaultValue={''}
+                            placeholder=""
+                            treeDefaultExpandAll
+                            onChange={onChange}
+                            treeData={treeData}
+                        />
                     </span>
                 </div>
             </section>

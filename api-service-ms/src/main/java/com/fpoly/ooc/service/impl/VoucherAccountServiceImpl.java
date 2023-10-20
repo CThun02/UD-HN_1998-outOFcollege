@@ -9,10 +9,8 @@ import com.fpoly.ooc.entity.Voucher;
 import com.fpoly.ooc.entity.VoucherAccount;
 import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.VoucherAccountRepository;
-import com.fpoly.ooc.repository.VoucherHistoryRepository;
 import com.fpoly.ooc.service.interfaces.AccountService;
 import com.fpoly.ooc.service.interfaces.VoucherAccountService;
-import com.fpoly.ooc.service.interfaces.VoucherService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -45,7 +43,7 @@ public class VoucherAccountServiceImpl implements VoucherAccountService {
     @Override
     public VoucherAccount updateAccountUsed(VoucherAccountUsedDTO dto) {
         VoucherAccount voucherAccount = voucherAccountRepository
-                .findVoucherAccountByAccountVoucher_UsernameAndVoucherAccount_Id(dto.getVoucherId(), dto.getUsername())
+                .findVoucherAccountByAccountVoucher_UsernameAndVoucherAccount_Id(dto.getUsername(), dto.getVoucherId())
                 .orElseThrow(() -> new NotFoundException(ErrorCodeConfig.getMessage(Const.VOUCHER_ACCOUNT_NOT_FOUND)));
         voucherAccount.setStatus(Const.STATUS_USED);
         return voucherAccountRepository.save(voucherAccount);

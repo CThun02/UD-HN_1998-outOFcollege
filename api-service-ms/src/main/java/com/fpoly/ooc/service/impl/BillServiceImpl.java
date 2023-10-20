@@ -12,12 +12,14 @@ import com.fpoly.ooc.entity.Payment;
 import com.fpoly.ooc.entity.PaymentDetail;
 import com.fpoly.ooc.entity.ProductDetail;
 import com.fpoly.ooc.entity.Timeline;
+import com.fpoly.ooc.entity.VoucherHistory;
 import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.BillDetailRepo;
 import com.fpoly.ooc.repository.BillRepo;
 import com.fpoly.ooc.repository.DeliveryNoteRepo;
 import com.fpoly.ooc.repository.PaymentDetailRepo;
 import com.fpoly.ooc.repository.TimeLineRepo;
+import com.fpoly.ooc.repository.VoucherHistoryRepository;
 import com.fpoly.ooc.request.bill.BillDetailRequest;
 import com.fpoly.ooc.request.bill.BillRequest;
 import com.fpoly.ooc.responce.account.GetListCustomer;
@@ -48,6 +50,9 @@ public class BillServiceImpl implements BillService {
     @Autowired
     private DeliveryNoteRepo deliveryNoteRepo;
 
+    @Autowired
+    private VoucherHistoryRepository voucherHistoryRepository;
+
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -62,7 +67,10 @@ public class BillServiceImpl implements BillService {
                 .account(accountBuilder)
                 .priceReduce(request.getPriceReduce())
                 .price(request.getPrice())
+                .amountPaid(request.getAmountPaid())
                 .billType(request.getBillType())
+                .transactionCode(request.getTransactionCode())
+                .symbol(request.getSymbol())
                 .note(request.getNote())
                 .billCode(request.getBillCode())
                 .completionDate(LocalDateTime.now())
@@ -83,7 +91,8 @@ public class BillServiceImpl implements BillService {
 
         PaymentDetail paymentDetail = PaymentDetail.builder()
                 .bill(bill)
-                .payment(Payment.builder().id(1L).build())
+                .payment(Payment.builder().id(request.getPaymentDetailId()).build())
+                .price(request.getPrice())
                 .build();
         paymentDetailRepo.save(paymentDetail);
 
@@ -93,15 +102,24 @@ public class BillServiceImpl implements BillService {
                         Address.builder().id(request.getAddressId()).build())
                 .name(request.getFullname())
                 .phoneNumber(request.getPhoneNumber())
+                .shipDate(request.getShipDate())
                 .shipPrice(request.getShipPrice())
                 .build();
         deliveryNoteRepo.save(deliveryNote);
 
-        Timeline timeline = new Timeline();
-        timeline.setBill(bill);
-        timeline.setNote("Tạo đơn hàng");
-        timeline.setStatus("1");
-        timeLineRepo.save(timeline);
+        for (int i = 0; i < 2; i++) {
+            String n = String.valueOf((i + 1));
+            Timeline timeline = new Timeline();
+            timeline.setBill(bill);
+            timeline.setStatus(n);
+            timeLineRepo.save(timeline);
+        }
+
+        VoucherHistory voucherHistory = VoucherHistory.builder()
+                .bill(bill)
+                .voucherCode(request.getVoucherCode())
+                .build();
+        voucherHistoryRepository.save(voucherHistory);
 
         return bill;
     }
@@ -112,9 +130,10 @@ public class BillServiceImpl implements BillService {
             LocalDateTime startDate,
             LocalDateTime endDate,
             String status,
-            String billType) {
+            String billType,
+            String symbol) {
         return billRepo.getAllBillManagement(billCode,
-                startDate, endDate, status, billType);
+                startDate, endDate, status, billType, symbol);
     }
 
     @Transactional(rollbackFor = Exception.class)

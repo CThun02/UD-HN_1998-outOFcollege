@@ -11,7 +11,7 @@ import java.util.Optional;
 @Repository
 public interface VoucherAccountRepository extends JpaRepository<VoucherAccount, Long> {
 
-    @Query("select new java.lang.Boolean((COUNT(*) > 0)) " +
+    @Query("select new java.lang.Boolean((COUNT(va) > 0)) " +
             "from  Account account " +
             "join VoucherAccount va on va.accountVoucher.username = account.username " +
             "join Voucher voucher on voucher.id = va.voucherAccount.id " +
@@ -20,7 +20,9 @@ public interface VoucherAccountRepository extends JpaRepository<VoucherAccount, 
     Boolean isCheckUserUsedVoucher(@Param("voucherId") Long voucherId,
                                    @Param("username") String username);
 
-    Optional<VoucherAccount> findVoucherAccountByAccountVoucher_UsernameAndVoucherAccount_Id(@Param("voucherId") Long voucherId,
-                                                                      @Param("username") String username);
+    Optional<VoucherAccount> findVoucherAccountByAccountVoucher_UsernameAndVoucherAccount_Id(
+            @Param("username") String username,
+            @Param("voucherId") Long voucherId
+    );
 
 }

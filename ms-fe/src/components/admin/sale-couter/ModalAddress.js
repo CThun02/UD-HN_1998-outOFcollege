@@ -38,9 +38,7 @@ const ModalAddress = ({ isModalOpen, handleOk, handleCancel, address, render, se
 
     const handleSelectAddress = (record) => {
         // selected(index);
-        console.log(`object`, address)
         selectedAddress(record)
-        console.log(`record`, record)
         handleCancel();
         render(Math.random)
     }

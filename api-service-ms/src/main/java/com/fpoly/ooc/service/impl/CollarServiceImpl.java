@@ -24,7 +24,11 @@ public class CollarServiceImpl implements CollarServiceI {
 
     @Override
     public CollarType create(CollarType collarType) {
-        return repo.save(collarType);
+        CollarType collarCheck = repo.findFirstByCollarTypeName(collarType.getCollarTypeName());
+        if(collarCheck==null){
+            return repo.save(collarType);
+        }
+        return null;
     }
 
     @Override

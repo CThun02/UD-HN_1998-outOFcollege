@@ -20,17 +20,16 @@ public class ColorServiceImpl implements ColorServiceI {
 
     @Override
     public Color create(Color color) {
-        Color existColor = repo.findByColorCode(color.getColorCode());
-        if (existColor != null) {
-            throw new IllegalArgumentException("Mã màu sắc đã tồn tại");
+        Color existColor = repo.findFirstByColorCodeOrColorName(color.getColorCode(), color.getColorName());
+        if (existColor == null) {
+            return repo.save(color);
         }
-        return repo.save(color);
+        return null;
     }
 
     @Override
     public Color update(Color color, Long id) {
-
-        Color existColor = repo.findByColorCode(color.getColorCode());
+        Color existColor = repo.findFirstByColorCodeOrColorName(color.getColorCode(), color.getColorName());
         if (existColor != null) {
             throw new IllegalArgumentException("Mã màu sắc đã tồn tại");
         }

@@ -18,7 +18,6 @@ import { NotificationProvider } from "./components/element/notification/Notifica
 import AccountForm from "./components/admin/account/AccountForm";
 import CustomerAdmin from "./components/admin/account/CustomorAdmin";
 import DetailForm from "./components/admin/account/DetailForm";
-import ProductUpdateDetails from "./components/admin/product/ProductUpdateDetails";
 import MaterialAdmin from "./components/admin/material/MaterialAdmin";
 import CollorAdmin from "./components/admin/collor/ColorAdmin";
 import SleeveAdmin from "./components/admin/sleeve/SleeveAdmin";
@@ -63,11 +62,6 @@ function App() {
                     </Route>
                     {/* Đơn hàng */}
                     <Route path="order" element={<BillManagement />}></Route>
-                    {/* Thu chi */}
-                    {/* ví dụ path= san-pham/hien-thi ->  
-                      path="income-and-expenses"
-                      element="income-and-expenses"
-                    ></Route>
                     {/* Sản phẩm */}
                     <Route path="product">
                       <Route index element={<ProductIndex />} />
@@ -79,13 +73,6 @@ function App() {
                         path={"create-details"}
                         element={<ProductCreateDetails />}
                       />
-                      <Route
-                        path={"update-details/:productId"}
-                        element={<ProductUpdateDetails />}
-                      />
-                      {/* ví dụ path= san-pham/hien-thi ->  
-                    <Route path="hien-thi" element="el" />
-                    */}
                     </Route>
                     <Route path="button" element={<ButtonAdmin />}></Route>
                     <Route path="material" element={<MaterialAdmin />} />

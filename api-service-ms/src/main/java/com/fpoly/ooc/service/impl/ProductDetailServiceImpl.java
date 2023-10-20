@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -59,8 +60,11 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
     @Override
     public List<ProductDetailResponse> filterProductDetailsByIdCom(Long productId, Long idButton, Long idMaterial,
                                                                    Long idShirtTail, Long idSleeve, Long idCollar,
-                                                                   Long idColor, Long idSize, Long patternId, Long formId) {
-        return repo.filterProductDetailsByIdCom(productId, idButton, idMaterial, idShirtTail, idSleeve, idCollar, idColor, idSize, patternId, formId);
+                                                                   Long idColor, Long idSize, Long patternId, Long formId,
+                                                                   BigDecimal minPrice, BigDecimal maxPrice) {
+        return repo.filterProductDetailsByIdCom(productId, idButton, idMaterial, idShirtTail, idSleeve, idCollar
+                , idColor, idSize, patternId, formId,
+                minPrice, maxPrice);
     }
 
     @Override
@@ -84,6 +88,11 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
                                              Long idSleeve, Long idCollar, Long idColor, Long idSize, String status) {
         return repo.updateProductDetailsByCom(productId, idButton, idMaterial, idShirtTail, idSleeve, idCollar, idColor,
                 idSize, status);
+    }
+
+    @Override
+    public BigDecimal getMaxPricePDByProductId(Long productId) {
+        return repo.getMaxPricePDByProductId(productId);
     }
 
     @Override

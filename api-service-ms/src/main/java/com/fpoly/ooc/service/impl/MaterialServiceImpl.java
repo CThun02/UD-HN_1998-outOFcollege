@@ -20,7 +20,11 @@ public class MaterialServiceImpl implements MaterialServiceI {
 
     @Override
     public Material create(Material material) {
-        return repo.save(material);
+        Material materialCheck = repo.findFirstByMaterialName(material.getMaterialName());
+        if(materialCheck==null){
+            return repo.save(material);
+        }
+        return null;
     }
 
     @Override

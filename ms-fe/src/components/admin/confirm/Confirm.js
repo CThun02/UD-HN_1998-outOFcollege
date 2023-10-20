@@ -2,7 +2,7 @@ import { CheckCircleOutlined } from "@ant-design/icons";
 import Modal from "antd/es/modal/Modal";
 import React from "react";
 
-const Confirm = ({ isModalOpen, handelOk, handleCancel }) => {
+const Confirm = ({ isModalOpen, handelOk, handleCancel, title }) => {
   return (
     <Modal open={isModalOpen} onOk={handelOk} onCancel={handleCancel}>
       <div style={{ textAlign: "center", marginTop: "20px" }}>
@@ -11,7 +11,7 @@ const Confirm = ({ isModalOpen, handelOk, handleCancel }) => {
             style={{ fontSize: "180px", color: "#52C41A" }}
           />
         </div>
-        <h1>Xác nhận thêm mới</h1>
+        <h1>{title}</h1>
       </div>
     </Modal>
   );

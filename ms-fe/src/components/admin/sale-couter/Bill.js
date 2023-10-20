@@ -355,7 +355,6 @@ const Bill = () => {
         .then((response) => {
           const leadtimeTimestamp = response.data.data.leadtime;
           const leadtimeMoment = moment.unix(leadtimeTimestamp);
-
           const formattedDateTime = leadtimeMoment.format("DD/MM/YYYY");
           console.log(`lead time`, leadtimeMoment);
           console.log(
@@ -581,7 +580,6 @@ const Bill = () => {
       price: totalPrice,
       priceReduce: priceReduce,
       billType: billType,
-
       status: "unpaid",
       note: note,
       lstBillDetailRequest: [],
@@ -630,7 +628,6 @@ const Bill = () => {
         },
       });
     }
-
     console.log(bill);
   };
 
@@ -770,7 +767,6 @@ const Bill = () => {
                           <span>
                             <b style={{ color: "red" }}>*</b> Họ và tên
                           </span>
-
                           <Input
                             placeholder="nhập họ và tên"
                             value={selectedAddress.fullName}
@@ -780,7 +776,6 @@ const Bill = () => {
                           <span>
                             <b style={{ color: "red" }}>*</b> Số điện thoại
                           </span>
-
                           <Input
                             placeholder="nhập số điện thoại"
                             value={selectedAddress.numberPhone}
@@ -880,7 +875,6 @@ const Bill = () => {
                       <Row>
                         <Col span={16}>
                           <span>Địa chỉ cụ thể</span>
-
                           <Input
                             placeholder="Nhập địa chỉ cụ thể"
                             value={
@@ -897,7 +891,6 @@ const Bill = () => {
                             style={{ width: "90px", height: "80px" }}
                           />
                         </Col>
-
                         {switchChange[index] && account && (
                           <h3>
                             Ngày giao hàng dự kiến:{" "}

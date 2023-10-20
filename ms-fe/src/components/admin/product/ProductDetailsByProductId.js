@@ -11,6 +11,7 @@ import {
   Button,
   Carousel,
   Col,
+  ColorPicker,
   message,
   notification,
   Popconfirm,
@@ -27,6 +28,7 @@ import Modal from "antd/es/modal/Modal";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import Confirm from "../confirm/Confirm";
 import styles from "./ProductDetailsByProductId.module.css";
 import { isFormInputEmpty } from "./ValidateForm";
 
@@ -40,6 +42,7 @@ var buttonId = "",
   sizeId = "",
   colorId = "",
   price = [0, 0];
+var productDetailsUpdate = [];
 const ProductDetails = (props) => {
   const api = "http://localhost:8080/api/admin/";
   const [messageApi, contextHolder] = message.useMessage();
@@ -70,6 +73,19 @@ const ProductDetails = (props) => {
   const [editProduct, setEditProduct] = useState(false);
   const [brands, setBrands] = useState([]);
   const [brandCreate, setBrandCreate] = useState("");
+  const [sizeCreate, setSizeCreate] = useState("");
+  const [shirtTailCreate, setshirtTailCreate] = useState("");
+  const [colorCreate, setColorCreate] = useState({
+    colorCode: "",
+    colorName: "",
+  });
+  const [modalColorOpen, setModalColorOpen] = useState(false);
+  const [patternCreate, setPatternCreate] = useState("");
+  const [formCreate, setFormCreate] = useState("");
+  const [buttonCreate, setButtonCreate] = useState("");
+  const [collarCreate, setCollarCreate] = useState("");
+  const [materialCreate, setMaterialCreate] = useState("");
+  const [sleeveCreate, setSleeveCreate] = useState("");
   const [categories, setCategories] = useState([]);
   const [categoryCreate, setCategoryCreate] = useState("");
   const [render, setRender] = useState();
@@ -77,6 +93,24 @@ const ProductDetails = (props) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const [maxPrice, setMaxprice] = useState();
+  const [isModalConfirmOpen, setIsModalConfirmOpen] = useState(false);
+  const [isModalUpdateDetailOpen, setIsModalUpdateDetailOpen] = useState([]);
+  const [productDetailUpdate, setProductDetailUpdate] = useState({
+    product: product,
+    button: { id: " " },
+    material: { id: " " },
+    collar: { id: " " },
+    sleeve: { id: " " },
+    size: { id: " " },
+    color: { id: " " },
+    shirtTail: { id: " " },
+    pattern: { id: " " },
+    form: { id: " " },
+    price: 200000,
+    quantity: 10,
+    QRCode: " ",
+    status: "ACTIVE",
+  });
   const columns = [
     {
       key: "stt",
@@ -123,6 +157,9 @@ const ProductDetails = (props) => {
             size="small"
             style={{ textAlign: "center" }}
             defaultValue={record.quantity}
+            onBlur={(event) =>
+              getProductDetailsUpdate(record, "quantity", event.target.value)
+            }
           />
         ) : (
           record.quantity
@@ -139,6 +176,9 @@ const ProductDetails = (props) => {
             size="small"
             style={{ textAlign: "center" }}
             defaultValue={record.price}
+            onBlur={(event) =>
+              getProductDetailsUpdate(record, "price", event.target.value)
+            }
           />
         ) : (
           record.price
@@ -191,23 +231,1078 @@ const ProductDetails = (props) => {
       title: "Thao tác",
       render: (text, record, index) => {
         return (
-          <Button type="primary" size={"large"}>
-            <EditFilled />
-          </Button>
+          <>
+            <Modal
+              title={
+                <span style={{ fontWeight: "500" }}>
+                  Sản phẩm {record.product.productName}
+                </span>
+              }
+              open={isModalUpdateDetailOpen[index]}
+              footer={null}
+              onCancel={() => handlesetIsModalUpdateDetail(index, false)}
+              width={800}
+            >
+              <Row className={styles.productDetails__filter}>
+                <Col span={8}>
+                  <div style={{ margin: "0 8px 24px 8px" }}>
+                    <span
+                      style={{
+                        fontWeight: "500",
+                        display: "block",
+                        textAlign: "center",
+                      }}
+                    >
+                      Nút áo
+                    </span>
+                    <Select
+                      showSearch
+                      maxTagCount={"responsive"}
+                      optionFilterProp="children"
+                      filterOption={(input, option) =>
+                        (option?.label ?? "").includes(input)
+                      }
+                      filterSort={(optionA, optionB) =>
+                        (optionA?.label ?? "")
+                          .toLowerCase()
+                          .localeCompare((optionB?.label ?? "").toLowerCase())
+                      }
+                      value={productDetailUpdate?.button.id}
+                      bordered={false}
+                      onChange={(event) => {
+                        handleSetProductDetail("button", { id: event });
+                      }}
+                      style={{ borderBottom: "1px solid black", width: "100%" }}
+                      status={
+                        productDetailUpdate.button.id === "" ? "error" : ""
+                      }
+                    >
+                      <Select.Option value={"add"}>
+                        <Space.Compact>
+                          <Input
+                            placeholder="Add new button"
+                            size="small"
+                            value={buttonCreate}
+                            onClick={(event) => {
+                              handleCustomOptionClick(event);
+                            }}
+                            onChange={(event) => {
+                              setButtonCreate(event.target.value);
+                            }}
+                          />
+                          <Button
+                            onClick={(event) => {
+                              createButton(event);
+                            }}
+                          >
+                            <PlusOutlined />
+                          </Button>
+                        </Space.Compact>
+                      </Select.Option>
+                      {buttons &&
+                        buttons.map((item) => {
+                          return (
+                            <Select.Option key={item.id} value={item.id}>
+                              {item.buttonName}
+                            </Select.Option>
+                          );
+                        })}
+                    </Select>
+                  </div>
+                </Col>
+                <Col span={8}>
+                  <div style={{ margin: "0 8px 24px 8px" }}>
+                    <span
+                      style={{
+                        fontWeight: "500",
+                        display: "block",
+                        textAlign: "center",
+                      }}
+                    >
+                      Chất liệu
+                    </span>
+                    <Select
+                      showSearch
+                      maxTagCount={"responsive"}
+                      optionFilterProp="children"
+                      filterOption={(input, option) =>
+                        (option?.label ?? "").includes(input)
+                      }
+                      filterSort={(optionA, optionB) =>
+                        (optionA?.label ?? "")
+                          .toLowerCase()
+                          .localeCompare((optionB?.label ?? "").toLowerCase())
+                      }
+                      bordered={false}
+                      onChange={(event) => {
+                        handleSetProductDetail("material", { id: event });
+                      }}
+                      value={productDetailUpdate.material.id}
+                      style={{ borderBottom: "1px solid black", width: "100%" }}
+                      status={
+                        productDetailUpdate.material.id === "" ? "error" : ""
+                      }
+                    >
+                      <Select.Option value={"add"}>
+                        <Space.Compact>
+                          <Input
+                            placeholder="Add new material"
+                            size="small"
+                            value={materialCreate}
+                            onClick={(event) => {
+                              handleCustomOptionClick(event);
+                            }}
+                            onChange={(event) => {
+                              setMaterialCreate(event.target.value);
+                            }}
+                          />
+                          <Button
+                            onClick={(event) => {
+                              createMaterial(event);
+                            }}
+                          >
+                            <PlusOutlined />
+                          </Button>
+                        </Space.Compact>
+                      </Select.Option>
+                      {materials &&
+                        materials.map((item) => {
+                          return (
+                            <Select.Option key={item.id} value={item.id}>
+                              {item.materialName}
+                            </Select.Option>
+                          );
+                        })}
+                    </Select>
+                  </div>
+                </Col>
+                <Col span={8}>
+                  <div style={{ margin: "0 8px 24px 8px" }}>
+                    <span
+                      style={{
+                        fontWeight: "500",
+                        display: "block",
+                        textAlign: "center",
+                      }}
+                    >
+                      Cổ áo
+                    </span>
+                    <Select
+                      showSearch
+                      maxTagCount={"responsive"}
+                      optionFilterProp="children"
+                      filterOption={(input, option) =>
+                        (option?.label ?? "").includes(input)
+                      }
+                      filterSort={(optionA, optionB) =>
+                        (optionA?.label ?? "")
+                          .toLowerCase()
+                          .localeCompare((optionB?.label ?? "").toLowerCase())
+                      }
+                      bordered={false}
+                      onChange={(event) => {
+                        handleSetProductDetail("collar", { id: event });
+                      }}
+                      value={productDetailUpdate.collar.id}
+                      style={{ borderBottom: "1px solid black", width: "100%" }}
+                      status={
+                        productDetailUpdate.collar.id === "" ? "error" : ""
+                      }
+                    >
+                      <Select.Option value={"add"}>
+                        <Space.Compact>
+                          <Input
+                            placeholder="Add new collar"
+                            size="small"
+                            value={collarCreate}
+                            onClick={(event) => {
+                              handleCustomOptionClick(event);
+                            }}
+                            onChange={(event) => {
+                              setCollarCreate(event.target.value);
+                            }}
+                          />
+                          <Button
+                            onClick={(event) => {
+                              createCollar(event);
+                            }}
+                          >
+                            <PlusOutlined />
+                          </Button>
+                        </Space.Compact>
+                      </Select.Option>
+                      {collars &&
+                        collars.map((item) => {
+                          return (
+                            <Select.Option key={item.id} value={item.id}>
+                              {item.collarTypeName}
+                            </Select.Option>
+                          );
+                        })}
+                    </Select>
+                  </div>
+                </Col>
+                <Col span={8}>
+                  <div style={{ margin: "0 8px 24px 8px" }}>
+                    <span
+                      style={{
+                        fontWeight: "500",
+                        display: "block",
+                        textAlign: "center",
+                      }}
+                    >
+                      Tay áo
+                    </span>
+                    <Select
+                      showSearch
+                      maxTagCount={"responsive"}
+                      optionFilterProp="children"
+                      filterOption={(input, option) =>
+                        (option?.label ?? "").includes(input)
+                      }
+                      filterSort={(optionA, optionB) =>
+                        (optionA?.label ?? "")
+                          .toLowerCase()
+                          .localeCompare((optionB?.label ?? "").toLowerCase())
+                      }
+                      bordered={false}
+                      onChange={(event) => {
+                        handleSetProductDetail("sleeve", { id: event });
+                      }}
+                      status={
+                        productDetailUpdate.sleeve.id === "" ? "error" : ""
+                      }
+                      value={productDetailUpdate.sleeve.id}
+                      style={{ borderBottom: "1px solid black", width: "100%" }}
+                    >
+                      <Select.Option value={"add"}>
+                        <Space.Compact>
+                          <Input
+                            placeholder="Add new sleeve"
+                            size="small"
+                            value={sleeveCreate}
+                            onClick={(event) => {
+                              handleCustomOptionClick(event);
+                            }}
+                            onChange={(event) => {
+                              setSleeveCreate(event.target.value);
+                            }}
+                          />
+                          <Button
+                            onClick={(event) => {
+                              createSleeve(event);
+                            }}
+                          >
+                            <PlusOutlined />
+                          </Button>
+                        </Space.Compact>
+                      </Select.Option>
+                      {sleeves &&
+                        sleeves.map((item) => {
+                          return (
+                            <Select.Option key={item.id} value={item.id}>
+                              {item.sleeveName}
+                            </Select.Option>
+                          );
+                        })}
+                    </Select>
+                  </div>
+                </Col>
+                <Col span={8}>
+                  <div style={{ margin: "0 8px 24px 8px" }}>
+                    <span
+                      style={{
+                        fontWeight: "500",
+                        display: "block",
+                        textAlign: "center",
+                      }}
+                    >
+                      Họa tiết
+                    </span>
+                    <Select
+                      showSearch
+                      optionFilterProp="children"
+                      filterOption={(input, option) =>
+                        (option?.label ?? "").includes(input)
+                      }
+                      filterSort={(optionA, optionB) =>
+                        (optionA?.label ?? "")
+                          .toLowerCase()
+                          .localeCompare((optionB?.label ?? "").toLowerCase())
+                      }
+                      bordered={false}
+                      onChange={(event) => {
+                        handleSetProductDetail("pattern", { id: event });
+                      }}
+                      status={
+                        productDetailUpdate.pattern.id === "" ? "error" : ""
+                      }
+                      value={productDetailUpdate.pattern.id}
+                      style={{ borderBottom: "1px solid black", width: "100%" }}
+                    >
+                      <Select.Option value={"add"}>
+                        <Space.Compact>
+                          <Input
+                            placeholder="Add new pattern"
+                            size="small"
+                            value={patternCreate}
+                            onClick={(event) => {
+                              handleCustomOptionClick(event);
+                            }}
+                            onChange={(event) => {
+                              setPatternCreate(event.target.value);
+                            }}
+                          />
+                          <Button
+                            onClick={(event) => {
+                              createPattern(event);
+                            }}
+                          >
+                            <PlusOutlined />
+                          </Button>
+                        </Space.Compact>
+                      </Select.Option>
+                      {patterns &&
+                        patterns.map((item) => {
+                          return (
+                            <Select.Option key={item.id} value={item.id}>
+                              {item.patternName}
+                            </Select.Option>
+                          );
+                        })}
+                    </Select>
+                  </div>
+                </Col>
+                <Col span={8}>
+                  <div style={{ margin: "0 8px 24px 8px" }}>
+                    <span
+                      style={{
+                        fontWeight: "500",
+                        display: "block",
+                        textAlign: "center",
+                      }}
+                    >
+                      Đuôi áo
+                    </span>
+                    <Select
+                      showSearch
+                      optionFilterProp="children"
+                      filterOption={(input, option) =>
+                        (option?.label ?? "").includes(input)
+                      }
+                      filterSort={(optionA, optionB) =>
+                        (optionA?.label ?? "")
+                          .toLowerCase()
+                          .localeCompare((optionB?.label ?? "").toLowerCase())
+                      }
+                      bordered={false}
+                      onChange={(event) => {
+                        handleSetProductDetail("shirtTail", { id: event });
+                      }}
+                      status={
+                        productDetailUpdate.shirtTail.id === "" ? "error" : ""
+                      }
+                      value={productDetailUpdate.shirtTail.id}
+                      style={{ borderBottom: "1px solid black", width: "100%" }}
+                    >
+                      <Select.Option value={"add"}>
+                        <Space.Compact>
+                          <Input
+                            placeholder="Add new shirtTail"
+                            size="small"
+                            value={shirtTailCreate}
+                            onClick={(event) => {
+                              handleCustomOptionClick(event);
+                            }}
+                            onChange={(event) => {
+                              setshirtTailCreate(event.target.value);
+                            }}
+                          />
+                          <Button
+                            onClick={(event) => {
+                              createShirtTail(event);
+                            }}
+                          >
+                            <PlusOutlined />
+                          </Button>
+                        </Space.Compact>
+                      </Select.Option>
+                      {shirtTails &&
+                        shirtTails.map((item) => {
+                          return (
+                            <Select.Option key={item.id} value={item.id}>
+                              {item.shirtTailTypeName}
+                            </Select.Option>
+                          );
+                        })}
+                    </Select>
+                  </div>
+                </Col>
+                <Col span={8}>
+                  <div style={{ margin: "0 8px 24px 8px" }}>
+                    <span
+                      style={{
+                        fontWeight: "500",
+                        display: "block",
+                        textAlign: "center",
+                      }}
+                    >
+                      Dáng áo
+                    </span>
+                    <Select
+                      showSearch
+                      maxTagCount={"responsive"}
+                      optionFilterProp="children"
+                      filterOption={(input, option) =>
+                        (option?.label ?? "").includes(input)
+                      }
+                      filterSort={(optionA, optionB) =>
+                        (optionA?.label ?? "")
+                          .toLowerCase()
+                          .localeCompare((optionB?.label ?? "").toLowerCase())
+                      }
+                      bordered={false}
+                      onChange={(event) => {
+                        handleSetProductDetail("form", { id: event });
+                      }}
+                      status={productDetailUpdate.form.id === "" ? "error" : ""}
+                      value={productDetailUpdate.form.id}
+                      style={{ borderBottom: "1px solid black", width: "100%" }}
+                    >
+                      <Select.Option value={"add"}>
+                        <Space.Compact>
+                          <Input
+                            placeholder="Add new form"
+                            size="small"
+                            value={formCreate}
+                            onClick={(event) => {
+                              handleCustomOptionClick(event);
+                            }}
+                            onChange={(event) => {
+                              setFormCreate(event.target.value);
+                            }}
+                          />
+                          <Button
+                            onClick={(event) => {
+                              createForm(event);
+                            }}
+                          >
+                            <PlusOutlined />
+                          </Button>
+                        </Space.Compact>
+                      </Select.Option>
+                      {forms &&
+                        forms.map((item) => {
+                          return (
+                            <Select.Option key={item.id} value={item.id}>
+                              {item.formName}
+                            </Select.Option>
+                          );
+                        })}
+                    </Select>
+                  </div>
+                </Col>
+                <Col span={8}>
+                  <div style={{ margin: "0 8px 24px 8px" }}>
+                    <span
+                      style={{
+                        fontWeight: "500",
+                        display: "block",
+                        textAlign: "center",
+                      }}
+                    >
+                      Màu sắc
+                    </span>
+                    <Select
+                      maxTagCount={"responsive"}
+                      showSearch
+                      optionFilterProp="children"
+                      filterOption={(input, option) =>
+                        (option?.label ?? "").includes(input)
+                      }
+                      filterSort={(optionA, optionB) =>
+                        (optionA?.label ?? "")
+                          .toLowerCase()
+                          .localeCompare((optionB?.label ?? "").toLowerCase())
+                      }
+                      bordered={false}
+                      onChange={(event) => {
+                        handleSetProductDetail("color", { id: event });
+                      }}
+                      status={
+                        productDetailUpdate.color.id === "" ? "error" : ""
+                      }
+                      value={productDetailUpdate.color.id}
+                      style={{ borderBottom: "1px solid black", width: "100%" }}
+                    >
+                      <Select.Option value={"add"}>
+                        <Space.Compact>
+                          <Button
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              setModalColorOpen(true);
+                            }}
+                          >
+                            <PlusOutlined />
+                          </Button>
+                        </Space.Compact>
+                      </Select.Option>
+                      {colors &&
+                        colors.map((item) => {
+                          return (
+                            <Select.Option key={item.id} value={item.id}>
+                              <div className={styles.optionColor}>
+                                <span
+                                  style={{ backgroundColor: item.colorCode }}
+                                ></span>
+                                {item.colorName}
+                              </div>
+                            </Select.Option>
+                          );
+                        })}
+                    </Select>
+                  </div>
+                </Col>
+                <Col span={8}>
+                  <div style={{ margin: "0 8px 24px 8px" }}>
+                    <span
+                      style={{
+                        fontWeight: "500",
+                        display: "block",
+                        textAlign: "center",
+                      }}
+                    >
+                      Kích cỡ
+                    </span>
+                    <Select
+                      showSearch
+                      maxTagCount={"responsive"}
+                      optionFilterProp="children"
+                      filterOption={(input, option) =>
+                        (option?.label ?? "").includes(input)
+                      }
+                      filterSort={(optionA, optionB) =>
+                        (optionA?.label ?? "")
+                          .toLowerCase()
+                          .localeCompare((optionB?.label ?? "").toLowerCase())
+                      }
+                      status={productDetailUpdate.size.id === "" ? "error" : ""}
+                      bordered={false}
+                      onChange={(event) => {
+                        handleSetProductDetail("size", { id: event });
+                      }}
+                      value={productDetailUpdate.size.id}
+                      style={{ borderBottom: "1px solid black", width: "100%" }}
+                    >
+                      <Select.Option value={"add"}>
+                        <Space.Compact>
+                          <Input
+                            placeholder="Add new size"
+                            size="small"
+                            value={sizeCreate}
+                            onClick={(event) => {
+                              handleCustomOptionClick(event);
+                            }}
+                            onChange={(event) => {
+                              setSizeCreate(event.target.value);
+                            }}
+                          />
+                          <Button
+                            onClick={(event) => {
+                              createSize(event);
+                            }}
+                          >
+                            <PlusOutlined />
+                          </Button>
+                        </Space.Compact>
+                      </Select.Option>
+                      {sizes &&
+                        sizes.map((item) => {
+                          return (
+                            <Select.Option key={item.id} value={item.id}>
+                              {item.sizeName}
+                            </Select.Option>
+                          );
+                        })}
+                    </Select>
+                  </div>
+                </Col>
+                <Col span={12}>
+                  <div className="m-5">
+                    <span
+                      style={{
+                        fontWeight: "500",
+                        display: "block",
+                        textAlign: "center",
+                      }}
+                    >
+                      Số lượng
+                    </span>
+                    <Input
+                      type={"number"}
+                      value={productDetailUpdate.quantity}
+                      status={
+                        productDetailUpdate.quantity === "" ? "error" : ""
+                      }
+                      onChange={(event) => {
+                        handleSetProductDetail(
+                          "quantity",
+                          event.target.value.replace(".", "")
+                        );
+                      }}
+                    />
+                  </div>
+                </Col>
+                <Col span={12}>
+                  <div className="m-5">
+                    <span
+                      style={{
+                        fontWeight: "500",
+                        display: "block",
+                        textAlign: "center",
+                      }}
+                    >
+                      Giá
+                    </span>
+                    <Input
+                      type={"number"}
+                      value={productDetailUpdate.price}
+                      onChange={(event) =>
+                        handleSetProductDetail("price", event.target.value)
+                      }
+                      status={productDetailUpdate.price === "" ? "error" : ""}
+                    />
+                  </div>
+                </Col>
+                <Col span={6} style={{ marginTop: "12px" }}>
+                  <div className="m-5">
+                    <img
+                      alt=""
+                      style={{ width: "100%" }}
+                      src={
+                        "https://cdn.britannica.com/17/155017-050-9AC96FC8/Example-QR-code.jpg"
+                      }
+                    />
+                  </div>
+                </Col>
+                <Col span={18} style={{ marginTop: "12px" }}>
+                  <Row>
+                    {productImages &&
+                      productImages.map((productImage) => {
+                        if (record.color.id === productImage.color.id) {
+                          if (
+                            productImage.path.includes(
+                              "" +
+                                record.button.id +
+                                record.material.id +
+                                record.collar.id +
+                                record.sleeve.id +
+                                record.shirtTail.id +
+                                record.pattern.id +
+                                record.form.id
+                            )
+                          ) {
+                            return (
+                              <Col span={6} key={productImage.id}>
+                                <div className="m-5">
+                                  <img
+                                    style={{ width: "100%" }}
+                                    alt=""
+                                    src={productImage.path}
+                                  />
+                                </div>
+                              </Col>
+                            );
+                          }
+                        }
+                      })}
+                  </Row>
+                </Col>
+                <Col span={24} style={{ textAlign: "end" }}>
+                  <Popconfirm
+                    title={"Xác nhận cập nhật sản phẩm"}
+                    onConfirm={() => {
+                      updateProductDetail(productDetailUpdate, true);
+                      handlesetIsModalUpdateDetail(index, false);
+                    }}
+                  >
+                    <Button type="primary">Cập nhật</Button>
+                  </Popconfirm>
+                </Col>
+              </Row>
+            </Modal>
+            <Button
+              onClick={() => {
+                setProductDetailUpdate(record);
+                handlesetIsModalUpdateDetail(index, true);
+              }}
+              type="primary"
+              size={"large"}
+            >
+              <EditFilled />
+            </Button>
+          </>
         );
       },
     },
   ];
-
   const rowSelection = {
     selectedRowKeys,
     onChange: onSelectChange,
   };
   //functions
+  function handleSetColorCreate(field, value) {
+    setColorCreate((prevProduct) => ({
+      ...prevProduct,
+      [field]: value,
+    }));
+  }
+
+  function createPattern(event) {
+    event.stopPropagation();
+    messageApi.loading("Đang tải", 1);
+    if (patternCreate.trim() !== "") {
+      axios
+        .post(api + "pattern?categoryName=" + patternCreate.trim(), null)
+        .then((res) => {
+          setPatternCreate(" ");
+          setTimeout(() => {
+            if (res.data === "") {
+              messageApi.error("Họa tiết đã tồn tại!", 1);
+            } else {
+              messageApi.success("Thêm hoạ tiết thành công!", 1);
+            }
+            setRender(Math.random());
+          }, 1000);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      setTimeout(() => {
+        messageApi.error("Vui lòng nhập hoạt tiết!", 1);
+      }, 1000);
+    }
+  }
+
+  function createForm(event) {
+    event.stopPropagation();
+    messageApi.loading("Đang tải", 1);
+    if (formCreate.trim() !== "") {
+      axios
+        .post(api + "form?categoryName=" + formCreate.trim(), null)
+        .then((res) => {
+          setRender(Math.random);
+          setTimeout(() => {
+            if (res.data === "") {
+              messageApi.error("Dáng áo đã tồn tại!", 1);
+            } else {
+              messageApi.success("Thêm dáng áo thành công!", 1);
+            }
+            setFormCreate(" ");
+          }, 1000);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      setTimeout(() => {
+        messageApi.error("Vui lòng nhập dáng áo!", 1);
+      }, 1000);
+    }
+  }
+
+  function createButton(event) {
+    event.stopPropagation();
+    messageApi.loading("Đang tải", 1);
+    if (buttonCreate.trim() !== "") {
+      axios
+        .post(api + "button/create", { buttonName: buttonCreate.trim() })
+        .then((res) => {
+          setRender(Math.random);
+          setTimeout(() => {
+            if (res.data === "") {
+              messageApi.error("Nút áo đã tồn tại!", 1);
+            } else {
+              messageApi.success("Thêm nút áo thành công!", 1);
+            }
+            setButtonCreate(" ");
+          }, 1000);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      setTimeout(() => {
+        messageApi.error("Vui lòng nhập nút áo!", 1);
+      }, 1000);
+    }
+  }
+
+  function createMaterial(event) {
+    event.stopPropagation();
+    messageApi.loading("Đang tải", 1);
+    if (materialCreate.trim() !== "") {
+      axios
+        .post(api + "material/create", { materialName: materialCreate.trim() })
+        .then((res) => {
+          setRender(Math.random);
+          setTimeout(() => {
+            if (res.data === "") {
+              messageApi.error("Chất liệu đã tồn tại!", 1);
+            } else {
+              messageApi.success("Thêm chất liệu thành công!", 1);
+            }
+            setMaterialCreate(" ");
+          }, 1000);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      setTimeout(() => {
+        messageApi.error("Vui lòng nhập chất liệu!", 1);
+      }, 1000);
+    }
+  }
+
+  function createCollar(event) {
+    event.stopPropagation();
+    messageApi.loading("Đang tải", 1);
+    if (collarCreate.trim() !== "") {
+      axios
+        .post(api + "collar/create", { collarTypeName: collarCreate.trim() })
+        .then((res) => {
+          setRender(Math.random);
+          setTimeout(() => {
+            if (res.data === "") {
+              messageApi.error("Cổ áo đã tồn tại!", 1);
+            } else {
+              messageApi.success("Thêm cổ áo thành công!", 1);
+            }
+            setCollarCreate(" ");
+          }, 1000);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      setTimeout(() => {
+        messageApi.error("Vui lòng nhập cổ áo!", 1);
+      }, 1000);
+    }
+  }
+  function createShirtTail(event) {
+    event.stopPropagation();
+    messageApi.loading("Đang tải", 1);
+    if (formCreate.trim() !== "") {
+      axios
+        .post(
+          api + "shirt-tail?shirtTailTypeName=" + shirtTailCreate.trim(),
+          null
+        )
+        .then((res) => {
+          setRender(Math.random);
+          setTimeout(() => {
+            if (res.data === "") {
+              messageApi.error("Đuôi áo đã tồn tại!", 1);
+            } else {
+              messageApi.success("Thêm đuôi áo thành công!", 1);
+            }
+            setshirtTailCreate(" ");
+          }, 1000);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      setTimeout(() => {
+        messageApi.error("Vui lòng nhập dáng áo!", 1);
+      }, 1000);
+    }
+  }
+  function createSleeve(event) {
+    event.stopPropagation();
+    messageApi.loading("Đang tải", 1);
+    if (sleeveCreate.trim() !== "") {
+      axios
+        .post(api + "sleeve/create", { sleeveName: sleeveCreate.trim() })
+        .then((res) => {
+          setRender(Math.random);
+          setTimeout(() => {
+            if (res.data === "") {
+              messageApi.error("Tay áo đã tồn tại!", 1);
+            } else {
+              messageApi.success("Thêm tay áo thành công!", 1);
+            }
+            setSleeveCreate(" ");
+          }, 1000);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      setTimeout(() => {
+        messageApi.error("Vui lòng nhập tay áo!", 1);
+      }, 1000);
+    }
+  }
+
+  function createSize(event) {
+    event.stopPropagation();
+    messageApi.loading("Đang tải", 1);
+    if (sizeCreate.trim() !== "") {
+      axios
+        .post(api + "size/create", { sizeName: sizeCreate.trim() })
+        .then((res) => {
+          setRender(Math.random);
+          setTimeout(() => {
+            if (res.data === "") {
+              messageApi.error("Kích cỡ đã tồn tại!", 1);
+            } else {
+              messageApi.success("Thêm kích cỡ thành công!", 1);
+            }
+            setSizeCreate(" ");
+          }, 1000);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      setTimeout(() => {
+        messageApi.error("Vui lòng nhập kích cỡ!", 1);
+      }, 1000);
+    }
+  }
+
+  function createColor(event) {
+    event.stopPropagation();
+    messageApi.loading("Đang tải", 1);
+    if (
+      colorCreate.colorName.trim() !== "" ||
+      colorCreate.colorCode.trim() !== ""
+    ) {
+      axios
+        .post(api + "color/create", colorCreate)
+        .then((res) => {
+          setTimeout(() => {
+            if (res.data === "") {
+              messageApi.error("Màu sắc đã tồn tại!", 1);
+            } else {
+              messageApi.success("Thêm màu sắc thành công!", 1);
+              setRender(Math.random());
+            }
+            setModalColorOpen(false);
+          }, 1000);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      setTimeout(() => {
+        messageApi.error("Vui lòng nhập màu sắc!", 1);
+      }, 1000);
+    }
+  }
+
   function onSelectChange(newSelectedRowKeys) {
     setSelectedRowKeys(newSelectedRowKeys);
     setRender(Math.random);
   }
+
+  function handlesetIsModalUpdateDetail(index, value) {
+    const newModalVisible = [...isModalUpdateDetailOpen];
+    newModalVisible[index] = value;
+    setIsModalUpdateDetailOpen(newModalVisible);
+  }
+
+  function handleSetProduct(field, value) {
+    setProduct((prevProduct) => ({
+      ...prevProduct,
+      [field]: value,
+    }));
+  }
+
+  function handleSetProductDetail(field, value) {
+    setProductDetailUpdate((productDetail) => ({
+      ...productDetail,
+      [field]: value,
+    }));
+  }
+
+  function handleCustomOptionClick(event) {
+    event.stopPropagation();
+    event.target.focus();
+  }
+
+  function getProductDetailsUpdate(record, field, value) {
+    record[field] = value;
+    if (productDetailsUpdate.length === 0) {
+      productDetailsUpdate.push(record);
+    } else {
+      for (let i = 0; i < productDetailsUpdate.length; i++) {
+        if (productDetailsUpdate[i].id === record.id) {
+          productDetailsUpdate.splice(i, 1, record);
+          return;
+        }
+      }
+      productDetailsUpdate.push(record);
+    }
+  }
+
+  function updateProductDetail(productDetail, notifi) {
+    if (notifi) {
+      message.loading("loading", 1);
+    }
+    let check = isFormInputEmpty(productDetailUpdate);
+    if (check) {
+      setTimeout(() => {
+        notification.error({
+          message: "Thông báo",
+          description: "Vui lòng không để trống các trường",
+        });
+        setRender(Math.random());
+      }, 1000);
+    } else {
+      axios
+        .put(api + "product/updateProductDetail", productDetail)
+        .then((res) => {
+          if (notifi) {
+            setTimeout(() => {
+              notification.success({
+                message: "Thông báo",
+                description: "Cập nhật sản phẩm thành công",
+              });
+              setRender(Math.random());
+            }, 1000);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }
+
+  function updateProductDetails() {
+    message.loading("Loading...", 1);
+    setIsModalConfirmOpen(false);
+    setSelectedRowKeys([]);
+    for (let keyUpdates of selectedRowKeys) {
+      for (let productDetail of productDetailsUpdate) {
+        if (keyUpdates === productDetail.id) {
+          updateProductDetail(productDetail);
+        }
+      }
+    }
+    setTimeout(() => {
+      notification.success({
+        message: "Thông báo",
+        description: <span>Chỉnh sửa sản phẩm thành công</span>,
+      });
+      setRender(Math.random());
+    }, 1000);
+  }
+
   function filter() {
     setLoading(true);
     axios
@@ -257,17 +1352,6 @@ const ProductDetails = (props) => {
   const handleCancel = () => {
     setIsModalOpen(false);
   };
-  function handleSetProduct(field, value) {
-    setProduct((prevProduct) => ({
-      ...prevProduct,
-      [field]: value,
-    }));
-  }
-
-  function handleCustomOptionClick(event) {
-    event.stopPropagation();
-    event.target.focus();
-  }
 
   function createBrand(event) {
     event.stopPropagation();
@@ -361,6 +1445,7 @@ const ProductDetails = (props) => {
       .get(api + "product/getMaxPrice?productId=" + productId)
       .then((res) => {
         setMaxprice(res.data);
+        price[1] = res.data;
       })
       .catch((err) => {
         console.log(err);
@@ -489,6 +1574,38 @@ const ProductDetails = (props) => {
     <>
       {contextHolder}
       <div className={styles.productDetails}>
+        <Modal
+          title="Thêm nhanh màu sắc"
+          centered
+          open={modalColorOpen}
+          footer={false}
+          onCancel={() => setModalColorOpen(false)}
+        >
+          <ColorPicker
+            showText
+            onChange={(event) => {
+              handleSetColorCreate("colorCode", event.toHexString());
+            }}
+          ></ColorPicker>
+          <h6>Tên màu sắc</h6>
+          <Input
+            onChange={(event) => {
+              handleSetColorCreate("colorName", event.target.value);
+            }}
+          />
+          <div style={{ textAlign: "end" }}>
+            <Button
+              style={{
+                marginTop: "16px",
+                backgroundColor: "#337CCF",
+                color: "white",
+              }}
+              onClick={(event) => createColor(event)}
+            >
+              Thêm mới
+            </Button>
+          </div>
+        </Modal>
         <h2>
           <FilePptOutlined /> Chỉnh sửa sản phẩm
         </h2>
@@ -1189,7 +2306,19 @@ const ProductDetails = (props) => {
             }}
           />
           <div style={{ marginTop: "30px", textAlign: "center" }}>
-            <Button type="primary" onClick={() => {}}>
+            <Confirm
+              handelOk={updateProductDetails}
+              handleCancel={() => setIsModalConfirmOpen(false)}
+              isModalOpen={isModalConfirmOpen}
+              title={"Xác nhận chỉnh sửa"}
+            />
+            <Button
+              type="primary"
+              disabled={selectedRowKeys.length === 0}
+              onClick={() => {
+                setIsModalConfirmOpen(true);
+              }}
+            >
               Xác nhận
             </Button>
           </div>

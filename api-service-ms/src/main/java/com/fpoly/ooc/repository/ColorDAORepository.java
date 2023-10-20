@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ColorDAORepository extends JpaRepository<Color, Long> {
-    Color findByColorCode(String colorCode);
+    Color findFirstByColorCodeOrColorName(String colorCode, String colorName);
 }

@@ -165,9 +165,8 @@ public class ProductController {
     }
 
     @PutMapping("/updateProductDetail")
-    public ResponseEntity<?> updateProductDetail(@RequestBody ProductDetailRequest request,
+    public ResponseEntity<?> updateProductDetail(@RequestBody ProductDetail productDetail,
                                                  @RequestParam(name = "method", defaultValue = "Update") String method){
-        ProductDetail productDetail = request.dto();
         if(method.equals("Deleted")){
             if(productDetail.getStatus().equals("DELETED")){
                 productDetail.setDeletedAt(LocalDateTime.now());

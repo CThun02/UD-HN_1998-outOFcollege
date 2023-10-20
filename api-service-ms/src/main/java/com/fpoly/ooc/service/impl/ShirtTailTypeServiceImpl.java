@@ -20,7 +20,11 @@ public class ShirtTailTypeServiceImpl implements ShirtTailTypeServiceI {
 
     @Override
     public ShirtTailType create(ShirtTailType shirtTailType) {
-        return repo.save(shirtTailType);
+        ShirtTailType check = repo.findFirstByShirtTailTypeName(shirtTailType.getShirtTailTypeName());
+        if(check==null){
+            return repo.save(shirtTailType);
+        }
+        return null;
     }
 
     @Override

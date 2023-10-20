@@ -617,6 +617,7 @@ const ProductDetailsTable = (props) => {
           isModalOpen={isModalOpen}
           handelOk={createProductDetails}
           handleCancel={handleCancel}
+          title={"Xác nhận thêm mới"}
         />
         <Button onClick={showModal}>Hoàn thành</Button>
       </div>

@@ -1,8 +1,4 @@
-import {
-  CaretRightOutlined,
-  PlusOutlined,
-  WarningTwoTone,
-} from "@ant-design/icons";
+import { CaretRightOutlined, PlusOutlined } from "@ant-design/icons";
 import {
   Button,
   Col,
@@ -49,18 +45,18 @@ const ProductCreateDetails = () => {
   const [colorsCreate, setColorsCreate] = useState([]);
   const [productDetailsExist, setproductDetailsExist] = useState([]);
   const [isLoading, setisLoading] = useState(false);
-  const [sizeCreate, setSizeCreate] = useState({});
+  const [sizeCreate, setSizeCreate] = useState("");
   const [colorCreate, setColorCreate] = useState({
     colorCode: "",
     colorName: "",
   });
-  const [patternCreate, setPatternCreate] = useState({});
-  const [formCreate, setFormCreate] = useState({});
-  const [buttonCreate, setButtonCreate] = useState({});
-  const [collarCreate, setCollarCreate] = useState({});
-  const [materialCreate, setMaterialCreate] = useState({});
-  const [sleeveCreate, setSleeveCreate] = useState({});
-  const [shirtTailCreate, setshirtTailCreate] = useState({});
+  const [patternCreate, setPatternCreate] = useState("");
+  const [formCreate, setFormCreate] = useState("");
+  const [buttonCreate, setButtonCreate] = useState("");
+  const [collarCreate, setCollarCreate] = useState("");
+  const [materialCreate, setMaterialCreate] = useState("");
+  const [sleeveCreate, setSleeveCreate] = useState("");
+  const [shirtTailCreate, setshirtTailCreate] = useState("");
   const [productList, setProductList] = useState(null);
   const [render, setRender] = useState(1);
   const [modalColorOpen, setModalColorOpen] = useState(false);
@@ -261,16 +257,16 @@ const ProductCreateDetails = () => {
     messageApi.loading("Đang tải", 1);
     if (patternCreate.trim() !== "") {
       axios
-        .post(api + "pattern?categoryName=" + patternCreate, null)
+        .post(api + "pattern?categoryName=" + patternCreate.trim(), null)
         .then((res) => {
+          setPatternCreate(" ");
           setTimeout(() => {
             if (res.data === "") {
               messageApi.error("Họa tiết đã tồn tại!", 1);
             } else {
               messageApi.success("Thêm hoạ tiết thành công!", 1);
-              setRender(res.data);
             }
-            setPatternCreate(" ");
+            setRender(Math.random());
           }, 1000);
         })
         .catch((err) => {
@@ -283,19 +279,49 @@ const ProductCreateDetails = () => {
     }
   }
 
+  function createShirtTail(event) {
+    event.stopPropagation();
+    messageApi.loading("Đang tải", 1);
+    if (formCreate.trim() !== "") {
+      axios
+        .post(
+          api + "shirt-tail?shirtTailTypeName=" + shirtTailCreate.trim(),
+          null
+        )
+        .then((res) => {
+          setRender(Math.random);
+          setTimeout(() => {
+            if (res.data === "") {
+              messageApi.error("Đuôi áo đã tồn tại!", 1);
+            } else {
+              messageApi.success("Thêm đuôi áo thành công!", 1);
+            }
+            setshirtTailCreate(" ");
+          }, 1000);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      setTimeout(() => {
+        messageApi.error("Vui lòng nhập dáng áo!", 1);
+      }, 1000);
+    }
+  }
+
   function createForm(event) {
     event.stopPropagation();
     messageApi.loading("Đang tải", 1);
     if (formCreate.trim() !== "") {
       axios
-        .post(api + "form?formName=" + formCreate, null)
+        .post(api + "form?categoryName=" + formCreate.trim(), null)
         .then((res) => {
+          setRender(Math.random);
           setTimeout(() => {
             if (res.data === "") {
               messageApi.error("Dáng áo đã tồn tại!", 1);
             } else {
               messageApi.success("Thêm dáng áo thành công!", 1);
-              setRender(res.data);
             }
             setFormCreate(" ");
           }, 1000);
@@ -306,6 +332,171 @@ const ProductCreateDetails = () => {
     } else {
       setTimeout(() => {
         messageApi.error("Vui lòng nhập dáng áo!", 1);
+      }, 1000);
+    }
+  }
+
+  function createButton(event) {
+    event.stopPropagation();
+    messageApi.loading("Đang tải", 1);
+    if (buttonCreate.trim() !== "") {
+      axios
+        .post(api + "button/create", { buttonName: buttonCreate.trim() })
+        .then((res) => {
+          setRender(Math.random);
+          setTimeout(() => {
+            if (res.data === "") {
+              messageApi.error("Nút áo đã tồn tại!", 1);
+            } else {
+              messageApi.success("Thêm nút áo thành công!", 1);
+            }
+            setButtonCreate(" ");
+          }, 1000);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      setTimeout(() => {
+        messageApi.error("Vui lòng nhập nút áo!", 1);
+      }, 1000);
+    }
+  }
+
+  function createMaterial(event) {
+    event.stopPropagation();
+    messageApi.loading("Đang tải", 1);
+    if (materialCreate.trim() !== "") {
+      axios
+        .post(api + "material/create", { materialName: materialCreate.trim() })
+        .then((res) => {
+          setRender(Math.random);
+          setTimeout(() => {
+            if (res.data === "") {
+              messageApi.error("Chất liệu đã tồn tại!", 1);
+            } else {
+              messageApi.success("Thêm chất liệu thành công!", 1);
+            }
+            setMaterialCreate(" ");
+          }, 1000);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      setTimeout(() => {
+        messageApi.error("Vui lòng nhập chất liệu!", 1);
+      }, 1000);
+    }
+  }
+
+  function createCollar(event) {
+    event.stopPropagation();
+    messageApi.loading("Đang tải", 1);
+    if (collarCreate.trim() !== "") {
+      axios
+        .post(api + "collar/create", { collarTypeName: collarCreate.trim() })
+        .then((res) => {
+          setRender(Math.random);
+          setTimeout(() => {
+            if (res.data === "") {
+              messageApi.error("Cổ áo đã tồn tại!", 1);
+            } else {
+              messageApi.success("Thêm cổ áo thành công!", 1);
+            }
+            setCollarCreate(" ");
+          }, 1000);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      setTimeout(() => {
+        messageApi.error("Vui lòng nhập cổ áo!", 1);
+      }, 1000);
+    }
+  }
+
+  function createSleeve(event) {
+    event.stopPropagation();
+    messageApi.loading("Đang tải", 1);
+    if (sleeveCreate.trim() !== "") {
+      axios
+        .post(api + "sleeve/create", { sleeveName: sleeveCreate.trim() })
+        .then((res) => {
+          setRender(Math.random);
+          setTimeout(() => {
+            if (res.data === "") {
+              messageApi.error("Tay áo đã tồn tại!", 1);
+            } else {
+              messageApi.success("Thêm tay áo thành công!", 1);
+            }
+            setSleeveCreate(" ");
+          }, 1000);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      setTimeout(() => {
+        messageApi.error("Vui lòng nhập tay áo!", 1);
+      }, 1000);
+    }
+  }
+
+  function createSize(event) {
+    event.stopPropagation();
+    messageApi.loading("Đang tải", 1);
+    if (sizeCreate.trim() !== "") {
+      axios
+        .post(api + "size/create", { sizeName: sizeCreate.trim() })
+        .then((res) => {
+          setRender(Math.random);
+          setTimeout(() => {
+            if (res.data === "") {
+              messageApi.error("Kích cỡ đã tồn tại!", 1);
+            } else {
+              messageApi.success("Thêm kích cỡ thành công!", 1);
+            }
+            setSizeCreate(" ");
+          }, 1000);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      setTimeout(() => {
+        messageApi.error("Vui lòng nhập kích cỡ!", 1);
+      }, 1000);
+    }
+  }
+
+  function createColor(event) {
+    event.stopPropagation();
+    messageApi.loading("Đang tải", 1);
+    if (
+      colorCreate.colorName.trim() !== "" ||
+      colorCreate.colorCode.trim() !== ""
+    ) {
+      axios
+        .post(api + "color/create", colorCreate)
+        .then((res) => {
+          setTimeout(() => {
+            if (res.data === "") {
+              messageApi.error("Màu sắc đã tồn tại!", 1);
+            } else {
+              messageApi.success("Thêm màu sắc thành công!", 1);
+              setRender(Math.random());
+            }
+            setModalColorOpen(false);
+          }, 1000);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      setTimeout(() => {
+        messageApi.error("Vui lòng nhập màu sắc!", 1);
       }, 1000);
     }
   }
@@ -435,6 +626,7 @@ const ProductCreateDetails = () => {
                   backgroundColor: "#337CCF",
                   color: "white",
                 }}
+                onClick={(event) => createColor(event)}
               >
                 Thêm mới
               </Button>
@@ -597,6 +789,7 @@ const ProductCreateDetails = () => {
                                     <Input
                                       placeholder="Add new button"
                                       size="small"
+                                      value={buttonCreate}
                                       onClick={(event) => {
                                         handleCustomOptionClick(event);
                                       }}
@@ -606,7 +799,7 @@ const ProductCreateDetails = () => {
                                     />
                                     <Button
                                       onClick={(event) => {
-                                        event.stopPropagation();
+                                        createButton(event);
                                       }}
                                     >
                                       <PlusOutlined />
@@ -654,10 +847,11 @@ const ProductCreateDetails = () => {
                                       onChange={(event) => {
                                         setMaterialCreate(event.target.value);
                                       }}
+                                      value={materialCreate}
                                     />
                                     <Button
                                       onClick={(event) => {
-                                        event.stopPropagation();
+                                        createMaterial(event);
                                       }}
                                     >
                                       <PlusOutlined />
@@ -705,10 +899,11 @@ const ProductCreateDetails = () => {
                                       onChange={(event) => {
                                         setCollarCreate(event.target.value);
                                       }}
+                                      value={collarCreate}
                                     />
                                     <Button
                                       onClick={(event) => {
-                                        event.stopPropagation();
+                                        createCollar(event);
                                       }}
                                     >
                                       <PlusOutlined />
@@ -759,7 +954,7 @@ const ProductCreateDetails = () => {
                                     />
                                     <Button
                                       onClick={(event) => {
-                                        event.stopPropagation();
+                                        createSleeve(event);
                                       }}
                                     >
                                       <PlusOutlined />
@@ -815,7 +1010,7 @@ const ProductCreateDetails = () => {
                                     />
                                     <Button
                                       onClick={(event) => {
-                                        event.stopPropagation();
+                                        createShirtTail();
                                       }}
                                     >
                                       <PlusOutlined />
@@ -858,6 +1053,7 @@ const ProductCreateDetails = () => {
                                       onClick={(event) => {
                                         handleCustomOptionClick(event);
                                       }}
+                                      value={patternCreate}
                                       onChange={(event) => {
                                         setPatternCreate(event.target.value);
                                       }}
@@ -909,6 +1105,7 @@ const ProductCreateDetails = () => {
                                       onChange={(event) => {
                                         setFormCreate(event.target.value);
                                       }}
+                                      value={formCreate}
                                     />
                                     <Button
                                       onClick={(event) => {
@@ -973,10 +1170,11 @@ const ProductCreateDetails = () => {
                                       onChange={(event) => {
                                         setSizeCreate(event.target.value);
                                       }}
+                                      value={sizeCreate}
                                     />
                                     <Button
                                       onClick={(event) => {
-                                        event.stopPropagation();
+                                        createSize(event);
                                       }}
                                     >
                                       <PlusOutlined />

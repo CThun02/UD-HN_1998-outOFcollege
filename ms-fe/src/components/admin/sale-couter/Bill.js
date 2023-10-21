@@ -12,6 +12,7 @@ import {
   InputNumber,
   notification,
   Modal,
+  Carousel,
 } from "antd";
 import React, { useEffect, useState } from "react";
 import styles from "./Bill.module.css";
@@ -98,60 +99,90 @@ const Bill = () => {
       width: 70,
     },
     {
+      key: "productName",
+      dataIndex: "productName",
       title: "Sản phẩm",
-      key: "name",
-      width: 500,
       render: (text, record, index) => {
         return (
           <Row>
-            <Col span={6}>
+            <Col span={4}>
+              <Carousel
+                style={{ width: "100%", justifyContent: "center" }}
+                autoplay
+              >
+                {record.productDetailImages &&
+                  record.productDetailImages.map((productImage) => {
+                    if (productImage.product.id === record.product.id) {
+                      if (record.color.id === productImage.color.id) {
+                        if (
+                          productImage.path.includes(
+                            "" +
+                            record.button.id +
+                            record.material.id +
+                            record.collar.id +
+                            record.sleeve.id +
+                            record.shirtTail.id +
+                            record.pattern.id +
+                            record.form.id
+                          )
+                        ) {
+                          return (
+                            <img
+                              key={productImage.id}
+                              alt=""
+                              src={productImage.path}
+                            />
+                          );
+                        }
+                      }
+                    }
+                  })}
+              </Carousel>
+            </Col>
+            <Col span={20}>
               <div
+                className="m-5"
                 style={{
-                  display: "flex",
-                  alignItems: "center",
+                  textAlign: "start",
                   height: "100%",
+                  justifyContent: "center",
                 }}
               >
-                <img
-                  src={
-                    "https://vapa.vn/wp-content/uploads/2022/12/anh-3d-thien-nhien.jpeg"
-                  }
-                  width={"100%"}
-                  alt=""
-                />
-              </div>
-            </Col>
-            <Col span={18}>
-              <h6>
-                {record.productDetail.product.productName} {" - "}
+                <span style={{ fontWeight: "500" }}>
+                  {record.productDetail.product.productName +
+                    "-" +
+                    record.productDetail.button.buttonName +
+                    "-" +
+                    record.productDetail.material.materialName +
+                    "-" +
+                    record.productDetail.collar.collarTypeName +
+                    "-" +
+                    record.productDetail.sleeve.sleeveName +
+                    "-" +
+                    record.productDetail.shirtTail.shirtTailTypeName +
+                    "-" +
+                    record.productDetail.pattern.patternName +
+                    "-" +
+                    record.productDetail.form.formName}
+                </span>
+                <br />
                 <div className={styles.optionColor}>
+                  <b>Màu sắc: </b>
                   <span
                     style={{
                       backgroundColor: record.productDetail.color.colorCode,
+                      marginLeft: "8px",
                     }}
                   ></span>
                   {record.productDetail.color.colorName}
                 </div>
-              </h6>
-              <div style={{ textAlign: "left", marginLeft: 20 }}>
-                <span style={{ fontWeight: 500, marginRight: 20 }}>
-                  Kích cỡ: {record.productDetail.size.sizeName}
-                </span>
-                <br />
-                <span style={{ fontWeight: 500 }}>
-                  Chất liệu: {record.productDetail.material.materialName}
-                </span>
-                <br />
-                <span style={{ fontWeight: 500 }}>
-                  Nút áo: {record.productDetail.button.buttonName}
-                </span>
-                <br />
-                <span style={{ fontWeight: 500 }}>
-                  Cổ áo: {record.productDetail.collar.collarTypeName}
-                </span>
-                <br />
-                <span style={{ fontWeight: 500 }}>
-                  Đuôi áo: {record.productDetail.shirtTail.shirtTailTypeName}
+                <b>Kích cỡ: </b>
+                <span
+                  style={{
+                    marginLeft: "8px",
+                  }}
+                >
+                  {record.productDetail.size.sizeName}
                 </span>
               </div>
             </Col>
@@ -742,7 +773,11 @@ const Bill = () => {
                     style={{ marginTop: "3px" }}
                   />
                   <Table
-                    dataSource={productDetails}
+                    dataSource={productDetails &&
+                      productDetails.map((record, index) => ({
+                        ...record,
+                        key: record.id,
+                      }))}
                     columns={columns}
                     pagination={false}
                   />

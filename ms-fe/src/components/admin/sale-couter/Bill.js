@@ -79,9 +79,9 @@ const Bill = () => {
     let productDetails = cart.productDetails;
     if (value > 99) {
       notification.warning({
-        message: 'Thông báo',
-        description: 'Chỉ được mua 100 sản phẩm',
-        duration: 1
+        message: "Thông báo",
+        description: "Chỉ được mua 100 sản phẩm",
+        duration: 1,
       });
     }
     productDetails[index].quantity = value;
@@ -231,8 +231,8 @@ const Bill = () => {
   const [account, setAccount] = useState(null);
   const [address, setAddress] = useState({});
   const [showAddress, setShowAddress] = useState([]);
-  const [selectedAddress, setSelectedAddress] = useState({})
-  const [transactionCode, setTransactionCode] = useState('')
+  const [selectedAddress, setSelectedAddress] = useState({});
+  const [transactionCode, setTransactionCode] = useState("");
   const navigate = useNavigate();
   const [fullname, setFullname] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -392,13 +392,14 @@ const Bill = () => {
     let result = totalPrice;
     console.log(voucherAdd);
 
-    if (voucherAdd && voucherAdd.voucherMethod === 'vnd') {
+    if (voucherAdd && voucherAdd.voucherMethod === "vnd") {
       if (result > (voucherAdd.voucherCondition ?? 0)) {
         result -= voucherAdd.voucherValue ?? 0;
       }
-    } else if (voucherAdd && voucherAdd.voucherMethod === '%') {
+    } else if (voucherAdd && voucherAdd.voucherMethod === "%") {
       if (result > voucherAdd.voucherCondition) {
-        const maxDiscount = (totalPrice * (voucherAdd.voucherValueMax ?? 0)) / 100; // Giới hạn giảm giá tối đa là 50%
+        const maxDiscount =
+          (totalPrice * (voucherAdd.voucherValueMax ?? 0)) / 100; // Giới hạn giảm giá tối đa là 50%
         const discount = (totalPrice * (voucherAdd.voucherValue ?? 0)) / 100;
         result -= Math.min(discount, maxDiscount);
       }
@@ -450,7 +451,7 @@ const Bill = () => {
       const visible = [...switchChange];
       visible[index] = checked;
       setSwitchChange(visible);
-      setSymbol(checked ? 'Shipping' : 'Received');
+      setSymbol(checked ? "Shipping" : "Received");
     } else {
       notification.error({
         message: "Lỗi",
@@ -579,13 +580,19 @@ const Bill = () => {
     fetchProvinces();
 
     if (selectedAddress?.city) {
-      const city = selectedAddress?.city.substring(1 + selectedAddress.city.indexOf("|"))
-      const district = selectedAddress?.district.substring(1 + selectedAddress.district.indexOf("|"))
-      const ward = selectedAddress?.ward.substring(1 + selectedAddress.ward.indexOf("|"))
+      const city = selectedAddress?.city.substring(
+        1 + selectedAddress.city.indexOf("|")
+      );
+      const district = selectedAddress?.district.substring(
+        1 + selectedAddress.district.indexOf("|")
+      );
+      const ward = selectedAddress?.ward.substring(
+        1 + selectedAddress.ward.indexOf("|")
+      );
 
       handleProvinceChange(city);
       handleDistrictChange(district);
-      handleShippingOrderLeadtime(district, ward)
+      handleShippingOrderLeadtime(district, ward);
       handleShippingFee(totalPrice, district, ward);
     }
 
@@ -593,11 +600,10 @@ const Bill = () => {
     initializeModalStates();
   }, [cartId, render, account?.username]);
 
-  const [symbol, setSymbol] = useState("Received")
-  const [note, setNote] = useState("")
-  const [priceReduce, setPriceReduce] = useState(null)
-  const [amountPaid, setAmountPaid] = useState(0)
-
+  const [symbol, setSymbol] = useState("Received");
+  const [note, setNote] = useState("");
+  const [priceReduce, setPriceReduce] = useState(null);
+  const [amountPaid, setAmountPaid] = useState(0);
 
   const handleCreateBill = (index) => {
     const bill = {
@@ -606,9 +612,9 @@ const Bill = () => {
       price: totalPrice,
       priceReduce: totalPrice - voucherPrice(),
       amountPaid: amountPaid,
-      billType: 'In-Store',
+      billType: "In-Store",
       symbol: symbol,
-      status: selectedButton !== 2 ? 'Paid' : 'Unpaid',
+      status: selectedButton !== 2 ? "Paid" : "Unpaid",
       note: note,
       paymentDetailId: selectedButton,
       lstBillDetailRequest: [],
@@ -618,7 +624,7 @@ const Bill = () => {
       shipDate: switchChange[index] === true ? leadtime : null,
       shipPrice: switchChange[index] === true ? shippingFee : null,
       transactionCode: selectedButton === 2 ? transactionCode : null,
-      voucherCode: voucherAdd?.voucherCode
+      voucherCode: voucherAdd?.voucherCode,
     };
 
     if (productDetails.length <= 0) {
@@ -627,14 +633,14 @@ const Bill = () => {
         description: "Không có sản phẩm nào trong giỏ hàng.",
         duration: 2,
       });
-    }
-    else if (selectedButton == null) {
-      return console.log('chưa chọn hình thức thanh toán')
-    }
-    else if (selectedButton !== 2 && (remainAmount < 0 || isNaN(remainAmount))) {
-      return setInputError('Tiền không đủ')
-    }
-    else {
+    } else if (selectedButton == null) {
+      return console.log("chưa chọn hình thức thanh toán");
+    } else if (
+      selectedButton !== 2 &&
+      (remainAmount < 0 || isNaN(remainAmount))
+    ) {
+      return setInputError("Tiền không đủ");
+    } else {
       for (let i = 0; i < productDetails.length; i++) {
         const billDetail = {
           productDetailId: productDetails[i].productDetail.id,
@@ -645,7 +651,7 @@ const Bill = () => {
         bill.lstBillDetailRequest.push(billDetail);
       }
 
-      console.log(voucherPrice(), `voucher`)
+      console.log(voucherPrice(), `voucher`);
 
       Modal.confirm({
         title: "Xác nhận thanh toán",
@@ -654,15 +660,19 @@ const Bill = () => {
           axios
             .post("http://localhost:8080/api/admin/bill", bill)
             .then((response) => {
-              if (response.data.symbol === 'Received') {
-                axios.put(`http://localhost:8080/api/admin/bill/${response.data.id}`, {
-                  status: 'PAID'
-                })
+              if (response.data.symbol === "Received") {
+                axios
+                  .put(
+                    `http://localhost:8080/api/admin/bill/${response.data.id}`,
+                    {
+                      status: "PAID",
+                    }
+                  )
                   .then((response) => {
-                    console.log(response)
+                    console.log(response);
                   })
                   .catch((error) => {
-                    console.log(error)
+                    console.log(error);
                   });
               }
               navigate(`/admin/order`);
@@ -674,28 +684,27 @@ const Bill = () => {
         },
       });
     }
-  }
+  };
 
-  const [inputError, setInputError] = useState('');
+  const [inputError, setInputError] = useState("");
   const handleChangeInput = (e, index) => {
     const inputValue = e.target.value;
     let calculatedValue = 0;
     if (switchChange[index]) {
       calculatedValue = inputValue - voucherPrice() - shippingFee;
     } else {
-      calculatedValue = inputValue - voucherPrice()
+      calculatedValue = inputValue - voucherPrice();
     }
     setRemainAmount(calculatedValue);
-    numeral(inputValue).format('0,0')
+    numeral(inputValue).format("0,0");
 
     if (calculatedValue < 0) {
       setInputError("Số tiền không đủ");
     } else {
-      setAmountPaid(inputValue)
-      setInputError('');
+      setAmountPaid(inputValue);
+      setInputError("");
     }
   };
-
 
   return (
     <>
@@ -774,21 +783,21 @@ const Bill = () => {
                         <Col span={6} style={{ marginTop: "2px" }}>
                           {account && (
                             <>
-                              <span style={{ display: 'block', width: '200px' }}>
+                              <span
+                                style={{ display: "block", width: "200px" }}
+                              >
                                 <b>Tên khách hàng: </b> {account?.fullName}
                               </span>
                             </>
                           )}
-                          {
-                            !account && (
-                              <>
-                                <span>
-                                  <b>Tên tài khoản:</b> Khách lẻ
-                                </span>
-                              </>
-                            )
-                          }
-                        </Col >
+                          {!account && (
+                            <>
+                              <span>
+                                <b>Tên tài khoản:</b> Khách lẻ
+                              </span>
+                            </>
+                          )}
+                        </Col>
                         <Col span={12}>
                           {account && (
                             <Button
@@ -815,22 +824,27 @@ const Bill = () => {
                             selectedAddress={setSelectedAddress}
                           />
                         </Col>
-                      </Row >
+                      </Row>
                       <Row>
                         <Col span={10}>
                           <span>
                             <b style={{ color: "red" }}>*</b> Họ và tên
                           </span>
-                          <Input placeholder="nhập họ và tên" value={selectedAddress?.fullName} />
-                        </Col >
+                          <Input
+                            placeholder="nhập họ và tên"
+                            value={selectedAddress?.fullName}
+                          />
+                        </Col>
                         <Col span={10} style={{ marginLeft: "40px" }}>
                           <span>
                             <b style={{ color: "red" }}>*</b> Số điện thoại
                           </span>
-                          <Input placeholder="nhập số điện thoại" value={selectedAddress?.numberPhone} />
-
-                        </Col >
-                      </Row >
+                          <Input
+                            placeholder="nhập số điện thoại"
+                            value={selectedAddress?.numberPhone}
+                          />
+                        </Col>
+                      </Row>
                       <Row style={{ margin: "40px 0" }}>
                         <Col span={7}>
                           <span>
@@ -843,10 +857,10 @@ const Bill = () => {
                             value={
                               selectedAddress.city
                                 ? Number(
-                                  selectedAddress?.city.substring(
-                                    1 + selectedAddress.city.indexOf("|")
+                                    selectedAddress?.city.substring(
+                                      1 + selectedAddress.city.indexOf("|")
+                                    )
                                   )
-                                )
                                 : undefined
                             }
                           >
@@ -873,10 +887,10 @@ const Bill = () => {
                             value={
                               selectedAddress.district
                                 ? Number(
-                                  selectedAddress?.district.substring(
-                                    1 + selectedAddress.district.indexOf("|")
+                                    selectedAddress?.district.substring(
+                                      1 + selectedAddress.district.indexOf("|")
+                                    )
                                   )
-                                )
                                 : undefined
                             }
                           >
@@ -904,8 +918,8 @@ const Bill = () => {
                             value={
                               selectedAddress.ward
                                 ? selectedAddress.ward.substring(
-                                  1 + selectedAddress.ward.indexOf("|")
-                                )
+                                    1 + selectedAddress.ward.indexOf("|")
+                                  )
                                 : ""
                             }
                           >
@@ -949,7 +963,7 @@ const Bill = () => {
                           </h3>
                         )}
                       </Row>
-                    </Col >
+                    </Col>
                     <Col span={8}>
                       <Switch onChange={(e) => handleChangSwitch(e, index)} />
                       <span style={{ marginLeft: "5px" }}>Giao hàng</span>
@@ -1013,8 +1027,16 @@ const Bill = () => {
                               {/* {voucherAdd.voucherName} */}
                             </span>
                             {voucherAdd.voucherId ? (
-                              <bttuon style={{ marginLeft: "20px", color: "green", cursor: 'pointer' }}
-                                onClick={() => setVoucherAdd({})}>❌</bttuon>
+                              <bttuon
+                                style={{
+                                  marginLeft: "20px",
+                                  color: "green",
+                                  cursor: "pointer",
+                                }}
+                                onClick={() => setVoucherAdd({})}
+                              >
+                                ❌
+                              </bttuon>
                             ) : null}
                           </span>
                           {switchChange[index] && (
@@ -1073,24 +1095,45 @@ const Bill = () => {
                               </span>
                             )}
                           </span>
-                          {
-                            selectedButton !== 2 && <span style={{ fontSize: "16px", width: '200%', display: "block" }}>
+                          {selectedButton !== 2 && (
+                            <span
+                              style={{
+                                fontSize: "16px",
+                                width: "200%",
+                                display: "block",
+                              }}
+                            >
                               Số tiền khách trả
-                              <input type="number"
+                              <input
+                                type="number"
                                 className={styles.input}
-                                onChange={(e) => handleChangeInput(e, index)} />
-                              {inputError && <span className={styles.error}>{inputError}</span>}
+                                onChange={(e) => handleChangeInput(e, index)}
+                              />
+                              {inputError && (
+                                <span className={styles.error}>
+                                  {inputError}
+                                </span>
+                              )}
                             </span>
-                          }
-                          {
-                            selectedButton === 2 && <Input
+                          )}
+                          {selectedButton === 2 && (
+                            <Input
                               placeholder="Nhập mã giao dịch"
                               size="large"
-                              onChange={(e) => setTransactionCode(e.target.value)}
-                              style={{ margin: '10px 0', width: '380px' }} />
-                          }
-                          {
-                            selectedButton !== 2 && <span style={{ fontSize: "16px", width: '200%', display: "block" }}>
+                              onChange={(e) =>
+                                setTransactionCode(e.target.value)
+                              }
+                              style={{ margin: "10px 0", width: "380px" }}
+                            />
+                          )}
+                          {selectedButton !== 2 && (
+                            <span
+                              style={{
+                                fontSize: "16px",
+                                width: "200%",
+                                display: "block",
+                              }}
+                            >
                               Tiền thừa trả khách
                               <span style={{ marginLeft: "59px" }}>
                                 <span style={{ color: "red" }}>
@@ -1100,8 +1143,9 @@ const Bill = () => {
                                   })}
                                 </span>
                               </span>
-                            </span >}
-                        </Col >
+                            </span>
+                          )}
+                        </Col>
                         <TextArea
                           onChange={(e) => setNote(e.target.value)}
                           rows={3}
@@ -1111,8 +1155,9 @@ const Bill = () => {
                         <div style={{ marginTop: "20px" }}>
                           <div className={styles.buttonGroup}>
                             <Button
-                              className={`${styles.cashButton} ${selectedButton === 1 ? styles.selected : ""
-                                }`}
+                              className={`${styles.cashButton} ${
+                                selectedButton === 1 ? styles.selected : ""
+                              }`}
                               icon={<DollarOutlined />}
                               onClick={() => handleButtonClick(1)}
                             >
@@ -1120,16 +1165,18 @@ const Bill = () => {
                             </Button>
                             <Button
                               style={{ margin: "0 10px" }}
-                              className={`${styles.cashButton} ${selectedButton === 2 ? styles.selected : ""
-                                }`}
+                              className={`${styles.cashButton} ${
+                                selectedButton === 2 ? styles.selected : ""
+                              }`}
                               icon={<SwapOutlined />}
                               onClick={() => handleButtonClick(2)}
                             >
                               Chuyển khoản
                             </Button>
                             <Button
-                              className={`${styles.cashButton} ${selectedButton === 3 ? styles.selected : ""
-                                }`}
+                              className={`${styles.cashButton} ${
+                                selectedButton === 3 ? styles.selected : ""
+                              }`}
                               onClick={() => handleButtonClick(3)}
                             >
                               Cả hai
@@ -1137,8 +1184,6 @@ const Bill = () => {
                           </div>
                         </div>
                         <div style={{ marginTop: "20px" }}>
-
-
                           <Button
                             type="primary"
                             onClick={() => handleCreateBill(index)}
@@ -1147,14 +1192,14 @@ const Bill = () => {
                             Xác nhận thanh toán
                           </Button>
                         </div>
-                      </Row >
-                    </Col >
-                  </Row >
-                </div >
-              </Tabs.TabPane >
+                      </Row>
+                    </Col>
+                  </Row>
+                </div>
+              </Tabs.TabPane>
             );
           })}
-      </Tabs >
+      </Tabs>
     </>
   );
 };

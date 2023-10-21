@@ -1,12 +1,16 @@
+import { CheckCircleFilled } from "@ant-design/icons";
 import {
-  FilePptOutlined,
-  SearchOutlined,
-  EyeFilled,
-  EyeOutlined,
-  SelectOutlined,
-  CheckCircleFilled,
-} from "@ant-design/icons";
-import { Button, Checkbox, Col, message, Row, Select, Table } from "antd";
+  Button,
+  Carousel,
+  Checkbox,
+  Col,
+  message,
+  notification,
+  Row,
+  Select,
+  Slider,
+  Table,
+} from "antd";
 import Input from "antd/es/input/Input";
 import Modal from "antd/es/modal/Modal";
 import axios from "axios";
@@ -20,11 +24,14 @@ var productId = "",
   sleeveId = "",
   shirtTailId = "",
   sizeId = "",
-  colorId = "";
+  patternId = "",
+  formId = "",
+  colorId = "",
+  price = [0, 0];
 const ProductDetails = (props) => {
   const api = "http://localhost:8080/api/admin/";
   const [messageApi, contextHolder] = message.useMessage();
-  const [products, setProducts] = useState(null);
+  const [products, setProducts] = useState([]);
   const [sizes, setSizes] = useState(null);
   const [colors, setColors] = useState(null);
   const [buttons, setButtons] = useState(null);
@@ -32,9 +39,16 @@ const ProductDetails = (props) => {
   const [materials, setMaterials] = useState(null);
   const [sleeves, setSleeves] = useState(null);
   const [shirtTails, setshirtTails] = useState(null);
-  const [productDetails, setProductDetails] = useState(null);
+  const [productDetails, setProductDetails] = useState([]);
   const [loading, setLoading] = useState(true);
   const [renderThis, setRenderThis] = useState(null);
+  const [productImages, setProductImages] = useState([]);
+  const [patterns, setPatterns] = useState(null);
+  const [forms, setForms] = useState(null);
+  const [maxPrice, setMaxPrice] = useState(600000);
+  const [modalSetQuantity, setModalSetQuantity] = useState([]);
+  const [quantity, setQuantiy] = useState(1);
+
   const columns = [
     {
       key: "stt",
@@ -49,6 +63,7 @@ const ProductDetails = (props) => {
       key: "productCode",
       dataIndex: "productCode",
       title: "Mã",
+      width: 150,
       render: (text, record, index) => {
         return record.product.productCode;
       },
@@ -57,86 +72,97 @@ const ProductDetails = (props) => {
       key: "productName",
       dataIndex: "productName",
       title: "Sản phẩm",
-      width: 110,
-      render: (text, record, index) => {
-        return record.product.productName;
-      },
-    },
-    {
-      key: "button",
-      dataIndex: "button",
-      title: "Cúc áo",
-      render: (text, record, index) => {
-        return record.button.buttonName;
-      },
-    },
-    {
-      key: "material",
-      dataIndex: "material",
-      title: "Chất liệu",
-      with: 110,
-      render: (text, record, index) => {
-        return record.material.materialName;
-      },
-    },
-    {
-      key: "collar",
-      dataIndex: "collar",
-      title: "Cổ áo",
-      render: (text, record, index) => {
-        return record.collar.collarTypeName;
-      },
-    },
-    {
-      key: "shirtTail",
-      dataIndex: "shirtTail",
-      title: "Đuôi áo",
-      render: (text, record, index) => {
-        return record.shirtTail.shirtTailTypeName;
-      },
-    },
-    {
-      key: "sleeve",
-      dataIndex: "sleeve",
-      title: "Tay áo",
-      render: (text, record, index) => {
-        return record.sleeve.sleeveName;
-      },
-    },
-    {
-      key: "size",
-      dataIndex: "size",
-      title: "Kích cỡ",
-      render: (text, record, index) => {
-        return record.size.sizeName;
-      },
-    },
-    {
-      key: "color",
-      dataIndex: "color",
-      title: "Màu sắc",
       render: (text, record, index) => {
         return (
-          <div
-            className={styles.optionColor}
-            style={{ justifyContent: "center" }}
-          >
-            <span style={{ backgroundColor: record.color.colorCode }}></span>
-          </div>
+          <Row>
+            <Col span={4}>
+              <Carousel
+                style={{ width: "100%", justifyContent: "center" }}
+                autoplay
+              >
+                {productImages &&
+                  productImages.map((productImage) => {
+                    if (productImage.product.id === record.product.id) {
+                      if (record.color.id === productImage.color.id) {
+                        if (
+                          productImage.path.includes(
+                            "" +
+                              record.button.id +
+                              record.material.id +
+                              record.collar.id +
+                              record.sleeve.id +
+                              record.shirtTail.id +
+                              record.pattern.id +
+                              record.form.id
+                          )
+                        ) {
+                          return (
+                            <img
+                              key={productImage.id}
+                              alt=""
+                              src={productImage.path}
+                            />
+                          );
+                        }
+                      }
+                    }
+                  })}
+              </Carousel>
+            </Col>
+            <Col span={20}>
+              <div
+                className="m-5"
+                style={{
+                  textAlign: "start",
+                  height: "100%",
+                  justifyContent: "center",
+                }}
+              >
+                <span style={{ fontWeight: "500" }}>
+                  {record.product.productName +
+                    "-" +
+                    record.button.buttonName +
+                    "-" +
+                    record.material.materialName +
+                    "-" +
+                    record.collar.collarTypeName +
+                    "-" +
+                    record.sleeve.sleeveName +
+                    "-" +
+                    record.shirtTail.shirtTailTypeName +
+                    "-" +
+                    record.pattern.patternName +
+                    "-" +
+                    record.form.formName}
+                </span>
+                <br />
+                <div className={styles.optionColor}>
+                  <b>Màu sắc: </b>
+                  <span
+                    style={{
+                      backgroundColor: record.color.colorCode,
+                      marginLeft: "8px",
+                    }}
+                  ></span>
+                  {record.color.colorName}
+                </div>
+                <b>Kích cỡ: </b>
+                <span
+                  style={{
+                    marginLeft: "8px",
+                  }}
+                >
+                  {record.size.sizeName}
+                </span>
+              </div>
+            </Col>
+          </Row>
         );
       },
     },
     {
-      key: "price",
-      dataIndex: "price",
-      title: "Giá",
-      render: (text, record, index) => {
-        return record.price;
-      },
-    },
-    {
-      key: "quntity",
-      dataIndex: "quntity",
+      key: "quantity",
+      dataIndex: "quantity",
       title: "Số lượng",
       width: 110,
       render: (text, record, index) => {
@@ -144,57 +170,119 @@ const ProductDetails = (props) => {
       },
     },
     {
+      key: "price",
+      dataIndex: "price",
+      title: "Giá",
+      width: 110,
+      render: (text, record, index) => {
+        return record.price;
+      },
+    },
+    {
       key: "action",
       title: "Thao tác",
       dataIndex: "id",
       fixed: "right",
+      width: 100,
       render: (text, record, index) => (
         <>
-          <Checkbox
-            onClick={(event) => {
-              addProductDetail(record, event.target.checked);
+          <Modal
+            title="Số lượng mua"
+            centered
+            open={modalSetQuantity[index]}
+            onOk={() => {
+              addProductDetail(record);
             }}
-            defaultChecked={props.productDetailsCreate?.some(
-              (item) => item.productDetail.id === record.id
-            )}
-          />
+            onCancel={() => handleCancelModalQuantity(index)}
+            footer={null}
+          >
+            <Input
+              defaultValue={1}
+              onChange={(event) => handleChangeQuantity(event.target.value)}
+            />
+            <div style={{ marginTop: "12px", textAlign: "center" }}>
+              <Button
+                type="primary"
+                onClick={() => {
+                  addProductDetail(record, index);
+                }}
+              >
+                Xác nhận
+              </Button>
+            </div>
+          </Modal>
+          <Button
+            type="primary"
+            onClick={() => {
+              handleShowModalModalQuantity(index);
+            }}
+          >
+            Chọn
+          </Button>
         </>
       ),
     },
   ];
   //functions
+
+  function handleChangeQuantity(quantity) {
+    setQuantiy(quantity);
+  }
+
+  const handleShowModalModalQuantity = (index) => {
+    const visible = [...modalSetQuantity];
+    visible[index] = true;
+    setModalSetQuantity(visible);
+  };
+
+  const handleCancelModalQuantity = (index) => {
+    const visible = [...modalSetQuantity];
+    visible[index] = false;
+    setModalSetQuantity(visible);
+  };
+
   function completeAdd() {
     props.action();
   }
 
-  function addProductDetail(record, checked) {
-    let productDetailCreate = {
+  function addProductDetail(record, index) {
+    var indexExist = -1;
+    var productDetailCreate = {
       productDetail: {},
-      quantity: 1,
+      quantity: quantity,
     };
-
-    if (!checked) {
-      for (let i = 0; i < props.productDetailsCreate.length; i++) {
-        if (props.productDetailsCreate[i].productDetail.id === record.id) {
-          props.productDetailsCreate?.splice(i, 1);
-        }
+    for (let i = 0; i < props.productDetailsCreate.length; i++) {
+      if (props.productDetailsCreate[i].productDetail.id === record.id) {
+        indexExist = i;
+        break;
       }
+    }
+    if (indexExist !== -1) {
+      productDetailCreate.quantity =
+        Number(quantity) +
+        Number(props.productDetailsCreate[indexExist].quantity);
+    }
+    if (
+      productDetailCreate.quantity >= record.quantity ||
+      productDetailCreate.quantity >= 100
+    ) {
+      notification.error({
+        message: "Thông báo",
+        description: "Số lượng sản phẩm không có sẵn",
+      });
     } else {
+      props.productDetailsCreate?.splice(indexExist, 1);
       productDetailCreate.productDetail = record;
       props.productDetailsCreate?.push(productDetailCreate);
+      notification.success({
+        message: "Thông báo",
+        description: "Thêm sản phẩm vào giỏ hàng thành công!",
+      });
+      handleCancelModalQuantity(index);
+      props.action();
     }
   }
 
-  function search(keywords) {
-    axios
-      .get(api + `product/searchProductDetail?keyWords=` + keywords.toString())
-      .then((response) => {
-        setProductDetails(response.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }
   function filter() {
     setLoading(true);
     axios
@@ -215,7 +303,15 @@ const ProductDetails = (props) => {
           "&colorId=" +
           colorId +
           "&sizeId=" +
-          sizeId
+          sizeId +
+          "&patternId=" +
+          patternId +
+          "&formId=" +
+          formId +
+          "&minPrice=" +
+          price[0] +
+          "&maxPrice=" +
+          price[1]
       )
       .then((response) => {
         setProductDetails(response.data);
@@ -224,8 +320,28 @@ const ProductDetails = (props) => {
       .catch((error) => {
         console.log(error);
       });
+    setTimeout(() => {
+      setLoading(false);
+    }, 1000);
   }
   useEffect(() => {
+    axios
+      .get(api + "product/getAllProductImages")
+      .then((res) => {
+        setProductImages(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    axios
+      .get(api + "product/filterProductDetailByIdCom?status=ACTIVE")
+      .then((response) => {
+        setProductDetails(response.data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
     axios
       .get(api + "product/filterByCom?status=ACTIVE")
       .then((response) => {
@@ -276,6 +392,22 @@ const ProductDetails = (props) => {
         console.log(error);
       });
     axios
+      .get(api + "pattern")
+      .then((response) => {
+        setPatterns(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    axios
+      .get(api + "form")
+      .then((response) => {
+        setForms(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    axios
       .get(api + "shirt-tail")
       .then((response) => {
         setshirtTails(response.data);
@@ -291,14 +423,6 @@ const ProductDetails = (props) => {
       .catch((error) => {
         console.log(error);
       });
-    axios
-      .get(api + "product/getAllProductDetail")
-      .then((response) => {
-        setProductDetails(response.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
   }, [props.render, renderThis]);
 
   return (
@@ -306,51 +430,7 @@ const ProductDetails = (props) => {
       {contextHolder}
       <div className={styles.productDetails}>
         <Col span={20} offset={2}>
-          <Row className={styles.productDetails__filter}>
-            <Col span={6}>
-              <div style={{ margin: "0 8px 24px 8px" }}>
-                <span
-                  style={{
-                    fontWeight: "500",
-                    display: "block",
-                    textAlign: "center",
-                  }}
-                >
-                  Sản phẩm
-                </span>
-                <Select
-                  showSearch
-                  optionFilterProp="children"
-                  filterOption={(input, option) =>
-                    (option?.label ?? "").includes(input)
-                  }
-                  filterSort={(optionA, optionB) =>
-                    (optionA?.label ?? "")
-                      .toLowerCase()
-                      .localeCompare((optionB?.label ?? "").toLowerCase())
-                  }
-                  bordered={false}
-                  onChange={(event) => {
-                    productId = event;
-                    filter();
-                  }}
-                  defaultValue={""}
-                  style={{ borderBottom: "1px solid black", width: "100%" }}
-                >
-                  <Select.Option key={"ALL"} value={""}>
-                    Tất cả
-                  </Select.Option>
-                  {products &&
-                    products.map((item) => {
-                      return (
-                        <Select.Option key={item.id} value={item.id}>
-                          {item.productName}
-                        </Select.Option>
-                      );
-                    })}
-                </Select>
-              </div>
-            </Col>
+          <Row style={{ margin: 0 }}>
             <Col span={6}>
               <div style={{ margin: "0 8px 24px 8px" }}>
                 <span
@@ -364,6 +444,7 @@ const ProductDetails = (props) => {
                 </span>
                 <Select
                   showSearch
+                  maxTagCount={"responsive"}
                   optionFilterProp="children"
                   filterOption={(input, option) =>
                     (option?.label ?? "").includes(input)
@@ -408,6 +489,7 @@ const ProductDetails = (props) => {
                 </span>
                 <Select
                   showSearch
+                  maxTagCount={"responsive"}
                   optionFilterProp="children"
                   filterOption={(input, option) =>
                     (option?.label ?? "").includes(input)
@@ -452,6 +534,7 @@ const ProductDetails = (props) => {
                 </span>
                 <Select
                   showSearch
+                  maxTagCount={"responsive"}
                   optionFilterProp="children"
                   filterOption={(input, option) =>
                     (option?.label ?? "").includes(input)
@@ -496,6 +579,7 @@ const ProductDetails = (props) => {
                 </span>
                 <Select
                   showSearch
+                  maxTagCount={"responsive"}
                   optionFilterProp="children"
                   filterOption={(input, option) =>
                     (option?.label ?? "").includes(input)
@@ -521,6 +605,50 @@ const ProductDetails = (props) => {
                       return (
                         <Select.Option key={item.id} value={item.id}>
                           {item.sleeveName}
+                        </Select.Option>
+                      );
+                    })}
+                </Select>
+              </div>
+            </Col>
+            <Col span={6}>
+              <div style={{ margin: "0 8px 24px 8px" }}>
+                <span
+                  style={{
+                    fontWeight: "500",
+                    display: "block",
+                    textAlign: "center",
+                  }}
+                >
+                  Họa tiết
+                </span>
+                <Select
+                  showSearch
+                  optionFilterProp="children"
+                  filterOption={(input, option) =>
+                    (option?.label ?? "").includes(input)
+                  }
+                  filterSort={(optionA, optionB) =>
+                    (optionA?.label ?? "")
+                      .toLowerCase()
+                      .localeCompare((optionB?.label ?? "").toLowerCase())
+                  }
+                  bordered={false}
+                  onChange={(event) => {
+                    patternId = event;
+                    filter();
+                  }}
+                  defaultValue={""}
+                  style={{ borderBottom: "1px solid black", width: "100%" }}
+                >
+                  <Select.Option key={"ALL"} value={""}>
+                    Tất cả
+                  </Select.Option>
+                  {patterns &&
+                    patterns.map((item) => {
+                      return (
+                        <Select.Option key={item.id} value={item.id}>
+                          {item.patternName}
                         </Select.Option>
                       );
                     })}
@@ -580,10 +708,11 @@ const ProductDetails = (props) => {
                     textAlign: "center",
                   }}
                 >
-                  Kích cỡ
+                  Dáng áo
                 </span>
                 <Select
                   showSearch
+                  maxTagCount={"responsive"}
                   optionFilterProp="children"
                   filterOption={(input, option) =>
                     (option?.label ?? "").includes(input)
@@ -595,7 +724,7 @@ const ProductDetails = (props) => {
                   }
                   bordered={false}
                   onChange={(event) => {
-                    sizeId = event;
+                    formId = event;
                     filter();
                   }}
                   defaultValue={""}
@@ -604,11 +733,11 @@ const ProductDetails = (props) => {
                   <Select.Option key={"ALL"} value={""}>
                     Tất cả
                   </Select.Option>
-                  {sizes &&
-                    sizes.map((item) => {
+                  {forms &&
+                    forms.map((item) => {
                       return (
                         <Select.Option key={item.id} value={item.id}>
-                          {item.sizeName}
+                          {item.formName}
                         </Select.Option>
                       );
                     })}
@@ -627,6 +756,7 @@ const ProductDetails = (props) => {
                   Màu sắc
                 </span>
                 <Select
+                  maxTagCount={"responsive"}
                   showSearch
                   optionFilterProp="children"
                   filterOption={(input, option) =>
@@ -664,29 +794,93 @@ const ProductDetails = (props) => {
                 </Select>
               </div>
             </Col>
-            <Col span={12} offset={6}>
-              <Input
-                className={styles.filter_inputSearch}
-                placeholder="Nhập mã, tên sản phẩm"
-                onChange={(event) => {
-                  search(event.target.value);
-                }}
-                prefix={<SearchOutlined />}
-              />
+            <Col span={6}>
+              <div style={{ margin: "0 8px 24px 8px" }}>
+                <span
+                  style={{
+                    fontWeight: "500",
+                    display: "block",
+                    textAlign: "center",
+                  }}
+                >
+                  Kích cỡ
+                </span>
+                <Select
+                  showSearch
+                  maxTagCount={"responsive"}
+                  optionFilterProp="children"
+                  filterOption={(input, option) =>
+                    (option?.label ?? "").includes(input)
+                  }
+                  filterSort={(optionA, optionB) =>
+                    (optionA?.label ?? "")
+                      .toLowerCase()
+                      .localeCompare((optionB?.label ?? "").toLowerCase())
+                  }
+                  bordered={false}
+                  onChange={(event) => {
+                    sizeId = event;
+                    filter();
+                  }}
+                  defaultValue={""}
+                  style={{ borderBottom: "1px solid black", width: "100%" }}
+                >
+                  <Select.Option key={"ALL"} value={""}>
+                    Tất cả
+                  </Select.Option>
+                  {sizes &&
+                    sizes.map((item) => {
+                      return (
+                        <Select.Option key={item.id} value={item.id}>
+                          {item.sizeName}
+                        </Select.Option>
+                      );
+                    })}
+                </Select>
+              </div>
+            </Col>
+            <Col span={12}>
+              <div style={{ margin: "0 8px 24px 8px" }}>
+                <span
+                  style={{
+                    fontWeight: "500",
+                    display: "block",
+                    textAlign: "center",
+                  }}
+                >
+                  Khoảng giá
+                </span>
+                <Slider
+                  max={maxPrice}
+                  min={0}
+                  onAfterChange={(event) => {
+                    price = event;
+                    filter();
+                  }}
+                  range
+                />
+              </div>
             </Col>
           </Row>
         </Col>
-
-        <div className={styles.productDetails__table}>
+        <div>
           <Table
+            pagination={{
+              showSizeChanger: true,
+              pageSizeOptions: [5, 10, 15, 20],
+              defaultPageSize: 5,
+              showLessItems: true,
+              style: { marginRight: "10px" },
+            }}
+            scroll={{ y: 360 }}
             columns={columns}
             dataSource={productDetails}
-            scroll={{ y: 400, x: 1300 }}
             loading={loading}
           />
         </div>
-        <div style={{ textAlign: "center" }}>
+        <div style={{ textAlign: "center", marginTop: "16px" }}>
           <Button
+            type="primary"
             onClick={() => {
               completeAdd();
             }}

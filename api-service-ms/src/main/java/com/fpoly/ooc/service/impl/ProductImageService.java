@@ -34,7 +34,7 @@ public class ProductImageService implements ProductImageServiceI {
 
     @Override
     public List<ProductImage> getAll() {
-        return null;
+        return repo.findAllProductImages();
     }
 
     @Override

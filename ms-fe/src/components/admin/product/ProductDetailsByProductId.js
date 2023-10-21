@@ -108,7 +108,7 @@ const ProductDetails = (props) => {
     form: { id: " " },
     price: 200000,
     quantity: 10,
-    QRCode: " ",
+    QRCode: "empty",
     status: "ACTIVE",
   });
   const columns = [
@@ -957,7 +957,6 @@ const ProductDetails = (props) => {
       [field]: value,
     }));
   }
-
   function createPattern(event) {
     event.stopPropagation();
     messageApi.loading("Đang tải", 1);
@@ -1473,7 +1472,9 @@ const ProductDetails = (props) => {
       .then((res) => {
         setProductImagesDefault(res.data);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        console.log(err);
+      });
     axios
       .get(api + "product/filterProductDetailByIdCom?productId=" + productId)
       .then((response) => {
@@ -1487,6 +1488,9 @@ const ProductDetails = (props) => {
       .get(api + "product/getProductImageByProductId?productId=" + productId)
       .then((res) => {
         setProductImages(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
       });
     axios
       .get(api + "product/getProductEdit?productId=" + productId)

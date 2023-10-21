@@ -111,6 +111,12 @@ public class ProductController {
         return productImageService.getProductImageByProductId(productId);
     }
 
+
+    @GetMapping("/getAllProductImages")
+    public List<?> getAllProductImages(){
+        return productImageService.getAll();
+    }
+
     @GetMapping("/getProductImageDefaultByProductId")
     public List<?> getProductImageDefaultByProductId(@RequestParam("productId")Long productId){
         return productImageService.getProductImageDefaultByProductId(productId);

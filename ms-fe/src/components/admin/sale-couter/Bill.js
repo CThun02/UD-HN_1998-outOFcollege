@@ -31,12 +31,8 @@ import moment from "moment";
 import { useNavigate } from "react-router-dom";
 import ModalAccount from "./ModalAccount";
 import ModalAddress from "./ModalAddress";
-import Big from "big.js";
-import { object } from "yup";
 import FormUsingVoucher from "../../element/voucher/FormUsingVoucher";
 import numeral from "numeral";
-import ModalConfirm from "./ModalConfirm";
-import Confirm from "../confirm/Confirm";
 
 const Bill = () => {
   var initialItems = [];
@@ -86,7 +82,6 @@ const Bill = () => {
       });
     }
     if (value > productDetails[index].quantity) {
-
     }
     productDetails[index].quantity = value;
     cart.productDetails = productDetails;
@@ -100,28 +95,21 @@ const Bill = () => {
       dataIndex: "index",
       key: "stt",
       width: 70,
+      render: (text, record, index) => {
+        return index + 1;
+      },
     },
     {
       key: "productName",
       title: "Sản phẩm",
-      width: 600,
       render: (text, record, index) => {
         return (
           <Row>
             <Col span={4}>
-              <Carousel
-                style={{ width: "100%", justifyContent: "center" }}
-                autoplay
-              >
+              <Carousel autoplay className={styles.slider}>
                 {record.productDetailImages &&
-                  record.productDetailImages.map((productImage) => {
-                    return (
-                      <img
-                        key={productImage.id}
-                        alt=""
-                        src={productImage.path}
-                      />
-                    );
+                  record.productDetailImages.map((productImage, index) => {
+                    return <img key={index} alt="abc" src={productImage} />;
                   })}
               </Carousel>
             </Col>
@@ -181,6 +169,7 @@ const Bill = () => {
       title: "Số lượng",
       dataIndex: "quantity",
       key: "quantity",
+      width: 200,
       render: (text, record, index) => {
         return (
           <InputNumber
@@ -196,6 +185,8 @@ const Bill = () => {
       title: "Thành tiền",
       dataIndex: "totalPrice",
       key: "totalPrice",
+      width: 200,
+
       render: (text, record, index) => {
         return <span>{record.productDetail.price * record.quantity}</span>;
       },
@@ -203,6 +194,8 @@ const Bill = () => {
     {
       title: "Thao tác",
       key: "action",
+      width: 200,
+
       render: (text, record, index) => (
         <Space size="middle">
           <Button
@@ -243,7 +236,7 @@ const Bill = () => {
   const [remainAmount, setRemainAmount] = useState(-1);
   const [shippingFee, setShippingFee] = useState(0);
   const [leadtime, setLeadtime] = useState(null);
-  const [selectedProvince, setSelectedProvince] = useState(null)
+  const [selectedProvince, setSelectedProvince] = useState(null);
   const [selectedDictrict, setSelectedDictrict] = useState(null);
   const [selectedWard, setSelectedWard] = useState(null);
   const [selectedButton, setSelectedButton] = useState(null);
@@ -255,7 +248,7 @@ const Bill = () => {
   const navigate = useNavigate();
   const [fullname, setFullname] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [detailAddress, setDetailAddress] = useState('');
+  const [detailAddress, setDetailAddress] = useState("");
   const [isOpenFormVoucher, setIsOpenFormVoucher] = useState(false);
   const [voucherAdd, setVoucherAdd] = useState({});
 
@@ -295,10 +288,10 @@ const Bill = () => {
 
   const handleButtonClick = (button) => {
     if (selectedButton === button) {
-      setInputError('')
+      setInputError("");
       setSelectedButton(null);
     } else {
-      setInputError('')
+      setInputError("");
       setSelectedButton(button);
     }
   };
@@ -318,7 +311,7 @@ const Bill = () => {
   };
 
   const handleProvinceChange = async (value, valueDB) => {
-    setSelectedProvince(valueDB)
+    setSelectedProvince(valueDB);
     if (value) {
       await axios
         .get(
@@ -339,7 +332,7 @@ const Bill = () => {
   };
 
   const handleDistrictChange = async (value, valueDB) => {
-    setSelectedDictrict(valueDB)
+    setSelectedDictrict(valueDB);
     if (value) {
       try {
         const response = await axios.get(
@@ -387,10 +380,6 @@ const Bill = () => {
         .then((response) => {
           const leadtimeTimestamp = response.data.data.leadtime;
           const leadtimeMoment = moment.unix(leadtimeTimestamp);
-          console.log(
-            `object`,
-            moment(leadtimeMoment._d).format("YYYY-MM-DDTHH:mm:ss.SSS")
-          );
           setLeadtime(
             moment(leadtimeMoment._d).format("YYYY-MM-DDTHH:mm:ss.SSS")
           );
@@ -467,7 +456,7 @@ const Bill = () => {
     const visible = [...switchChange];
     visible[index] = checked;
     setSwitchChange(visible);
-    setSymbol(checked ? 'Shipping' : 'Received');
+    setSymbol(checked ? "Shipping" : "Received");
   };
 
   // mở modal product
@@ -583,7 +572,6 @@ const Bill = () => {
         });
     }
   };
-
   useEffect(() => {
     getListAddressByUsername(account?.username);
     fetchProvinces();
@@ -604,19 +592,24 @@ const Bill = () => {
       handleShippingOrderLeadtime(district, ward);
       handleShippingFee(totalPrice, district, ward);
     } else {
-      handleShippingOrderLeadtime(selectedDictrict?.split('|')[1],
-        selectedWard?.split('|')[1])
-      handleShippingFee(totalPrice, selectedDictrict?.split('|')[1],
-        selectedWard?.split('|')[1])
+      handleShippingOrderLeadtime(
+        selectedDictrict?.split("|")[1],
+        selectedWard?.split("|")[1]
+      );
+      handleShippingFee(
+        totalPrice,
+        selectedDictrict?.split("|")[1],
+        selectedWard?.split("|")[1]
+      );
     }
 
     getProductDetails();
     initializeModalStates();
   }, [cartId, render, account?.username, selectedDictrict, selectedWard]);
 
-  const [symbol, setSymbol] = useState("Received")
-  const [note, setNote] = useState("")
-  const [amountPaid, setAmountPaid] = useState(0)
+  const [symbol, setSymbol] = useState("Received");
+  const [note, setNote] = useState("");
+  const [amountPaid, setAmountPaid] = useState(0);
 
   const handleCreateBill = (index) => {
     const bill = {
@@ -646,31 +639,29 @@ const Bill = () => {
       city: selectedProvince,
       district: selectedDictrict,
       ward: selectedWard,
-      descriptionDetail: detailAddress
-    }
+      descriptionDetail: detailAddress,
+    };
 
-    console.log(`object`, billAddress)
     if (productDetails.length <= 0) {
       return notification.error({
         message: "Thông báo",
         description: "Không có sản phẩm nào trong giỏ hàng.",
         duration: 2,
       });
-    }
-    else if (selectedButton == null) {
+    } else if (selectedButton == null) {
       return notification.error({
         message: "Thông báo",
         description: "Chưa chọn hình thức thanh toán",
         duration: 2,
       });
-    }
-    else if (selectedButton === 2 && transactionCode === '') {
-      return setInputError('Mã giao dịch không được để trống');
-    }
-    else if (selectedButton !== 2 && (remainAmount < 0 || isNaN(remainAmount))) {
-      return setInputError('Tiền không đủ')
-    }
-    else {
+    } else if (selectedButton === 2 && transactionCode === "") {
+      return setInputError("Mã giao dịch không được để trống");
+    } else if (
+      selectedButton !== 2 &&
+      (remainAmount < 0 || isNaN(remainAmount))
+    ) {
+      return setInputError("Tiền không đủ");
+    } else {
       for (let i = 0; i < productDetails.length; i++) {
         const billDetail = {
           productDetailId: productDetails[i].productDetail.id,
@@ -685,13 +676,12 @@ const Bill = () => {
         content: "Bạn có chắc chắn muốn thanh toán?",
         onOk() {
           if (account !== null && switchChange[index]) {
-            axios.post(`http://localhost:8080/api/admin/address`, billAddress)
-              .then((response) => {
-
-              })
+            axios
+              .post(`http://localhost:8080/api/admin/address`, billAddress)
+              .then((response) => {})
               .catch((error) => {
-                console.log(error)
-              })
+                console.log(error);
+              });
           }
           axios
             .post("http://localhost:8080/api/admin/bill", bill)
@@ -704,9 +694,7 @@ const Bill = () => {
                       status: "PAID",
                     }
                   )
-                  .then((response) => {
-                    console.log(response);
-                  })
+                  .then((response) => {})
                   .catch((error) => {
                     console.log(error);
                   });
@@ -781,11 +769,13 @@ const Bill = () => {
                     style={{ marginTop: "3px" }}
                   />
                   <Table
-                    dataSource={productDetails &&
+                    dataSource={
+                      productDetails &&
                       productDetails.map((record, index) => ({
                         ...record,
                         key: record.id,
-                      }))}
+                      }))
+                    }
                     columns={columns}
                     pagination={false}
                   />
@@ -864,8 +854,8 @@ const Bill = () => {
                             selectedAddress={setSelectedAddress}
                           />
                         </Col>
-                      </Row >
-                      <Row >
+                      </Row>
+                      <Row>
                         <Col span={24}>
                           <Row>
                             <Col span={12}>
@@ -874,45 +864,56 @@ const Bill = () => {
                                   <b style={{ color: "red" }}>*</b> Họ và tên
                                 </Col>
                                 <Col span={14}>
-                                  <Input placeholder="nhập họ và tên"
-                                    onChange={(e) => setFullname(e.target.value)}
-                                    value={selectedAddress?.fullName} />
+                                  <Input
+                                    placeholder="nhập họ và tên"
+                                    onChange={(e) =>
+                                      setFullname(e.target.value)
+                                    }
+                                    value={selectedAddress?.fullName}
+                                  />
                                 </Col>
                               </Row>
                             </Col>
                             <Col span={12}>
                               <Row>
                                 <Col span={7}>
-                                  <b style={{ color: "red" }}>*</b> Số điện thoại
+                                  <b style={{ color: "red" }}>*</b> Số điện
+                                  thoại
                                 </Col>
                                 <Col span={14}>
-                                  <Input placeholder="nhập số điện thoại"
-                                    onChange={(e) => setPhoneNumber(e.target.value)}
-                                    value={selectedAddress?.numberPhone} />
+                                  <Input
+                                    placeholder="nhập số điện thoại"
+                                    onChange={(e) =>
+                                      setPhoneNumber(e.target.value)
+                                    }
+                                    value={selectedAddress?.sdt}
+                                  />
                                 </Col>
                               </Row>
                             </Col>
                           </Row>
-                        </Col >
-                      </Row >
-                      <Row style={{ marginBottom: '50px' }}>
+                        </Col>
+                      </Row>
+                      <Row style={{ marginBottom: "50px" }}>
                         <Col span={8}>
-
                           <span>
                             <b style={{ color: "red" }}>*</b> Tỉnh/thành phố
                           </span>
                           <br />
                           <Select
                             style={{ width: 200 }}
-                            onChange={(event) => handleProvinceChange(
-                              event.substring(event.indexOf("|") + 1), event)}
+                            onChange={(event) =>
+                              handleProvinceChange(
+                                event.substring(event.indexOf("|") + 1),
+                                event
+                              )
+                            }
                             value={
                               selectedAddress.city
-                                ? Number(
-                                  selectedAddress?.city.substring(
-                                    1 + selectedAddress.city.indexOf("|")
+                                ? selectedAddress?.city.substring(
+                                    0,
+                                    selectedAddress.city.indexOf("|")
                                   )
-                                )
                                 : undefined
                             }
                           >
@@ -935,17 +936,18 @@ const Bill = () => {
                           <br />
                           <Select
                             style={{ width: 200 }}
-                            onChange={(event) => handleDistrictChange(
-                              event.substring(event.indexOf("|") + 1),
-                              event
-                            )}
+                            onChange={(event) =>
+                              handleDistrictChange(
+                                event.substring(event.indexOf("|") + 1),
+                                event
+                              )
+                            }
                             value={
                               selectedAddress.district
-                                ? Number(
-                                  selectedAddress?.district.substring(
-                                    1 + selectedAddress.district.indexOf("|")
+                                ? selectedAddress?.district.substring(
+                                    0,
+                                    selectedAddress.district.indexOf("|")
                                   )
-                                )
                                 : undefined
                             }
                           >
@@ -973,8 +975,9 @@ const Bill = () => {
                             value={
                               selectedAddress.ward
                                 ? selectedAddress.ward.substring(
-                                  1 + selectedAddress.ward.indexOf("|")
-                                )
+                                    0,
+                                    selectedAddress.ward.indexOf("|")
+                                  )
                                 : undefined
                             }
                           >
@@ -996,11 +999,7 @@ const Bill = () => {
                           <Input
                             placeholder="Nhập địa chỉ cụ thể"
                             onChange={(e) => setDetailAddress(e.target.value)}
-                            value={
-                              address.addressAccount
-                                ? selectedAddress.descriptionDetail
-                                : undefined
-                            }
+                            value={selectedAddress?.descriptionDetail}
                           />
                         </Col>
                         <Col span={6} style={{ marginLeft: "30px" }}>
@@ -1018,7 +1017,7 @@ const Bill = () => {
                           </h3>
                         )}
                       </Row>
-                    </Col >
+                    </Col>
                     <Col span={8}>
                       <Switch onChange={(e) => handleChangSwitch(e, index)} />
                       <span style={{ marginLeft: "5px" }}>Giao hàng</span>
@@ -1034,11 +1033,15 @@ const Bill = () => {
                           marginLeft: "10px",
                         }}
                         onClick={() =>
-                          setIsOpenFormVoucher(productDetails.length > 0 ? true : notification.error({
-                            message: 'Lỗi',
-                            description: 'Chưa có sản phẩm trong giỏ hàng.',
-                            duration: 2
-                          })
+                          setIsOpenFormVoucher(
+                            productDetails.length > 0
+                              ? true
+                              : notification.error({
+                                  message: "Lỗi",
+                                  description:
+                                    "Chưa có sản phẩm trong giỏ hàng.",
+                                  duration: 2,
+                                })
                           )
                         }
                       >
@@ -1054,24 +1057,31 @@ const Bill = () => {
                       <Row style={{ marginTop: "10px" }}>
                         <Col span={12}>
                           <Row>
-                            <Col span={16}> <span
-                              style={{
-                                fontSize: "16px",
-                                width: "100px",
-                              }}
-                            >
-                              Thành tiền
-                            </span>
-                            </Col >
+                            <Col span={16}>
+                              {" "}
+                              <span
+                                style={{
+                                  fontSize: "16px",
+                                  width: "100px",
+                                }}
+                              >
+                                Thành tiền
+                              </span>
+                            </Col>
                             <Col span={8}>
-                              <span style={{ marginLeft: '100px', fontSize: '16px' }}>
+                              <span
+                                style={{
+                                  marginLeft: "100px",
+                                  fontSize: "16px",
+                                }}
+                              >
                                 {totalPrice.toLocaleString("vi-VN", {
                                   style: "currency",
                                   currency: "VND",
                                 })}
                               </span>
                             </Col>
-                          </Row >
+                          </Row>
                           <Row>
                             <Col span={16}>
                               <span
@@ -1085,7 +1095,12 @@ const Bill = () => {
                               </span>
                             </Col>
                             <Col span={8}>
-                              <span style={{ marginLeft: '100px', fontSize: '16px' }}>
+                              <span
+                                style={{
+                                  marginLeft: "100px",
+                                  fontSize: "16px",
+                                }}
+                              >
                                 {voucherAdd?.voucherValue
                                   ? voucherAdd.voucherMethod === "vnd"
                                     ? voucherAdd?.voucherValue + "đ"
@@ -1093,36 +1108,47 @@ const Bill = () => {
                                   : "0đ"}
                               </span>
                               {voucherAdd.voucherId ? (
-                                <bttuon style={{ marginLeft: "20px", color: "green", cursor: 'pointer' }}
-                                  onClick={() => setVoucherAdd({})}>❌</bttuon>
+                                <bttuon
+                                  style={{
+                                    marginLeft: "20px",
+                                    color: "green",
+                                    cursor: "pointer",
+                                  }}
+                                  onClick={() => setVoucherAdd({})}
+                                >
+                                  ❌
+                                </bttuon>
                               ) : null}
                             </Col>
                           </Row>
 
-                          {
-                            switchChange[index] && (
-                              <Row>
-                                <Col span={16}>
-                                  <span
-                                    style={{
-                                      fontSize: "16px",
-                                      width: "200px",
-                                    }}
-                                  >
-                                    Phí vận chuyển
-                                  </span>
-                                </Col>
-                                <Col span={8}>
-                                  <span style={{ marginLeft: '100px', fontSize: '16px' }}>
-                                    {shippingFee?.toLocaleString("vi-VN", {
-                                      style: "currency",
-                                      currency: "VND",
-                                    })}
-                                  </span>
-                                </Col>
-                              </Row>
-                            )
-                          }
+                          {switchChange[index] && (
+                            <Row>
+                              <Col span={16}>
+                                <span
+                                  style={{
+                                    fontSize: "16px",
+                                    width: "200px",
+                                  }}
+                                >
+                                  Phí vận chuyển
+                                </span>
+                              </Col>
+                              <Col span={8}>
+                                <span
+                                  style={{
+                                    marginLeft: "100px",
+                                    fontSize: "16px",
+                                  }}
+                                >
+                                  {shippingFee?.toLocaleString("vi-VN", {
+                                    style: "currency",
+                                    currency: "VND",
+                                  })}
+                                </span>
+                              </Col>
+                            </Row>
+                          )}
                           <Row>
                             <Col span={16}>
                               <span
@@ -1141,23 +1167,22 @@ const Bill = () => {
                                   style={{
                                     color: "red",
                                     marginLeft: "100px",
-                                    fontSize: '16px'
+                                    fontSize: "16px",
                                   }}
                                 >
-                                  {(voucherPrice() + shippingFee).toLocaleString(
-                                    "vi-VN",
-                                    {
-                                      style: "currency",
-                                      currency: "VND",
-                                    }
-                                  )}
+                                  {(
+                                    voucherPrice() + shippingFee
+                                  ).toLocaleString("vi-VN", {
+                                    style: "currency",
+                                    currency: "VND",
+                                  })}
                                 </span>
                               ) : (
                                 <span
                                   style={{
                                     color: "red",
                                     marginLeft: "100px",
-                                    fontSize: ' 16px'
+                                    fontSize: " 16px",
                                   }}
                                 >
                                   {voucherPrice().toLocaleString("vi-VN", {
@@ -1168,52 +1193,81 @@ const Bill = () => {
                               )}
                             </Col>
                           </Row>
-                          {
-                            selectedButton !== 2 &&
+                          {selectedButton !== 2 && (
                             <Row>
                               <Col span={16}>
-                                <span style={{ fontSize: "16px", width: '200%', display: "block" }}>
+                                <span
+                                  style={{
+                                    fontSize: "16px",
+                                    width: "200%",
+                                    display: "block",
+                                  }}
+                                >
                                   Số tiền khách trả
                                 </span>
                               </Col>
                               <Col span={8}>
-                                <input type="number"
-                                  style={{ marginLeft: '100px' }}
+                                <input
+                                  type="number"
+                                  style={{ marginLeft: "100px" }}
                                   className={styles.input}
-                                  onChange={(e) => handleChangeInput(e, index)} />
-                                {inputError && <span style={{ marginLeft: '100px', width: '200%' }} className={styles.error}>{inputError}</span>}
+                                  onChange={(e) => handleChangeInput(e, index)}
+                                />
+                                {inputError && (
+                                  <span
+                                    style={{
+                                      marginLeft: "100px",
+                                      width: "200%",
+                                    }}
+                                    className={styles.error}
+                                  >
+                                    {inputError}
+                                  </span>
+                                )}
                               </Col>
                             </Row>
-                          }
-                          {
-                            selectedButton === 2 && <>
+                          )}
+                          {selectedButton === 2 && (
+                            <>
                               <Input
                                 placeholder="Nhập mã giao dịch"
                                 size="large"
-                                onChange={(e) => setTransactionCode(e.target.value)}
-                                style={{ margin: '10px 0', width: '380px' }} />
-                              <span style={{ fontSize: '16px', color: 'red' }}>{inputError}</span>
+                                onChange={(e) =>
+                                  setTransactionCode(e.target.value)
+                                }
+                                style={{ margin: "10px 0", width: "380px" }}
+                              />
+                              <span style={{ fontSize: "16px", color: "red" }}>
+                                {inputError}
+                              </span>
                             </>
-                          }
-                          {
-                            selectedButton !== 2 &&
+                          )}
+                          {selectedButton !== 2 && (
                             <Row>
                               <Col span={16}>
-                                <span style={{ fontSize: "16px", width: '200%' }}>
+                                <span
+                                  style={{ fontSize: "16px", width: "200%" }}
+                                >
                                   Tiền thừa
-                                </span >
+                                </span>
                               </Col>
                               <Col span={8}>
-                                <span style={{ fontSize: '16px', marginLeft: '100px', color: "red" }}>
-
+                                <span
+                                  style={{
+                                    fontSize: "16px",
+                                    marginLeft: "100px",
+                                    color: "red",
+                                  }}
+                                >
                                   {remainAmount.toLocaleString("vi-VN", {
                                     style: "currency",
                                     currency: "VND",
                                   })}
                                 </span>
-                              </Col >
-                            </Row >}
-                        </Col >
+                              </Col>
+                            </Row>
+                          )}
+                        </Col>
                         <TextArea
                           onChange={(e) => setNote(e.target.value)}
                           rows={3}
@@ -1223,8 +1277,9 @@ const Bill = () => {
                         <div style={{ marginTop: "20px" }}>
                           <div className={styles.buttonGroup}>
                             <Button
-                              className={`${styles.cashButton} ${selectedButton === 1 ? styles.selected : ""
-                                }`}
+                              className={`${styles.cashButton} ${
+                                selectedButton === 1 ? styles.selected : ""
+                              }`}
                               icon={<DollarOutlined />}
                               onClick={() => handleButtonClick(1)}
                             >
@@ -1232,16 +1287,18 @@ const Bill = () => {
                             </Button>
                             <Button
                               style={{ margin: "0 10px" }}
-                              className={`${styles.cashButton} ${selectedButton === 2 ? styles.selected : ""
-                                }`}
+                              className={`${styles.cashButton} ${
+                                selectedButton === 2 ? styles.selected : ""
+                              }`}
                               icon={<SwapOutlined />}
                               onClick={() => handleButtonClick(2)}
                             >
                               Chuyển khoản
                             </Button>
                             <Button
-                              className={`${styles.cashButton} ${selectedButton === 3 ? styles.selected : ""
-                                }`}
+                              className={`${styles.cashButton} ${
+                                selectedButton === 3 ? styles.selected : ""
+                              }`}
                               onClick={() => handleButtonClick(3)}
                             >
                               Cả hai
@@ -1257,14 +1314,14 @@ const Bill = () => {
                             Xác nhận thanh toán
                           </Button>
                         </div>
-                      </Row >
-                    </Col >
-                  </Row >
-                </div >
-              </Tabs.TabPane >
+                      </Row>
+                    </Col>
+                  </Row>
+                </div>
+              </Tabs.TabPane>
             );
           })}
-      </Tabs >
+      </Tabs>
     </>
   );
 };

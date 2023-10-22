@@ -14,8 +14,6 @@ const ModalProduct = ({ visible, onCancel, cartId, render }) => {
       account: cart.account,
     };
     localStorage.setItem(cartId, JSON.stringify(cart));
-    render(productDetailsCreate);
-    // setRenderThis(productDetailsCreate);
   }
 
   return (
@@ -26,7 +24,7 @@ const ModalProduct = ({ visible, onCancel, cartId, render }) => {
         open={visible}
         onCancel={() => {
           onCancel();
-          // setRenderThis(visible);
+          render(Math.random());
         }}
         className={styles.modalSize}
         footer={null}
@@ -35,7 +33,6 @@ const ModalProduct = ({ visible, onCancel, cartId, render }) => {
         <ProductDetails
           action={action}
           productDetailsCreate={productDetailsCreate}
-          render={cartId}
         />
       </Modal>
     </>

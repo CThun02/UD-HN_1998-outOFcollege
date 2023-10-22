@@ -15,6 +15,7 @@ const ModalProduct = ({ visible, onCancel, cartId, render }) => {
     };
     localStorage.setItem(cartId, JSON.stringify(cart));
     render(productDetailsCreate);
+    // setRenderThis(productDetailsCreate);
   }
 
   return (

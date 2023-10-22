@@ -2,7 +2,6 @@ import { CheckCircleFilled } from "@ant-design/icons";
 import {
   Button,
   Carousel,
-  Checkbox,
   Col,
   message,
   notification,
@@ -87,13 +86,13 @@ const ProductDetails = (props) => {
                         if (
                           productImage.path.includes(
                             "" +
-                              record.button.id +
-                              record.material.id +
-                              record.collar.id +
-                              record.sleeve.id +
-                              record.shirtTail.id +
-                              record.pattern.id +
-                              record.form.id
+                            record.button.id +
+                            record.material.id +
+                            record.collar.id +
+                            record.sleeve.id +
+                            record.shirtTail.id +
+                            record.pattern.id +
+                            record.form.id
                           )
                         ) {
                           return (
@@ -249,6 +248,27 @@ const ProductDetails = (props) => {
     var indexExist = -1;
     var productDetailCreate = {
       productDetail: {},
+      productDetailImages:
+        productImages &&
+        productImages.reduce((result, productImage) => {
+          if (
+            productImage.product.id === record.product.id &&
+            record.color.id === productImage.color.id &&
+            productImage.path.includes(
+              "" +
+              record.button.id +
+              record.material.id +
+              record.collar.id +
+              record.sleeve.id +
+              record.shirtTail.id +
+              record.pattern.id +
+              record.form.id
+            )
+          ) {
+            result.push(productImage.path);
+          }
+          return result;
+        }, []),
       quantity: quantity,
     };
     for (let i = 0; i < props.productDetailsCreate.length; i++) {
@@ -261,17 +281,20 @@ const ProductDetails = (props) => {
       productDetailCreate.quantity =
         Number(quantity) +
         Number(props.productDetailsCreate[indexExist].quantity);
+      props.productDetailsCreate?.splice(indexExist, 1);
     }
     if (
-      productDetailCreate.quantity >= record.quantity ||
-      productDetailCreate.quantity >= 100
+      productDetailCreate.quantity > record.quantity ||
+      productDetailCreate.quantity > 100
     ) {
       notification.error({
         message: "Thông báo",
-        description: "Số lượng sản phẩm không có sẵn",
+        description: `Số lượng sản phẩm ${productDetailCreate.quantity > 100
+          ? "thêm tối đa 100"
+          : "tồn không đủ"
+          }`,
       });
     } else {
-      props.productDetailsCreate?.splice(indexExist, 1);
       productDetailCreate.productDetail = record;
       props.productDetailsCreate?.push(productDetailCreate);
       notification.success({
@@ -288,30 +311,30 @@ const ProductDetails = (props) => {
     axios
       .get(
         api +
-          "product/filterProductDetailByIdCom?productId=" +
-          productId +
-          "&buttonId=" +
-          buttonId +
-          "&materialId=" +
-          materialId +
-          "&shirtTailId=" +
-          shirtTailId +
-          "&sleeveId=" +
-          sleeveId +
-          "&collarId=" +
-          collarId +
-          "&colorId=" +
-          colorId +
-          "&sizeId=" +
-          sizeId +
-          "&patternId=" +
-          patternId +
-          "&formId=" +
-          formId +
-          "&minPrice=" +
-          price[0] +
-          "&maxPrice=" +
-          price[1]
+        "product/filterProductDetailByIdCom?productId=" +
+        productId +
+        "&buttonId=" +
+        buttonId +
+        "&materialId=" +
+        materialId +
+        "&shirtTailId=" +
+        shirtTailId +
+        "&sleeveId=" +
+        sleeveId +
+        "&collarId=" +
+        collarId +
+        "&colorId=" +
+        colorId +
+        "&sizeId=" +
+        sizeId +
+        "&patternId=" +
+        patternId +
+        "&formId=" +
+        formId +
+        "&minPrice=" +
+        price[0] +
+        "&maxPrice=" +
+        price[1]
       )
       .then((response) => {
         setProductDetails(response.data);
@@ -874,7 +897,13 @@ const ProductDetails = (props) => {
             }}
             scroll={{ y: 360 }}
             columns={columns}
-            dataSource={productDetails}
+            dataSource={
+              productDetails &&
+              productDetails.map((record, index) => ({
+                ...record,
+                key: record.id,
+              }))
+            }
             loading={loading}
           />
         </div>

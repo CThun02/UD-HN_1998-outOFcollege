@@ -453,9 +453,9 @@ const ProductDetails = (props) => {
     <>
       {contextHolder}
       <div className={styles.productDetails}>
-        <Col span={20} offset={2}>
+        <Col span={22} offset={1}>
           <Row style={{ margin: 0 }}>
-            <Col span={6}>
+            <Col span={4}>
               <div style={{ margin: "0 8px 24px 8px" }}>
                 <span
                   style={{
@@ -500,7 +500,7 @@ const ProductDetails = (props) => {
                 </Select>
               </div>
             </Col>
-            <Col span={6}>
+            <Col span={4}>
               <div style={{ margin: "0 8px 24px 8px" }}>
                 <span
                   style={{
@@ -545,7 +545,7 @@ const ProductDetails = (props) => {
                 </Select>
               </div>
             </Col>
-            <Col span={6}>
+            <Col span={4}>
               <div style={{ margin: "0 8px 24px 8px" }}>
                 <span
                   style={{
@@ -590,7 +590,7 @@ const ProductDetails = (props) => {
                 </Select>
               </div>
             </Col>
-            <Col span={6}>
+            <Col span={4}>
               <div style={{ margin: "0 8px 24px 8px" }}>
                 <span
                   style={{
@@ -635,7 +635,7 @@ const ProductDetails = (props) => {
                 </Select>
               </div>
             </Col>
-            <Col span={6}>
+            <Col span={4}>
               <div style={{ margin: "0 8px 24px 8px" }}>
                 <span
                   style={{
@@ -679,7 +679,7 @@ const ProductDetails = (props) => {
                 </Select>
               </div>
             </Col>
-            <Col span={6}>
+            <Col span={4}>
               <div style={{ margin: "0 8px 24px 8px" }}>
                 <span
                   style={{
@@ -723,7 +723,7 @@ const ProductDetails = (props) => {
                 </Select>
               </div>
             </Col>
-            <Col span={6}>
+            <Col span={4}>
               <div style={{ margin: "0 8px 24px 8px" }}>
                 <span
                   style={{
@@ -768,7 +768,7 @@ const ProductDetails = (props) => {
                 </Select>
               </div>
             </Col>
-            <Col span={6}>
+            <Col span={4}>
               <div style={{ margin: "0 8px 24px 8px" }}>
                 <span
                   style={{
@@ -818,7 +818,7 @@ const ProductDetails = (props) => {
                 </Select>
               </div>
             </Col>
-            <Col span={6}>
+            <Col span={4}>
               <div style={{ margin: "0 8px 24px 8px" }}>
                 <span
                   style={{
@@ -907,16 +907,6 @@ const ProductDetails = (props) => {
             }
             loading={loading}
           />
-        </div>
-        <div style={{ textAlign: "center", marginTop: "16px" }}>
-          <Button
-            type="primary"
-            onClick={() => {
-              completeAdd();
-            }}
-          >
-            Hoàn thành <CheckCircleFilled />
-          </Button>
         </div>
       </div>
     </>

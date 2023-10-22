@@ -156,3 +156,8 @@ btn:hover {
   color: red;
   display: block;
 }
+
+.slider {
+  width: 100px;
+  justify-content: center;
+}

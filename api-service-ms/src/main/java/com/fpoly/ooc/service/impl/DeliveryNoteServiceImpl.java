@@ -18,8 +18,8 @@ public class DeliveryNoteServiceImpl implements DeliveryNoteService {
     @Override
     public DeliveryNote createDeliveryNote(DeliveryNoteRequest request) {
         DeliveryNote deliveryNote = DeliveryNote.builder()
-                .bill(request.getBillId())
-                .address(request.getAddressId())
+                .bill(Bill.builder().id(request.getBillId()).build())
+                .address(Address.builder().id(request.getAddressId()).build())
                 .shipPrice(request.getShipPrice())
                 .shipDate(request.getShipDate())
                 .dateOfReceipt(request.getDateOfreceipt())

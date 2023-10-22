@@ -49,14 +49,7 @@ public class BillServiceImpl implements BillService {
     private TimeLineRepo timeLineRepo;
 
     @Autowired
-    private DeliveryNoteService deliveryNoteService;
-
-    @Autowired
     private VoucherHistoryRepository voucherHistoryRepository;
-
-    @Autowired
-    private AddressRepository addressRepository;
-
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -106,26 +99,6 @@ public class BillServiceImpl implements BillService {
             timeline.setBill(bill);
             timeline.setStatus(n);
             timeLineRepo.save(timeline);
-        }
-
-        if (bill.getSymbol() == "Shipping" && bill.getAccount() == null) {
-
-            Address address = Address.builder()
-                    .city(request.getCity())
-                    .district(request.getDistrict())
-                    .ward(request.getWard())
-                    .fullName(request.getFullname())
-                    .sdt(request.getPhoneNumber())
-                    .build();
-            addressRepository.save(address);
-
-            DeliveryNoteRequest deliveryNoteRequest = DeliveryNoteRequest.builder()
-                    .billId(bill)
-                    .addressId(address)
-                    .shipDate(request.getShipDate())
-                    .shipPrice(request.getShipPrice())
-                    .build();
-            deliveryNoteService.createDeliveryNote(deliveryNoteRequest);
         }
 
         VoucherHistory voucherHistory = VoucherHistory.builder()

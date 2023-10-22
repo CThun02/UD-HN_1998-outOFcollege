@@ -176,7 +176,7 @@ const BillTimeLine = (addId) => {
             <section className={styles.background}>
                 <div style={{ overflowX: 'scroll' }}>
                     <div style={{ width: 'fit-content' }}>
-                        {billInfo?.symbol !== 'received' ? (
+                        {billInfo?.symbol !== 'Received' ? (
                             <Timeline minEvents={6} placeholder className={styles.timeLine}>
                                 {timelines && timelines.map((data) => (
                                     <TimelineEvent

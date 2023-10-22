@@ -16,9 +16,9 @@ import java.time.LocalDateTime;
 @Builder
 public class DeliveryNoteRequest {
 
-    private Bill billId;
+    private Long billId;
 
-    private Address addressId;
+    private Long addressId;
 
     private LocalDateTime shipDate;
 

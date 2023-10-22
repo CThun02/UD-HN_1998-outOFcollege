@@ -189,9 +189,10 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public List<AccountDetailResponce> getAllCustomer() {
         List<AddressDetail> accountAddressDetails = addressDetailService.getAllCustomer();
+        List<Account> accounts = accountRepository.getAllAccountByRoleId(Long.valueOf(2));
         List<AccountDetailResponce> lstAccountDetailResponces = new ArrayList<>();
-        for (AddressDetail addressDetail : accountAddressDetails) {
-            Account account = addressDetail.getAccountAddress();
+        for (Account accountGet : accounts) {
+            Account account = accountGet;
             AccountDetailResponce accountDetailResponce = AccountDetailResponce.builder()
                     .image(account.getAvatar())
                     .username(account.getUsername())
@@ -202,14 +203,15 @@ public class AccountServiceImpl implements AccountService {
                     .email(account.getEmail())
                     .numberPhone(account.getNumberPhone())
                     .build();
-
-            List<Address> accountAddressList = accountAddressDetails.stream()
-                    .filter(ad -> ad.getAccountAddress().equals(account))
-                    .map(ad -> ad.getAddressDetail())
-                    .collect(Collectors.toList());
-
-            accountDetailResponce.setAccountAddress(accountAddressList);
+            for (AddressDetail addressDetail : accountAddressDetails) {
+                List<Address> accountAddressList = accountAddressDetails.stream()
+                        .filter(ad -> ad.getAccountAddress().equals(account))
+                        .map(ad -> ad.getAddressDetail())
+                        .collect(Collectors.toList());
+                accountDetailResponce.setAccountAddress(accountAddressList);
+            }
             lstAccountDetailResponces.add(accountDetailResponce);
+
         }
 
         return lstAccountDetailResponces;

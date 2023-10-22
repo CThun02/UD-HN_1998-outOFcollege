@@ -12,6 +12,7 @@ import {
   InputNumber,
   notification,
   Modal,
+  Carousel,
 } from "antd";
 import React, { useEffect, useState } from "react";
 import styles from "./Bill.module.css";
@@ -84,6 +85,9 @@ const Bill = () => {
         duration: 1,
       });
     }
+    if (value > productDetails[index].quantity) {
+
+    }
     productDetails[index].quantity = value;
     cart.productDetails = productDetails;
     localStorage.setItem(cartId, JSON.stringify(cart));
@@ -98,60 +102,74 @@ const Bill = () => {
       width: 70,
     },
     {
+      key: "productName",
       title: "Sản phẩm",
-      key: "name",
-      width: 500,
+      width: 600,
       render: (text, record, index) => {
         return (
           <Row>
-            <Col span={6}>
+            <Col span={4}>
+              <Carousel
+                style={{ width: "100%", justifyContent: "center" }}
+                autoplay
+              >
+                {record.productDetailImages &&
+                  record.productDetailImages.map((productImage) => {
+                    return (
+                      <img
+                        key={productImage.id}
+                        alt=""
+                        src={productImage.path}
+                      />
+                    );
+                  })}
+              </Carousel>
+            </Col>
+            <Col span={20}>
               <div
+                className="m-5"
                 style={{
-                  display: "flex",
-                  alignItems: "center",
+                  textAlign: "start",
                   height: "100%",
+                  justifyContent: "center",
                 }}
               >
-                <img
-                  src={
-                    "https://vapa.vn/wp-content/uploads/2022/12/anh-3d-thien-nhien.jpeg"
-                  }
-                  width={"100%"}
-                  alt=""
-                />
-              </div>
-            </Col>
-            <Col span={18}>
-              <h6>
-                {record.productDetail.product.productName} {" - "}
+                <span style={{ fontWeight: "500" }}>
+                  {record.productDetail.product.productName +
+                    "-" +
+                    record.productDetail.button.buttonName +
+                    "-" +
+                    record.productDetail.material.materialName +
+                    "-" +
+                    record.productDetail.collar.collarTypeName +
+                    "-" +
+                    record.productDetail.sleeve.sleeveName +
+                    "-" +
+                    record.productDetail.shirtTail.shirtTailTypeName +
+                    "-" +
+                    record.productDetail.pattern.patternName +
+                    "-" +
+                    record.productDetail.form.formName}
+                </span>
+                <br />
                 <div className={styles.optionColor}>
+                  <b>Màu sắc: </b>
                   <span
                     style={{
                       backgroundColor: record.productDetail.color.colorCode,
+                      marginLeft: "8px",
                     }}
                   ></span>
                   {record.productDetail.color.colorName}
                 </div>
-              </h6>
-              <div style={{ textAlign: "left", marginLeft: 20 }}>
-                <span style={{ fontWeight: 500, marginRight: 20 }}>
-                  Kích cỡ: {record.productDetail.size.sizeName}
-                </span>
                 <br />
-                <span style={{ fontWeight: 500 }}>
-                  Chất liệu: {record.productDetail.material.materialName}
-                </span>
-                <br />
-                <span style={{ fontWeight: 500 }}>
-                  Nút áo: {record.productDetail.button.buttonName}
-                </span>
-                <br />
-                <span style={{ fontWeight: 500 }}>
-                  Cổ áo: {record.productDetail.collar.collarTypeName}
-                </span>
-                <br />
-                <span style={{ fontWeight: 500 }}>
-                  Đuôi áo: {record.productDetail.shirtTail.shirtTailTypeName}
+                <b>Kích cỡ: </b>
+                <span
+                  style={{
+                    marginLeft: "8px",
+                  }}
+                >
+                  {record.productDetail.size.sizeName}
                 </span>
               </div>
             </Col>
@@ -225,6 +243,7 @@ const Bill = () => {
   const [remainAmount, setRemainAmount] = useState(-1);
   const [shippingFee, setShippingFee] = useState(0);
   const [leadtime, setLeadtime] = useState(null);
+  const [selectedProvince, setSelectedProvince] = useState(null)
   const [selectedDictrict, setSelectedDictrict] = useState(null);
   const [selectedWard, setSelectedWard] = useState(null);
   const [selectedButton, setSelectedButton] = useState(null);
@@ -236,7 +255,7 @@ const Bill = () => {
   const navigate = useNavigate();
   const [fullname, setFullname] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [addressId, setAddressId] = useState(null);
+  const [detailAddress, setDetailAddress] = useState('');
   const [isOpenFormVoucher, setIsOpenFormVoucher] = useState(false);
   const [voucherAdd, setVoucherAdd] = useState({});
 
@@ -247,7 +266,6 @@ const Bill = () => {
     localStorage.setItem(cartId, JSON.stringify(cart));
     setSelectedAddress({});
     setShippingFee(0);
-    setAddressId(null);
     setLeadtime(null);
     setRendered(Math.random);
   };
@@ -277,8 +295,10 @@ const Bill = () => {
 
   const handleButtonClick = (button) => {
     if (selectedButton === button) {
+      setInputError('')
       setSelectedButton(null);
     } else {
+      setInputError('')
       setSelectedButton(button);
     }
   };
@@ -297,7 +317,8 @@ const Bill = () => {
       .catch((err) => console.log(err));
   };
 
-  const handleProvinceChange = async (value) => {
+  const handleProvinceChange = async (value, valueDB) => {
+    setSelectedProvince(valueDB)
     if (value) {
       await axios
         .get(
@@ -317,7 +338,8 @@ const Bill = () => {
     }
   };
 
-  const handleDistrictChange = async (value) => {
+  const handleDistrictChange = async (value, valueDB) => {
+    setSelectedDictrict(valueDB)
     if (value) {
       try {
         const response = await axios.get(
@@ -331,7 +353,6 @@ const Bill = () => {
 
         const wards = response.data.data;
         setWards(wards);
-        setSelectedDictrict(value);
       } catch (error) {
         console.log(error);
       }
@@ -351,7 +372,7 @@ const Bill = () => {
       service_id: 53321,
     };
 
-    if (account !== null && toDistrictId && toWardCode) {
+    if (toDistrictId && toWardCode) {
       axios
         .post(
           "https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/leadtime",
@@ -366,9 +387,6 @@ const Bill = () => {
         .then((response) => {
           const leadtimeTimestamp = response.data.data.leadtime;
           const leadtimeMoment = moment.unix(leadtimeTimestamp);
-
-          const formattedDateTime = leadtimeMoment.format("DD/MM/YYYY");
-          console.log(`lead time`, leadtimeMoment);
           console.log(
             `object`,
             moment(leadtimeMoment._d).format("YYYY-MM-DDTHH:mm:ss.SSS")
@@ -390,7 +408,6 @@ const Bill = () => {
 
   const voucherPrice = () => {
     let result = totalPrice;
-    console.log(voucherAdd);
 
     if (voucherAdd && voucherAdd.voucherMethod === "vnd") {
       if (result > (voucherAdd.voucherCondition ?? 0)) {
@@ -424,7 +441,7 @@ const Bill = () => {
       width: 15,
     };
 
-    if (account !== null && insuranceValue && toDistrictId && toWardCode) {
+    if (insuranceValue && toDistrictId && toWardCode) {
       axios
         .post(
           "https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee",
@@ -447,18 +464,10 @@ const Bill = () => {
 
   // switch bán tại quầy hoặc online
   const handleChangSwitch = (checked, index) => {
-    if (account !== undefined) {
-      const visible = [...switchChange];
-      visible[index] = checked;
-      setSwitchChange(visible);
-      setSymbol(checked ? "Shipping" : "Received");
-    } else {
-      notification.error({
-        message: "Lỗi",
-        description: "Chưa chọn tài khoản.",
-        duration: 1,
-      });
-    }
+    const visible = [...switchChange];
+    visible[index] = checked;
+    setSwitchChange(visible);
+    setSymbol(checked ? 'Shipping' : 'Received');
   };
 
   // mở modal product
@@ -594,16 +603,20 @@ const Bill = () => {
       handleDistrictChange(district);
       handleShippingOrderLeadtime(district, ward);
       handleShippingFee(totalPrice, district, ward);
+    } else {
+      handleShippingOrderLeadtime(selectedDictrict?.split('|')[1],
+        selectedWard?.split('|')[1])
+      handleShippingFee(totalPrice, selectedDictrict?.split('|')[1],
+        selectedWard?.split('|')[1])
     }
 
     getProductDetails();
     initializeModalStates();
-  }, [cartId, render, account?.username]);
+  }, [cartId, render, account?.username, selectedDictrict, selectedWard]);
 
-  const [symbol, setSymbol] = useState("Received");
-  const [note, setNote] = useState("");
-  const [priceReduce, setPriceReduce] = useState(null);
-  const [amountPaid, setAmountPaid] = useState(0);
+  const [symbol, setSymbol] = useState("Received")
+  const [note, setNote] = useState("")
+  const [amountPaid, setAmountPaid] = useState(0)
 
   const handleCreateBill = (index) => {
     const bill = {
@@ -627,20 +640,37 @@ const Bill = () => {
       voucherCode: voucherAdd?.voucherCode,
     };
 
+    const billAddress = {
+      fullName: fullname,
+      sdt: phoneNumber,
+      city: selectedProvince,
+      district: selectedDictrict,
+      ward: selectedWard,
+      descriptionDetail: detailAddress
+    }
+
+    console.log(`object`, billAddress)
     if (productDetails.length <= 0) {
       return notification.error({
         message: "Thông báo",
         description: "Không có sản phẩm nào trong giỏ hàng.",
         duration: 2,
       });
-    } else if (selectedButton == null) {
-      return console.log("chưa chọn hình thức thanh toán");
-    } else if (
-      selectedButton !== 2 &&
-      (remainAmount < 0 || isNaN(remainAmount))
-    ) {
-      return setInputError("Tiền không đủ");
-    } else {
+    }
+    else if (selectedButton == null) {
+      return notification.error({
+        message: "Thông báo",
+        description: "Chưa chọn hình thức thanh toán",
+        duration: 2,
+      });
+    }
+    else if (selectedButton === 2 && transactionCode === '') {
+      return setInputError('Mã giao dịch không được để trống');
+    }
+    else if (selectedButton !== 2 && (remainAmount < 0 || isNaN(remainAmount))) {
+      return setInputError('Tiền không đủ')
+    }
+    else {
       for (let i = 0; i < productDetails.length; i++) {
         const billDetail = {
           productDetailId: productDetails[i].productDetail.id,
@@ -650,13 +680,19 @@ const Bill = () => {
 
         bill.lstBillDetailRequest.push(billDetail);
       }
-
-      console.log(voucherPrice(), `voucher`);
-
       Modal.confirm({
         title: "Xác nhận thanh toán",
         content: "Bạn có chắc chắn muốn thanh toán?",
         onOk() {
+          if (account !== null && switchChange[index]) {
+            axios.post(`http://localhost:8080/api/admin/address`, billAddress)
+              .then((response) => {
+
+              })
+              .catch((error) => {
+                console.log(error)
+              })
+          }
           axios
             .post("http://localhost:8080/api/admin/bill", bill)
             .then((response) => {
@@ -745,7 +781,11 @@ const Bill = () => {
                     style={{ marginTop: "3px" }}
                   />
                   <Table
-                    dataSource={productDetails}
+                    dataSource={productDetails &&
+                      productDetails.map((record, index) => ({
+                        ...record,
+                        key: record.id,
+                      }))}
                     columns={columns}
                     pagination={false}
                   />
@@ -824,43 +864,55 @@ const Bill = () => {
                             selectedAddress={setSelectedAddress}
                           />
                         </Col>
-                      </Row>
-                      <Row>
-                        <Col span={10}>
-                          <span>
-                            <b style={{ color: "red" }}>*</b> Họ và tên
-                          </span>
-                          <Input
-                            placeholder="nhập họ và tên"
-                            value={selectedAddress?.fullName}
-                          />
-                        </Col>
-                        <Col span={10} style={{ marginLeft: "40px" }}>
-                          <span>
-                            <b style={{ color: "red" }}>*</b> Số điện thoại
-                          </span>
-                          <Input
-                            placeholder="nhập số điện thoại"
-                            value={selectedAddress?.numberPhone}
-                          />
-                        </Col>
-                      </Row>
-                      <Row style={{ margin: "40px 0" }}>
-                        <Col span={7}>
+                      </Row >
+                      <Row >
+                        <Col span={24}>
+                          <Row>
+                            <Col span={12}>
+                              <Row>
+                                <Col span={5}>
+                                  <b style={{ color: "red" }}>*</b> Họ và tên
+                                </Col>
+                                <Col span={14}>
+                                  <Input placeholder="nhập họ và tên"
+                                    onChange={(e) => setFullname(e.target.value)}
+                                    value={selectedAddress?.fullName} />
+                                </Col>
+                              </Row>
+                            </Col>
+                            <Col span={12}>
+                              <Row>
+                                <Col span={7}>
+                                  <b style={{ color: "red" }}>*</b> Số điện thoại
+                                </Col>
+                                <Col span={14}>
+                                  <Input placeholder="nhập số điện thoại"
+                                    onChange={(e) => setPhoneNumber(e.target.value)}
+                                    value={selectedAddress?.numberPhone} />
+                                </Col>
+                              </Row>
+                            </Col>
+                          </Row>
+                        </Col >
+                      </Row >
+                      <Row style={{ marginBottom: '50px' }}>
+                        <Col span={8}>
+
                           <span>
                             <b style={{ color: "red" }}>*</b> Tỉnh/thành phố
                           </span>
                           <br />
                           <Select
                             style={{ width: 200 }}
-                            onChange={handleProvinceChange}
+                            onChange={(event) => handleProvinceChange(
+                              event.substring(event.indexOf("|") + 1), event)}
                             value={
                               selectedAddress.city
                                 ? Number(
-                                    selectedAddress?.city.substring(
-                                      1 + selectedAddress.city.indexOf("|")
-                                    )
+                                  selectedAddress?.city.substring(
+                                    1 + selectedAddress.city.indexOf("|")
                                   )
+                                )
                                 : undefined
                             }
                           >
@@ -869,28 +921,31 @@ const Bill = () => {
                                 <Select.Option
                                   label={province.ProvinceName}
                                   key={province.ProvinceID}
-                                  value={province.ProvinceID}
+                                  value={`${province.ProvinceName}|${province.ProvinceID}`}
                                 >
                                   {province.ProvinceName}
                                 </Select.Option>
                               ))}
                           </Select>
                         </Col>
-                        <Col span={7}>
+                        <Col span={8}>
                           <span>
                             <b style={{ color: "red" }}>*</b> Quận/huyện
                           </span>
                           <br />
                           <Select
                             style={{ width: 200 }}
-                            onChange={handleDistrictChange}
+                            onChange={(event) => handleDistrictChange(
+                              event.substring(event.indexOf("|") + 1),
+                              event
+                            )}
                             value={
                               selectedAddress.district
                                 ? Number(
-                                    selectedAddress?.district.substring(
-                                      1 + selectedAddress.district.indexOf("|")
-                                    )
+                                  selectedAddress?.district.substring(
+                                    1 + selectedAddress.district.indexOf("|")
                                   )
+                                )
                                 : undefined
                             }
                           >
@@ -899,7 +954,7 @@ const Bill = () => {
                                 return (
                                   <Select.Option
                                     key={district.DistrictID}
-                                    value={Number(district.DistrictID)}
+                                    value={`${district.DistrictName}|${district.DistrictID}`}
                                   >
                                     {district.DistrictName}
                                   </Select.Option>
@@ -907,7 +962,7 @@ const Bill = () => {
                               })}
                           </Select>
                         </Col>
-                        <Col span={7}>
+                        <Col span={8}>
                           <span>
                             <b style={{ color: "red" }}>*</b> Phường/xã
                           </span>
@@ -918,16 +973,16 @@ const Bill = () => {
                             value={
                               selectedAddress.ward
                                 ? selectedAddress.ward.substring(
-                                    1 + selectedAddress.ward.indexOf("|")
-                                  )
-                                : ""
+                                  1 + selectedAddress.ward.indexOf("|")
+                                )
+                                : undefined
                             }
                           >
                             {wards &&
                               wards.map((ward) => (
                                 <Select.Option
                                   key={ward.WardCode}
-                                  value={ward.WardCode}
+                                  value={`${ward.WardName}|${ward.WardCode}`}
                                 >
                                   {ward.WardName}
                                 </Select.Option>
@@ -938,32 +993,32 @@ const Bill = () => {
                       <Row>
                         <Col span={16}>
                           <span>Địa chỉ cụ thể</span>
-
                           <Input
                             placeholder="Nhập địa chỉ cụ thể"
+                            onChange={(e) => setDetailAddress(e.target.value)}
                             value={
                               address.addressAccount
                                 ? selectedAddress.descriptionDetail
-                                : ""
+                                : undefined
                             }
                           />
                         </Col>
                         <Col span={6} style={{ marginLeft: "30px" }}>
                           <img
                             src={logoGhn}
-                            alt="an sẽ"
+                            alt="logo"
                             style={{ width: "90px", height: "80px" }}
                           />
                         </Col>
 
-                        {switchChange[index] && account && (
+                        {switchChange[index] && (
                           <h3>
                             Ngày giao hàng dự kiến:{" "}
                             {moment(leadtime).format("DD/MM/YYYY") || ""}
                           </h3>
                         )}
                       </Row>
-                    </Col>
+                    </Col >
                     <Col span={8}>
                       <Switch onChange={(e) => handleChangSwitch(e, index)} />
                       <span style={{ marginLeft: "5px" }}>Giao hàng</span>
@@ -978,7 +1033,14 @@ const Bill = () => {
                           marginTop: "10px",
                           marginLeft: "10px",
                         }}
-                        onClick={() => setIsOpenFormVoucher(true)}
+                        onClick={() =>
+                          setIsOpenFormVoucher(productDetails.length > 0 ? true : notification.error({
+                            message: 'Lỗi',
+                            description: 'Chưa có sản phẩm trong giỏ hàng.',
+                            duration: 2
+                          })
+                          )
+                        }
                       >
                         Chọn mã giảm giá
                       </Button>
@@ -991,56 +1053,27 @@ const Bill = () => {
                       />
                       <Row style={{ marginTop: "10px" }}>
                         <Col span={12}>
-                          <span
-                            style={{
-                              fontSize: "16px",
-                              width: "200%",
-                              display: "block",
-                            }}
-                          >
-                            Thành tiền
-                            <span style={{ marginLeft: "117px" }}>
-                              {totalPrice.toLocaleString("vi-VN", {
-                                style: "currency",
-                                currency: "VND",
-                              })}
-                            </span>
-                          </span>
-                          <span
-                            style={{
-                              fontSize: "16px",
-                              width: "200%",
-                              display: "block",
-                            }}
-                          >
-                            Giảm giá
-                            <span style={{ marginLeft: "130px" }}>
-                              {voucherAdd?.voucherValue
-                                ? voucherAdd.voucherMethod === "vnd"
-                                  ? voucherAdd?.voucherValue + "đ"
-                                  : voucherAdd?.voucherValue + "%"
-                                : "0đ"}
-                            </span>
-                            <span
-                              style={{ marginLeft: "28px", color: "green" }}
+                          <Row>
+                            <Col span={16}> <span
+                              style={{
+                                fontSize: "16px",
+                                width: "100px",
+                              }}
                             >
-                              {/* {voucherAdd.voucherName} */}
+                              Thành tiền
                             </span>
-                            {voucherAdd.voucherId ? (
-                              <bttuon
-                                style={{
-                                  marginLeft: "20px",
-                                  color: "green",
-                                  cursor: "pointer",
-                                }}
-                                onClick={() => setVoucherAdd({})}
-                              >
-                                ❌
-                              </bttuon>
-                            ) : null}
-                          </span>
-                          {switchChange[index] && (
-                            <>
+                            </Col >
+                            <Col span={8}>
+                              <span style={{ marginLeft: '100px', fontSize: '16px' }}>
+                                {totalPrice.toLocaleString("vi-VN", {
+                                  style: "currency",
+                                  currency: "VND",
+                                })}
+                              </span>
+                            </Col>
+                          </Row >
+                          <Row>
+                            <Col span={16}>
                               <span
                                 style={{
                                   fontSize: "16px",
@@ -1048,104 +1081,139 @@ const Bill = () => {
                                   display: "block",
                                 }}
                               >
-                                Phí vận chuyển
-                                <span style={{ marginLeft: "87px" }}>
-                                  {shippingFee?.toLocaleString("vi-VN", {
+                                Giảm giá
+                              </span>
+                            </Col>
+                            <Col span={8}>
+                              <span style={{ marginLeft: '100px', fontSize: '16px' }}>
+                                {voucherAdd?.voucherValue
+                                  ? voucherAdd.voucherMethod === "vnd"
+                                    ? voucherAdd?.voucherValue + "đ"
+                                    : voucherAdd?.voucherValue + "%"
+                                  : "0đ"}
+                              </span>
+                              {voucherAdd.voucherId ? (
+                                <bttuon style={{ marginLeft: "20px", color: "green", cursor: 'pointer' }}
+                                  onClick={() => setVoucherAdd({})}>❌</bttuon>
+                              ) : null}
+                            </Col>
+                          </Row>
+
+                          {
+                            switchChange[index] && (
+                              <Row>
+                                <Col span={16}>
+                                  <span
+                                    style={{
+                                      fontSize: "16px",
+                                      width: "200px",
+                                    }}
+                                  >
+                                    Phí vận chuyển
+                                  </span>
+                                </Col>
+                                <Col span={8}>
+                                  <span style={{ marginLeft: '100px', fontSize: '16px' }}>
+                                    {shippingFee?.toLocaleString("vi-VN", {
+                                      style: "currency",
+                                      currency: "VND",
+                                    })}
+                                  </span>
+                                </Col>
+                              </Row>
+                            )
+                          }
+                          <Row>
+                            <Col span={16}>
+                              <span
+                                style={{
+                                  fontSize: "16px",
+                                  width: "200%",
+                                  display: "block",
+                                }}
+                              >
+                                Tổng cộng
+                              </span>
+                            </Col>
+                            <Col span={8}>
+                              {switchChange[index] ? (
+                                <span
+                                  style={{
+                                    color: "red",
+                                    marginLeft: "100px",
+                                    fontSize: '16px'
+                                  }}
+                                >
+                                  {(voucherPrice() + shippingFee).toLocaleString(
+                                    "vi-VN",
+                                    {
+                                      style: "currency",
+                                      currency: "VND",
+                                    }
+                                  )}
+                                </span>
+                              ) : (
+                                <span
+                                  style={{
+                                    color: "red",
+                                    marginLeft: "100px",
+                                    fontSize: ' 16px'
+                                  }}
+                                >
+                                  {voucherPrice().toLocaleString("vi-VN", {
                                     style: "currency",
                                     currency: "VND",
                                   })}
                                 </span>
-                              </span>
-                            </>
-                          )}
-                          <span
-                            style={{
-                              fontSize: "16px",
-                              width: "200%",
-                              display: "block",
-                            }}
-                          >
-                            Tổng cộng
-                            {switchChange[index] && account !== null ? (
-                              <span
-                                style={{
-                                  color: "red",
-                                  marginLeft: "117px",
-                                }}
-                              >
-                                {(voucherPrice() + shippingFee).toLocaleString(
-                                  "vi-VN",
-                                  {
-                                    style: "currency",
-                                    currency: "VND",
-                                  }
-                                )}
-                              </span>
-                            ) : (
-                              <span
-                                style={{
-                                  color: "red",
-                                  marginLeft: "117px",
-                                }}
-                              >
-                                {voucherPrice().toLocaleString("vi-VN", {
-                                  style: "currency",
-                                  currency: "VND",
-                                })}
-                              </span>
-                            )}
-                          </span>
-                          {selectedButton !== 2 && (
-                            <span
-                              style={{
-                                fontSize: "16px",
-                                width: "200%",
-                                display: "block",
-                              }}
-                            >
-                              Số tiền khách trả
-                              <input
-                                type="number"
-                                className={styles.input}
-                                onChange={(e) => handleChangeInput(e, index)}
-                              />
-                              {inputError && (
-                                <span className={styles.error}>
-                                  {inputError}
-                                </span>
                               )}
-                            </span>
-                          )}
-                          {selectedButton === 2 && (
-                            <Input
-                              placeholder="Nhập mã giao dịch"
-                              size="large"
-                              onChange={(e) =>
-                                setTransactionCode(e.target.value)
-                              }
-                              style={{ margin: "10px 0", width: "380px" }}
-                            />
-                          )}
-                          {selectedButton !== 2 && (
-                            <span
-                              style={{
-                                fontSize: "16px",
-                                width: "200%",
-                                display: "block",
-                              }}
-                            >
-                              Tiền thừa trả khách
-                              <span style={{ marginLeft: "59px" }}>
-                                <span style={{ color: "red" }}>
+                            </Col>
+                          </Row>
+                          {
+                            selectedButton !== 2 &&
+                            <Row>
+                              <Col span={16}>
+                                <span style={{ fontSize: "16px", width: '200%', display: "block" }}>
+                                  Số tiền khách trả
+                                </span>
+                              </Col>
+                              <Col span={8}>
+                                <input type="number"
+                                  style={{ marginLeft: '100px' }}
+                                  className={styles.input}
+                                  onChange={(e) => handleChangeInput(e, index)} />
+                                {inputError && <span style={{ marginLeft: '100px', width: '200%' }} className={styles.error}>{inputError}</span>}
+                              </Col>
+                            </Row>
+                          }
+                          {
+                            selectedButton === 2 && <>
+                              <Input
+                                placeholder="Nhập mã giao dịch"
+                                size="large"
+                                onChange={(e) => setTransactionCode(e.target.value)}
+                                style={{ margin: '10px 0', width: '380px' }} />
+                              <span style={{ fontSize: '16px', color: 'red' }}>{inputError}</span>
+                            </>
+                          }
+                          {
+                            selectedButton !== 2 &&
+                            <Row>
+                              <Col span={16}>
+                                <span style={{ fontSize: "16px", width: '200%' }}>
+                                  Tiền thừa
+                                </span >
+                              </Col>
+                              <Col span={8}>
+                                <span style={{ fontSize: '16px', marginLeft: '100px', color: "red" }}>
+
                                   {remainAmount.toLocaleString("vi-VN", {
                                     style: "currency",
                                     currency: "VND",
                                   })}
                                 </span>
-                              </span>
-                            </span>
-                          )}
-                        </Col>
+                              </Col >
+                            </Row >}
+                        </Col >
                         <TextArea
                           onChange={(e) => setNote(e.target.value)}
                           rows={3}
@@ -1155,9 +1223,8 @@ const Bill = () => {
                         <div style={{ marginTop: "20px" }}>
                           <div className={styles.buttonGroup}>
                             <Button
-                              className={`${styles.cashButton} ${
-                                selectedButton === 1 ? styles.selected : ""
-                              }`}
+                              className={`${styles.cashButton} ${selectedButton === 1 ? styles.selected : ""
+                                }`}
                               icon={<DollarOutlined />}
                               onClick={() => handleButtonClick(1)}
                             >
@@ -1165,18 +1232,16 @@ const Bill = () => {
                             </Button>
                             <Button
                               style={{ margin: "0 10px" }}
-                              className={`${styles.cashButton} ${
-                                selectedButton === 2 ? styles.selected : ""
-                              }`}
+                              className={`${styles.cashButton} ${selectedButton === 2 ? styles.selected : ""
+                                }`}
                               icon={<SwapOutlined />}
                               onClick={() => handleButtonClick(2)}
                             >
                               Chuyển khoản
                             </Button>
                             <Button
-                              className={`${styles.cashButton} ${
-                                selectedButton === 3 ? styles.selected : ""
-                              }`}
+                              className={`${styles.cashButton} ${selectedButton === 3 ? styles.selected : ""
+                                }`}
                               onClick={() => handleButtonClick(3)}
                             >
                               Cả hai
@@ -1192,14 +1257,14 @@ const Bill = () => {
                             Xác nhận thanh toán
                           </Button>
                         </div>
-                      </Row>
-                    </Col>
-                  </Row>
-                </div>
-              </Tabs.TabPane>
+                      </Row >
+                    </Col >
+                  </Row >
+                </div >
+              </Tabs.TabPane >
             );
           })}
-      </Tabs>
+      </Tabs >
     </>
   );
 };

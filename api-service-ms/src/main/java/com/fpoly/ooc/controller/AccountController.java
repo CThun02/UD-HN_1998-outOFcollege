@@ -95,8 +95,8 @@ public class AccountController {
     }
 
     @GetMapping("/getAllCustomer")
-    public ResponseEntity<?> getAllCustomer(){
-        return ResponseEntity.ok(service.getAllCustomer());
+    public ResponseEntity<?> getAllCustomer(@RequestParam String keyword){
+        return ResponseEntity.ok(service.getAllCustomer(keyword));
     }
 
 }

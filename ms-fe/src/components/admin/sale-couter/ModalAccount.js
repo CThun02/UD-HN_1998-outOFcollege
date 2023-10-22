@@ -1,8 +1,11 @@
-import { Button, Modal, Table } from "antd";
+import { SearchOutlined } from "@ant-design/icons";
+import { Button, Col, Modal, Row, Table } from "antd";
+import Input from "antd/es/input/Input";
 import axios from "axios";
 import React from "react";
 import { useState } from "react";
 import { useEffect } from "react";
+import styles from "./search.module.css";
 
 const ModalAccount = ({
   visible,
@@ -31,6 +34,14 @@ const ModalAccount = ({
 
   const columns = [
     {
+      title: "#",
+      dataIndex: "index",
+      key: "index",
+      render: (text, record, index) => {
+        return index + 1;
+      },
+    },
+    {
       title: "Tên",
       dataIndex: "fullName",
       key: "fullname",
@@ -39,6 +50,11 @@ const ModalAccount = ({
       title: "Email",
       dataIndex: "email",
       key: "email",
+    },
+    {
+      title: "Số điện thoại",
+      dataIndex: "numberPhone",
+      key: "numberPhone",
     },
     {
       title: "Giới tính",
@@ -54,7 +70,9 @@ const ModalAccount = ({
       render: (_, record) => {
         return (
           <div>
-            <Button onClick={() => add(record)}>Thêm</Button>
+            <Button type="primary" onClick={() => add(record)}>
+              Chọn
+            </Button>
           </div>
         );
       },
@@ -62,13 +80,25 @@ const ModalAccount = ({
   ];
 
   const [data, setData] = useState([]);
+  function filter(keyword) {
+    axios
+      .get(
+        `http://localhost:8080/api/admin/account/getAllCustomer?keyword=${keyword}`
+      )
+      .then((response) => {
+        setData(response.data);
+        setLoadding(false);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
   useEffect(() => {
     axios
       .get(`http://localhost:8080/api/admin/account/getAllCustomer`)
       .then((response) => {
         setData(response.data);
         setLoadding(false);
-        console.log(response.data);
       })
       .catch((error) => {
         console.log(error);
@@ -87,18 +117,32 @@ const ModalAccount = ({
         footer={null}
         width={1000}
       >
-        <Table
-          pagination={false}
-          columns={columns}
-          dataSource={
-            data &&
-            data.map((record, index) => ({
-              ...record,
-              key: record.id,
-            }))
-          }
-          loading={loading}
-        />
+        <Row>
+          <Col span={12} style={{ marginBottom: "12px" }}>
+            <Input
+              className={styles.filter_inputSearch}
+              placeholder="Nhập tên, số điện thoại khách hàng"
+              prefix={<SearchOutlined />}
+              onChange={(event) => {
+                filter(event.target.value);
+              }}
+            />
+          </Col>
+          <Col span={24}>
+            <Table
+              pagination={false}
+              columns={columns}
+              dataSource={
+                data &&
+                data.map((record, index) => ({
+                  ...record,
+                  key: record.id,
+                }))
+              }
+              loading={loading}
+            />
+          </Col>
+        </Row>
       </Modal>
     </div>
   );

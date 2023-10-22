@@ -20,8 +20,9 @@ public interface AccountRepository extends JpaRepository<Account, String> {
             "FROM Account a where a.role.id=?1")
     List<AccountResponce> getAllByRoleId(Long roleId);
 
-    @Query("SELECT a FROM Account a where a.role.id=?1")
-    List<Account> getAllAccountByRoleId(Long roleId);
+    @Query("SELECT a FROM Account a where a.role.id=?1 and ((a.fullName like ?2 or ?2 is null) " +
+            "or (a.numberPhone like?2 or ?2 is null ))")
+    List<Account> getAllAccountByRoleId(Long roleId, String keyword);
 
     @Query(value = "select email from account " +
             "left join role on account.role_id = role.id " +

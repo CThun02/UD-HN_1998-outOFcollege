@@ -1,7 +1,10 @@
 import { text } from "@fortawesome/fontawesome-svg-core";
-import { Button, Modal, Table } from "antd";
+import { Button, Col, Modal, Row, Table } from "antd";
 import axios from "axios";
+import styles from "./search.module.css";
 import React, { useEffect, useState } from "react";
+import Input from "antd/es/input/Input";
+import { SearchOutlined } from "@ant-design/icons";
 
 const ModalAddress = ({
   isModalOpen,
@@ -42,7 +45,9 @@ const ModalAddress = ({
       render: (_, record, index) => {
         return (
           <div>
-            <Button onClick={() => handleSelectAddress(record)}>Chọn</Button>
+            <Button type="primary" onClick={() => handleSelectAddress(record)}>
+              Chọn
+            </Button>
           </div>
         );
       },
@@ -65,19 +70,32 @@ const ModalAddress = ({
         onCancel={handleCancel}
         footer={null}
         width={1000}
+        title="Tìm kiếm địa chỉ"
       >
-        <Table
-          columns={columns}
-          dataSource={
-            address &&
-            address.map((record, index) => ({
-              ...record,
-              key: record.id,
-            }))
-          }
-          pagination={false}
-          closeIcon
-        />
+        <Row>
+          <Col span={12} style={{ marginBottom: "12px" }}>
+            <Input
+              className={styles.filter_inputSearch}
+              placeholder="Nhập địa chỉ"
+              prefix={<SearchOutlined />}
+              onChange={(event) => {}}
+            />
+          </Col>
+          <Col span={24}>
+            <Table
+              columns={columns}
+              dataSource={
+                address &&
+                address.map((record, index) => ({
+                  ...record,
+                  key: record.id,
+                }))
+              }
+              pagination={false}
+              closeIcon
+            />
+          </Col>
+        </Row>
       </Modal>
     </div>
   );

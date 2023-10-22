@@ -1,0 +1,10 @@
+.filter_inputSearch {
+  border-radius: 0;
+  box-shadow: none;
+  border: none;
+  border-bottom: 1px solid #ccc;
+}
+
+.filter_inputSearch span:focus {
+  border: none;
+}

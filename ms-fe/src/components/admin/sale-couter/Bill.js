@@ -684,15 +684,6 @@ const Bill = () => {
         title: "Xác nhận thanh toán",
         content: "Bạn có chắc chắn muốn thanh toán?",
         onOk() {
-          if (account !== null && switchChange[index]) {
-            axios.post(`http://localhost:8080/api/admin/address`, billAddress)
-              .then((response) => {
-
-              })
-              .catch((error) => {
-                console.log(error)
-              })
-          }
           axios
             .post("http://localhost:8080/api/admin/bill", bill)
             .then((response) => {

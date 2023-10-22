@@ -7,24 +7,25 @@ import com.fpoly.ooc.entity.Account;
 import com.fpoly.ooc.entity.Address;
 import com.fpoly.ooc.entity.Bill;
 import com.fpoly.ooc.entity.BillDetail;
-import com.fpoly.ooc.entity.DeliveryNote;
 import com.fpoly.ooc.entity.Payment;
 import com.fpoly.ooc.entity.PaymentDetail;
 import com.fpoly.ooc.entity.ProductDetail;
 import com.fpoly.ooc.entity.Timeline;
 import com.fpoly.ooc.entity.VoucherHistory;
 import com.fpoly.ooc.exception.NotFoundException;
+import com.fpoly.ooc.repository.AddressRepository;
 import com.fpoly.ooc.repository.BillDetailRepo;
 import com.fpoly.ooc.repository.BillRepo;
-import com.fpoly.ooc.repository.DeliveryNoteRepo;
 import com.fpoly.ooc.repository.PaymentDetailRepo;
 import com.fpoly.ooc.repository.TimeLineRepo;
 import com.fpoly.ooc.repository.VoucherHistoryRepository;
+import com.fpoly.ooc.request.DeliveryNoteRequest;
 import com.fpoly.ooc.request.bill.BillDetailRequest;
 import com.fpoly.ooc.request.bill.BillRequest;
 import com.fpoly.ooc.responce.account.GetListCustomer;
 import com.fpoly.ooc.responce.bill.BillManagementResponse;
 import com.fpoly.ooc.service.interfaces.BillService;
+import com.fpoly.ooc.service.interfaces.DeliveryNoteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,10 +49,13 @@ public class BillServiceImpl implements BillService {
     private TimeLineRepo timeLineRepo;
 
     @Autowired
-    private DeliveryNoteRepo deliveryNoteRepo;
+    private DeliveryNoteService deliveryNoteService;
 
     @Autowired
     private VoucherHistoryRepository voucherHistoryRepository;
+
+    @Autowired
+    private AddressRepository addressRepository;
 
 
     @Transactional(rollbackFor = Exception.class)
@@ -96,21 +100,32 @@ public class BillServiceImpl implements BillService {
                 .build();
         paymentDetailRepo.save(paymentDetail);
 
-        DeliveryNote deliveryNote = DeliveryNote.builder()
-                .bill(bill)
-                .address(request.getAddressId() == null ? null :
-                        Address.builder().id(request.getAddressId()).build())
-                .shipDate(request.getShipDate())
-                .shipPrice(request.getShipPrice())
-                .build();
-        deliveryNoteRepo.save(deliveryNote);
-
         for (int i = 0; i < 2; i++) {
             String n = String.valueOf((i + 1));
             Timeline timeline = new Timeline();
             timeline.setBill(bill);
             timeline.setStatus(n);
             timeLineRepo.save(timeline);
+        }
+
+        if (bill.getSymbol() == "Shipping" && bill.getAccount() == null) {
+
+            Address address = Address.builder()
+                    .city(request.getCity())
+                    .district(request.getDistrict())
+                    .ward(request.getWard())
+                    .fullName(request.getFullname())
+                    .sdt(request.getPhoneNumber())
+                    .build();
+            addressRepository.save(address);
+
+            DeliveryNoteRequest deliveryNoteRequest = DeliveryNoteRequest.builder()
+                    .billId(bill)
+                    .addressId(address)
+                    .shipDate(request.getShipDate())
+                    .shipPrice(request.getShipPrice())
+                    .build();
+            deliveryNoteService.createDeliveryNote(deliveryNoteRequest);
         }
 
         VoucherHistory voucherHistory = VoucherHistory.builder()

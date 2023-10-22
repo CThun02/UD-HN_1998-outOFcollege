@@ -100,8 +100,6 @@ public class BillServiceImpl implements BillService {
                 .bill(bill)
                 .address(request.getAddressId() == null ? null :
                         Address.builder().id(request.getAddressId()).build())
-                .name(request.getFullname())
-                .phoneNumber(request.getPhoneNumber())
                 .shipDate(request.getShipDate())
                 .shipPrice(request.getShipPrice())
                 .build();

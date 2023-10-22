@@ -41,7 +41,7 @@ public interface TimeLineRepo extends JpaRepository<Timeline, Long> {
             "    b.price, b.priceReduce, dn.shipPrice, b.amountPaid, dn.shipDate, pd.payment.paymentName, b.createdAt, " +
             "    add.descriptionDetail +  ' ' + add.ward + ' ' + add.district + ' ' + add.city) " +
             "FROM Bill b " +
-            "   LEFT JOIN DeliveryNote dn ON b.id = dn.bill.id   " +
+            "   LEFT JOIN DeliveryNote dn ON b.id = dn.bill.id " +
             "   LEFT JOIN Address add ON add.id = dn.address.id " +
             "   LEFT JOIN PaymentDetail pd ON pd.bill.id = b.id " +
             "WHERE b.id = :billId")

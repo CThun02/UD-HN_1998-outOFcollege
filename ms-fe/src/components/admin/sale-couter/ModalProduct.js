@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { Modal, Input, Select, Button, Table } from "antd";
+import React from "react";
+import { Modal } from "antd";
 import styles from "./ModalProduct.module.css";
 import ProductDetails from "../product/ProductDetails";
 import { now } from "moment";
 
 const ModalProduct = ({ visible, onCancel, cartId, render }) => {
-  const [renderThis, setRenderThis] = useState(null);
   var cart = JSON.parse(localStorage.getItem(cartId));
   let productDetailsCreate = cart.productDetails;
   function action() {

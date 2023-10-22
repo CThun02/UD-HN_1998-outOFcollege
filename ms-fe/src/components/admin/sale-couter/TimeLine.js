@@ -303,64 +303,119 @@ const BillTimeLine = (addId) => {
                     <Col span={12}>
                         <Row>
                             <Col span={12}>
-                                <span className={styles.span}>Mã đơn hàng</span>
-                                <span className={styles.span}>HÌnh thức mùa hàng</span>
-                                <span className={styles.span}>Ngày mua hàng</span>
-                                <span className={styles.span}>Mã giao dịch</span>
-                                {billInfo?.symbol === 'Shipping' && <>
-                                    <span className={styles.span}>Phương thức thanh toán</span>
-                                    <span className={styles.span}>Hình thức giao hàng </span>
-                                    <span style={{ fontSize: '16px', display: 'block' }}>Ngày nhận hàng dự kiến</span></>}
+                                <span >Mã đơn hàng</span>
                             </Col>
                             <Col span={12}>
-                                <div style={{ display: 'flex', alignItems: 'center', width: '10px', margin: '20px 0 20px 0' }}>
-                                    <SpanBorder child={billInfo.billCode} color={'#1677ff'} />
-                                </div>
-                                <div style={{ display: 'flex', alignItems: 'center', width: '10px', margin: '20px 0 20px 0' }}>
-                                    <SpanBorder child={billInfo.symbol} color={'#1677ff'} />
-                                </div>
-                                <div style={{ display: 'flex', alignItems: 'center', width: '10px', marginBottom: '20px' }}>
-                                    <SpanBorder child={moment(billInfo.createdDate).format('HH:mm:ss  DD/MM/YYYY')} color={'#1677ff'} />
-                                </div>
-                                <div style={{ display: 'flex', alignItems: 'center', width: '10px', marginBottom: '20px' }}>
-                                    <SpanBorder child={billInfo?.transaction || '__'} color={'#1677ff'} />
-                                </div>
-                                {billInfo?.symbol === 'Shipping' && <>
-                                    <div style={{ display: 'flex', alignItems: 'center', width: '10px', marginBottom: '20px' }}>
-                                        <SpanBorder child={billInfo?.paymentName || '__'} color={'#1677ff'} />
-                                    </div>
-                                    <div style={{ display: 'flex', alignItems: 'center', width: '50px' }}>
-                                        {billInfo.symbol === "Shipping" && (
-                                            <SpanBorder child={'Giao hàng tại nhà'} color={'gray'} />
-                                        )}
-                                        {billInfo.symbol !== 'Shipping' && "__"}
-                                    </div>
-                                    <div style={{ display: 'flex', alignItems: 'center', width: '50px', marginTop: '20px' }}>
-                                        {moment(billInfo?.shipDate).format('DD/MM/YYYY') || '__'}
-                                    </div></>}
+                                <SpanBorder child={billInfo.billCode} color={'#1677ff'} />
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col span={12}>
+                                <span >Hình thức mùa hàng</span>
+                            </Col>
+                            <Col span={12}>
+                                <SpanBorder child={billInfo.symbol} color={'#1677ff'} />
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col span={12}>
+                                <span >Ngày mua hàng</span>
+                            </Col>
+                            <Col span={12}>
+                                <SpanBorder child={moment(billInfo.createdDate).format('HH:mm:ss  DD/MM/YYYY')} color={'#1677ff'} />
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col span={12}>
+                                <span >Mã giao dịch</span>
+                            </Col>
+                            <Col span={12}>
+                                <SpanBorder child={billInfo?.transaction || '__'} color={'#1677ff'} />
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col span={12}>
+                                <span >Phương thức thanh toán</span>
+                            </Col>
+                            <Col span={12}>
+                                <SpanBorder child={billInfo?.paymentName || '__'} color={'#1677ff'} />
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col span={12}>
+                                <span  >Hình thức giao hàng </span>
+                            </Col>
+                            <Col span={12}>
+                                <SpanBorder child={'Giao hàng tại nhà'} color={'gray'} />
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col span={12}>
+                                <span >
+                                    Ngày nhận hàng dự kiến
+                                </span>
+                            </Col>
+                            <Col span={12}>
+                                <span >
+                                    {moment(billInfo?.shipDate).format('DD/MM/YYYY') || '__'}
+                                </span>
                             </Col>
                         </Row>
                     </Col>
                     <Col span={11}>
                         <Row>
-                            <Col span={8}>
-                                <span className={styles.span}>Tên khách hàng</span>
-                                <span className={styles.span}>Số diện thoại</span>
-                                <span className={styles.span}>Địa chỉ</span>
-                                <div style={{ marginTop: '42px' }}></div>
-                                <span className={styles.span} >Số tiền khách trả</span>
-                                <span className={styles.span}>Tiền thừa</span>
+                            <Col span={24}>
+                                <Row>
+                                    <Col span={10}>
+                                        <h6>Tên khách hàng</h6>
+                                    </Col>
+                                    <Col span={14}>
+                                        <span >{billInfo.fullName || 'khách lẻ'}</span>
+                                    </Col>
+                                </Row>
                             </Col>
-                            <Col span={12}>
-                                <span className={styles.span}>{billInfo.fullName || 'khách lẻ'}</span>
-                                <span className={styles.span}>{billInfo.phoneNumber || '__'}</span>
-                                <span className={styles.span}>{billInfo?.address?.replace(/[0-9|-]/g, "") || '__'}</span>
-                                <div style={{ marginTop: '42px' }}></div>
-                                <span className={styles.span}>{billInfo.amountPaid || '__'}</span>
-                                <span className={styles.span}>
-                                    {(billInfo?.amountPaid + billInfo?.priceReduce - billInfo.shipPrice - billInfo.totalPrice
-                                    ) || '0đ'}
-                                </span>
+                            <Col span={24}>
+                                <Row>
+                                    <Col span={10}>
+                                        <span >Số diện thoại</span>
+                                    </Col>
+                                    <Col span={14}>
+                                        <span >{billInfo.phoneNumber || '__'}</span>
+                                    </Col>
+                                </Row>
+                            </Col>
+                            <Col span={24}>
+                                <Row>
+                                    <Col span={10}>
+                                        <span >Địa chỉ</span>
+                                    </Col>
+                                    <Col span={14}>
+                                        <span >{billInfo?.address?.replace(/[0-9|-]/g, "") || '__'}</span>
+                                    </Col>
+                                </Row>
+                            </Col>
+                            <Col span={24}>
+                                <Row>
+                                    <Col span={10}>
+                                        <span  >Số tiền khách trả</span>
+                                    </Col>
+                                    <Col span={14}>
+                                        <span >{billInfo.amountPaid || '__'}</span>
+                                    </Col>
+                                </Row>
+                            </Col>
+                            <Col span={24}>
+                                <Row>
+                                    <Col span={10}>
+                                        <span >Tiền thừa</span>
+                                    </Col>
+                                    <Col span={14}>
+                                        <span >
+                                            {(billInfo?.amountPaid + billInfo?.priceReduce - billInfo.shipPrice - billInfo.totalPrice
+                                            ) || '0đ'}
+                                        </span>
+                                    </Col>
+                                </Row>
                             </Col>
                         </Row>
                     </Col>

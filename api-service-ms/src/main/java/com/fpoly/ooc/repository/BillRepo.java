@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -49,7 +50,9 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
             @Param("symbol") String symbol);
 
     @Modifying
-    @Query("UPDATE Bill b SET b.status = :status WHERE b.id = :id")
-    Integer update(@Param("status") String status, @Param("id") Long id);
+    @Query("UPDATE Bill b SET b.status = :status, b.amountPaid = :amountPaid WHERE b.id = :id")
+    Integer update(@Param("status") String status,
+                   @Param("amountPaid") BigDecimal amountPaid,
+                   @Param("id") Long id);
 
 }

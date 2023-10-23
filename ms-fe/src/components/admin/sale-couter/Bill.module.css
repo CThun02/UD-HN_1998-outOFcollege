@@ -161,3 +161,14 @@ btn:hover {
   width: 100px;
   justify-content: center;
 }
+
+.input_noneBorder {
+  border-radius: 0;
+  box-shadow: none;
+  border: none;
+  border-bottom: 1px solid #ccc;
+}
+
+.input_noneBorder span:focus {
+  border: none;
+}

@@ -24,10 +24,6 @@ public class BillInfoResponse {
 
     private String billType;
 
-    private String fullName;
-
-    private String phoneNumber;
-
     private BigDecimal totalPrice;
 
     private BigDecimal priceReduce;
@@ -41,6 +37,10 @@ public class BillInfoResponse {
     private String paymentName;
 
     private LocalDateTime createdDate;
+
+    private String fullName;
+
+    private String phoneNumber;
 
     private String address;
 

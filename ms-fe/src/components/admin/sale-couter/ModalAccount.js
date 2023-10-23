@@ -94,15 +94,7 @@ const ModalAccount = ({
       });
   }
   useEffect(() => {
-    axios
-      .get(`http://localhost:8080/api/admin/account/getAllCustomer`)
-      .then((response) => {
-        setData(response.data);
-        setLoadding(false);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    filter("All")
   }, [renderThis]);
   return (
     <div>

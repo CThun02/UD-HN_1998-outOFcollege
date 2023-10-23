@@ -212,7 +212,7 @@ function Voucher() {
       key: "voucherValue",
     },
     {
-      title: "Đối tượng sử dụng",
+      title: "Đối tượng",
       dataIndex: "objectUse",
       key: "objectUse",
     },

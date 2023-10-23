@@ -36,11 +36,13 @@ public class BillController {
             @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Optional<LocalDate> startDate,
             @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Optional<LocalDate> endDate,
             @RequestParam(value = "status", required = false) String status,
-            @RequestParam(value = "billType", required = false) String billType) {
+            @RequestParam(value = "billType", required = false) String billType,
+            @RequestParam(value = "symbol", required = false) String symbol) {
         LocalDateTime startDateTime = startDate.map(date -> LocalDateTime.of(date, LocalTime.MIN)).orElse(null);
         LocalDateTime endDateTime = endDate.map(date -> LocalDateTime.of(date, LocalTime.MAX)).orElse(null);
 
-        return ResponseEntity.ok(billService.getAllBillManagement(billCode, startDateTime, endDateTime, status, billType));
+        return ResponseEntity.ok(billService.getAllBillManagement(billCode, startDateTime, endDateTime,
+                status, billType, symbol));
     }
 
     @PostMapping()

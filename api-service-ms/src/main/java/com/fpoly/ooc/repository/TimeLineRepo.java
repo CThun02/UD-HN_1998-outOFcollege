@@ -16,7 +16,6 @@ public interface TimeLineRepo extends JpaRepository<Timeline, Long> {
 
     @Query("SELECT DISTINCT new com.fpoly.ooc.responce.timeline.TimeLineResponse(t.id, t.bill.id, t.note, t.status, " +
             "   t.createdAt, t.createdBy, t.bill.billType, p.paymentName, b.status, b.completionDate, b.price, " +
-            "   dn.name, dn.phoneNumber, " +
             "   add.descriptionDetail + ' ' + add.ward + ' ' + add.district + ' ' + add.city )" +
             "FROM Timeline t " +
             "   LEFT JOIN Bill b ON t.bill.id = b.id " +
@@ -31,17 +30,19 @@ public interface TimeLineRepo extends JpaRepository<Timeline, Long> {
 
     @Query("SELECT new com.fpoly.ooc.responce.timeline.TimelineProductResponse(" +
             "   pd.product.imgDefault, pd.product.productName, bd.quantity, bd.price, pd.size.sizeName, pd.color.colorCode," +
-            "   pd.button.buttonName, pd.collar.collarTypeName, pd.material.materialName, pd.sleeve.sleeveName, pd.shirtTail.shirtTailTypeName )" +
+            "   pd.button.buttonName, pd.collar.collarTypeName, pd.material.materialName, pd.sleeve.sleeveName, " +
+            "   pd.shirtTail.shirtTailTypeName, pd.color.colorName, pd.form.formName, pd.pattern.patternName )" +
             "FROM ProductDetail pd " +
             "   JOIN BillDetail bd ON bd.productDetail.id = pd.id " +
             "WHERE bd.bill.id = :billId")
     List<TimelineProductResponse> getTimelineProductByBillId(@Param("billId") Long id);
 
-    @Query("SELECT new com.fpoly.ooc.responce.bill.BillInfoResponse(b.id, b.billCode, b.billType, dn.name, dn.phoneNumber, " +
-            "    b.price, b.priceReduce, dn.shipPrice, dn.shipDate, pd.payment.paymentName, b.createdAt, " +
+    @Query("SELECT new com.fpoly.ooc.responce.bill.BillInfoResponse(b.id, b.billCode,b.transactionCode, b.symbol, b.billType, " +
+            "    b.price, b.priceReduce, dn.shipPrice, b.amountPaid, dn.shipDate, pd.payment.paymentName, b.createdAt, " +
+            "    add.fullName, add.sdt," +
             "    add.descriptionDetail +  ' ' + add.ward + ' ' + add.district + ' ' + add.city) " +
             "FROM Bill b " +
-            "   LEFT JOIN DeliveryNote dn ON b.id = dn.bill.id   " +
+            "   LEFT JOIN DeliveryNote dn ON b.id = dn.bill.id " +
             "   LEFT JOIN Address add ON add.id = dn.address.id " +
             "   LEFT JOIN PaymentDetail pd ON pd.bill.id = b.id " +
             "WHERE b.id = :billId")

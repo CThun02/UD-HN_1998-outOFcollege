@@ -3,10 +3,7 @@ package com.fpoly.ooc.service.impl;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
 import com.fpoly.ooc.dto.CustomerConditionDTO;
-import com.fpoly.ooc.entity.Account;
-import com.fpoly.ooc.entity.Address;
-import com.fpoly.ooc.entity.AddressDetail;
-import com.fpoly.ooc.entity.Role;
+import com.fpoly.ooc.entity.*;
 import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.AccountRepository;
 import com.fpoly.ooc.repository.AddressDetailRepository;
@@ -18,6 +15,7 @@ import com.fpoly.ooc.responce.account.AccountVoucher;
 import com.fpoly.ooc.responce.voucher.VoucherResponse;
 import com.fpoly.ooc.service.interfaces.AccountService;
 import com.fpoly.ooc.service.interfaces.AddressDetailService;
+import com.fpoly.ooc.utilities.UniqueRandomHex;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +28,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -56,6 +55,15 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Account save(AccountRequest request) {
+        while(true){
+            String userName= "user_"+ UniqueRandomHex.generateUniqueRandomHex();
+            userName = userName.replace("#", "");
+            Optional<Account> check = accountRepository.findById(userName);
+            if(check.isEmpty()){
+                request.setUsername(userName);
+                break;
+            }
+        };
         Account account = Account.builder()
                 .username(request.getUsername())
                 .avatar(request.getImage())
@@ -72,6 +80,10 @@ public class AccountServiceImpl implements AccountService {
         Account createAccount = accountRepository.save(account);
 
         Address address = Address.builder()
+                .fullName(request.getFullName())
+                .sdt(request.getNumberPhone())
+                .email(request.getEmail())
+                .defaultaddress(true)
                 .city(request.getCity())
                 .descriptionDetail(request.getDescriptionDetail())
                 .district(request.getDistrict())
@@ -175,11 +187,12 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public List<AccountDetailResponce> getAllCustomer() {
+    public List<AccountDetailResponce> getAllCustomer(String keyword) {
         List<AddressDetail> accountAddressDetails = addressDetailService.getAllCustomer();
+        List<Account> accounts = accountRepository.getAllAccountByRoleId(Long.valueOf(2), "%"+keyword+"%");
         List<AccountDetailResponce> lstAccountDetailResponces = new ArrayList<>();
-        for (AddressDetail addressDetail : accountAddressDetails) {
-            Account account = addressDetail.getAccountAddress();
+        for (Account accountGet : accounts) {
+            Account account = accountGet;
             AccountDetailResponce accountDetailResponce = AccountDetailResponce.builder()
                     .image(account.getAvatar())
                     .username(account.getUsername())
@@ -190,14 +203,15 @@ public class AccountServiceImpl implements AccountService {
                     .email(account.getEmail())
                     .numberPhone(account.getNumberPhone())
                     .build();
-
-            List<Address> accountAddressList = accountAddressDetails.stream()
-                    .filter(ad -> ad.getAccountAddress().equals(account))
-                    .map(ad -> ad.getAddressDetail())
-                    .collect(Collectors.toList());
-
-            accountDetailResponce.setAccountAddress(accountAddressList);
+            for (AddressDetail addressDetail : accountAddressDetails) {
+                List<Address> accountAddressList = accountAddressDetails.stream()
+                        .filter(ad -> ad.getAccountAddress().equals(account))
+                        .map(ad -> ad.getAddressDetail())
+                        .collect(Collectors.toList());
+                accountDetailResponce.setAccountAddress(accountAddressList);
+            }
             lstAccountDetailResponces.add(accountDetailResponce);
+
         }
 
         return lstAccountDetailResponces;

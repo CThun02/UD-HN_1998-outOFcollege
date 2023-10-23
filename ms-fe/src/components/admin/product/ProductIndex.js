@@ -48,7 +48,6 @@ const ProductIndex = () => {
       key: "3",
       title: "Tên sản phẩm",
       dataIndex: "productName",
-      width: 300,
     },
     {
       key: "4",
@@ -70,13 +69,11 @@ const ProductIndex = () => {
       key: "5",
       title: "Số lượng",
       dataIndex: "quantity",
-      width: 150,
     },
     {
       key: "6",
       title: "Trạng thái",
       dataIndex: "status",
-      width: 150,
       render: (status, record) => (
         <>
           <Switch
@@ -92,17 +89,11 @@ const ProductIndex = () => {
       key: "7",
       title: "Thao tác",
       dataIndex: "id",
-      width: 150,
       render: (id) => (
         <>
           <Link to={`/admin/product/details/${id}`}>
             <Button className={styles.product__button}>
               <EyeFilled />
-            </Button>
-          </Link>{" "}
-          <Link to={`/admin/product/update-details/${id}`}>
-            <Button className={styles.product__button}>
-              <EditFilled />
             </Button>
           </Link>
         </>

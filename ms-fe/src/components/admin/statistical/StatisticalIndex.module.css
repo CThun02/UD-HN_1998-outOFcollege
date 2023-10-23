@@ -1,0 +1,22 @@
+.bgWhite {
+  background-color: #fff;
+  border: 1px solid #edf2f9;
+  border-radius: 4px;
+  padding: 10px 20px 10px 20px;
+}
+.fixHeightDefault {
+  height: 270px;
+  overflow: auto;
+}
+
+.input_noneBorder {
+  border-radius: 0;
+  box-shadow: none;
+  border: none;
+  border-bottom: 1px solid #ccc;
+  margin: 8px 0;
+}
+
+.input_noneBorder span:focus {
+  border: none;
+}

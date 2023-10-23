@@ -34,7 +34,7 @@ public class ProductImageService implements ProductImageServiceI {
 
     @Override
     public List<ProductImage> getAll() {
-        return null;
+        return repo.findAllProductImages();
     }
 
     @Override
@@ -50,6 +50,11 @@ public class ProductImageService implements ProductImageServiceI {
     @Override
     public List<ProductImageResponse> getProductImageByProductId(Long productId) {
         return repo.getProductImageByProductId(productId);
+    }
+
+    @Override
+    public List<ProductImageResponse> getProductImageDefaultByProductId(Long productId) {
+        return repo.getProductImageDefaultByProductId(productId);
     }
 
 

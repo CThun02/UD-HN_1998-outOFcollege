@@ -1,7 +1,6 @@
 import AccountForm from "./account/AccountForm";
 import CustomerAdmin from "./account/CustomorAdmin";
 import DetailForm from "./account/DetailForm";
-import ProductUpdateDetails from "./product/ProductUpdateDetails";
 import MaterialAdmin from "./material/MaterialAdmin";
 import CollorAdmin from "./collor/ColorAdmin";
 import SleeveAdmin from "./sleeve/SleeveAdmin";
@@ -73,10 +72,6 @@ function AdminPage() {
                 <Route
                   path={"create-details"}
                   element={<ProductCreateDetails />}
-                />
-                <Route
-                  path={"update-details/:productId"}
-                  element={<ProductUpdateDetails />}
                 />
                 {/* ví dụ path= san-pham/hien-thi ->  
                     <Route path="hien-thi" element="el" />

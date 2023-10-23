@@ -21,7 +21,11 @@ public class SleeveServiceImpl implements SleeveServiceI {
 
     @Override
     public SleeveType create(SleeveType sleeveType) {
-        return repo.save(sleeveType);
+        SleeveType sleeveCheck = repo.findFirstBySleeveName(sleeveType.getSleeveName());
+        if(sleeveCheck==null){
+            return repo.save(sleeveType);
+        }
+        return null;
     }
 
     @Override

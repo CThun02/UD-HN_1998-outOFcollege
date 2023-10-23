@@ -1,9 +1,8 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Table, Space, Button, Row, Col, Form, Modal } from "antd";
-import { EyeOutlined, FileOutlined } from "@ant-design/icons";
+import { Table, Space, Button } from "antd";
+import { EyeOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
-import style from "./styles/CustomerIndex.module.css";
 import axios from "axios";
 import Avatar from "antd/es/avatar/avatar";
 function CustomerTable(props) {

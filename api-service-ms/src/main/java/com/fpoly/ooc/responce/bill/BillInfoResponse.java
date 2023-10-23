@@ -18,11 +18,11 @@ public class BillInfoResponse {
 
     private String billCode;
 
+    private String transaction;
+
+    private String symbol;
+
     private String billType;
-
-    private String fullName;
-
-    private String phoneNumber;
 
     private BigDecimal totalPrice;
 
@@ -30,11 +30,17 @@ public class BillInfoResponse {
 
     private BigDecimal shipPrice;
 
+    private BigDecimal amountPaid;
+
     private LocalDateTime shipDate;
 
     private String paymentName;
 
     private LocalDateTime createdDate;
+
+    private String fullName;
+
+    private String phoneNumber;
 
     private String address;
 

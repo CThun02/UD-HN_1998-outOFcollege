@@ -2,7 +2,7 @@ import { Modal, Table } from 'antd'
 import React from 'react'
 import styles from './ModalDetail.module.css'
 import moment from 'moment/moment';
-const ModalDetail = ({ isModalOpen, handleOk, handleCancel, timelineDetail, billType }) => {
+const ModalDetail = ({ isModalOpen, handleOk, handleCancel, timelineDetail, symbol }) => {
     const columns = [
         {
             title: 'STT',
@@ -16,7 +16,7 @@ const ModalDetail = ({ isModalOpen, handleOk, handleCancel, timelineDetail, bill
             dataIndex: 'status',
             key: 'status',
             render: (status) => {
-                if (billType === 'In-store') {
+                if (symbol === 'In-store') {
                     return status === '1'
                         ? 'Chờ xác nhận'
                         : status === '2'
@@ -27,7 +27,7 @@ const ModalDetail = ({ isModalOpen, handleOk, handleCancel, timelineDetail, bill
                     return status === '1'
                         ? 'Chờ xác nhận'
                         : status === '2'
-                            ? 'Chờ xác nhận'
+                            ? 'Đã xác nhận'
                             : status === '3' ? 'Đã giao đóng gói & đang được giao'
                                 : status === '4' ? 'Giao hàng thành công' :
                                     status === '0' ? 'Đã hủy'

@@ -169,9 +169,11 @@ CREATE TABLE product_detail(
 
 CREATE TABLE product_image(
     id                  BIGINT IDENTITY PRIMARY KEY,
-    product_detail_id   BIGINT FOREIGN KEY(product_detail_id) REFERENCES product_detail(id) ,
+    product_id		    BIGINT FOREIGN KEY(product_id) REFERENCES product(id) ,
+	color_id			BIGINT FOREIGN KEY(color_id) REFERENCES color(id) , 
     path                VARCHAR(MAX),
     status              VARCHAR(50),
+	is_default			BIT,
     created_at          DATETIME,
     updated_at          DATETIME,
     created_by          NVARCHAR(50),
@@ -277,12 +279,15 @@ CREATE TABLE address_detail(
 CREATE TABLE bill(
     id                  BIGINT IDENTITY PRIMARY KEY,
     bill_code           VARCHAR(20) UNIQUE,
+    transaction_code    VARCHAR(255), 
     account_id          VARCHAR(100) FOREIGN KEY(account_id) REFERENCES account(username),
     date_of_receipt     DATETIME,
     completion_date     DATETIME,
     price               DECIMAL,
     price_reduce        DECIMAL,
+    amount_paid         DECIMAL,
     bill_type           VARCHAR(50),
+    symbol              VARCHAR(50),
     note                NVARCHAR(MAX),
     status              VARCHAR(50),
     created_at          DATETIME,

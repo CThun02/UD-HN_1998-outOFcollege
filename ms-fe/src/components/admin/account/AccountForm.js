@@ -21,7 +21,11 @@ import { useNavigate } from "react-router-dom";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { saveImage } from "../../../config/FireBase";
 import QRScanner from "./QRScanner";
-import { isFormInputEmpty } from "../product/ValidateForm";
+import {
+  isFormInputEmpty,
+  isEmailCorrectFormat,
+  isValidPhoneNumber,
+} from "../product/ValidateForm";
 import dayjs from "dayjs";
 // Nhập ảnh mã QR
 const MyForm = (props) => {
@@ -36,7 +40,6 @@ const MyForm = (props) => {
   const [visible, setVisible] = useState(false);
   const [accountScan, setAccountScan] = useState({
     idNo: " ",
-    username: " ",
     image: "none",
     fullName: " ",
     email: " ",
@@ -133,64 +136,86 @@ const MyForm = (props) => {
   };
 
   const onFinish = async () => {
-    let check = isFormInputEmpty(accountScan);
-    messageApi.loading("loading", 2);
-    if (!check) {
-      const currentTimeInMillis = new Date().getTime();
-      const imgRef = ref(
-        saveImage,
-        `accounts/${Number(roleId) === 1 ? "employees" : "customers"}/${
-          currentTimeInMillis + accountScan.username
-        }`
-      );
-      let accountAdd = { ...accountScan };
-      for (let key in accountAdd) {
-        if (typeof accountAdd[key] === "string") {
-          accountAdd[key] = accountAdd[key].trim();
-        }
+    for (let key in accountScan) {
+      if (typeof accountScan[key] === "string") {
+        handleSetAccountScan(key, accountScan[key].trim());
       }
-      uploadBytes(imgRef, imageFile)
-        .then(() => {
-          return getDownloadURL(imgRef);
-        })
-        .then((url) => {
-          console.log("Đường dẫn tham chiếu:", url);
-          accountAdd.image = url;
-        })
-        .then(() => {
-          try {
-            // Gửi yêu cầu POST đến API
-            const response = axios.post(
-              "http://localhost:8080/api/admin/account/create",
-              accountAdd
+    }
+    let check = isFormInputEmpty(accountScan);
+    if (!check) {
+      if (isEmailCorrectFormat(accountScan.email)) {
+        notification.error({
+          message: "Thông báo",
+          description: "Email nhập không đúng định dạng!",
+        });
+      } else if (isValidPhoneNumber(accountScan.numberPhone)) {
+        notification.error({
+          message: "Thông báo",
+          description: "Số điện thoại nhập không đúng định dạng!",
+        });
+      } else {
+        Modal.confirm({
+          title: "Xác nhận cập nhật",
+          content: "Bạn có chắc chắn muốn Thêm mới không?",
+          okText: "Thêm mới",
+          cancelText: "Hủy bỏ",
+          onOk: () => {
+            messageApi.loading("loading", 2);
+            const currentTimeInMillis = new Date().getTime();
+            const imgRef = ref(
+              saveImage,
+              `accounts/${Number(roleId) === 1 ? "employees" : "customers"}/${
+                currentTimeInMillis + accountScan.username
+              }`
             );
-            setTimeout(() => {
-              notification.open({
-                message: "Notification",
-                description: `Thêm mới ${
-                  Number(roleId) === 1 ? "nhân viên" : "khách hàng"
-                } thành công`,
-                icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
+            let accountAdd = { ...accountScan };
+            for (let key in accountAdd) {
+              if (typeof accountAdd[key] === "string") {
+                accountAdd[key] = accountAdd[key].trim();
+              }
+            }
+            uploadBytes(imgRef, imageFile)
+              .then(() => {
+                return getDownloadURL(imgRef);
+              })
+              .then((url) => {
+                accountAdd.image = url;
+              })
+              .then(() => {
+                try {
+                  // Gửi yêu cầu POST đến API
+                  const response = axios.post(
+                    "http://localhost:8080/api/admin/account/create",
+                    accountAdd
+                  );
+                  setTimeout(() => {
+                    notification.open({
+                      message: "Notification",
+                      description: `Thêm mới ${
+                        Number(roleId) === 1 ? "nhân viên" : "khách hàng"
+                      } thành công`,
+                      icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
+                    });
+                    navigate(
+                      `/admin/${Number(roleId) === 1 ? "employee" : "customer"}`
+                    );
+                  }, 2000);
+                } catch (error) {
+                  console.error(error);
+                }
+              })
+              .catch((error) => {
+                console.error("Lỗi khi tải lên ảnh:", error);
               });
-              navigate(
-                `/admin/${Number(roleId) === 1 ? "employee" : "customer"}`
-              );
-            }, 2000);
-          } catch (error) {
-            console.error(error);
-          }
-        })
-        .catch((error) => {
-          console.error("Lỗi khi tải lên ảnh:", error);
+          },
         });
+      }
     } else {
-      setTimeout(() => {
-        notification.open({
-          type: "error",
-          message: "Notification",
-          description: `Vui lòng nhập hết cách trường`,
-        });
-      }, 2000);
+      notification.open({
+        type: "error",
+        message: "Notification",
+        description: `Vui lòng nhập hết các trường`,
+      });
     }
 
     // Xử lý khi gửi form thành công
@@ -334,6 +359,7 @@ const MyForm = (props) => {
                     onChange={(event) =>
                       handleSetAccountScan("email", event.target.value)
                     }
+                    required={true}
                     status={accountScan.email === "" ? "error" : ""}
                   />
                 </div>
@@ -344,13 +370,13 @@ const MyForm = (props) => {
             <Row style={{ paddingBottom: "16px" }}>
               <Col span={8}>
                 <div className="m-5">
-                  <h6>Tên tài khoản</h6>
+                  <h6> Họ và tên</h6>
                   <Input
-                    value={accountScan.username}
+                    value={accountScan.fullName}
                     onChange={(event) =>
-                      handleSetAccountScan("username", event.target.value)
+                      handleSetAccountScan("fullName", event.target.value)
                     }
-                    status={accountScan.username === "" ? "error" : ""}
+                    status={accountScan.fullName === "" ? "error" : ""}
                   />
                 </div>
               </Col>
@@ -383,138 +409,115 @@ const MyForm = (props) => {
               </Col>
             </Row>
           </Col>
-
           <Col span={24}>
             <Row style={{ paddingBottom: "16px" }}>
               <Col span={8}>
                 <div className="m-5">
-                  <h6> Tên Nhân Viên</h6>
-                  <Input
-                    value={accountScan.fullName}
-                    onChange={(event) =>
-                      handleSetAccountScan("fullName", event.target.value)
+                  <h6>Tỉnh/Thành phố</h6>
+                  <Select
+                    showSearch
+                    style={{ width: "100%" }}
+                    size="medium"
+                    onChange={(event) => {
+                      fetchDistricts(event.substring(event.indexOf("|") + 1));
+                      handleSetAccountScan("city", event);
+                    }}
+                    optionFilterProp="children"
+                    filterOption={(input, option) =>
+                      (option?.label ?? "").includes(input)
                     }
-                    status={accountScan.fullName === "" ? "error" : ""}
-                  />
+                    filterSort={(optionA, optionB) =>
+                      (optionA?.label ?? "")
+                        .toLowerCase()
+                        .localeCompare((optionB?.label ?? "").toLowerCase())
+                    }
+                    status={accountScan.city === "" ? "error" : ""}
+                  >
+                    {provinces &&
+                      provinces.map((province) => (
+                        <Select.Option
+                          key={province.ProvinceID}
+                          value={
+                            province.ProvinceName + "|" + province.ProvinceID
+                          }
+                          label={province.ProvinceName}
+                        >
+                          {province.ProvinceName}
+                        </Select.Option>
+                      ))}
+                  </Select>
                 </div>
               </Col>
-              <Col span={16}>
-                <Row>
-                  <Col span={8}>
-                    <div className="m-5">
-                      <h6>Tỉnh/Thành phố</h6>
-                      <Select
-                        showSearch
-                        style={{ width: "100%" }}
-                        size="medium"
-                        onChange={(event) => {
-                          fetchDistricts(
-                            event.substring(event.indexOf("|") + 1)
-                          );
-                          handleSetAccountScan("city", event);
-                        }}
-                        optionFilterProp="children"
-                        filterOption={(input, option) =>
-                          (option?.label ?? "").includes(input)
-                        }
-                        filterSort={(optionA, optionB) =>
-                          (optionA?.label ?? "")
-                            .toLowerCase()
-                            .localeCompare((optionB?.label ?? "").toLowerCase())
-                        }
-                        status={accountScan.city === "" ? "error" : ""}
-                      >
-                        {provinces &&
-                          provinces.map((province) => (
-                            <Select.Option
-                              key={province.ProvinceID}
-                              value={
-                                province.ProvinceName +
-                                "|" +
-                                province.ProvinceID
-                              }
-                              label={province.ProvinceName}
-                            >
-                              {province.ProvinceName}
-                            </Select.Option>
-                          ))}
-                      </Select>
-                    </div>
-                  </Col>
-                  <Col span={8}>
-                    <div className="m-5">
-                      <h6>Quận/huyện</h6>
-                      <Select
-                        showSearch
-                        style={{ width: "100%" }}
-                        size="medium"
-                        onChange={(event) => {
-                          fetchWard(event.substring(event.indexOf("|") + 1));
-                          handleSetAccountScan("district", event);
-                        }}
-                        optionFilterProp="children"
-                        filterOption={(input, option) =>
-                          (option?.label ?? "").includes(input)
-                        }
-                        filterSort={(optionA, optionB) =>
-                          (optionA?.label ?? "")
-                            .toLowerCase()
-                            .localeCompare((optionB?.label ?? "").toLowerCase())
-                        }
-                        status={accountScan.district === "" ? "error" : ""}
-                      >
-                        {districts &&
-                          districts.map((district) => (
-                            <Select.Option
-                              label={district.DistrictName}
-                              key={district.DistrictID}
-                              value={
-                                district.DistrictName +
-                                "|" +
-                                district.DistrictID
-                              }
-                            >
-                              {district.DistrictName}
-                            </Select.Option>
-                          ))}
-                      </Select>
-                    </div>
-                  </Col>
-                  <Col span={8}>
-                    <div className="m-5">
-                      <h6>Xã/Phường/Thị trấn</h6>
-                      <Select
-                        showSearch
-                        style={{ width: "100%" }}
-                        size="medium"
-                        onChange={(event) => {
-                          handleSetAccountScan("ward", event);
-                        }}
-                        optionFilterProp="children"
-                        filterOption={(input, option) =>
-                          (option?.label ?? "").includes(input)
-                        }
-                        filterSort={(optionA, optionB) =>
-                          (optionA?.label ?? "")
-                            .toLowerCase()
-                            .localeCompare((optionB?.label ?? "").toLowerCase())
-                        }
-                        status={accountScan.ward === "" ? "error" : ""}
-                      >
-                        {wards &&
-                          wards.map((ward) => (
-                            <Select.Option
-                              label={ward.WardName}
-                              key={ward.WardCode}
-                              value={ward.WardName + "|" + ward.WardCode}
-                            >
-                              {ward.WardName}
-                            </Select.Option>
-                          ))}
-                      </Select>
-                    </div>
-                  </Col>
-                </Row>
+              <Col span={8}>
+                <div className="m-5">
+                  <h6>Quận/huyện</h6>
+                  <Select
+                    showSearch
+                    style={{ width: "100%" }}
+                    size="medium"
+                    onChange={(event) => {
+                      fetchWard(event.substring(event.indexOf("|") + 1));
+                      handleSetAccountScan("district", event);
+                    }}
+                    optionFilterProp="children"
+                    filterOption={(input, option) =>
+                      (option?.label ?? "").includes(input)
+                    }
+                    filterSort={(optionA, optionB) =>
+                      (optionA?.label ?? "")
+                        .toLowerCase()
+                        .localeCompare((optionB?.label ?? "").toLowerCase())
+                    }
+                    status={accountScan.district === "" ? "error" : ""}
+                  >
+                    {districts &&
+                      districts.map((district) => (
+                        <Select.Option
+                          label={district.DistrictName}
+                          key={district.DistrictID}
+                          value={
+                            district.DistrictName + "|" + district.DistrictID
+                          }
+                        >
+                          {district.DistrictName}
+                        </Select.Option>
+                      ))}
+                  </Select>
+                </div>
+              </Col>
+              <Col span={8}>
+                <div className="m-5">
+                  <h6>Xã/Phường/Thị trấn</h6>
+                  <Select
+                    showSearch
+                    style={{ width: "100%" }}
+                    size="medium"
+                    onChange={(event) => {
+                      handleSetAccountScan("ward", event);
+                    }}
+                    optionFilterProp="children"
+                    filterOption={(input, option) =>
+                      (option?.label ?? "").includes(input)
+                    }
+                    filterSort={(optionA, optionB) =>
+                      (optionA?.label ?? "")
+                        .toLowerCase()
+                        .localeCompare((optionB?.label ?? "").toLowerCase())
+                    }
+                    status={accountScan.ward === "" ? "error" : ""}
+                  >
+                    {wards &&
+                      wards.map((ward) => (
+                        <Select.Option
+                          label={ward.WardName}
+                          key={ward.WardCode}
+                          value={ward.WardName + "|" + ward.WardCode}
+                        >
+                          {ward.WardName}
+                        </Select.Option>
+                      ))}
+                  </Select>
+                </div>
               </Col>
             </Row>
           </Col>

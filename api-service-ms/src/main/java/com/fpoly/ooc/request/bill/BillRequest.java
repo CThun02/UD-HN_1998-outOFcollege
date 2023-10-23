@@ -60,4 +60,10 @@ public class BillRequest {
 
     private String voucherCode;
 
+    private String city;
+
+    private String district;
+
+    private String ward;
+
 }

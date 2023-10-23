@@ -47,13 +47,20 @@ const BillManagement = () => {
       value: [dayjs().add(-90, "d"), dayjs()],
     },
   ];
-
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
   const columns = [
     {
+      key: "stt",
+      dataIndex: "index",
       title: "#",
-      key: "index",
+      width: 70,
       render: (text, record, index) => {
-        return index + 1;
+        return (
+          <span id={record.id}>
+            {(currentPage - 1) * pageSize + (index + 1)}
+          </span>
+        );
       },
     },
     {
@@ -89,15 +96,15 @@ const BillManagement = () => {
     },
     {
       title: "Loại hóa đơn",
-      dataIndex: "symbol",
-      key: "symbol",
+      dataIndex: "billType",
+      key: "billType",
       render: (object) => {
         let color =
-          object.toLocaleLowerCase() === "Shipping".toLocaleLowerCase()
+          object.toLocaleLowerCase() === "In-store".toLocaleLowerCase()
             ? "geekblue"
-            : object.toLocaleLowerCase() === "Received".toLocaleLowerCase()
-            ? "green"
-            : null;
+            : object.toLocaleLowerCase() === "Online".toLocaleLowerCase()
+              ? "green"
+              : null;
         return (
           <Space direction="vertical">
             <div style={{ width: "auto", display: "flex" }}>
@@ -113,22 +120,22 @@ const BillManagement = () => {
       key: "status",
       render: (object) => {
         let color =
-          object === "ACTIVE"
+          object === "Unpaid"
             ? "geekblue"
             : object.toLocaleLowerCase() === "PAID".toLocaleLowerCase()
-            ? "green"
-            : object === "cancel"
-            ? "red"
-            : null;
+              ? "green"
+              : object === "cancel"
+                ? "red"
+                : null;
         return (
           <Space direction="vertical">
             <div style={{ width: "auto", display: "flex" }}>
               <Tag color={color}>
-                {object === "ACTIVE"
+                {object === "Unpaid"
                   ? "Chưa thanh toán"
                   : object === "cancel"
-                  ? "Đã hủy"
-                  : "Đã thanh toán"}
+                    ? "Đã hủy"
+                    : "Đã thanh toán"}
               </Tag>
             </div>
           </Space>
@@ -296,6 +303,10 @@ const BillManagement = () => {
             defaultPageSize: 5,
             showLessItems: true,
             style: { marginRight: "10px" },
+            onChange: (currentPage, pageSize) => {
+              setCurrentPage(currentPage);
+              setPageSize(pageSize);
+            },
           }}
         />
       </section>

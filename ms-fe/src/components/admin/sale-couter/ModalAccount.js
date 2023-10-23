@@ -94,7 +94,7 @@ const ModalAccount = ({
       });
   }
   useEffect(() => {
-    filter("All")
+    filter("");
   }, [renderThis]);
   return (
     <div>

@@ -27,6 +27,7 @@ import ProductDetailsByProductId from "./product/ProductDetailsByProductId";
 import ProductCreateDetails from "./product/ProductCreateDetails";
 import BillTimeLine from "./sale-couter/TimeLine";
 import SaveVoucher from "./voucher/SaveVoucher";
+import StatisticalIndex from "./statistical/StatisticalIndex";
 import { useState } from "react";
 function AdminPage() {
   const [message, setMessage] = useState("");
@@ -46,7 +47,7 @@ function AdminPage() {
               {/* Thống kê */}
               {/* hiển thị mặc định khi vào admin là trang thống kê */}
               <Route index element="statistical" />
-              <Route path="statistical" element="statistical"></Route>
+              <Route path="statistical" element={<StatisticalIndex />}></Route>
               {/* Tại quầy */}
               <Route path="counter-sales">
                 <Route index element={<Bill />}></Route>

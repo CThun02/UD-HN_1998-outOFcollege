@@ -1,50 +1,23 @@
 import React, { useState, useEffect } from "react";
-import { Line, Pie } from "@ant-design/plots";
+import { Line } from "@ant-design/plots";
 import styles from "./StatisticalIndex.module.css";
 import axios from "axios";
 import {
   ArrowUpOutlined,
+  DoubleRightOutlined,
   LineChartOutlined,
   MoneyCollectFilled,
   RetweetOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
 import { Col, Row, DatePicker } from "antd";
 import Statistic from "antd/es/statistic/Statistic";
+import PieChart from "./PieChart";
+import TableUserBuyTheMost from "./TableProdutSellTheMost";
+import TableProdutSellTheMost from "./TableProdutSellTheMost";
 
 const StatisticalIndex = () => {
   const [data, setData] = useState([]);
-  const dataPieChart = [
-    {
-      type: "In Store",
-      value: 25,
-    },
-    {
-      type: "Online",
-      value: 75,
-    },
-  ];
-  const configPieChart = {
-    appendPadding: 10,
-    dataPieChart,
-    angleField: "value",
-    colorField: "type",
-    radius: 0.9,
-    label: {
-      type: "inner",
-      offset: "-30%",
-      content: ({ percent }) => `${(percent * 100).toFixed(0)}%`,
-      style: {
-        fontSize: 14,
-        textAlign: "center",
-      },
-    },
-    interactions: [
-      {
-        type: "element-active",
-      },
-    ],
-  };
-
   const configLineChart = {
     data,
     xField: "year",
@@ -100,7 +73,7 @@ const StatisticalIndex = () => {
             <Statistic title="Tổng doanh thu" value={200000.3126 + " VND"} />
           </div>
         </Col>
-        <Col span={12}>
+        <Col span={10}>
           <div
             className={`${styles.bgWhite} ${styles.fixHeightDefault} ms-5 me-5`}
           >
@@ -139,18 +112,37 @@ const StatisticalIndex = () => {
             </Row>
           </div>
         </Col>
-        <Col span={6}>
-          <div className={`${styles.bgWhite} ${styles.fixHeightDefault}  ms-5`}>
-            {/* <Pie {...configPieChart} /> */}
+      </Row>
+      <Row>
+        <Col span={24}>
+          <div className={styles.bgWhite}>
+            <h2>
+              <LineChartOutlined /> Thống kê doanh thu
+            </h2>
+            <Line {...configLineChart} />
           </div>
         </Col>
       </Row>
-      <div className={styles.bgWhite}>
-        <h2>
-          <LineChartOutlined /> Thống kê doanh thu
-        </h2>
-        <Line {...configLineChart} />
-      </div>
+      <Row>
+        <Col span={6}>
+          <div className={`${styles.bgWhite} me-5`}>
+            <h2>
+              <DoubleRightOutlined /> Tỷ lệ thu chi
+            </h2>
+            <PieChart />
+          </div>
+        </Col>
+        <Col span={18}>
+          <div className={`${styles.bgWhite} ms-5`}>
+            <h2>
+              <UserOutlined /> Sản phẩm mua nhiều nhất
+            </h2>
+            <div style={{ margin: "20px 0" }}>
+              <TableProdutSellTheMost />
+            </div>
+          </div>
+        </Col>
+      </Row>
     </>
   );
 };

@@ -193,7 +193,7 @@ function Voucher() {
       dataIndex: "voucherCode",
       key: "voucherCode",
       render: (code) => (
-        <Link to={`/admin/vouchers/detail/${code}`}>{code}</Link>
+        <Link to={`/api/admin/vouchers/detail/${code}`}>{code}</Link>
       ),
     },
     {
@@ -245,7 +245,7 @@ function Voucher() {
       key: "action",
       render: (object) => (
         <Space size="middle">
-          <Link to={`/admin/vouchers/detail/${object[0]}`}>
+          <Link to={`/api/admin/vouchers/detail/${object[0]}`}>
             <Button className={styles.iconButton}>
               <EyeOutlined />
             </Button>
@@ -290,7 +290,7 @@ function Voucher() {
 
             <Col span={4}>
               <>
-                <Link to="/admin/vouchers/save">
+                <Link to="/api/admin/vouchers/save">
                   <Button type="primary" icon={<PlusOutlined />} size="large">
                     Tạo mã giảm giá
                   </Button>

@@ -114,10 +114,11 @@ public class PromotionServiceImpl implements PromotionService {
 
     @Override
     public Promotion findByCode(String code) {
+        log.info("PromotionCode: " + code);
         return promotionRepository
                 .findPromotionByPromotionCode(code)
                 .orElseThrow(
-                        () -> new NotFoundException(ErrorCodeConfig.getMessage(Const.CODE_NOT_FOUND)));
+                        () -> new NotFoundException(ErrorCodeConfig.getFormatMessage(Const.CODE_NOT_FOUND)));
     }
 
     @Override
@@ -141,7 +142,6 @@ public class PromotionServiceImpl implements PromotionService {
         Promotion promotion = findByCode(code);
 
         promotion.setStatus(status);
-        promotion.setDeletedAt(LocalDateTime.now());
 
         return promotionRepository.save(promotion);
     }

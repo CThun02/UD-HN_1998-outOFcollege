@@ -187,7 +187,7 @@ function CreatePromotion() {
               })
               .then(() => {
                 setIsLoading(false);
-                navigate("/admin/promotion");
+                navigate("/api/admin/promotion");
                 showSuccessNotification("Thao tác thành công", "promotion");
               })
               .catch((err) => {
@@ -548,7 +548,7 @@ function CreatePromotion() {
                           </Row>
                           <Row>
                             <Space>
-                              <Link to="/admin/promotion">
+                              <Link to="/api/admin/promotion">
                                 <Button>Hủy</Button>
                               </Link>
                               <Button

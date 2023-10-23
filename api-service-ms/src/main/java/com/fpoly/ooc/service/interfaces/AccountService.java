@@ -33,7 +33,7 @@ public interface AccountService {
 
     Account findByUsername(String username);
 
-    List<AccountDetailResponce> getAllCustomer();
+    List<AccountDetailResponce> getAllCustomer(String keyword);
 
 
 }

@@ -30,6 +30,7 @@ import BrandAdmin from "./components/admin/brand/BrandAdmin";
 import FormAdmin from "./components/admin/form/FormAdmin";
 import CollarAdmin from "./components/admin/collar/CollarAdmin";
 import BillManagement from "./components/admin/sale-couter/BillManagement";
+import StatisticalIndex from "./components/admin/statistical/StatisticalIndex";
 function App() {
   const [message, setMessage] = useState("");
 
@@ -50,8 +51,11 @@ function App() {
                   <Route path="admin">
                     {/* Thống kê */}
                     {/* hiển thị mặc định khi vào admin là trang thống kê */}
-                    <Route index element="statistical" />
-                    <Route path="statistical" element="statistical"></Route>
+                    <Route index element={<StatisticalIndex />} />
+                    <Route
+                      path="statistical"
+                      element={<StatisticalIndex />}
+                    ></Route>
                     {/* Tại quầy */}
                     <Route path="counter-sales">
                       <Route index element={<Bill />}></Route>

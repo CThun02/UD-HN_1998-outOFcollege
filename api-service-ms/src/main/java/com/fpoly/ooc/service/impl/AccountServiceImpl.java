@@ -187,9 +187,9 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public List<AccountDetailResponce> getAllCustomer() {
+    public List<AccountDetailResponce> getAllCustomer(String keyword) {
         List<AddressDetail> accountAddressDetails = addressDetailService.getAllCustomer();
-        List<Account> accounts = accountRepository.getAllAccountByRoleId(Long.valueOf(2));
+        List<Account> accounts = accountRepository.getAllAccountByRoleId(Long.valueOf(2), "%"+keyword+"%");
         List<AccountDetailResponce> lstAccountDetailResponces = new ArrayList<>();
         for (Account accountGet : accounts) {
             Account account = accountGet;

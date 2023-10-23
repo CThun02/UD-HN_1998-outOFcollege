@@ -17,6 +17,14 @@
   margin: 5px 5px;
 }
 
+.ms-5 {
+  margin-left: 5px;
+}
+
+.me-5 {
+  margin-right: 5px;
+}
+
 thead > tr > th,
 thead > tr > td {
   background-color: #337ccf !important;

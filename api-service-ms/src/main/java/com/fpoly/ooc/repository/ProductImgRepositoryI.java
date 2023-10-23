@@ -11,15 +11,18 @@ import java.util.List;
 @Repository
 public interface ProductImgRepositoryI extends JpaRepository<ProductImage, Long> {
     @Query("SELECT pi.id as id, pi.product as product, pi.color as color," +
-            " pi.path as path, pi.status as status FROM ProductImage pi where pi.product.id=?1 and pi.color.id=?2")
+            " pi.path as path, pi.status as status, pi.isDefault as isDefault" +
+            " FROM ProductImage pi where pi.product.id=?1 and pi.color.id=?2")
     public List<ProductImageResponse> getProductImageByProductIdAndColorId(Long productId, Long colorId);
 
     @Query("SELECT pi.id as id, pi.product as product, pi.color as color," +
-            " pi.path as path, pi.status as status FROM ProductImage pi where pi.product.id=?1")
+            " pi.path as path, pi.status as status, pi.isDefault as isDefault " +
+            "FROM ProductImage pi where pi.product.id=?1")
     public List<ProductImageResponse> getProductImageByProductId(Long productId);
 
     @Query("SELECT pi.id as id, pi.product as product, pi.color as color," +
-            " pi.path as path, pi.status as status FROM ProductImage pi where pi.product.id=?1 and pi.isDefault = true")
+            " pi.path as path, pi.status as status, pi.isDefault as isDefault" +
+            " FROM ProductImage pi where pi.product.id=?1 and pi.isDefault = true")
     public List<ProductImageResponse> getProductImageDefaultByProductId(Long productId);
 
     @Query("SELECT pi FROM ProductImage pi JOIN FETCH pi.product p JOIN FETCH pi.color")

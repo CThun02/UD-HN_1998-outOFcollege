@@ -185,6 +185,13 @@ public class ProductController {
         return ResponseEntity.ok(productDetailService.update(productDetail));
     }
 
+
+    @PutMapping("/updateProductImg")
+    public ResponseEntity<?> updateProductImg(@RequestBody ProductImage request){
+        return ResponseEntity.ok(productImageService.update(request));
+    }
+
+
     @DeleteMapping("/deleteProductImage")
     public ResponseEntity<?> deleteProductImage(@RequestParam Long id){
         ProductImage productImage = productImageService.getOne(id);

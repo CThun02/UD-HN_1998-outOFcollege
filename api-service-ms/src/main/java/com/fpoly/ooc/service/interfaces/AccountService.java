@@ -14,7 +14,7 @@ import java.util.List;
 
 public interface AccountService {
 
-    List<AccountResponce> getAllByRoleid(Long roleId);
+    List<AccountResponce> getAllByRoleid(Long roleId, String keyword);
 
     Account save(AccountRequest request);
 

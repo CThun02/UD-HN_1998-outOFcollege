@@ -49,8 +49,8 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public List<AccountResponce> getAllByRoleid(Long roleId) {
-        return accountRepository.getAllByRoleId(roleId);
+    public List<AccountResponce> getAllByRoleid(Long roleId, String keyword) {
+        return accountRepository.getAllByRoleId(roleId, keyword);
     }
 
     @Override

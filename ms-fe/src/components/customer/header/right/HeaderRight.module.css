@@ -1,0 +1,70 @@
+.logoSize {
+  height: 70px;
+}
+
+.iconUser {
+  display: flex;
+  justify-content: flex-end;
+  height: 70px;
+  padding-right: 10px;
+}
+
+.lineHeight {
+  line-height: 70px;
+}
+
+.link {
+  font-size: 1rem;
+  color: var(--ast-global-color-3);
+  font-weight: 450;
+}
+
+.margin {
+  margin-bottom: 0px !important;
+}
+/* 
+.flex {
+  display: flex;
+  justify-content: flex-end;
+  align-content: center;
+} */
+
+.flexEnd {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.lineHeight {
+  line-height: 70px;
+}
+
+.link {
+  font-size: 1rem;
+  color: var(--ast-global-color-3);
+  font-weight: 450;
+}
+
+.margin {
+  margin-bottom: 0px !important;
+}
+
+.iconSize {
+  font-size: 24px;
+}
+
+.centerd {
+  display: flex;
+  align-items: center;
+}
+
+.cssParagraph {
+  display: inline-block;
+  font-weight: 500;
+  margin-right: 10px;
+}

@@ -1,0 +1,58 @@
+.relative {
+  position: relative;
+}
+
+.padding {
+  padding-bottom: 100px;
+}
+
+.background {
+  background-image: url(https://websitedemos.net/organic-shop-02/wp-content/uploads/sites/465/2019/06/leaves-free-img.png);
+  opacity: 0.5;
+}
+
+.absolute {
+  position: absolute;
+  top: 200px;
+  left: 180px;
+}
+
+.imageSize {
+  display: flex;
+  justify-content: center;
+}
+
+.textH2 {
+  font-weight: 400;
+  letter-spacing: 16px;
+  font-size: 32px;
+  color: #845b38;
+}
+
+.textH1 {
+  font-size: 56px;
+  color: #543a1f;
+  letter-spacing: 2px;
+}
+
+.textSpan {
+  font-size: 24px;
+  letter-spacing: 4px;
+  color: #845b38;
+}
+
+.upperCase {
+  text-transform: uppercase;
+}
+
+.button {
+  background-color: #845b38;
+}
+
+.button:hover {
+  background-color: #543a1f !important;
+}
+
+.spacing {
+  margin-top: 28px;
+}

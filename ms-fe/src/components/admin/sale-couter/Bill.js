@@ -85,13 +85,6 @@ const Bill = () => {
         duration: 1,
       });
     }
-    if (value > productDetails[index].quantity) {
-      notification.warning({
-        message: "Thông báo",
-        description: "Không đủ số lượng",
-        duration: 1,
-      });
-    }
     productDetails[index].quantity = value;
     cart.productDetails = productDetails;
     localStorage.setItem(cartId, JSON.stringify(cart));
@@ -246,6 +239,9 @@ const Bill = () => {
   const handleOptionChange = (value) => {
     setInputError('')
     setSelectedOption(value);
+    if (value === '2') {
+      setAmountPaid(0)
+    }
   };
 
   // xóa sản phẩm trong giỏ hàng
@@ -644,7 +640,7 @@ const Bill = () => {
     const visible = [...showAddress];
     visible[index] = checked;
     setTypeShipping(visible);
-    console.log(selectedOption)
+    setSelectedOption(1)
   }
 
   const [errors, setErrors] = useState({})
@@ -654,25 +650,21 @@ const Bill = () => {
       accountId: account?.username,
       price: totalPrice,
       priceReduce: totalPrice - voucherPrice(),
-      amountPaid: amountPaid,
+      amountPaid: typeShipping[index] ? 0 :
+        selectedOption === '2' ? voucherPrice() + shippingFee : amountPaid,
       billType: "In-Store",
-      symbol: typeShipping ? "Shipping" : symbol,
-      status: typeShipping ? "Unpaid" : selectedOption !== 2 ? "Paid" : "Unpaid",
+      symbol: typeShipping[index] ? "Shipping" : symbol,
+      status: typeShipping[index] ? "Unpaid" : "Paid",
       note: note,
       paymentDetailId: selectedOption,
       lstBillDetailRequest: [],
       addressId: selectedAddress?.id,
       fullname: selectedAddress?.fullName,
       phoneNumber: selectedAddress.numberPhone,
-      transactionCode: selectedOption === 2 ? transactionCode : null,
+      transactionCode: selectedOption === '2' ? transactionCode : null,
       voucherCode: voucherAdd?.voucherCode,
     };
-
-    const deliveryNote = {
-      shipDate: switchChange[index] === true ? leadtime : null,
-      shipPrice: switchChange[index] === true ? shippingFee : null,
-    }
-
+    console.log(transactionCode)
     const billAddress = {
       fullName: fullname,
       sdt: phoneNumber,
@@ -690,7 +682,6 @@ const Bill = () => {
       ward: Yup.string().required("Phường/xã không được để trống"),
     });
 
-
     if (productDetails.length <= 0) {
       return notification.error({
         message: "Thông báo",
@@ -700,10 +691,10 @@ const Bill = () => {
     } else if (selectedOption === 2 && transactionCode === "") {
       return setInputError("Mã giao dịch không được để trống");
     } else if (
-      selectedOption !== 2 &&
-      (remainAmount < 0 || isNaN(remainAmount))
+      selectedOption !== '2' &&
+      ((remainAmount < 0 && !typeShipping[index]) || isNaN(remainAmount))
     ) {
-      return setInputError("Tiền không đủ");
+      return console.log("Tiền không đủ");
     } else {
       for (let i = 0; i < productDetails.length; i++) {
         const billDetail = {
@@ -725,7 +716,6 @@ const Bill = () => {
           if (account !== undefined && switchChange[index]) {
             try {
               await schema.validate(billAddress, { abortEarly: false });
-              console.log("real");
               setErrors({});
               const response = await axios.post(
                 "http://localhost:8080/api/admin/address",
@@ -739,7 +729,6 @@ const Bill = () => {
               });
               setErrors(validationErrors);
               hasError = true;
-              console.log(123);
             }
           }
 
@@ -753,15 +742,6 @@ const Bill = () => {
               "http://localhost:8080/api/admin/bill",
               bill
             );
-            if (response.data.symbol === "Received") {
-              await axios.put(
-                `http://localhost:8080/api/admin/bill/${response.data.id}`,
-                {
-                  status: "PAID",
-                }
-              );
-            }
-
             if (switchChange[index]) {
               await axios.post("http://localhost:8080/api/admin/delivery-note", {
                 billId: response.data.id,
@@ -1133,147 +1113,134 @@ const Bill = () => {
                         setIsOpen={setIsOpenFormVoucher}
                       />
                       <Row style={{ marginTop: "10px" }}>
-                        <Col span={12}>
-                          <Row>
+                        <Col span={16}>
+                          {" "}
+                          <span
+                            style={{
+                              fontSize: "16px",
+                              width: "100px",
+                            }}
+                          >
+                            Thành tiền
+                          </span>
+                        </Col>
+                        <Col span={8}>
+                          <span
+                            style={{
+                              fontSize: "16px",
+                            }}
+                          >
+                            {totalPrice.toLocaleString("vi-VN", {
+                              style: "currency",
+                              currency: "VND",
+                            })}
+                          </span>
+                        </Col>
+                        <Col span={16}>
+                          <span
+                            style={{
+                              fontSize: "16px",
+                              width: "200%",
+                              display: "block",
+                            }}
+                          >
+                            Giảm giá
+                          </span>
+                        </Col>
+                        <Col span={8}>
+                          <span
+                            style={{
+                              fontSize: "16px",
+                            }}
+                          >
+                            {voucherAdd?.voucherValue
+                              ? voucherAdd.voucherMethod === "vnd"
+                                ? voucherAdd?.voucherValue + "đ"
+                                : voucherAdd?.voucherValue + "%"
+                              : "0đ"}
+                          </span>
+                          {voucherAdd.voucherId ? (
+                            <bttuon
+                              style={{
+                                marginLeft: "20px",
+                                color: "green",
+                                cursor: "pointer",
+                              }}
+                              onClick={() => setVoucherAdd({})}
+                            >
+                              ❌
+                            </bttuon>
+                          ) : null}
+                        </Col>
+
+                        {switchChange[index] && (
+                          <>
                             <Col span={16}>
-                              {" "}
                               <span
                                 style={{
                                   fontSize: "16px",
-                                  width: "100px",
+                                  width: "200px",
                                 }}
                               >
-                                Thành tiền
+                                Phí vận chuyển
                               </span>
                             </Col>
                             <Col span={8}>
                               <span
                                 style={{
-                                  marginLeft: "100px",
                                   fontSize: "16px",
                                 }}
                               >
-                                {totalPrice.toLocaleString("vi-VN", {
+                                {shippingFee?.toLocaleString("vi-VN", {
                                   style: "currency",
                                   currency: "VND",
                                 })}
                               </span>
                             </Col>
-                          </Row>
-                          <Row>
-                            <Col span={16}>
-                              <span
-                                style={{
-                                  fontSize: "16px",
-                                  width: "200%",
-                                  display: "block",
-                                }}
-                              >
-                                Giảm giá
-                              </span>
-                            </Col>
-                            <Col span={8}>
-                              <span
-                                style={{
-                                  marginLeft: "100px",
-                                  fontSize: "16px",
-                                }}
-                              >
-                                {voucherAdd?.voucherValue
-                                  ? voucherAdd.voucherMethod === "vnd"
-                                    ? voucherAdd?.voucherValue + "đ"
-                                    : voucherAdd?.voucherValue + "%"
-                                  : "0đ"}
-                              </span>
-                              {voucherAdd.voucherId ? (
-                                <bttuon
-                                  style={{
-                                    marginLeft: "20px",
-                                    color: "green",
-                                    cursor: "pointer",
-                                  }}
-                                  onClick={() => setVoucherAdd({})}
-                                >
-                                  ❌
-                                </bttuon>
-                              ) : null}
-                            </Col>
-                          </Row>
-
-                          {switchChange[index] && (
-                            <Row>
-                              <Col span={16}>
-                                <span
-                                  style={{
-                                    fontSize: "16px",
-                                    width: "200px",
-                                  }}
-                                >
-                                  Phí vận chuyển
-                                </span>
-                              </Col>
-                              <Col span={8}>
-                                <span
-                                  style={{
-                                    marginLeft: "100px",
-                                    fontSize: "16px",
-                                  }}
-                                >
-                                  {shippingFee?.toLocaleString("vi-VN", {
-                                    style: "currency",
-                                    currency: "VND",
-                                  })}
-                                </span>
-                              </Col>
-                            </Row>
+                          </>
+                        )}
+                        <Col span={16}>
+                          <span
+                            style={{
+                              fontSize: "16px",
+                            }}
+                          >
+                            Tổng cộng
+                          </span>
+                        </Col>
+                        <Col span={8}>
+                          {switchChange[index] ? (
+                            <span
+                              style={{
+                                color: "red",
+                                fontSize: "16px",
+                              }}
+                            >
+                              {(
+                                voucherPrice() + shippingFee
+                              ).toLocaleString("vi-VN", {
+                                style: "currency",
+                                currency: "VND",
+                              })}
+                            </span>
+                          ) : (
+                            <span
+                              style={{
+                                color: "red",
+                                fontSize: " 16px",
+                              }}
+                            >
+                              {voucherPrice().toLocaleString("vi-VN", {
+                                style: "currency",
+                                currency: "VND",
+                              })}
+                            </span>
                           )}
-                          <Row>
-                            <Col span={16}>
-                              <span
-                                style={{
-                                  fontSize: "16px",
-                                  width: "200%",
-                                  display: "block",
-                                }}
-                              >
-                                Tổng cộng
-                              </span>
-                            </Col>
-                            <Col span={8}>
-                              {switchChange[index] ? (
-                                <span
-                                  style={{
-                                    color: "red",
-                                    marginLeft: "100px",
-                                    fontSize: "16px",
-                                  }}
-                                >
-                                  {(
-                                    voucherPrice() + shippingFee
-                                  ).toLocaleString("vi-VN", {
-                                    style: "currency",
-                                    currency: "VND",
-                                  })}
-                                </span>
-                              ) : (
-                                <span
-                                  style={{
-                                    color: "red",
-                                    marginLeft: "100px",
-                                    fontSize: " 16px",
-                                  }}
-                                >
-                                  {voucherPrice().toLocaleString("vi-VN", {
-                                    style: "currency",
-                                    currency: "VND",
-                                  })}
-                                </span>
-                              )}
-                            </Col>
-                          </Row>
-                          {(selectedOption !== 2) ? (
-                            <Row>
-                              <Col span={16}>
+                        </Col>
+                        {(Number(selectedOption) !== 2 && !typeShipping[index])
+                          ? (
+                            <>
+                              <Col span={8} style={{ marginTop: '8px' }}>
                                 <span
                                   style={{
                                     fontSize: "16px",
@@ -1284,70 +1251,68 @@ const Bill = () => {
                                   Số tiền khách trả
                                 </span>
                               </Col>
-                              <Col span={8} ư>
+                              <Col span={16} >
                                 <Input
                                   type="number"
-                                  style={{ marginLeft: "100px", width: '100%' }}
                                   className={styles.input_noneBorder}
                                   onChange={(e) => handleChangeInput(e, index)}
                                 />
                                 {inputError && (
                                   <span
                                     style={{
-                                      marginLeft: "100px",
                                       width: "200%",
+                                      color: 'red'
                                     }}
-                                    className={styles.error}
                                   >
                                     {inputError}
                                   </span>
                                 )}
                               </Col>
-                            </Row>
-                          ) : null}
-                          {console.log(selectedOption)}
-                          {Number(selectedOption) === 2 ? (
-                            <>
-                              <Input
-                                placeholder="Nhập mã giao dịch"
-                                size="large"
-                                onChange={(e) =>
-                                  setTransactionCode(e.target.value)
-                                }
-                                style={{ margin: "10px 0", width: "380px" }}
-                                className={styles.input_noneBorder}
-                              />
-                              <span style={{ fontSize: "16px", color: "red" }}>
-                                {inputError}
-                              </span>
                             </>
                           ) : null}
-                          {selectedOption !== 2 ? (
-                            <Row>
-                              <Col span={16}>
-                                <span
-                                  style={{ fontSize: "16px", width: "200%" }}
-                                >
-                                  Tiền thừa
-                                </span>
-                              </Col>
-                              <Col span={8}>
-                                <span
-                                  style={{
-                                    fontSize: "16px",
-                                    marginLeft: "100px",
-                                    color: "red",
-                                  }}
-                                >
-                                  {remainAmount.toLocaleString("vi-VN", {
-                                    style: "currency",
-                                    currency: "VND",
-                                  })}
-                                </span>
-                              </Col>
-                            </Row>
+                        {Number(selectedOption) === 2 ? (
+                          <>
+                            <Input
+                              placeholder="Nhập mã giao dịch"
+                              size="large"
+                              onChange={(e) =>
+                                setTransactionCode(e.target.value)
+                              }
+                              style={{ margin: "10px 0", width: "380px" }}
+                              className={styles.input_noneBorder}
+                            />
+                            <span style={{ fontSize: "16px", color: "red" }}>
+                              {inputError}
+                            </span>
+                          </>
+                        ) : null}
+                        {(Number(selectedOption) !== 2 && !typeShipping[index])
+                          ? (
+                            <Col span={24}>
+                              <Row style={{ marginTop: '8px' }}>
+                                <Col span={16}>
+                                  <span
+                                    style={{ fontSize: "16px", width: "200%" }}
+                                  >
+                                    Tiền thừa
+                                  </span>
+                                </Col>
+                                <Col span={8}>
+                                  <span
+                                    style={{
+                                      fontSize: "16px",
+                                      color: "red",
+                                    }}
+                                  >
+                                    {remainAmount.toLocaleString("vi-VN", {
+                                      style: "currency",
+                                      currency: "VND",
+                                    })}
+                                  </span>
+                                </Col>
+                              </Row>
+                            </Col>
                           ) : null}
-                        </Col>
                         <TextArea
                           onChange={(e) => setNote(e.target.value)}
                           rows={3}
@@ -1366,7 +1331,7 @@ const Bill = () => {
                                 </div>
                               ))}
                             </Segmented>}
-                          <Row>
+                          {switchChange[index] && <Row>
                             <Col span={5}>
                               <Switch
                                 onChange={(e) => onChangeTypeShip(e, index)}
@@ -1376,7 +1341,7 @@ const Bill = () => {
                               Thanh toán khi nhân hàng
                             </h6>
                             </Col>
-                          </Row>
+                          </Row>}
                         </div>
                         <div style={{ marginTop: "20px" }}>
                           <Button

@@ -72,6 +72,8 @@ public class BillServiceImpl implements BillService {
                 .billCode(request.getBillCode())
                 .completionDate(LocalDateTime.now())
                 .build();
+
+        bill.setStatus(request.getStatus());
         billRepo.save(bill);
 
         for (BillDetailRequest billDetailRequest : request.getLstBillDetailRequest()) {
@@ -81,7 +83,6 @@ public class BillServiceImpl implements BillService {
                     .price(billDetailRequest.getPrice())
                     .quantity(billDetailRequest.getQuantity())
                     .note("null")
-                    .status("UNPAID")
                     .build();
             billDetailRepo.save(billDetail);
         }
@@ -141,7 +142,7 @@ public class BillServiceImpl implements BillService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Integer updateBillStatus(BillStatusDTO dto, Long id) {
-        billRepo.update(dto.getStatus(), id);
+        billRepo.update(dto.getStatus(), dto.getAmountPaid(), id);
         return 1;
     }
 

@@ -47,13 +47,20 @@ const BillManagement = () => {
       value: [dayjs().add(-90, "d"), dayjs()],
     },
   ];
-
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
   const columns = [
     {
+      key: "stt",
+      dataIndex: "index",
       title: "#",
-      key: "index",
+      width: 70,
       render: (text, record, index) => {
-        return index + 1;
+        return (
+          <span id={record.id}>
+            {(currentPage - 1) * pageSize + (index + 1)}
+          </span>
+        );
       },
     },
     {
@@ -113,7 +120,7 @@ const BillManagement = () => {
       key: "status",
       render: (object) => {
         let color =
-          object === "ACTIVE"
+          object === "Unpaid"
             ? "geekblue"
             : object.toLocaleLowerCase() === "PAID".toLocaleLowerCase()
               ? "green"
@@ -124,7 +131,7 @@ const BillManagement = () => {
           <Space direction="vertical">
             <div style={{ width: "auto", display: "flex" }}>
               <Tag color={color}>
-                {object === "ACTIVE"
+                {object === "Unpaid"
                   ? "Chưa thanh toán"
                   : object === "cancel"
                     ? "Đã hủy"
@@ -296,6 +303,10 @@ const BillManagement = () => {
             defaultPageSize: 5,
             showLessItems: true,
             style: { marginRight: "10px" },
+            onChange: (currentPage, pageSize) => {
+              setCurrentPage(currentPage);
+              setPageSize(pageSize);
+            },
           }}
         />
       </section>

@@ -1,4 +1,4 @@
-import { Button, Col, Divider, Row, Table } from 'antd';
+import { Button, Carousel, Col, Divider, Row, Table } from 'antd';
 import { useEffect, useState } from 'react';
 import { Timeline, TimelineEvent } from '@mailtop/horizontal-timeline';
 import { FaRegCheckCircle, FaRegFileAlt, FaTimes, FaTruck } from 'react-icons/fa';
@@ -21,6 +21,7 @@ const BillTimeLine = (addId) => {
     const [timelinePoduct, setTimelinesPoduct] = useState([]);
     const [billInfo, setBillInfo] = useState({});
     const { billId } = useParams();
+    const [render, setRender] = useState(null)
 
     // tạo mới timeline
     const handleCreateTimeline = async (note, stauts) => {
@@ -35,12 +36,13 @@ const BillTimeLine = (addId) => {
             })
     }
 
-    const handleUpdateBillStatus = (status) => {
+    const handleUpdateBillStatus = (status, price) => {
         axios.put(`http://localhost:8080/api/admin/bill/${billId}`, {
-            status: status
+            status: status,
+            amountPaid: price
         })
             .then((response) => {
-                console.log(response)
+                setRender(response.data.amountPaid)
             })
             .catch((error) => {
                 console.log(error)
@@ -58,7 +60,7 @@ const BillTimeLine = (addId) => {
     const handleOkConFirm = (note) => {
         handleCreateTimeline(note, action === 'cancel' ? '0' : null);
         if (billInfo.symbol === 'Shipping' && timelines.length === 3 && billInfo.status !== 'Paid') {
-            handleUpdateBillStatus(action === 'cancel' ? 'cancel' : 'paid');
+            handleUpdateBillStatus(action === 'cancel' ? 'cancel' : 'paid', billInfo.totalPrice + billInfo?.shipPrice - billInfo.priceReduce);
         }
         setIsModalConfirm(false);
     };
@@ -94,70 +96,87 @@ const BillTimeLine = (addId) => {
             .catch((error) => {
                 console.log(error)
             })
-    }, [billId])
+    }, [billId, render])
 
     const columnProduct = [
         {
-            title: 'Sản phẩm',
-            key: 'product',
-            width: 500,
-            render: (_, record, index) => {
+            title: "#",
+            dataIndex: "index",
+            key: "stt",
+            width: 70,
+            render: (text, record, index) => {
+                return index + 1;
+            },
+        },
+        {
+            key: "productName",
+            title: "Sản phẩm",
+            width: 800,
+            render: (text, record, index) => {
                 return (
                     <Row>
-                        <Col span={6}>
+                        {console.log(record)
+                        }
+                        <Col span={4}>
+                            <Carousel autoplay className={styles.slider}>
+                                {record.productDetailImages &&
+                                    record.productDetailImages.map((productImage, index) => {
+                                        return <img key={index} style={{ width: '100px' }} alt="abc" src={productImage} />;
+                                    })
+                                }
+                            </Carousel>
+                        </Col>
+                        <Col span={20}>
                             <div
+                                className="m-5"
                                 style={{
-                                    display: "flex",
-                                    alignItems: "center",
+                                    textAlign: "start",
                                     height: "100%",
+                                    justifyContent: "center",
                                 }}
                             >
-                                <img
-                                    src={record.imgDefault === null ?
-                                        "https://vapa.vn/wp-content/uploads/2022/12/anh-3d-thien-nhien.jpeg"
-                                        : record.imgDefault
-                                    }
-                                    width={"100%"}
-                                    alt=""
-                                />
-                            </div>
-                        </Col>
-                        <Col span={12}>
-                            <div style={{ textAlign: "left", marginLeft: 20 }}>
-                                <h6 >
-                                    {record.productName} {" - "}
-                                    <span className={styles.optionColor}>
-                                        <span
-                                            style={{
-                                                backgroundColor: record.productColor,
-                                            }}
-                                        ></span>
-                                        {record.productColor}
-                                    </span>
-                                </h6>
-                                <span style={{ fontWeight: 500, marginRight: 20 }}>
-                                    Kích cỡ: {record.productSize}
+                                <span style={{ fontWeight: "500" }}>
+                                    {record.productName +
+                                        "-" +
+                                        record.productButton +
+                                        "-" +
+                                        record.productMaterial
+                                        +
+                                        "-" +
+                                        record.productCollar +
+                                        "-" +
+                                        record.productSleeve +
+                                        "-" +
+                                        record.productShirtTail +
+                                        "-" +
+                                        record.productPatternName +
+                                        "-" +
+                                        record.productFormName}
                                 </span>
                                 <br />
-                                <span style={{ fontWeight: 500 }}>
-                                    Chất liệu: {record.productMaterial}
-                                </span>
+                                <div className={styles.optionColor}>
+                                    <b>Màu sắc: </b>
+                                    <span
+                                        style={{
+                                            backgroundColor: record.productColor,
+                                            marginLeft: "8px",
+                                        }}
+                                    ></span>
+                                    {record.productColorName}
+                                </div>
                                 <br />
-                                <span style={{ fontWeight: 500 }}>
-                                    Nút áo: {record.productButton}
-                                </span>
-                                <br />
-                                <span style={{ fontWeight: 500 }}>
-                                    Cổ áo: {record.productCollar}
-                                </span>
-                                <br />
-                                <span style={{ fontWeight: 500 }}>
-                                    Đuôi áo: {record.productShirtTail}
+                                <b>Kích cỡ: </b>
+                                <span
+                                    style={{
+                                        marginLeft: "8px",
+                                    }}
+                                >
+                                    {record.productSize}
                                 </span>
                             </div>
                         </Col>
                     </Row>
-                )
+                );
             },
         },
         {
@@ -262,19 +281,20 @@ const BillTimeLine = (addId) => {
                             >
                                 Xác nhận
                             </Button>
-                            <Button
-                                type="primary"
-                                danger
-                                style={{ margin: '0 10px' }}
-                                onClick={() => {
-                                    setAction('cancel');
-                                    showModalConfirm();
-                                }}
-                            >
-                                Hủy
-                            </Button>
+
                         </>
                     )}
+                    {billInfo?.symbol !== 'Received' && (timelines.length !== 3 && timelines.length !== 4) && timelines[timelines.length - 1]?.status !== '0' && <Button
+                        type="primary"
+                        danger
+                        style={{ margin: '0 10px' }}
+                        onClick={() => {
+                            setAction('cancel');
+                            showModalConfirm();
+                        }}
+                    >
+                        Hủy
+                    </Button>}
                     <ModalConfirm
                         isModalOpen={isModalConfirm}
                         handleCancel={handleCancelConfirm}
@@ -402,7 +422,9 @@ const BillTimeLine = (addId) => {
                                         <span  >Số tiền khách trả</span>
                                     </Col>
                                     <Col span={14}>
-                                        <span >{billInfo.amountPaid || '__'}</span>
+                                        <span>
+                                            {numeral(billInfo.amountPaid).format('0,0') + 'đ'}
+                                        </span>
                                     </Col>
                                 </Row>
                             </Col>
@@ -414,7 +436,8 @@ const BillTimeLine = (addId) => {
                                     <Col span={14}>
                                         <span >
                                             {(billInfo?.amountPaid + billInfo?.priceReduce - billInfo.shipPrice - billInfo.totalPrice
-                                            ) || '0đ'}
+                                            ) <= 0 ? "__" : (billInfo?.amountPaid + billInfo?.priceReduce - billInfo.shipPrice - billInfo.totalPrice
+                                            )}
                                         </span>
                                     </Col>
                                 </Row>

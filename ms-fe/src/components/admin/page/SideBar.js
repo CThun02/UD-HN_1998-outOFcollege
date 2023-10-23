@@ -31,7 +31,7 @@ import { useNavigate } from "react-router-dom";
 
 const SideBar = () => {
   const navigate = useNavigate();
-  const href = "/admin/";
+  const href = "/api/admin/";
   const handelClick = (key) => {
     switch (key) {
       case "thongKe":
@@ -42,9 +42,6 @@ const SideBar = () => {
         break;
       case "donHang":
         navigate(href + "order");
-        break;
-      case "thuChi":
-        navigate(href + "income-and-expenses");
         break;
       case "sanPhamChiTiet":
         navigate(href + "product");
@@ -126,11 +123,6 @@ const SideBar = () => {
                 label: "Quản lý đơn hàng",
                 icon: <ShoppingCartOutlined />,
                 key: "donHang",
-              },
-              {
-                label: "Quản lý thu chi",
-                icon: <EuroCircleOutlined />,
-                key: "thuChi",
               },
               {
                 label: "Quản lý sản phẩm",

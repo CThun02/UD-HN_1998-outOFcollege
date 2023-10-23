@@ -1,0 +1,17 @@
+.paddingTopAndBottom {
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+
+.paddingLeftAndRight {
+  padding-left: 35px;
+  padding-right: 35px;
+}
+/* 
+.header {
+  background-color: rgb(243, 246, 246);
+} */
+
+.margin {
+  margin-bottom: 0px !important;
+}

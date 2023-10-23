@@ -341,26 +341,28 @@ const BillTimeLine = (addId) => {
                                 <SpanBorder child={billInfo?.paymentName || '__'} color={'#1677ff'} />
                             </Col>
                         </Row>
-                        <Row>
-                            <Col span={12}>
-                                <span  >Hình thức giao hàng </span>
-                            </Col>
-                            <Col span={12}>
-                                <SpanBorder child={'Giao hàng tại nhà'} color={'gray'} />
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Col span={12}>
-                                <span >
-                                    Ngày nhận hàng dự kiến
-                                </span>
-                            </Col>
-                            <Col span={12}>
-                                <span >
-                                    {moment(billInfo?.shipDate).format('DD/MM/YYYY') || '__'}
-                                </span>
-                            </Col>
-                        </Row>
+                        {billInfo.symbol === 'Shipping' &&
+                            <>
+                                <Row>
+                                    <Col span={12}>
+                                        <span  >Hình thức giao hàng </span>
+                                    </Col>
+                                    <Col span={12}>
+                                        <SpanBorder child={'Giao hàng tại nhà'} color={'gray'} />
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Col span={12}>
+                                        <span >
+                                            Ngày nhận hàng dự kiến
+                                        </span>
+                                    </Col>
+                                    <Col span={12}>
+                                        <span >
+                                            {moment(billInfo?.shipDate).format('DD/MM/YYYY') || '__'}
+                                        </span>
+                                    </Col>
+                                </Row></>}
                     </Col>
                     <Col span={11}>
                         <Row>

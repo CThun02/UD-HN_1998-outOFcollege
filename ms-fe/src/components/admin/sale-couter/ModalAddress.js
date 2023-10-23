@@ -27,11 +27,11 @@ const ModalAddress = ({
           <>
             {record.descriptionDetail +
               " " +
-              record.ward +
+              record.ward.replace(/[0-9|-]/g, "") +
               " " +
-              record.district +
+              record.district.replace(/[0-9|-]/g, "") +
               " " +
-              record.city}
+              record.city.replace(/[0-9|-]/g, "")}
           </>
         );
       },

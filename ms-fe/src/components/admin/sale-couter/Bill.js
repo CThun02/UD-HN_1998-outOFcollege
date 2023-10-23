@@ -641,10 +641,10 @@ const Bill = () => {
   const [amountPaid, setAmountPaid] = useState(0);
 
   const onChangeTypeShip = (checked, index) => {
-    console.log(checked)
     const visible = [...showAddress];
-    visible[shippingFee] = checked;
+    visible[index] = checked;
     setTypeShipping(visible);
+    console.log(selectedOption)
   }
 
   const [errors, setErrors] = useState({})
@@ -656,8 +656,8 @@ const Bill = () => {
       priceReduce: totalPrice - voucherPrice(),
       amountPaid: amountPaid,
       billType: "In-Store",
-      symbol: symbol,
-      status: selectedOption !== 2 ? "Paid" : "Unpaid",
+      symbol: typeShipping ? "Shipping" : symbol,
+      status: typeShipping ? "Unpaid" : selectedOption !== 2 ? "Paid" : "Unpaid",
       note: note,
       paymentDetailId: selectedOption,
       lstBillDetailRequest: [],
@@ -1271,7 +1271,7 @@ const Bill = () => {
                               )}
                             </Col>
                           </Row>
-                          {selectedOption !== 2 && (
+                          {(selectedOption !== 2) ? (
                             <Row>
                               <Col span={16}>
                                 <span
@@ -1284,11 +1284,11 @@ const Bill = () => {
                                   Số tiền khách trả
                                 </span>
                               </Col>
-                              <Col span={8}>
-                                <input
+                              <Col span={8} ư>
+                                <Input
                                   type="number"
-                                  style={{ marginLeft: "100px" }}
-                                  className={styles.input}
+                                  style={{ marginLeft: "100px", width: '100%' }}
+                                  className={styles.input_noneBorder}
                                   onChange={(e) => handleChangeInput(e, index)}
                                 />
                                 {inputError && (
@@ -1304,8 +1304,9 @@ const Bill = () => {
                                 )}
                               </Col>
                             </Row>
-                          )}
-                          {selectedOption === 2 && (
+                          ) : null}
+                          {console.log(selectedOption)}
+                          {Number(selectedOption) === 2 ? (
                             <>
                               <Input
                                 placeholder="Nhập mã giao dịch"
@@ -1314,13 +1315,14 @@ const Bill = () => {
                                   setTransactionCode(e.target.value)
                                 }
                                 style={{ margin: "10px 0", width: "380px" }}
+                                className={styles.input_noneBorder}
                               />
                               <span style={{ fontSize: "16px", color: "red" }}>
                                 {inputError}
                               </span>
                             </>
-                          )}
-                          {selectedOption !== 2 && (
+                          ) : null}
+                          {selectedOption !== 2 ? (
                             <Row>
                               <Col span={16}>
                                 <span
@@ -1344,7 +1346,7 @@ const Bill = () => {
                                 </span>
                               </Col>
                             </Row>
-                          )}
+                          ) : null}
                         </Col>
                         <TextArea
                           onChange={(e) => setNote(e.target.value)}
@@ -1354,16 +1356,11 @@ const Bill = () => {
                         />
                         <div style={{ marginTop: "20px" }}>
                           {!typeShipping[index] &&
-                            <Segmented options={options} style={{ marginBottom: '20px' }} onChange={handleOptionChange}>
+                            <Segmented options={options} style={{ marginBottom: '20px' }}
+                              onChange={handleOptionChange}>
                               {options.map((option) => (
                                 <div
                                   key={option.value}
-                                  style={{
-                                    flex: 1,
-                                    backgroundColor: selectedOption === option.value ? 'blue' : 'white',
-                                    color: selectedOption === option.value ? 'white' : 'blue',
-                                    cursor: 'pointer',
-                                  }}
                                 >
                                   {option.label}
                                 </div>
@@ -1372,12 +1369,13 @@ const Bill = () => {
                           <Row>
                             <Col span={5}>
                               <Switch
-                                onChange={onChangeTypeShip}
+                                onChange={(e) => onChangeTypeShip(e, index)}
                                 style={{}} />
                             </Col>
                             <Col span={19}><h6 style={{ fontSize: '14px', width: '200px' }}>
                               Thanh toán khi nhân hàng
-                            </h6></Col>
+                            </h6>
+                            </Col>
                           </Row>
                         </div>
                         <div style={{ marginTop: "20px" }}>

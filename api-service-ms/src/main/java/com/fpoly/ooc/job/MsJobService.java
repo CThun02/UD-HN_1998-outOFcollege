@@ -1,3 +1,5 @@
+package com.fpoly.ooc.job;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.dto.VoucherAndPromotionConditionDTO;
@@ -129,18 +131,22 @@ public class MsJobService {
 
         if (startDate.isBefore(endDate)) {
             if (dateNow.isBefore(startDate)) {
+                log.info("STATUS_UPCOMING");
                 return Const.STATUS_UPCOMING;
             }
 
             if (dateNow.isAfter(startDate) && dateNow.isBefore(endDate)) {
+                log.info("STATUS_ACTIVE");
                 return Const.STATUS_ACTIVE;
             }
 
             if (dateNow.isAfter(endDate)) {
+                log.info("STATUS_INACTIVE");
                 return Const.STATUS_INACTIVE;
             }
         }
 
+        log.info("nullable");
         return null;
     }
 

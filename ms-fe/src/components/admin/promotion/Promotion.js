@@ -64,7 +64,7 @@ function Promotion() {
       title: "Mã",
       dataIndex: "promotionCode",
       key: "promotionCode",
-      render: (code) => <Link to={"/admin/promotion/detail"}>{code}</Link>,
+      render: (code) => <Link to={"/api/admin/promotion/detail"}>{code}</Link>,
     },
     {
       title: "Tên",
@@ -110,7 +110,7 @@ function Promotion() {
       key: "action",
       render: (object) => (
         <Space size="middle">
-          <Link to={`/admin/promotion/detail/${object[0]}`}>
+          <Link to={`/api/admin/promotion/detail/${object[0]}`}>
             <Button className={styles.iconButton}>
               <EyeOutlined />
             </Button>

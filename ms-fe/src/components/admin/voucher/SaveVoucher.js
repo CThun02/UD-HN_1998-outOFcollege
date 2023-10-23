@@ -227,7 +227,7 @@ function SaveVoucher() {
               })
               .then(() => {
                 setIsLoading(false);
-                navigate("/admin/vouchers");
+                navigate("/api/admin/vouchers");
                 showSuccessNotification("Thao tác thành công", "voucher");
               })
               .catch((err) => {
@@ -904,7 +904,9 @@ function SaveVoucher() {
                               <Space size={10}>
                                 <Button
                                   size="large"
-                                  onClick={() => navigate("/admin/vouchers")}
+                                  onClick={() =>
+                                    navigate("/api/admin/vouchers")
+                                  }
                                 >
                                   {`${
                                     values.status === "INACTIVE"

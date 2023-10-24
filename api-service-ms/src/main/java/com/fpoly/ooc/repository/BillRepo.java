@@ -30,16 +30,18 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
 
 
     @Query("SELECT new com.fpoly.ooc.responce.bill.BillManagementResponse(b.id, b.billCode, COUNT(bd.id)," +
-            "   b.price, a.fullName, b.createdAt, b.billType, b.symbol, b.status) " +
+            "   b.price, a.fullName, b.createdAt, b.billType, b.symbol, b.status, dn.shipPrice, b.priceReduce) " +
             "FROM Bill b LEFT JOIN Account a ON a.username = b.account.username " +
             "   JOIN BillDetail bd ON b.id = bd.bill.id " +
+            "   JOIN DeliveryNote dn ON dn.bill.id = b.id " +
             "WHERE (b.billCode like %:billCode% OR :billCode IS NULL) " +
             "   AND (b.createdAt >= :startDate OR :startDate IS NULL) " +
             "   AND (b.createdAt <= :endDate OR :endDate IS NULL) " +
             "   AND (:status IS NULL OR b.status LIKE %:status%) " +
             "   AND (:billType IS NULL OR b.billType LIKE %:billType%) " +
             "   AND (:symbol IS NULL OR b.symbol LIKE %:symbol%) " +
-            "GROUP BY b.id, b.billCode, b.price, a.fullName, b.createdAt, b.billType, b.status, b.symbol " +
+            "GROUP BY b.id, b.billCode, b.price, a.fullName, b.createdAt, b.billType, b.status," +
+            "    b.symbol, dn.shipPrice, b.priceReduce " +
             "ORDER BY b.createdAt DESC ")
     List<BillManagementResponse> getAllBillManagement(
             @Param("billCode") String billCode,

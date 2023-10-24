@@ -75,8 +75,10 @@ const BillManagement = () => {
     },
     {
       title: "Tổng tiền",
-      dataIndex: "totalPrice",
       key: "totalPrice",
+      render: (text, record) => {
+        return record.totalPrice + record.shipPrice - record.priceReduce
+      }
     },
     {
       title: "Tên khách hàng",

@@ -74,6 +74,8 @@ const Bill = () => {
     setModalVisible(initialState);
   };
 
+  const [disable, setDisable] = useState()
+  let check
   const updateQuantity = (record, index, value) => {
     let cart = JSON.parse(localStorage.getItem(cartId));
     let productDetails = cart.productDetails;
@@ -82,6 +84,14 @@ const Bill = () => {
       notification.warning({
         message: "Thông báo",
         description: "Chỉ được mua 100 sản phẩm",
+        duration: 1,
+      });
+    }
+
+    if (value >= productDetails[index].productDetail.quantity) {
+      notification.warning({
+        message: "Thông báo",
+        description: "Đã vượt quá số lượng tồn",
         duration: 1,
       });
     }
@@ -173,10 +183,12 @@ const Bill = () => {
       key: "quantity",
       width: 200,
       render: (text, record, index) => {
+        const isDisabled = record.quantity >= record.productDetail.quantity;
+        console.log(isDisabled)
         return (
           <InputNumber
             min={1}
-            max={100}
+            max={isDisabled ? record.quantity : 100}
             value={record.quantity}
             onChange={(value) => updateQuantity(record, index, value)}
           />
@@ -481,6 +493,9 @@ const Bill = () => {
     visible[index] = checked;
     setSwitchChange(visible);
     setSymbol(checked ? "Shipping" : "Received");
+    if (!checked) {
+      setTypeShipping(false)
+    }
   };
 
   // mở modal product
@@ -600,6 +615,8 @@ const Bill = () => {
     getListAddressByUsername(account?.username);
     fetchProvinces();
 
+    console.log(voucherAdd)
+
     if (selectedAddress?.city) {
       const city = selectedAddress?.city.substring(
         1 + selectedAddress.city.indexOf("|")
@@ -664,7 +681,6 @@ const Bill = () => {
       transactionCode: selectedOption === '2' ? transactionCode : null,
       voucherCode: voucherAdd?.voucherCode,
     };
-    console.log(transactionCode)
     const billAddress = {
       fullName: fullname,
       sdt: phoneNumber,
@@ -694,7 +710,7 @@ const Bill = () => {
       selectedOption !== '2' &&
       ((remainAmount < 0 && !typeShipping[index]) || isNaN(remainAmount))
     ) {
-      return console.log("Tiền không đủ");
+      setInputError("Tiền không đủ");
     } else {
       for (let i = 0; i < productDetails.length; i++) {
         const billDetail = {
@@ -713,7 +729,8 @@ const Bill = () => {
           let addressId;
           let hasError = false;
 
-          if (account !== undefined && switchChange[index]) {
+          console.log(`object`, account)
+          if (account === null && switchChange[index]) {
             try {
               await schema.validate(billAddress, { abortEarly: false });
               setErrors({});
@@ -730,6 +747,7 @@ const Bill = () => {
               setErrors(validationErrors);
               hasError = true;
             }
+            console.log(`bill address`, billAddress);
           }
 
           if (hasError) {
@@ -749,6 +767,12 @@ const Bill = () => {
                 shipDate: switchChange[index] === true ? leadtime : null,
                 shipPrice: switchChange[index] === true ? shippingFee : null,
               });
+              console.log({
+                billId: response.data.id,
+                addressId: account ? selectedAddress?.id : addressId,
+                shipDate: switchChange[index] === true ? leadtime : null,
+                shipPrice: switchChange[index] === true ? shippingFee : null,
+              })
             }
 
             navigate(`/admin/order`);

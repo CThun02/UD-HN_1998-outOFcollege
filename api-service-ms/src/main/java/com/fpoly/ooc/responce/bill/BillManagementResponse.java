@@ -30,4 +30,8 @@ public class BillManagementResponse {
 
     private String status;
 
+    private BigDecimal shipPrice;
+    
+    private BigDecimal priceReduce;
+
 }

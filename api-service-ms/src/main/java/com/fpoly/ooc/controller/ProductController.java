@@ -188,7 +188,8 @@ public class ProductController {
 
     @PutMapping("/updateProductImg")
     public ResponseEntity<?> updateProductImg(@RequestBody ProductImage request){
-        return ResponseEntity.ok(productImageService.update(request));
+        ProductImage productImage = productImageService.update(request);
+        return ResponseEntity.ok(productImage);
     }
 
 

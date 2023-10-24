@@ -17,7 +17,7 @@ const CustomerAddminIndex = function (props) {
 
   const navigate = useNavigate();
   const handleAddAccount = () => {
-    navigate(`/admin/${roleId === 1 ? "employee" : "customer"}/create`);
+    navigate(`/api/admin/${roleId === 1 ? "employee" : "customer"}/create`);
   };
 
   let roleId = props.roleId;

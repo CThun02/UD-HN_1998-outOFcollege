@@ -13,7 +13,7 @@ function CustomerTable(props) {
 
   const handleOpenSecondModal = async (customer) => {
     navigate(
-      `/admin/${roleId === 1 ? "employee" : "customer"}/detail/${customer}`
+      `/api/admin/${roleId === 1 ? "employee" : "customer"}/detail/${customer}`
     );
   };
 

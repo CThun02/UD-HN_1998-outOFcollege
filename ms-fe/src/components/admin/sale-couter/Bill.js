@@ -21,10 +21,13 @@ import styles from "./Bill.module.css";
 import ModalProduct from "./ModalProduct";
 import logoGhn from "../../../Assets/img/logo/logo_ghn.png";
 import {
+  CarOutlined,
   CloseCircleOutlined,
   DeleteOutlined,
   DollarOutlined,
+  QrcodeOutlined,
   SwapOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
 import * as Yup from "yup";
 import axios from "axios";
@@ -741,7 +744,7 @@ const Bill = () => {
           let addressId;
           let hasError = false;
 
-          if (account === undefined && switchChange[index]) {
+          if (account === null && switchChange[index]) {
             try {
               await schema.validate(billAddress, { abortEarly: false });
               setErrors({});
@@ -782,7 +785,7 @@ const Bill = () => {
               );
             }
 
-            navigate(`/admin/order`);
+            navigate(`/api/admin/order`);
             remove(activeKey);
           } catch (error) {
             console.log(error);
@@ -835,8 +838,17 @@ const Bill = () => {
                         className={styles.addButton}
                         onClick={() => showModal(index)}
                         type="primary"
+                        size="large"
                       >
-                        Thêm giỏ hàng
+                        <CarOutlined style={{ fontSize: "20px" }} />
+                      </Button>
+                      <Button
+                        className={styles.addButton}
+                        type="primary"
+                        size="large"
+                        style={{ marginRight: "8px" }}
+                      >
+                        <QrcodeOutlined style={{ fontSize: "20px" }} />
                       </Button>
                       <ModalProduct
                         visible={modalVisible[index]}
@@ -872,8 +884,10 @@ const Bill = () => {
                       <Button
                         type="primary"
                         onClick={() => handleShowModalAccount(index)}
+                        size="large"
                       >
-                        Chọn tài khoản
+                        <UserOutlined style={{ fontSize: "20px" }} /> Chọn tài
+                        khoản
                       </Button>
                       <ModalAccount
                         visible={modalAccountVisible[index]}

@@ -116,6 +116,14 @@ const ProductDetails = (props) => {
     QRCode: "empty",
     status: "ACTIVE",
   });
+  const [productImage, setProductImage] = useState({
+    id: null,
+    product: {},
+    color: {},
+    path: "",
+    isDefault: false,
+    status: "ACTIVE",
+  });
   const columns = [
     {
       key: "stt",
@@ -953,7 +961,6 @@ const ProductDetails = (props) => {
                                         key="setDefault"
                                         className={styles.defaultImage}
                                         onClick={() => {
-                                          console.log(productImage);
                                           updateProductImage(productImage);
                                         }}
                                         style={
@@ -1485,17 +1492,24 @@ const ProductDetails = (props) => {
     }
   }
 
-  function updateProductImage(productImage) {
+  function updateProductImage(productImageEdit) {
+    let productImageUpdate = { ...productImage };
+    productImageUpdate.id = productImageEdit.id;
+    productImageUpdate.product = { id: productImageEdit.product.id };
+    productImageUpdate.color = { id: productImageEdit.color.id };
+    productImageUpdate.isDefault = !productImageEdit.isDefault;
+    productImageUpdate.path = productImageEdit.path;
+    productImageUpdate.status = productImageEdit.status;
     axios
-      .put(api + "product/updateProductImg", productImage)
-      .then((res) => {
-        messageApi.success(
-          `${res.data.isDefault ? "Đặt" : "Hủy"} ảnh mặc định thành công`
-        );
-      })
+      .put(api + "product/updateProductImg", productImageUpdate)
+      .then((res) => {})
       .catch((err) => {
         console.log(err);
       });
+    messageApi.success(
+      `${productImageUpdate.isDefault ? "Đặt" : "Hủy"} ảnh mặc định thành công`
+    );
+    setRender(Math.random());
   }
 
   function deleteProductImage(productImage) {

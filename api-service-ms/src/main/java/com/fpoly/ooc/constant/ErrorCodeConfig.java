@@ -41,6 +41,8 @@ public class ErrorCodeConfig {
         errors.put("START_DATE_NOT_FOUND", "Định dạng ngày không hợp lệ.");
         errors.put("VOUCHER_END_OF_USE", "Hết thời gian sử dụng mã giảm giá.");
         errors.put("VOUCHER_ACCOUNT_NOT_FOUND", "Không tìm thấy mã giảm giá với tài khoản hiện tại.");
+        errors.put("IS_SEND_EMAIL_MEMBER_REQUIRED", "Gửi cho mã giảm giá cho thành viên là bắt buộc.");
+        errors.put("ARRAYS_CUSTOMER_NOT_NULL", "Danh sách khách hàng rỗng.");
     }
 
     public static String getMessage(String code) {

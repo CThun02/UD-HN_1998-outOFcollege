@@ -15,7 +15,7 @@ public interface VoucherAccountRepository extends JpaRepository<VoucherAccount, 
             "from  Account account " +
             "join VoucherAccount va on va.accountVoucher.username = account.username " +
             "join Voucher voucher on voucher.id = va.voucherAccount.id " +
-            "and account.username = :username " +
+            "and lower(account.username) = :username " +
             "and voucher.id = :voucherId ")
     Boolean isCheckUserUsedVoucher(@Param("voucherId") Long voucherId,
                                    @Param("username") String username);

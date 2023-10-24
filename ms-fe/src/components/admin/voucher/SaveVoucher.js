@@ -103,6 +103,19 @@ const validationSchema = Yup.object().shape({
         return true;
       }
     ),
+  isCheckSendEmail: Yup.boolean().test(
+    "sendEmail",
+    "* Vui lòng không bỏ trống",
+    function (isCheckSendEmail) {
+      const { objectUse } = this.parent;
+
+      if (objectUse === "member" && isCheckSendEmail) {
+        return true;
+      }
+
+      return false;
+    }
+  ),
 });
 
 //date
@@ -214,7 +227,7 @@ function SaveVoucher() {
                 voucherId: voucher?.voucherId ? voucher?.voucherId : "",
                 voucherCode: voucher?.voucherCode ? voucher?.voucherCode : "",
                 voucherCurrentName: voucher?.voucherCurrentName,
-                objectUser: voucher?.objectUser,
+                objectUse: voucher?.objectUse,
                 emailDetails: {
                   messageBody:
                     "Hi bạn, \n Men's Shirt Shop gửi bạn voucher đặc biệt: \n\t1. Mã voucher: ASDFSAF724, Bạn có thể lên shop hoặc tới cửa hàng để sử dụng voucher này.\nThanks.",
@@ -895,6 +908,18 @@ function SaveVoucher() {
                                 >
                                   Gửi mã giảm giá cho khách hàng
                                 </Checkbox>
+                                {touched.isCheckSendEmail && (
+                                  <div className={styles.errors}>
+                                    {errors.isCheckSendEmail}{" "}
+                                    {errorsServer.isCheckSendEmail}
+                                  </div>
+                                )}
+                                <div className={styles.errors}>
+                                  {values.objectUse === "member" &&
+                                  customers.length === 0
+                                    ? "* Vui lòng chọn khách hàng cần gửi."
+                                    : ""}
+                                </div>
                               </Space>
                             </Col>
                           </Row>
@@ -921,7 +946,9 @@ function SaveVoucher() {
                                   size="large"
                                   disabled={
                                     values.status === "INACTIVE" ||
-                                    values.status === "CANCEL"
+                                    values.status === "CANCEL" ||
+                                    (values.objectUse === "member" &&
+                                      customers.length === 0)
                                   }
                                 >
                                   Xác nhận

@@ -17,8 +17,9 @@ public interface AccountRepository extends JpaRepository<Account, String> {
 
     @Query("SELECT new com.fpoly.ooc.responce.account.AccountResponce(a.username,a.avatar, a.fullName, a.gender," +
             " a.numberPhone, a.email,a.status)" +
-            "FROM Account a where a.role.id=?1")
-    List<AccountResponce> getAllByRoleId(Long roleId);
+            "FROM Account a where a.role.id=?1 and ((a.fullName like ?2 or ?2 is null) " +
+            "or (a.numberPhone like?2 or ?2 is null ))")
+    List<AccountResponce> getAllByRoleId(Long roleId, String keyword);
 
     @Query("SELECT a FROM Account a where a.role.id=?1 and ((a.fullName like ?2 or ?2 is null) " +
             "or (a.numberPhone like?2 or ?2 is null ))")

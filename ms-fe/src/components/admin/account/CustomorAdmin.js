@@ -9,13 +9,15 @@ import {
 } from "@ant-design/icons";
 import CustomerTable from "./CustomerAdminTable";
 import styles from "./styles/CustomerIndex.module.css";
+import axios from "axios";
 
 const CustomerAddminIndex = function (props) {
   const [value, setValue] = useState(1);
+  const [data, setData] = useState([]);
 
   const navigate = useNavigate();
   const handleAddAccount = () => {
-    navigate(`/admin/${roleId === 1 ? "employee" : "customer"}/create`);
+    navigate(`/api/admin/${roleId === 1 ? "employee" : "customer"}/create`);
   };
 
   let roleId = props.roleId;
@@ -24,7 +26,23 @@ const CustomerAddminIndex = function (props) {
     setValue(e.target.value);
   };
 
-  useEffect(() => {}, [roleId]);
+  function filter(keyword) {
+    axios
+      .get(
+        "http://localhost:8080/api/admin/account/viewAll?roleId=" +
+          roleId +
+          "&keyword=" +
+          keyword
+      )
+      .then((response) => {
+        setData(response.data);
+      })
+      .catch((err) => console.log(err));
+  }
+
+  useEffect(() => {
+    filter("");
+  }, [roleId]);
 
   return (
     <>
@@ -49,6 +67,9 @@ const CustomerAddminIndex = function (props) {
               className={styles.filter_inputSearch}
               placeholder="Nhập mã tên để tìm kiếm"
               prefix={<SearchOutlined />}
+              onChange={(event) => {
+                filter(event.target.value);
+              }}
             />
           </Col>
         </Row>
@@ -67,7 +88,7 @@ const CustomerAddminIndex = function (props) {
               <PlusOutlined />
             </Button>
           </div>
-          <CustomerTable roleId={roleId}></CustomerTable>
+          <CustomerTable data={data} roleId={roleId}></CustomerTable>
         </div>
       </div>
     </>

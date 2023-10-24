@@ -9,4 +9,5 @@ public interface ProductImageResponse {
     public Color getColor();
     public String getPath();
     public String getStatus();
+    public Boolean getIsDefault();
 }

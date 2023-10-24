@@ -91,7 +91,7 @@ const ProductIndex = () => {
       dataIndex: "id",
       render: (id) => (
         <>
-          <Link to={`/admin/product/details/${id}`}>
+          <Link to={`/api/admin/product/details/${id}`}>
             <Button className={styles.product__button}>
               <EyeFilled />
             </Button>
@@ -232,7 +232,7 @@ const ProductIndex = () => {
           </h2>
           <Row className={styles.filter__search}>
             <Col span={24}>
-              <Link to={"/admin/product/create-details"}>
+              <Link to={"/api/admin/product/create-details"}>
                 <Button className={styles.product_tableButtonCreate}>
                   <PlusOutlined />
                 </Button>

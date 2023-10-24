@@ -103,8 +103,8 @@ const BillManagement = () => {
           object.toLocaleLowerCase() === "In-store".toLocaleLowerCase()
             ? "geekblue"
             : object.toLocaleLowerCase() === "Online".toLocaleLowerCase()
-              ? "green"
-              : null;
+            ? "green"
+            : null;
         return (
           <Space direction="vertical">
             <div style={{ width: "auto", display: "flex" }}>
@@ -123,10 +123,10 @@ const BillManagement = () => {
           object === "Unpaid"
             ? "geekblue"
             : object.toLocaleLowerCase() === "PAID".toLocaleLowerCase()
-              ? "green"
-              : object === "cancel"
-                ? "red"
-                : null;
+            ? "green"
+            : object === "cancel"
+            ? "red"
+            : null;
         return (
           <Space direction="vertical">
             <div style={{ width: "auto", display: "flex" }}>
@@ -134,8 +134,8 @@ const BillManagement = () => {
                 {object === "Unpaid"
                   ? "Chưa thanh toán"
                   : object === "cancel"
-                    ? "Đã hủy"
-                    : "Đã thanh toán"}
+                  ? "Đã hủy"
+                  : "Đã thanh toán"}
               </Tag>
             </div>
           </Space>
@@ -147,7 +147,7 @@ const BillManagement = () => {
       key: "action",
       render: (text, record) => {
         return (
-          <Link to={`/admin/counter-sales/${record.billId}/timeline`}>
+          <Link to={`/api/admin/counter-sales/${record.billId}/timeline`}>
             <Button>
               <EyeOutlined />
             </Button>

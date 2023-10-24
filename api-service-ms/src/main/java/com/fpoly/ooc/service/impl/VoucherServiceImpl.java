@@ -30,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -72,8 +73,8 @@ public class VoucherServiceImpl implements VoucherService {
         Voucher voucher = convertVoucherRequest(voucherRequest);
         String result = null;
 
-        if (voucherRequest.getIsCheckSendEmail()) {
-            if (voucherRequest.getObjectUse().equalsIgnoreCase("all")) {
+        if (voucher.getIsSendEmail()) {
+            if (voucher.getObjectUse().equalsIgnoreCase("all")) {
                 List<String> emails = accountService.findAllEmailAccount();
 
                 if (emails.isEmpty()) {
@@ -84,9 +85,6 @@ public class VoucherServiceImpl implements VoucherService {
             }
             result = emailService.sendSimpleMail(voucherRequest.getEmailDetails(), voucher.getId());
         }
-
-        log.info("Email: " + result);
-        log.info("Data: " + voucherRequest);
 
         Voucher dbVoucher = voucherRepository.save(voucher);
 
@@ -296,6 +294,15 @@ public class VoucherServiceImpl implements VoucherService {
         voucher.setVoucherCode(
                 StringUtils.isEmpty(request.getVoucherCode()) ? generatorCode() : request.getVoucherCode()
         );
+
+        if (request.getObjectUse().equals("member") && !request.getIsCheckSendEmail()) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.IS_SEND_EMAIL_MEMBER_REQUIRED));
+        } else {
+            if (request.getUsernames().isEmpty()) {
+                throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ARRAYS_CUSTOMER_NOT_NULL));
+            }
+        }
+
         voucher.setVoucherMethod(request.getVoucherMethod());
         voucher.setVoucherValue(request.getVoucherValue());
         voucher.setVoucherValueMax(request.getVoucherValueMax());

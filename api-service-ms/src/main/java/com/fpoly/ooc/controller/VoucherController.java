@@ -1,6 +1,7 @@
 package com.fpoly.ooc.controller;
 
 import com.fpoly.ooc.dto.VoucherAndPromotionConditionDTO;
+import com.fpoly.ooc.request.voucher.DisplayVoucherRequest;
 import com.fpoly.ooc.request.voucher.VoucherRequest;
 import com.fpoly.ooc.service.interfaces.VoucherService;
 import jakarta.validation.Valid;
@@ -60,12 +61,9 @@ public class VoucherController {
         return ResponseEntity.ok().body(voucherService.findByVoucherCode(code));
     }
 
-    @GetMapping("/display-modal-using")
-    public ResponseEntity<?> displayModalUsingVoucher(
-            @RequestParam(value = "username", defaultValue = "", required = false) String username,
-            @RequestParam(value = "priceBill", defaultValue = "-1", required = false) BigDecimal priceBill
-            ) {
-        return ResponseEntity.ok(voucherService.findAllVoucherResponseDisplayModalUsing(username, priceBill));
+    @PostMapping("/display-modal-using")
+    public ResponseEntity<?> displayModalUsingVoucher(@RequestBody DisplayVoucherRequest request) {
+        return ResponseEntity.ok(voucherService.findAllVoucherResponseDisplayModalUsing(request));
     }
 
 }

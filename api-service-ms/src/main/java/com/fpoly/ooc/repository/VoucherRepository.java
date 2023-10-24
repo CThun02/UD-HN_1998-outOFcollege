@@ -46,12 +46,14 @@ public interface VoucherRepository extends JpaRepository<Voucher, Long> {
             "v.limitQuantity, v.startDate, v.endDate, v.status, v.objectUse, v.voucherCondition) " +
             "from Voucher v " +
             "left join VoucherAccount va on v.id = va.voucherAccount.id " +
-            "where (:username is null or (va.accountVoucher.username = :username and va.status = 'ACTIVE')) " +
+            "where (:voucherCodeOrName is null or lower(v.voucherCode) like :voucherCodeOrName or lower(v.voucherName) like :voucherCodeOrName)" +
+            "and (:username is null or (va.accountVoucher.username = :username and va.status = 'ACTIVE')) " +
             "and (:priceBill is null or v.voucherCondition <= :priceBill) " +
             "group by v.id, v.voucherCode, v.voucherName, v.voucherValue, v.voucherValueMax, v.voucherMethod, " +
             "v.limitQuantity, v.startDate, v.endDate, v.status, v.objectUse, v.voucherCondition " +
             "order by v.voucherValue desc ")
-    List<VoucherResponse> findAllDisplayModalUsingVoucher(@Param("username") String username,
+    List<VoucherResponse> findAllDisplayModalUsingVoucher(@Param("voucherCodeOrName")String voucherCodeOrName,
+                                                          @Param("username") String username,
                                                           @Param("priceBill") BigDecimal priceBill);
 
     @Query("select new java.lang.Boolean((COUNT(*) > 0)) from VoucherAccount va " +

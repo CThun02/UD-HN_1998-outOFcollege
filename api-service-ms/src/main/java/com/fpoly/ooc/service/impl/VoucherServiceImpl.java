@@ -9,6 +9,7 @@ import com.fpoly.ooc.entity.Voucher;
 import com.fpoly.ooc.entity.VoucherAccount;
 import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.VoucherRepository;
+import com.fpoly.ooc.request.voucher.DisplayVoucherRequest;
 import com.fpoly.ooc.request.voucher.VoucherRequest;
 import com.fpoly.ooc.responce.account.AccountVoucher;
 import com.fpoly.ooc.responce.voucher.VoucherResponse;
@@ -167,10 +168,11 @@ public class VoucherServiceImpl implements VoucherService {
     }
 
     @Override
-    public List<VoucherResponse> findAllVoucherResponseDisplayModalUsing(String username, BigDecimal priceBill) {
+    public List<VoucherResponse> findAllVoucherResponseDisplayModalUsing(DisplayVoucherRequest request) {
         return voucherRepository.findAllDisplayModalUsingVoucher(
-                StringUtils.isBlank(username) ? null : username,
-                String.valueOf(priceBill).equals("-1") ? null : priceBill
+                StringUtils.isEmpty(request.getVoucherCodeOrName()) ? null : "%" + request.getVoucherCodeOrName().toLowerCase() + "%",
+                StringUtils.isBlank(request.getUsername()) ? null : request.getUsername(),
+                StringUtils.isEmpty(String.valueOf(request.getPriceBill())) ? null : request.getPriceBill()
         );
     }
 

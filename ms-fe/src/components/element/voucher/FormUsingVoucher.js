@@ -1,9 +1,10 @@
-import { Modal, Space, Radio } from "antd";
+import { Modal, Space, Radio, Input } from "antd";
 import styles from "./FormUsingVoucher.module.css";
 import { useEffect, useRef, useState } from "react";
 import VoucherList from "./VoucherList";
 import axios from "axios";
 import "./global.css";
+import SearchNameOrCodeVoucher from "./SearchNameOrCodeVoucher";
 
 const baseUrl = "http://localhost:8080/api/admin/vouchers";
 
@@ -16,6 +17,7 @@ function FormUsingVoucher({
   username,
 }) {
   const [vouchers, setVouchers] = useState([]);
+  const [voucherCodeOrName, setVoucherCodeOrName] = useState("");
 
   const handleOnChange = (value) => {
     setVoucher(value);
@@ -31,28 +33,24 @@ function FormUsingVoucher({
 
   useEffect(() => {
     async function getVouchers() {
-      if (username) {
-        const res = await axios.get(
-          baseUrl +
-            "/display-modal-using?username=" +
-            username +
-            "&priceBill=" +
-            priceBill
+      try {
+        const condition = {
+          username,
+          priceBill,
+          voucherCodeOrName,
+        };
+        const res = await axios.post(
+          baseUrl + "/display-modal-using",
+          condition
         );
         const data = await res.data;
         setVouchers(data);
-      } else {
-        try {
-          const res = await axios.get(baseUrl + "/display-modal-using");
-          const data = await res.data;
-          setVouchers(data);
-        } catch (e) {
-          console.log("Fetch data error: ", e);
-        }
+      } catch (err) {
+        console.log(err);
       }
     }
     getVouchers();
-  }, [priceBill, username]);
+  }, [priceBill, username, voucherCodeOrName]);
 
   return (
     <Modal
@@ -63,6 +61,14 @@ function FormUsingVoucher({
       className={styles.scroll}
       centered
     >
+      <div style={{ padding: "10px 0" }}>
+        <Input
+          placeholder="Nhập mã hoặc tên voucher"
+          size="large"
+          onChange={(e) => setVoucherCodeOrName(e.target.value)}
+          value={voucherCodeOrName}
+        />
+      </div>
       <Space style={{ width: "100%" }} direction="vertical">
         <Radio.Group
           onChange={(e) => {

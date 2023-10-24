@@ -31,7 +31,7 @@ public interface VoucherRepository extends JpaRepository<Voucher, Long> {
     Optional<Voucher> findVoucherByVoucherCode(String code);
 
     @Query("select new java.lang.Boolean((COUNT(*) > 0)) from VoucherAccount va " +
-            "where va.voucherAccount.id = :idVoucher and va.accountVoucher.username = :username")
+            "where va.voucherAccount.id = :idVoucher and lower(va.accountVoucher.username) = :username")
     Boolean isCheckAccountOwnerVoucher(Long idVoucher, String username);
 
     @Query("select new com.fpoly.ooc.responce.voucher.VoucherResponse(" +
@@ -47,7 +47,7 @@ public interface VoucherRepository extends JpaRepository<Voucher, Long> {
             "from Voucher v " +
             "left join VoucherAccount va on v.id = va.voucherAccount.id " +
             "where (:voucherCodeOrName is null or lower(v.voucherCode) like :voucherCodeOrName or lower(v.voucherName) like :voucherCodeOrName)" +
-            "and (:username is null or (va.accountVoucher.username = :username and va.status = 'ACTIVE')) " +
+            "and (:username is null or (lower(va.accountVoucher.username) = :username and va.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE )) " +
             "and (:priceBill is null or v.voucherCondition <= :priceBill) " +
             "group by v.id, v.voucherCode, v.voucherName, v.voucherValue, v.voucherValueMax, v.voucherMethod, " +
             "v.limitQuantity, v.startDate, v.endDate, v.status, v.objectUse, v.voucherCondition " +
@@ -59,8 +59,8 @@ public interface VoucherRepository extends JpaRepository<Voucher, Long> {
     @Query("select new java.lang.Boolean((COUNT(*) > 0)) from VoucherAccount va " +
             "join Voucher v on v.id = va.voucherAccount.id " +
             "join Account a on a.username = va.accountVoucher.username " +
-            "where (?1 is null or v.voucherCode = ?1) " +
-            "and (?2 is null or (a.username = ?2 and va.status = 'ACTIVE' )) " +
-            "and v.status = 'ACTIVE' ")
+            "where (?1 is null or lower(v.voucherCode) = ?1) " +
+            "and (?2 is null or (lower(a.username) = ?2 and va.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE )) " +
+            "and v.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE ")
     Boolean isCheckTimeUseAndAccount(String voucherCode, String username);
 }

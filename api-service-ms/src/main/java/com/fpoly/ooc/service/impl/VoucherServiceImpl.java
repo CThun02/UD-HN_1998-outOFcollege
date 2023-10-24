@@ -1,5 +1,6 @@
 package com.fpoly.ooc.service.impl;
 
+import com.fpoly.ooc.common.Commons;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
 import com.fpoly.ooc.dto.EmailDetails;
@@ -58,10 +59,10 @@ public class VoucherServiceImpl implements VoucherService {
 
         return (Page<VoucherResponse>) PageUltil.page(
                 voucherRepository.findAllVoucher(
-                        Objects.isNull(voucherConditionDTO.getCodeOrName()) ? null : "%" + voucherConditionDTO.getCodeOrName() + "%",
+                        Objects.isNull(voucherConditionDTO.getCodeOrName()) ? null : "%" + Commons.lower(voucherConditionDTO.getCodeOrName()) + "%",
                         Objects.isNull(voucherConditionDTO.getStartDate()) ? null : voucherConditionDTO.getStartDate(),
                         Objects.isNull(voucherConditionDTO.getEndDate()) ? null : voucherConditionDTO.getEndDate(),
-                        status
+                        Commons.lower(status)
                 ), pageable);
     }
 
@@ -159,7 +160,7 @@ public class VoucherServiceImpl implements VoucherService {
 
     @Override
     public Boolean isCheckAccountOwnerVoucher(Long idVoucher, String username) {
-        return voucherRepository.isCheckAccountOwnerVoucher(idVoucher, username);
+        return voucherRepository.isCheckAccountOwnerVoucher(idVoucher, Commons.lower(username));
     }
 
     @Override
@@ -170,8 +171,8 @@ public class VoucherServiceImpl implements VoucherService {
     @Override
     public List<VoucherResponse> findAllVoucherResponseDisplayModalUsing(DisplayVoucherRequest request) {
         return voucherRepository.findAllDisplayModalUsingVoucher(
-                StringUtils.isEmpty(request.getVoucherCodeOrName()) ? null : "%" + request.getVoucherCodeOrName().toLowerCase() + "%",
-                StringUtils.isBlank(request.getUsername()) ? null : request.getUsername(),
+                StringUtils.isEmpty(request.getVoucherCodeOrName()) ? null : "%" + Commons.lower(request.getVoucherCodeOrName()) + "%",
+                StringUtils.isBlank(request.getUsername()) ? null : Commons.lower(request.getUsername()),
                 StringUtils.isEmpty(String.valueOf(request.getPriceBill())) ? null : request.getPriceBill()
         );
     }
@@ -185,7 +186,7 @@ public class VoucherServiceImpl implements VoucherService {
 
     @Override
     public Boolean isCheckTimeUse(String voucherCode, String username) {
-        return voucherRepository.isCheckTimeUseAndAccount(voucherCode, username);
+        return voucherRepository.isCheckTimeUseAndAccount(Commons.lower(voucherCode), Commons.lower(username));
     }
 
     private VoucherRequest convertVoucher(Voucher voucher) {

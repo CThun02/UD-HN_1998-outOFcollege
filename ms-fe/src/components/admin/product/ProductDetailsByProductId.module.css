@@ -32,3 +32,7 @@
 .productDetails__table {
   margin-top: 30px;
 }
+
+.defaultImage:hover {
+  color: rgb(192, 192, 76) !important;
+}

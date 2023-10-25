@@ -20,8 +20,10 @@ public class BillManagementResponse {
 
     private BigDecimal totalPrice;
 
-    private String fullname;
+    private String fullName;
 
+    private String phoneNumber;
+    
     private LocalDateTime createdDate;
 
     private String billType;

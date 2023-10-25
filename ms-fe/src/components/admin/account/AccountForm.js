@@ -197,7 +197,9 @@ const MyForm = (props) => {
                       icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
                     });
                     navigate(
-                      `/admin/${Number(roleId) === 1 ? "employee" : "customer"}`
+                      `/api/admin/${
+                        Number(roleId) === 1 ? "employee" : "customer"
+                      }`
                     );
                   }, 2000);
                 } catch (error) {

@@ -58,7 +58,7 @@ function FormUsingVoucher({
     <Modal
       title="Chọn mã giảm giá"
       open={isOpen}
-      onOk={handleOk}
+      footer={null}
       onCancel={handleCancel}
       className={styles.scroll}
       centered

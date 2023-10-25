@@ -69,9 +69,17 @@ const BillManagement = () => {
       key: "code",
     },
     {
-      title: "Tổng sản phẩm",
-      dataIndex: "totalQuantity",
-      key: "totalQuantity",
+      title: "Tên khách hàng",
+      dataIndex: "fullName",
+      key: "fullName",
+      render: (fullName) => {
+        return fullName || "Khách lẻ";
+      },
+    },
+    {
+      title: "Số điện thoại",
+      dataIndex: "phoneNumber",
+      key: "phoneNumber",
     },
     {
       title: "Tổng tiền",
@@ -81,39 +89,11 @@ const BillManagement = () => {
       }
     },
     {
-      title: "Tên khách hàng",
-      dataIndex: "fullname",
-      key: "fullname",
-      render: (fullname) => {
-        return fullname || "Khách lẻ";
-      },
-    },
-    {
       title: "Ngày tạo",
       dataIndex: "createdDate",
       key: "createdDate",
       render: (createdDate) => {
         return moment(createdDate).format(` HH:mm:ss DD/MM/YYYY`);
-      },
-    },
-    {
-      title: "Loại hóa đơn",
-      dataIndex: "billType",
-      key: "billType",
-      render: (object) => {
-        let color =
-          object.toLocaleLowerCase() === "In-store".toLocaleLowerCase()
-            ? "geekblue"
-            : object.toLocaleLowerCase() === "Online".toLocaleLowerCase()
-              ? "green"
-              : null;
-        return (
-          <Space direction="vertical">
-            <div style={{ width: "auto", display: "flex" }}>
-              <Tag color={color}>{object}</Tag>
-            </div>
-          </Space>
-        );
       },
     },
     {
@@ -149,7 +129,7 @@ const BillManagement = () => {
       key: "action",
       render: (text, record) => {
         return (
-          <Link to={`/admin/counter-sales/${record.billId}/timeline`}>
+          <Link to={`/api/admin/counter-sales/${record.billId}/timeline`}>
             <Button>
               <EyeOutlined />
             </Button>

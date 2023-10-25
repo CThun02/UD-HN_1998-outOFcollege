@@ -21,10 +21,13 @@ import styles from "./Bill.module.css";
 import ModalProduct from "./ModalProduct";
 import logoGhn from "../../../Assets/img/logo/logo_ghn.png";
 import {
+  CarOutlined,
   CloseCircleOutlined,
   DeleteOutlined,
   DollarOutlined,
-  SwapOutlined
+  QrcodeOutlined,
+  SwapOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
 import * as Yup from "yup";
 import axios from "axios";
@@ -79,7 +82,7 @@ const Bill = () => {
   const updateQuantity = (record, index, value) => {
     let cart = JSON.parse(localStorage.getItem(cartId));
     let productDetails = cart.productDetails;
-    console.log(record)
+    console.log(record);
     if (value > 99) {
       notification.warning({
         message: "Thông báo",
@@ -121,7 +124,14 @@ const Bill = () => {
               <Carousel autoplay className={styles.slider}>
                 {record.productDetailImages &&
                   record.productDetailImages.map((productImage, index) => {
-                    return <img key={index} style={{ width: '100px' }} alt="abc" src={productImage} />;
+                    return (
+                      <img
+                        key={index}
+                        style={{ width: "100px" }}
+                        alt="abc"
+                        src={productImage}
+                      />
+                    );
                   })}
               </Carousel>
             </Col>
@@ -224,35 +234,50 @@ const Bill = () => {
     },
   ];
 
-
   const options = [
     {
       label: (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '160px', height: '50px' }}>
-          <Avatar src={<DollarOutlined style={{ color: 'black' }} />} />
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: "160px",
+            height: "50px",
+          }}
+        >
+          <Avatar src={<DollarOutlined style={{ color: "black" }} />} />
           <div style={{ marginLeft: 8 }}>Tiền mặt</div>
         </div>
       ),
-      value: '1',
+      value: "1",
     },
     {
       label: (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '160px', height: '50px' }}>
-          <Avatar src={<SwapOutlined style={{ color: 'black' }} />} />
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: "160px",
+            height: "50px",
+          }}
+        >
+          <Avatar src={<SwapOutlined style={{ color: "black" }} />} />
           <div style={{ marginLeft: 8 }}> Chuyển khoản</div>
         </div>
       ),
-      value: '2',
+      value: "2",
     },
   ];
 
   const [selectedOption, setSelectedOption] = useState(1);
 
   const handleOptionChange = (value) => {
-    setInputError('')
+    setInputError("");
     setSelectedOption(value);
-    if (value === '2') {
-      setAmountPaid(0)
+    if (value === "2") {
+      setAmountPaid(0);
     }
   };
 
@@ -489,6 +514,9 @@ const Bill = () => {
 
   // switch bán tại quầy hoặc online
   const handleChangSwitch = (checked, index) => {
+    if (!checked) {
+      setTypeShipping(false);
+    }
     const visible = [...switchChange];
     visible[index] = checked;
     setSwitchChange(visible);
@@ -657,18 +685,21 @@ const Bill = () => {
     const visible = [...showAddress];
     visible[index] = checked;
     setTypeShipping(visible);
-    setSelectedOption(1)
-  }
+    setSelectedOption(1);
+  };
 
-  const [errors, setErrors] = useState({})
+  const [errors, setErrors] = useState({});
   const handleCreateBill = (index) => {
     const bill = {
       billCode: activeKey,
       accountId: account?.username,
       price: totalPrice,
       priceReduce: totalPrice - voucherPrice(),
-      amountPaid: typeShipping[index] ? 0 :
-        selectedOption === '2' ? voucherPrice() + shippingFee : amountPaid,
+      amountPaid: typeShipping[index]
+        ? 0
+        : selectedOption === "2"
+          ? voucherPrice() + shippingFee
+          : amountPaid,
       billType: "In-Store",
       symbol: typeShipping[index] ? "Shipping" : symbol,
       status: typeShipping[index] ? "Unpaid" : "Paid",
@@ -678,7 +709,7 @@ const Bill = () => {
       addressId: selectedAddress?.id,
       fullname: selectedAddress?.fullName,
       phoneNumber: selectedAddress.numberPhone,
-      transactionCode: selectedOption === '2' ? transactionCode : null,
+      transactionCode: selectedOption === "2" ? transactionCode : null,
       voucherCode: voucherAdd?.voucherCode,
     };
     const billAddress = {
@@ -707,10 +738,10 @@ const Bill = () => {
     } else if (selectedOption === 2 && transactionCode === "") {
       return setInputError("Mã giao dịch không được để trống");
     } else if (
-      selectedOption !== '2' &&
+      selectedOption !== "2" &&
       ((remainAmount < 0 && !typeShipping[index]) || isNaN(remainAmount))
     ) {
-      setInputError("Tiền không đủ");
+      return setInputError("Tiền không đủ");
     } else {
       for (let i = 0; i < productDetails.length; i++) {
         const billDetail = {
@@ -747,11 +778,10 @@ const Bill = () => {
               setErrors(validationErrors);
               hasError = true;
             }
-            console.log(`bill address`, billAddress);
           }
 
           if (hasError) {
-            console.log(hasError)
+            console.log(hasError);
             return;
           }
 
@@ -761,21 +791,22 @@ const Bill = () => {
               bill
             );
             if (switchChange[index]) {
-              await axios.post("http://localhost:8080/api/admin/delivery-note", {
-                billId: response.data.id,
-                addressId: account ? selectedAddress?.id : addressId,
-                shipDate: switchChange[index] === true ? leadtime : null,
-                shipPrice: switchChange[index] === true ? shippingFee : null,
-              });
-              console.log({
-                billId: response.data.id,
-                addressId: account ? selectedAddress?.id : addressId,
-                shipDate: switchChange[index] === true ? leadtime : null,
-                shipPrice: switchChange[index] === true ? shippingFee : null,
-              })
+              await axios.post(
+                "http://localhost:8080/api/admin/delivery-note",
+                {
+                  billId: response.data.id,
+                  addressId: account ? selectedAddress?.id : addressId,
+                  shipDate: switchChange[index] === true ? leadtime : null,
+                  shipPrice: switchChange[index] === true ? shippingFee : null,
+                }
+              );
             }
-
-            navigate(`/admin/order`);
+            notification.success({
+              message: "Thông báo",
+              description: 'Thanh toán thành công',
+              duration: 2,
+            });
+            navigate(`/api/admin/order`);
             remove(activeKey);
           } catch (error) {
             console.log(error);
@@ -828,8 +859,17 @@ const Bill = () => {
                         className={styles.addButton}
                         onClick={() => showModal(index)}
                         type="primary"
+                        size="large"
                       >
-                        Thêm giỏ hàng
+                        <CarOutlined style={{ fontSize: "20px" }} />
+                      </Button>
+                      <Button
+                        className={styles.addButton}
+                        type="primary"
+                        size="large"
+                        style={{ marginRight: "8px" }}
+                      >
+                        <QrcodeOutlined style={{ fontSize: "20px" }} />
                       </Button>
                       <ModalProduct
                         visible={modalVisible[index]}
@@ -865,8 +905,10 @@ const Bill = () => {
                       <Button
                         type="primary"
                         onClick={() => handleShowModalAccount(index)}
+                        size="large"
                       >
-                        Chọn tài khoản
+                        <UserOutlined style={{ fontSize: "20px" }} /> Chọn tài
+                        khoản
                       </Button>
                       <ModalAccount
                         visible={modalAccountVisible[index]}
@@ -947,7 +989,9 @@ const Bill = () => {
                                     value={selectedAddress?.fullName}
                                   />
                                   {errors.fullName && (
-                                    <div style={{ color: "red" }}>{errors.fullName}</div>
+                                    <div style={{ color: "red" }}>
+                                      {errors.fullName}
+                                    </div>
                                   )}
                                 </Col>
                               </Row>
@@ -966,7 +1010,11 @@ const Bill = () => {
                                     }
                                     value={selectedAddress?.sdt}
                                   />
-                                  {errors.sdt && <div style={{ color: "red" }}>{errors.sdt}</div>}
+                                  {errors.sdt && (
+                                    <div style={{ color: "red" }}>
+                                      {errors.sdt}
+                                    </div>
+                                  )}
                                 </Col>
                               </Row>
                             </Col>
@@ -1007,7 +1055,9 @@ const Bill = () => {
                                 </Select.Option>
                               ))}
                           </Select>
-                          {errors.city && <div style={{ color: "red" }}>{errors.city}</div>}
+                          {errors.city && (
+                            <div style={{ color: "red" }}>{errors.city}</div>
+                          )}
                         </Col>
                         <Col span={8}>
                           <span>
@@ -1043,7 +1093,11 @@ const Bill = () => {
                                 );
                               })}
                           </Select>
-                          {errors.district && <div style={{ color: "red" }}>{errors.district}</div>}
+                          {errors.district && (
+                            <div style={{ color: "red" }}>
+                              {errors.district}
+                            </div>
+                          )}
                         </Col>
                         <Col span={8}>
                           <span>
@@ -1072,7 +1126,9 @@ const Bill = () => {
                                 </Select.Option>
                               ))}
                           </Select>
-                          {errors.ward && <div style={{ color: "red" }}>{errors.ward}</div>}
+                          {errors.ward && (
+                            <div style={{ color: "red" }}>{errors.ward}</div>
+                          )}
                         </Col>
                       </Row>
                       <Row>
@@ -1240,12 +1296,13 @@ const Bill = () => {
                                 fontSize: "16px",
                               }}
                             >
-                              {(
-                                voucherPrice() + shippingFee
-                              ).toLocaleString("vi-VN", {
-                                style: "currency",
-                                currency: "VND",
-                              })}
+                              {(voucherPrice() + shippingFee).toLocaleString(
+                                "vi-VN",
+                                {
+                                  style: "currency",
+                                  currency: "VND",
+                                }
+                              )}
                             </span>
                           ) : (
                             <span
@@ -1261,39 +1318,39 @@ const Bill = () => {
                             </span>
                           )}
                         </Col>
-                        {(Number(selectedOption) !== 2 && !typeShipping[index])
-                          ? (
-                            <>
-                              <Col span={8} style={{ marginTop: '8px' }}>
+                        {Number(selectedOption) !== 2 &&
+                          !typeShipping[index] ? (
+                          <>
+                            <Col span={8} style={{ marginTop: "8px" }}>
+                              <span
+                                style={{
+                                  fontSize: "16px",
+                                  width: "200%",
+                                  display: "block",
+                                }}
+                              >
+                                Số tiền khách trả
+                              </span>
+                            </Col>
+                            <Col span={16}>
+                              <Input
+                                type="number"
+                                className={styles.input_noneBorder}
+                                onChange={(e) => handleChangeInput(e, index)}
+                              />
+                              {inputError && (
                                 <span
                                   style={{
-                                    fontSize: "16px",
                                     width: "200%",
-                                    display: "block",
+                                    color: "red",
                                   }}
                                 >
-                                  Số tiền khách trả
+                                  {inputError}
                                 </span>
-                              </Col>
-                              <Col span={16} >
-                                <Input
-                                  type="number"
-                                  className={styles.input_noneBorder}
-                                  onChange={(e) => handleChangeInput(e, index)}
-                                />
-                                {inputError && (
-                                  <span
-                                    style={{
-                                      width: "200%",
-                                      color: 'red'
-                                    }}
-                                  >
-                                    {inputError}
-                                  </span>
-                                )}
-                              </Col>
-                            </>
-                          ) : null}
+                              )}
+                            </Col>
+                          </>
+                        ) : null}
                         {Number(selectedOption) === 2 ? (
                           <>
                             <Input
@@ -1310,33 +1367,33 @@ const Bill = () => {
                             </span>
                           </>
                         ) : null}
-                        {(Number(selectedOption) !== 2 && !typeShipping[index])
-                          ? (
-                            <Col span={24}>
-                              <Row style={{ marginTop: '8px' }}>
-                                <Col span={16}>
-                                  <span
-                                    style={{ fontSize: "16px", width: "200%" }}
-                                  >
-                                    Tiền thừa
-                                  </span>
-                                </Col>
-                                <Col span={8}>
-                                  <span
-                                    style={{
-                                      fontSize: "16px",
-                                      color: "red",
-                                    }}
-                                  >
-                                    {remainAmount.toLocaleString("vi-VN", {
-                                      style: "currency",
-                                      currency: "VND",
-                                    })}
-                                  </span>
-                                </Col>
-                              </Row>
-                            </Col>
-                          ) : null}
+                        {Number(selectedOption) !== 2 &&
+                          !typeShipping[index] ? (
+                          <Col span={24}>
+                            <Row style={{ marginTop: "8px" }}>
+                              <Col span={16}>
+                                <span
+                                  style={{ fontSize: "16px", width: "200%" }}
+                                >
+                                  Tiền thừa
+                                </span>
+                              </Col>
+                              <Col span={8}>
+                                <span
+                                  style={{
+                                    fontSize: "16px",
+                                    color: "red",
+                                  }}
+                                >
+                                  {remainAmount.toLocaleString("vi-VN", {
+                                    style: "currency",
+                                    currency: "VND",
+                                  })}
+                                </span>
+                              </Col>
+                            </Row>
+                          </Col>
+                        ) : null}
                         <TextArea
                           onChange={(e) => setNote(e.target.value)}
                           rows={3}
@@ -1344,28 +1401,34 @@ const Bill = () => {
                           style={{ margin: "10px 0" }}
                         />
                         <div style={{ marginTop: "20px" }}>
-                          {!typeShipping[index] &&
-                            <Segmented options={options} style={{ marginBottom: '20px' }}
-                              onChange={handleOptionChange}>
+                          {!typeShipping[index] && (
+                            <Segmented
+                              options={options}
+                              style={{ marginBottom: "20px" }}
+                              onChange={handleOptionChange}
+                            >
                               {options.map((option) => (
-                                <div
-                                  key={option.value}
-                                >
-                                  {option.label}
-                                </div>
+                                <div key={option.value}>{option.label}</div>
                               ))}
-                            </Segmented>}
-                          {switchChange[index] && <Row>
-                            <Col span={5}>
-                              <Switch
-                                onChange={(e) => onChangeTypeShip(e, index)}
-                                style={{}} />
-                            </Col>
-                            <Col span={19}><h6 style={{ fontSize: '14px', width: '200px' }}>
-                              Thanh toán khi nhân hàng
-                            </h6>
-                            </Col>
-                          </Row>}
+                            </Segmented>
+                          )}
+                          {switchChange[index] && (
+                            <Row>
+                              <Col span={5}>
+                                <Switch
+                                  onChange={(e) => onChangeTypeShip(e, index)}
+                                  style={{}}
+                                />
+                              </Col>
+                              <Col span={19}>
+                                <h6
+                                  style={{ fontSize: "14px", width: "200px" }}
+                                >
+                                  Thanh toán khi nhân hàng
+                                </h6>
+                              </Col>
+                            </Row>
+                          )}
                         </div>
                         <div style={{ marginTop: "20px" }}>
                           <Button

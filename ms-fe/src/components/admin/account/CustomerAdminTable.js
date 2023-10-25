@@ -3,28 +3,17 @@ import { useNavigate } from "react-router-dom";
 import { Table, Space, Button } from "antd";
 import { EyeOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import Avatar from "antd/es/avatar/avatar";
 function CustomerTable(props) {
-  const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
 
   let roleId = props.roleId;
-
-  useEffect(() => {
-    axios
-      .get("http://localhost:8080/api/admin/account/viewAll?roleId=" + roleId)
-      .then((response) => {
-        setData(response.data);
-      })
-      .catch((err) => console.log(err));
-  }, [roleId]);
 
   const navigate = useNavigate();
 
   const handleOpenSecondModal = async (customer) => {
     navigate(
-      `/admin/${roleId === 1 ? "employee" : "customer"}/detail/${customer}`
+      `/api/admin/${roleId === 1 ? "employee" : "customer"}/detail/${customer}`
     );
   };
 
@@ -39,8 +28,8 @@ function CustomerTable(props) {
           style: { marginRight: "10px" },
         }}
         dataSource={
-          data &&
-          data.map((record, index) => ({
+          props.data &&
+          props.data.map((record, index) => ({
             ...record,
             key: index,
           }))

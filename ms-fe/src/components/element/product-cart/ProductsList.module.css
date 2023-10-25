@@ -1,0 +1,24 @@
+/* w: 270
+  h: 300 */
+
+.width {
+  width: 90% !important;
+}
+
+.image {
+  height: 360px !important;
+}
+
+.width div:nth-child(2) {
+  width: 100%;
+  height: 170px;
+}
+
+.centerd {
+  display: flex;
+  justify-content: center;
+}
+
+.size {
+  padding: 10px 20px;
+}

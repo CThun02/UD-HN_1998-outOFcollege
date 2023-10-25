@@ -113,7 +113,7 @@ public class VoucherServiceImpl implements VoucherService {
 
     @Override
     public Voucher updateStatus(String code, String status) {
-        Voucher voucher = findVoucherByVoucherCode(status);
+        Voucher voucher = findVoucherByVoucherCode(code);
         voucher.setStatus(status);
 
         return voucherRepository.save(voucher);
@@ -176,8 +176,9 @@ public class VoucherServiceImpl implements VoucherService {
 
     @Override
     public Voucher findVoucherByVoucherCode(String voucherCode) {
+        log.info("VoucherCode: " + voucherCode);
         return voucherRepository.findVoucherByVoucherCode(voucherCode)
-                .orElseThrow(() -> new NotFoundException(ErrorCodeConfig.getMessage(Const.CODE_NOT_FOUND)));
+                .orElseThrow(() -> new NotFoundException(ErrorCodeConfig.getFormatMessage(Const.CODE_NOT_FOUND)));
     }
 
     @Override

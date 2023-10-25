@@ -6,6 +6,8 @@ import {
   CloseOutlined,
   PlusOutlined,
   CheckCircleTwoTone,
+  DeleteFilled,
+  StarFilled,
 } from "@ant-design/icons";
 import {
   Button,
@@ -22,6 +24,7 @@ import {
   Table,
   Tooltip,
 } from "antd";
+import Card from "antd/es/card/Card";
 import Input from "antd/es/input/Input";
 import TextArea from "antd/es/input/TextArea";
 import Modal from "antd/es/modal/Modal";
@@ -31,6 +34,8 @@ import { useParams } from "react-router-dom";
 import Confirm from "../confirm/Confirm";
 import styles from "./ProductDetailsByProductId.module.css";
 import { isFormInputEmpty } from "./ValidateForm";
+import { deleteObject, ref } from "firebase/storage";
+import { saveImage } from "../../../config/FireBase";
 
 var buttonId = "",
   materialId = "",
@@ -109,6 +114,14 @@ const ProductDetails = (props) => {
     price: 200000,
     quantity: 10,
     QRCode: "empty",
+    status: "ACTIVE",
+  });
+  const [productImage, setProductImage] = useState({
+    id: null,
+    product: {},
+    color: {},
+    path: "",
+    isDefault: false,
     status: "ACTIVE",
   });
   const columns = [
@@ -242,6 +255,7 @@ const ProductDetails = (props) => {
               footer={null}
               onCancel={() => handlesetIsModalUpdateDetail(index, false)}
               width={800}
+              style={{ top: "20px" }}
             >
               <Row className={styles.productDetails__filter}>
                 <Col span={8}>
@@ -874,6 +888,20 @@ const ProductDetails = (props) => {
                     />
                   </div>
                 </Col>
+                <Col
+                  span={24}
+                  style={{ textAlign: "center", margin: "12px 0" }}
+                >
+                  <Popconfirm
+                    title={"Xác nhận cập nhật sản phẩm"}
+                    onConfirm={() => {
+                      updateProductDetail(productDetailUpdate, true);
+                      handlesetIsModalUpdateDetail(index, false);
+                    }}
+                  >
+                    <Button type="primary">Cập nhật</Button>
+                  </Popconfirm>
+                </Col>
                 <Col span={6} style={{ marginTop: "12px" }}>
                   <div className="m-5">
                     <img
@@ -885,6 +913,7 @@ const ProductDetails = (props) => {
                     />
                   </div>
                 </Col>
+
                 <Col span={18} style={{ marginTop: "12px" }}>
                   <Row>
                     {productImages &&
@@ -905,11 +934,45 @@ const ProductDetails = (props) => {
                             return (
                               <Col span={6} key={productImage.id}>
                                 <div className="m-5">
-                                  <img
-                                    style={{ width: "100%" }}
-                                    alt=""
-                                    src={productImage.path}
-                                  />
+                                  <Card
+                                    hoverable
+                                    cover={
+                                      <img
+                                        onClick={() => {}}
+                                        alt="example"
+                                        src={productImage.path}
+                                      />
+                                    }
+                                    actions={[
+                                      <Popconfirm
+                                        title="Bạn có chắc muốn xóa ảnh này?"
+                                        onConfirm={() =>
+                                          deleteProductImage(productImage)
+                                        }
+                                        okText="Xóa"
+                                        cancelText="Hủy"
+                                        key="delete"
+                                      >
+                                        <DeleteFilled
+                                          style={{ fontSize: "16px" }}
+                                        />
+                                      </Popconfirm>,
+                                      <StarFilled
+                                        key="setDefault"
+                                        className={styles.defaultImage}
+                                        onClick={() => {
+                                          updateProductImage(productImage);
+                                        }}
+                                        style={
+                                          productImage.isDefault === true
+                                            ? {
+                                                color: "rgb(192, 192, 76) ",
+                                              }
+                                            : {}
+                                        }
+                                      />,
+                                    ]}
+                                  ></Card>
                                 </div>
                               </Col>
                             );
@@ -917,17 +980,6 @@ const ProductDetails = (props) => {
                         }
                       })}
                   </Row>
-                </Col>
-                <Col span={24} style={{ textAlign: "end" }}>
-                  <Popconfirm
-                    title={"Xác nhận cập nhật sản phẩm"}
-                    onConfirm={() => {
-                      updateProductDetail(productDetailUpdate, true);
-                      handlesetIsModalUpdateDetail(index, false);
-                    }}
-                  >
-                    <Button type="primary">Cập nhật</Button>
-                  </Popconfirm>
                 </Col>
               </Row>
             </Modal>
@@ -1438,6 +1490,39 @@ const ProductDetails = (props) => {
     } else {
       messageApi.error("Vui lòng nhập đầy đủ các trường");
     }
+  }
+
+  function updateProductImage(productImageEdit) {
+    let productImageUpdate = { ...productImage };
+    productImageUpdate.id = productImageEdit.id;
+    productImageUpdate.product = { id: productImageEdit.product.id };
+    productImageUpdate.color = { id: productImageEdit.color.id };
+    productImageUpdate.isDefault = !productImageEdit.isDefault;
+    productImageUpdate.path = productImageEdit.path;
+    productImageUpdate.status = productImageEdit.status;
+    axios
+      .put(api + "product/updateProductImg", productImageUpdate)
+      .then((res) => {})
+      .catch((err) => {
+        console.log(err);
+      });
+    messageApi.success(
+      `${productImageUpdate.isDefault ? "Đặt" : "Hủy"} ảnh mặc định thành công`
+    );
+    setRender(Math.random());
+  }
+
+  function deleteProductImage(productImage) {
+    axios
+      .delete(api + "product/deleteProductImage?id=" + productImage.id)
+      .then((res) => {
+        messageApi.success(`Xóa ảnh thành công`);
+        deleteObject(ref(saveImage, productImage.path));
+        setRender(Math.random);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
   useEffect(() => {
     axios

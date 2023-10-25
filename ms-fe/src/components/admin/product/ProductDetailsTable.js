@@ -188,9 +188,7 @@ const ProductDetailsTable = (props) => {
           let productImageCreate = { ...productImage };
           productImageCreate.colorId = color.key;
           productImageCreate.path = url;
-          if (imgs.isDefault) {
-            productImageCreate.isDefault = true;
-          }
+          productImageCreate.isDefault = imgs[i].default;
           axios
             .post(api + "product/createProductImg", productImageCreate)
             .then((res) => {})
@@ -332,7 +330,7 @@ const ProductDetailsTable = (props) => {
       });
       setTimeout(() => {
         imgList = []; //reset
-        navigate("/admin/product");
+        navigate("/api/admin/product");
       }, 500);
     }, 1000);
   }

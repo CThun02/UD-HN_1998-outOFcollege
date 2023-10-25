@@ -25,8 +25,8 @@ import {
   CloseCircleOutlined,
   DeleteOutlined,
   DollarOutlined,
-  QrcodeOutlined,
   SwapOutlined,
+  QrcodeOutlined,
   UserOutlined,
 } from "@ant-design/icons";
 import * as Yup from "yup";
@@ -39,6 +39,7 @@ import ModalAccount from "./ModalAccount";
 import ModalAddress from "./ModalAddress";
 import FormUsingVoucher from "../../element/voucher/FormUsingVoucher";
 import numeral from "numeral";
+import SearchNameOrCodeVoucher from "../../element/voucher/SearchNameOrCodeVoucher";
 
 const Bill = () => {
   var initialItems = [];
@@ -1160,9 +1161,11 @@ const Bill = () => {
                       <Switch onChange={(e) => handleChangSwitch(e, index)} />
                       <span style={{ marginLeft: "5px" }}>Giao hàng</span>
                       <br />
-                      <Input
-                        style={{ width: "200px" }}
-                        placeholder="Mã giảm giá"
+                      <SearchNameOrCodeVoucher
+                        priceBill={totalPrice}
+                        username={account}
+                        voucher={voucherAdd}
+                        setVoucher={setVoucherAdd}
                       />
                       <Button
                         type="primary"

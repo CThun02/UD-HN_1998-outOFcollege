@@ -1,5 +1,6 @@
 package com.fpoly.ooc.service.impl;
 
+import com.fpoly.ooc.common.Commons;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
 import com.fpoly.ooc.dto.EmailDetails;
@@ -9,6 +10,7 @@ import com.fpoly.ooc.entity.Voucher;
 import com.fpoly.ooc.entity.VoucherAccount;
 import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.VoucherRepository;
+import com.fpoly.ooc.request.voucher.DisplayVoucherRequest;
 import com.fpoly.ooc.request.voucher.VoucherRequest;
 import com.fpoly.ooc.responce.account.AccountVoucher;
 import com.fpoly.ooc.responce.voucher.VoucherResponse;
@@ -28,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -57,10 +60,10 @@ public class VoucherServiceImpl implements VoucherService {
 
         return (Page<VoucherResponse>) PageUltil.page(
                 voucherRepository.findAllVoucher(
-                        Objects.isNull(voucherConditionDTO.getCodeOrName()) ? null : "%" + voucherConditionDTO.getCodeOrName() + "%",
+                        Objects.isNull(voucherConditionDTO.getCodeOrName()) ? null : "%" + Commons.lower(voucherConditionDTO.getCodeOrName()) + "%",
                         Objects.isNull(voucherConditionDTO.getStartDate()) ? null : voucherConditionDTO.getStartDate(),
                         Objects.isNull(voucherConditionDTO.getEndDate()) ? null : voucherConditionDTO.getEndDate(),
-                        status
+                        Commons.lower(status)
                 ), pageable);
     }
 
@@ -70,8 +73,8 @@ public class VoucherServiceImpl implements VoucherService {
         Voucher voucher = convertVoucherRequest(voucherRequest);
         String result = null;
 
-        if (voucherRequest.getIsCheckSendEmail()) {
-            if (voucherRequest.getObjectUse().equalsIgnoreCase("all")) {
+        if (voucher.getIsSendEmail()) {
+            if (voucher.getObjectUse().equalsIgnoreCase("all")) {
                 List<String> emails = accountService.findAllEmailAccount();
 
                 if (emails.isEmpty()) {
@@ -82,9 +85,6 @@ public class VoucherServiceImpl implements VoucherService {
             }
             result = emailService.sendSimpleMail(voucherRequest.getEmailDetails(), voucher.getId());
         }
-
-        log.info("Email: " + result);
-        log.info("Data: " + voucherRequest);
 
         Voucher dbVoucher = voucherRepository.save(voucher);
 
@@ -158,7 +158,7 @@ public class VoucherServiceImpl implements VoucherService {
 
     @Override
     public Boolean isCheckAccountOwnerVoucher(Long idVoucher, String username) {
-        return voucherRepository.isCheckAccountOwnerVoucher(idVoucher, username);
+        return voucherRepository.isCheckAccountOwnerVoucher(idVoucher, Commons.lower(username));
     }
 
     @Override
@@ -167,10 +167,11 @@ public class VoucherServiceImpl implements VoucherService {
     }
 
     @Override
-    public List<VoucherResponse> findAllVoucherResponseDisplayModalUsing(String username, BigDecimal priceBill) {
+    public List<VoucherResponse> findAllVoucherResponseDisplayModalUsing(DisplayVoucherRequest request) {
         return voucherRepository.findAllDisplayModalUsingVoucher(
-                StringUtils.isBlank(username) ? null : username,
-                String.valueOf(priceBill).equals("-1") ? null : priceBill
+                StringUtils.isEmpty(request.getVoucherCodeOrName()) ? null : "%" + Commons.lower(request.getVoucherCodeOrName()) + "%",
+                StringUtils.isBlank(request.getUsername()) ? null : Commons.lower(request.getUsername()),
+                StringUtils.isEmpty(String.valueOf(request.getPriceBill())) ? null : request.getPriceBill()
         );
     }
 
@@ -183,7 +184,7 @@ public class VoucherServiceImpl implements VoucherService {
 
     @Override
     public Boolean isCheckTimeUse(String voucherCode, String username) {
-        return voucherRepository.isCheckTimeUseAndAccount(voucherCode, username);
+        return voucherRepository.isCheckTimeUseAndAccount(Commons.lower(voucherCode), Commons.lower(username));
     }
 
     private VoucherRequest convertVoucher(Voucher voucher) {
@@ -293,6 +294,15 @@ public class VoucherServiceImpl implements VoucherService {
         voucher.setVoucherCode(
                 StringUtils.isEmpty(request.getVoucherCode()) ? generatorCode() : request.getVoucherCode()
         );
+
+        if (request.getObjectUse().equals("member") && !request.getIsCheckSendEmail()) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.IS_SEND_EMAIL_MEMBER_REQUIRED));
+        } else {
+            if (request.getUsernames().isEmpty()) {
+                throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ARRAYS_CUSTOMER_NOT_NULL));
+            }
+        }
+
         voucher.setVoucherMethod(request.getVoucherMethod());
         voucher.setVoucherValue(request.getVoucherValue());
         voucher.setVoucherValueMax(request.getVoucherValueMax());

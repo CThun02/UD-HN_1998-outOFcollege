@@ -27,7 +27,11 @@ function SockJs({ setValues, connectTo }) {
 
   const onMessageReceived = (msg) => {
     console.log("New Message Received!!", msg);
-    setValues(JSON.parse(msg.body));
+    if (msg.body) {
+      console.log("New Message Received If!!", msg.body);
+
+      setValues(JSON.parse(msg.body));
+    }
   };
 
   useEffect(function () {

@@ -34,6 +34,7 @@ function FormUsingVoucher({
   useEffect(() => {
     async function getVouchers() {
       try {
+        console.log("Voucher: ", voucher);
         const condition = {
           username,
           priceBill,

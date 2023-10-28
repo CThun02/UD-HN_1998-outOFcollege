@@ -1,4 +1,3 @@
-import { CheckCircleFilled } from "@ant-design/icons";
 import {
   Button,
   Carousel,
@@ -86,13 +85,13 @@ const ProductDetails = (props) => {
                         if (
                           productImage.path.includes(
                             "" +
-                            record.button.id +
-                            record.material.id +
-                            record.collar.id +
-                            record.sleeve.id +
-                            record.shirtTail.id +
-                            record.pattern.id +
-                            record.form.id
+                              record.button.id +
+                              record.material.id +
+                              record.collar.id +
+                              record.sleeve.id +
+                              record.shirtTail.id +
+                              record.pattern.id +
+                              record.form.id
                           )
                         ) {
                           return (
@@ -256,13 +255,13 @@ const ProductDetails = (props) => {
             record.color.id === productImage.color.id &&
             productImage.path.includes(
               "" +
-              record.button.id +
-              record.material.id +
-              record.collar.id +
-              record.sleeve.id +
-              record.shirtTail.id +
-              record.pattern.id +
-              record.form.id
+                record.button.id +
+                record.material.id +
+                record.collar.id +
+                record.sleeve.id +
+                record.shirtTail.id +
+                record.pattern.id +
+                record.form.id
             )
           ) {
             result.push(productImage.path);
@@ -289,10 +288,11 @@ const ProductDetails = (props) => {
     ) {
       notification.error({
         message: "Thông báo",
-        description: `Số lượng sản phẩm ${productDetailCreate.quantity > 100
-          ? "thêm tối đa 100"
-          : "tồn không đủ"
-          }`,
+        description: `Số lượng sản phẩm ${
+          productDetailCreate.quantity > 100
+            ? "thêm tối đa 100"
+            : "tồn không đủ"
+        }`,
       });
     } else {
       productDetailCreate.productDetail = record;
@@ -311,30 +311,30 @@ const ProductDetails = (props) => {
     axios
       .get(
         api +
-        "product/filterProductDetailByIdCom?productId=" +
-        productId +
-        "&buttonId=" +
-        buttonId +
-        "&materialId=" +
-        materialId +
-        "&shirtTailId=" +
-        shirtTailId +
-        "&sleeveId=" +
-        sleeveId +
-        "&collarId=" +
-        collarId +
-        "&colorId=" +
-        colorId +
-        "&sizeId=" +
-        sizeId +
-        "&patternId=" +
-        patternId +
-        "&formId=" +
-        formId +
-        "&minPrice=" +
-        price[0] +
-        "&maxPrice=" +
-        price[1]
+          "product/filterProductDetailByIdCom?productId=" +
+          productId +
+          "&buttonId=" +
+          buttonId +
+          "&materialId=" +
+          materialId +
+          "&shirtTailId=" +
+          shirtTailId +
+          "&sleeveId=" +
+          sleeveId +
+          "&collarId=" +
+          collarId +
+          "&colorId=" +
+          colorId +
+          "&sizeId=" +
+          sizeId +
+          "&patternId=" +
+          patternId +
+          "&formId=" +
+          formId +
+          "&minPrice=" +
+          price[0] +
+          "&maxPrice=" +
+          price[1]
       )
       .then((response) => {
         setProductDetails(response.data);

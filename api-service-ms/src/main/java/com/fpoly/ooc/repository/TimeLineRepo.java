@@ -29,7 +29,7 @@ public interface TimeLineRepo extends JpaRepository<Timeline, Long> {
     List<TimeLineResponse> getTimeLineByBillId(@Param("billId") Long id);
 
     @Query("SELECT new com.fpoly.ooc.responce.timeline.TimelineProductResponse(" +
-            "   pd.product.imgDefault, pd.product.productName, bd.quantity, bd.price, pd.size.sizeName, pd.color.colorCode," +
+            "   pd.product.productName, bd.quantity, bd.price, pd.size.sizeName, pd.color.colorCode," +
             "   pd.button.buttonName, pd.collar.collarTypeName, pd.material.materialName, pd.sleeve.sleeveName, " +
             "   pd.shirtTail.shirtTailTypeName, pd.color.colorName, pd.form.formName, pd.pattern.patternName )" +
             "FROM ProductDetail pd " +

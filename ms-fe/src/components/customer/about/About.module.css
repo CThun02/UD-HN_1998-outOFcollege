@@ -1,0 +1,11 @@
+.img {
+  height: auto;
+  max-width: 100%;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.maxW {
+  max-width: 1200px;
+}

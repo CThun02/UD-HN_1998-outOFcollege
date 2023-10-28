@@ -3,6 +3,7 @@ import { Link, Route, Routes } from "react-router-dom";
 import Header from "./header/Header";
 import Footer from "./footer/Footer";
 import HomeClient from "./home/index/HomeClient";
+import About from "./about/About";
 
 function ClientPage() {
   return (
@@ -15,6 +16,7 @@ function ClientPage() {
           <Routes>
             <Route index element={"index"} />
             <Route path="home" element={<HomeClient />} />
+            <Route path="about" element={<About />} />
             <Route
               path="*"
               element={

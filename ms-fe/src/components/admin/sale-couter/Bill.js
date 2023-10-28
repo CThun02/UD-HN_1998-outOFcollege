@@ -78,8 +78,7 @@ const Bill = () => {
     setModalVisible(initialState);
   };
 
-  const [disable, setDisable] = useState()
-  let check
+
   const updateQuantity = (record, index, value) => {
     let cart = JSON.parse(localStorage.getItem(cartId));
     let productDetails = cart.productDetails;

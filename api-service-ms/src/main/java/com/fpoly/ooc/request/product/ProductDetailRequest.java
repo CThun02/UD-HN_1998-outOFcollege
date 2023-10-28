@@ -2,11 +2,13 @@ package com.fpoly.ooc.request.product;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fpoly.ooc.entity.*;
+import lombok.Builder;
 import lombok.Getter;
 
 import java.math.BigDecimal;
 
 @Getter
+@Builder
 public class ProductDetailRequest {
     @JsonProperty("id")
     private Long id;
@@ -30,8 +32,14 @@ public class ProductDetailRequest {
     private Long patternId;
     @JsonProperty("formId")
     private Long formId;
+    @JsonProperty("brandId")
+    private Long brandId;
+    @JsonProperty("categoryId")
+    private Long categoryId;
     @JsonProperty("price")
     private BigDecimal price;
+    @JsonProperty("weight")
+    private Float weight;
     @JsonProperty("quantity")
     private Integer quantity;
     @JsonProperty("descriptionDetail")
@@ -45,8 +53,9 @@ public class ProductDetailRequest {
                 .collar(CollarType.builder().id(collarId).build()).sleeve(SleeveType.builder().id(sleeveId).build())
                 .pattern(Pattern.builder().id(patternId).build()).form(Form.builder().id(formId).build())
                 .shirtTail(ShirtTailType.builder().id(shirtTailId).build()).size(Size.builder().id(sizeId).build())
-                .color(Color.builder().id(colorId).build()).color(Color.builder().id(colorId).build()).price(price)
-                .quantity(quantity).descriptionDetail(descriptionDetail).build();
+                .color(Color.builder().id(colorId).build()).brand(Brand.builder().id(brandId).build())
+                .category(Category.builder().id(categoryId).build()).price(price)
+                .weight(weight).quantity(quantity).descriptionDetail(descriptionDetail).build();
         productDetail.setStatus(status);
         return productDetail;
     }

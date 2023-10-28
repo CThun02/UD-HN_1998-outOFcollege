@@ -108,6 +108,16 @@ public class ProductDetail extends BaseEntity{
     private Product product;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private Category category;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "brand_id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private  Brand brand;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pattern_id")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Pattern pattern;
@@ -157,6 +167,9 @@ public class ProductDetail extends BaseEntity{
 
     @Column(name = "quantity")
     private Integer quantity;
+
+    @Column(name = "weight")
+    private Float weight;
 
     @Column(name = "description_detail")
     private String descriptionDetail;

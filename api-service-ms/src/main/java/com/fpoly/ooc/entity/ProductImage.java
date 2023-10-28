@@ -17,12 +17,8 @@ public class ProductImage extends BaseEntity{
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id")
-    private Product product;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "color_id")
-    private Color color;
+    @JoinColumn(name = "product_detail_id")
+    private ProductDetail productDetail;
 
     @Column(name = "path")
     private String path;

@@ -5,9 +5,7 @@ import com.fpoly.ooc.entity.Product;
 
 public interface ProductImageResponse {
     public Long getId();
-    public Product getProduct();
-    public Color getColor();
+    public Long getProductDetailId();
     public String getPath();
     public String getStatus();
-    public Boolean getIsDefault();
 }

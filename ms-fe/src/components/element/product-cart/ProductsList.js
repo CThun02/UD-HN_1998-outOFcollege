@@ -1,5 +1,7 @@
-import { Card, Col } from "antd";
+import { Card, Col, Space } from "antd";
 import styles from "./ProductsList.module.css";
+
+const image = "/products/shirt-men.jpg";
 
 function ProductsList({ data }) {
   return (
@@ -7,24 +9,24 @@ function ProductsList({ data }) {
       <Card
         className={styles.width}
         hoverable
-        style={{ width: 240 }}
-        cover={
-          <img
-            className={styles.image}
-            alt="product"
-            src="https://firebasestorage.googleapis.com/v0/b/outofcollge.appspot.com/o/products%2FShirt%20A%2FOrange%2F1697979036874Shirt_A2122124?alt=media&token=59b6e0ac-ebe7-4bc1-b02e-708ce3c212e0"
-          />
-        }
+        style={{ width: 270, border: "none" }}
+        cover={<img alt="product" src={image} />}
       >
         <div className={styles.size}>
-          <p className={styles.centerd}>Category</p>
-          <h2 className={styles.centerd}>Name product</h2>
-          <p className={styles.centerd}>
-            <i>star</i>
-          </p>
-          <p className={styles.centerd}>
-            <bdi>$50</bdi>
-          </p>
+          <Space direction="vertical" size={6} style={{ width: "100%" }}>
+            <p className={`${styles.centerd} ${styles.opacity}`}>Category</p>
+            <h2 className={`${styles.centerd} ${styles.textH2}`}>
+              Name Product
+            </h2>
+            <p className={styles.centerd}>
+              <i>star</i>
+            </p>
+            <p className={styles.centerd}>
+              <bdi className={`${styles.fontWeight} ${styles.bdiSize}`}>
+                $50
+              </bdi>
+            </p>
+          </Space>
         </div>
       </Card>
     </Col>

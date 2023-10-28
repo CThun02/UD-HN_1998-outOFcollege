@@ -13,7 +13,7 @@ function ClientPage() {
         </div>
         <div>
           <Routes>
-            <Route index element={"index"} />
+            <Route index element={<HomeClient />} />
             <Route path="home" element={<HomeClient />} />
             <Route
               path="*"

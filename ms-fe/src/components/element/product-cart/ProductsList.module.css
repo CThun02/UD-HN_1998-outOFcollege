@@ -1,8 +1,5 @@
-/* w: 270
-  h: 300 */
-
 .width {
-  width: 90% !important;
+  width: 270px !important;
 }
 
 .image {
@@ -11,7 +8,7 @@
 
 .width div:nth-child(2) {
   width: 100%;
-  height: 170px;
+  height: auto;
 }
 
 .centerd {
@@ -20,5 +17,21 @@
 }
 
 .size {
-  padding: 10px 20px;
+  padding: 20px 10px;
+}
+
+.textH2 {
+  font-size: 1rem;
+}
+
+.opacity {
+  opacity: 0.6;
+}
+
+.fontWeight {
+  font-weight: 500;
+}
+
+.bdiSize {
+  font-size: 1rem;
 }

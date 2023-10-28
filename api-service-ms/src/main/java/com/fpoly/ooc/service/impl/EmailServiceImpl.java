@@ -1,5 +1,6 @@
 package com.fpoly.ooc.service.impl;
 
+import com.fpoly.ooc.common.Commons;
 import com.fpoly.ooc.dto.EmailDetails;
 import com.fpoly.ooc.repository.VoucherRepository;
 import com.fpoly.ooc.service.interfaces.EmailService;
@@ -36,7 +37,7 @@ public class EmailServiceImpl implements EmailService {
 
             for (String recipient: details.getRecipient()) {
 
-                if(voucherRepository.isCheckAccountOwnerVoucher(idVoucher, recipient)) {
+                if(voucherRepository.isCheckAccountOwnerVoucher(idVoucher, Commons.lower(recipient))) {
                     continue;
                 }
 

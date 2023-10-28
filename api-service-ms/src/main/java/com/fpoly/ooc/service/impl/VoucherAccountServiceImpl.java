@@ -1,5 +1,6 @@
 package com.fpoly.ooc.service.impl;
 
+import com.fpoly.ooc.common.Commons;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
 import com.fpoly.ooc.dto.VoucherAccountConditionDTO;
@@ -30,7 +31,7 @@ public class VoucherAccountServiceImpl implements VoucherAccountService {
 
         if (voucherAccountRepository.isCheckUserUsedVoucher(
                 voucherAccountConditionDTO.getVoucher().getId(),
-                voucherAccountConditionDTO.getUsername())
+                Commons.lower(voucherAccountConditionDTO.getUsername()))
         ) {
             return null;
         }

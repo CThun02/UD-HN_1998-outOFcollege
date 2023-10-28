@@ -69,6 +69,11 @@ const BillManagement = () => {
       key: "code",
     },
     {
+      title: "Tên nhân viên",
+      dataIndex: "employee",
+      key: "employee",
+    },
+    {
       title: "Tên khách hàng",
       dataIndex: "fullName",
       key: "fullName",

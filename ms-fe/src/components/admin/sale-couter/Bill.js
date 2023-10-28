@@ -712,6 +712,7 @@ const Bill = () => {
       phoneNumber: selectedAddress.numberPhone,
       transactionCode: selectedOption === "2" ? transactionCode : null,
       voucherCode: voucherAdd?.voucherCode,
+      createdBy: "user3"
     };
     const billAddress = {
       fullName: fullname,
@@ -761,7 +762,6 @@ const Bill = () => {
           let addressId;
           let hasError = false;
 
-          console.log(`object`, account)
           if (account === null && switchChange[index]) {
             try {
               await schema.validate(billAddress, { abortEarly: false });

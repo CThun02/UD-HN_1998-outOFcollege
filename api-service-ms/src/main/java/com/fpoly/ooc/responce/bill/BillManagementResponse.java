@@ -36,4 +36,6 @@ public class BillManagementResponse {
     
     private BigDecimal priceReduce;
 
+    private String employee;
+
 }

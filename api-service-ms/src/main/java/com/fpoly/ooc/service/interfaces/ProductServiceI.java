@@ -17,13 +17,10 @@ public interface ProductServiceI {
     public List<Product> getAll();
     public Product getOne(Long id);
     public Product getOneByCode(String code);
-    public List<ProductTableResponse> getProductsTable(String status1, String status2);
     public ProductTableResponse getProductEdit(Long id);
     public ProductResponse getProductResponseById(Long id);
-    public List<ProductTableResponse> getProductFilterByCom(Long brandId, Long categoryId, String status);
-    public List<ProductTableResponse> getProductCreateDetail(String status);
+    public List<ProductTableResponse> getProductFilterByCom(String status, String keywords);
     Page<ProductPromotionResponse> findProductPromotion(Pageable pageable);
-
     List<Long> findIdsProductsByIdPromotion(Long idPromotion);
 
 }

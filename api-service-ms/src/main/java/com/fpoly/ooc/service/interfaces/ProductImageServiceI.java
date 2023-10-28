@@ -12,8 +12,5 @@ public interface ProductImageServiceI {
     public void delete(ProductImage productImage);
     public List<ProductImage> getAll();
     public ProductImage getOne(Long id);
-    public List<ProductImageResponse> getProductImageByProductIdAndColorId(Long productId, Long colorId);
-    public List<ProductImageResponse> getProductImageByProductId(Long productId);
-    public List<ProductImageResponse> getProductImageDefaultByProductId(Long productId);
-
+    List<ProductImageResponse>  getProductImageByProductDetailId(Long productDetailId);
 }

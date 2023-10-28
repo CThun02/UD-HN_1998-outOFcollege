@@ -26,18 +26,6 @@ public class Product extends BaseEntity {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "img_default")
-    private String imgDefault;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    private Category category;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "brand_id")
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    private  Brand brand;
-
-
+    @Column(name = "status")
+    private String status;
 }

@@ -14,8 +14,8 @@ function Header() {
       setVisible(position > moving);
       setPosition(moving);
       setCheckTop(moving);
+      console.log("top: ", moving, "position: ", position);
     };
-    console.log(visible);
     window.addEventListener("scroll", handleScroll);
     return () => {
       window.removeEventListener("scroll", handleScroll);

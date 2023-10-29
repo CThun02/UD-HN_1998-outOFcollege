@@ -1,4 +1,4 @@
-import { Card, Col, Space } from "antd";
+import { Card, Col, Image, Space } from "antd";
 import styles from "./ProductsList.module.css";
 
 const image = "/products/shirt-men.jpg";

@@ -3,6 +3,7 @@ import { Link, Route, Routes } from "react-router-dom";
 import Header from "./header/Header";
 import Footer from "./footer/Footer";
 import HomeClient from "./home/index/HomeClient";
+import Shop from "./shop/Shop";
 
 function ClientPage() {
   return (
@@ -15,6 +16,7 @@ function ClientPage() {
           <Routes>
             <Route index element={<HomeClient />} />
             <Route path="home" element={<HomeClient />} />
+            <Route path="anything" element={<Shop />} />
             <Route
               path="*"
               element={
@@ -23,7 +25,7 @@ function ClientPage() {
                   title={"404"}
                   subTitle={"Xin lỗi, trang bạn truy cập không tồn tại."}
                   extra={
-                    <Link to={"/admin"}>
+                    <Link to={"/ms-shop/home"}>
                       <Button type="primary">Back Home</Button>
                     </Link>
                   }

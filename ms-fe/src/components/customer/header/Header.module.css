@@ -10,7 +10,7 @@
 
 .header {
   width: 100%;
-  transition: top 0.3s;
+  transition: top 0.3s ease-out;
   /* background-color: rgb(243, 246, 246); */
   position: fixed;
   z-index: 10;
@@ -18,16 +18,17 @@
 
 .background {
   background-color: #ffffff;
+  border-bottom: 1px solid rgb(226 232 240);
 }
 
 .visible {
   top: 0;
-  transition: top 0.2s ease-out;
+  transition: top 0.3s ease-out;
 }
 
 .hidden {
   top: -80px;
-  transition: top 0.2s ease-out;
+  transition: top 0.3s ease-out;
 }
 
 .margin {

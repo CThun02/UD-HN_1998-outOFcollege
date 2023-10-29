@@ -10,8 +10,5 @@ public interface ProductResponse {
     public String getProductCode();
     public String getProductName();
     public String getDescription();
-    public String getImgDefault();
-    public Category getCategory();
-    public Brand getBrand();
     public String getStatus();
 }

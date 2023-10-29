@@ -34,10 +34,6 @@ public class TimeLineResponse {
 
     private BigDecimal totalPrice;
 
-    private String fullName;
-
-    private String phoneNumber;
-
-     private String address;
+    private String address;
 
 }

@@ -11,9 +11,6 @@ public interface ProductTableResponse {
     Long getId();
     String getProductCode();
     String getProductName();
-    String getImgDefault();
-    Brand getBrand();
-    Category getCategory();
     Integer getQuantity();
     String getStatus();
     String getDescription();

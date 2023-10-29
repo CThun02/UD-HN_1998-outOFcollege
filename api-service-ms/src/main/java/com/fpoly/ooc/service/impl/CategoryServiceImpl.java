@@ -22,7 +22,11 @@ public class CategoryServiceImpl implements CategoryServiceI {
 
     @Override
     public Category create(Category category) {
-        return repo.save(category);
+        Category check = repo.findFirstByCategoryName(category.getCategoryName());
+        if(check==null){
+            return repo.save(category);
+        }
+        return null;
     }
 
     @Override

@@ -1,17 +1,17 @@
 package com.fpoly.ooc.controller;
 
+import com.fpoly.ooc.entity.ButtonType;
 import com.fpoly.ooc.entity.Color;
+import com.fpoly.ooc.request.color.ColorRequest;
 import com.fpoly.ooc.service.interfaces.ColorServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/admin/color")
+    @RequestMapping("/api/admin/color")
 @CrossOrigin("*")
 public class ColorController {
     @Autowired
@@ -20,5 +20,25 @@ public class ColorController {
     @GetMapping("")
     public List<Color> data(){
         return service.findAll();
+    }
+    @PostMapping("create")
+    public ResponseEntity<?> create(@RequestBody Color color) {
+        return ResponseEntity.ok(service.create(color));
+    }
+
+    @PutMapping("edit/{id}")
+    public ResponseEntity<?>update(@PathVariable Long id, @RequestBody Color color){
+        return ResponseEntity.ok(service.update(color,id));
+    }
+
+    @PutMapping("updateStatus/{id}")
+    public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestBody ColorRequest request){
+        return ResponseEntity.ok(service.updateStatus(request, id).getId());
+    }
+    @DeleteMapping("delete/{id}")
+    public ResponseEntity<?>delete(@PathVariable Long id){
+        Color color = service.getOne(id);
+        service.delete(color.getId());
+        return ResponseEntity.ok("Ok");
     }
 }

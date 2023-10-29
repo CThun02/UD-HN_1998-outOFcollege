@@ -4,7 +4,7 @@
 }
 
 .filter {
-  min-height: 200px;
+  min-height: 100px;
   height: auto;
   background-color: #ffffff;
   border: 1px solid #edf2f9;

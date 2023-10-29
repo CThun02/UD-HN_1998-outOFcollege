@@ -17,8 +17,13 @@ public interface AccountRepository extends JpaRepository<Account, String> {
 
     @Query("SELECT new com.fpoly.ooc.responce.account.AccountResponce(a.username,a.avatar, a.fullName, a.gender," +
             " a.numberPhone, a.email,a.status)" +
-            "FROM Account a where a.role.id=?1")
-    List<AccountResponce> getAllByRoleId(Long roleId);
+            "FROM Account a where a.role.id=?1 and ((a.fullName like ?2 or ?2 is null) " +
+            "or (a.numberPhone like?2 or ?2 is null ))")
+    List<AccountResponce> getAllByRoleId(Long roleId, String keyword);
+
+    @Query("SELECT a FROM Account a where a.role.id=?1 and ((a.fullName like ?2 or ?2 is null) " +
+            "or (a.numberPhone like?2 or ?2 is null ))")
+    List<Account> getAllAccountByRoleId(Long roleId, String keyword);
 
     @Query(value = "select email from account " +
             "left join role on account.role_id = role.id " +
@@ -28,4 +33,10 @@ public interface AccountRepository extends JpaRepository<Account, String> {
     @Query(name = "Account.customerAccountList", nativeQuery = true)
     List<AccountVoucher> customerAccountList(String username, Boolean gender);
 
+    @Query(name = "Account.customerAccountList", nativeQuery = true)
+    List<Account> findAllAccount(String username, String email, String numberPhone );
+
+//        @Query("SELECT new com.fpoly.ooc.responce.account.AccountResponce(a.username,a.avatar,a.fullName,a.)" +
+//                "FROM Account a where a.role=?1")
+//    List<Account> seach(String username);
 }

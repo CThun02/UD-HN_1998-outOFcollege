@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SleeveDAORepository extends JpaRepository<SleeveType, Long> {
+    SleeveType findFirstBySleeveName(String name);
 }

@@ -21,8 +21,6 @@ public class BillResponse {
 
     private Long productDetailId;
 
-    private String imgDefault;
-
     private Integer quantity;
 
     private String productName;

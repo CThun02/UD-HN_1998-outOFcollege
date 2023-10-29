@@ -1,0 +1,26 @@
+.fontWeight500 {
+  font-weight: 600;
+}
+
+.fontWeight400 {
+  font-weight: 400;
+}
+
+.fontWeight100 {
+  font-weight: 300;
+}
+
+.color {
+  color: #7d7c7c;
+}
+
+.padding {
+  padding: 20px;
+  padding-left: 0;
+}
+
+.flex {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

@@ -22,7 +22,11 @@ public class PatternServiceImpl implements PatternServiceI {
 
     @Override
     public Pattern create(Pattern pattern) {
-        return repo.save(pattern);
+        Pattern patternCheck = repo.findFirstByPatternName(pattern.getPatternName());
+        if (patternCheck==null){
+            return repo.save(pattern);
+        }
+        return null;
     }
 
     @Override

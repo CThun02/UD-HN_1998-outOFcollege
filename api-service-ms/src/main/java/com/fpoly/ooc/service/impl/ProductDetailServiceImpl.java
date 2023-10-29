@@ -6,20 +6,32 @@ import com.fpoly.ooc.dto.ProductDetailsDTO;
 import com.fpoly.ooc.entity.*;
 import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.ProductDetailDAORepositoryI;
+import com.fpoly.ooc.request.product.ProductDetailRequest;
+import com.fpoly.ooc.responce.product.ProductDetailDisplayResponse;
 import com.fpoly.ooc.responce.product.ProductDetailResponse;
+import com.fpoly.ooc.responce.product.ProductImageResponse;
 import com.fpoly.ooc.responce.productdetail.ProductsDetailsResponse;
 import com.fpoly.ooc.service.interfaces.ProductDetailServiceI;
+import com.fpoly.ooc.service.interfaces.ProductImageServiceI;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class ProductDetailServiceImpl implements ProductDetailServiceI {
-    @Autowired
     private ProductDetailDAORepositoryI repo;
+    private ProductImageServiceI productImageService;
+
+    @Autowired
+    public ProductDetailServiceImpl(ProductDetailDAORepositoryI repo, ProductImageServiceI productImageService) {
+        this.repo = repo;
+        this.productImageService = productImageService;
+    }
 
     @Override
     public ProductDetail create(ProductDetail productDetail) {
@@ -52,25 +64,29 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
     }
 
     @Override
-    public List<ProductDetailResponse> getAll() {
-        return repo.getAll();
-    }
-
-    @Override
-    public List<ProductDetailResponse> filterProductDetailsByIdCom(Long productId, Long idButton, Long idMaterial,
-                                                                   Long idShirtTail, Long idSleeve, Long idCollar,
-                                                                   Long idColor, Long idSize, Long patternId, Long formId) {
-        return repo.filterProductDetailsByIdCom(productId, idButton, idMaterial, idShirtTail, idSleeve, idCollar, idColor, idSize, patternId, formId);
-    }
-
-    @Override
-    public List<ProductDetailResponse> searchByCodeOrName(String keyWords) {
-        keyWords = "%" + keyWords + "%";
-        Optional<List<ProductDetailResponse>> values = Optional.of(repo.searchProductDetailByProductName(keyWords));
-        if (values.get().isEmpty()) {
-            values = Optional.of(repo.searchProductDetailByProductCode(keyWords));
+    public List<ProductDetailDisplayResponse> filterProductDetailsByIdCom(ProductDetailRequest request,
+                                                                          BigDecimal minPrice, BigDecimal maxPrice) {
+        List <ProductDetailDisplayResponse> productDetailDisplayResponses = new ArrayList<>();
+        List<ProductDetailResponse> productDetailResponses = repo.filterProductDetailsByIdCom(request.getProductId(),
+                request.getButtonId(), request.getMaterialId(),
+                request.getShirtTailId(), request.getSleeveId(), request.getCollarId(), request.getColorId(),
+                request.getSizeId(), request.getPatternId(), request.getFormId(), request.getBrandId(), request.getCategoryId(),
+                minPrice, maxPrice);
+        for(int i=0; i<productDetailResponses.size(); i++){
+            ProductDetailDisplayResponse productDetailDisplayResponse = new ProductDetailDisplayResponse(productDetailResponses.get(i));
+            List<ProductImageResponse> productImageResponses = productImageService.
+                    getProductImageByProductDetailId(productDetailDisplayResponse.getId());
+            productDetailDisplayResponse.setProductImageResponse(productImageResponses);
+            productDetailDisplayResponses.add(productDetailDisplayResponse);
         }
-        return values.orElse(null);
+        return  productDetailDisplayResponses;
+    }
+
+    @Override
+    public List<ProductDetailResponse> searchProductDetail(String keyWords) {
+        keyWords = "%" + keyWords + "%";
+        List<ProductDetailResponse> values = repo.searchProductDetail(keyWords);
+        return values;
     }
 
     public ProductDetail findById(Long id) {
@@ -80,10 +96,8 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
     }
 
     @Override
-    public Integer updateProductDetailsByCom(Long productId, Long idButton, Long idMaterial, Long idShirtTail,
-                                             Long idSleeve, Long idCollar, Long idColor, Long idSize, String status) {
-        return repo.updateProductDetailsByCom(productId, idButton, idMaterial, idShirtTail, idSleeve, idCollar, idColor,
-                idSize, status);
+    public BigDecimal getMaxPricePDByProductId(Long productId) {
+        return repo.getMaxPricePDByProductId(productId);
     }
 
     @Override

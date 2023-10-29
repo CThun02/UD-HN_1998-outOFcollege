@@ -24,17 +24,18 @@ import java.util.List;
 
 @NamedNativeQuery(
         name = "Voucher.findAllVoucher",
-        query = "select voucher.id as 'voucherId', voucher.voucher_code as 'voucherCode', " +
-                "voucher.voucher_name as 'voucherName', voucher.voucher_value as 'voucherValue', " +
-                "voucher.voucher_value_max as 'voucherValueMax', voucher.voucher_method as 'voucherMethod', " +
-                "voucher.limit_quantity as 'limitQuantity', voucher.start_date as 'startDate', " +
-                "voucher.end_date as 'endDate', voucher.status as 'status', voucher.private as 'objectUse' \n" +
-                "from Voucher voucher\n" +
-                "where (?1 is null or voucher.voucher_code like ?1 or voucher.voucher_name like ?1)\n" +
-                "and (?2 is null or voucher.start_date >= ?2)\n" +
-                "and (?3 is null or voucher.end_date <= ?3)\n" +
-                "and (?4 is null or voucher.status = (?4)) " +
-                "order by created_at desc ",    
+        query = """
+                select voucher.id as 'voucherId', voucher.voucher_code as 'voucherCode', 
+                voucher.voucher_name as 'voucherName', voucher.voucher_value as 'voucherValue', 
+                voucher.voucher_value_max as 'voucherValueMax', voucher.voucher_method as 'voucherMethod', 
+                voucher.limit_quantity as 'limitQuantity', voucher.start_date as 'startDate', 
+                voucher.end_date as 'endDate', voucher.status as 'status', voucher.private as 'objectUse', 
+                voucher.voucher_condition as 'voucherCondition'
+                from Voucher voucher
+                where (?1 is null or lower(voucher.voucher_code) like ?1 or lower(voucher.voucher_name) like ?1)
+                and (?2 is null or voucher.start_date >= ?2)
+                and (?3 is null or voucher.end_date <= ?3)
+                and (?4 is null or lower(voucher.status) = (?4)) order by created_at desc\s""",
         resultSetMapping = "Mapping.VoucherResponse"
 )
 
@@ -53,7 +54,8 @@ import java.util.List;
                         @ColumnResult(name = "startDate", type = LocalDateTime.class),
                         @ColumnResult(name = "endDate", type = LocalDateTime.class),
                         @ColumnResult(name = "status", type = String.class),
-                        @ColumnResult(name = "objectUse", type = String.class)
+                        @ColumnResult(name = "objectUse", type = String.class),
+                        @ColumnResult(name = "voucherCondition", type = BigDecimal.class)
                 }
         )
 )

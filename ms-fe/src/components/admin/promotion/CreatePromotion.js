@@ -64,10 +64,10 @@ const validationSchema = Yup.object().shape({
       "start-date-current",
       "* Ngày bắt đầu phải lớn hơn ngày hiện tại tối thiểu 10 phút",
       function (startDate) {
-        const { status } = this.parent;
-        if (startDate && status !== "ACTIVE") {
-          return startDate > dayjs().add(9, "minute");
-        }
+        // const { status } = this.parent;
+        // if (startDate && status !== "ACTIVE") {
+        //   return startDate > dayjs().add(9, "minute");
+        // }
         return true;
       }
     ),
@@ -187,7 +187,7 @@ function CreatePromotion() {
               })
               .then(() => {
                 setIsLoading(false);
-                navigate("/admin/promotion");
+                navigate("/api/admin/promotion");
                 showSuccessNotification("Thao tác thành công", "promotion");
               })
               .catch((err) => {
@@ -548,7 +548,7 @@ function CreatePromotion() {
                           </Row>
                           <Row>
                             <Space>
-                              <Link to="/admin/promotion">
+                              <Link to="/api/admin/promotion">
                                 <Button>Hủy</Button>
                               </Link>
                               <Button

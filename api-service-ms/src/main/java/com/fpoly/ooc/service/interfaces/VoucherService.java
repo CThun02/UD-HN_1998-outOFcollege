@@ -2,6 +2,7 @@ package com.fpoly.ooc.service.interfaces;
 
 import com.fpoly.ooc.dto.VoucherAndPromotionConditionDTO;
 import com.fpoly.ooc.entity.Voucher;
+import com.fpoly.ooc.request.voucher.DisplayVoucherRequest;
 import com.fpoly.ooc.request.voucher.VoucherRequest;
 import com.fpoly.ooc.responce.voucher.VoucherResponse;
 import org.springframework.data.domain.Page;
@@ -30,6 +31,10 @@ public interface VoucherService {
 
     List<VoucherResponse> findAllNoFilter();
 
-    List<VoucherResponse> findAllVoucherResponseDisplayModalUsing(String username, BigDecimal priceBill);
+    List<VoucherResponse> findAllVoucherResponseDisplayModalUsing(DisplayVoucherRequest request);
+
+    Voucher findVoucherByVoucherCode(String voucherCode);
+
+    Boolean isCheckTimeUse(String voucherCode, String username);
 
 }

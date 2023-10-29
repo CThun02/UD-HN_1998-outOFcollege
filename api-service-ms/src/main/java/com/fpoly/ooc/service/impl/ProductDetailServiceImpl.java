@@ -75,7 +75,7 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
         for(int i=0; i<productDetailResponses.size(); i++){
             ProductDetailDisplayResponse productDetailDisplayResponse = new ProductDetailDisplayResponse(productDetailResponses.get(i));
             List<ProductImageResponse> productImageResponses = productImageService.
-                    getProductImageByProductDetailId(productDetailResponses.get(i).getId());
+                    getProductImageByProductDetailId(productDetailDisplayResponse.getId());
             productDetailDisplayResponse.setProductImageResponse(productImageResponses);
             productDetailDisplayResponses.add(productDetailDisplayResponse);
         }

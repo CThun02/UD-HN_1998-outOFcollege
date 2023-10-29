@@ -33,7 +33,7 @@ function AdminPage() {
   const [message, setMessage] = useState("");
 
   return (
-    <Row>
+    <Row style={{ margin: 0 }}>
       <Col span={4}>
         <SideBar />
       </Col>

@@ -265,7 +265,7 @@ const ProductDetailsTable = (props) => {
         setRender(props.productDetails);
         setTimeout(() => {
           notification.open({
-            message: "Notification",
+            message: "Thông báo",
             description: "Thêm mới các chi tiết sản phẩm thành công",
             icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
           });

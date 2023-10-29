@@ -35,3 +35,8 @@
 .bdiSize {
   font-size: 1rem;
 }
+
+.priceReduce {
+  color: rgba(0, 0, 0, 0.54);
+  font-size: 16px;
+}

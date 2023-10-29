@@ -5,10 +5,13 @@ import com.fpoly.ooc.entity.ProductDetail;
 import com.fpoly.ooc.request.product.ProductDetailRequest;
 import com.fpoly.ooc.responce.product.ProductDetailDisplayResponse;
 import com.fpoly.ooc.responce.product.ProductDetailResponse;
+import com.fpoly.ooc.responce.productdetail.ProductDetailShop;
 import com.fpoly.ooc.responce.productdetail.ProductsDetailsResponse;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
+
 public interface ProductDetailServiceI {
     public ProductDetail create(ProductDetail productDetail);
     public ProductDetail update(ProductDetail productDetail);
@@ -21,5 +24,7 @@ public interface ProductDetailServiceI {
     List<Long> findAllIdsResponseProductDetails(Long idPromotion);
     List<ProductsDetailsResponse> findListProductdetailsByListProductId(ProductDetailsDTO productDetailsDTO);
     public BigDecimal getMaxPricePDByProductId(Long productId);
+    Optional<List<ProductDetailShop>> getProductDetailBestSelling();
+    Optional<List<ProductDetailShop>> getNewProductDetail();
 
 }

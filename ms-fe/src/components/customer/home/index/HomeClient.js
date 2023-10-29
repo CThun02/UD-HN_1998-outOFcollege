@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Banner from "../banner/Banner";
 import Slider from "../slider/Slider";
 import TypeCategory from "../type-category/TypeCategory";
@@ -8,10 +8,44 @@ import BestSellingAndNewProduct from "../best-selling-and-new-product/BestSellin
 import { FloatButton } from "antd";
 import { ArrowUpOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
+import axios from "axios";
+
+const baseUrl = "http://localhost:8080/api/admin/product";
 
 function HomeClient() {
   const [bestSellings, setBestSellings] = useState([]);
-  const [newProduces, setNewProducts] = useState([]);
+  const [newProducs, setNewProducts] = useState([]);
+
+  useEffect(() => {
+    async function getBestSellings() {
+      try {
+        const res = await axios.get(baseUrl + "/best-selling");
+        const data = await res.data;
+        console.log("data: ", data);
+        setBestSellings(data);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    getBestSellings();
+  }, []);
+
+  useEffect(() => {
+    async function getNewProduct() {
+      try {
+        const res = await axios.get(baseUrl + "/new-product");
+        const data = await res.data;
+
+        console.log("data: ", data);
+        setNewProducts(data);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    getNewProduct();
+  }, []);
 
   function handleScrollTop() {
     window.scrollTo({
@@ -24,13 +58,13 @@ function HomeClient() {
       <Slider />
       <Banner />
       <BestSellingAndNewProduct
-        data={bestSellings}
+        arrays={bestSellings}
         title={"Best Selling Products"}
       />
       <ImageTree />
       <TypeCategory />
       <FirstPayBill />
-      <BestSellingAndNewProduct data={newProduces} title={"New Products"} />
+      <BestSellingAndNewProduct arrays={newProducs} title={"New Products"} />
       <Link to={"/ms-shop/home"}>
         <FloatButton
           onClick={handleScrollTop}

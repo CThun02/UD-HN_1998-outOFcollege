@@ -1,6 +1,7 @@
 package com.fpoly.ooc.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fpoly.ooc.responce.productdetail.ProductsDetailsResponse;
@@ -24,7 +25,7 @@ import java.util.List;
                 select pd.id as 'ProductDetailsId',
                        p.product_code as 'ProductCode',
                        p.product_name as 'ProductName',
-                       p.img_default as 'ImageDefault',
+                       pi.path as 'ImageDefault',
                        bt.button_name as 'ButtonName',
                        m.material_name as 'MaterialName',
                        ct.collar_type_name as 'CollarName',
@@ -45,8 +46,18 @@ import java.util.List;
                          left join shirt_tail_type stt on pd.shirt_tail_id = stt.id
                          left join size s on pd.size_id = s.id
                          left join color c on pd.color_id = c.id
+                         left join product_image pi on pd.id = pi.product_detail_id
 
-                where (pd.status = 'ACTIVE')
+                where pd.status = 'ACTIVE'
+                  and p.status = 'ACTIVE'
+                  and bt.status = 'ACTIVE'
+                  and m.status = 'ACTIVE'
+                  and ct.status = 'ACTIVE'
+                  and st.status = 'ACTIVE'
+                  and stt.status = 'ACTIVE'
+                  and s.status = 'ACTIVE'
+                  and c.status = 'ACTIVE'
+                  and pi.status = 'ACTIVE'
                   and (p.id in ?1)
                   and (?2 is null or bt.id = ?2)
                   and (?3 is null or m.id = ?3)
@@ -57,7 +68,7 @@ import java.util.List;
                   and (?8 is null or c.id = ?8)
                   and (?9 is null or p.product_name like ?9 or p.product_code like ?9)
                   
-                group by pd.id, p.product_code, p.product_name, p.img_default, bt.button_name, m.material_name, 
+                group by pd.id, p.product_code, p.product_name, pi.path, bt.button_name, m.material_name, 
                 ct.collar_type_name, st.seleeve_name, s.size_name, c.color_code, stt.shirt_tail_name, pd.price,
                 pd.quantity, pd.description_detail, pd.status
                 """,

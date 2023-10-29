@@ -22,10 +22,9 @@ function BestSellingAndNewProduct({ arrays, title }) {
       <div className={styles.products}>
         <div className={styles.spacing}>
           <Row>
-            <ProductsList />
-            <ProductsList />
-            <ProductsList />
-            <ProductsList />
+            {arrays.map((product) => (
+              <ProductsList data={product} key={product.productDetailId} />
+            ))}
           </Row>
         </div>
       </div>

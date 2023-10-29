@@ -1,0 +1,28 @@
+.textSize {
+  font-size: 16px;
+}
+
+.textColor {
+  color: #111111;
+}
+
+.rangePrice {
+  font-size: 50px;
+}
+
+.rowSpacing {
+  margin: 0;
+  padding: 0;
+}
+
+.textLabel {
+  font-weight: 400;
+}
+
+.input {
+  border-radius: 30px;
+}
+
+.input input {
+  padding-left: 8px !important;
+}

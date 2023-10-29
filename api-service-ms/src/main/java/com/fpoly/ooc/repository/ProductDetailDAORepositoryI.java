@@ -2,16 +2,13 @@ package com.fpoly.ooc.repository;
 
 import com.fpoly.ooc.entity.*;
 import com.fpoly.ooc.responce.product.ProductDetailResponse;
+import com.fpoly.ooc.responce.productdetail.ProductDetailShop;
 import com.fpoly.ooc.responce.productdetail.ProductsDetailsResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -63,4 +60,63 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
                                                                        Long idSizes,
                                                                        Long idColors,
                                                                        String searchText);
+
+    @Query("""
+            SELECT NEW
+            com.fpoly.ooc.responce.productdetail.ProductDetailShop(
+            pd.id, c.categoryName, pt.productName, pn.promotionMethod,
+            pn.promotionValue, pd.price, COUNT(bd.id)
+            )
+            FROM ProductDetail pd
+            LEFT JOIN ProductImage pi ON pd.id = pi.productDetail.id
+            LEFT JOIN BillDetail bd ON pd.id = bd.productDetail.id
+            LEFT JOIN Category c ON c.id = pd.category.id
+            LEFT JOIN Product pt ON pt.id = pd.product.id
+            LEFT JOIN PromotionProduct pp ON pd.id = pp.productDetailId.id
+            LEFT JOIN Promotion pn ON pn.id = pp.promotion.id
+            
+            WHERE
+                pd.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                AND pi.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                AND bd.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                AND pp.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                AND pn.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                AND pt.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                AND c.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+            GROUP BY pd.id, c.categoryName, pt.productName, pn.promotionMethod,
+                     pn.promotionValue, pd.price, pd.createdAt
+            ORDER BY COUNT(bd.id) DESC
+            LIMIT 4
+        """)
+    List<ProductDetailShop> getProductDetailBestSelling();
+
+    @Query("""
+            SELECT NEW
+            com.fpoly.ooc.responce.productdetail.ProductDetailShop(
+            pd.id, c.categoryName, pt.productName, pn.promotionMethod,
+            pn.promotionValue, pd.price, COUNT(bd.id)
+            )
+            FROM ProductDetail pd
+            LEFT JOIN ProductImage pi ON pd.id = pi.productDetail.id
+            LEFT JOIN BillDetail bd ON pd.id = bd.productDetail.id
+            LEFT JOIN Category c ON c.id = pd.category.id
+            LEFT JOIN Product pt ON pt.id = pd.product.id
+            LEFT JOIN PromotionProduct pp ON pd.id = pp.productDetailId.id
+            LEFT JOIN Promotion pn ON pn.id = pp.promotion.id
+            
+            WHERE
+                pd.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                AND pi.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                AND bd.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                AND pp.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                AND pn.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                AND pt.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                AND c.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+            GROUP BY pd.id, c.categoryName, pt.productName, pn.promotionMethod,
+                     pn.promotionValue, pd.price, pd.createdAt
+            ORDER BY pd.createdAt DESC
+            LIMIT 4
+        """)
+    List<ProductDetailShop> getNewProductDetail();
+
 }

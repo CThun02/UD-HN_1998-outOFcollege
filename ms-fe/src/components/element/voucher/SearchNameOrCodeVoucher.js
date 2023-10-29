@@ -27,7 +27,6 @@ function SearchNameOrCodeVoucher({ username, priceBill, setVoucher, voucher }) {
           condition
         );
         const data = await res.data;
-        console.log("voucher: ", data);
         const arrays = data?.map((e) => ({
           key: e.voucherId,
           value: (
@@ -47,10 +46,11 @@ function SearchNameOrCodeVoucher({ username, priceBill, setVoucher, voucher }) {
       } catch (err) {
         console.log(err);
       }
+      setCode(voucher.voucherCode);
     }
 
     getVouchers();
-  }, [priceBill, username]);
+  }, [priceBill, username, voucher]);
 
   return (
     <AutoComplete

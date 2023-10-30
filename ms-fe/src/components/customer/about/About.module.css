@@ -1,0 +1,39 @@
+.img {
+  height: auto;
+  max-width: 100%;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.maxW {
+  max-width: 1200px;
+}
+
+.textCenter {
+  display: flex;
+  justify-content: center;
+}
+
+.btn {
+  height: 50px;
+  width: 200px;
+  font-size: 18px;
+  margin-top: 15px;
+}
+
+.ul {
+  list-style-type: disc;
+  columns: blue;
+}
+
+.img {
+  width: 500px;
+  height: 500px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin-top: -150px;
+  border-radius: 10px;
+}

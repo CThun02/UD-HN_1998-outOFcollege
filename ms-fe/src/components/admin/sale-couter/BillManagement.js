@@ -69,22 +69,29 @@ const BillManagement = () => {
       key: "code",
     },
     {
-      title: "Tổng sản phẩm",
-      dataIndex: "totalQuantity",
-      key: "totalQuantity",
-    },
-    {
-      title: "Tổng tiền",
-      dataIndex: "totalPrice",
-      key: "totalPrice",
+      title: "Tên nhân viên",
+      dataIndex: "employee",
+      key: "employee",
     },
     {
       title: "Tên khách hàng",
-      dataIndex: "fullname",
-      key: "fullname",
-      render: (fullname) => {
-        return fullname || "Khách lẻ";
+      dataIndex: "fullName",
+      key: "fullName",
+      render: (fullName) => {
+        return fullName || "Khách lẻ";
       },
+    },
+    {
+      title: "Số điện thoại",
+      dataIndex: "phoneNumber",
+      key: "phoneNumber",
+    },
+    {
+      title: "Tổng tiền",
+      key: "totalPrice",
+      render: (text, record) => {
+        return record.totalPrice + record.shipPrice - record.priceReduce
+      }
     },
     {
       title: "Ngày tạo",
@@ -92,26 +99,6 @@ const BillManagement = () => {
       key: "createdDate",
       render: (createdDate) => {
         return moment(createdDate).format(` HH:mm:ss DD/MM/YYYY`);
-      },
-    },
-    {
-      title: "Loại hóa đơn",
-      dataIndex: "billType",
-      key: "billType",
-      render: (object) => {
-        let color =
-          object.toLocaleLowerCase() === "In-store".toLocaleLowerCase()
-            ? "geekblue"
-            : object.toLocaleLowerCase() === "Online".toLocaleLowerCase()
-            ? "green"
-            : null;
-        return (
-          <Space direction="vertical">
-            <div style={{ width: "auto", display: "flex" }}>
-              <Tag color={color}>{object}</Tag>
-            </div>
-          </Space>
-        );
       },
     },
     {
@@ -123,10 +110,10 @@ const BillManagement = () => {
           object === "Unpaid"
             ? "geekblue"
             : object.toLocaleLowerCase() === "PAID".toLocaleLowerCase()
-            ? "green"
-            : object === "cancel"
-            ? "red"
-            : null;
+              ? "green"
+              : object === "cancel"
+                ? "red"
+                : null;
         return (
           <Space direction="vertical">
             <div style={{ width: "auto", display: "flex" }}>
@@ -134,8 +121,8 @@ const BillManagement = () => {
                 {object === "Unpaid"
                   ? "Chưa thanh toán"
                   : object === "cancel"
-                  ? "Đã hủy"
-                  : "Đã thanh toán"}
+                    ? "Đã hủy"
+                    : "Đã thanh toán"}
               </Tag>
             </div>
           </Space>

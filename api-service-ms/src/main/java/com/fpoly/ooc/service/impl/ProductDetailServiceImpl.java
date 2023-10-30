@@ -10,6 +10,7 @@ import com.fpoly.ooc.request.product.ProductDetailRequest;
 import com.fpoly.ooc.responce.product.ProductDetailDisplayResponse;
 import com.fpoly.ooc.responce.product.ProductDetailResponse;
 import com.fpoly.ooc.responce.product.ProductImageResponse;
+import com.fpoly.ooc.responce.productdetail.ProductDetailShop;
 import com.fpoly.ooc.responce.productdetail.ProductsDetailsResponse;
 import com.fpoly.ooc.service.interfaces.ProductDetailServiceI;
 import com.fpoly.ooc.service.interfaces.ProductImageServiceI;
@@ -101,6 +102,18 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
     }
 
     @Override
+    public Optional<List<ProductDetailShop>> getProductDetailBestSelling() {
+        List<ProductDetailShop> result = getImageByProductDetailId(repo.getProductDetailBestSelling());
+        return Optional.of(result);
+    }
+
+    @Override
+    public Optional<List<ProductDetailShop>> getNewProductDetail() {
+        List<ProductDetailShop> result = getImageByProductDetailId(repo.getNewProductDetail());
+        return Optional.of(result);
+    }
+
+    @Override
     public List<Long> findAllIdsResponseProductDetails(Long idPromotion) {
         return repo.findAllByIdPromotion(idPromotion);
     }
@@ -113,6 +126,16 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
                 dto.getIdSizes(), dto.getIdColors(),
                 StringUtils.isEmpty(dto.getSearchText()) ? null : "%" + dto.getSearchText() + "%"
         );
+    }
+
+    private List<ProductDetailShop> getImageByProductDetailId(List<ProductDetailShop> list) {
+        List<ProductDetailShop> result = new ArrayList<>();
+        for (ProductDetailShop res: list) {
+            res.setProductImages(productImageService.getProductImageByProductDetailId(res.getProductDetailId()));
+            result.add(res);
+        }
+
+        return result;
     }
 
 }

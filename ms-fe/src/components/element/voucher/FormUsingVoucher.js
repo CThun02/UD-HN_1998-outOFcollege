@@ -1,10 +1,9 @@
 import { Modal, Space, Radio, Input } from "antd";
 import styles from "./FormUsingVoucher.module.css";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import VoucherList from "./VoucherList";
 import axios from "axios";
 import "./global.css";
-import SearchNameOrCodeVoucher from "./SearchNameOrCodeVoucher";
 
 const baseUrl = "http://localhost:8080/api/admin/vouchers";
 
@@ -81,6 +80,7 @@ function FormUsingVoucher({
               key={data.voucherId}
               data={data}
               setValue={setVoucher}
+              value={voucher}
             />
           ))}
         </Radio.Group>

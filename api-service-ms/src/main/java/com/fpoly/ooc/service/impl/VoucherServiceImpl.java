@@ -60,7 +60,7 @@ public class VoucherServiceImpl implements VoucherService {
 
         return (Page<VoucherResponse>) PageUltil.page(
                 voucherRepository.findAllVoucher(
-                        Objects.isNull(voucherConditionDTO.getCodeOrName()) ? null : "%" + Commons.lower(voucherConditionDTO.getCodeOrName()) + "%",
+                        StringUtils.isEmpty(voucherConditionDTO.getCodeOrName()) ? null : "%" + Commons.lower(voucherConditionDTO.getCodeOrName()) + "%",
                         Objects.isNull(voucherConditionDTO.getStartDate()) ? null : voucherConditionDTO.getStartDate(),
                         Objects.isNull(voucherConditionDTO.getEndDate()) ? null : voucherConditionDTO.getEndDate(),
                         Commons.lower(status)

@@ -1,32 +1,72 @@
-import { Card, Col } from "antd";
+import { Badge, Card, Col, Rate, Space } from "antd";
 import styles from "./ProductsList.module.css";
+import numeral from "numeral";
 
 function ProductsList({ data }) {
+  const isMethod = data.promotionReduce
+    ? data.promotionMethod === "vnd"
+      ? "vnd"
+      : data.promotionMethod === "%"
+      ? "%"
+      : null
+    : null;
+
+  const price =
+    isMethod === "vnd"
+      ? data.priceProduct - data.promotionReduce
+      : isMethod === "%"
+      ? data.priceProduct * (data.promotionReduce / 100)
+      : null;
+
   return (
     <Col span={6} className={styles.centerd}>
-      <Card
-        className={styles.width}
-        hoverable
-        style={{ width: 240 }}
-        cover={
-          <img
-            className={styles.image}
-            alt="product"
-            src="https://firebasestorage.googleapis.com/v0/b/outofcollge.appspot.com/o/products%2FShirt%20A%2FOrange%2F1697979036874Shirt_A2122124?alt=media&token=59b6e0ac-ebe7-4bc1-b02e-708ce3c212e0"
-          />
+      <Badge.Ribbon
+        text={
+          isMethod && price
+            ? isMethod === "vnd"
+              ? numeral(data.promotionReduce).format("0,0") + "đ"
+              : isMethod === "%"
+              ? data.promotionReduce + "%"
+              : null
+            : null
         }
+        color="#FF9130"
+        style={{ height: "32px", lineHeight: "32px" }}
       >
-        <div className={styles.size}>
-          <p className={styles.centerd}>Category</p>
-          <h2 className={styles.centerd}>Name product</h2>
-          <p className={styles.centerd}>
-            <i>star</i>
-          </p>
-          <p className={styles.centerd}>
-            <bdi>$50</bdi>
-          </p>
-        </div>
-      </Card>
+        <Card
+          className={styles.width}
+          hoverable
+          style={{ width: 270, border: "none" }}
+          cover={<img alt="product" src={data?.productImages[0].path} />}
+        >
+          <div className={styles.size}>
+            <input type="hidden" value={data.productDetailId} />
+            <Space direction="vertical" size={6} style={{ width: "100%" }}>
+              <p className={`${styles.centerd} ${styles.opacity}`}>
+                {data.categoryName}
+              </p>
+              <h2 className={`${styles.centerd} ${styles.textH2}`}>
+                {data.productName}
+              </h2>
+              <p className={styles.centerd}>
+                <i>
+                  <Rate value={5} style={{ fontSize: "14px" }} />
+                </i>
+              </p>
+              <p className={styles.centerd}>
+                <del className={styles.priceReduce}>
+                  {isMethod
+                    ? numeral(data.priceProduct).format("0,0") + "đ"
+                    : ""}
+                </del>
+                <bdi className={`${styles.fontWeight} ${styles.bdiSize}`}>
+                  {numeral(price ? price : null).format("0,0") + "đ"}
+                </bdi>
+              </p>
+            </Space>
+          </div>
+        </Card>
+      </Badge.Ribbon>
     </Col>
   );
 }

@@ -5,9 +5,9 @@ import moment from "moment/moment";
 
 const image = "/vouchers/voucher_img.png";
 
-function VoucherList({ data, setValue }) {
+function VoucherList({ data, setValue, value }) {
   function handleOnClick(e) {
-    console.log(e);
+    console.log("onClick: ", e);
     if (e.target.checked) {
       setValue({});
     }
@@ -36,7 +36,7 @@ function VoucherList({ data, setValue }) {
         </h4>
       </Col>
       <Col span={2} className={styles.flex}>
-        <Radio value={data} key={data.voucherId} onClick={handleOnClick} />
+        <Radio value={data} onClick={handleOnClick} />
       </Col>
     </Row>
   );

@@ -1,0 +1,28 @@
+.footerBackground {
+  background-color: #111111;
+}
+
+.content {
+  padding: 75px 0px;
+  color: #fff;
+}
+
+.flexCenter {
+  width: 80%;
+}
+
+.footer {
+  display: flex;
+  justify-content: center;
+}
+
+.copyRight {
+  padding: 25px 0;
+  display: flex;
+  justify-content: center;
+  color: #ffffffa8;
+}
+
+.rowMargin {
+  margin: 0;
+}

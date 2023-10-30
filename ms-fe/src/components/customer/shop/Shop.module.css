@@ -1,0 +1,32 @@
+.content {
+  display: flex;
+  justify-content: center;
+}
+
+.body,
+.dividerSize {
+  width: 80%;
+}
+
+.breadCrumb {
+  padding: 20px 0;
+}
+
+.shop {
+  background-color: #fff;
+}
+
+.divider {
+  display: flex;
+  justify-content: center;
+  padding-bottom: 30px;
+}
+
+.dividerChange {
+  margin: 0;
+  padding-bottom: 32px;
+}
+
+.shop {
+  padding-bottom: 50px;
+}

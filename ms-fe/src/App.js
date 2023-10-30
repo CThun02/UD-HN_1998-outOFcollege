@@ -13,6 +13,7 @@ function App() {
       <NotificationProvider>
         <BrowserRouter>
           <Routes>
+            <Route index element={<ClientPage />} />
             <Route path="api/*" element={<AdminPage />} />
             <Route path="ms-shop/*" element={<ClientPage />} />
             <Route

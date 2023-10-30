@@ -3,6 +3,7 @@ package com.fpoly.ooc.controller;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.dto.ProductDetailsDTO;
 import com.fpoly.ooc.entity.*;
+import com.fpoly.ooc.repository.ProductDetailDAORepositoryI;
 import com.fpoly.ooc.request.product.ProductDetailRequest;
 import com.fpoly.ooc.request.product.ProductImageRequest;
 import com.fpoly.ooc.request.product.ProductRequest;
@@ -188,6 +189,16 @@ public class ProductController {
             @RequestBody ProductDetailsDTO dto
     ) {
         return ResponseEntity.ok(productDetailService.findListProductdetailsByListProductId(dto));
+    }
+
+    @GetMapping("/best-selling")
+    public ResponseEntity<?> getBestSellingProduct() {
+        return ResponseEntity.ok(productDetailService.getProductDetailBestSelling());
+    }
+
+    @GetMapping("/new-product")
+    public ResponseEntity<?> getNewProduct() {
+        return ResponseEntity.ok(productDetailService.getNewProductDetail());
     }
 
 }

@@ -7,10 +7,29 @@
   padding-left: 35px;
   padding-right: 35px;
 }
-/* 
+
 .header {
-  background-color: rgb(243, 246, 246);
-} */
+  width: 100%;
+  transition: top 0.3s ease-out;
+  /* background-color: rgb(243, 246, 246); */
+  position: fixed;
+  z-index: 10;
+}
+
+.background {
+  background-color: #ffffff;
+  border-bottom: 1px solid rgb(226 232 240);
+}
+
+.visible {
+  top: 0;
+  transition: top 0.3s ease-out;
+}
+
+.hidden {
+  top: -80px;
+  transition: top 0.3s ease-out;
+}
 
 .margin {
   margin-bottom: 0px !important;

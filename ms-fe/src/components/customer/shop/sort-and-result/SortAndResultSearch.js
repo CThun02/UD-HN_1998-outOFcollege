@@ -1,8 +1,8 @@
 import { Col, Row, Select } from "antd";
 
-function SortAndResultSearch() {
+function SortAndResultSearch({ products, filter, setFilter }) {
   const handleChange = (value) => {
-    console.log(`selected ${value}`);
+    setFilter({ ...filter, sort: value });
   };
 
   return (
@@ -11,18 +11,19 @@ function SortAndResultSearch() {
         <Row>
           <Col span={20}>
             <p style={{ fontSize: "16px", color: "#111111" }}>
-              Hiển thị từ 1-12 trên 23 kết quả
+              Hiển thị {products.length} kết quả
             </p>
           </Col>
           <Col span={4}>
             <Select
               style={{ width: "100%" }}
               defaultValue={null}
+              value={filter.sort}
               onChange={handleChange}
               options={[
                 { value: null, label: "Giá" },
-                { value: "priceUp", label: "Giá thấp đến cao" },
-                { value: "priceDown", label: "Giá cao đến thấp" },
+                { value: "up", label: "Giá thấp đến cao" },
+                { value: "down", label: "Giá cao đến thấp" },
               ]}
             />
           </Col>

@@ -69,16 +69,19 @@ function TablesProductsDetails({
 }) {
   const [selectedRows, setSelectedRows] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-  const [arrays, setArrays] = useState([]);
 
   function handleOnChangeRow(key, row) {
     setSelectedRowKeys(key);
     setSelectedRows(row);
-    // setProductsDetailsId(key);
+    setProductsDetailsId(
+      row.map((e) => {
+        const { key } = e;
+        return key;
+      })
+    );
   }
 
   const rowSelection = {
-    selectedRowKeys,
     onChange: handleOnChangeRow,
     selections:
       status === "INACTIVE" || status === "CANCEL"
@@ -98,16 +101,6 @@ function TablesProductsDetails({
     [values, productsDetailsId, productsId]
   );
 
-  function handleOnSelect(record, isSelected, selectedRows, nativeEvent) {
-    if (!isSelected && values?.productsDetailsIdDb.includes(record.key)) {
-      arraysIds.push(record.key);
-      setOnDeleteProductDetailIds(arraysIds);
-    }
-
-    const { key } = record;
-    setProductsDetailsId((prevData) => [...prevData, key]);
-  }
-
   return (
     <div>
       <span>
@@ -119,7 +112,6 @@ function TablesProductsDetails({
             rowSelection={{
               type: "checkbox",
               ...rowSelection,
-              onSelect: handleOnSelect,
             }}
             columns={columns}
             dataSource={productsDetails.map((p) => ({

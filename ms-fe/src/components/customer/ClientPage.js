@@ -3,6 +3,7 @@ import { Link, Route, Routes } from "react-router-dom";
 import Header from "./header/Header";
 import Footer from "./footer/Footer";
 import HomeClient from "./home/index/HomeClient";
+import About from "./about/About";
 import Shop from "./shop/Shop";
 
 function ClientPage() {
@@ -16,6 +17,7 @@ function ClientPage() {
           <Routes>
             <Route index element={<HomeClient />} />
             <Route path="home" element={<HomeClient />} />
+            <Route path="about" element={<About />} />
             <Route path="anything" element={<Shop />} />
             <Route
               path="*"
@@ -32,13 +34,13 @@ function ClientPage() {
                 />
               }
             />
-          </Routes>
+          </Routes >
           <div>
             <Footer />
           </div>
-        </div>
-      </Col>
-    </Row>
+        </div >
+      </Col >
+    </Row >
   );
 }
 

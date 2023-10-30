@@ -23,6 +23,8 @@ public class BillRequest {
 
     private String accountId;
 
+    private String createdBy;
+
     private String transactionCode;
 
     private String symbol;

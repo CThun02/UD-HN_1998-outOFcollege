@@ -78,6 +78,7 @@ const Bill = () => {
     setModalVisible(initialState);
   };
 
+
   const updateQuantity = (record, index, value) => {
     let cart = JSON.parse(localStorage.getItem(cartId));
     let productDetails = cart.productDetails;
@@ -86,6 +87,14 @@ const Bill = () => {
       notification.warning({
         message: "Thông báo",
         description: "Chỉ được mua 100 sản phẩm",
+        duration: 1,
+      });
+    }
+
+    if (value >= productDetails[index].productDetail.quantity) {
+      notification.warning({
+        message: "Thông báo",
+        description: "Đã vượt quá số lượng tồn",
         duration: 1,
       });
     }
@@ -184,10 +193,12 @@ const Bill = () => {
       key: "quantity",
       width: 200,
       render: (text, record, index) => {
+        const isDisabled = record.quantity >= record.productDetail.quantity;
+        console.log(isDisabled)
         return (
           <InputNumber
             min={1}
-            max={100}
+            max={isDisabled ? record.quantity : 100}
             value={record.quantity}
             onChange={(value) => updateQuantity(record, index, value)}
           />
@@ -510,6 +521,9 @@ const Bill = () => {
     visible[index] = checked;
     setSwitchChange(visible);
     setSymbol(checked ? "Shipping" : "Received");
+    if (!checked) {
+      setTypeShipping(false)
+    }
   };
 
   // mở modal product
@@ -629,6 +643,8 @@ const Bill = () => {
     getListAddressByUsername(account?.username);
     fetchProvinces();
 
+    console.log(voucherAdd)
+
     if (selectedAddress?.city) {
       const city = selectedAddress?.city.substring(
         1 + selectedAddress.city.indexOf("|")
@@ -682,8 +698,8 @@ const Bill = () => {
       amountPaid: typeShipping[index]
         ? 0
         : selectedOption === "2"
-        ? voucherPrice() + shippingFee
-        : amountPaid,
+          ? voucherPrice() + shippingFee
+          : amountPaid,
       billType: "In-Store",
       symbol: typeShipping[index] ? "Shipping" : symbol,
       status: typeShipping[index] ? "Unpaid" : "Paid",
@@ -695,8 +711,8 @@ const Bill = () => {
       phoneNumber: selectedAddress.numberPhone,
       transactionCode: selectedOption === "2" ? transactionCode : null,
       voucherCode: voucherAdd?.voucherCode,
+      createdBy: "user3"
     };
-    console.log(transactionCode);
     const billAddress = {
       fullName: fullname,
       sdt: phoneNumber,
@@ -726,7 +742,7 @@ const Bill = () => {
       selectedOption !== "2" &&
       ((remainAmount < 0 && !typeShipping[index]) || isNaN(remainAmount))
     ) {
-      return console.log("Tiền không đủ");
+      return setInputError("Tiền không đủ");
     } else {
       for (let i = 0; i < productDetails.length; i++) {
         const billDetail = {
@@ -785,7 +801,11 @@ const Bill = () => {
                 }
               );
             }
-
+            notification.success({
+              message: "Thông báo",
+              description: 'Thanh toán thành công',
+              duration: 2,
+            });
             navigate(`/api/admin/order`);
             remove(activeKey);
           } catch (error) {
@@ -1018,9 +1038,9 @@ const Bill = () => {
                             value={
                               selectedAddress.city
                                 ? selectedAddress?.city.substring(
-                                    0,
-                                    selectedAddress.city.indexOf("|")
-                                  )
+                                  0,
+                                  selectedAddress.city.indexOf("|")
+                                )
                                 : undefined
                             }
                           >
@@ -1055,9 +1075,9 @@ const Bill = () => {
                             value={
                               selectedAddress.district
                                 ? selectedAddress?.district.substring(
-                                    0,
-                                    selectedAddress.district.indexOf("|")
-                                  )
+                                  0,
+                                  selectedAddress.district.indexOf("|")
+                                )
                                 : undefined
                             }
                           >
@@ -1090,9 +1110,9 @@ const Bill = () => {
                             value={
                               selectedAddress.ward
                                 ? selectedAddress.ward.substring(
-                                    0,
-                                    selectedAddress.ward.indexOf("|")
-                                  )
+                                  0,
+                                  selectedAddress.ward.indexOf("|")
+                                )
                                 : undefined
                             }
                           >
@@ -1157,11 +1177,11 @@ const Bill = () => {
                             productDetails.length > 0
                               ? true
                               : notification.error({
-                                  message: "Lỗi",
-                                  description:
-                                    "Chưa có sản phẩm trong giỏ hàng.",
-                                  duration: 2,
-                                })
+                                message: "Lỗi",
+                                description:
+                                  "Chưa có sản phẩm trong giỏ hàng.",
+                                duration: 2,
+                              })
                           )
                         }
                       >
@@ -1301,7 +1321,7 @@ const Bill = () => {
                           )}
                         </Col>
                         {Number(selectedOption) !== 2 &&
-                        !typeShipping[index] ? (
+                          !typeShipping[index] ? (
                           <>
                             <Col span={8} style={{ marginTop: "8px" }}>
                               <span
@@ -1350,7 +1370,7 @@ const Bill = () => {
                           </>
                         ) : null}
                         {Number(selectedOption) !== 2 &&
-                        !typeShipping[index] ? (
+                          !typeShipping[index] ? (
                           <Col span={24}>
                             <Row style={{ marginTop: "8px" }}>
                               <Col span={16}>

@@ -71,6 +71,7 @@ public class BillServiceImpl implements BillService {
                 .note(request.getNote())
                 .billCode(request.getBillCode())
                 .completionDate(LocalDateTime.now())
+                .createdBy(request.getCreatedBy())
                 .build();
 
         bill.setStatus(request.getStatus());

@@ -137,11 +137,11 @@ select * from product
 
 INSERT INTO voucher (voucher_code, voucher_name, start_date, end_date, voucher_value, voucher_value_max, voucher_method, voucher_condition, limit_quantity, status, created_at, updated_at, created_by, updated_by, deleted_at, private)
 VALUES
-('DISCOUNT10', N'Discount 10%', '2023-09-01', '2023-09-30', 10, 100, 'Percentage', 50, 100, 'ACTIVE', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL, 'all'),
-('FREESHIP', N'Free Shipping', '2023-09-15', '2023-09-30', 0, NULL, 'Fixed', 0, 50, 'ACTIVE', '2023-09-15', '2023-09-15', N'Admin', N'Admin', NULL, 'member'),
-('FLASH20', N'Flash Sale 20%', '2023-09-10', '2023-09-12', 20, 50, 'Percentage', 100, 200, 'ACTIVE', '2023-09-10', '2023-09-10', N'Admin', N'Admin', NULL, 'all'),
-('NEWCUST10', N'New Customer Discount', '2023-09-01', '2023-12-31', 10, 100, 'Percentage', 0, NULL, 'ACTIVE', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL, 'member'),
-('HOLIDAY25', N'Holiday Special', '2023-12-15', '2024-01-01', 25, 0, 'Fixed', 150, 1000, 'ACTIVE', '2023-12-15', '2023-12-15', N'Admin', N'Admin', NULL, 'member');
+('DISCOUNT10', N'Discount 10%', '2023-09-01', '2023-09-30', 10, 100, '%', 50, 100, 'ACTIVE', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL, 'all'),
+('FREESHIP', N'Free Shipping', '2023-09-15', '2023-09-30', 0, NULL, 'vnd', 0, 50, 'ACTIVE', '2023-09-15', '2023-09-15', N'Admin', N'Admin', NULL, 'member'),
+('FLASH20', N'Flash Sale 20%', '2023-09-10', '2023-09-12', 20, 50, '%', 100, 200, 'ACTIVE', '2023-09-10', '2023-09-10', N'Admin', N'Admin', NULL, 'all'),
+('NEWCUST10', N'New Customer Discount', '2023-09-01', '2023-12-31', 10, 100, '%', 0, NULL, 'ACTIVE', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL, 'member'),
+('HOLIDAY25', N'Holiday Special', '2023-12-15', '2024-01-01', 25, 0, 'vnd', 150, 1000, 'ACTIVE', '2023-12-15', '2023-12-15', N'Admin', N'Admin', NULL, 'member');
 select * from voucher
 
 INSERT INTO account (username, role_id, full_name, dob, gender, phone_number, email, id_no, password, status, created_at, updated_at, created_by, updated_by, deleted_at)

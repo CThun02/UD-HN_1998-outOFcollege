@@ -4,17 +4,20 @@ import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.dto.ProductDetailsDTO;
 import com.fpoly.ooc.entity.*;
 import com.fpoly.ooc.repository.ProductDetailDAORepositoryI;
+import com.fpoly.ooc.request.product.ProductDetailCondition;
 import com.fpoly.ooc.request.product.ProductDetailRequest;
 import com.fpoly.ooc.request.product.ProductImageRequest;
 import com.fpoly.ooc.request.product.ProductRequest;
 import com.fpoly.ooc.responce.product.ProductDetailDisplayResponse;
 import com.fpoly.ooc.responce.product.ProductDetailResponse;
 import com.fpoly.ooc.responce.product.ProductResponse;
+import com.fpoly.ooc.responce.productdetail.ProductDetailShop;
 import com.fpoly.ooc.service.interfaces.ProductDetailServiceI;
 import com.fpoly.ooc.service.interfaces.ProductImageServiceI;
 import com.fpoly.ooc.service.interfaces.ProductServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -191,12 +194,31 @@ public class ProductController {
 
     @GetMapping("/best-selling")
     public ResponseEntity<?> getBestSellingProduct() {
+        System.out.println("best");
         return ResponseEntity.ok(productDetailService.getProductDetailBestSelling());
     }
 
     @GetMapping("/new-product")
     public ResponseEntity<?> getNewProduct() {
         return ResponseEntity.ok(productDetailService.getNewProductDetail());
+    }
+
+    @PostMapping("/product-shop")
+    public ResponseEntity<?> findAllProductDetailShop(
+            @RequestParam(value = "pageNo", defaultValue = "0") int pageNo,
+            @RequestParam(value = "pageSize", defaultValue = "12") int pageSize,
+            @RequestBody ProductDetailCondition req
+            ) {
+
+        return ResponseEntity.ok(
+                productDetailService.getAllProductDetailShop(
+                        req, PageRequest.of(pageNo, pageSize))
+        );
+    }
+
+    @GetMapping("/get-price-max")
+    public ResponseEntity<?> getPriceMax() {
+        return ResponseEntity.ok(productDetailService.getPriceMax());
     }
 
 }

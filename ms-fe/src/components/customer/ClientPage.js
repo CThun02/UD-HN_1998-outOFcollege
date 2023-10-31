@@ -5,6 +5,7 @@ import Footer from "./footer/Footer";
 import HomeClient from "./home/index/HomeClient";
 import About from "./about/About";
 import Contact from "./contact/Contact";
+import Checkout from "./checkout/Checkout";
 import Shop from "./shop/Shop";
 
 function ClientPage() {
@@ -20,6 +21,7 @@ function ClientPage() {
             <Route path="home" element={<HomeClient />} />
             <Route path="about" element={<About />} />
             <Route path="contact" element={<Contact />} />
+            <Route path="checkout" element={<Checkout />} />
             <Route path="anything" element={<Shop />} />
             <Route
               path="*"

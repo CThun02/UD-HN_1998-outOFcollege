@@ -4,6 +4,7 @@ import Header from "./header/Header";
 import Footer from "./footer/Footer";
 import HomeClient from "./home/index/HomeClient";
 import About from "./about/About";
+import Contact from "./contact/Contact";
 import Shop from "./shop/Shop";
 
 function ClientPage() {
@@ -18,6 +19,7 @@ function ClientPage() {
             <Route index element={<HomeClient />} />
             <Route path="home" element={<HomeClient />} />
             <Route path="about" element={<About />} />
+            <Route path="contact" element={<Contact />} />
             <Route path="anything" element={<Shop />} />
             <Route
               path="*"

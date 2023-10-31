@@ -27,7 +27,7 @@ function HeaderRight() {
                 <Link to={"/ms-shop/about"} className={styles.link}>Giới thiệu</Link>
               </Col>
               <Col span={7}>
-                <Link className={styles.link}>Liên hệ</Link>
+                <Link to={"/ms-shop/contact"} className={styles.link}>Liên hệ</Link>
               </Col>
               <Col span={7}>
                 <p className={styles.cssParagraph}>$0.00</p>

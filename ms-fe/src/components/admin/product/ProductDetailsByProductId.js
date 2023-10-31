@@ -100,6 +100,7 @@ const ProductDetails = (props) => {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [productDetailUpdate, setProductDetailUpdate] = useState({
+    id: "",
     product: product,
     brand: { id: " " },
     category: { id: " " },
@@ -121,7 +122,7 @@ const ProductDetails = (props) => {
   });
   const productImage = {
     id: null,
-    productDetail: {},
+    productDetailId: "",
     path: "",
     status: "ACTIVE",
   };
@@ -995,7 +996,7 @@ const ProductDetails = (props) => {
                     );
                   })}
                 {record.productImageResponse?.length < 3 ? (
-                  <Col span={4} key={productImage.id}>
+                  <Col span={4}>
                     <div
                       className="m-5"
                       style={{
@@ -1008,12 +1009,18 @@ const ProductDetails = (props) => {
                         type={"file"}
                         style={{ display: "none" }}
                         multiple={true}
-                        onChange={(event) =>
-                          addProductImage(event.target.files, record)
-                        }
-                        id="uploadnew"
+                        onChange={(event) => {
+                          addProductImage(
+                            productDetailUpdate,
+                            event.target.files
+                          );
+                        }}
+                        id={productDetailUpdate.id + "upload"}
                       />
-                      <label className={styles.btnUpload} htmlFor="uploadnew">
+                      <label
+                        className={styles.btnUpload}
+                        htmlFor={productDetailUpdate.id + "upload"}
+                      >
                         <PlusOutlined />
                       </label>
                     </div>
@@ -1041,7 +1048,7 @@ const ProductDetails = (props) => {
     onChange: onSelectChange,
   };
   //functions
-  function addProductImage(event, productDetail) {
+  function addProductImage(productDetail, event) {
     message.loading("Vui lòng chờ", 1.5);
     var imageQuantity = productDetail.productImageResponse.length;
     var imageName =
@@ -1079,7 +1086,9 @@ const ProductDetails = (props) => {
           productImageCreate.path = url;
           axios
             .post(api + "product/createProductImg", productImageCreate)
-            .then((res) => {})
+            .then((res) => {
+              setRender(Math.random());
+            })
             .catch((err) => {
               console.log(err);
               return;
@@ -1091,7 +1100,6 @@ const ProductDetails = (props) => {
     }
     setTimeout(() => {
       message.success("Thêm ảnh thành công", 2);
-      setRender(Math.random());
     }, 1500);
   }
 
@@ -1434,7 +1442,7 @@ const ProductDetails = (props) => {
 
   function updateProductDetail(productDetail, notifi, index) {
     if (notifi) {
-      message.loading("loading", 1);
+      message.loading("loading", 20);
     }
     let check = isFormInputEmpty(productDetailUpdate);
     if (check) {
@@ -1451,6 +1459,7 @@ const ProductDetails = (props) => {
         .then((res) => {
           if (notifi) {
             if (res.data.id === productDetail.id) {
+              clearTimeout(1000);
               handlesetIsModalUpdateDetail(index, false);
               setTimeout(() => {
                 notification.success({
@@ -1602,6 +1611,7 @@ const ProductDetails = (props) => {
         console.log(err);
       });
   }
+
   useEffect(() => {
     axios
       .get(api + "product/getMaxPrice?productId=" + productId)
@@ -2376,7 +2386,7 @@ const ProductDetails = (props) => {
               },
             }}
           />
-          <div style={{ marginTop: "30px", textAlign: "center" }}>
+          <div style={{ margin: "30px 0", textAlign: "center" }}>
             <Button
               type="primary"
               disabled={selectedRowKeys.length === 0}

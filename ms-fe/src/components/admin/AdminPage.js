@@ -36,7 +36,7 @@ function AdminPage() {
 
   return (
     <NotificationProvider>
-      <Row>
+      <Row style={{ margin: 0 }}>
         <Col span={4}>
           <SideBar />
         </Col>

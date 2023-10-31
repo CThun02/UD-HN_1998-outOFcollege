@@ -128,7 +128,7 @@ const Bill = () => {
                     (productImage, index) => {
                       return (
                         <img
-                          key={index}
+                          key={productImage.id}
                           style={{ width: "100px" }}
                           alt="abc"
                           src={productImage.path}
@@ -197,7 +197,6 @@ const Bill = () => {
       width: 200,
       render: (text, record, index) => {
         const isDisabled = record.quantity >= record.productDetail.quantity;
-        console.log(isDisabled);
         return (
           <InputNumber
             min={1}
@@ -660,7 +659,6 @@ const Bill = () => {
   };
 
   const addIntoCartByScan = () => {
-    console.log(productDetailScan);
     if (
       !modalQRScanOpen &&
       productDetailScan.id !== undefined &&
@@ -675,20 +673,19 @@ const Bill = () => {
           Number(productDetailScan.id)
         ) {
           notExist = false;
-          productDetails[i].productDetail.quantity += 1;
+          productDetails[i].quantity += 1;
           break;
         }
       }
       if (notExist) {
         productDetails.push({ productDetail: productDetailScan, quantity: 1 });
       }
+      setProductDetailScan({});
       notification.success({
         message: "Thông báo",
         description: "Thêm thành công",
         duration: 2,
       });
-      setProductDetailScan({});
-      setRendered(Math.random());
       cart = {
         productDetails: productDetails,
         timeStart: now(),
@@ -701,7 +698,6 @@ const Bill = () => {
   useEffect(() => {
     getListAddressByUsername(account?.username);
     fetchProvinces();
-
     if (selectedAddress?.city) {
       const city = selectedAddress?.city.substring(
         1 + selectedAddress.city.indexOf("|")
@@ -739,8 +735,10 @@ const Bill = () => {
     account?.username,
     selectedDictrict,
     selectedWard,
-    productDetailScan.id,
+    modalQRScanOpen,
   ]);
+
+  console.log("redn");
 
   const [symbol, setSymbol] = useState("Received");
   const [note, setNote] = useState("");

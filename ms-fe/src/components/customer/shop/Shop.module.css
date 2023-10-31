@@ -30,3 +30,7 @@
 .shop {
   padding-bottom: 50px;
 }
+
+.width div:nth-child(2) {
+  height: auto;
+}

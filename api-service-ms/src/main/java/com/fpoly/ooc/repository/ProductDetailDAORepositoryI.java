@@ -6,6 +6,7 @@ import com.fpoly.ooc.responce.productdetail.ProductDetailShop;
 import com.fpoly.ooc.responce.productdetail.ProductsDetailsResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
@@ -126,5 +127,18 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
             LIMIT 4
         """)
     List<ProductDetailShop> getNewProductDetail();
+    @Query( name = "ProductDetail.getAllProductDetailShop", nativeQuery = true)
+    List<ProductDetailShop> getAllProductDetailShop(String productName,
+                                                    BigDecimal minPrice,
+                                                    BigDecimal maxPrice,
+                                                    String cateStr,
+                                                    String brandStr,
+                                                    String colorStr,
+                                                    String sizeStr,
+                                                    List<Long> categories,
+                                                    List<Long> brands,
+                                                    List<Long> colors,
+                                                    List<Long> sizes,
+                                                    String sort);
 
 }

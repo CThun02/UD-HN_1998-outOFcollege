@@ -1,14 +1,17 @@
-import Modal from "antd/es/modal/Modal";
-import React from "react";
-import { QrReader } from "react-qr-reader";
+import React, { useEffect, useState } from "react";
+import QrReader from "react-qr-reader";
+import { Modal } from "antd";
 
 const QRReader = ({ visible, onCancel, setData }) => {
   const handleScan = (data) => {
     if (data) {
-      setData(data.getText());
+      setData(data);
     }
   };
-
+  const [scan, setScan] = useState(false);
+  useEffect(() => {
+    setScan(visible);
+  }, [visible]);
   return (
     <Modal
       title="Tìm kiếm sản phẩm"
@@ -19,15 +22,15 @@ const QRReader = ({ visible, onCancel, setData }) => {
       footer={null}
       centered
     >
-      <QrReader
-        scanDelay={500}
-        onResult={(result, error) => {
-          console.log(error);
-          handleScan(result);
-        }}
-        constraints={{ facingMode: "user" }}
-        style={{ width: "100%" }}
-      />
+      {scan && (
+        <QrReader
+          facingMode={"user"}
+          delay={1000}
+          onError={(e) => console.log(e)}
+          onScan={handleScan}
+          style={{ width: "100%" }}
+        />
+      )}
     </Modal>
   );
 };

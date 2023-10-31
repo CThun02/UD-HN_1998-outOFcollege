@@ -83,13 +83,17 @@ function TableProduct({ productsId, setProductsId, values, status }) {
 
   useEffect(() => {
     async function getProducts() {
-      const res = await axios.get(baseUrl + "/promotion");
+      const res = await axios.get(
+        baseUrl + "/promotion?pageNo=" + (pageNo - 1) + "&pageSize=" + pageSize
+      );
 
+      console.log("log: ", res.totalElements);
       setData(res.data.content);
+      setTotalElements(res.data.totalElements);
     }
 
     getProducts();
-  }, []);
+  }, [pageNo, pageSize]);
 
   return (
     <div>
@@ -100,7 +104,7 @@ function TableProduct({ productsId, setProductsId, values, status }) {
           stt: calculateStt(index),
           key: e.productId,
           product: e.productName,
-          sellQuantity: e.sellQuantity,
+          sellQuantity: e.sellQuantity ? e.sellQuantity : "Đang bán",
           price: `${
             e.minPrice === e.maxPrice
               ? numeral(e.maxPrice).format("0,0") + "đ"

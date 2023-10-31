@@ -2,11 +2,14 @@ package com.fpoly.ooc.service.interfaces;
 
 import com.fpoly.ooc.dto.ProductDetailsDTO;
 import com.fpoly.ooc.entity.ProductDetail;
+import com.fpoly.ooc.request.product.ProductDetailCondition;
 import com.fpoly.ooc.request.product.ProductDetailRequest;
 import com.fpoly.ooc.responce.product.ProductDetailDisplayResponse;
 import com.fpoly.ooc.responce.product.ProductDetailResponse;
 import com.fpoly.ooc.responce.productdetail.ProductDetailShop;
 import com.fpoly.ooc.responce.productdetail.ProductsDetailsResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -28,4 +31,7 @@ public interface ProductDetailServiceI {
     Optional<List<ProductDetailShop>> getProductDetailBestSelling();
     Optional<List<ProductDetailShop>> getNewProductDetail();
 
+    Optional<Page<ProductDetailShop>> getAllProductDetailShop(ProductDetailCondition req, Pageable pageable);
+
+    Optional<BigDecimal> getPriceMax();
 }

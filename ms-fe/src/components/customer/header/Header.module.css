@@ -10,8 +10,6 @@
 
 .header {
   width: 100%;
-  transition: top 0.3s ease-out;
-  /* background-color: rgb(243, 246, 246); */
   position: fixed;
   z-index: 10;
 }

@@ -22,6 +22,7 @@ public interface ProductDetailServiceI {
     public ProductDetail getOne(Long id);
     public List<ProductDetailDisplayResponse> filterProductDetailsByIdCom(ProductDetailRequest request,
                                                                           BigDecimal minPrice, BigDecimal maxPrice);
+    public ProductDetailDisplayResponse getOnePDDisplayById(Long id);
     public List<ProductDetailResponse> searchProductDetail(String keyWords);
     ProductDetail findById(Long id);
     List<Long> findAllIdsResponseProductDetails(Long idPromotion);

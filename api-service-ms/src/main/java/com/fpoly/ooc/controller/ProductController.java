@@ -48,6 +48,11 @@ public class ProductController {
                     keywords.equals("null")?null:"%"+keywords+"%"));
     }
 
+    @GetMapping("/getproductdetailbyidpd")
+    public ResponseEntity<?> filterByCom(@RequestParam() Long productDetailId){
+        return ResponseEntity.ok(productDetailService.getOnePDDisplayById(productDetailId));
+    }
+
     @GetMapping("/getMaxPrice")
     public ResponseEntity<?> getMaxPrice(@RequestParam Long productId){
         return ResponseEntity.ok(productDetailService.getMaxPricePDByProductId(productId));
@@ -154,14 +159,16 @@ public class ProductController {
                 .categoryId(productDetail.getCategory().getId()).build();
         List<ProductDetailDisplayResponse> check = productDetailService.filterProductDetailsByIdCom(request, null, null);
         Optional<ProductDetailDisplayResponse> result = check.stream()
-                .filter(productDetailGet -> !productDetailGet.getId().equals(request.getId()))
+                .filter(productDetailGet -> !productDetailGet.getId().equals(productDetail.getId()))
                 .findFirst();
         if(!result.isEmpty()){
-            return ResponseEntity.ok(result.get());
+            if(!(result.get().getId() == productDetail.getId())){
+                System.out.println(result.get().getId()+"check"+ request.getId());
+                return ResponseEntity.ok(result.get());
+            }
         }
         return ResponseEntity.ok(productDetailService.update(productDetail));
     }
-
 
     @PutMapping("/updateProductImg")
     public ResponseEntity<?> updateProductImg(@RequestBody ProductImage request){

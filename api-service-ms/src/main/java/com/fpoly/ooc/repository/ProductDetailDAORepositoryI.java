@@ -33,6 +33,14 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
                                                                    Long brandId, Long categoryId, BigDecimal minPrice,
                                                                    BigDecimal maxPrice);
 
+    @Query("SELECT pd.id AS id, pd.product AS product, pd.brand as brand, pd.category as category, pd.button AS button" +
+            ", pd.material AS material, pd.collar AS collar, pd.sleeve AS sleeve" +
+            ", pd.size AS size, pd.color AS color, pd.shirtTail AS shirtTail" +
+            ", pd.price AS price, pd.weight as weight, pd.quantity AS quantity, pd.descriptionDetail AS descriptionDetail" +
+            ", pd.pattern as pattern, pd.form as form, pd.status as status FROM ProductDetail pd " +
+            "WHERE (pd.id = ?1 OR ?1 IS NULL) ")
+    public ProductDetailResponse getProductDetailResponseById(Long productDetailId);
+
     @Query("SELECT pd.id AS id, pd.product AS product, pd.brand as brand, pd.category as category,   pd.button AS button" +
             ", pd.material AS material, pd.collar AS collar, pd.sleeve AS sleeve" +
             ", pd.size AS size, pd.color AS color, pd.shirtTail AS shirtTail" +

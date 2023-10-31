@@ -95,12 +95,12 @@ import java.util.List;
 
                     WHERE
                         pd.status = 'ACTIVE'
-                        AND pie.status = 'ACTIVE'
-                        AND bd.status = 'ACTIVE'
-                        AND pp.status = 'ACTIVE'
-                        AND pn.status = 'ACTIVE'
+                        AND (pie.product_detail_id is null or pie.status = 'ACTIVE')
+                        AND (bd.product_detail_id is null or bd.status = 'ACTIVE')
+                        AND (pp.product_detail_id is null or pp.status = 'ACTIVE')
                         AND pt.status = 'ACTIVE'
                         AND c.status = 'ACTIVE'
+                        AND (pp.promotion_id is null or pn.status = 'ACTIVE')
                         AND (?1 IS NULL OR lower(pt.product_name) LIKE ?1)
                         AND (?2 IS NULL OR pd.price >= ?2)
                         AND (?3 IS NULL OR pd.price <= ?3)

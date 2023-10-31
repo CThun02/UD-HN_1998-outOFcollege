@@ -45,6 +45,11 @@ public class ProductController {
                     keywords.equals("null")?null:"%"+keywords+"%"));
     }
 
+    @GetMapping("/getproductdetailbyidpd")
+    public ResponseEntity<?> filterByCom(@RequestParam() Long productDetailId){
+        return ResponseEntity.ok(productDetailService.getOnePDDisplayById(productDetailId));
+    }
+
     @GetMapping("/getMaxPrice")
     public ResponseEntity<?> getMaxPrice(@RequestParam Long productId){
         return ResponseEntity.ok(productDetailService.getMaxPricePDByProductId(productId));

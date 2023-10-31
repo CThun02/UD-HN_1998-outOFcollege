@@ -61,7 +61,17 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
 
     @Override
     public ProductDetail getOne(Long id) {
-        return repo.findById(id).get();
+        return repo.findById(id).orElse(null);
+    }
+
+    @Override
+    public ProductDetailDisplayResponse getOnePDDisplayById(Long id) {
+        ProductDetailResponse productDetailResponse = repo.getProductDetailResponseById(id);
+        ProductDetailDisplayResponse productDetailDisplayResponse = new ProductDetailDisplayResponse(productDetailResponse);
+        List<ProductImageResponse> productImageResponses = productImageService.
+                getProductImageByProductDetailId(productDetailDisplayResponse.getId());
+        productDetailDisplayResponse.setProductImageResponse(productImageResponses);
+        return  productDetailDisplayResponse;
     }
 
     @Override

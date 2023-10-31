@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fpoly.ooc.responce.productdetail.ProductDetailShop;
 import com.fpoly.ooc.responce.productdetail.ProductsDetailsResponse;
 import com.fpoly.ooc.responce.voucher.VoucherResponse;
 import jakarta.persistence.*;
@@ -25,7 +26,7 @@ import java.util.List;
                 select pd.id as 'ProductDetailsId',
                        p.product_code as 'ProductCode',
                        p.product_name as 'ProductName',
-                       pi.path as 'ImageDefault',
+                       pie.path as 'ImageDefault',
                        bt.button_name as 'ButtonName',
                        m.material_name as 'MaterialName',
                        ct.collar_type_name as 'CollarName',
@@ -46,7 +47,7 @@ import java.util.List;
                          left join shirt_tail_type stt on pd.shirt_tail_id = stt.id
                          left join size s on pd.size_id = s.id
                          left join color c on pd.color_id = c.id
-                         left join product_image pi on pd.id = pi.product_detail_id
+                         left join product_image pie on pd.id = pie.product_detail_id
 
                 where pd.status = 'ACTIVE'
                   and p.status = 'ACTIVE'
@@ -57,7 +58,7 @@ import java.util.List;
                   and stt.status = 'ACTIVE'
                   and s.status = 'ACTIVE'
                   and c.status = 'ACTIVE'
-                  and pi.status = 'ACTIVE'
+                  and (pie.product_detail_id is null or pie.status = 'ACTIVE')
                   and (p.id in ?1)
                   and (?2 is null or bt.id = ?2)
                   and (?3 is null or m.id = ?3)
@@ -67,13 +68,52 @@ import java.util.List;
                   and (?7 is null or s.id = ?7)
                   and (?8 is null or c.id = ?8)
                   and (?9 is null or p.product_name like ?9 or p.product_code like ?9)
-                  
-                group by pd.id, p.product_code, p.product_name, pi.path, bt.button_name, m.material_name, 
-                ct.collar_type_name, st.seleeve_name, s.size_name, c.color_code, stt.shirt_tail_name, pd.price,
-                pd.quantity, pd.description_detail, pd.status
                 """,
         resultSetMapping = "Mapping.ProductsDetailsResponse"
 )
+
+@NamedNativeQuery(name = "ProductDetail.getAllProductDetailShop",
+        query = """
+            SELECT pd.id                as 'ProductDetailId',
+                    c.category_name     as 'CategoryName',
+                    pt.product_name     as 'ProductName',
+                    pn.promotion_method as 'PromotionMethod',
+                    pn.promotion_value  as 'PromotionValue',
+                    pd.price            as 'Price',
+                    COUNT(bd.id)        as 'QuantitySelling'
+
+                    FROM product_detail pd
+                    LEFT JOIN product_image pie ON pd.id = pie.product_detail_id
+                    LEFT JOIN bill_detail bd ON pd.id = bd.product_detail_id
+                    LEFT JOIN category c ON c.id = pd.category_id
+                    LEFT JOIN product pt ON pt.id = pd.product_id
+                    LEFT JOIN brand b ON b.id = pd.brand_id
+                    LEFT JOIN color cor ON cor.id = pd.color_id
+                    LEFT JOIN size se ON se.id = pd.size_id
+                    LEFT JOIN promotion_product_detail pp ON pd.id = pp.product_detail_id
+                    LEFT JOIN promotion pn ON pn.id = pp.promotion_id
+
+                    WHERE
+                        pd.status = 'ACTIVE'
+                        AND pie.status = 'ACTIVE'
+                        AND bd.status = 'ACTIVE'
+                        AND pp.status = 'ACTIVE'
+                        AND pn.status = 'ACTIVE'
+                        AND pt.status = 'ACTIVE'
+                        AND c.status = 'ACTIVE'
+                        AND (?1 IS NULL OR lower(pt.product_name) LIKE ?1)
+                        AND (?2 IS NULL OR pd.price >= ?2)
+                        AND (?3 IS NULL OR pd.price <= ?3)
+                        AND (?4 = '' OR c.id IN (?8))
+                        AND (?5 = '' OR b.id IN (?9))
+                        AND (?6 = '' OR cor.id IN (?10))
+                        AND (?7 = '' OR se.id IN (?11))
+                    GROUP BY pd.id, c.category_name, pt.product_name, pn.promotion_method,
+                    pn.promotion_value, pd.price
+                    ORDER BY
+                        CASE WHEN ?12 = 'desc' THEN pd.price END DESC,
+                        CASE WHEN ?12 = 'asc' THEN pd.price END ASC;
+        """, resultSetMapping = "Mapping.ProductDetailShop")
 
 @SqlResultSetMapping(
         name = "Mapping.ProductsDetailsResponse",
@@ -95,6 +135,21 @@ import java.util.List;
                         @ColumnResult(name = "Quantity", type = Integer.class),
                         @ColumnResult(name = "Description", type = String.class),
                         @ColumnResult(name = "Status", type = String.class)
+                }
+        )
+)
+
+@SqlResultSetMapping(name = "Mapping.ProductDetailShop",
+        classes = @ConstructorResult(
+                targetClass = ProductDetailShop.class,
+                columns = {
+                        @ColumnResult(name = "ProductDetailId", type = Long.class),
+                        @ColumnResult(name = "CategoryName", type = String.class),
+                        @ColumnResult(name = "ProductName", type = String.class),
+                        @ColumnResult(name = "PromotionMethod", type = String.class),
+                        @ColumnResult(name = "PromotionValue", type = BigDecimal.class),
+                        @ColumnResult(name = "Price", type = BigDecimal.class),
+                        @ColumnResult(name = "QuantitySelling", type = Long.class),
                 }
         )
 )

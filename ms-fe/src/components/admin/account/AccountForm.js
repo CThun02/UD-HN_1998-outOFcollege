@@ -20,13 +20,13 @@ import { CheckCircleTwoTone, ScanOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { saveImage } from "../../../config/FireBase";
-import QRScanner from "./QRScanner";
 import {
   isFormInputEmpty,
   isEmailCorrectFormat,
   isValidPhoneNumber,
 } from "../product/ValidateForm";
 import dayjs from "dayjs";
+import QRReader from "../../../service/QRReader";
 // Nhập ảnh mã QR
 const MyForm = (props) => {
   const navigate = useNavigate();
@@ -69,6 +69,7 @@ const MyForm = (props) => {
   };
 
   const handleScan = (result) => {
+    console.log(result);
     let value = result;
     const idNo = value.substring(0, value.indexOf("|"));
     const fullName = value.substring(
@@ -259,9 +260,11 @@ const MyForm = (props) => {
           </Col>
           {roleId === 1 ? (
             <>
-              <Modal open={visible} onCancel={handleCancel} footer={null}>
-                <QRScanner onScan={handleScan} />
-              </Modal>
+              <QRReader
+                visible={visible}
+                setData={handleScan}
+                onCancel={handleCancel}
+              />
               <Col span={3}>
                 <div className="m-5">
                   <Button className={styles.btnQR} onClick={showModal}>

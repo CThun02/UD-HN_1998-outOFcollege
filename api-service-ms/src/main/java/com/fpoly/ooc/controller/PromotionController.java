@@ -23,6 +23,7 @@ public class PromotionController {
 
     @PostMapping("save")
     public ResponseEntity<?> save(@RequestBody PromotionRequest request) {
+        System.out.println("requeststtt: " + request);
         return ResponseEntity.ok(promotionService.saveOrUpdate(request));
     }
 

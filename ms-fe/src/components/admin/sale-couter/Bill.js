@@ -21,13 +21,13 @@ import styles from "./Bill.module.css";
 import ModalProduct from "./ModalProduct";
 import logoGhn from "../../../Assets/img/logo/logo_ghn.png";
 import {
-  CarOutlined,
   CloseCircleOutlined,
   DeleteOutlined,
   DollarOutlined,
   SwapOutlined,
   QrcodeOutlined,
   UserOutlined,
+  ShoppingCartOutlined,
 } from "@ant-design/icons";
 import * as Yup from "yup";
 import axios from "axios";
@@ -37,6 +37,7 @@ import moment from "moment";
 import { useNavigate } from "react-router-dom";
 import ModalAccount from "./ModalAccount";
 import ModalAddress from "./ModalAddress";
+import QRReader from "../../../service/QRReader";
 import FormUsingVoucher from "../../element/voucher/FormUsingVoucher";
 import numeral from "numeral";
 import SearchNameOrCodeVoucher from "../../element/voucher/SearchNameOrCodeVoucher";
@@ -45,6 +46,7 @@ const Bill = () => {
   var initialItems = [];
   const [modalVisible, setModalVisible] = useState([]);
   const [modalAccountVisible, setModalAccountVisible] = useState([]);
+  const [modalQRScanOpen, setModalQRScanOpen] = useState(false);
   function getCart() {
     initialItems = [];
     var checkEmpty = 0;
@@ -77,7 +79,6 @@ const Bill = () => {
     const initialState = items.map(() => false);
     setModalVisible(initialState);
   };
-
 
   const updateQuantity = (record, index, value) => {
     let cart = JSON.parse(localStorage.getItem(cartId));
@@ -122,17 +123,19 @@ const Bill = () => {
           <Row>
             <Col span={4}>
               <Carousel autoplay className={styles.slider}>
-                {record.productDetailImages &&
-                  record.productDetailImages.map((productImage, index) => {
-                    return (
-                      <img
-                        key={index}
-                        style={{ width: "100px" }}
-                        alt="abc"
-                        src={productImage}
-                      />
-                    );
-                  })}
+                {record.productDetail.productImageResponse &&
+                  record.productDetail.productImageResponse.map(
+                    (productImage, index) => {
+                      return (
+                        <img
+                          key={productImage.id}
+                          style={{ width: "100px" }}
+                          alt="abc"
+                          src={productImage.path}
+                        />
+                      );
+                    }
+                  )}
               </Carousel>
             </Col>
             <Col span={20}>
@@ -194,7 +197,6 @@ const Bill = () => {
       width: 200,
       render: (text, record, index) => {
         const isDisabled = record.quantity >= record.productDetail.quantity;
-        console.log(isDisabled)
         return (
           <InputNumber
             min={1}
@@ -322,6 +324,7 @@ const Bill = () => {
   const [isOpenFormVoucher, setIsOpenFormVoucher] = useState(false);
   const [voucherAdd, setVoucherAdd] = useState({});
   const [typeShipping, setTypeShipping] = useState([]);
+  const [productDetailScan, setProductDetailScan] = useState({});
 
   // xóa tài khoản
   const handleDeleteAccount = () => {
@@ -522,7 +525,7 @@ const Bill = () => {
     setSwitchChange(visible);
     setSymbol(checked ? "Shipping" : "Received");
     if (!checked) {
-      setTypeShipping(false)
+      setTypeShipping(false);
     }
   };
 
@@ -639,12 +642,62 @@ const Bill = () => {
         });
     }
   };
+  const scanAddProductDetailIntoCart = (result) => {
+    axios
+      .get(
+        "http://localhost:8080/api/admin/product/getproductdetailbyidpd?productDetailId=" +
+          result
+      )
+      .then((response) => {
+        setProductDetailScan(response.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    setModalQRScanOpen(false);
+    setRendered(Math.random());
+  };
+
+  const addIntoCartByScan = () => {
+    if (
+      !modalQRScanOpen &&
+      productDetailScan.id !== undefined &&
+      productDetailScan.id !== null
+    ) {
+      var cart = JSON.parse(localStorage.getItem(cartId));
+      var productDetails = cart.productDetails;
+      var notExist = true;
+      for (var i = 0; i < productDetails.length; i++) {
+        if (
+          Number(productDetails[i].productDetail.id) ===
+          Number(productDetailScan.id)
+        ) {
+          notExist = false;
+          productDetails[i].quantity += 1;
+          break;
+        }
+      }
+      if (notExist) {
+        productDetails.push({ productDetail: productDetailScan, quantity: 1 });
+      }
+      setProductDetailScan({});
+      notification.success({
+        message: "Thông báo",
+        description: "Thêm thành công",
+        duration: 2,
+      });
+      cart = {
+        productDetails: productDetails,
+        timeStart: now(),
+        account: cart.account,
+      };
+      localStorage.setItem(cartId, JSON.stringify(cart));
+    }
+  };
+
   useEffect(() => {
     getListAddressByUsername(account?.username);
     fetchProvinces();
-
-    console.log(voucherAdd)
-
     if (selectedAddress?.city) {
       const city = selectedAddress?.city.substring(
         1 + selectedAddress.city.indexOf("|")
@@ -674,8 +727,18 @@ const Bill = () => {
 
     getProductDetails();
     initializeModalStates();
+    addIntoCartByScan();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cartId, render, account?.username, selectedDictrict, selectedWard]);
+  }, [
+    cartId,
+    render,
+    account?.username,
+    selectedDictrict,
+    selectedWard,
+    modalQRScanOpen,
+  ]);
+
+  console.log("redn");
 
   const [symbol, setSymbol] = useState("Received");
   const [note, setNote] = useState("");
@@ -698,8 +761,8 @@ const Bill = () => {
       amountPaid: typeShipping[index]
         ? 0
         : selectedOption === "2"
-          ? voucherPrice() + shippingFee
-          : amountPaid,
+        ? voucherPrice() + shippingFee
+        : amountPaid,
       billType: "In-Store",
       symbol: typeShipping[index] ? "Shipping" : symbol,
       status: typeShipping[index] ? "Unpaid" : "Paid",
@@ -711,7 +774,7 @@ const Bill = () => {
       phoneNumber: selectedAddress.numberPhone,
       transactionCode: selectedOption === "2" ? transactionCode : null,
       voucherCode: voucherAdd?.voucherCode,
-      createdBy: "user3"
+      createdBy: "user3",
     };
     const billAddress = {
       fullName: fullname,
@@ -803,7 +866,7 @@ const Bill = () => {
             }
             notification.success({
               message: "Thông báo",
-              description: 'Thanh toán thành công',
+              description: "Thanh toán thành công",
               duration: 2,
             });
             navigate(`/api/admin/order`);
@@ -838,6 +901,14 @@ const Bill = () => {
 
   return (
     <>
+      <QRReader
+        visible={modalQRScanOpen}
+        key={cartId}
+        onCancel={() => {
+          setModalQRScanOpen(false);
+        }}
+        setData={scanAddProductDetailIntoCart}
+      />
       <Tabs
         type="editable-card"
         onChange={onChange}
@@ -861,13 +932,14 @@ const Bill = () => {
                         type="primary"
                         size="large"
                       >
-                        <CarOutlined style={{ fontSize: "20px" }} />
+                        <ShoppingCartOutlined style={{ fontSize: "20px" }} />
                       </Button>
                       <Button
                         className={styles.addButton}
                         type="primary"
                         size="large"
                         style={{ marginRight: "8px" }}
+                        onClick={() => setModalQRScanOpen(true)}
                       >
                         <QrcodeOutlined style={{ fontSize: "20px" }} />
                       </Button>
@@ -1038,9 +1110,9 @@ const Bill = () => {
                             value={
                               selectedAddress.city
                                 ? selectedAddress?.city.substring(
-                                  0,
-                                  selectedAddress.city.indexOf("|")
-                                )
+                                    0,
+                                    selectedAddress.city.indexOf("|")
+                                  )
                                 : undefined
                             }
                           >
@@ -1075,9 +1147,9 @@ const Bill = () => {
                             value={
                               selectedAddress.district
                                 ? selectedAddress?.district.substring(
-                                  0,
-                                  selectedAddress.district.indexOf("|")
-                                )
+                                    0,
+                                    selectedAddress.district.indexOf("|")
+                                  )
                                 : undefined
                             }
                           >
@@ -1110,9 +1182,9 @@ const Bill = () => {
                             value={
                               selectedAddress.ward
                                 ? selectedAddress.ward.substring(
-                                  0,
-                                  selectedAddress.ward.indexOf("|")
-                                )
+                                    0,
+                                    selectedAddress.ward.indexOf("|")
+                                  )
                                 : undefined
                             }
                           >
@@ -1177,11 +1249,11 @@ const Bill = () => {
                             productDetails.length > 0
                               ? true
                               : notification.error({
-                                message: "Lỗi",
-                                description:
-                                  "Chưa có sản phẩm trong giỏ hàng.",
-                                duration: 2,
-                              })
+                                  message: "Lỗi",
+                                  description:
+                                    "Chưa có sản phẩm trong giỏ hàng.",
+                                  duration: 2,
+                                })
                           )
                         }
                       >
@@ -1321,7 +1393,7 @@ const Bill = () => {
                           )}
                         </Col>
                         {Number(selectedOption) !== 2 &&
-                          !typeShipping[index] ? (
+                        !typeShipping[index] ? (
                           <>
                             <Col span={8} style={{ marginTop: "8px" }}>
                               <span
@@ -1370,7 +1442,7 @@ const Bill = () => {
                           </>
                         ) : null}
                         {Number(selectedOption) !== 2 &&
-                          !typeShipping[index] ? (
+                        !typeShipping[index] ? (
                           <Col span={24}>
                             <Row style={{ marginTop: "8px" }}>
                               <Col span={16}>

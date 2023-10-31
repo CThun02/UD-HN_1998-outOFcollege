@@ -6,6 +6,7 @@ import com.fpoly.ooc.responce.productdetail.ProductDetailShop;
 import com.fpoly.ooc.responce.productdetail.ProductsDetailsResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
@@ -31,6 +32,14 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
                                                                    Long idColor, Long idSize, Long patternId, Long formId,
                                                                    Long brandId, Long categoryId, BigDecimal minPrice,
                                                                    BigDecimal maxPrice);
+
+    @Query("SELECT pd.id AS id, pd.product AS product, pd.brand as brand, pd.category as category, pd.button AS button" +
+            ", pd.material AS material, pd.collar AS collar, pd.sleeve AS sleeve" +
+            ", pd.size AS size, pd.color AS color, pd.shirtTail AS shirtTail" +
+            ", pd.price AS price, pd.weight as weight, pd.quantity AS quantity, pd.descriptionDetail AS descriptionDetail" +
+            ", pd.pattern as pattern, pd.form as form, pd.status as status FROM ProductDetail pd " +
+            "WHERE (pd.id = ?1 OR ?1 IS NULL) ")
+    public ProductDetailResponse getProductDetailResponseById(Long productDetailId);
 
     @Query("SELECT pd.id AS id, pd.product AS product, pd.brand as brand, pd.category as category,   pd.button AS button" +
             ", pd.material AS material, pd.collar AS collar, pd.sleeve AS sleeve" +
@@ -118,5 +127,18 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
             LIMIT 4
         """)
     List<ProductDetailShop> getNewProductDetail();
+    @Query( name = "ProductDetail.getAllProductDetailShop", nativeQuery = true)
+    List<ProductDetailShop> getAllProductDetailShop(String productName,
+                                                    BigDecimal minPrice,
+                                                    BigDecimal maxPrice,
+                                                    String cateStr,
+                                                    String brandStr,
+                                                    String colorStr,
+                                                    String sizeStr,
+                                                    List<Long> categories,
+                                                    List<Long> brands,
+                                                    List<Long> colors,
+                                                    List<Long> sizes,
+                                                    String sort);
 
 }

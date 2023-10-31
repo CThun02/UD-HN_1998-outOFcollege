@@ -1,6 +1,5 @@
 package com.fpoly.ooc.responce.productdetail;
 
-import com.fpoly.ooc.entity.ProductImage;
 import com.fpoly.ooc.responce.product.ProductImageResponse;
 import lombok.AllArgsConstructor;
 import lombok.Data;

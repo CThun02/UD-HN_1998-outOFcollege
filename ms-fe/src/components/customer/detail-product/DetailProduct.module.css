@@ -1,0 +1,21 @@
+.detailProduct {
+  display: flex;
+  justify-content: center;
+}
+
+.background {
+  background-color: #fff;
+}
+
+.content {
+  width: 90%;
+}
+
+.row {
+  margin: 0;
+  padding: 0;
+}
+
+.title {
+  padding: 20px 0;
+}

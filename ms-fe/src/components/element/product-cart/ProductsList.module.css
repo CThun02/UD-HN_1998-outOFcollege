@@ -60,6 +60,15 @@
   width: 100%;
 }
 
+.fixed {
+  width: 270px !important;
+  height: 270px !important;
+}
+
+.fixed:hover {
+  cursor: pointer;
+}
+
 .absoluteCenter {
   display: flex;
   justify-content: center;

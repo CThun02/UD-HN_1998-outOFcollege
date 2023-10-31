@@ -5,6 +5,7 @@ import Footer from "./footer/Footer";
 import HomeClient from "./home/index/HomeClient";
 import About from "./about/About";
 import Shop from "./shop/Shop";
+import DetailProduct from "./detail-product/DetailProduct";
 
 function ClientPage() {
   return (
@@ -18,7 +19,14 @@ function ClientPage() {
             <Route index element={<HomeClient />} />
             <Route path="home" element={<HomeClient />} />
             <Route path="about" element={<About />} />
-            <Route path="anything" element={<Shop />} />
+            <Route path="shopping">
+              <Route index element={<Shop />} />
+              <Route path=":typeCategory">
+                <Route index element={<Shop />} />
+                <Route path="detail/:id" element={<DetailProduct />} />
+              </Route>
+              <Route path="detail/:id" element={<DetailProduct />} />
+            </Route>
             <Route
               path="*"
               element={
@@ -34,13 +42,13 @@ function ClientPage() {
                 />
               }
             />
-          </Routes >
+          </Routes>
           <div>
             <Footer />
           </div>
-        </div >
-      </Col >
-    </Row >
+        </div>
+      </Col>
+    </Row>
   );
 }
 

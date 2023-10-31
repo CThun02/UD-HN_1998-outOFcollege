@@ -7,6 +7,7 @@ import About from "./about/About";
 import Contact from "./contact/Contact";
 import Checkout from "./checkout/Checkout";
 import Shop from "./shop/Shop";
+import DetailProduct from "./detail-product/DetailProduct";
 
 function ClientPage() {
   return (
@@ -23,6 +24,14 @@ function ClientPage() {
             <Route path="contact" element={<Contact />} />
             <Route path="checkout" element={<Checkout />} />
             <Route path="anything" element={<Shop />} />
+            <Route path="shopping">
+              <Route index element={<Shop />} />
+              <Route path=":typeCategory">
+                <Route index element={<Shop />} />
+                <Route path="detail/:id" element={<DetailProduct />} />
+              </Route>
+              <Route path="detail/:id" element={<DetailProduct />} />
+            </Route>
             <Route
               path="*"
               element={
@@ -38,13 +47,13 @@ function ClientPage() {
                 />
               }
             />
-          </Routes >
+          </Routes>
           <div>
             <Footer />
           </div>
-        </div >
-      </Col >
-    </Row >
+        </div>
+      </Col>
+    </Row>
   );
 }
 

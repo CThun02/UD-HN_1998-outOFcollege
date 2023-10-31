@@ -52,14 +52,17 @@ function ProductsList({ data, span }) {
           style={{ width: "270px", border: "none" }}
           cover={
             <div
-              className={styles.position}
+              className={`${styles.position} ${
+                data?.productImages[0]?.path ? "" : styles.fixed
+              }`}
               onMouseLeave={() => handleMouseOut(false)}
+              onMouseEnter={() => handleMouseIn(true)}
             >
               <img
                 onMouseEnter={() => handleMouseIn(true)}
                 alt="product"
-                src={data?.productImages[0].path}
-                className={`${styles.cssHover} ${styles.imageSize}`}
+                src={data?.productImages[0]?.path}
+                className={`${styles.cssHover} ${styles.imageSize} `}
               />
               <div
                 className={`${styles.transition} ${

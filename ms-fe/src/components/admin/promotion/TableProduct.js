@@ -109,11 +109,12 @@ function TableProduct({ productsId, setProductsId, values, status }) {
             e.minPrice === e.maxPrice
               ? numeral(e.maxPrice).format("0,0") + "đ"
               : numeral(e.minPrice).format("0,0") +
-                "đ" -
+                "đ" +
+                " - " +
                 numeral(e.maxPrice).format("0,0") +
                 "đ"
           }`,
-          quantity: e.quantityProduct,
+          quantity: e.quantityProduct ? e.quantityProduct : "Hết hàng",
         }))}
         pagination={false}
       />

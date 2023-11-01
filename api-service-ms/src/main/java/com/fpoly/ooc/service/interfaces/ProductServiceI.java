@@ -20,7 +20,7 @@ public interface ProductServiceI {
     public ProductTableResponse getProductEdit(Long id);
     public ProductResponse getProductResponseById(Long id);
     public List<ProductTableResponse> getProductFilterByCom(String status, String keywords);
-    Page<ProductPromotionResponse> findProductPromotion(Pageable pageable);
+    List<ProductPromotionResponse> findProductPromotion();
     List<Long> findIdsProductsByIdPromotion(Long idPromotion);
 
 }

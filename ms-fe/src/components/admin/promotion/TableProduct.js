@@ -37,13 +37,11 @@ const columns = [
 ];
 
 const baseUrl = "http://localhost:8080/api/admin/product";
-const baseUrlProductDetail = "http://localhost:8080/api/admin/product";
 
 function TableProduct({ productsId, setProductsId, values, status }) {
   const [data, setData] = useState([]);
 
   //paging
-  const [totalElements, setTotalElements] = useState(1);
   const [pageNo, setPageNo] = useState(1);
   const [pageSize, setPageSize] = useState(5);
 
@@ -67,6 +65,10 @@ function TableProduct({ productsId, setProductsId, values, status }) {
   const rowSelection = {
     selectedRowKeys,
     onChange: handleOnChange,
+    selections:
+      status === "INACTIVE" || status === "CANCEL"
+        ? null
+        : [Table.SELECTION_ALL, Table.SELECTION_NONE],
     getCheckboxProps: (record) => ({
       disabled: status === "INACTIVE" || status === "CANCEL" ? true : false,
     }),
@@ -83,17 +85,12 @@ function TableProduct({ productsId, setProductsId, values, status }) {
 
   useEffect(() => {
     async function getProducts() {
-      const res = await axios.get(
-        baseUrl + "/promotion?pageNo=" + (pageNo - 1) + "&pageSize=" + pageSize
-      );
-
-      console.log("log: ", res.totalElements);
-      setData(res.data.content);
-      setTotalElements(res.data.totalElements);
+      const res = await axios.get(baseUrl + "/promotion");
+      setData(res.data);
     }
 
     getProducts();
-  }, [pageNo, pageSize]);
+  }, []);
 
   return (
     <div>
@@ -116,17 +113,16 @@ function TableProduct({ productsId, setProductsId, values, status }) {
           }`,
           quantity: e.quantityProduct ? e.quantityProduct : "Hết hàng",
         }))}
-        pagination={false}
-      />
-      <Pagination
-        style={{ marginTop: "20px" }}
-        defaultCurrent={pageNo}
-        total={totalElements}
-        showSizeChanger={true}
-        pageSize={pageSize}
-        pageSizeOptions={["5", "10", "20", "50", "100"]}
-        onShowSizeChange={handlePageSize}
-        onChange={(page) => setPageNo(page)}
+        pagination={{
+          showSizeChanger: true,
+          pageSizeOptions: [5, 10, 15, 20],
+          defaultPageSize: 5,
+          showLessItems: true,
+          style: { marginRight: "10px" },
+          onChange: (currentPage, pageSize) => {
+            handlePageSize(currentPage, pageSize);
+          },
+        }}
       />
     </div>
   );

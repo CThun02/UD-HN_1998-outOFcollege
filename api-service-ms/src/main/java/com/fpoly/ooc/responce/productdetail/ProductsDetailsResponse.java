@@ -33,4 +33,5 @@ public class ProductsDetailsResponse {
     private Integer quantity;
     private String descriptionDetail;
     private String status;
+    private Boolean isCheckExistsInPromotion;
 }

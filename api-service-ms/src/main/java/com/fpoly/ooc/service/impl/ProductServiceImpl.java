@@ -88,8 +88,8 @@ public class ProductServiceImpl implements ProductServiceI {
     }
 
     @Override
-    public Page<ProductPromotionResponse> findProductPromotion(Pageable pageable) {
-        return repo.findProductPromotion(pageable);
+    public List<ProductPromotionResponse> findProductPromotion() {
+        return repo.findProductPromotion();
     }
 
     @Override

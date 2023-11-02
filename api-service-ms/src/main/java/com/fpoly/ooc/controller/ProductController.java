@@ -185,11 +185,8 @@ public class ProductController {
     }
 
     @GetMapping("/promotion")
-    public ResponseEntity<?> findProductPromotion(
-            @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
-            @RequestParam(value = "pageSize", defaultValue = "5") Integer pageSize
-    ) {
-        return ResponseEntity.ok(service.findProductPromotion(PageRequest.of(pageNo, pageSize)));
+    public ResponseEntity<?> findProductPromotion() {
+        return ResponseEntity.ok(service.findProductPromotion());
     }
 
     @PostMapping("/by-product-details-dto")

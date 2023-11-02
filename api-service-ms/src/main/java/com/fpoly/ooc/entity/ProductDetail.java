@@ -26,7 +26,7 @@ import java.util.List;
                 select pd.id as 'ProductDetailsId',
                        p.product_code as 'ProductCode',
                        p.product_name as 'ProductName',
-                       pi.path as 'ImageDefault',
+                       pie.path as 'ImageDefault',
                        bt.button_name as 'ButtonName',
                        m.material_name as 'MaterialName',
                        ct.collar_type_name as 'CollarName',
@@ -37,7 +37,12 @@ import java.util.List;
                        pd.price as 'Price',
                        pd.quantity as 'Quantity',
                        pd.description_detail as 'Description',
-                       pd.status as 'Status'
+                       pd.status as 'Status',
+                       CASE 
+                       WHEN COUNT(ppd.product_detail_id) > 0 
+                       THEN CAST(1 AS bit) 
+                       ELSE CAST(0 AS bit) 
+                       END AS 'ProductInPromotion'
                 from product_detail pd
                          left join product p on pd.product_id = p.id
                          left join button_type bt on pd.button_id = bt.id
@@ -47,8 +52,9 @@ import java.util.List;
                          left join shirt_tail_type stt on pd.shirt_tail_id = stt.id
                          left join size s on pd.size_id = s.id
                          left join color c on pd.color_id = c.id
-                         left join product_image pi on pd.id = pi.product_detail_id
-
+                         left join product_image pie on pd.id = pie.product_detail_id
+                         left join promotion_product_detail ppd on pd.id = ppd.product_detail_id
+                         left join promotion pn on ppd.promotion_id = pn.id
                 where pd.status = 'ACTIVE'
                   and p.status = 'ACTIVE'
                   and bt.status = 'ACTIVE'
@@ -58,7 +64,9 @@ import java.util.List;
                   and stt.status = 'ACTIVE'
                   and s.status = 'ACTIVE'
                   and c.status = 'ACTIVE'
-                  and pi.status = 'ACTIVE'
+                  and (pie.product_detail_id is null or pie.status = 'ACTIVE')
+                  and (ppd.product_detail_id is null or pn.status not in ('INACTIVE', 'CANCEL'))
+                  and (pie.product_detail_id is null or pie.status = 'ACTIVE')
                   and (p.id in ?1)
                   and (?2 is null or bt.id = ?2)
                   and (?3 is null or m.id = ?3)
@@ -69,9 +77,15 @@ import java.util.List;
                   and (?8 is null or c.id = ?8)
                   and (?9 is null or p.product_name like ?9 or p.product_code like ?9)
                   
-                group by pd.id, p.product_code, p.product_name, pi.path, bt.button_name, m.material_name,
-                ct.collar_type_name, st.seleeve_name, s.size_name, c.color_code, stt.shirt_tail_name, pd.price,
-                pd.quantity, pd.description_detail, pd.status
+                  group by pd.id, p.product_code, p.product_name, pie.path,
+                           bt.button_name, m.material_name, ct.collar_type_name,
+                           st.seleeve_name, s.size_name, stt.shirt_tail_name, c.color_code,
+                           pd.price, pd.quantity, pd.description_detail, pd.status
+                  ORDER BY
+                      CASE
+                          WHEN COUNT(ppd.product_detail_id) > 0 THEN 1
+                          ELSE 0
+                      END ASC;
                 """,
         resultSetMapping = "Mapping.ProductsDetailsResponse"
 )
@@ -99,12 +113,12 @@ import java.util.List;
 
                     WHERE
                         pd.status = 'ACTIVE'
-                        AND pie.status = 'ACTIVE'
-                        AND bd.status = 'ACTIVE'
-                        AND pp.status = 'ACTIVE'
-                        AND pn.status = 'ACTIVE'
+                        AND (pie.product_detail_id is null or pie.status = 'ACTIVE')
+                        AND (bd.product_detail_id is null or bd.status = 'ACTIVE')
+                        AND (pp.product_detail_id is null or pp.status = 'ACTIVE')
                         AND pt.status = 'ACTIVE'
                         AND c.status = 'ACTIVE'
+                        AND (pp.promotion_id is null or pn.status = 'ACTIVE')
                         AND (?1 IS NULL OR lower(pt.product_name) LIKE ?1)
                         AND (?2 IS NULL OR pd.price >= ?2)
                         AND (?3 IS NULL OR pd.price <= ?3)
@@ -138,7 +152,8 @@ import java.util.List;
                         @ColumnResult(name = "Price", type = BigDecimal.class),
                         @ColumnResult(name = "Quantity", type = Integer.class),
                         @ColumnResult(name = "Description", type = String.class),
-                        @ColumnResult(name = "Status", type = String.class)
+                        @ColumnResult(name = "Status", type = String.class),
+                        @ColumnResult(name = "ProductInPromotion", type = Boolean.class)
                 }
         )
 )

@@ -213,7 +213,6 @@ const ProductCreateDetails = () => {
             productDetailRequest.formId
         )
         .then((res) => {
-          console.log(res.data);
           let productDetailsExist = [...res.data];
           let setArrayByColors = [];
           setQuantityExist(productDetailsExist.length);
@@ -251,7 +250,7 @@ const ProductCreateDetails = () => {
         });
     }
   }
-
+  console.log("spam");
   function handleSetProductDetailCom(field, value) {
     if (field === "button") {
       setButton(value);
@@ -272,7 +271,19 @@ const ProductCreateDetails = () => {
     } else if (field === "category") {
       setCategory(value);
     }
-    setRender(Math.random());
+    if (
+      button.key !== undefined &&
+      collar.key !== undefined &&
+      material.key !== undefined &&
+      sleeve.key !== undefined &&
+      shirtTail.key !== undefined &&
+      form.key !== undefined &&
+      pattern.key !== undefined &&
+      brand.key !== undefined &&
+      category.key !== undefined
+    ) {
+      setRender(Math.random());
+    }
   }
 
   function selectProduct(index) {

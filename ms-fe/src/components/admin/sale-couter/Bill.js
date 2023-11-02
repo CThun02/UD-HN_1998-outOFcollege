@@ -324,7 +324,6 @@ const Bill = () => {
   const [isOpenFormVoucher, setIsOpenFormVoucher] = useState(false);
   const [voucherAdd, setVoucherAdd] = useState({});
   const [typeShipping, setTypeShipping] = useState([]);
-  const [productDetailScan, setProductDetailScan] = useState({});
 
   // xóa tài khoản
   const handleDeleteAccount = () => {
@@ -649,50 +648,52 @@ const Bill = () => {
           result
       )
       .then((response) => {
-        setProductDetailScan(response.data);
+        var cart = JSON.parse(localStorage.getItem(cartId));
+        var productDetails = cart.productDetails;
+        var notExist = true;
+        for (var i = 0; i < productDetails.length; i++) {
+          if (
+            Number(productDetails[i].productDetail.id) ===
+            Number(response.data.id)
+          ) {
+            if (
+              productDetails[i].quantity >
+              productDetails[i].productDetail.quantity
+            ) {
+              notification.warning({
+                message: "Thông báo",
+                description: "Đã vượt quá số lượng tồn hoặc 100",
+                duration: 1,
+              });
+              return;
+            }
+            notExist = false;
+            productDetails[i].quantity += 1;
+            break;
+          }
+        }
+        if (notExist) {
+          productDetails.push({
+            productDetail: response.data,
+            quantity: 1,
+          });
+        }
+        cart = {
+          productDetails: productDetails,
+          timeStart: now(),
+          account: cart.account,
+        };
+        localStorage.setItem(cartId, JSON.stringify(cart));
+        notification.success({
+          message: "Thông báo",
+          description: "Thêm thành công",
+          duration: 2,
+        });
       })
       .catch((err) => {
         console.log(err);
       });
-    setModalQRScanOpen(false);
     setRendered(Math.random());
-  };
-
-  const addIntoCartByScan = () => {
-    if (
-      !modalQRScanOpen &&
-      productDetailScan.id !== undefined &&
-      productDetailScan.id !== null
-    ) {
-      var cart = JSON.parse(localStorage.getItem(cartId));
-      var productDetails = cart.productDetails;
-      var notExist = true;
-      for (var i = 0; i < productDetails.length; i++) {
-        if (
-          Number(productDetails[i].productDetail.id) ===
-          Number(productDetailScan.id)
-        ) {
-          notExist = false;
-          productDetails[i].quantity += 1;
-          break;
-        }
-      }
-      if (notExist) {
-        productDetails.push({ productDetail: productDetailScan, quantity: 1 });
-      }
-      setProductDetailScan({});
-      notification.success({
-        message: "Thông báo",
-        description: "Thêm thành công",
-        duration: 2,
-      });
-      cart = {
-        productDetails: productDetails,
-        timeStart: now(),
-        account: cart.account,
-      };
-      localStorage.setItem(cartId, JSON.stringify(cart));
-    }
   };
 
   useEffect(() => {
@@ -727,7 +728,6 @@ const Bill = () => {
 
     getProductDetails();
     initializeModalStates();
-    addIntoCartByScan();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     cartId,
@@ -737,8 +737,6 @@ const Bill = () => {
     selectedWard,
     modalQRScanOpen,
   ]);
-
-  console.log("redn");
 
   const [symbol, setSymbol] = useState("Received");
   const [note, setNote] = useState("");

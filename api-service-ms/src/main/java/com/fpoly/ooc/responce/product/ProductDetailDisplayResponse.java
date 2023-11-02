@@ -32,6 +32,9 @@ public class ProductDetailDisplayResponse{
     private Integer quantity;
     private String descriptionDetail;
     private String status;
+    private String promotionMethod;
+    private BigDecimal promotionValue;
+    private BigDecimal promotionCondition;
     private List<ProductImageResponse> productImageResponse;
 
     public ProductDetailDisplayResponse(ProductDetailResponse productDetailResponse) {

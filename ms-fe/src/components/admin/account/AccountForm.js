@@ -114,23 +114,23 @@ const MyForm = (props) => {
         console.error(error);
       });
   };
-  const fetchWard = async (value) => {
-    await axios
-      .get(
-        `https://online-gateway.ghn.vn/shiip/public-api/master-data/ward?district_id=${value}`,
-        {
-          headers: {
-            token: "0f082cbe-5110-11ee-a59f-a260851ba65c",
-          },
-        }
-      )
-      .then((response) => {
-        setWards(response.data.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
+    const fetchWard = async (value) => {
+      await axios
+        .get(
+          `https://online-gateway.ghn.vn/shiip/public-api/master-data/ward?district_id=${value}`,
+          {
+            headers: {
+              token: "0f082cbe-5110-11ee-a59f-a260851ba65c",
+            },
+          }
+        )
+        .then((response) => {
+          setWards(response.data.data);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    };
 
   const onFinish = async () => {
     let check = isFormInputEmpty(accountScan);

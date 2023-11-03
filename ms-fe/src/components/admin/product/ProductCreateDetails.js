@@ -19,7 +19,6 @@ import TextArea from "antd/es/input/TextArea";
 import Modal from "antd/es/modal/Modal";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import ProductCreate from "./ProductCreate";
 import styles from "./ProductCreateDetails.module.css";
 import ProductDetailsTable from "./ProductDetailsTable";
 import { isFormInputEmpty } from "./ValidateForm";
@@ -28,6 +27,8 @@ const ProductCreateDetails = () => {
   const api = "http://localhost:8080/api/admin/";
   const [messageApi, contextHolder] = message.useMessage();
   const { confirm } = Modal;
+  const [loadingProduct, setLoadingProduct] = useState(false);
+  const [loadingColor, setLoadingColor] = useState(false);
   const [button, setButton] = useState({});
   const [collar, setCollar] = useState({});
   const [material, setMaterial] = useState({});
@@ -135,20 +136,19 @@ const ProductCreateDetails = () => {
         icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
         content: "Xác nhận thêm mới",
         onOk() {
-          messageApi.loading("Vui lòng chờ!", 2);
+          setLoadingProduct(true);
           axios
             .post(api + "product/create", product)
             .then((res) => {
-              setTimeout(() => {
-                handleSetProduct("description", " ");
-                setmodalProductCreate(false);
-                setRender(Math.random());
-                notification.open({
-                  message: "Thông báo",
-                  description: "Thêm mới sản phẩm thành công",
-                  icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
-                });
-              }, 2000);
+              setLoadingProduct(false);
+              handleSetProduct("description", " ");
+              setmodalProductCreate(false);
+              setRender(Math.random());
+              notification.open({
+                message: "Thông báo",
+                description: "Thêm mới sản phẩm thành công",
+                icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
+              });
             })
             .catch((err) => {
               console.log(err);
@@ -364,19 +364,18 @@ const ProductCreateDetails = () => {
         icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
         content: "Xác nhận thêm mới",
         onOk() {
-          messageApi.loading("Đang tải", 1);
+          setisLoading(true);
           axios
             .post(api + "pattern?categoryName=" + patternCreate.trim(), null)
             .then((res) => {
               setPatternCreate(" ");
-              setTimeout(() => {
-                if (res.data === "") {
-                  messageApi.error("Họa tiết đã tồn tại!", 1);
-                } else {
-                  messageApi.success("Thêm hoạ tiết thành công!", 1);
-                }
-                setRender(Math.random());
-              }, 1000);
+              if (res.data === "") {
+                messageApi.error("Họa tiết đã tồn tại!", 1);
+              } else {
+                messageApi.success("Thêm hoạ tiết thành công!", 1);
+              }
+              setRender(Math.random());
+              setisLoading(false);
             })
             .catch((err) => {
               console.log(err);
@@ -385,9 +384,7 @@ const ProductCreateDetails = () => {
         onCancel() {},
       });
     } else {
-      setTimeout(() => {
-        messageApi.error("Vui lòng nhập hoạt tiết!", 1);
-      }, 1000);
+      messageApi.error("Vui lòng nhập hoạt tiết!", 1);
     }
   }
 
@@ -399,7 +396,7 @@ const ProductCreateDetails = () => {
         icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
         content: "Xác nhận thêm mới",
         onOk() {
-          messageApi.loading("Đang tải", 1);
+          setisLoading(true);
           axios
             .post(
               api + "shirt-tail?shirtTailTypeName=" + shirtTailCreate.trim(),
@@ -407,14 +404,13 @@ const ProductCreateDetails = () => {
             )
             .then((res) => {
               setRender(Math.random);
-              setTimeout(() => {
-                if (res.data === "") {
-                  messageApi.error("Đuôi áo đã tồn tại!", 1);
-                } else {
-                  messageApi.success("Thêm đuôi áo thành công!", 1);
-                }
-                setshirtTailCreate(" ");
-              }, 1000);
+              if (res.data === "") {
+                messageApi.error("Đuôi áo đã tồn tại!", 1);
+              } else {
+                messageApi.success("Thêm đuôi áo thành công!", 1);
+              }
+              setshirtTailCreate(" ");
+              setisLoading(false);
             })
             .catch((err) => {
               console.log(err);
@@ -423,9 +419,7 @@ const ProductCreateDetails = () => {
         onCancel() {},
       });
     } else {
-      setTimeout(() => {
-        messageApi.error("Vui lòng nhập dáng áo!", 1);
-      }, 1000);
+      messageApi.error("Vui lòng nhập dáng áo!", 1);
     }
   }
 
@@ -437,19 +431,18 @@ const ProductCreateDetails = () => {
         icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
         content: "Xác nhận thêm mới",
         onOk() {
-          messageApi.loading("Đang tải", 1);
+          setisLoading(true);
           axios
             .post(api + "brand?brandName=" + brandCreate, null)
             .then((res) => {
-              setTimeout(() => {
-                if (res.data === "") {
-                  messageApi.error("Thương hiệu đã tồn tại!", 1);
-                } else {
-                  messageApi.success("Thêm thương hiệu thành công!", 1);
-                  setRender(res.data);
-                }
-                setBrandCreate(" ");
-              }, 1000);
+              if (res.data === "") {
+                messageApi.error("Thương hiệu đã tồn tại!", 1);
+              } else {
+                messageApi.success("Thêm thương hiệu thành công!", 1);
+                setRender(res.data);
+              }
+              setisLoading(false);
+              setBrandCreate(" ");
             })
             .catch((err) => {
               console.log(err);
@@ -458,9 +451,7 @@ const ProductCreateDetails = () => {
         onCancel() {},
       });
     } else {
-      setTimeout(() => {
-        messageApi.error("Vui lòng nhập thương hiệu!", 1);
-      }, 1000);
+      messageApi.error("Vui lòng nhập thương hiệu!", 1);
     }
   }
 
@@ -472,19 +463,18 @@ const ProductCreateDetails = () => {
         icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
         content: "Xác nhận thêm mới",
         onOk() {
-          messageApi.loading("Đang tải", 1);
+          setisLoading(true);
           axios
             .post(api + "category?categoryName=" + categoryCreate, null)
             .then((res) => {
-              setTimeout(() => {
-                if (res.data === "") {
-                  messageApi.error("Loại sản phẩm đã tồn tại!", 1);
-                } else {
-                  messageApi.success("Thêm loại sản phẩm thành công!", 1);
-                  setRender(res.data);
-                }
-                setCategoryCreate(" ");
-              }, 1000);
+              if (res.data === "") {
+                messageApi.error("Loại sản phẩm đã tồn tại!", 1);
+              } else {
+                messageApi.success("Thêm loại sản phẩm thành công!", 1);
+                setRender(res.data);
+              }
+              setCategoryCreate(" ");
+              setisLoading(false);
             })
             .catch((err) => {
               console.log(err);
@@ -493,9 +483,7 @@ const ProductCreateDetails = () => {
         onCancel() {},
       });
     } else {
-      setTimeout(() => {
-        messageApi.error("Vui lòng nhập loại sản phẩm!", 1);
-      }, 1000);
+      messageApi.error("Vui lòng nhập loại sản phẩm!", 1);
     }
   }
 
@@ -507,19 +495,18 @@ const ProductCreateDetails = () => {
         icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
         content: "Xác nhận thêm mới",
         onOk() {
-          messageApi.loading("Đang tải", 1);
+          setisLoading(true);
           axios
             .post(api + "form?categoryName=" + formCreate.trim(), null)
             .then((res) => {
               setRender(Math.random);
-              setTimeout(() => {
-                if (res.data === "") {
-                  messageApi.error("Dáng áo đã tồn tại!", 1);
-                } else {
-                  messageApi.success("Thêm dáng áo thành công!", 1);
-                }
-                setFormCreate(" ");
-              }, 1000);
+              if (res.data === "") {
+                messageApi.error("Dáng áo đã tồn tại!", 1);
+              } else {
+                messageApi.success("Thêm dáng áo thành công!", 1);
+              }
+              setFormCreate(" ");
+              setisLoading(false);
             })
             .catch((err) => {
               console.log(err);
@@ -528,9 +515,7 @@ const ProductCreateDetails = () => {
         onCancel() {},
       });
     } else {
-      setTimeout(() => {
-        messageApi.error("Vui lòng nhập dáng áo!", 1);
-      }, 1000);
+      messageApi.error("Vui lòng nhập dáng áo!", 1);
     }
   }
 
@@ -542,19 +527,18 @@ const ProductCreateDetails = () => {
         icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
         content: "Xác nhận thêm mới",
         onOk() {
-          messageApi.loading("Đang tải", 1);
+          setisLoading(true);
           axios
             .post(api + "form?categoryName=" + formCreate.trim(), null)
             .then((res) => {
               setRender(Math.random);
-              setTimeout(() => {
-                if (res.data === "") {
-                  messageApi.error("Dáng áo đã tồn tại!", 1);
-                } else {
-                  messageApi.success("Thêm dáng áo thành công!", 1);
-                }
-                setFormCreate(" ");
-              }, 1000);
+              if (res.data === "") {
+                messageApi.error("Dáng áo đã tồn tại!", 1);
+              } else {
+                messageApi.success("Thêm dáng áo thành công!", 1);
+              }
+              setFormCreate(" ");
+              setisLoading(false);
             })
             .catch((err) => {
               console.log(err);
@@ -563,9 +547,7 @@ const ProductCreateDetails = () => {
         onCancel() {},
       });
     } else {
-      setTimeout(() => {
-        messageApi.error("Vui lòng nhập nút áo!", 1);
-      }, 1000);
+      messageApi.error("Vui lòng nhập nút áo!", 1);
     }
   }
 
@@ -577,21 +559,20 @@ const ProductCreateDetails = () => {
         icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
         content: "Xác nhận thêm mới",
         onOk() {
-          messageApi.loading("Đang tải", 1);
+          setisLoading(true);
           axios
             .post(api + "material/create", {
               materialName: materialCreate.trim(),
             })
             .then((res) => {
               setRender(Math.random);
-              setTimeout(() => {
-                if (res.data === "") {
-                  messageApi.error("Chất liệu đã tồn tại!", 1);
-                } else {
-                  messageApi.success("Thêm chất liệu thành công!", 1);
-                }
-                setMaterialCreate(" ");
-              }, 1000);
+              if (res.data === "") {
+                messageApi.error("Chất liệu đã tồn tại!", 1);
+              } else {
+                messageApi.success("Thêm chất liệu thành công!", 1);
+              }
+              setMaterialCreate(" ");
+              setisLoading(false);
             })
             .catch((err) => {
               console.log(err);
@@ -600,9 +581,7 @@ const ProductCreateDetails = () => {
         onCancel() {},
       });
     } else {
-      setTimeout(() => {
-        messageApi.error("Vui lòng nhập chất liệu!", 1);
-      }, 1000);
+      messageApi.error("Vui lòng nhập chất liệu!", 1);
     }
   }
 
@@ -614,21 +593,20 @@ const ProductCreateDetails = () => {
         icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
         content: "Xác nhận thêm mới",
         onOk() {
-          messageApi.loading("Đang tải", 1);
+          setisLoading(true);
           axios
             .post(api + "collar/create", {
               collarTypeName: collarCreate.trim(),
             })
             .then((res) => {
               setRender(Math.random);
-              setTimeout(() => {
-                if (res.data === "") {
-                  messageApi.error("Cổ áo đã tồn tại!", 1);
-                } else {
-                  messageApi.success("Thêm cổ áo thành công!", 1);
-                }
-                setCollarCreate(" ");
-              }, 1000);
+              if (res.data === "") {
+                messageApi.error("Cổ áo đã tồn tại!", 1);
+              } else {
+                messageApi.success("Thêm cổ áo thành công!", 1);
+              }
+              setCollarCreate(" ");
+              setisLoading(false);
             })
             .catch((err) => {
               console.log(err);
@@ -637,9 +615,7 @@ const ProductCreateDetails = () => {
         onCancel() {},
       });
     } else {
-      setTimeout(() => {
-        messageApi.error("Vui lòng nhập cổ áo!", 1);
-      }, 1000);
+      messageApi.error("Vui lòng nhập cổ áo!", 1);
     }
   }
 
@@ -651,19 +627,18 @@ const ProductCreateDetails = () => {
         icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
         content: "Xác nhận thêm mới",
         onOk() {
-          messageApi.loading("Đang tải", 1);
+          setisLoading(true);
           axios
             .post(api + "sleeve/create", { sleeveName: sleeveCreate.trim() })
             .then((res) => {
               setRender(Math.random);
-              setTimeout(() => {
-                if (res.data === "") {
-                  messageApi.error("Tay áo đã tồn tại!", 1);
-                } else {
-                  messageApi.success("Thêm tay áo thành công!", 1);
-                }
-                setSleeveCreate(" ");
-              }, 1000);
+              if (res.data === "") {
+                messageApi.error("Tay áo đã tồn tại!", 1);
+              } else {
+                messageApi.success("Thêm tay áo thành công!", 1);
+              }
+              setSleeveCreate(" ");
+              setisLoading(false);
             })
             .catch((err) => {
               console.log(err);
@@ -672,9 +647,7 @@ const ProductCreateDetails = () => {
         onCancel() {},
       });
     } else {
-      setTimeout(() => {
-        messageApi.error("Vui lòng nhập tay áo!", 1);
-      }, 1000);
+      messageApi.error("Vui lòng nhập tay áo!", 1);
     }
   }
 
@@ -686,19 +659,18 @@ const ProductCreateDetails = () => {
         icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
         content: "Xác nhận thêm mới",
         onOk() {
-          messageApi.loading("Đang tải", 1);
+          setisLoading(true);
           axios
             .post(api + "size/create", { sizeName: sizeCreate.trim() })
             .then((res) => {
               setRender(Math.random);
-              setTimeout(() => {
-                if (res.data === "") {
-                  messageApi.error("Kích cỡ đã tồn tại!", 1);
-                } else {
-                  messageApi.success("Thêm kích cỡ thành công!", 1);
-                }
-                setSizeCreate(" ");
-              }, 1000);
+              if (res.data === "") {
+                messageApi.error("Kích cỡ đã tồn tại!", 1);
+              } else {
+                messageApi.success("Thêm kích cỡ thành công!", 1);
+              }
+              setSizeCreate(" ");
+              setisLoading(false);
             })
             .catch((err) => {
               console.log(err);
@@ -707,9 +679,7 @@ const ProductCreateDetails = () => {
         onCancel() {},
       });
     } else {
-      setTimeout(() => {
-        messageApi.error("Vui lòng nhập kích cỡ!", 1);
-      }, 1000);
+      messageApi.error("Vui lòng nhập kích cỡ!", 1);
     }
   }
 
@@ -724,19 +694,18 @@ const ProductCreateDetails = () => {
         icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
         content: "Xác nhận thêm mới",
         onOk() {
-          messageApi.loading("Đang tải", 1);
+          setLoadingColor(true);
           axios
             .post(api + "color/create", colorCreate)
             .then((res) => {
-              setTimeout(() => {
-                if (res.data === "") {
-                  messageApi.error("Màu sắc đã tồn tại!", 1);
-                } else {
-                  messageApi.success("Thêm màu sắc thành công!", 1);
-                  setRender(Math.random());
-                }
-                setModalColorOpen(false);
-              }, 1000);
+              setLoadingColor(true);
+              setModalColorOpen(false);
+              if (res.data === "") {
+                messageApi.error("Màu sắc đã tồn tại!", 1);
+              } else {
+                messageApi.success("Thêm màu sắc thành công!", 1);
+                setRender(Math.random());
+              }
             })
             .catch((err) => {
               console.log(err);
@@ -745,9 +714,7 @@ const ProductCreateDetails = () => {
         onCancel() {},
       });
     } else {
-      setTimeout(() => {
-        messageApi.error("Vui lòng nhập màu sắc!", 1);
-      }, 1000);
+      messageApi.error("Vui lòng nhập màu sắc!", 1);
     }
   }
   useEffect(() => {
@@ -861,7 +828,6 @@ const ProductCreateDetails = () => {
       >
         <div className={styles.product}>
           {contextHolder}
-          <ProductCreate render={setRender} />
           <Modal
             title="Thêm nhanh màu sắc"
             centered
@@ -869,31 +835,38 @@ const ProductCreateDetails = () => {
             footer={false}
             onCancel={() => setModalColorOpen(false)}
           >
-            <ColorPicker
-              showText
-              onChange={(event) => {
-                handleSetColorCreate("colorCode", event.toHexString());
-              }}
-            ></ColorPicker>
-            <h6>Tên màu sắc</h6>
-            <Input
-              value={colorCreate.colorName}
-              onChange={(event) => {
-                handleSetColorCreate("colorName", event.target.value);
-              }}
-            />
-            <div style={{ textAlign: "end" }}>
-              <Button
-                style={{
-                  marginTop: "16px",
-                  backgroundColor: "#337CCF",
-                  color: "white",
+            <Spin
+              tip="Loading..."
+              spinning={loadingColor}
+              size="large"
+              style={{ width: "100%" }}
+            >
+              <ColorPicker
+                showText
+                onChange={(event) => {
+                  handleSetColorCreate("colorCode", event.toHexString());
                 }}
-                onClick={() => createColor()}
-              >
-                Thêm mới
-              </Button>
-            </div>
+              ></ColorPicker>
+              <h6>Tên màu sắc</h6>
+              <Input
+                value={colorCreate.colorName}
+                onChange={(event) => {
+                  handleSetColorCreate("colorName", event.target.value);
+                }}
+              />
+              <div style={{ textAlign: "end" }}>
+                <Button
+                  style={{
+                    marginTop: "16px",
+                    backgroundColor: "#337CCF",
+                    color: "white",
+                  }}
+                  onClick={() => createColor()}
+                >
+                  Thêm mới
+                </Button>
+              </div>
+            </Spin>
           </Modal>
           <Modal
             title="Thêm nhanh sản phẩm"
@@ -903,43 +876,50 @@ const ProductCreateDetails = () => {
             onCancel={() => setmodalProductCreate(false)}
           >
             <div>
-              <Row>
-                <Col span={24}>
-                  <div className="m-5">
-                    <span style={{ fontWeight: 500 }}>Tên sản phẩm</span>
-                    <Input
-                      placeholder="Product name"
-                      value={product.productName}
-                      onChange={(event) =>
-                        handleSetProduct("productName", event.target.value)
-                      }
-                      status={product.productName === "" ? "error" : ""}
-                    ></Input>
-                  </div>
-                  <div className="m-5">
-                    <span style={{ fontWeight: 500 }}>Mô tả</span>
-                    <TextArea
-                      value={product.description}
-                      placeholder="Description"
-                      allowClear
-                      onChange={(event) =>
-                        handleSetProduct("description", event.target.value)
-                      }
-                      status={product.description === "" ? "error" : ""}
-                    />
-                  </div>
-                  <br />
-                  <div style={{ textAlign: "center" }}>
-                    <Button
-                      type="primary"
-                      loading={false}
-                      onClick={createProduct}
-                    >
-                      Xác nhận
-                    </Button>
-                  </div>
-                </Col>
-              </Row>
+              <Spin
+                tip="Loading..."
+                spinning={loadingProduct}
+                size="large"
+                style={{ width: "100%" }}
+              >
+                <Row>
+                  <Col span={24}>
+                    <div className="m-5">
+                      <span style={{ fontWeight: 500 }}>Tên sản phẩm</span>
+                      <Input
+                        placeholder="Product name"
+                        value={product.productName}
+                        onChange={(event) =>
+                          handleSetProduct("productName", event.target.value)
+                        }
+                        status={product.productName === "" ? "error" : ""}
+                      ></Input>
+                    </div>
+                    <div className="m-5">
+                      <span style={{ fontWeight: 500 }}>Mô tả</span>
+                      <TextArea
+                        value={product.description}
+                        placeholder="Description"
+                        allowClear
+                        onChange={(event) =>
+                          handleSetProduct("description", event.target.value)
+                        }
+                        status={product.description === "" ? "error" : ""}
+                      />
+                    </div>
+                    <br />
+                    <div style={{ textAlign: "center" }}>
+                      <Button
+                        type="primary"
+                        loading={false}
+                        onClick={createProduct}
+                      >
+                        Xác nhận
+                      </Button>
+                    </div>
+                  </Col>
+                </Row>
+              </Spin>
             </div>
           </Modal>
           <h2>

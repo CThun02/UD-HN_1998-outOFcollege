@@ -83,25 +83,32 @@ const Bill = () => {
   const updateQuantity = (record, index, value) => {
     let cart = JSON.parse(localStorage.getItem(cartId));
     let productDetails = cart.productDetails;
-    console.log(record);
     if (value > 99) {
       notification.warning({
         message: "Thông báo",
         description: "Chỉ được mua 100 sản phẩm",
         duration: 1,
       });
+      setRendered(Math.random());
+      return;
     }
-
-    if (value >= productDetails[index].productDetail.quantity) {
+    if (value > productDetails[index].productDetail.quantity) {
       notification.warning({
         message: "Thông báo",
         description: "Đã vượt quá số lượng tồn",
         duration: 1,
       });
+      setRendered(Math.random());
+      return;
     }
     productDetails[index].quantity = value;
     cart.productDetails = productDetails;
     localStorage.setItem(cartId, JSON.stringify(cart));
+    notification.success({
+      message: "Thông báo",
+      description: "Chỉnh sửa số lượng thành công",
+      duration: 1,
+    });
     setRendered(cart);
   };
 
@@ -152,6 +159,10 @@ const Bill = () => {
                     "-" +
                     record.productDetail.button.buttonName +
                     "-" +
+                    record.productDetail.brand.brandName +
+                    "-" +
+                    record.productDetail.category.categoryName +
+                    "-" +
                     record.productDetail.material.materialName +
                     "-" +
                     record.productDetail.collar.collarTypeName +
@@ -196,13 +207,14 @@ const Bill = () => {
       key: "quantity",
       width: 200,
       render: (text, record, index) => {
-        const isDisabled = record.quantity >= record.productDetail.quantity;
         return (
           <InputNumber
             min={1}
-            max={isDisabled ? record.quantity : 100}
+            max={record.quantity >= record.productDetail.quantity}
             value={record.quantity}
-            onChange={(value) => updateQuantity(record, index, value)}
+            onBlur={(event) =>
+              updateQuantity(record, index, event.target.value)
+            }
           />
         );
       },
@@ -285,12 +297,22 @@ const Bill = () => {
 
   // xóa sản phẩm trong giỏ hàng
   const handleDeleteProduct = (record, index) => {
-    let cart = JSON.parse(localStorage.getItem(cartId));
-    let productDetails = cart.productDetails;
-
-    productDetails.splice(index, 1);
-    localStorage.setItem(cartId, JSON.stringify(cart));
-    setRendered(cart);
+    Modal.confirm({
+      title: "Xóa sản phẩm",
+      content: "Bạn có chắc chắn muốn xóa sản phẩm?",
+      onOk() {
+        let cart = JSON.parse(localStorage.getItem(cartId));
+        let productDetails = cart.productDetails;
+        productDetails.splice(index, 1);
+        localStorage.setItem(cartId, JSON.stringify(cart));
+        setRendered(cart);
+        notification.error({
+          message: "Thông báo",
+          description: "Xóa sản phẩm thành công.",
+          duration: 2,
+        });
+      },
+    });
   };
 
   const [activeKey, setActiveKey] = useState(
@@ -995,7 +1017,7 @@ const Bill = () => {
                     style={{ marginTop: "3px" }}
                   />
                   <Row>
-                    <Col span={16}>
+                    <Col span={15}>
                       <Row style={{ marginBottom: "20px" }}>
                         <Col span={6} style={{ marginTop: "2px" }}>
                           {account && (
@@ -1042,163 +1064,156 @@ const Bill = () => {
                           />
                         </Col>
                       </Row>
-                      <Row>
+                      <Row style={{ marginBottom: "30px" }}>
                         <Col span={24}>
                           <Row>
                             <Col span={12}>
-                              <Row>
-                                <Col span={5}>
-                                  <b style={{ color: "red" }}>*</b> Họ và tên
-                                </Col>
-                                <Col span={14}>
-                                  <Input
-                                    placeholder="nhập họ và tên"
-                                    onChange={(e) =>
-                                      setFullname(e.target.value)
-                                    }
-                                    value={selectedAddress?.fullName}
-                                  />
-                                  {errors.fullName && (
-                                    <div style={{ color: "red" }}>
-                                      {errors.fullName}
-                                    </div>
-                                  )}
-                                </Col>
-                              </Row>
+                              <div className="m-5">
+                                <b style={{ color: "red" }}>*</b> Họ và tên
+                                <Input
+                                  placeholder="nhập họ và tên"
+                                  onChange={(e) => setFullname(e.target.value)}
+                                  value={selectedAddress?.fullName}
+                                />
+                                {errors.fullName && (
+                                  <div style={{ color: "red" }}>
+                                    {errors.fullName}
+                                  </div>
+                                )}
+                              </div>
                             </Col>
                             <Col span={12}>
-                              <Row>
-                                <Col span={7}>
-                                  <b style={{ color: "red" }}>*</b> Số điện
-                                  thoại
-                                </Col>
-                                <Col span={14}>
-                                  <Input
-                                    placeholder="nhập số điện thoại"
-                                    onChange={(e) =>
-                                      setPhoneNumber(e.target.value)
-                                    }
-                                    value={selectedAddress?.sdt}
-                                  />
-                                  {errors.sdt && (
-                                    <div style={{ color: "red" }}>
-                                      {errors.sdt}
-                                    </div>
-                                  )}
-                                </Col>
-                              </Row>
+                              <div className="m-5">
+                                <b style={{ color: "red" }}>*</b> Số điện thoại
+                                <Input
+                                  placeholder="nhập số điện thoại"
+                                  onChange={(e) =>
+                                    setPhoneNumber(e.target.value)
+                                  }
+                                  value={selectedAddress?.sdt}
+                                />
+                                {errors.sdt && (
+                                  <div style={{ color: "red" }}>
+                                    {errors.sdt}
+                                  </div>
+                                )}
+                              </div>
                             </Col>
                           </Row>
                         </Col>
-                      </Row>
-                      <Row style={{ marginBottom: "50px" }}>
                         <Col span={8}>
-                          <span>
-                            <b style={{ color: "red" }}>*</b> Tỉnh/thành phố
-                          </span>
-                          <br />
-                          <Select
-                            style={{ width: 200 }}
-                            onChange={(event) =>
-                              handleProvinceChange(
-                                event.substring(event.indexOf("|") + 1),
-                                event
-                              )
-                            }
-                            value={
-                              selectedAddress.city
-                                ? selectedAddress?.city.substring(
-                                    0,
-                                    selectedAddress.city.indexOf("|")
-                                  )
-                                : undefined
-                            }
-                          >
-                            {provinces &&
-                              provinces.map((province) => (
-                                <Select.Option
-                                  label={province.ProvinceName}
-                                  key={province.ProvinceID}
-                                  value={`${province.ProvinceName}|${province.ProvinceID}`}
-                                >
-                                  {province.ProvinceName}
-                                </Select.Option>
-                              ))}
-                          </Select>
-                          {errors.city && (
-                            <div style={{ color: "red" }}>{errors.city}</div>
-                          )}
-                        </Col>
-                        <Col span={8}>
-                          <span>
-                            <b style={{ color: "red" }}>*</b> Quận/huyện
-                          </span>
-                          <br />
-                          <Select
-                            style={{ width: 200 }}
-                            onChange={(event) =>
-                              handleDistrictChange(
-                                event.substring(event.indexOf("|") + 1),
-                                event
-                              )
-                            }
-                            value={
-                              selectedAddress.district
-                                ? selectedAddress?.district.substring(
-                                    0,
-                                    selectedAddress.district.indexOf("|")
-                                  )
-                                : undefined
-                            }
-                          >
-                            {districts &&
-                              districts.map((district) => {
-                                return (
+                          <div className="m-5">
+                            <span>
+                              <b style={{ color: "red" }}>*</b> Tỉnh/thành phố
+                            </span>
+                            <br />
+                            <Select
+                              style={{ width: "100%" }}
+                              onChange={(event) =>
+                                handleProvinceChange(
+                                  event.substring(event.indexOf("|") + 1),
+                                  event
+                                )
+                              }
+                              value={
+                                selectedAddress.city
+                                  ? selectedAddress?.city.substring(
+                                      0,
+                                      selectedAddress.city.indexOf("|")
+                                    )
+                                  : undefined
+                              }
+                            >
+                              {provinces &&
+                                provinces.map((province) => (
                                   <Select.Option
-                                    key={district.DistrictID}
-                                    value={`${district.DistrictName}|${district.DistrictID}`}
+                                    label={province.ProvinceName}
+                                    key={province.ProvinceID}
+                                    value={`${province.ProvinceName}|${province.ProvinceID}`}
                                   >
-                                    {district.DistrictName}
+                                    {province.ProvinceName}
                                   </Select.Option>
-                                );
-                              })}
-                          </Select>
-                          {errors.district && (
-                            <div style={{ color: "red" }}>
-                              {errors.district}
-                            </div>
-                          )}
+                                ))}
+                            </Select>
+                            {errors.city && (
+                              <div style={{ color: "red" }}>{errors.city}</div>
+                            )}
+                          </div>
                         </Col>
                         <Col span={8}>
-                          <span>
-                            <b style={{ color: "red" }}>*</b> Phường/xã
-                          </span>
-                          <br />
-                          <Select
-                            style={{ width: 200 }}
-                            onChange={handleWardChange}
-                            value={
-                              selectedAddress.ward
-                                ? selectedAddress.ward.substring(
-                                    0,
-                                    selectedAddress.ward.indexOf("|")
-                                  )
-                                : undefined
-                            }
-                          >
-                            {wards &&
-                              wards.map((ward) => (
-                                <Select.Option
-                                  key={ward.WardCode}
-                                  value={`${ward.WardName}|${ward.WardCode}`}
-                                >
-                                  {ward.WardName}
-                                </Select.Option>
-                              ))}
-                          </Select>
-                          {errors.ward && (
-                            <div style={{ color: "red" }}>{errors.ward}</div>
-                          )}
+                          <div className="m-5">
+                            <span>
+                              <b style={{ color: "red" }}>*</b> Quận/huyện
+                            </span>
+                            <br />
+                            <Select
+                              style={{ width: "100%" }}
+                              onChange={(event) =>
+                                handleDistrictChange(
+                                  event.substring(event.indexOf("|") + 1),
+                                  event
+                                )
+                              }
+                              value={
+                                selectedAddress.district
+                                  ? selectedAddress?.district.substring(
+                                      0,
+                                      selectedAddress.district.indexOf("|")
+                                    )
+                                  : undefined
+                              }
+                            >
+                              {districts &&
+                                districts.map((district) => {
+                                  return (
+                                    <Select.Option
+                                      key={district.DistrictID}
+                                      value={`${district.DistrictName}|${district.DistrictID}`}
+                                    >
+                                      {district.DistrictName}
+                                    </Select.Option>
+                                  );
+                                })}
+                            </Select>
+                            {errors.district && (
+                              <div style={{ color: "red" }}>
+                                {errors.district}
+                              </div>
+                            )}
+                          </div>
+                        </Col>
+                        <Col span={8}>
+                          <div className="m-5">
+                            <span>
+                              <b style={{ color: "red" }}>*</b> Phường/xã
+                            </span>
+                            <br />
+                            <Select
+                              style={{ width: "100%" }}
+                              onChange={handleWardChange}
+                              value={
+                                selectedAddress.ward
+                                  ? selectedAddress.ward.substring(
+                                      0,
+                                      selectedAddress.ward.indexOf("|")
+                                    )
+                                  : undefined
+                              }
+                            >
+                              {wards &&
+                                wards.map((ward) => (
+                                  <Select.Option
+                                    key={ward.WardCode}
+                                    value={`${ward.WardName}|${ward.WardCode}`}
+                                  >
+                                    {ward.WardName}
+                                  </Select.Option>
+                                ))}
+                            </Select>
+                            {errors.ward && (
+                              <div style={{ color: "red" }}>{errors.ward}</div>
+                            )}
+                          </div>
                         </Col>
                       </Row>
                       <Row>
@@ -1226,7 +1241,7 @@ const Bill = () => {
                         )}
                       </Row>
                     </Col>
-                    <Col span={8}>
+                    <Col span={8} offset={1}>
                       <Switch onChange={(e) => handleChangSwitch(e, index)} />
                       <span style={{ marginLeft: "5px" }}>Giao hàng</span>
                       <br />

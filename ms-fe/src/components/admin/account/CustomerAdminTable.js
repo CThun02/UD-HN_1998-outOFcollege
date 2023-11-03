@@ -2,10 +2,11 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Table, Space, Button } from "antd";
 import { EyeOutlined } from "@ant-design/icons";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Avatar from "antd/es/avatar/avatar";
 function CustomerTable(props) {
   const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
 
   let roleId = props.roleId;
 
@@ -26,6 +27,10 @@ function CustomerTable(props) {
           defaultPageSize: 5,
           showLessItems: true,
           style: { marginRight: "10px" },
+          onChange: (currentPage, pageSize) => {
+            setCurrentPage(currentPage);
+            setPageSize(pageSize);
+          },
         }}
         dataSource={
           props.data &&
@@ -40,7 +45,7 @@ function CustomerTable(props) {
             dataIndex: "index",
             key: "index",
             render: (text, record, index) => {
-              return (currentPage - 1) * 5 + index + 1;
+              return (currentPage - 1) * pageSize + index + 1;
             },
           },
 
@@ -88,10 +93,12 @@ function CustomerTable(props) {
             render: (_, customer) => (
               <Space size="middle">
                 <Button
-                  type="link"
+                  type="primary"
                   onClick={() => handleOpenSecondModal(customer.username)}
-                  icon={<EyeOutlined />}
-                ></Button>
+                  size="large"
+                >
+                  <EyeOutlined />
+                </Button>
               </Space>
             ),
           },

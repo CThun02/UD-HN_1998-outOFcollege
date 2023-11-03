@@ -1,7 +1,7 @@
 export function isFormInputEmpty(object) {
   for (let key in object) {
     if (typeof object[key] === "string") {
-      if (object[key].toString().trim() === "") {
+      if (object[key].trim() === "") {
         return true;
       }
     } else if (object[key] === null || object[key] === undefined) {

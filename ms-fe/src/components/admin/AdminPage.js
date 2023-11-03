@@ -49,7 +49,7 @@ function AdminPage() {
               <Route path="admin">
                 {/* Thống kê */}
                 {/* hiển thị mặc định khi vào admin là trang thống kê */}
-                <Route index element="statistical" />
+                <Route index element={<StatisticalIndex />} />
                 <Route
                   path="statistical"
                   element={<StatisticalIndex />}

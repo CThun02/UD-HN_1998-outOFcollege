@@ -128,6 +128,11 @@ public class AccountServiceImpl implements AccountService {
         return null;
     }
 
+    @Override
+    public Account getAccountByEmailOrIdNoOrNumberPhone(Long idRole, String keyWords) {
+        return accountRepository.getAccountByEmailOrIdNoOrNumberPhone(idRole, keyWords);
+    }
+
 
     @Override
     public AccountDetailResponce detail(String username) {

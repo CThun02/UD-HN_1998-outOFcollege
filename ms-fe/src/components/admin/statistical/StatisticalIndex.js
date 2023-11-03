@@ -10,14 +10,15 @@ import {
   RetweetOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { Col, Row, DatePicker } from "antd";
+import { Col, Row, DatePicker, Select } from "antd";
 import Statistic from "antd/es/statistic/Statistic";
 import PieChart from "./PieChart";
-import TableUserBuyTheMost from "./TableProdutSellTheMost";
 import TableProdutSellTheMost from "./TableProdutSellTheMost";
-
+const { Option } = Select;
 const StatisticalIndex = () => {
   const [data, setData] = useState([]);
+  const [billRevenue, setBillRevenue] = useState({});
+  const [dateCompare, setDateCompare] = useState("date");
   const configLineChart = {
     data,
     xField: "year",
@@ -39,6 +40,15 @@ const StatisticalIndex = () => {
       },
     },
   };
+  useEffect(() => {
+    axios
+      .get("http://localhost:8080/api/admin/bill/getGrossRevenue")
+      .then((res) => {
+        setBillRevenue(res.data);
+      })
+      .catch((err) => console.log(err));
+    asyncFetch();
+  }, []);
 
   const asyncFetch = () => {
     axios
@@ -53,10 +63,6 @@ const StatisticalIndex = () => {
       });
   };
 
-  useEffect(() => {
-    asyncFetch();
-  }, []);
-
   return (
     <>
       <Row>
@@ -65,12 +71,21 @@ const StatisticalIndex = () => {
             <h2>
               <MoneyCollectFilled /> Doanh thu hôm nay
             </h2>
+
             <Statistic
               style={{ marginTop: "8px" }}
               title="Đơn hàng bán được"
-              value={10}
+              value={billRevenue.billSell || 0}
             />
-            <Statistic title="Tổng doanh thu" value={200000.3126 + " VND"} />
+            <Statistic
+              title="Tổng doanh thu"
+              value={
+                billRevenue.grossRevenue?.toLocaleString("vi-VN", {
+                  style: "currency",
+                  currency: "VND",
+                }) || 0
+              }
+            />
           </div>
         </Col>
         <Col span={10}>
@@ -82,9 +97,25 @@ const StatisticalIndex = () => {
             </h2>
             <Row>
               <Col span={24}>
-                <DatePicker.RangePicker
+                <Select
+                  value={dateCompare}
+                  onChange={setDateCompare}
+                  style={{ width: "20%" }}
+                  bordered={false}
+                >
+                  <Option value="date">Date</Option>
+                  <Option value="month">Month</Option>
+                  <Option value="year">Year</Option>
+                </Select>
+                <DatePicker
                   className={styles.input_noneBorder}
-                  style={{ width: "100%" }}
+                  style={{ width: "40%" }}
+                  picker={dateCompare}
+                />
+                <DatePicker
+                  className={styles.input_noneBorder}
+                  style={{ width: "40%" }}
+                  picker={dateCompare}
                 />
               </Col>
               <Col span={12}>

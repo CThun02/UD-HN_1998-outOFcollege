@@ -41,4 +41,8 @@ public class AddressServiceImpl implements AddressServiceI {
     public Address getOne(Long id) {
         return null;
     }
+    @Override
+    public void updateAddressDefault(Long addressId, Boolean value) {
+        repo.updateAddressDefault(addressId, value);
+    }
 }

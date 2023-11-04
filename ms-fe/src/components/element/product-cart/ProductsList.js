@@ -20,16 +20,16 @@ function ProductsList({ data, span }) {
     ? data.promotionMethod === "vnd"
       ? "vnd"
       : data.promotionMethod === "%"
-      ? "%"
-      : null
+        ? "%"
+        : null
     : null;
 
   const price =
     isMethod === "vnd"
       ? data.priceProduct - data.promotionReduce
       : isMethod === "%"
-      ? data.priceProduct - data.priceProduct * (data.promotionReduce / 100)
-      : null;
+        ? data.priceProduct - data.priceProduct * (data.promotionReduce / 100)
+        : null;
   //onMouseEnter={onMouseIn}
   //onMouseLeave = { onMouseOut };
   return (
@@ -40,8 +40,8 @@ function ProductsList({ data, span }) {
             ? isMethod === "vnd"
               ? numeral(data.promotionReduce).format("0,0") + "đ"
               : isMethod === "%"
-              ? data.promotionReduce + "%"
-              : null
+                ? data.promotionReduce + "%"
+                : null
             : null
         }
         color="#FF9130"
@@ -52,9 +52,8 @@ function ProductsList({ data, span }) {
           style={{ width: "270px", border: "none" }}
           cover={
             <div
-              className={`${styles.position} ${
-                data?.productImages[0]?.path ? "" : styles.fixed
-              }`}
+              className={`${styles.position} ${data?.productImages[0]?.path ? "" : styles.fixed
+                }`}
               onMouseLeave={() => handleMouseOut(false)}
               onMouseEnter={() => handleMouseIn(true)}
             >
@@ -65,44 +64,37 @@ function ProductsList({ data, span }) {
                 className={`${styles.cssHover} ${styles.imageSize} `}
               />
               <div
-                className={`${styles.transition} ${
-                  active ? styles.absolute : styles.hidden
-                }`}
+                className={styles.absoluteCenter}
                 onMouseEnter={() => handleMouseIn(true)}
               >
-                <div
-                  className={styles.absoluteCenter}
+                <Row
+                  className={styles.row}
                   onMouseEnter={() => handleMouseIn(true)}
                 >
-                  <Row
-                    className={styles.row}
-                    onMouseEnter={() => handleMouseIn(true)}
-                  >
-                    <Space onMouseEnter={() => handleMouseIn(true)}>
-                      <Link onMouseEnter={() => handleMouseIn(true)}>
-                        <Button
-                          onMouseEnter={() => handleMouseIn(true)}
-                          type="primary"
-                          className={`${styles.cssBtn} ${styles.addToCart}`}
-                        >
-                          <PlusCircleOutlined />
-                          Add to cart
-                        </Button>
-                      </Link>
-                      <Link onMouseEnter={() => handleMouseIn(true)}>
-                        <Button
-                          onMouseEnter={() => handleMouseIn(true)}
-                          onMouseLeave={() => handleMouseOut(false)}
-                          type="primary"
-                          className={`${styles.cssBtn} ${styles.quickView}`}
-                        >
-                          <EyeOutlined />
-                          Quick view
-                        </Button>
-                      </Link>
-                    </Space>
-                  </Row>
-                </div>
+                  <Space onMouseEnter={() => handleMouseIn(true)}>
+                    <Link onMouseEnter={() => handleMouseIn(true)}>
+                      <Button
+                        onMouseEnter={() => handleMouseIn(true)}
+                        type="primary"
+                        className={`${styles.cssBtn} ${styles.addToCart}`}
+                      >
+                        <PlusCircleOutlined />
+                        Add to cart
+                      </Button>
+                    </Link>
+                    <Link onMouseEnter={() => handleMouseIn(true)}>
+                      <Button
+                        onMouseEnter={() => handleMouseIn(true)}
+                        onMouseLeave={() => handleMouseOut(false)}
+                        type="primary"
+                        className={`${styles.cssBtn} ${styles.quickView}`}
+                      >
+                        <EyeOutlined />
+                        Quick view
+                      </Button>
+                    </Link>
+                  </Space>
+                </Row>
               </div>
             </div>
           }

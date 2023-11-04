@@ -1,5 +1,5 @@
 .wrapper {
-  background-color: #f8f6f3;
+  background-color: #ffffff;
 }
 
 .container {
@@ -8,6 +8,7 @@
   max-width: 1240px;
   padding: 0 20px;
   margin: 0 auto;
+  color: #111111;
 }
 
 .visuallyHidden {
@@ -67,7 +68,7 @@
 
 .productDescription {
   font-size: 14px;
-  padding-left: 10px;
+  padding-left: 15px;
   width: 100%;
 }
 
@@ -78,4 +79,24 @@
 .textLeft {
   text-align: left !important;
   padding-bottom: 10px;
+}
+
+.inputLabel {
+  font-size: 16px;
+  position: absolute;
+  top: 12px;
+  transition: all 0.3s;
+}
+
+.inputLabel .active {
+  font-size: 12px;
+  top: -12px;
+}
+
+.mb {
+  margin-bottom: 20px;
+}
+
+.txt {
+  margin: 8px 0;
 }

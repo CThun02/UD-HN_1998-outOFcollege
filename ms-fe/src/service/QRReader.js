@@ -1,36 +1,28 @@
-import React, { useEffect, useState } from "react";
-import QrReader from "react-qr-reader";
+import React from "react";
 import { Modal } from "antd";
+import { useZxing } from "react-zxing";
 
 const QRReader = ({ visible, onCancel, setData }) => {
-  const handleScan = (data) => {
-    if (data) {
-      setData(data);
-    }
-  };
-  const [scan, setScan] = useState(false);
-  useEffect(() => {
-    setScan(visible);
-  }, [visible]);
+  const { ref } = useZxing({
+    onDecodeResult: (result) => {
+      setData(result.getText());
+    },
+    paused: !visible,
+  });
+
   return (
     <Modal
       title="Tìm kiếm sản phẩm"
-      open={visible}
+      visible={visible}
       onCancel={() => {
         onCancel();
       }}
       footer={null}
       centered
     >
-      {scan && (
-        <QrReader
-          facingMode={"user"}
-          delay={1000}
-          onError={(e) => console.log(e)}
-          onScan={handleScan}
-          style={{ width: "100%" }}
-        />
-      )}
+      <>
+        <video width={"100%"} ref={ref} />
+      </>
     </Modal>
   );
 };

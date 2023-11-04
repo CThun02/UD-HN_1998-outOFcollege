@@ -11,4 +11,6 @@ public interface AddressServiceI {
     public Boolean delete(Long id);
     public List<Address> findAll();
     public Address getOne(Long id);
+    void updateAddressDefault(Long addressId, Boolean value);
+
 }

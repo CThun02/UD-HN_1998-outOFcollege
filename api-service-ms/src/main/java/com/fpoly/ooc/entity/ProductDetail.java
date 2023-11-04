@@ -37,7 +37,12 @@ import java.util.List;
                        pd.price as 'Price',
                        pd.quantity as 'Quantity',
                        pd.description_detail as 'Description',
-                       pd.status as 'Status'
+                       pd.status as 'Status',
+                       CASE 
+                       WHEN COUNT(ppd.product_detail_id) > 0 
+                       THEN CAST(1 AS bit) 
+                       ELSE CAST(0 AS bit) 
+                       END AS 'ProductInPromotion'
                 from product_detail pd
                          left join product p on pd.product_id = p.id
                          left join button_type bt on pd.button_id = bt.id
@@ -48,7 +53,8 @@ import java.util.List;
                          left join size s on pd.size_id = s.id
                          left join color c on pd.color_id = c.id
                          left join product_image pie on pd.id = pie.product_detail_id
-
+                         left join promotion_product_detail ppd on pd.id = ppd.product_detail_id
+                         left join promotion pn on ppd.promotion_id = pn.id
                 where pd.status = 'ACTIVE'
                   and p.status = 'ACTIVE'
                   and bt.status = 'ACTIVE'
@@ -59,6 +65,8 @@ import java.util.List;
                   and s.status = 'ACTIVE'
                   and c.status = 'ACTIVE'
                   and (pie.product_detail_id is null or pie.status = 'ACTIVE')
+                  and (ppd.product_detail_id is null or pn.status not in ('INACTIVE', 'CANCEL'))
+                  and (pie.product_detail_id is null or pie.status = 'ACTIVE')
                   and (p.id in ?1)
                   and (?2 is null or bt.id = ?2)
                   and (?3 is null or m.id = ?3)
@@ -68,6 +76,16 @@ import java.util.List;
                   and (?7 is null or s.id = ?7)
                   and (?8 is null or c.id = ?8)
                   and (?9 is null or p.product_name like ?9 or p.product_code like ?9)
+                  
+                  group by pd.id, p.product_code, p.product_name, pie.path,
+                           bt.button_name, m.material_name, ct.collar_type_name,
+                           st.seleeve_name, s.size_name, stt.shirt_tail_name, c.color_code,
+                           pd.price, pd.quantity, pd.description_detail, pd.status
+                  ORDER BY
+                      CASE
+                          WHEN COUNT(ppd.product_detail_id) > 0 THEN 1
+                          ELSE 0
+                      END ASC;
                 """,
         resultSetMapping = "Mapping.ProductsDetailsResponse"
 )
@@ -134,7 +152,8 @@ import java.util.List;
                         @ColumnResult(name = "Price", type = BigDecimal.class),
                         @ColumnResult(name = "Quantity", type = Integer.class),
                         @ColumnResult(name = "Description", type = String.class),
-                        @ColumnResult(name = "Status", type = String.class)
+                        @ColumnResult(name = "Status", type = String.class),
+                        @ColumnResult(name = "ProductInPromotion", type = Boolean.class)
                 }
         )
 )

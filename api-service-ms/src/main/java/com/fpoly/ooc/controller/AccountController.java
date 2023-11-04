@@ -54,6 +54,11 @@ public class AccountController {
         return ResponseEntity.ok(service.detail(username));
     }
 
+    @GetMapping("/getByEmailOrNumberPhoneOrIdNo")
+    public ResponseEntity<?> getByEmailOrNumberPhoneOrIdNo(@RequestParam String keyWords, @RequestParam Long idRole) {
+        return ResponseEntity.ok(service.getAccountByEmailOrIdNoOrNumberPhone(idRole, keyWords));
+    }
+
     @PostMapping("create")
     public ResponseEntity<?> save(@RequestBody AccountRequest request) {
         service.save(request);
@@ -76,6 +81,13 @@ public class AccountController {
         AddressDetail addressDetailCreate = AddressDetail.builder().accountAddress(Account.builder().username(userName).build())
                 .addressDetail(Address.builder().id(addressCreate.getId()).build()).build();
         return ResponseEntity.ok(addressDetailService.create(addressDetailCreate));
+    }
+
+
+    @PutMapping("/updateAddressDefault")
+    public ResponseEntity<?> updateAddressDefault(@RequestParam Long id, @RequestParam(defaultValue = "false") Boolean value) {
+        addressService.updateAddressDefault(id, value);
+        return ResponseEntity.ok("ok");
     }
 
     @DeleteMapping("delete/{id}")

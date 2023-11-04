@@ -22,6 +22,7 @@ import com.fpoly.ooc.repository.VoucherHistoryRepository;
 import com.fpoly.ooc.request.DeliveryNoteRequest;
 import com.fpoly.ooc.request.bill.BillDetailRequest;
 import com.fpoly.ooc.request.bill.BillRequest;
+import com.fpoly.ooc.request.bill.BillRevenue;
 import com.fpoly.ooc.responce.account.GetListCustomer;
 import com.fpoly.ooc.responce.bill.BillManagementResponse;
 import com.fpoly.ooc.service.interfaces.BillService;
@@ -30,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -156,5 +158,12 @@ public class BillServiceImpl implements BillService {
     public Bill findBillByBillId(Long id) {
         return billRepo.findById(id)
                 .orElseThrow(() -> new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND)));
+    }
+
+    @Override
+    public BillRevenue getBillRevenue() {
+        LocalDate currentDate = LocalDate.now();
+        LocalDateTime startOfDay = currentDate.atStartOfDay();
+        return billRepo.getBillRevenue(startOfDay);
     }
 }

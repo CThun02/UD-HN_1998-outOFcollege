@@ -3,6 +3,12 @@ import { useEffect } from "react";
 import { useState } from "react";
 const columns = [
   {
+    title: "STT",
+    dataIndex: "stt",
+    key: "stt",
+    width: "5%",
+  },
+  {
     key: "product",
     dataIndex: "product",
     title: "Sản phẩm",
@@ -56,7 +62,6 @@ const columns = [
     width: 110,
   },
 ];
-const arraysIds = [];
 
 function TablesProductsDetails({
   productsDetails,
@@ -69,26 +74,40 @@ function TablesProductsDetails({
 }) {
   const [selectedRows, setSelectedRows] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  //paging
+  const [pageNo, setPageNo] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
+
+  const calculateStt = (index) => {
+    return (pageNo - 1) * pageSize + index + 1;
+  };
 
   function handleOnChangeRow(key, row) {
+    const data = row.filter((item) => item.isCheckExistsInPromotion === false);
     setSelectedRowKeys(key);
-    setSelectedRows(row);
+    setSelectedRows(data);
     setProductsDetailsId(
-      row.map((e) => {
+      data.map((e) => {
         const { key } = e;
         return key;
       })
     );
   }
 
+  function handlePageSize(current, size) {
+    setPageNo(current);
+    setPageSize(size);
+  }
+
   const rowSelection = {
+    selectedRowKeys,
     onChange: handleOnChangeRow,
     selections:
       status === "INACTIVE" || status === "CANCEL"
         ? null
         : [Table.SELECTION_ALL, Table.SELECTION_NONE],
     getCheckboxProps: (record) => ({
-      disabled: status === "INACTIVE" || status === "CANCEL" ? true : false,
+      disabled: record.isCheckExistsInPromotion,
     }),
   };
 
@@ -114,7 +133,8 @@ function TablesProductsDetails({
               ...rowSelection,
             }}
             columns={columns}
-            dataSource={productsDetails.map((p) => ({
+            dataSource={productsDetails.map((p, index) => ({
+              stt: calculateStt(index),
               key: p.productDetailsId,
               product: p.productName,
               button: p.buttonTypeName,
@@ -126,8 +146,19 @@ function TablesProductsDetails({
               color: p.color,
               price: p.price,
               quantity: p.quantity,
+              isCheckExistsInPromotion: p.isCheckExistsInPromotion,
             }))}
             scroll={{ y: 400, x: 1300 }}
+            pagination={{
+              showSizeChanger: true,
+              pageSizeOptions: [5, 10, 15, 20],
+              defaultPageSize: 5,
+              showLessItems: true,
+              style: { marginRight: "10px" },
+              onChange: (currentPage, pageSize) => {
+                handlePageSize(currentPage, pageSize);
+              },
+            }}
           />
         </Space>
       </div>

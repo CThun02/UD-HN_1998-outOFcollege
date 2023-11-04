@@ -1,12 +1,15 @@
-import { Button, Space } from "antd";
+import { Breadcrumb, Button, Space } from "antd";
 import React from "react";
 import styles from "./NavBar.module.css";
 import {
   BellOutlined,
+  HomeOutlined,
   MenuFoldOutlined,
   SearchOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
 import Input from "antd/es/input/Input";
+import Link from "antd/es/typography/Link";
 
 const NavBar = () => {
   return (
@@ -17,10 +20,21 @@ const NavBar = () => {
             <Button className={styles.navBar__button}>
               <MenuFoldOutlined />
             </Button>
-            <Input
-              placeholder="Enter your key words..."
-              prefix={<SearchOutlined />}
-              className={styles.navBar__input}
+            <Breadcrumb
+              items={[
+                {
+                  href: "http://localhost:3000/api/admin",
+                  title: <HomeOutlined />,
+                },
+                {
+                  title: (
+                    <>
+                      <UserOutlined />
+                      <span>Application List</span>
+                    </>
+                  ),
+                },
+              ]}
             />
           </Space>
           <Space>

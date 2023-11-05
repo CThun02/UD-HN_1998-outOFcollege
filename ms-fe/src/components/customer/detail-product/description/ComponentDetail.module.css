@@ -1,0 +1,16 @@
+.rowCss {
+  margin: 0;
+  padding: 0;
+}
+
+.size {
+  font-size: 1rem;
+}
+
+.color {
+  color: #111111;
+}
+
+.fontWeight {
+  font-weight: 500;
+}

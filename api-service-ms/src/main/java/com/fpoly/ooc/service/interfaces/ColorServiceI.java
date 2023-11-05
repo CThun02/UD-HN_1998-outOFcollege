@@ -3,8 +3,10 @@ package com.fpoly.ooc.service.interfaces;
 
 import com.fpoly.ooc.entity.Color;
 import com.fpoly.ooc.request.color.ColorRequest;
+import com.fpoly.ooc.request.productDetail.GetSizeAndColorRequest;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ColorServiceI {
     public Color create(Color color);
@@ -14,4 +16,5 @@ public interface ColorServiceI {
     public Color getOne(Long id);
 
     Color updateStatus(ColorRequest request, Long id);
+    Optional<List<Color>> findColorsByProductId(GetSizeAndColorRequest req);
 }

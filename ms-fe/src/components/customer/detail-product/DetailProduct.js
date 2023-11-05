@@ -1,37 +1,176 @@
-import { Col, Row } from "antd";
+import { Col, Divider, Row } from "antd";
 import { useParams } from "react-router";
 import styles from "./DetailProduct.module.css";
 import BreadCrumb from "../../element/bread-crumb/BreadCrumb";
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+
+import ImageDetail from "./image-detail/ImageDetail";
+import ProductInfo from "./product-info/ProductInfo";
+import Description from "./description/Description";
+import RelatedProducts from "../../element/related/RelatedProducts";
+import axios from "axios";
 
 const items = [
   {
-    title: <Link to="/ms-shop/home">Home</Link>,
+    title: <Link to="/ms-shop/home">Trang chủ</Link>,
   },
   {
-    title: <Link to="/ms-shop/shopping">Shop</Link>,
+    title: <Link to="/ms-shop/shopping">Cửa hàng</Link>,
   },
   {
-    title: "Detail",
+    title: "Chi tiết sản phẩm",
   },
 ];
 
+const baseUrl = "http://localhost:8080/api/admin/product";
+
 function DetailProduct() {
   const { id } = useParams();
+  const decode64 = atob(id);
+  const decodeData = JSON.parse(decode64);
+  const [chooseColor, setChooseColor] = useState({});
+  const [chooseSize, setChooseSize] = useState({});
+  const [productDetail, setProductDetail] = useState({});
+  const [colorsAndSizes, setColorsAndSizes] = useState({});
+
+  const [productId, setProductId] = useState(0);
+  const [brandId, setBrandId] = useState(0);
+  const [categoryId, setCategoryId] = useState(0);
+  const [patternId, setPatternId] = useState(0);
+  const [formId, setFormId] = useState(0);
+  const [buttonId, setButtonId] = useState(0);
+  const [materialId, setMaterialId] = useState(0);
+  const [collarId, setCollarId] = useState(0);
+  const [sleeveId, setSleeveId] = useState(0);
+  const [shirtTailId, setShirtTailId] = useState(0);
+
+  useEffect(() => {
+    async function getProductDetails() {
+      console.log(decodeData);
+      try {
+        const res = await axios.post(baseUrl + "/details-product", {
+          productDetailId: decodeData.productDetailId,
+          productId: decodeData.productId,
+          brandId: decodeData.brandId,
+          categoryId: decodeData.categoryId,
+          patternId: decodeData.patternId,
+          formId: decodeData.formId,
+          buttonId: decodeData.buttonId,
+          materialId: decodeData.materialId,
+          collarId: decodeData.collarId,
+          sleeveId: decodeData.sleeveId,
+          shirtTailId: decodeData.shirtTailId,
+        });
+        const data = await res.data;
+        setProductDetail(data);
+        setProductId(data.productId);
+        setBrandId(data.brandId);
+        setCategoryId(data.categoryId);
+        setPatternId(data.patternId);
+        setFormId(data.formId);
+        setButtonId(data.buttonId);
+        setMaterialId(data.materialId);
+        setCollarId(data.collarId);
+        setSleeveId(data.sleeveId);
+        setShirtTailId(data.shirtId);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+    getProductDetails();
+  }, [id]);
+
+  useEffect(() => {
+    if (
+      productId &&
+      brandId &&
+      categoryId &&
+      patternId &&
+      formId &&
+      buttonId &&
+      materialId &&
+      collarId &&
+      sleeveId &&
+      shirtTailId
+    ) {
+      async function getColorsAndSizes() {
+        try {
+          const res = await axios.post(baseUrl + "/colors-and-sizes", {
+            productId,
+            brandId,
+            categoryId,
+            patternId,
+            formId,
+            buttonId,
+            materialId,
+            collarId,
+            sleeveId,
+            shirtTailId,
+            colorId: chooseColor?.id,
+            sizeId: chooseSize?.id,
+          });
+          const data = await res.data;
+          setColorsAndSizes(data);
+        } catch (err) {
+          console.log(err);
+        }
+      }
+      getColorsAndSizes();
+    }
+  }, [
+    productId,
+    chooseColor,
+    chooseSize,
+    brandId,
+    categoryId,
+    patternId,
+    formId,
+    buttonId,
+    materialId,
+    collarId,
+    sleeveId,
+    shirtTailId,
+  ]);
+
   return (
     <div className={styles.background}>
-      <div className={styles.detailProduct}>
+      <div className={styles.title}>
+        <BreadCrumb title={"Chi tiết sản phẩm"} items={items} />
+      </div>
+      <div className={styles.flexCenter}>
         <div className={styles.content}>
-          <div className={styles.title}>
-            <BreadCrumb title={"Shop"} items={items} />
-          </div>
           <div className={styles.body}>
             <Row className={styles.row}>
-              <Col span={13}>hihi</Col>
-              <Col span={11}>hihi</Col>
+              <Col span={13}>
+                <ImageDetail paths={productDetail?.images} />
+              </Col>
+              <Col span={11}>
+                <div className={styles.product}>
+                  <ProductInfo
+                    data={productDetail}
+                    colorsAndSizes={colorsAndSizes}
+                    setChooseColor={setChooseColor}
+                    setChooseSize={setChooseSize}
+                    chooseColor={chooseColor}
+                    chooseSize={chooseSize}
+                  />
+                  <Divider className={styles.spacing} />
+                </div>
+              </Col>
             </Row>
           </div>
         </div>
+      </div>
+
+      <div className={styles.flexCenter}>
+        <div className={styles.description}>
+          <Description productDetail={productDetail} />
+        </div>
+      </div>
+
+      <div>
+        <RelatedProducts />
       </div>
     </div>
   );

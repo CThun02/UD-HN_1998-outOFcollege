@@ -1,0 +1,13 @@
+.content {
+  width: 80%;
+}
+
+.relatedProducts {
+  display: flex;
+  justify-content: center;
+}
+
+.cssText span {
+  font-size: 36px;
+  line-height: 36px;
+}

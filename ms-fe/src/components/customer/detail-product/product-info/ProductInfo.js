@@ -5,7 +5,7 @@ import ChooseSize from "../../../element/choose-size/ChooseSize";
 import Quantity from "../../../element/quantity/Quantity";
 import { faCartPlus, faCirclePlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Col, Rate, Row, Space } from "antd";
+import { Col, Rate, Row, Space, Tag } from "antd";
 import { Link } from "react-router-dom";
 import numeral from "numeral";
 import { useState } from "react";
@@ -34,9 +34,22 @@ function ProductInfo({
   return (
     <>
       <div className={styles.productName}>
-        <h2 className={`${styles.h2FontSize} ${styles.color}`}>
-          {data.productName}
-        </h2>
+        <Space size={10} direction="horizontal" style={{ width: "100%" }}>
+          <h2
+            className={`${styles.h2FontSize} ${styles.color}`}
+            style={{ display: "inline-block" }}
+          >
+            {data.productName}
+          </h2>
+          {data.promotionMethod && data.promotionValue && (
+            <Tag
+              color="#D80032"
+              style={{ fontSize: "16px", padding: "6px 12px" }}
+            >
+              Giảm {`${data.promotionValue}${data.promotionMethod}`}
+            </Tag>
+          )}
+        </Space>
       </div>
       <div className={styles.items}>
         <div className={styles.spaceItems}>

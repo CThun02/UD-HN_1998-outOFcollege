@@ -150,8 +150,8 @@ import java.util.List;
                         AND shirtTail.status = 'ACTIVE'
                         AND (pp.promotion_id is null or pn.status = 'ACTIVE')
                         AND (?1 IS NULL OR lower(pt.product_name) LIKE ?1)
-                        AND (?2 IS NULL OR pd.price >= ?2)
-                        AND (?3 IS NULL OR pd.price <= ?3)
+                        AND (?2 IS NULL OR pp.money_after >= ?2 OR pd.price >= ?2)
+                        AND (?3 IS NULL OR pp.money_after <= ?3 OR pd.price <= ?3)
                         AND (?4 = '' OR c.id IN (?8))
                         AND (?5 = '' OR b.id IN (?9))
                         AND (?6 = '' OR cor.id IN (?10))

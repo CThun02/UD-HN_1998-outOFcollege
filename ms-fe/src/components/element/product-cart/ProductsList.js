@@ -85,27 +85,23 @@ function ProductsList({ data, span }) {
                       onMouseEnter={() => handleMouseIn(true)}
                     >
                       <Space onMouseEnter={() => handleMouseIn(true)}>
-                        <Link onMouseEnter={() => handleMouseIn(true)}>
-                          <Button
-                            onMouseEnter={() => handleMouseIn(true)}
-                            type="primary"
-                            className={`${styles.cssBtn} ${styles.addToCart}`}
-                          >
-                            <PlusCircleOutlined />
-                            Add to cart
-                          </Button>
-                        </Link>
-                        <Link onMouseEnter={() => handleMouseIn(true)}>
-                          <Button
-                            onMouseEnter={() => handleMouseIn(true)}
-                            onMouseLeave={() => handleMouseOut(false)}
-                            type="primary"
-                            className={`${styles.cssBtn} ${styles.quickView}`}
-                          >
-                            <EyeOutlined />
-                            Quick view
-                          </Button>
-                        </Link>
+                        <Button
+                          onMouseEnter={() => handleMouseIn(true)}
+                          type="primary"
+                          className={`${styles.cssBtn} ${styles.addToCart}`}
+                        >
+                          <PlusCircleOutlined />
+                          Add to cart
+                        </Button>
+                        <Button
+                          onMouseEnter={() => handleMouseIn(true)}
+                          onMouseLeave={() => handleMouseOut(false)}
+                          type="primary"
+                          className={`${styles.cssBtn} ${styles.quickView}`}
+                        >
+                          <EyeOutlined />
+                          Quick view
+                        </Button>
                       </Space>
                     </Row>
                   </div>

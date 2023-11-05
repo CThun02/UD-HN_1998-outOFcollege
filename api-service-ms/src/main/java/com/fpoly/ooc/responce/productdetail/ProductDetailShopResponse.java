@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Data
@@ -36,13 +37,15 @@ public class ProductDetailShopResponse {
     private String shirtTail;
     private  Float weight;
     private String description;
+    private String promotionMethod;
+    private BigDecimal promotionValue;
 
     public ProductDetailShopResponse(Long productDetailId, Long productId, Long brandId, Long categoryId,
                                      Long patternId, Long formId, Long buttonId, Long materialId, Long collarId,
                                      Long sleeveId, Long shirtId, String productName, String brandName,
                                      String categoryName, String patternName, String formName, String buttonName,
                                      String materialName, String collarName, String sleeveName, String shirtTail,
-                                     Float weight, String description) {
+                                     Float weight, String description, String promotionMethod, BigDecimal promotionValue) {
         this.productDetailId = productDetailId;
         this.productId = productId;
         this.brandId = brandId;
@@ -66,5 +69,7 @@ public class ProductDetailShopResponse {
         this.shirtTail = shirtTail;
         this.weight = weight;
         this.description = description;
+        this.promotionMethod = promotionMethod;
+        this.promotionValue = promotionValue;
     }
 }

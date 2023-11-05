@@ -6,6 +6,7 @@ import com.fpoly.ooc.entity.Color;
 import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.ColorDAORepository;
 import com.fpoly.ooc.request.color.ColorRequest;
+import com.fpoly.ooc.request.productDetail.GetSizeAndColorRequest;
 import com.fpoly.ooc.service.interfaces.ColorServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -72,5 +73,12 @@ public class ColorServiceImpl implements ColorServiceI {
                 new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND)));
         color.setStatus(request.getStatus());
         return repo.save(color);
+    }
+
+    @Override
+    public Optional<List<Color>> findColorsByProductId(GetSizeAndColorRequest req) {
+        return Optional.of(repo.findColorsByProductId(req.getProductId(), req.getBrandId(), req.getCategoryId(),
+                req.getPatternId(), req.getFormId(), req.getButtonId(), req.getMaterialId(),
+                req.getCollarId(), req.getSleeveId(), req.getShirtTailId(), req.getSizeId()));
     }
 }

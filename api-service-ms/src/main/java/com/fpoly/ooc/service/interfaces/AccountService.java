@@ -22,6 +22,7 @@ public interface AccountService {
 
     List<AddressDetail> getAddressDetailsByUsername(String username);
 
+    Account getAccountByEmailOrIdNoOrNumberPhone(Long id, String keyWords);
 
     AccountDetailResponce detail(String userName);
 

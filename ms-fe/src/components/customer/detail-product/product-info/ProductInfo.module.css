@@ -1,0 +1,102 @@
+.newProduct {
+  margin-left: 6px;
+}
+
+.items {
+  margin-top: 20px;
+}
+
+.detailProduct {
+  display: flex;
+  justify-content: center;
+}
+
+.background {
+  background-color: #fff;
+}
+
+.content {
+  width: 80%;
+}
+
+.row {
+  margin: 0;
+  padding: 0;
+}
+
+.title {
+  padding: 20px 0;
+}
+
+.h2FontSize {
+  font-size: 2rem;
+}
+
+.color {
+  color: #111111 !important;
+}
+
+.money {
+  display: inline-block;
+  border-radius: 8px;
+  padding: 6px 12px;
+  border: 3px solid rgb(2, 132, 199);
+  color: rgb(2, 132, 199);
+  font-weight: 600;
+  font-size: 1.125rem;
+}
+
+.borderRight {
+  height: 100%;
+  border: 2px solid #000;
+}
+
+.textSpan {
+  font-weight: 500;
+}
+
+.quantity,
+.colorDiv {
+  margin-top: 32px;
+}
+
+.fontWeight {
+  font-weight: 600;
+}
+
+.textSize {
+  font-size: 1rem;
+}
+
+.sizeDiv,
+.itemsCart {
+  margin-top: 32px;
+}
+
+.text {
+  color: #111111;
+}
+
+.btn {
+  padding: 16px;
+  font-size: 1rem;
+  width: 90%;
+  border: none;
+  border-radius: 30px;
+  font-weight: 500;
+}
+
+.shoppingNow {
+  background-color: #0f172a;
+  color: #fff;
+}
+
+.iconAddToCart {
+  padding-right: 10px;
+}
+
+.btn:hover {
+  cursor: pointer;
+  transition: 0.2s linear;
+  opacity: 0.6;
+}

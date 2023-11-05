@@ -7,6 +7,7 @@ import com.fpoly.ooc.entity.Size;
 import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.SizeDAORepository;
 import com.fpoly.ooc.request.color.ColorRequest;
+import com.fpoly.ooc.request.productDetail.GetSizeAndColorRequest;
 import com.fpoly.ooc.request.size.SizeRequest;
 import com.fpoly.ooc.service.interfaces.SizeServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,5 +67,12 @@ public class SizeServiceImpl implements SizeServiceI {
                 new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND)));
         size.setStatus(request.getStatus());
         return repo.save(size);
+    }
+
+    @Override
+    public Optional<List<Size>> findSizesByProductId(GetSizeAndColorRequest req) {
+        return Optional.of(repo.findSizesByProductId(req.getProductId(), req.getBrandId(), req.getCategoryId(),
+                req.getPatternId(), req.getFormId(), req.getButtonId(), req.getMaterialId(),
+                req.getCollarId(), req.getSleeveId(), req.getShirtTailId(), req.getColorId()));
     }
 }

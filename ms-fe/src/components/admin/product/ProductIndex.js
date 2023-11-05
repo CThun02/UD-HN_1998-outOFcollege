@@ -1,5 +1,4 @@
 import {
-  EditFilled,
   EyeFilled,
   FilterFilled,
   PlusOutlined,
@@ -12,6 +11,7 @@ import styles from "./ProductIndex.module.css";
 import axios from "axios";
 import Input from "antd/es/input/Input";
 import { Link } from "react-router-dom";
+import ProductOpenActive from "./ProductOpenActive";
 
 const ProductIndex = () => {
   const api = "http://localhost:8080/api/admin/";
@@ -20,7 +20,14 @@ const ProductIndex = () => {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState(null);
   const [keywords, setKeywords] = useState(null);
-
+  const [openModalEditActiveProduct, setOpenModalEditActiveProduct] = useState(
+    []
+  );
+  function handlesetOpenModalEditActiveProduct(index, value) {
+    const newModalVisible = [...openModalEditActiveProduct];
+    newModalVisible[index] = value;
+    setOpenModalEditActiveProduct(newModalVisible);
+  }
   const columns = [
     {
       key: "1",
@@ -50,13 +57,23 @@ const ProductIndex = () => {
       key: "5",
       title: "Trạng thái",
       dataIndex: "status",
-      render: (status, record) => (
+      render: (status, record, index) => (
         <>
           <Switch
             onChange={(event) => {
-              updateStatus(record, event);
+              if (!event) {
+                updateStatus(record);
+              } else {
+                handlesetOpenModalEditActiveProduct(index, event);
+              }
             }}
             checked={status === "ACTIVE" ? true : false}
+          />
+          <ProductOpenActive
+            open={openModalEditActiveProduct[index]}
+            product={record}
+            onCancel={() => handlesetOpenModalEditActiveProduct(index, false)}
+            render={filterProductByCom}
           />
         </>
       ),
@@ -96,29 +113,26 @@ const ProductIndex = () => {
       });
   }
 
-  function updateStatus(product, statusUpdate) {
-    let mess =
-      statusUpdate === true
-        ? `${product.productName} vừa bật hoạt động kinh doanh`
-        : `${product.productName} tạm ngưng hoạt động kinh doanh`;
+  function updateStatus(product) {
     axios
       .put(
         api +
           "product/updateProductStatus?productId=" +
           product.id +
           "&status=" +
-          (statusUpdate === true ? "ACTIVE" : "INACTIVE")
+          "INACTIVE"
       )
       .then((response) => {
         setTimeout(() => {
-          messageApi.success(mess, 2);
+          messageApi.success(
+            `${product.productName} tạm ngưng hoạt động kinh doanh`,
+            2
+          );
           filterProductByCom();
         }, 500);
       })
       .catch((error) => {
-        setTimeout(() => {
-          messageApi.error(`Cập nhật trạng thái thất bại`, 2);
-        }, 500);
+        messageApi.error(`Cập nhật trạng thái thất bại`, 2);
       });
   }
 

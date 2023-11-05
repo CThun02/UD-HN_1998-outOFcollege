@@ -2,6 +2,7 @@ package com.fpoly.ooc.repository;
 
 import com.fpoly.ooc.entity.Address;
 import com.fpoly.ooc.entity.Bill;
+import com.fpoly.ooc.responce.bill.BillRevenue;
 import com.fpoly.ooc.responce.account.GetListCustomer;
 import com.fpoly.ooc.responce.bill.BillManagementResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -57,5 +58,9 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
     Integer update(@Param("status") String status,
                    @Param("amountPaid") BigDecimal amountPaid,
                    @Param("id") Long id);
+
+    @Query("SELECT COUNT(b) AS billSell, SUM(b.price) as grossRevenue FROM Bill " +
+            "b WHERE b.createdAt >= ?1")
+    BillRevenue getBillRevenue(LocalDateTime startOfDay);
 
 }

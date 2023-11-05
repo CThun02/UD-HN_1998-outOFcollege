@@ -22,6 +22,9 @@ public interface ProductDetailResponse {
     public Size getSize();
     public Color getColor();
     public ShirtTailType getShirtTail();
+    public String getPromotionMethod();
+    public BigDecimal getPromotionValue();
+    public BigDecimal getPromotionCondition();
     public BigDecimal getPrice();
     public Float getWeight();
     public Integer getQuantity();

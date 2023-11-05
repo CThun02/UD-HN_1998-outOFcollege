@@ -1,0 +1,63 @@
+.text {
+  color: #111111;
+  font-size: 1rem;
+}
+
+.hiddenElement::-webkit-inner-spin-button,
+.hiddenElement::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.cssInputNumber:focus {
+  outline: none;
+  border: none;
+  border-radius: 30px;
+}
+
+.cssInputNumber {
+  padding: 14px;
+  font-size: 20px;
+  width: 100%;
+  text-align: center;
+  background-color: rgba(241, 245, 249, 0.7);
+  border: none;
+  border-radius: 30px;
+  font-weight: 300;
+}
+
+.positon {
+  position: relative;
+  width: 100%;
+}
+
+.buttonCss {
+  height: 32px;
+  width: 32px;
+  border-radius: 50%;
+  border: 1px solid rgba(156, 163, 175);
+  background-color: white;
+  font-size: 16px;
+}
+
+.buttonPLus {
+  position: absolute;
+  right: 12px;
+  top: 10px;
+}
+
+.buttonMinus {
+  position: absolute;
+  left: 12px;
+  top: 10px;
+}
+
+.felxCenter {
+  display: flex;
+  align-items: center;
+}
+
+.buttonHover:hover {
+  cursor: pointer;
+  border: 1px solid #000;
+}

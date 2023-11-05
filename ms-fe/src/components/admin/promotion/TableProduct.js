@@ -37,13 +37,11 @@ const columns = [
 ];
 
 const baseUrl = "http://localhost:8080/api/admin/product";
-const baseUrlProductDetail = "http://localhost:8080/api/admin/product";
 
 function TableProduct({ productsId, setProductsId, values, status }) {
   const [data, setData] = useState([]);
 
   //paging
-  const [totalElements, setTotalElements] = useState(1);
   const [pageNo, setPageNo] = useState(1);
   const [pageSize, setPageSize] = useState(5);
 
@@ -67,6 +65,10 @@ function TableProduct({ productsId, setProductsId, values, status }) {
   const rowSelection = {
     selectedRowKeys,
     onChange: handleOnChange,
+    selections:
+      status === "INACTIVE" || status === "CANCEL"
+        ? null
+        : [Table.SELECTION_ALL, Table.SELECTION_NONE],
     getCheckboxProps: (record) => ({
       disabled: status === "INACTIVE" || status === "CANCEL" ? true : false,
     }),
@@ -84,8 +86,7 @@ function TableProduct({ productsId, setProductsId, values, status }) {
   useEffect(() => {
     async function getProducts() {
       const res = await axios.get(baseUrl + "/promotion");
-
-      setData(res.data.content);
+      setData(res.data);
     }
 
     getProducts();
@@ -100,28 +101,28 @@ function TableProduct({ productsId, setProductsId, values, status }) {
           stt: calculateStt(index),
           key: e.productId,
           product: e.productName,
-          sellQuantity: e.sellQuantity,
+          sellQuantity: e.sellQuantity ? e.sellQuantity : "Đang bán",
           price: `${
             e.minPrice === e.maxPrice
               ? numeral(e.maxPrice).format("0,0") + "đ"
               : numeral(e.minPrice).format("0,0") +
-                "đ" -
+                "đ" +
+                " - " +
                 numeral(e.maxPrice).format("0,0") +
                 "đ"
           }`,
-          quantity: e.quantityProduct,
+          quantity: e.quantityProduct ? e.quantityProduct : "Hết hàng",
         }))}
-        pagination={false}
-      />
-      <Pagination
-        style={{ marginTop: "20px" }}
-        defaultCurrent={pageNo}
-        total={totalElements}
-        showSizeChanger={true}
-        pageSize={pageSize}
-        pageSizeOptions={["5", "10", "20", "50", "100"]}
-        onShowSizeChange={handlePageSize}
-        onChange={(page) => setPageNo(page)}
+        pagination={{
+          showSizeChanger: true,
+          pageSizeOptions: [5, 10, 15, 20],
+          defaultPageSize: 5,
+          showLessItems: true,
+          style: { marginRight: "10px" },
+          onChange: (currentPage, pageSize) => {
+            handlePageSize(currentPage, pageSize);
+          },
+        }}
       />
     </div>
   );

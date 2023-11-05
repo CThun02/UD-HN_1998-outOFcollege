@@ -21,13 +21,13 @@ import styles from "./Bill.module.css";
 import ModalProduct from "./ModalProduct";
 import logoGhn from "../../../Assets/img/logo/logo_ghn.png";
 import {
-  CarOutlined,
   CloseCircleOutlined,
   DeleteOutlined,
   DollarOutlined,
   SwapOutlined,
   QrcodeOutlined,
   UserOutlined,
+  ShoppingCartOutlined,
 } from "@ant-design/icons";
 import * as Yup from "yup";
 import axios from "axios";
@@ -37,6 +37,7 @@ import moment from "moment";
 import { useNavigate } from "react-router-dom";
 import ModalAccount from "./ModalAccount";
 import ModalAddress from "./ModalAddress";
+import QRReader from "../../../service/QRReader";
 import FormUsingVoucher from "../../element/voucher/FormUsingVoucher";
 import numeral from "numeral";
 import SearchNameOrCodeVoucher from "../../element/voucher/SearchNameOrCodeVoucher";
@@ -45,6 +46,7 @@ const Bill = () => {
   var initialItems = [];
   const [modalVisible, setModalVisible] = useState([]);
   const [modalAccountVisible, setModalAccountVisible] = useState([]);
+  const [modalQRScanOpen, setModalQRScanOpen] = useState(false);
   function getCart() {
     initialItems = [];
     var checkEmpty = 0;
@@ -81,17 +83,32 @@ const Bill = () => {
   const updateQuantity = (record, index, value) => {
     let cart = JSON.parse(localStorage.getItem(cartId));
     let productDetails = cart.productDetails;
-    console.log(record);
     if (value > 99) {
       notification.warning({
         message: "Thông báo",
         description: "Chỉ được mua 100 sản phẩm",
         duration: 1,
       });
+      setRendered(Math.random());
+      return;
+    }
+    if (value > productDetails[index].productDetail.quantity) {
+      notification.warning({
+        message: "Thông báo",
+        description: "Đã vượt quá số lượng tồn",
+        duration: 1,
+      });
+      setRendered(Math.random());
+      return;
     }
     productDetails[index].quantity = value;
     cart.productDetails = productDetails;
     localStorage.setItem(cartId, JSON.stringify(cart));
+    notification.success({
+      message: "Thông báo",
+      description: "Chỉnh sửa số lượng thành công",
+      duration: 1,
+    });
     setRendered(cart);
   };
 
@@ -113,17 +130,19 @@ const Bill = () => {
           <Row>
             <Col span={4}>
               <Carousel autoplay className={styles.slider}>
-                {record.productDetailImages &&
-                  record.productDetailImages.map((productImage, index) => {
-                    return (
-                      <img
-                        key={index}
-                        style={{ width: "100px" }}
-                        alt="abc"
-                        src={productImage}
-                      />
-                    );
-                  })}
+                {record.productDetail.productImageResponse &&
+                  record.productDetail.productImageResponse.map(
+                    (productImage, index) => {
+                      return (
+                        <img
+                          key={productImage.id}
+                          style={{ width: "100px" }}
+                          alt="abc"
+                          src={productImage.path}
+                        />
+                      );
+                    }
+                  )}
               </Carousel>
             </Col>
             <Col span={20}>
@@ -139,6 +158,10 @@ const Bill = () => {
                   {record.productDetail.product.productName +
                     "-" +
                     record.productDetail.button.buttonName +
+                    "-" +
+                    record.productDetail.brand.brandName +
+                    "-" +
+                    record.productDetail.category.categoryName +
                     "-" +
                     record.productDetail.material.materialName +
                     "-" +
@@ -187,9 +210,11 @@ const Bill = () => {
         return (
           <InputNumber
             min={1}
-            max={100}
+            max={record.quantity >= record.productDetail.quantity}
             value={record.quantity}
-            onChange={(value) => updateQuantity(record, index, value)}
+            onBlur={(event) =>
+              updateQuantity(record, index, event.target.value)
+            }
           />
         );
       },
@@ -272,12 +297,22 @@ const Bill = () => {
 
   // xóa sản phẩm trong giỏ hàng
   const handleDeleteProduct = (record, index) => {
-    let cart = JSON.parse(localStorage.getItem(cartId));
-    let productDetails = cart.productDetails;
-
-    productDetails.splice(index, 1);
-    localStorage.setItem(cartId, JSON.stringify(cart));
-    setRendered(cart);
+    Modal.confirm({
+      title: "Xóa sản phẩm",
+      content: "Bạn có chắc chắn muốn xóa sản phẩm?",
+      onOk() {
+        let cart = JSON.parse(localStorage.getItem(cartId));
+        let productDetails = cart.productDetails;
+        productDetails.splice(index, 1);
+        localStorage.setItem(cartId, JSON.stringify(cart));
+        setRendered(cart);
+        notification.error({
+          message: "Thông báo",
+          description: "Xóa sản phẩm thành công.",
+          duration: 2,
+        });
+      },
+    });
   };
 
   const [activeKey, setActiveKey] = useState(
@@ -510,6 +545,9 @@ const Bill = () => {
     visible[index] = checked;
     setSwitchChange(visible);
     setSymbol(checked ? "Shipping" : "Received");
+    if (!checked) {
+      setTypeShipping(false);
+    }
   };
 
   // mở modal product
@@ -625,10 +663,64 @@ const Bill = () => {
         });
     }
   };
+  const scanAddProductDetailIntoCart = (result) => {
+    axios
+      .get(
+        "http://localhost:8080/api/admin/product/getproductdetailbyidpd?productDetailId=" +
+          result
+      )
+      .then((response) => {
+        var cart = JSON.parse(localStorage.getItem(cartId));
+        var productDetails = cart.productDetails;
+        var notExist = true;
+        for (var i = 0; i < productDetails.length; i++) {
+          if (
+            Number(productDetails[i].productDetail.id) ===
+            Number(response.data.id)
+          ) {
+            if (
+              productDetails[i].quantity >
+              productDetails[i].productDetail.quantity
+            ) {
+              notification.warning({
+                message: "Thông báo",
+                description: "Đã vượt quá số lượng tồn hoặc 100",
+                duration: 1,
+              });
+              return;
+            }
+            notExist = false;
+            productDetails[i].quantity += 1;
+            break;
+          }
+        }
+        if (notExist) {
+          productDetails.push({
+            productDetail: response.data,
+            quantity: 1,
+          });
+        }
+        cart = {
+          productDetails: productDetails,
+          timeStart: now(),
+          account: cart.account,
+        };
+        localStorage.setItem(cartId, JSON.stringify(cart));
+        notification.success({
+          message: "Thông báo",
+          description: "Thêm thành công",
+          duration: 2,
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    setRendered(Math.random());
+  };
+
   useEffect(() => {
     getListAddressByUsername(account?.username);
     fetchProvinces();
-
     if (selectedAddress?.city) {
       const city = selectedAddress?.city.substring(
         1 + selectedAddress.city.indexOf("|")
@@ -659,7 +751,14 @@ const Bill = () => {
     getProductDetails();
     initializeModalStates();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cartId, render, account?.username, selectedDictrict, selectedWard]);
+  }, [
+    cartId,
+    render,
+    account?.username,
+    selectedDictrict,
+    selectedWard,
+    modalQRScanOpen,
+  ]);
 
   const [symbol, setSymbol] = useState("Received");
   const [note, setNote] = useState("");
@@ -695,8 +794,8 @@ const Bill = () => {
       phoneNumber: selectedAddress.numberPhone,
       transactionCode: selectedOption === "2" ? transactionCode : null,
       voucherCode: voucherAdd?.voucherCode,
+      createdBy: "user3",
     };
-    console.log(transactionCode);
     const billAddress = {
       fullName: fullname,
       sdt: phoneNumber,
@@ -726,7 +825,7 @@ const Bill = () => {
       selectedOption !== "2" &&
       ((remainAmount < 0 && !typeShipping[index]) || isNaN(remainAmount))
     ) {
-      return console.log("Tiền không đủ");
+      return setInputError("Tiền không đủ");
     } else {
       for (let i = 0; i < productDetails.length; i++) {
         const billDetail = {
@@ -785,7 +884,11 @@ const Bill = () => {
                 }
               );
             }
-
+            notification.success({
+              message: "Thông báo",
+              description: "Thanh toán thành công",
+              duration: 2,
+            });
             navigate(`/api/admin/order`);
             remove(activeKey);
           } catch (error) {
@@ -818,6 +921,14 @@ const Bill = () => {
 
   return (
     <>
+      <QRReader
+        visible={modalQRScanOpen}
+        key={cartId}
+        onCancel={() => {
+          setModalQRScanOpen(false);
+        }}
+        setData={scanAddProductDetailIntoCart}
+      />
       <Tabs
         type="editable-card"
         onChange={onChange}
@@ -841,13 +952,14 @@ const Bill = () => {
                         type="primary"
                         size="large"
                       >
-                        <CarOutlined style={{ fontSize: "20px" }} />
+                        <ShoppingCartOutlined style={{ fontSize: "20px" }} />
                       </Button>
                       <Button
                         className={styles.addButton}
                         type="primary"
                         size="large"
                         style={{ marginRight: "8px" }}
+                        onClick={() => setModalQRScanOpen(true)}
                       >
                         <QrcodeOutlined style={{ fontSize: "20px" }} />
                       </Button>
@@ -905,7 +1017,7 @@ const Bill = () => {
                     style={{ marginTop: "3px" }}
                   />
                   <Row>
-                    <Col span={16}>
+                    <Col span={15}>
                       <Row style={{ marginBottom: "20px" }}>
                         <Col span={6} style={{ marginTop: "2px" }}>
                           {account && (
@@ -952,163 +1064,156 @@ const Bill = () => {
                           />
                         </Col>
                       </Row>
-                      <Row>
+                      <Row style={{ marginBottom: "30px" }}>
                         <Col span={24}>
                           <Row>
                             <Col span={12}>
-                              <Row>
-                                <Col span={5}>
-                                  <b style={{ color: "red" }}>*</b> Họ và tên
-                                </Col>
-                                <Col span={14}>
-                                  <Input
-                                    placeholder="nhập họ và tên"
-                                    onChange={(e) =>
-                                      setFullname(e.target.value)
-                                    }
-                                    value={selectedAddress?.fullName}
-                                  />
-                                  {errors.fullName && (
-                                    <div style={{ color: "red" }}>
-                                      {errors.fullName}
-                                    </div>
-                                  )}
-                                </Col>
-                              </Row>
+                              <div className="m-5">
+                                <b style={{ color: "red" }}>*</b> Họ và tên
+                                <Input
+                                  placeholder="nhập họ và tên"
+                                  onChange={(e) => setFullname(e.target.value)}
+                                  value={selectedAddress?.fullName}
+                                />
+                                {errors.fullName && (
+                                  <div style={{ color: "red" }}>
+                                    {errors.fullName}
+                                  </div>
+                                )}
+                              </div>
                             </Col>
                             <Col span={12}>
-                              <Row>
-                                <Col span={7}>
-                                  <b style={{ color: "red" }}>*</b> Số điện
-                                  thoại
-                                </Col>
-                                <Col span={14}>
-                                  <Input
-                                    placeholder="nhập số điện thoại"
-                                    onChange={(e) =>
-                                      setPhoneNumber(e.target.value)
-                                    }
-                                    value={selectedAddress?.sdt}
-                                  />
-                                  {errors.sdt && (
-                                    <div style={{ color: "red" }}>
-                                      {errors.sdt}
-                                    </div>
-                                  )}
-                                </Col>
-                              </Row>
+                              <div className="m-5">
+                                <b style={{ color: "red" }}>*</b> Số điện thoại
+                                <Input
+                                  placeholder="nhập số điện thoại"
+                                  onChange={(e) =>
+                                    setPhoneNumber(e.target.value)
+                                  }
+                                  value={selectedAddress?.sdt}
+                                />
+                                {errors.sdt && (
+                                  <div style={{ color: "red" }}>
+                                    {errors.sdt}
+                                  </div>
+                                )}
+                              </div>
                             </Col>
                           </Row>
                         </Col>
-                      </Row>
-                      <Row style={{ marginBottom: "50px" }}>
                         <Col span={8}>
-                          <span>
-                            <b style={{ color: "red" }}>*</b> Tỉnh/thành phố
-                          </span>
-                          <br />
-                          <Select
-                            style={{ width: 200 }}
-                            onChange={(event) =>
-                              handleProvinceChange(
-                                event.substring(event.indexOf("|") + 1),
-                                event
-                              )
-                            }
-                            value={
-                              selectedAddress.city
-                                ? selectedAddress?.city.substring(
-                                    0,
-                                    selectedAddress.city.indexOf("|")
-                                  )
-                                : undefined
-                            }
-                          >
-                            {provinces &&
-                              provinces.map((province) => (
-                                <Select.Option
-                                  label={province.ProvinceName}
-                                  key={province.ProvinceID}
-                                  value={`${province.ProvinceName}|${province.ProvinceID}`}
-                                >
-                                  {province.ProvinceName}
-                                </Select.Option>
-                              ))}
-                          </Select>
-                          {errors.city && (
-                            <div style={{ color: "red" }}>{errors.city}</div>
-                          )}
-                        </Col>
-                        <Col span={8}>
-                          <span>
-                            <b style={{ color: "red" }}>*</b> Quận/huyện
-                          </span>
-                          <br />
-                          <Select
-                            style={{ width: 200 }}
-                            onChange={(event) =>
-                              handleDistrictChange(
-                                event.substring(event.indexOf("|") + 1),
-                                event
-                              )
-                            }
-                            value={
-                              selectedAddress.district
-                                ? selectedAddress?.district.substring(
-                                    0,
-                                    selectedAddress.district.indexOf("|")
-                                  )
-                                : undefined
-                            }
-                          >
-                            {districts &&
-                              districts.map((district) => {
-                                return (
+                          <div className="m-5">
+                            <span>
+                              <b style={{ color: "red" }}>*</b> Tỉnh/thành phố
+                            </span>
+                            <br />
+                            <Select
+                              style={{ width: "100%" }}
+                              onChange={(event) =>
+                                handleProvinceChange(
+                                  event.substring(event.indexOf("|") + 1),
+                                  event
+                                )
+                              }
+                              value={
+                                selectedAddress.city
+                                  ? selectedAddress?.city.substring(
+                                      0,
+                                      selectedAddress.city.indexOf("|")
+                                    )
+                                  : undefined
+                              }
+                            >
+                              {provinces &&
+                                provinces.map((province) => (
                                   <Select.Option
-                                    key={district.DistrictID}
-                                    value={`${district.DistrictName}|${district.DistrictID}`}
+                                    label={province.ProvinceName}
+                                    key={province.ProvinceID}
+                                    value={`${province.ProvinceName}|${province.ProvinceID}`}
                                   >
-                                    {district.DistrictName}
+                                    {province.ProvinceName}
                                   </Select.Option>
-                                );
-                              })}
-                          </Select>
-                          {errors.district && (
-                            <div style={{ color: "red" }}>
-                              {errors.district}
-                            </div>
-                          )}
+                                ))}
+                            </Select>
+                            {errors.city && (
+                              <div style={{ color: "red" }}>{errors.city}</div>
+                            )}
+                          </div>
                         </Col>
                         <Col span={8}>
-                          <span>
-                            <b style={{ color: "red" }}>*</b> Phường/xã
-                          </span>
-                          <br />
-                          <Select
-                            style={{ width: 200 }}
-                            onChange={handleWardChange}
-                            value={
-                              selectedAddress.ward
-                                ? selectedAddress.ward.substring(
-                                    0,
-                                    selectedAddress.ward.indexOf("|")
-                                  )
-                                : undefined
-                            }
-                          >
-                            {wards &&
-                              wards.map((ward) => (
-                                <Select.Option
-                                  key={ward.WardCode}
-                                  value={`${ward.WardName}|${ward.WardCode}`}
-                                >
-                                  {ward.WardName}
-                                </Select.Option>
-                              ))}
-                          </Select>
-                          {errors.ward && (
-                            <div style={{ color: "red" }}>{errors.ward}</div>
-                          )}
+                          <div className="m-5">
+                            <span>
+                              <b style={{ color: "red" }}>*</b> Quận/huyện
+                            </span>
+                            <br />
+                            <Select
+                              style={{ width: "100%" }}
+                              onChange={(event) =>
+                                handleDistrictChange(
+                                  event.substring(event.indexOf("|") + 1),
+                                  event
+                                )
+                              }
+                              value={
+                                selectedAddress.district
+                                  ? selectedAddress?.district.substring(
+                                      0,
+                                      selectedAddress.district.indexOf("|")
+                                    )
+                                  : undefined
+                              }
+                            >
+                              {districts &&
+                                districts.map((district) => {
+                                  return (
+                                    <Select.Option
+                                      key={district.DistrictID}
+                                      value={`${district.DistrictName}|${district.DistrictID}`}
+                                    >
+                                      {district.DistrictName}
+                                    </Select.Option>
+                                  );
+                                })}
+                            </Select>
+                            {errors.district && (
+                              <div style={{ color: "red" }}>
+                                {errors.district}
+                              </div>
+                            )}
+                          </div>
+                        </Col>
+                        <Col span={8}>
+                          <div className="m-5">
+                            <span>
+                              <b style={{ color: "red" }}>*</b> Phường/xã
+                            </span>
+                            <br />
+                            <Select
+                              style={{ width: "100%" }}
+                              onChange={handleWardChange}
+                              value={
+                                selectedAddress.ward
+                                  ? selectedAddress.ward.substring(
+                                      0,
+                                      selectedAddress.ward.indexOf("|")
+                                    )
+                                  : undefined
+                              }
+                            >
+                              {wards &&
+                                wards.map((ward) => (
+                                  <Select.Option
+                                    key={ward.WardCode}
+                                    value={`${ward.WardName}|${ward.WardCode}`}
+                                  >
+                                    {ward.WardName}
+                                  </Select.Option>
+                                ))}
+                            </Select>
+                            {errors.ward && (
+                              <div style={{ color: "red" }}>{errors.ward}</div>
+                            )}
+                          </div>
                         </Col>
                       </Row>
                       <Row>
@@ -1136,7 +1241,7 @@ const Bill = () => {
                         )}
                       </Row>
                     </Col>
-                    <Col span={8}>
+                    <Col span={8} offset={1}>
                       <Switch onChange={(e) => handleChangSwitch(e, index)} />
                       <span style={{ marginLeft: "5px" }}>Giao hàng</span>
                       <br />

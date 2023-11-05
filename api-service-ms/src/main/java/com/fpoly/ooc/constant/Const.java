@@ -50,5 +50,10 @@ public class Const {
     public static final String TOPIC_VOUCHER = "voucher-cronjob";
     public static final String TOPIC_PROMOTION = "promotion-cronjob";
 
+    //SORTING
+    public static final String SORT_BY_CREATE_AT = "SORT_BY_CREATE_AT";
+    public static final String SORT_BY_SELLING = "SORT_BY_SELLING";
+    public static final String SORT_BY_PRICE_UP = "SORT_BY_PRICE_UP";
+    public static final String SORT_BY_PRICE_DOWN = "SORT_BY_PRICE_DOWN";
 
 }

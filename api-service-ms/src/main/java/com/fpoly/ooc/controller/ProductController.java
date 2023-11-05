@@ -3,17 +3,21 @@ package com.fpoly.ooc.controller;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.dto.ProductDetailsDTO;
 import com.fpoly.ooc.entity.*;
+import com.fpoly.ooc.repository.ProductDetailDAORepositoryI;
+import com.fpoly.ooc.request.product.ProductDetailCondition;
 import com.fpoly.ooc.request.product.ProductDetailRequest;
 import com.fpoly.ooc.request.product.ProductImageRequest;
 import com.fpoly.ooc.request.product.ProductRequest;
 import com.fpoly.ooc.responce.product.ProductDetailDisplayResponse;
 import com.fpoly.ooc.responce.product.ProductDetailResponse;
 import com.fpoly.ooc.responce.product.ProductResponse;
+import com.fpoly.ooc.responce.productdetail.ProductDetailShop;
 import com.fpoly.ooc.service.interfaces.ProductDetailServiceI;
 import com.fpoly.ooc.service.interfaces.ProductImageServiceI;
 import com.fpoly.ooc.service.interfaces.ProductServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,6 +46,11 @@ public class ProductController {
                                          @RequestParam(defaultValue = "null") String keywords){
             return ResponseEntity.ok(service.getProductFilterByCom(status.equals("null")?null:status,
                     keywords.equals("null")?null:"%"+keywords+"%"));
+    }
+
+    @GetMapping("/getproductdetailbyidpd")
+    public ResponseEntity<?> filterByCom(@RequestParam() Long productDetailId){
+        return ResponseEntity.ok(productDetailService.getOnePDDisplayById(productDetailId));
     }
 
     @GetMapping("/getMaxPrice")
@@ -122,8 +131,13 @@ public class ProductController {
 
 
     @PutMapping("/updateProductStatus")
-    public ResponseEntity<?> updateProductStatus(@RequestParam Long productId, @RequestParam String status) {
+    public ResponseEntity<?> updateProductStatus(@RequestParam Long productId,
+                                                 @RequestParam String status,
+                                                 @RequestParam(defaultValue = "false") Boolean openAll) {
         Product product = service.getOne(productId);
+        if((openAll && status.equals("ACTIVE")) || status.equals("INACTIVE")){
+            productDetailService.updateProductDetailsByProductId(productId, status);
+        }
         product.setStatus(status);
         product.setDeletedAt(null);
         return ResponseEntity.ok(service.update(product));
@@ -176,11 +190,8 @@ public class ProductController {
     }
 
     @GetMapping("/promotion")
-    public ResponseEntity<?> findProductPromotion(
-            @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
-            @RequestParam(value = "pageSize", defaultValue = "5") Integer pageSize
-    ) {
-        return ResponseEntity.ok(service.findProductPromotion(PageRequest.of(pageNo, pageSize)));
+    public ResponseEntity<?> findProductPromotion() {
+        return ResponseEntity.ok(service.findProductPromotion());
     }
 
     @PostMapping("/by-product-details-dto")
@@ -188,6 +199,35 @@ public class ProductController {
             @RequestBody ProductDetailsDTO dto
     ) {
         return ResponseEntity.ok(productDetailService.findListProductdetailsByListProductId(dto));
+    }
+
+    @GetMapping("/best-selling")
+    public ResponseEntity<?> getBestSellingProduct() {
+        System.out.println("best");
+        return ResponseEntity.ok(productDetailService.getProductDetailBestSelling());
+    }
+
+    @GetMapping("/new-product")
+    public ResponseEntity<?> getNewProduct() {
+        return ResponseEntity.ok(productDetailService.getNewProductDetail());
+    }
+
+    @PostMapping("/product-shop")
+    public ResponseEntity<?> findAllProductDetailShop(
+            @RequestParam(value = "pageNo", defaultValue = "0") int pageNo,
+            @RequestParam(value = "pageSize", defaultValue = "12") int pageSize,
+            @RequestBody ProductDetailCondition req
+            ) {
+
+        return ResponseEntity.ok(
+                productDetailService.getAllProductDetailShop(
+                        req, PageRequest.of(pageNo, pageSize))
+        );
+    }
+
+    @GetMapping("/get-price-max")
+    public ResponseEntity<?> getPriceMax() {
+        return ResponseEntity.ok(productDetailService.getPriceMax());
     }
 
 }

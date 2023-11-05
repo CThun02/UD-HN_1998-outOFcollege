@@ -29,143 +29,150 @@ import BillTimeLine from "./sale-couter/TimeLine";
 import SaveVoucher from "./voucher/SaveVoucher";
 import StatisticalIndex from "./statistical/StatisticalIndex";
 import { useState } from "react";
+import { NotificationProvider } from "../element/notification/Notification";
+
 function AdminPage() {
   const [message, setMessage] = useState("");
 
   return (
-    <Row style={{ margin: 0 }}>
-      <Col span={4}>
-        <SideBar />
-      </Col>
-      <Col span={20} className="h-100vh">
-        <div>
-          <NavBar />
-        </div>
-        <div className="content">
-          <Routes>
-            <Route path="admin">
-              {/* Thống kê */}
-              {/* hiển thị mặc định khi vào admin là trang thống kê */}
-              <Route index element="statistical" />
-              <Route path="statistical" element={<StatisticalIndex />}></Route>
-              {/* Tại quầy */}
-              <Route path="counter-sales">
-                <Route index element={<Bill />}></Route>
+    <NotificationProvider>
+      <Row style={{ margin: 0 }}>
+        <Col span={4}>
+          <SideBar />
+        </Col>
+        <Col span={20} className="h-100vh">
+          <div>
+            <NavBar />
+          </div>
+          <div className="content">
+            <Routes>
+              <Route path="admin">
+                {/* Thống kê */}
+                {/* hiển thị mặc định khi vào admin là trang thống kê */}
+                <Route index element={<StatisticalIndex />} />
                 <Route
-                  path=":billId/timeline"
-                  element={<BillTimeLine />}
+                  path="statistical"
+                  element={<StatisticalIndex />}
                 ></Route>
-              </Route>
-              {/* Đơn hàng */}
-              <Route path="order" element={<BillManagement />}></Route>
-              {/* Thu chi */}
-              {/* ví dụ path= san-pham/hien-thi ->  
+                {/* Tại quầy */}
+                <Route path="counter-sales">
+                  <Route index element={<Bill />}></Route>
+                  <Route
+                    path=":billId/timeline"
+                    element={<BillTimeLine />}
+                  ></Route>
+                </Route>
+                {/* Đơn hàng */}
+                <Route path="order" element={<BillManagement />}></Route>
+                {/* Thu chi */}
+                {/* ví dụ path= san-pham/hien-thi ->  
                       path="income-and-expenses"
                       element="income-and-expenses"
                     ></Route>
                     {/* Sản phẩm */}
-              <Route path="product">
-                <Route index element={<ProductIndex />} />
-                <Route
-                  path={"details/:productId"}
-                  element={<ProductDetailsByProductId />}
-                />
-                <Route
-                  path={"create-details"}
-                  element={<ProductCreateDetails />}
-                />
-                {/* ví dụ path= san-pham/hien-thi ->  
+                <Route path="product">
+                  <Route index element={<ProductIndex />} />
+                  <Route
+                    path={"details/:productId"}
+                    element={<ProductDetailsByProductId />}
+                  />
+                  <Route
+                    path={"create-details"}
+                    element={<ProductCreateDetails />}
+                  />
+                  {/* ví dụ path= san-pham/hien-thi ->  
                     <Route path="hien-thi" element="el" />
                     */}
-              </Route>
-              <Route path="button" element={<ButtonAdmin />}></Route>
-              <Route path="material" element={<MaterialAdmin />} />
-              {/*sanpham chi tiet */}
-              <Route path="pattern" element={<PatternAdmin />}></Route>
-              <Route
-                path="category"
-                element={<CategoryAdmin></CategoryAdmin>}
-              ></Route>
-              <Route path="brand" element={<BrandAdmin></BrandAdmin>}></Route>
-              <Route path="form" element={<FormAdmin></FormAdmin>}></Route>
-              <Route
-                path="collar"
-                element={<CollarAdmin></CollarAdmin>}
-              ></Route>
-              <Route path="shirtTail" element={<ShirtailAdmin />}></Route>
-              <Route path="sleeve" element={<SleeveAdmin />}></Route>
-              <Route path="color" element={<CollorAdmin />}></Route>
-              <Route path="size" element={<SizeAdmin />}></Route>
-              {/* Voucher */}
-              <Route path="vouchers">
-                <Route index element={<Voucher message={message} />} />
+                </Route>
+                <Route path="button" element={<ButtonAdmin />}></Route>
+                <Route path="material" element={<MaterialAdmin />} />
+                {/*sanpham chi tiet */}
+                <Route path="pattern" element={<PatternAdmin />}></Route>
                 <Route
-                  path="save"
-                  element={<SaveVoucher setMessage={setMessage} />}
-                />
+                  path="category"
+                  element={<CategoryAdmin></CategoryAdmin>}
+                ></Route>
+                <Route path="brand" element={<BrandAdmin></BrandAdmin>}></Route>
+                <Route path="form" element={<FormAdmin></FormAdmin>}></Route>
                 <Route
-                  path="detail/:code"
-                  element={<SaveVoucher setMessage={setMessage} />}
-                />
+                  path="collar"
+                  element={<CollarAdmin></CollarAdmin>}
+                ></Route>
+                <Route path="shirtTail" element={<ShirtailAdmin />}></Route>
+                <Route path="sleeve" element={<SleeveAdmin />}></Route>
+                <Route path="color" element={<CollorAdmin />}></Route>
+                <Route path="size" element={<SizeAdmin />}></Route>
+                {/* Voucher */}
+                <Route path="vouchers">
+                  <Route index element={<Voucher message={message} />} />
+                  <Route
+                    path="save"
+                    element={<SaveVoucher setMessage={setMessage} />}
+                  />
+                  <Route
+                    path="detail/:code"
+                    element={<SaveVoucher setMessage={setMessage} />}
+                  />
+                </Route>
+                {/* Promotion */}
+                <Route path="promotion">
+                  <Route index element={<Promotion />} />
+                  <Route path="create" element={<CreatePromotion />} />
+                  <Route path="detail/:code" element={<CreatePromotion />} />
+                </Route>
+                <Route path="category" element="category"></Route>
+                <Route path="brand" element="brand"></Route>
+                {/* Tài khoản */}
+                <Route
+                  path="employee"
+                  element={<CustomerAdmin roleId={1} />}
+                ></Route>
+                <Route
+                  path="employee/create"
+                  element={<AccountForm roleId={1} />}
+                ></Route>
+                <Route
+                  path="employee/detail/:username"
+                  element={<DetailForm roleId={1} />}
+                ></Route>
+                <Route
+                  path="customer"
+                  element={<CustomerAdmin roleId={2} />}
+                ></Route>
+                <Route
+                  path="customer/create"
+                  element={<AccountForm roleId={2} />}
+                ></Route>
+                <Route
+                  path="customer/detail/:username"
+                  element={<DetailForm roleId={2} />}
+                ></Route>
               </Route>
-              {/* Promotion */}
-              <Route path="promotion">
-                <Route index element={<Promotion />} />
-                <Route path="create" element={<CreatePromotion />} />
-                <Route path="detail/:code" element={<CreatePromotion />} />
-              </Route>
-              <Route path="category" element="category"></Route>
-              <Route path="brand" element="brand"></Route>
-              {/* Tài khoản */}
-              <Route
-                path="employee"
-                element={<CustomerAdmin roleId={1} />}
-              ></Route>
-              <Route
-                path="employee/create"
-                element={<AccountForm roleId={1} />}
-              ></Route>
-              <Route
-                path="employee/detail/:username"
-                element={<DetailForm roleId={1} />}
-              ></Route>
-              <Route
-                path="customer"
-                element={<CustomerAdmin roleId={2} />}
-              ></Route>
-              <Route
-                path="customer/create"
-                element={<AccountForm roleId={2} />}
-              ></Route>
-              <Route
-                path="customer/detail/:username"
-                element={<DetailForm roleId={2} />}
-              ></Route>
-            </Route>
 
-            {/* Not found */}
-            <Route
-              path="*"
-              element={
-                <Result
-                  status={"404"}
-                  title={"404"}
-                  subTitle={"Xin lỗi, trang bạn truy cập không tồn tại."}
-                  extra={
-                    <Link to={"/admin"}>
-                      <Button type="primary">Back Home</Button>
-                    </Link>
-                  }
-                />
-              }
-            />
-          </Routes>
-          <div>
-            <Footer />
+              {/* Not found */}
+              <Route
+                path="*"
+                element={
+                  <Result
+                    status={"404"}
+                    title={"404"}
+                    subTitle={"Xin lỗi, trang bạn truy cập không tồn tại."}
+                    extra={
+                      <Link to={"/admin"}>
+                        <Button type="primary">Back Home</Button>
+                      </Link>
+                    }
+                  />
+                }
+              />
+            </Routes>
+            <div>
+              <Footer />
+            </div>
           </div>
-        </div>
-      </Col>
-    </Row>
+        </Col>
+      </Row>
+    </NotificationProvider>
   );
 }
 

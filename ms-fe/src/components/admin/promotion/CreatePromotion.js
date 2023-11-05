@@ -291,7 +291,7 @@ function CreatePromotion() {
                 <Col span={10}>
                   <Formik
                     initialValues={{
-                      promotionId: "",
+                      promotionId: null,
                       promotionCode: "",
                       promotionName: "",
                       promotionNameCurrent: "",

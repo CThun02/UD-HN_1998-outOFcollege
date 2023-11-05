@@ -60,7 +60,7 @@ public class VoucherServiceImpl implements VoucherService {
 
         return (Page<VoucherResponse>) PageUltil.page(
                 voucherRepository.findAllVoucher(
-                        Objects.isNull(voucherConditionDTO.getCodeOrName()) ? null : "%" + Commons.lower(voucherConditionDTO.getCodeOrName()) + "%",
+                        StringUtils.isEmpty(voucherConditionDTO.getCodeOrName()) ? null : "%" + Commons.lower(voucherConditionDTO.getCodeOrName()) + "%",
                         Objects.isNull(voucherConditionDTO.getStartDate()) ? null : voucherConditionDTO.getStartDate(),
                         Objects.isNull(voucherConditionDTO.getEndDate()) ? null : voucherConditionDTO.getEndDate(),
                         Commons.lower(status)
@@ -297,10 +297,10 @@ public class VoucherServiceImpl implements VoucherService {
 
         if (request.getObjectUse().equals("member") && !request.getIsCheckSendEmail()) {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.IS_SEND_EMAIL_MEMBER_REQUIRED));
-        } else {
-            if (request.getUsernames().isEmpty()) {
+        }
+
+        if (request.getObjectUse().equals("member") && request.getUsernames().isEmpty()) {
                 throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ARRAYS_CUSTOMER_NOT_NULL));
-            }
         }
 
         voucher.setVoucherMethod(request.getVoucherMethod());

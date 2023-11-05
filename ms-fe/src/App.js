@@ -10,24 +10,23 @@ import { Button, Result } from "antd";
 function App() {
   return (
     <>
-      <NotificationProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route path="api/*" element={<AdminPage />} />
-            <Route path="ms-shop/*" element={<ClientPage />} />
-            <Route
-              path="*"
-              element={
-                <Result
-                  status={"404"}
-                  title={"404"}
-                  subTitle={"Xin lỗi, trang bạn truy cập không tồn tại."}
-                />
-              }
-            />
-          </Routes>
-        </BrowserRouter>
-      </NotificationProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route index element={<ClientPage />} />
+          <Route path="api/*" element={<AdminPage />} />
+          <Route path="ms-shop/*" element={<ClientPage />} />
+          <Route
+            path="*"
+            element={
+              <Result
+                status={"404"}
+                title={"404"}
+                subTitle={"Xin lỗi, trang bạn truy cập không tồn tại."}
+              />
+            }
+          />
+        </Routes>
+      </BrowserRouter>
     </>
   );
 }

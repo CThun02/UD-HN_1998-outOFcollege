@@ -1,4 +1,4 @@
-import { Col, Row } from "antd";
+import { Col, Row, Space } from "antd";
 import styles from "./BestSellingProduct.module.css";
 import ProductsList from "../../../element/product-cart/ProductsList";
 
@@ -22,10 +22,13 @@ function BestSellingAndNewProduct({ arrays, title }) {
       <div className={styles.products}>
         <div className={styles.spacing}>
           <Row>
-            <ProductsList />
-            <ProductsList />
-            <ProductsList />
-            <ProductsList />
+            {arrays.map((product) => (
+              <ProductsList
+                span={6}
+                data={product}
+                key={product.productDetailId}
+              />
+            ))}
           </Row>
         </div>
       </div>

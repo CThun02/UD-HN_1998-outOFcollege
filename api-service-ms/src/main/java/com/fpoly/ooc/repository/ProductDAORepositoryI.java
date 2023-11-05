@@ -34,7 +34,7 @@ public interface ProductDAORepositoryI extends JpaRepository<Product, Long> {
             "left join ProductDetail pd on p.id = pd.product.id " +
             "left join BillDetail bd on pd.id = bd.productDetail.id " +
             "group by p.id, p.productName")
-    Page<ProductPromotionResponse> findProductPromotion(Pageable pageable);
+    List<ProductPromotionResponse> findProductPromotion();
 
     @Query("SELECT new java.lang.Long(product.id) " +
             " FROM ProductDetail pd " +

@@ -137,6 +137,7 @@ function Voucher() {
 
           setTotalElements(data.totalElements);
           setVouchers(data.content);
+          console.log("res: ", res);
         } catch (error) {
           console.error(error.message);
         }

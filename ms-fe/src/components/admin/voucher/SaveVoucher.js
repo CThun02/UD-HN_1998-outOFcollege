@@ -109,11 +109,11 @@ const validationSchema = Yup.object().shape({
     function (isCheckSendEmail) {
       const { objectUse } = this.parent;
 
-      if (objectUse === "member" && isCheckSendEmail) {
-        return true;
+      if (objectUse === "member") {
+        return isCheckSendEmail === true;
       }
 
-      return false;
+      return true;
     }
   ),
 });

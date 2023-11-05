@@ -3,11 +3,8 @@ package com.fpoly.ooc.repository;
 import com.fpoly.ooc.entity.Account;
 import com.fpoly.ooc.responce.account.AccountResponce;
 import com.fpoly.ooc.responce.account.AccountVoucher;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -24,6 +21,10 @@ public interface AccountRepository extends JpaRepository<Account, String> {
     @Query("SELECT a FROM Account a where a.role.id=?1 and ((a.fullName like ?2 or ?2 is null) " +
             "or (a.numberPhone like?2 or ?2 is null ))")
     List<Account> getAllAccountByRoleId(Long roleId, String keyword);
+
+    @Query("SELECT a FROM Account a where a.role.id=?1 and " +
+            "(a.numberPhone like ?2 or a.idNo like ?2 or a.email like ?2)")
+    Account getAccountByEmailOrIdNoOrNumberPhone(Long id, String keyWords);
 
     @Query(value = "select email from account " +
             "left join role on account.role_id = role.id " +

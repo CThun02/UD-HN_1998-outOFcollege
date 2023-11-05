@@ -20,8 +20,10 @@ public class BillManagementResponse {
 
     private BigDecimal totalPrice;
 
-    private String fullname;
+    private String fullName;
 
+    private String phoneNumber;
+    
     private LocalDateTime createdDate;
 
     private String billType;
@@ -29,5 +31,11 @@ public class BillManagementResponse {
     private String symbol;
 
     private String status;
+
+    private BigDecimal shipPrice;
+    
+    private BigDecimal priceReduce;
+
+    private String employee;
 
 }

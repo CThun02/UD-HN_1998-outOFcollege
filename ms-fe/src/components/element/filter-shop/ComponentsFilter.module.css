@@ -1,0 +1,38 @@
+.radioGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.radioGroup label {
+  margin-bottom: 16px;
+  font-weight: 400;
+}
+
+.divider {
+  margin: 0;
+  padding: 0;
+}
+
+.content {
+  padding-top: 32px;
+  padding-bottom: 16px;
+}
+
+input[type="checkbox"] {
+  width: 20px !important;
+  height: 20px !important;
+}
+
+.textSize,
+.radioGroup label {
+  font-size: 16px;
+}
+
+.textColor {
+  color: #111111;
+}
+
+.radio {
+  max-height: 170px;
+  overflow-y: scroll;
+}

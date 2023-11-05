@@ -129,6 +129,11 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
     }
 
     @Override
+    public void updateProductDetailsByProductId(Long productId, String status) {
+        repo.updateProductDetailsByProductId(productId, status);
+    }
+
+    @Override
     public Optional<Page<ProductDetailShop>> getAllProductDetailShop(ProductDetailCondition req, Pageable pageable) {
 
         String cateStr = "";

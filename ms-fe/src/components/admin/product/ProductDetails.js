@@ -1,4 +1,5 @@
 import {
+  Badge,
   Button,
   Carousel,
   Col,
@@ -82,33 +83,55 @@ const ProductDetails = (props) => {
       render: (text, record, index) => {
         return (
           <Row>
-            <Col span={4}>
+            <Col span={6}>
               <div
                 style={{
                   marginTop: "10px",
                 }}
               >
-                <Carousel
-                  style={{
-                    width: "100%",
-                  }}
-                  autoplay
-                >
-                  {record.productImageResponse &&
-                    record.productImageResponse.map((item) => {
-                      return (
-                        <img
-                          key={item.id}
-                          style={{ width: "100%", marginTop: "10px" }}
-                          alt=""
-                          src={item.path}
-                        />
-                      );
-                    })}
-                </Carousel>
+                {record.promotionValue !== null ? (
+                  <Badge.Ribbon
+                    text={`Giảm ${record.promotionValue.toLocaleString(
+                      "vi-VN",
+                      {
+                        style: "currency",
+                        currency: "VND",
+                      }
+                    )}`}
+                    color="red"
+                  >
+                    <Carousel autoplay>
+                      {record.productImageResponse &&
+                        record.productImageResponse.map((item) => {
+                          return (
+                            <img
+                              key={item.id}
+                              style={{ width: "100%", marginTop: "10px" }}
+                              alt=""
+                              src={item.path}
+                            />
+                          );
+                        })}
+                    </Carousel>
+                  </Badge.Ribbon>
+                ) : (
+                  <Carousel autoplay>
+                    {record.productImageResponse &&
+                      record.productImageResponse.map((item) => {
+                        return (
+                          <img
+                            key={item.id}
+                            style={{ width: "100%", marginTop: "10px" }}
+                            alt=""
+                            src={item.path}
+                          />
+                        );
+                      })}
+                  </Carousel>
+                )}
               </div>
             </Col>
-            <Col span={20}>
+            <Col span={18}>
               <div
                 className="m-5"
                 style={{
@@ -319,6 +342,7 @@ const ProductDetails = (props) => {
       .then((response) => {
         setProductDetails(response.data);
         setLoading(false);
+        console.log(response.data);
       })
       .catch((error) => {
         console.log(error);

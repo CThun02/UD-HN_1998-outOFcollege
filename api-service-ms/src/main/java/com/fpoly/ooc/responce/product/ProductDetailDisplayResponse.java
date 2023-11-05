@@ -56,5 +56,8 @@ public class ProductDetailDisplayResponse{
         this.quantity = productDetailResponse.getQuantity();
         this.descriptionDetail = productDetailResponse.getDescriptionDetail();
         this.status = productDetailResponse.getStatus();
+        this.promotionMethod = productDetailResponse.getPromotionMethod();
+        this.promotionValue = productDetailResponse.getPromotionValue();
+        this.promotionCondition = productDetailResponse.getPromotionCondition();
     }
 }

@@ -30,8 +30,7 @@ public interface ProductDetailServiceI {
     public BigDecimal getMaxPricePDByProductId(Long productId);
     Optional<List<ProductDetailShop>> getProductDetailBestSelling();
     Optional<List<ProductDetailShop>> getNewProductDetail();
-
+    public void updateProductDetailsByProductId(Long productId, String status);
     Optional<Page<ProductDetailShop>> getAllProductDetailShop(ProductDetailCondition req, Pageable pageable);
-
     Optional<BigDecimal> getPriceMax();
 }

@@ -55,6 +55,10 @@ public class BillController {
         return ResponseEntity.ok(billService.getListCustomer());
     }
 
+    @GetMapping("/getGrossRevenue")
+    public ResponseEntity<?> getGrossRevenue(){
+        return ResponseEntity.ok(billService.getBillRevenue());
+    }
     @GetMapping("/customer/{username}/address")
     public ResponseEntity<?> getListAddressByUserName(@PathVariable("username") String username) {
         return ResponseEntity.ok(billService.getListAddressByUserName(username));

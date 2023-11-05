@@ -13,4 +13,6 @@ public interface ProductImageServiceI {
     public List<ProductImage> getAll();
     public ProductImage getOne(Long id);
     List<ProductImageResponse>  getProductImageByProductDetailId(Long productDetailId);
+
+    List<ProductImageResponse>  getProductImageByProductDetailIds(List<Long> ids);
 }

@@ -1,4 +1,5 @@
-.detailProduct {
+.flexCenter {
+  padding-bottom: 90px;
   display: flex;
   justify-content: center;
 }
@@ -8,7 +9,7 @@
 }
 
 .content {
-  width: 90%;
+  width: 80%;
 }
 
 .row {
@@ -18,4 +19,17 @@
 
 .title {
   padding: 20px 0;
+}
+
+.product {
+  padding-left: 56px;
+}
+
+.spacing {
+  margin: 40px 0;
+}
+
+.description {
+  padding-bottom: 65px;
+  width: 80%;
 }

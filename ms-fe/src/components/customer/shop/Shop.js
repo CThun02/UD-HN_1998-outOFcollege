@@ -1,4 +1,4 @@
-import { Badge, Card, Col, Divider, Rate, Row, Space } from "antd";
+import { Col, Divider, Pagination, Row, Spin } from "antd";
 import styles from "./Shop.module.css";
 import FilterShop from "./filter-shop/FilterShop";
 import ProductsList from "../../element/product-cart/ProductsList";
@@ -7,14 +7,13 @@ import BreadCrumb from "../../element/bread-crumb/BreadCrumb";
 import { Link } from "react-router-dom";
 import SortAndResultSearch from "./sort-and-result/SortAndResultSearch";
 import axios from "axios";
-import numeral from "numeral";
 
 const items = [
   {
-    title: <Link to="/ms-shop/home">Home</Link>,
+    title: <Link to="/ms-shop/home">Trang chủ</Link>,
   },
   {
-    title: "Shop",
+    title: "Cửa hàng",
   },
 ];
 
@@ -33,14 +32,18 @@ function Shop() {
     brands: null,
     colors: null,
     sizes: null,
-    sort: null,
+    sort: "up",
   });
-  // note: filter giá giảm chứ không phải giá sản phẩm
   //page
   const [pageNo, setPageNo] = useState(1);
   const [pageSize, setPageSize] = useState(12);
+  const [totalElements, setTotalElements] = useState(-1);
+
+  //loading
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
+    setIsLoading(true);
     async function getProducts() {
       try {
         const res = await axios.post(
@@ -54,6 +57,8 @@ function Shop() {
         const data = await res.data;
 
         setProducts(data.content);
+        setTotalElements(data.totalElements);
+        setIsLoading(false);
       } catch (err) {
         console.log(err);
       }
@@ -62,46 +67,57 @@ function Shop() {
     getProducts();
   }, [pageNo, pageSize, filter]);
 
-  useEffect(() => {}, []);
-
   return (
-    <div className={styles.shop}>
-      <div className={styles.breadCrumb}>
-        <BreadCrumb title={"Shop"} items={items} />
-      </div>
-
-      <div className={styles.divider}>
-        <div className={styles.dividerSize}>
-          <Divider className={styles.dividerChange} />
+    <Spin
+      tip="Loading..."
+      spinning={isLoading}
+      size="large"
+      style={{ width: "100%" }}
+    >
+      <div className={styles.shop}>
+        <div className={styles.breadCrumb}>
+          <BreadCrumb title={"Shop"} items={items} />
+        </div>
+        <div className={styles.divider}>
+          <div className={styles.dividerSize}>
+            <Divider className={styles.dividerChange} />
+          </div>
+        </div>
+        <div className={styles.content}>
+          <div className={styles.body}>
+            <Row>
+              <Col span={6}>
+                <FilterShop filter={filter} setFilter={setFilter} />
+              </Col>
+              <Col span={18}>
+                <SortAndResultSearch
+                  filter={filter}
+                  setFilter={setFilter}
+                  products={products}
+                />
+                <Row>
+                  {products.map((product) => (
+                    <ProductsList
+                      span={8}
+                      key={product.productDetailId}
+                      data={product}
+                    />
+                  ))}
+                </Row>
+                <Pagination
+                  current={pageNo}
+                  pageSize={pageSize}
+                  pageSizeOptions={[9, 12, 15, 18]}
+                  total={totalElements}
+                  onChange={(e) => setPageNo(e)}
+                  onShowSizeChange={(e, v) => setPageSize(v)}
+                />
+              </Col>
+            </Row>
+          </div>
         </div>
       </div>
-
-      <div className={styles.content}>
-        <div className={styles.body}>
-          <Row>
-            <Col span={6}>
-              <FilterShop filter={filter} setFilter={setFilter} />
-            </Col>
-            <Col span={18}>
-              <SortAndResultSearch
-                filter={filter}
-                setFilter={setFilter}
-                products={products}
-              />
-              <Row>
-                {products.map((product) => (
-                  <ProductsList
-                    span={8}
-                    key={product.productDetailId}
-                    data={product}
-                  />
-                ))}
-              </Row>
-            </Col>
-          </Row>
-        </div>
-      </div>
-    </div>
+    </Spin>
   );
 }
 

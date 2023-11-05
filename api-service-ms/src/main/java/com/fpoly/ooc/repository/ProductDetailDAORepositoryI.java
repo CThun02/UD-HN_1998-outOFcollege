@@ -2,7 +2,9 @@ package com.fpoly.ooc.repository;
 
 import com.fpoly.ooc.entity.*;
 import com.fpoly.ooc.responce.product.ProductDetailResponse;
+import com.fpoly.ooc.responce.productdetail.GetColorAndSizeAndQuantity;
 import com.fpoly.ooc.responce.productdetail.ProductDetailShop;
+import com.fpoly.ooc.responce.productdetail.ProductDetailShopResponse;
 import com.fpoly.ooc.responce.productdetail.ProductsDetailsResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -70,63 +72,104 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
                                                                        String searchText);
 
     @Query("""
-            SELECT NEW
-            com.fpoly.ooc.responce.productdetail.ProductDetailShop(
-            pd.id, c.categoryName, pt.productName, pn.promotionMethod,
-            pn.promotionValue, pd.price, COUNT(bd.id)
-            )
-            FROM ProductDetail pd
-            LEFT JOIN ProductImage pi ON pd.id = pi.productDetail.id
-            LEFT JOIN BillDetail bd ON pd.id = bd.productDetail.id
-            LEFT JOIN Category c ON c.id = pd.category.id
-            LEFT JOIN Product pt ON pt.id = pd.product.id
-            LEFT JOIN PromotionProduct pp ON pd.id = pp.productDetailId.id
-            LEFT JOIN Promotion pn ON pn.id = pp.promotion.id
-            
-            WHERE
-                pd.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
-                AND pi.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
-                AND bd.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
-                AND pp.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
-                AND pn.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
-                AND pt.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
-                AND c.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
-            GROUP BY pd.id, c.categoryName, pt.productName, pn.promotionMethod,
-                     pn.promotionValue, pd.price, pd.createdAt
-            ORDER BY COUNT(bd.id) DESC
-            LIMIT 4
-        """)
+                SELECT NEW
+                com.fpoly.ooc.responce.productdetail.ProductDetailShop(
+                pd.id, pt.id, br.id, category.id, pattern.id, form.id, button.id, material.id,
+                collar.id, sleeve.id, shirtTail.id, c.categoryName, pt.productName, br.brandName, pn.promotionMethod,
+                pn.promotionValue, pd.price, COUNT(bd.id)
+                )
+                FROM ProductDetail pd
+                LEFT JOIN ProductImage pi ON pd.id = pi.productDetail.id
+                LEFT JOIN BillDetail bd ON pd.id = bd.productDetail.id
+                LEFT JOIN Category c ON c.id = pd.category.id
+                LEFT JOIN Product pt ON pt.id = pd.product.id
+                LEFT JOIN PromotionProduct pp ON pd.id = pp.productDetailId.id
+                LEFT JOIN Promotion pn ON pn.id = pp.promotion.id
+                LEFT JOIN Brand br ON br.id = pd.brand.id
+                LEFT JOIN Category category ON category.id = pd.category.id
+                LEFT JOIN Pattern pattern ON pattern.id = pd.pattern.id
+                LEFT JOIN Form form ON form.id = pd.form.id
+                LEFT JOIN ButtonType button ON button.id = pd.button.id
+                LEFT JOIN Material material ON material.id = pd.material.id
+                LEFT JOIN CollarType collar ON collar.id = pd.collar.id
+                LEFT JOIN SleeveType sleeve ON sleeve.id = pd.sleeve.id
+                LEFT JOIN ShirtTailType shirtTail ON shirtTail.id = pd.shirtTail.id
+                
+                WHERE
+                    pd.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                    AND pi.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                    AND bd.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                    AND pp.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                    AND pn.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                    AND pt.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                    AND c.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                    AND br.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                    AND category.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                    AND pattern.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                    AND form.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                    AND button.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                    AND material.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                    AND collar.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                    AND sleeve.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                    AND shirtTail.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                GROUP BY pd.id, pt.id, br.id, category.id, pattern.id, form.id, button.id, material.id,
+                collar.id, sleeve.id, shirtTail.id, c.categoryName, pt.productName, br.brandName,
+                 pn.promotionMethod, pn.promotionValue, pd.price, pd.createdAt
+                ORDER BY COUNT(bd.id) DESC
+                LIMIT 4
+            """)
     List<ProductDetailShop> getProductDetailBestSelling();
 
     @Query("""
-            SELECT NEW
-            com.fpoly.ooc.responce.productdetail.ProductDetailShop(
-            pd.id, c.categoryName, pt.productName, pn.promotionMethod,
-            pn.promotionValue, pd.price, COUNT(bd.id)
-            )
-            FROM ProductDetail pd
-            LEFT JOIN ProductImage pi ON pd.id = pi.productDetail.id
-            LEFT JOIN BillDetail bd ON pd.id = bd.productDetail.id
-            LEFT JOIN Category c ON c.id = pd.category.id
-            LEFT JOIN Product pt ON pt.id = pd.product.id
-            LEFT JOIN PromotionProduct pp ON pd.id = pp.productDetailId.id
-            LEFT JOIN Promotion pn ON pn.id = pp.promotion.id
-            
-            WHERE
-                pd.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
-                AND pi.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
-                AND bd.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
-                AND pp.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
-                AND pn.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
-                AND pt.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
-                AND c.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
-            GROUP BY pd.id, c.categoryName, pt.productName, pn.promotionMethod,
-                     pn.promotionValue, pd.price, pd.createdAt
-            ORDER BY pd.createdAt DESC
-            LIMIT 4
-        """)
+                SELECT NEW
+                com.fpoly.ooc.responce.productdetail.ProductDetailShop(
+                pd.id, pt.id, br.id, category.id, pattern.id, form.id, button.id, material.id,
+                collar.id, sleeve.id, shirtTail.id, c.categoryName, pt.productName, br.brandName,
+                pn.promotionMethod, pn.promotionValue, pd.price, COUNT(bd.id)
+                )
+                FROM ProductDetail pd
+                LEFT JOIN ProductImage pi ON pd.id = pi.productDetail.id
+                LEFT JOIN BillDetail bd ON pd.id = bd.productDetail.id
+                LEFT JOIN Category c ON c.id = pd.category.id
+                LEFT JOIN Product pt ON pt.id = pd.product.id
+                LEFT JOIN PromotionProduct pp ON pd.id = pp.productDetailId.id
+                LEFT JOIN Promotion pn ON pn.id = pp.promotion.id
+                LEFT JOIN Brand br ON br.id = pd.brand.id
+                LEFT JOIN Category category ON category.id = pd.category.id
+                LEFT JOIN Pattern pattern ON pattern.id = pd.pattern.id
+                LEFT JOIN Form form ON form.id = pd.form.id
+                LEFT JOIN ButtonType button ON button.id = pd.button.id
+                LEFT JOIN Material material ON material.id = pd.material.id
+                LEFT JOIN CollarType collar ON collar.id = pd.collar.id
+                LEFT JOIN SleeveType sleeve ON sleeve.id = pd.sleeve.id
+                LEFT JOIN ShirtTailType shirtTail ON shirtTail.id = pd.shirtTail.id
+                
+                WHERE
+                    pd.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                    AND pi.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                    AND bd.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                    AND pp.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                    AND pn.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                    AND pt.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                    AND c.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                    AND br.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                    AND category.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                    AND pattern.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                    AND form.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                    AND button.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                    AND material.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                    AND collar.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                    AND sleeve.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                    AND shirtTail.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                GROUP BY pd.id, pt.id, br.id, category.id, pattern.id, form.id, button.id, material.id,
+                collar.id, sleeve.id, shirtTail.id, c.categoryName, pt.productName, br.brandName,
+                pn.promotionMethod, pn.promotionValue, pd.price, pd.createdAt
+                ORDER BY pd.createdAt DESC
+                LIMIT 4
+            """)
     List<ProductDetailShop> getNewProductDetail();
-    @Query( name = "ProductDetail.getAllProductDetailShop", nativeQuery = true)
+
+    @Query(name = "ProductDetail.getAllProductDetailShop", nativeQuery = true)
     List<ProductDetailShop> getAllProductDetailShop(String productName,
                                                     BigDecimal minPrice,
                                                     BigDecimal maxPrice,
@@ -140,4 +183,109 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
                                                     List<Long> sizes,
                                                     String sort);
 
+    @Query("select new com.fpoly.ooc.responce.productdetail.GetColorAndSizeAndQuantity(" +
+            "min(productDetail.price), max(productDetail.price), sum(productDetail.quantity)) " +
+            "from ProductDetail productDetail " +
+            "left join Product product on productDetail.product.id = product.id " +
+            "left join Color color on productDetail.color.id = color.id " +
+            "left join Size s on productDetail.size.id = s.id " +
+            "left join Brand b on productDetail.brand.id = b.id " +
+            "left join Category cate on productDetail.category.id = cate.id " +
+            "left join Pattern patt on productDetail.pattern.id = patt.id " +
+            "left join Form form on productDetail.form.id = form.id " +
+            "left join ButtonType button on productDetail.button.id = button.id " +
+            "left join Material mate on productDetail.material.id = mate.id " +
+            "left join CollarType collar on productDetail.collar.id = collar.id " +
+            "left join SleeveType sleeve on productDetail.sleeve.id = sleeve.id " +
+            "left join ShirtTailType shirt on productDetail.shirtTail.id = shirt.id " +
+            "where " +
+            "productDetail.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and color.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and s.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and b.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and cate.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and patt.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and form.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and button.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and mate.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and collar.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and sleeve.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and shirt.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and product.id = :productId " +
+            "and (:brandId is null or b.id = :brandId) " +
+            "and (:categoryId is null or cate.id = :categoryId) " +
+            "and (:patternId is null or patt.id = :patternId) " +
+            "and (:formId is null or form.id = :formId) " +
+            "and (:buttonId is null or button.id = :buttonId) " +
+            "and (:materialId is null or mate.id = :materialId) " +
+            "and (:collarId is null or collar.id = :collarId) " +
+            "and (:sleeveId is null or sleeve.id = :sleeveId) " +
+            "and (:shirtId is null or shirt.id = :shirtId) " +
+            "and (:colorId is null or color.id  = :colorId)" +
+            "and (:sizeId is null or s.id = :sizeId) ")
+    GetColorAndSizeAndQuantity findColorAndSize(@Param("productId") Long productId,
+                                                @Param("brandId") Long brandId,
+                                                @Param("categoryId") Long categoryId,
+                                                @Param("patternId") Long patternId,
+                                                @Param("formId") Long formId,
+                                                @Param("buttonId") Long buttonId,
+                                                @Param("materialId") Long materialId,
+                                                @Param("collarId") Long collarId,
+                                                @Param("sleeveId") Long sleeveId,
+                                                @Param("shirtId") Long shirtId,
+                                                @Param("colorId") Long colorId,
+                                                @Param("sizeId") Long sizeId);
+
+    @Query("select new com.fpoly.ooc.responce.productdetail.ProductDetailShopResponse(" +
+            "productDetail.id, product.id, brand.id, category.id, pattern.id, form.id, button.id, " +
+            "material.id, collar.id, sleeve.id, shirtTail.id, product.productName, brand.brandName, " +
+            "category.categoryName, pattern.patternName, form.formName, button.buttonName, " +
+            "material.materialName, collar.collarTypeName, sleeve.sleeveName, shirtTail.shirtTailTypeName, " +
+            "productDetail.weight, productDetail.descriptionDetail, promotion.promotionMethod, promotion.promotionValue) " +
+            "from ProductDetail productDetail " +
+            "left join Product product on product.id = productDetail.product.id " +
+            "left join Brand brand on brand.id = productDetail.brand.id " +
+            "left join Category category on category.id = productDetail.category.id " +
+            "left join Pattern pattern on pattern.id = productDetail.pattern.id " +
+            "left join Form form on form.id = productDetail.form.id " +
+            "left join ButtonType button on button.id = productDetail.button.id " +
+            "left join Material material on material.id = productDetail.material.id " +
+            "left join CollarType collar on collar.id = productDetail.collar.id " +
+            "left join SleeveType sleeve on sleeve.id = productDetail.sleeve.id " +
+            "left join ShirtTailType shirtTail on shirtTail.id = productDetail.shirtTail.id " +
+            "left join PromotionProduct promotionProduct on promotionProduct.productDetailId.id = productDetail.id " +
+            "left join Promotion promotion on promotion.id = promotionProduct.promotion.id " +
+            "where productDetail.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and product.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and brand.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and category.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and pattern.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and form.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and button.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and material.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and collar.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and sleeve.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and shirtTail.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and (promotionProduct.productDetailId.id is null or promotionProduct.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE) " +
+            "and (promotionProduct.productDetailId.id is null or promotion.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE) " +
+            "and product.id = :productId " +
+            "and brand.id = :brandId " +
+            "and category.id = :categoryId " +
+            "and pattern.id = :patternId " +
+            "and form.id = :formId " +
+            "and button.id = :buttonId " +
+            "and material.id = :materialId " +
+            "and collar.id = :collarId " +
+            "and sleeve.id = :sleeveId " +
+            "and shirtTail.id = :shirtId")
+    List<ProductDetailShopResponse> findProductDetailShopResponse(@Param("productId") Long productId,
+                                                            @Param("brandId") Long brandId,
+                                                            @Param("categoryId") Long categoryId,
+                                                            @Param("patternId") Long patternId,
+                                                            @Param("formId") Long formId,
+                                                            @Param("buttonId") Long buttonId,
+                                                            @Param("materialId") Long materialId,
+                                                            @Param("collarId") Long collarId,
+                                                            @Param("sleeveId") Long sleeveId,
+                                                            @Param("shirtId") Long shirtId);
 }

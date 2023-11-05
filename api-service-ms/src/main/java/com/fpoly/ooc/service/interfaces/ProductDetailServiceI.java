@@ -4,9 +4,12 @@ import com.fpoly.ooc.dto.ProductDetailsDTO;
 import com.fpoly.ooc.entity.ProductDetail;
 import com.fpoly.ooc.request.product.ProductDetailCondition;
 import com.fpoly.ooc.request.product.ProductDetailRequest;
+import com.fpoly.ooc.request.productDetail.GetSizeAndColorRequest;
 import com.fpoly.ooc.responce.product.ProductDetailDisplayResponse;
 import com.fpoly.ooc.responce.product.ProductDetailResponse;
+import com.fpoly.ooc.responce.productdetail.GetColorAndSizeAndQuantity;
 import com.fpoly.ooc.responce.productdetail.ProductDetailShop;
+import com.fpoly.ooc.responce.productdetail.ProductDetailShopResponse;
 import com.fpoly.ooc.responce.productdetail.ProductsDetailsResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,4 +37,8 @@ public interface ProductDetailServiceI {
     Optional<Page<ProductDetailShop>> getAllProductDetailShop(ProductDetailCondition req, Pageable pageable);
 
     Optional<BigDecimal> getPriceMax();
+    Optional<GetColorAndSizeAndQuantity> getColorAndSize(GetSizeAndColorRequest req);
+
+    Optional<ProductDetailShopResponse> getProductDetailsShop(GetSizeAndColorRequest req);
+
 }

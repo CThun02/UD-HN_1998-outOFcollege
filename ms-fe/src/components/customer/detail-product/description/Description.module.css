@@ -1,0 +1,55 @@
+.flexContent {
+  display: flex;
+  justify-content: center;
+  padding-bottom: 80px;
+}
+
+.tabs {
+  display: inline-block;
+}
+
+.colorText {
+  color: #a3a3a3;
+}
+
+.sizeText {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.cssHover:hover {
+  cursor: pointer;
+}
+
+.active {
+  transition: 0.3s linear;
+  color: #111111;
+  padding: 6px 0;
+  border-bottom: 2px solid rgb(2, 132, 199);
+}
+
+.cssParagraph {
+  color: #606060;
+  font-size: 1rem;
+  font-weight: 400;
+  transition: 0.3s linear;
+}
+
+.open {
+  opacity: 1;
+}
+
+.hidden {
+  opacity: 0;
+}
+
+.block {
+  display: flex;
+  justify-content: center;
+  width: 80%;
+}
+
+.flexCenter {
+  display: flex;
+  justify-content: center;
+}

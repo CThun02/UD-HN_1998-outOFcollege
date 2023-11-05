@@ -9,14 +9,20 @@ import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.ProductDetailDAORepositoryI;
 import com.fpoly.ooc.request.product.ProductDetailCondition;
 import com.fpoly.ooc.request.product.ProductDetailRequest;
+import com.fpoly.ooc.request.productDetail.GetSizeAndColorRequest;
 import com.fpoly.ooc.responce.product.ProductDetailDisplayResponse;
 import com.fpoly.ooc.responce.product.ProductDetailResponse;
 import com.fpoly.ooc.responce.product.ProductImageResponse;
+import com.fpoly.ooc.responce.productdetail.GetColorAndSizeAndQuantity;
 import com.fpoly.ooc.responce.productdetail.ProductDetailShop;
+import com.fpoly.ooc.responce.productdetail.ProductDetailShopResponse;
 import com.fpoly.ooc.responce.productdetail.ProductsDetailsResponse;
+import com.fpoly.ooc.service.interfaces.ColorServiceI;
 import com.fpoly.ooc.service.interfaces.ProductDetailServiceI;
 import com.fpoly.ooc.service.interfaces.ProductImageServiceI;
+import com.fpoly.ooc.service.interfaces.SizeServiceI;
 import com.fpoly.ooc.util.PageUltil;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -27,16 +33,22 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductDetailServiceImpl implements ProductDetailServiceI {
     private ProductDetailDAORepositoryI repo;
     private ProductImageServiceI productImageService;
+    private ColorServiceI colorServiceI;
+    private SizeServiceI sizeServiceI;
 
     @Autowired
-    public ProductDetailServiceImpl(ProductDetailDAORepositoryI repo, ProductImageServiceI productImageService) {
+    public ProductDetailServiceImpl(ProductDetailDAORepositoryI repo, ProductImageServiceI productImageService,
+                                    ColorServiceI colorServiceI, SizeServiceI sizeServiceI) {
         this.repo = repo;
         this.productImageService = productImageService;
+        this.colorServiceI = colorServiceI;
+        this.sizeServiceI = sizeServiceI;
     }
 
     @Override
@@ -180,6 +192,48 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
         return repo.findAll().stream()
                 .map(ProductDetail::getPrice)
                 .max(BigDecimal::compareTo);
+    }
+
+    @Override
+    public Optional<GetColorAndSizeAndQuantity> getColorAndSize(GetSizeAndColorRequest req) {
+        GetColorAndSizeAndQuantity res = repo.findColorAndSize(req.getProductId(), req.getBrandId(), req.getCategoryId(),
+                req.getPatternId(), req.getFormId(), req.getButtonId(), req.getMaterialId(), req.getCollarId(), req.getSleeveId(),
+                req.getShirtTailId(), req.getColorId(), req.getSizeId());
+
+        if(res == null) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND));
+        }
+
+        Optional<List<Color>> colors = colorServiceI.findColorsByProductId(req);
+        Optional<List<Size>> sizes = sizeServiceI.findSizesByProductId(req);
+
+        if(colors.isEmpty() || sizes.isEmpty()) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND));
+        }
+
+        res.setColors(colors.get());
+        res.setSizes(sizes.get());
+
+        return Optional.of(res);
+    }
+
+    @Override
+    public Optional<ProductDetailShopResponse> getProductDetailsShop(GetSizeAndColorRequest request) {
+        List<ProductDetailShopResponse> res = repo.findProductDetailShopResponse(request.getProductId(), request.getBrandId(), request.getCategoryId(),
+                request.getPatternId(), request.getFormId(), request.getButtonId(), request.getMaterialId(), request.getCollarId(), request.getSleeveId(),
+                request.getShirtTailId());
+        List<Long> productDetailIds = res.stream().map(ProductDetailShopResponse::getProductDetailId).collect(Collectors.toList());
+        List<ProductImageResponse> images = productImageService.getProductImageByProductDetailIds(productDetailIds);
+
+        if (CollectionUtils.isEmpty(res)) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND));
+        }
+
+        ProductDetailShopResponse productDetailShopResponse = res.get(0);
+        GetColorAndSizeAndQuantity colorAndSize = getColorAndSize(request).orElseThrow();
+        productDetailShopResponse.setColorAndSizeAndQuantity(colorAndSize);
+        productDetailShopResponse.setImages(images);
+        return Optional.of(productDetailShopResponse);
     }
 
     @Override

@@ -133,8 +133,13 @@ public class ProductController {
 
 
     @PutMapping("/updateProductStatus")
-    public ResponseEntity<?> updateProductStatus(@RequestParam Long productId, @RequestParam String status) {
+    public ResponseEntity<?> updateProductStatus(@RequestParam Long productId,
+                                                 @RequestParam String status,
+                                                 @RequestParam(defaultValue = "false") Boolean openAll) {
         Product product = service.getOne(productId);
+        if((openAll && status.equals("ACTIVE")) || status.equals("INACTIVE")){
+            productDetailService.updateProductDetailsByProductId(productId, status);
+        }
         product.setStatus(status);
         product.setDeletedAt(null);
         return ResponseEntity.ok(service.update(product));

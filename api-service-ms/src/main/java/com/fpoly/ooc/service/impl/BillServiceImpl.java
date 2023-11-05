@@ -13,20 +13,17 @@ import com.fpoly.ooc.entity.ProductDetail;
 import com.fpoly.ooc.entity.Timeline;
 import com.fpoly.ooc.entity.VoucherHistory;
 import com.fpoly.ooc.exception.NotFoundException;
-import com.fpoly.ooc.repository.AddressRepository;
 import com.fpoly.ooc.repository.BillDetailRepo;
 import com.fpoly.ooc.repository.BillRepo;
 import com.fpoly.ooc.repository.PaymentDetailRepo;
 import com.fpoly.ooc.repository.TimeLineRepo;
 import com.fpoly.ooc.repository.VoucherHistoryRepository;
-import com.fpoly.ooc.request.DeliveryNoteRequest;
 import com.fpoly.ooc.request.bill.BillDetailRequest;
 import com.fpoly.ooc.request.bill.BillRequest;
-import com.fpoly.ooc.request.bill.BillRevenue;
+import com.fpoly.ooc.responce.bill.BillRevenue;
 import com.fpoly.ooc.responce.account.GetListCustomer;
 import com.fpoly.ooc.responce.bill.BillManagementResponse;
 import com.fpoly.ooc.service.interfaces.BillService;
-import com.fpoly.ooc.service.interfaces.DeliveryNoteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -164,6 +161,7 @@ public class BillServiceImpl implements BillService {
     public BillRevenue getBillRevenue() {
         LocalDate currentDate = LocalDate.now();
         LocalDateTime startOfDay = currentDate.atStartOfDay();
-        return billRepo.getBillRevenue(startOfDay);
+        BillRevenue revenue =  billRepo.getBillRevenue(startOfDay);
+        return revenue;
     }
 }

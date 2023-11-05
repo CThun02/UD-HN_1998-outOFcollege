@@ -6,6 +6,7 @@ import {
   PlusOutlined,
   CheckCircleTwoTone,
   DeleteFilled,
+  ReloadOutlined,
 } from "@ant-design/icons";
 import {
   Button,
@@ -38,6 +39,7 @@ import {
   getDownloadURL,
 } from "firebase/storage";
 import { saveImage } from "../../../config/FireBase";
+import ProductOpenActive from "./ProductOpenActive";
 
 var productDetailsUpdate = [];
 const ProductDetails = (props) => {
@@ -1095,6 +1097,18 @@ const ProductDetails = (props) => {
             >
               <EditFilled />
             </Button>
+            <Button
+              onClick={() => {}}
+              className="ms-5"
+              type="primary"
+              size={"large"}
+            >
+              {record.status === "ACTIVE" ? (
+                <DeleteFilled />
+              ) : (
+                <ReloadOutlined />
+              )}
+            </Button>
           </>
         );
       },
@@ -1592,19 +1606,18 @@ const ProductDetails = (props) => {
     };
     let check = isFormInputEmpty(productUpdate);
     if (!check) {
+      setLoadingUpdateProduct(true);
       axios
         .put(api + "product/update", productUpdate)
         .then((res) => {
-          messageApi.loading("Vui lòng chờ!", 2);
-          setTimeout(() => {
-            setRender(Math.random);
-            notification.open({
-              message: "Thông báo",
-              description: "Chỉnh sửa sản phẩm thành công",
-              icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
-            });
-            setEditProduct(false);
-          }, 2000);
+          setLoadingUpdateProduct(false);
+          setRender(Math.random);
+          notification.open({
+            message: "Thông báo",
+            description: "Chỉnh sửa sản phẩm thành công",
+            icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
+          });
+          setEditProduct(false);
         })
         .catch((err) => {
           console.log(err);
@@ -1761,6 +1774,12 @@ const ProductDetails = (props) => {
   ]);
   return (
     <>
+      <ProductOpenActive
+        product={product}
+        render={() => setRender(Math.random())}
+        onCancel={() => {}}
+        open={product?.status === "INACTIVE"}
+      />
       <Spin
         tip="Loading..."
         spinning={loadingUpdateProducts}
@@ -2370,6 +2389,7 @@ const ProductDetails = (props) => {
               columns={columns}
               dataSource={
                 productDetails &&
+                product.status === "ACTIVE" &&
                 productDetails.map((record, index) => ({
                   ...record,
                   key: record.id,

@@ -1,7 +1,7 @@
 import { Checkbox, Divider, Space } from "antd";
 import styles from "./ComponentsFilter.module.css";
 
-function ComponentsFilter({ title, options, setFilter, filter, object, name }) {
+function ComponentsFilter({ title, options, setFilter, filter, name }) {
   return (
     <>
       <Divider className={styles.divider} />

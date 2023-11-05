@@ -1,14 +1,4 @@
-import {
-  Badge,
-  Card,
-  Col,
-  Divider,
-  Pagination,
-  Rate,
-  Row,
-  Space,
-  Spin,
-} from "antd";
+import { Col, Divider, Pagination, Row, Spin } from "antd";
 import styles from "./Shop.module.css";
 import FilterShop from "./filter-shop/FilterShop";
 import ProductsList from "../../element/product-cart/ProductsList";
@@ -17,7 +7,6 @@ import BreadCrumb from "../../element/bread-crumb/BreadCrumb";
 import { Link } from "react-router-dom";
 import SortAndResultSearch from "./sort-and-result/SortAndResultSearch";
 import axios from "axios";
-import numeral from "numeral";
 
 const items = [
   {
@@ -45,7 +34,6 @@ function Shop() {
     sizes: null,
     sort: "up",
   });
-  // note: filter giá giảm chứ không phải giá sản phẩm
   //page
   const [pageNo, setPageNo] = useState(1);
   const [pageSize, setPageSize] = useState(12);

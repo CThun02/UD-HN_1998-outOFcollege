@@ -27,7 +27,8 @@ const baseUrl = "http://localhost:8080/api/admin/product";
 
 function DetailProduct() {
   const { id } = useParams();
-  const decode64 = atob(id);
+  const convertData = id.replace(/---/g, "/");
+  const decode64 = atob(convertData);
   const decodeData = JSON.parse(decode64);
   const [chooseColor, setChooseColor] = useState({});
   const [chooseSize, setChooseSize] = useState({});
@@ -47,7 +48,6 @@ function DetailProduct() {
 
   useEffect(() => {
     async function getProductDetails() {
-      console.log(decodeData);
       try {
         const res = await axios.post(baseUrl + "/details-product", {
           productDetailId: decodeData.productDetailId,

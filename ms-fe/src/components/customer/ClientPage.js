@@ -21,10 +21,10 @@ function ClientPage() {
             <Route path="about" element={<About />} />
             <Route path="shopping">
               <Route index element={<Shop />} />
-              <Route path=":typeCategory">
+              {/* <Route path=":typeCategory">
                 <Route index element={<Shop />} />
                 <Route path="detail/:id" element={<DetailProduct />} />
-              </Route>
+              </Route> */}
               <Route path="detail/:id" element={<DetailProduct />} />
             </Route>
             <Route

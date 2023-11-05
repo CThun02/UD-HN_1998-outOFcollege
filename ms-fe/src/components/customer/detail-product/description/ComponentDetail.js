@@ -3,18 +3,16 @@ import styles from "./ComponentDetail.module.css";
 
 function ComponentDetail({ title, content }) {
   return (
-    <div>
+    <div className={styles.borderBottom}>
       <Row className={styles.rowCss}>
-        <Col span={7}></Col>
-        <Col span={5}>
+        <Col span={12}>
           <p className={`${styles.size} `}>{title}</p>
         </Col>
-        <Col span={5}>
+        <Col span={12}>
           <p className={`${styles.size} ${styles.color} ${styles.fontWeight}`}>
             {content}
           </p>
         </Col>
-        <Col span={7}></Col>
       </Row>
     </div>
   );

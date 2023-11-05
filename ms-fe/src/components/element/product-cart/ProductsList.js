@@ -10,7 +10,7 @@ function ProductsList({ data, span }) {
 
   // const enCodeData = encodeURIComponent(JSON.stringify(data));
   const enCodeData = btoa(JSON.stringify(data));
-
+  const convertPath = enCodeData.replace(/\//g, "---");
   function handleMouseIn() {
     setActive(true);
   }
@@ -52,7 +52,7 @@ function ProductsList({ data, span }) {
           display: isMethod && price ? "" : "none",
         }}
       >
-        <Link to={"/ms-shop/shopping/detail/" + enCodeData}>
+        <Link to={"/ms-shop/shopping/detail/" + convertPath}>
           <Card
             className={`${styles.width} `}
             style={{ width: "270px", border: "none" }}

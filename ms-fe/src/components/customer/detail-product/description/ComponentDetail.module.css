@@ -1,6 +1,6 @@
 .rowCss {
   margin: 0;
-  padding: 0;
+  padding: 10px 0;
 }
 
 .size {
@@ -13,4 +13,8 @@
 
 .fontWeight {
   font-weight: 500;
+}
+
+.borderBottom {
+  border-bottom: 2px solid #ccc;
 }

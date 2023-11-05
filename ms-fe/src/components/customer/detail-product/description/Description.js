@@ -56,7 +56,7 @@ function Description({ productDetail }) {
                 tab === "detailProduct" ? styles.open : styles.hidden
               }`}
             >
-              <div className={styles.flexCenter}>
+              <div>
                 <Space style={{ width: "100%" }} direction="vertical" size={8}>
                   <ComponentDetail
                     title={"Loại cổ áo"}

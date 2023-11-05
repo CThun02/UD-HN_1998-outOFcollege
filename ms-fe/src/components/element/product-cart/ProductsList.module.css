@@ -1,0 +1,115 @@
+.width {
+  width: 270px !important;
+}
+
+.image {
+  height: 360px !important;
+}
+
+.width div:nth-child(2) {
+  width: 100%;
+  height: auto;
+}
+
+.centerd {
+  display: flex;
+  justify-content: center;
+}
+
+.marginBottom {
+  margin-bottom: 20px;
+}
+
+.size {
+  padding: 20px 10px;
+}
+
+.textH2 {
+  font-size: 1rem;
+}
+
+.opacity {
+  opacity: 0.6;
+}
+
+.fontWeight {
+  font-weight: 500;
+}
+
+.bdiSize {
+  font-size: 1rem;
+}
+
+.priceReduce {
+  color: rgba(0, 0, 0, 0.54);
+  font-size: 16px;
+  padding-right: 4px;
+}
+
+.cssHover:hover {
+  cursor: pointer;
+  bottom: 28px;
+  transition: bottom 0.3s ease-out;
+}
+
+.position {
+  position: relative;
+}
+
+.imageSize {
+  width: 100%;
+}
+
+.fixed {
+  width: 270px !important;
+  height: 270px !important;
+}
+
+.fixed:hover {
+  cursor: pointer;
+}
+
+.absoluteCenter {
+  display: flex;
+  justify-content: center;
+}
+
+.cssBtn {
+  border-radius: 30px;
+  margin: 0 2px;
+}
+
+.addToCart {
+  background-color: #00b2ff;
+  color: #fff;
+}
+
+.quickView {
+  background-color: #fff;
+  color: #111111;
+}
+
+.addToCart:hover,
+.quickView:hover {
+  color: #fff !important;
+}
+
+.transition {
+  bottom: -50px;
+  transition: bottom 1s ease-out;
+}
+
+.hidden {
+  display: none;
+}
+
+.absolute {
+  position: absolute;
+  bottom: 28px;
+  transition: bottom 1s ease-out;
+}
+
+.row {
+  margin: 0;
+  padding: 0;
+}

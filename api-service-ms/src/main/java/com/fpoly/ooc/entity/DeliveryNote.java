@@ -41,12 +41,6 @@ public class DeliveryNote extends BaseEntity {
     @JoinColumn(name = "address_id")
     private Address address;
 
-    @Column(name = "name")
-    private String name;
-
-    @Column(name = "number_phone")
-    private String phoneNumber;
-
     @Column(name = "ship_date")
     private LocalDateTime shipDate;
 

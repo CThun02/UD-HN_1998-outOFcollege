@@ -126,22 +126,22 @@ VALUES
 (N'ADMIN', 'ACTIVE', '2023-10-01', '2023-10-01', N'Admin', N'Admin', NULL)
 select * from role
 
-INSERT INTO product (brand_id, category_id, product_code, product_name, description, status, created_at, updated_at, created_by, updated_by, deleted_at)
+INSERT INTO product (product_code, product_name, description, status, created_at, updated_at, created_by, updated_by, deleted_at)
 VALUES
-(1, 1, N'P001', N'Shirt A', N'This is a stylish shirt.', 'ACTIVE', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL),
-(2, 2, N'P002', N'Shirt B', N'This shirt offers great comfort.', 'ACTIVE', '2023-09-15', '2023-09-15', N'Admin', N'Admin', NULL),
-(3, 3, N'P003', N'Pants A', N'These pants are suitable for any occasion.', 'ACTIVE', '2023-10-01', '2023-10-01', N'Admin', N'Admin', NULL),
-(4, 5, N'P004', N'Pants B', N'These pants are made of high-quality fabric.', 'ACTIVE', '2023-09-10', '2023-09-10', N'Admin', N'Admin', NULL),
-(5, 4, N'P005', N'Shoes A', N'These shoes provide excellent support.', 'ACTIVE', '2023-09-20', '2023-09-20', N'Admin', N'Admin', NULL);
+( N'P001', N'Shirt A', N'This is a stylish shirt.', 'ACTIVE', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL),
+( N'P002', N'Shirt B', N'This shirt offers great comfort.', 'ACTIVE', '2023-09-15', '2023-09-15', N'Admin', N'Admin', NULL),
+( N'P003', N'Pants A', N'These pants are suitable for any occasion.', 'ACTIVE', '2023-10-01', '2023-10-01', N'Admin', N'Admin', NULL),
+( N'P004', N'Pants B', N'These pants are made of high-quality fabric.', 'ACTIVE', '2023-09-10', '2023-09-10', N'Admin', N'Admin', NULL),
+( N'P005', N'Shoes A', N'These shoes provide excellent support.', 'ACTIVE', '2023-09-20', '2023-09-20', N'Admin', N'Admin', NULL);
 select * from product
 
 INSERT INTO voucher (voucher_code, voucher_name, start_date, end_date, voucher_value, voucher_value_max, voucher_method, voucher_condition, limit_quantity, status, created_at, updated_at, created_by, updated_by, deleted_at, private)
 VALUES
-('DISCOUNT10', N'Discount 10%', '2023-09-01', '2023-09-30', 10, 100, 'Percentage', 50, 100, 'ACTIVE', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL, 'all'),
-('FREESHIP', N'Free Shipping', '2023-09-15', '2023-09-30', 0, NULL, 'Fixed', 0, 50, 'ACTIVE', '2023-09-15', '2023-09-15', N'Admin', N'Admin', NULL, 'member'),
-('FLASH20', N'Flash Sale 20%', '2023-09-10', '2023-09-12', 20, 50, 'Percentage', 100, 200, 'ACTIVE', '2023-09-10', '2023-09-10', N'Admin', N'Admin', NULL, 'all'),
-('NEWCUST10', N'New Customer Discount', '2023-09-01', '2023-12-31', 10, 100, 'Percentage', 0, NULL, 'ACTIVE', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL, 'member'),
-('HOLIDAY25', N'Holiday Special', '2023-12-15', '2024-01-01', 25, 0, 'Fixed', 150, 1000, 'ACTIVE', '2023-12-15', '2023-12-15', N'Admin', N'Admin', NULL, 'member');
+('DISCOUNT10', N'Discount 10%', '2023-09-01', '2023-09-30', 10, 100, '%', 50, 100, 'ACTIVE', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL, 'all'),
+('FREESHIP', N'Free Shipping', '2023-09-15', '2023-09-30', 0, NULL, 'vnd', 0, 50, 'ACTIVE', '2023-09-15', '2023-09-15', N'Admin', N'Admin', NULL, 'member'),
+('FLASH20', N'Flash Sale 20%', '2023-09-10', '2023-09-12', 20, 50, '%', 100, 200, 'ACTIVE', '2023-09-10', '2023-09-10', N'Admin', N'Admin', NULL, 'all'),
+('NEWCUST10', N'New Customer Discount', '2023-09-01', '2023-12-31', 10, 100, '%', 0, NULL, 'ACTIVE', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL, 'member'),
+('HOLIDAY25', N'Holiday Special', '2023-12-15', '2024-01-01', 25, 0, 'vnd', 150, 1000, 'ACTIVE', '2023-12-15', '2023-12-15', N'Admin', N'Admin', NULL, 'member');
 select * from voucher
 
 INSERT INTO account (username, role_id, full_name, dob, gender, phone_number, email, id_no, password, status, created_at, updated_at, created_by, updated_by, deleted_at)
@@ -242,13 +242,13 @@ VALUES
 (5, 'VOUCHER005', 0.00, 'Not Applied', '2023-09-15', '2023-09-15', N'Admin', N'Admin', NULL);
 select * from voucher_history
 
-INSERT INTO product_detail (product_id, button_id, pattern_id, form_id, material_id, collar_id, sleeve_id, size_id, color_id, shirt_tail_id, price, quantity, description_detail, status, created_at, updated_at, created_by, updated_by, deleted_at)
+INSERT INTO product_detail (product_id, brand_id, category_id, button_id, pattern_id, form_id, material_id, collar_id, sleeve_id, size_id, color_id, shirt_tail_id, price, weight, quantity, description_detail, status, created_at, updated_at, created_by, updated_by, deleted_at)
 VALUES 
-(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 50.00, 10, N'Soft and comfortable fabric', 'ACTIVE', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL),
-(2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 75.00, 15, N'Stylish and trendy design', 'ACTIVE', '2023-09-05', '2023-09-05', N'Admin', N'Admin', NULL),
-(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 100.00, 20, N'High-quality material', 'ACTIVE', '2023-09-10', '2023-09-10', N'Admin', N'Admin', NULL),
-(4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 60.00, 12, N'Classic and elegant design', 'ACTIVE', '2023-09-12', '2023-09-12', N'Admin', N'Admin', NULL),
-(5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 90.00, 8, N'Various color options available', 'ACTIVE', '2023-09-15', '2023-09-15', N'Admin', N'Admin', NULL);
+(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 50.00, 300, 10, N'Soft and comfortable fabric', 'ACTIVE', '2023-09-01', '2023-09-01', N'Admin', N'Admin', NULL),
+(2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 75.00, 300, 15, N'Stylish and trendy design', 'ACTIVE', '2023-09-05', '2023-09-05', N'Admin', N'Admin', NULL),
+(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 100.00, 300, 20, N'High-quality material', 'ACTIVE', '2023-09-10', '2023-09-10', N'Admin', N'Admin', NULL),
+(4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 60.00, 300, 12, N'Classic and elegant design', 'ACTIVE', '2023-09-12', '2023-09-12', N'Admin', N'Admin', NULL),
+(5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 90.00, 300, 8, N'Various color options available', 'ACTIVE', '2023-09-15', '2023-09-15', N'Admin', N'Admin', NULL);
 select * from product_detail
 
 INSERT INTO promotion_product_detail (promotion_id, product_detail_id, percent_reduce, money_after, status, created_at, updated_at, created_by, updated_by, deleted_at)

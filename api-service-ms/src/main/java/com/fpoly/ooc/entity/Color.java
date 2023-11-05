@@ -14,6 +14,7 @@ import java.util.Date;
 @Builder
 public class Color extends BaseEntity{
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 

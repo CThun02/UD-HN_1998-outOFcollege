@@ -14,22 +14,14 @@ public class ProductRequest{
     private String productName;
     @JsonProperty("productCode")
     private String productCode;
-    @JsonProperty("brandId")
-    private Long brandId;
-    @JsonProperty("categoryId")
-    private Long categoryId;
     @JsonProperty("description")
     private String description;
-    @JsonProperty("imgDefault")
-    private String imgDefault;
     @JsonProperty("status")
     private String status;
 
     public Product dto(){
         Product product = Product.builder().id(id).productCode(productCode).productName(productName)
-                .brand(Brand.builder().id(brandId).build())
-                .category(Category.builder().id(categoryId).build())
-                .description(description).imgDefault((imgDefault)).build();
+                .description(description).build();
         product.setStatus(status);
         return product;
     }

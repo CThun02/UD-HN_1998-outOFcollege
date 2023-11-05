@@ -73,11 +73,6 @@ public class ProductServiceImpl implements ProductServiceI {
     }
 
     @Override
-    public List<ProductTableResponse> getProductsTable(String status1, String status2) {
-        return repo.getProductsTable(status1, status2);
-    }
-
-    @Override
     public ProductTableResponse getProductEdit(Long id) {
         return null;
     }
@@ -88,18 +83,13 @@ public class ProductServiceImpl implements ProductServiceI {
     }
 
     @Override
-    public List<ProductTableResponse> getProductFilterByCom(Long brandId, Long categoryId, String status) {
-        return repo.getProductFilterByCom(brandId, categoryId, status);
+    public List<ProductTableResponse> getProductFilterByCom(String status, String keywords) {
+        return repo.getProductFilterByCom(status, keywords);
     }
 
     @Override
-    public List<ProductTableResponse> getProductCreateDetail(String status) {
-        return repo.getProductCreateDetail(status);
-    }
-
-    @Override
-    public Page<ProductPromotionResponse> findProductPromotion(Pageable pageable) {
-        return repo.findProductPromotion(pageable);
+    public List<ProductPromotionResponse> findProductPromotion() {
+        return repo.findProductPromotion();
     }
 
     @Override

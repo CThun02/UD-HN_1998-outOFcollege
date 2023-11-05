@@ -16,8 +16,6 @@ public class ProductPromotionResponse {
 
     private String productName;
 
-    private String imageDefault;
-
     private Long sellQuantity;
 
     private BigDecimal minPrice;

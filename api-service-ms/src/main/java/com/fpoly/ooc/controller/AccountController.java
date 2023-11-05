@@ -40,8 +40,8 @@ public class AccountController {
     }
 
     @GetMapping("/viewAll")
-    public ResponseEntity<?> getAllByRoleid(@RequestParam Long roleId) {
-        return ResponseEntity.ok(service.getAllByRoleid(roleId));
+    public ResponseEntity<?> getAllByRoleid(@RequestParam Long roleId, @RequestParam String keyword) {
+        return ResponseEntity.ok(service.getAllByRoleid(roleId, keyword.equals("")?null:keyword));
     }
 
     @GetMapping("address-detail/{username}")
@@ -95,8 +95,9 @@ public class AccountController {
     }
 
     @GetMapping("/getAllCustomer")
-    public ResponseEntity<?> getAllCustomer(){
-        return ResponseEntity.ok(service.getAllCustomer());
+    public ResponseEntity<?> getAllCustomer(@RequestParam() String keyword) {
+        return ResponseEntity.ok(service.getAllCustomer(keyword.equals("All")
+                ? null : keyword));
     }
 
 }

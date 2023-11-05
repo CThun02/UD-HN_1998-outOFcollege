@@ -21,8 +21,6 @@ public class CartResponse {
 
     private Long productDetailId;
 
-    private String imgDefault;
-
     private String productName;
 
     private String sizeName;

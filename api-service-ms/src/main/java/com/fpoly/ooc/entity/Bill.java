@@ -39,6 +39,9 @@ public class Bill extends BaseEntity {
     @Column(name = "bill_code")
     private String billCode;
 
+    @Column(name = "transaction_code")
+    private String transactionCode;
+
     @Column(name = "date_of_receipt")
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime dateOfReceipt;
@@ -53,11 +56,20 @@ public class Bill extends BaseEntity {
     @Column(name = "price_reduce")
     private BigDecimal priceReduce;
 
+    @Column(name = "amount_paid")
+    private BigDecimal amountPaid;
+
     @Column(name = "bill_type")
     private String billType;
 
+    @Column(name = "symbol")
+    private String symbol;
+
     @Column(name = "note")
     private String note;
+
+    @Column(name = "created_by")
+    private String createdBy;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id", referencedColumnName = "username")

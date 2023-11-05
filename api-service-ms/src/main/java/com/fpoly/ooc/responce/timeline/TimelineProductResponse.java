@@ -11,8 +11,6 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class TimelineProductResponse {
 
-    private String imgDefault;
-
     private String productName;
 
     private Integer quantity;
@@ -33,4 +31,9 @@ public class TimelineProductResponse {
 
     private String productShirtTail;
 
+    private String productColorName;
+
+    private String productFormName;
+
+    private String productPatternName;
 }

@@ -10,8 +10,8 @@ function SockJs({ setValues, connectTo }) {
   const [connected, setConnected] = useState(false);
 
   const connect = () => {
-    const sock = new SockJS(SOCKET_URL);
-    const temp = over(sock);
+    let sock = new SockJS(SOCKET_URL);
+    let temp = over(sock);
     setStompClient(temp);
 
     temp.connect({}, onConnect, onError);
@@ -26,12 +26,16 @@ function SockJs({ setValues, connectTo }) {
   };
 
   const onMessageReceived = (msg) => {
-    console.log("New Message Received!!");
-    setValues(JSON.parse(msg.body));
+    console.log("New Message Received!!", msg);
+    if (msg.body) {
+      console.log("New Message Received If!!", msg.body);
+
+      setValues(JSON.parse(msg.body));
+    }
   };
 
   useEffect(function () {
-    if (connected && stompClient.connected) {
+    if (connected && stompClient?.connected) {
       const subcription = stompClient.subscribe(
         "/topic/" + connectTo,
         onMessageReceived
@@ -44,8 +48,8 @@ function SockJs({ setValues, connectTo }) {
   });
 
   useEffect(() => {
-    connect();
-  }, []);
+    return () => connect();
+  }, [Math.random]);
 }
 
 export default SockJs;

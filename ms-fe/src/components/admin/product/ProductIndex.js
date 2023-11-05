@@ -6,28 +6,20 @@ import {
   SearchOutlined,
   TableOutlined,
 } from "@ant-design/icons";
-import { Col, Row, Select, Table, Button, Switch, Radio, message } from "antd";
+import { Col, Row, Table, Button, Switch, Radio, message } from "antd";
 import React, { useEffect, useState } from "react";
 import styles from "./ProductIndex.module.css";
 import axios from "axios";
 import Input from "antd/es/input/Input";
 import { Link } from "react-router-dom";
 
-var brand = "";
-var category = "";
-var pattern = "";
-var form = "";
-var status = "ALL";
 const ProductIndex = () => {
   const api = "http://localhost:8080/api/admin/";
   const [messageApi, contextHolder] = message.useMessage();
-  const [brands, setBrands] = useState(null);
-  const [categories, setCategories] = useState(null);
-  const [patterns, setPatterns] = useState(null);
-  const [forms, setForms] = useState(null);
   const [productsTable, setProductsTable] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [render, setRendering] = useState(null);
+  const [status, setStatus] = useState(null);
+  const [keywords, setKeywords] = useState(null);
 
   const columns = [
     {
@@ -48,35 +40,16 @@ const ProductIndex = () => {
       key: "3",
       title: "Tên sản phẩm",
       dataIndex: "productName",
-      width: 300,
     },
     {
       key: "4",
-      title: "Loại sản phẩm",
-      dataIndex: "category",
-      render: (category) => {
-        return category.categoryName;
-      },
-    },
-    {
-      key: "5",
-      title: "Thương hiệu",
-      dataIndex: "brand",
-      render: (brand) => {
-        return brand.brandName;
-      },
-    },
-    {
-      key: "5",
       title: "Số lượng",
       dataIndex: "quantity",
-      width: 150,
     },
     {
-      key: "6",
+      key: "5",
       title: "Trạng thái",
       dataIndex: "status",
-      width: 150,
       render: (status, record) => (
         <>
           <Switch
@@ -89,20 +62,14 @@ const ProductIndex = () => {
       ),
     },
     {
-      key: "7",
+      key: "6",
       title: "Thao tác",
       dataIndex: "id",
-      width: 150,
       render: (id) => (
         <>
-          <Link to={`/admin/product/details/${id}`}>
+          <Link to={`/api/admin/product/details/${id}`}>
             <Button className={styles.product__button}>
               <EyeFilled />
-            </Button>
-          </Link>{" "}
-          <Link to={`/admin/product/update-details/${id}`}>
-            <Button className={styles.product__button}>
-              <EditFilled />
             </Button>
           </Link>
         </>
@@ -115,16 +82,10 @@ const ProductIndex = () => {
     axios
       .get(
         api +
-          "product/filterByCom?brandId=" +
-          brand +
-          "&categoryId=" +
-          category +
-          "&patternId=" +
-          pattern +
-          "&formId=" +
-          form +
-          "&status=" +
-          status
+          "product/getproductfilterByCom?status=" +
+          status +
+          "&keywords=" +
+          keywords
       )
       .then((res) => {
         setProductsTable(res.data);
@@ -164,39 +125,8 @@ const ProductIndex = () => {
   useEffect(() => {
     setLoading(true);
     filterProductByCom();
-    axios
-      .get(api + "brand")
-      .then((response) => {
-        setBrands(response.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-    axios
-      .get(api + "category")
-      .then((response) => {
-        setCategories(response.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-    axios
-      .get(api + "pattern")
-      .then((response) => {
-        setPatterns(response.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-    axios
-      .get(api + "form")
-      .then((response) => {
-        setForms(response.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, [render]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status, keywords]);
   return (
     <>
       {contextHolder}
@@ -213,13 +143,12 @@ const ProductIndex = () => {
                 </span>
 
                 <Radio.Group
-                  defaultValue={"ALL"}
+                  defaultValue={"null"}
                   onFocus={(event) => {
-                    status = event.target.value;
-                    filterProductByCom();
+                    setStatus(event.target.value);
                   }}
                 >
-                  <Radio value={"ALL"}>Tất cả</Radio>
+                  <Radio value={"null"}>Tất cả</Radio>
                   <Radio value={"ACTIVE"}>Đang kinh doanh</Radio>
                   <Radio value={"INACTIVE"}>Ngừng kinh doanh</Radio>
                 </Radio.Group>
@@ -231,6 +160,13 @@ const ProductIndex = () => {
                 className={styles.filter_inputSearch}
                 placeholder="Nhập mã, tên sản phẩm"
                 prefix={<SearchOutlined />}
+                onChange={(event) => {
+                  setKeywords(
+                    event.target.value.trim() === ""
+                      ? "null"
+                      : event.target.value
+                  );
+                }}
               />
             </Col>
           </Row>
@@ -241,14 +177,13 @@ const ProductIndex = () => {
           </h2>
           <Row className={styles.filter__search}>
             <Col span={24}>
-              <Link to={"/admin/product/create-details"}>
+              <Link to={"/api/admin/product/create-details"}>
                 <Button className={styles.product_tableButtonCreate}>
                   <PlusOutlined />
                 </Button>
               </Link>
             </Col>
           </Row>
-          <br />
           <div className={styles.product__tableProducts}>
             <Table
               columns={columns}

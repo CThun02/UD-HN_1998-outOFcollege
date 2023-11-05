@@ -1,4 +1,4 @@
-﻿﻿use master
+﻿use master
 
 create database DATN_DB_MS
 
@@ -50,11 +50,8 @@ CREATE TABLE form(
 
 CREATE TABLE product(
     id                  BIGINT IDENTITY PRIMARY KEY,
-    brand_id            BIGINT FOREIGN KEY(brand_id) REFERENCES brand(id),
-    category_id         BIGINT FOREIGN KEY(category_id) REFERENCES category(id),
     product_code        NVARCHAR(50),
     product_name        NVARCHAR(50),
-    img_default         VARCHAR(MAX),
     description         NVARCHAR(100),
     status              VARCHAR(50),
     created_at          DATETIME,
@@ -146,6 +143,8 @@ CREATE TABLE size(
 CREATE TABLE product_detail(
     id                  BIGINT IDENTITY PRIMARY KEY,
     product_id          BIGINT FOREIGN KEY(product_id) REFERENCES product(id),
+	brand_id            BIGINT FOREIGN KEY(brand_id) REFERENCES brand(id),
+    category_id         BIGINT FOREIGN KEY(category_id) REFERENCES category(id),
 	pattern_id          BIGINT FOREIGN KEY(pattern_id) REFERENCES pattern(id),
     form_id             BIGINT FOREIGN KEY(form_id) REFERENCES form(id),
     button_id           BIGINT FOREIGN KEY(button_id) REFERENCES button_type(id),
@@ -156,6 +155,7 @@ CREATE TABLE product_detail(
     color_id            BIGINT FOREIGN KEY(color_id) REFERENCES color(id),
     shirt_tail_id       BIGINT FOREIGN KEY(shirt_tail_id) REFERENCES shirt_tail_type(id),
     price               DECIMAL,
+	weight				FLOAT,
     quantity            INT,
     description_detail  NVARCHAR(MAX),
     status              VARCHAR(50),
@@ -169,9 +169,10 @@ CREATE TABLE product_detail(
 
 CREATE TABLE product_image(
     id                  BIGINT IDENTITY PRIMARY KEY,
-    product_detail_id   BIGINT FOREIGN KEY(product_detail_id) REFERENCES product_detail(id) ,
+    product_detail_id	BIGINT FOREIGN KEY(product_detail_id) REFERENCES product_detail(id) ,
     path                VARCHAR(MAX),
     status              VARCHAR(50),
+	is_default			BIT,
     created_at          DATETIME,
     updated_at          DATETIME,
     created_by          NVARCHAR(50),
@@ -277,12 +278,15 @@ CREATE TABLE address_detail(
 CREATE TABLE bill(
     id                  BIGINT IDENTITY PRIMARY KEY,
     bill_code           VARCHAR(20) UNIQUE,
+    transaction_code    VARCHAR(255), 
     account_id          VARCHAR(100) FOREIGN KEY(account_id) REFERENCES account(username),
     date_of_receipt     DATETIME,
     completion_date     DATETIME,
     price               DECIMAL,
     price_reduce        DECIMAL,
+    amount_paid         DECIMAL,
     bill_type           VARCHAR(50),
+    symbol              VARCHAR(50),
     note                NVARCHAR(MAX),
     status              VARCHAR(50),
     created_at          DATETIME,

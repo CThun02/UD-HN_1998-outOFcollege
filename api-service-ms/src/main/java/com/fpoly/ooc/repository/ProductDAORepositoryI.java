@@ -13,50 +13,28 @@ import java.util.List;
 
 @Repository
 public interface ProductDAORepositoryI extends JpaRepository<Product, Long> {
-    @Query("Select o.id as id, o.productCode as productCode, o.productName as productName, o.status as status, " +
-            "o.imgDefault as imgDefault, o.brand as brand, o.category as category," +
-            "o.description as description, " +
+    @Query("Select o.id as id, o.productCode as productCode, o.productName as productName," +
+            " o.status as status, o.description as description, " +
             "count(od) as quantity from Product o left join ProductDetail od on " +
-            "od.product.id = o.id WHERE (o.brand.id = ?1 OR ?1 IS NULL)" +
-            " AND (o.category.id = ?2 OR ?2 IS NULL)" +
-            " AND (o.status=?3 or ?3 is NULL)" +
-            "group by o.id, o.productName, o.status, o.imgDefault, o.brand, o.category," +
+            "od.product.id = o.id WHERE (o.status=?1 or ?1 is NULL) and (o.productCode like ?2" +
+            " or o.productName like ?2 or ?2 is NULL)" +
+            "group by o.id, o.productName, o.status, " +
             "o.description, o.productCode, o.createdAt  " +
             "order by o.createdAt desc ")
-    public List<ProductTableResponse> getProductFilterByCom(Long brandId, Long categoryId, String status);
+    public List<ProductTableResponse> getProductFilterByCom(String status, String keywords);
 
-    @Query("Select o.id as id, o.productCode as productCode, o.productName as productName, o.status as status, " +
-            "o.imgDefault as imgDefault, o.brand as brand, o.category as category," +
-            "o.description as description, " +
-            "count(od) as quantity from Product o left join ProductDetail od on " +
-            "od.product.id = o.id where o.status=?1 or o.status =?2" +
-           " group by o.id, o.productName, o.status, o.imgDefault, o.brand, o.category," +
-            "o.description, o.productCode, o.createdAt  " +
-            "order by o.createdAt desc ")
-    public List<ProductTableResponse> getProductsTable(String status1, String status2);
-
-    @Query("Select o.id as id, o.productCode as productCode, o.productName as productName, o.status as status, " +
-            "o.imgDefault as imgDefault, o.brand as brand, o.category as category," +
-            "o.description as description, " +
-            "count(od) as quantity from Product o left join ProductDetail od on " +
-            "od.product.id = o.id where (o.status=?1 or ?1 is null)" +
-            " group by o.id, o.productName, o.status, o.imgDefault, o.brand, o.category," +
-            " o.description, o.productCode")
-    public List<ProductTableResponse> getProductCreateDetail(String status);
-
-    @Query("Select o.id as id, o.productCode as productCode, o.productName as productName, o.brand as brand" +
-            ",o.category as category, o.status as status, " +
-            "o.imgDefault as imgDefault, o.description as description from Product o where o.id=?1")
+    @Query("Select o.id as id, o.productCode as productCode, o.productName as productName" +
+            ", o.status as status, o.description as description from Product o where o.id=?1")
     public ProductResponse getProductResponseById(Long id);
     public Product findFirstByProductCode(String productCode);
 
     @Query("select new com.fpoly.ooc.responce.product.ProductPromotionResponse(" +
-            "p.id, p.productName, p.imgDefault, sum(bd.quantity), min(pd.price), max(pd.price), sum(pd.quantity)) " +
-            "from Product p " +
+            "p.id, p.productName, sum(bd.quantity), min(pd.price), max(pd.price), " +
+            "sum(pd.quantity)) from Product p " +
             "left join ProductDetail pd on p.id = pd.product.id " +
             "left join BillDetail bd on pd.id = bd.productDetail.id " +
-            "group by p.id, p.productName, p.imgDefault")
-    Page<ProductPromotionResponse> findProductPromotion(Pageable pageable);
+            "group by p.id, p.productName")
+    List<ProductPromotionResponse> findProductPromotion();
 
     @Query("SELECT new java.lang.Long(product.id) " +
             " FROM ProductDetail pd " +

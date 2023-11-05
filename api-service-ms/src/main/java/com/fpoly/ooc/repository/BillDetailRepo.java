@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public interface BillDetailRepo extends JpaRepository<BillDetail, Long> {
 
-    @Query("SELECT new com.fpoly.ooc.responce.bill.BillResponse(b.id, bd.id, p.id, p.imgDefault , bd.quantity, " +
+    @Query("SELECT new com.fpoly.ooc.responce.bill.BillResponse(b.id, bd.id, p.id , bd.quantity, " +
             "p.productName, b.price, bd.status, bd.createdAt) " +
             "FROM BillDetail bd " +
             "JOIN bd.bill b " +

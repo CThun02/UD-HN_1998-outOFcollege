@@ -17,11 +17,22 @@
   margin: 5px 5px;
 }
 
-tr > th {
+.ms-5 {
+  margin-left: 5px;
+}
+
+.me-5 {
+  margin-right: 5px;
+}
+
+thead > tr > th,
+thead > tr > td {
   background-color: #337ccf !important;
   color: #fff !important;
 }
 
+.ant-table-row-expand-icon-cell {
+}
 .ant-table-row {
   border: 1px solid #d0f1ff !important;
 }

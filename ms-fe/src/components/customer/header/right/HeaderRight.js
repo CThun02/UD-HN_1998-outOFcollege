@@ -32,7 +32,7 @@ function HeaderRight() {
               <Col span={7}>
                 <p className={styles.cssParagraph}>$0.00</p>
                 <Badge count={5}>
-                  <Link className={styles.link}>
+                  <Link to={'/ms-shop/cart'} className={styles.link}>
                     <ShoppingCartOutlined className={styles.iconSize} />
                   </Link>
                 </Badge>

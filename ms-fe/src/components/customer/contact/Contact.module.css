@@ -14,7 +14,7 @@
 .boxContentChild {
   border: 1px solid gray;
   height: 150px;
-  width: 300px;
+  width: 330px;
   display: flex;
   flex-direction: column;
   justify-content: center;

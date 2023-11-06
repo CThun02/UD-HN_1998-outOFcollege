@@ -8,6 +8,8 @@ import moment from 'moment/moment'
 import numeral from 'numeral'
 import TextArea from 'antd/es/input/TextArea'
 import FloatingLabels from '../../element/FloatingLabels/FloatingLabels'
+import * as yup from 'yup';
+
 
 const Checkout = () => {
     const [provinces, setProvinces] = useState([])
@@ -18,12 +20,14 @@ const Checkout = () => {
     const [selectedWard, setSelectedWard] = useState('')
     const [leadtime, setLeadtime] = useState(null)
     const [shippingFee, setShippingFee] = useState(null)
-
+    const [error, setError] = useState({})
 
     const handleProvincesChange = (e) => {
         formData.city = e
         formData.district = ''
         formData.ward = ''
+        setDistricts([])
+        setWards([])
         fetchDistrict(e)
         setSelectedDistrict(null)
         setSelectedWard(null)
@@ -34,6 +38,7 @@ const Checkout = () => {
     const handleDistrictChange = (e) => {
         formData.district = e
         formData.ward = ''
+        setWards([])
         setSelectedDistrict(e)
         fetchWard(e)
         setSelectedWard(null)
@@ -69,8 +74,7 @@ const Checkout = () => {
                         headers: {
                             token: "0f082cbe-5110-11ee-a59f-a260851ba65c",
                         },
-                    }
-                )
+                    })
                 .then((response) => {
                     setDistricts(response.data.data);
                 })
@@ -135,9 +139,9 @@ const Checkout = () => {
     };
 
     const handleShippingFee = (insuranceValue, toDistrictId, toWardCode) => {
-        console.log(toDistrictId, toWardCode)
+        let service_id = 53321
         const values = {
-            service_id: 53321,
+            service_id: service_id,
             insurance_value: insuranceValue,
             coupon: null,
             from_district_id: 3440,
@@ -165,12 +169,33 @@ const Checkout = () => {
                     setShippingFee(response.data.data.total);
                 })
                 .catch((error) => {
-                    console.log(error);
+                    console.log("Lỗi khi gọi API lần 1:", error);
+                    service_id = 53322;
+                    values.service_id = service_id;
+                    axios
+                        .post(
+                            "https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee",
+                            values,
+                            {
+                                headers: {
+                                    token: "0f082cbe-5110-11ee-a59f-a260851ba65c",
+                                    shop_id: "4534109",
+                                },
+                            }
+                        )
+                        .then((response) => {
+                            setShippingFee(response.data.data.total);
+                        })
+                        .catch((err) => {
+                            console.log(values)
+                            console.log("Lỗi khi gọi API lần 2:", err);
+                        });
                 });
         }
     };
 
     useEffect(() => {
+        window.scrollTo(0, 0);
         fetchProvince();
         fetchDistrict();
         fetchWard();
@@ -178,15 +203,43 @@ const Checkout = () => {
         handleShippingFee(100, selectedDistrict, selectedWard);
     }, [selectedDistrict, selectedWard])
 
+    const generateRandomBillCode = () => {
+        let result = "";
+        const characters = "ABCDEF0123456789";
+
+        for (let i = 0; i < 6; i++) {
+            const randomIndex = Math.floor(Math.random() * characters.length);
+            result += characters.charAt(randomIndex);
+        }
+
+        return "HD_" + result;
+    }
+
     const [formData, setFormData] = useState({
-        fullname: '',
+        bill_code: generateRandomBillCode(),
+        billType: 'Online',
+        paymentDetailId: 1,
+        price: 0,
+        priceReduce: 0,
+        fullName: '',
         phoneNumber: '',
         city: '',
         district: '',
         ward: '',
         addressDetail: '',
         note: '',
-        payment: 1
+        lstBillDetailRequest: [],
+    })
+
+    const validate = yup.object().shape({
+        fullName: yup.string().required('Tên không được để trống'),
+        phoneNumber: yup.string()
+            .required('Số điện thoại không được để trống')
+            .matches(/^0\d{9}$/,
+                'Số điện thoại phải bắt đầu bằng số 0 và có đúng 10 chữ số'),
+        city: yup.string().required('Thành phố không được để trống'),
+        district: yup.string().required('Quận huyện không được để trống'),
+        ward: yup.string().required('Phường xã không được để trống'),
     })
 
     const handleChange = (e) => {
@@ -197,12 +250,19 @@ const Checkout = () => {
         });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Đây bạn có thể sử dụng biến `formData` để truy cập tất cả thông tin từ biểu mẫu
-        console.log('Thông tin biểu mẫu đã gửi:', formData);
+        try {
+            await validate.validate(formData, { abortEarly: false });
+            setError({})
+        } catch (errors) {
+            const validationErrors = {};
+            errors.inner.forEach((err) => {
+                validationErrors[err.path] = err.message;
+            });
+            setError(validationErrors);
+        }
     };
-
 
     return (
         <div className={styles.wrapper}>
@@ -233,14 +293,15 @@ const Checkout = () => {
                                         <FloatingLabels
                                             label="Họ tên"
                                             zIndex={true}
-                                            value={formData.fullname}
+                                            value={formData.fullName}
                                         >
                                             <Input
                                                 size='large'
-                                                name='fullname'
+                                                name='fullName'
                                                 onChange={handleChange}
                                                 allowClear
                                             />
+                                            {error.fullName && <div className={styles.errorText}>{error.fullName}</div>}
                                         </FloatingLabels>
                                     </Col>
                                     <Col className={styles.mb} span={24}>
@@ -255,6 +316,7 @@ const Checkout = () => {
                                                 onChange={handleChange}
                                                 allowClear
                                             />
+                                            {error.phoneNumber && <div className={styles.errorText}>{error.phoneNumber}</div>}
                                         </FloatingLabels>
                                     </Col>
                                     <Col className={styles.mb} span={24}>
@@ -282,6 +344,7 @@ const Checkout = () => {
                                                     label: province.ProvinceName,
                                                 }))}
                                             />
+                                            {error.city && <div className={styles.errorText}>{error.city}</div>}
                                         </FloatingLabels>
                                     </Col>
                                     <Col className={styles.mb} span={24}>
@@ -309,6 +372,7 @@ const Checkout = () => {
                                                 }))}
                                                 allowClear
                                             />
+                                            {error.district && <div className={styles.errorText}>{error.district}</div>}
                                         </FloatingLabels>
                                     </Col>
                                     <Col className={styles.mb} span={24}>
@@ -336,6 +400,7 @@ const Checkout = () => {
                                                     label: ward.WardName,
                                                 }))}
                                             />
+                                            {error.ward && <div className={styles.errorText}>{error.ward}</div>}
                                         </FloatingLabels>
                                     </Col>
                                     <Col className={styles.mb} span={24}>
@@ -391,11 +456,11 @@ const Checkout = () => {
                                     padding: '10px',
                                     width: '110%'
                                 }}>
-                                    <Radio.Group name='payment' onChange={handleChange} value={formData.payment}>
+                                    <Radio.Group name='paymentDetailId' onChange={handleChange} value={formData.paymentDetailId}>
                                         <Space direction='vertical'>
                                             <Radio value={1} style={{ marginBottom: 15 }}>
                                                 <span style={{ fontWeight: 500 }}>Thanh toán khi nhận hàng</span>
-                                                {formData.payment === 1 && <div>
+                                                {formData.paymentDetailId === 1 && <div>
                                                     Bạn sẽ thanh toán khi nhận được hàng
                                                 </div>}
                                             </Radio>
@@ -403,7 +468,7 @@ const Checkout = () => {
                                                 <span style={{ fontWeight: 500 }}>
                                                     Thanh toán trưc tuyến
                                                 </span>
-                                                {formData.payment === 2 && <div>
+                                                {formData.paymentDetailId === 2 && <div>
                                                     Bạn sẽ thanh toán bằng hình thức chuyển khoản
                                                 </div>}
                                             </Radio>
@@ -414,10 +479,10 @@ const Checkout = () => {
                         </Row>
                     </Col>
                     <Col span={10}>
-                        <div style={{ border: '1px solid rgba(175, 175, 175, .34)', width: 'auto', height: '600px', padding: ' 20px', marginLeft: 40 }}>
+                        <div style={{ border: '1px solid rgba(175, 175, 175, .34)', width: 'auto', height: '700px', padding: ' 20px', marginLeft: 40 }}>
                             <h1 style={{ marginBottom: '10px' }}>Đơn hàng</h1>
                             <hr />
-                            <div style={{ maxHeight: '200px', overflowY: 'auto', }}>
+                            <div style={{ maxHeight: '300px', overflowY: 'auto', }}>
                                 <table>
                                     <thead>
                                         <tr>
@@ -426,112 +491,134 @@ const Checkout = () => {
                                             <th className={styles.visuallyHidden}>Đơn giá</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>
-                                                <div className={styles.productThumbnail}>
-                                                    <div className={styles.productThumbnailWrapper}>
-                                                        <img src="//bizweb.dktcdn.net/thumb/thumb/100/415/697/products/te9180-64ffkovk-1-yrw5-hinh-mat-truoc-0.jpg?v=1692005106000" alt="" className={styles.productThumbnailImage} />
-                                                    </div>
-                                                    <span className={styles.productThumbnailQuantity}>1</span>
+                                    <tbody >
+                                        <Space style={{ width: '100%' }} direction='vertical' size={16}>
+                                            <tr>
+                                                <div style={{ width: '100%' }}>
+                                                    <Space style={{ width: '100%', borderBottom: '1px solid #ccc', padding: '8px 8px 10px 8px' }} direction='horizontal' size={16}>
+                                                        <div className={styles.productThumbnail}>
+                                                            <div className={styles.productThumbnailWrapper}>
+                                                                <img src="//bizweb.dktcdn.net/thumb/thumb/100/415/697/products/te9180-64ffkovk-1-yrw5-hinh-mat-truoc-0.jpg?v=1692005106000" alt="" className={styles.productThumbnailImage} />
+                                                            </div>
+                                                            <span className={styles.productThumbnailQuantity}>1</span>
+                                                        </div>
+                                                        <div>
+                                                            <span >
+                                                                Áo Thun Baby Tee Teelab Local Brand Scarlett BT01012323123
+                                                            </span>
+                                                            <div>
+                                                                <span >
+                                                                    Kem / S
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            135.000đ
+                                                        </div>
+                                                    </Space>
                                                 </div>
-                                            </td>
-                                            <td className={styles.productDescription}>
-                                                <span style={{ display: 'block', textAlign: 'left', fontWeight: '500' }}>
-                                                    Áo Thun Baby Tee Teelab Local Brand Scarlett BT01012323123
-                                                </span>
-                                                <span style={{ display: 'block', textAlign: 'left' }}>
-                                                    Kem / S
-                                                </span>
-                                            </td>
-                                            <td >
-                                                135.000đ
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div className={styles.productThumbnail}>
-                                                    <div className={styles.productThumbnailWrapper}>
-                                                        <img src="//bizweb.dktcdn.net/thumb/thumb/100/415/697/products/te9180-64ffkovk-1-yrw5-hinh-mat-truoc-0.jpg?v=1692005106000" alt="" className={styles.productThumbnailImage} />
-                                                    </div>
-                                                    <span className={styles.productThumbnailQuantity}>1</span>
+                                            </tr>
+                                            <tr>
+                                                <div style={{ width: '100%' }}>
+                                                    <Space style={{ width: '100%', borderBottom: '1px solid #ccc', padding: '8px 8px 12px 8px' }} direction='horizontal' size={16}>
+                                                        <div className={styles.productThumbnail}>
+                                                            <div className={styles.productThumbnailWrapper}>
+                                                                <img src="//bizweb.dktcdn.net/thumb/thumb/100/415/697/products/te9180-64ffkovk-1-yrw5-hinh-mat-truoc-0.jpg?v=1692005106000" alt="" className={styles.productThumbnailImage} />
+                                                            </div>
+                                                            <span className={styles.productThumbnailQuantity}>1</span>
+                                                        </div>
+                                                        <div>
+                                                            <span >
+                                                                Áo Thun Baby Tee Teelab Local Brand Scarlett BT01012323123
+                                                            </span>
+                                                            <div>
+                                                                <span >
+                                                                    Kem / S
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            135.000đ
+                                                        </div>
+                                                    </Space>
                                                 </div>
-                                            </td>
-                                            <td className={styles.productDescription}>
-                                                <span style={{ display: 'block', textAlign: 'left', fontWeight: '500' }}>
-                                                    Áo Thun Baby Tee Teelab Local Brand Scarlett BT01012323123
-                                                </span>
-                                                <span style={{ display: 'block', textAlign: 'left' }}>
-                                                    Kem / S
-                                                </span>
-                                            </td>
-                                            <td >
-                                                135.000đ
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div className={styles.productThumbnail}>
-                                                    <div className={styles.productThumbnailWrapper}>
-                                                        <img src="//bizweb.dktcdn.net/thumb/thumb/100/415/697/products/te9180-64ffkovk-1-yrw5-hinh-mat-truoc-0.jpg?v=1692005106000" alt="" className={styles.productThumbnailImage} />
-                                                    </div>
-                                                    <span className={styles.productThumbnailQuantity}>1</span>
+                                            </tr>
+                                            <tr>
+                                                <div style={{ width: '100%' }}>
+                                                    <Space style={{ width: '100%', borderBottom: '1px solid #ccc', padding: '8px 8px 12px 8px' }} direction='horizontal' size={16}>
+                                                        <div className={styles.productThumbnail}>
+                                                            <div className={styles.productThumbnailWrapper}>
+                                                                <img src="//bizweb.dktcdn.net/thumb/thumb/100/415/697/products/te9180-64ffkovk-1-yrw5-hinh-mat-truoc-0.jpg?v=1692005106000" alt="" className={styles.productThumbnailImage} />
+                                                            </div>
+                                                            <span className={styles.productThumbnailQuantity}>1</span>
+                                                        </div>
+                                                        <div>
+                                                            <span >
+                                                                Áo Thun Baby Tee Teelab Local Brand Scarlett BT01012323123
+                                                            </span>
+                                                            <div>
+                                                                <span >
+                                                                    Kem / S
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            135.000đ
+                                                        </div>
+                                                    </Space>
                                                 </div>
-                                            </td>
-                                            <td className={styles.productDescription}>
-                                                <span style={{ display: 'block', textAlign: 'left', fontWeight: '500' }}>
-                                                    Áo Thun Baby Tee Teelab Local Brand Scarlett BT01012323123
-                                                </span>
-                                                <span style={{ display: 'block', textAlign: 'left' }}>
-                                                    Kem / S
-                                                </span>
-                                            </td>
-                                            <td >
-                                                135.000đ
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div className={styles.productThumbnail}>
-                                                    <div className={styles.productThumbnailWrapper}>
-                                                        <img src="//bizweb.dktcdn.net/thumb/thumb/100/415/697/products/te9180-64ffkovk-1-yrw5-hinh-mat-truoc-0.jpg?v=1692005106000" alt="" className={styles.productThumbnailImage} />
-                                                    </div>
-                                                    <span className={styles.productThumbnailQuantity}>1</span>
+                                            </tr>
+                                            <tr>
+                                                <div style={{ width: '100%' }}>
+                                                    <Space style={{ width: '100%', borderBottom: '1px solid #ccc', padding: '8px 8px 12px 8px' }} direction='horizontal' size={16}>
+                                                        <div className={styles.productThumbnail}>
+                                                            <div className={styles.productThumbnailWrapper}>
+                                                                <img src="//bizweb.dktcdn.net/thumb/thumb/100/415/697/products/te9180-64ffkovk-1-yrw5-hinh-mat-truoc-0.jpg?v=1692005106000" alt="" className={styles.productThumbnailImage} />
+                                                            </div>
+                                                            <span className={styles.productThumbnailQuantity}>1</span>
+                                                        </div>
+                                                        <div>
+                                                            <span >
+                                                                Áo Thun Baby Tee Teelab Local Brand Scarlett BT01012323123
+                                                            </span>
+                                                            <div>
+                                                                <span >
+                                                                    Kem / S
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            135.000đ
+                                                        </div>
+                                                    </Space>
                                                 </div>
-                                            </td>
-                                            <td className={styles.productDescription}>
-                                                <span style={{ display: 'block', textAlign: 'left', fontWeight: '500' }}>
-                                                    Áo Thun Baby Tee Teelab Local Brand Scarlett BT01012323123
-                                                </span>
-                                                <span style={{ display: 'block', textAlign: 'left' }}>
-                                                    Kem / S
-                                                </span>
-                                            </td>
-                                            <td >
-                                                135.000đ
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div className={styles.productThumbnail}>
-                                                    <div className={styles.productThumbnailWrapper}>
-                                                        <img src="//bizweb.dktcdn.net/thumb/thumb/100/415/697/products/te9180-64ffkovk-1-yrw5-hinh-mat-truoc-0.jpg?v=1692005106000" alt="" className={styles.productThumbnailImage} />
-                                                    </div>
-                                                    <span className={styles.productThumbnailQuantity}>1</span>
+                                            </tr>
+                                            <tr>
+                                                <div style={{ width: '100%' }}>
+                                                    <Space style={{ width: '100%', borderBottom: '1px solid #ccc', padding: '8px 8px 12px 8px' }} direction='horizontal' size={16}>
+                                                        <div className={styles.productThumbnail}>
+                                                            <div className={styles.productThumbnailWrapper}>
+                                                                <img src="//bizweb.dktcdn.net/thumb/thumb/100/415/697/products/te9180-64ffkovk-1-yrw5-hinh-mat-truoc-0.jpg?v=1692005106000" alt="" className={styles.productThumbnailImage} />
+                                                            </div>
+                                                            <span className={styles.productThumbnailQuantity}>1</span>
+                                                        </div>
+                                                        <div>
+                                                            <span >
+                                                                Áo Thun Baby Tee Teelab Local Brand Scarlett BT01012323123
+                                                            </span>
+                                                            <div>
+                                                                <span >
+                                                                    Kem / S
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            135.000đ
+                                                        </div>
+                                                    </Space>
                                                 </div>
-                                            </td>
-                                            <td className={styles.productDescription}>
-                                                <span style={{ display: 'block', textAlign: 'left', fontWeight: '500' }}>
-                                                    Áo Thun Baby Tee Teelab Local Brand Scarlett BT01012323123
-                                                </span>
-                                                <span style={{ display: 'block', textAlign: 'left' }}>
-                                                    Kem / S
-                                                </span>
-                                            </td>
-                                            <td >
-                                                135.000đ
-                                            </td>
-                                        </tr>
+                                            </tr>
+                                        </Space>
                                     </tbody>
                                 </table>
                             </div>
@@ -548,25 +635,25 @@ const Checkout = () => {
                                     </thead>
                                     <tbody>
                                         <tr style={{ marginBottom: '100px' }} >
-                                            <th className={styles.textLeft}>
+                                            <td className={styles.textLeft}>
                                                 Tạm tính
-                                            </th>
+                                            </td>
                                             <td style={{ textAlign: 'right' }}>1.173.000đ</td>
                                         </tr>
 
                                         <tr  >
-                                            <th className={styles.textLeft}>
+                                            <td className={styles.textLeft}>
                                                 Phí vận chuyển
-                                            </th>
+                                            </td>
                                             <td style={{ textAlign: 'right' }}>
                                                 {numeral(shippingFee).format('0,0 đ')}
                                             </td>
                                         </tr>
 
                                         <tr  >
-                                            <th className={styles.textLeft}>
+                                            <td className={styles.textLeft}>
                                                 Giảm giá
-                                            </th>
+                                            </td>
                                             <td style={{ textAlign: 'right' }}>
                                                 {numeral(shippingFee).format('0,0 đ')}
                                             </td>

@@ -8,6 +8,7 @@ import Contact from "./contact/Contact";
 import Checkout from "./checkout/Checkout";
 import Shop from "./shop/Shop";
 import DetailProduct from "./detail-product/DetailProduct";
+import Cart from "./cart/Cart";
 
 function ClientPage() {
   return (
@@ -23,6 +24,7 @@ function ClientPage() {
             <Route path="about" element={<About />} />
             <Route path="contact" element={<Contact />} />
             <Route path="checkout" element={<Checkout />} />
+            <Route path="cart" element={<Cart />} />
             <Route path="anything" element={<Shop />} />
             <Route path="shopping">
               <Route index element={<Shop />} />

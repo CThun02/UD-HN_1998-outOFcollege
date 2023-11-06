@@ -2,7 +2,7 @@ package com.fpoly.ooc.repository;
 
 import com.fpoly.ooc.entity.Address;
 import com.fpoly.ooc.entity.Bill;
-import com.fpoly.ooc.request.bill.BillRevenue;
+import com.fpoly.ooc.responce.bill.BillRevenue;
 import com.fpoly.ooc.responce.account.GetListCustomer;
 import com.fpoly.ooc.responce.bill.BillManagementResponse;
 import org.springframework.data.jpa.repository.JpaRepository;

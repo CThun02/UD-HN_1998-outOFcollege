@@ -19,7 +19,9 @@ function HeaderLeft() {
           <div className={styles.lineHeight}>
             <Row className={styles.margin}>
               <Col span={5}>
-                <Link className={styles.link}>Tất cả</Link>
+                <Link to={"/ms-shop/shopping"} className={styles.link}>
+                  Tất cả
+                </Link>
               </Col>
               <Col span={5}>
                 <Link className={styles.link}>Áo sơ mi</Link>

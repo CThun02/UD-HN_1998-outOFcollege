@@ -8,6 +8,7 @@ import com.fpoly.ooc.request.product.ProductDetailCondition;
 import com.fpoly.ooc.request.product.ProductDetailRequest;
 import com.fpoly.ooc.request.product.ProductImageRequest;
 import com.fpoly.ooc.request.product.ProductRequest;
+import com.fpoly.ooc.request.productDetail.GetSizeAndColorRequest;
 import com.fpoly.ooc.responce.product.ProductDetailDisplayResponse;
 import com.fpoly.ooc.responce.product.ProductDetailResponse;
 import com.fpoly.ooc.responce.product.ProductResponse;
@@ -15,6 +16,7 @@ import com.fpoly.ooc.responce.productdetail.ProductDetailShop;
 import com.fpoly.ooc.service.interfaces.ProductDetailServiceI;
 import com.fpoly.ooc.service.interfaces.ProductImageServiceI;
 import com.fpoly.ooc.service.interfaces.ProductServiceI;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -131,8 +133,13 @@ public class ProductController {
 
 
     @PutMapping("/updateProductStatus")
-    public ResponseEntity<?> updateProductStatus(@RequestParam Long productId, @RequestParam String status) {
+    public ResponseEntity<?> updateProductStatus(@RequestParam Long productId,
+                                                 @RequestParam String status,
+                                                 @RequestParam(defaultValue = "false") Boolean openAll) {
         Product product = service.getOne(productId);
+        if((openAll && status.equals("ACTIVE")) || status.equals("INACTIVE")){
+            productDetailService.updateProductDetailsByProductId(productId, status);
+        }
         product.setStatus(status);
         product.setDeletedAt(null);
         return ResponseEntity.ok(service.update(product));
@@ -223,6 +230,16 @@ public class ProductController {
     @GetMapping("/get-price-max")
     public ResponseEntity<?> getPriceMax() {
         return ResponseEntity.ok(productDetailService.getPriceMax());
+    }
+
+    @PostMapping("/details-product")
+    public ResponseEntity<?> getProductDetail(@RequestBody GetSizeAndColorRequest req) {
+        return ResponseEntity.ok(productDetailService.getProductDetailsShop(req));
+    }
+
+    @PostMapping("/colors-and-sizes")
+    public ResponseEntity<?> getSizesAndColors(@RequestBody GetSizeAndColorRequest req) {
+        return ResponseEntity.ok(productDetailService.getColorAndSize(req));
     }
 
 }

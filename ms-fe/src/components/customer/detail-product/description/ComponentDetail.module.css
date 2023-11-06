@@ -1,0 +1,20 @@
+.rowCss {
+  margin: 0;
+  padding: 10px 0;
+}
+
+.size {
+  font-size: 1rem;
+}
+
+.color {
+  color: #111111;
+}
+
+.fontWeight {
+  font-weight: 500;
+}
+
+.borderBottom {
+  border-bottom: 2px solid #ccc;
+}

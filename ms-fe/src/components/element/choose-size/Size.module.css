@@ -1,0 +1,29 @@
+.sizeActive {
+  background-color: rgb(2, 132, 199);
+  transition: 0.3s linear;
+}
+
+.size:hover {
+  cursor: pointer;
+}
+
+.size {
+  border-radius: 16px;
+  width: 70px;
+  padding: 22px 0;
+  height: 1.5rem;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid rgb(203, 213, 225);
+}
+
+.colorText {
+  color: #111111;
+}
+
+.spacing {
+  padding-right: 4px;
+  padding-bottom: 4px;
+}

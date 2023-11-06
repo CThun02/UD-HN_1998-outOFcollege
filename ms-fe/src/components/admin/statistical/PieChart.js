@@ -1,15 +1,17 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Pie } from "@ant-design/plots";
+import axios from "axios";
 
 const PieChart = () => {
+  const [billRevenueCompare, setBillRevenueCompare] = useState({});
   const data = [
     {
       type: "In Store",
-      value: 27,
+      value: billRevenueCompare.inStoreRevenue,
     },
     {
       type: "Online",
-      value: 73,
+      value: billRevenueCompare.onlineRevenue,
     },
   ];
   const config = {
@@ -33,6 +35,14 @@ const PieChart = () => {
       },
     ],
   };
+  useEffect(() => {
+    axios
+      .get("http://localhost:8080/api/admin/bill/getBillRevenueCompare")
+      .then((res) => {
+        setBillRevenueCompare(res.data);
+      })
+      .catch((err) => console.log(err));
+  }, []);
   return <Pie {...config} />;
 };
 

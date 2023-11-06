@@ -158,7 +158,7 @@ const StatisticalIndex = () => {
         <Col span={6}>
           <div className={`${styles.bgWhite} me-5`}>
             <h2>
-              <DoubleRightOutlined /> Tỷ lệ thu chi
+              <DoubleRightOutlined /> Tỷ lệ doanh thu
             </h2>
             <PieChart />
           </div>

@@ -20,14 +20,18 @@ import com.fpoly.ooc.repository.TimeLineRepo;
 import com.fpoly.ooc.repository.VoucherHistoryRepository;
 import com.fpoly.ooc.request.bill.BillDetailRequest;
 import com.fpoly.ooc.request.bill.BillRequest;
+import com.fpoly.ooc.responce.bill.BillProductSellTheMost;
 import com.fpoly.ooc.responce.bill.BillRevenue;
 import com.fpoly.ooc.responce.account.GetListCustomer;
 import com.fpoly.ooc.responce.bill.BillManagementResponse;
+import com.fpoly.ooc.responce.bill.BillRevenueCompare;
 import com.fpoly.ooc.service.interfaces.BillService;
+import com.fpoly.ooc.service.interfaces.ProductImageServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -49,6 +53,9 @@ public class BillServiceImpl implements BillService {
 
     @Autowired
     private VoucherHistoryRepository voucherHistoryRepository;
+
+    @Autowired
+    private ProductImageServiceI productImageService;
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -163,5 +170,23 @@ public class BillServiceImpl implements BillService {
         LocalDateTime startOfDay = currentDate.atStartOfDay();
         BillRevenue revenue =  billRepo.getBillRevenue(startOfDay);
         return revenue;
+    }
+
+    @Override
+    public BillRevenueCompare getRevenueInStoreOnlineCompare() {
+        BillRevenueCompare billRevenueCompare = new BillRevenueCompare();
+        billRevenueCompare.setOnlineRevenue(billRepo.getRevenueInStoreOnlineCompare("Online"));
+        billRevenueCompare.setInStoreRevenue(billRepo.getRevenueInStoreOnlineCompare("In-Store"));
+        billRevenueCompare.setTotalRevenue(billRevenueCompare.getOnlineRevenue()+billRevenueCompare.getInStoreRevenue());
+        return billRevenueCompare;
+    }
+
+    @Override
+    public List<BillProductSellTheMost> getBillProductSellTheMost() {
+        List<BillProductSellTheMost>  billProductSellTheMosts = billRepo.getBillProductSellTheMost();
+        for (int i = 0; i < billProductSellTheMosts.size(); i++) {
+            billProductSellTheMosts.get(i).setProductImageResponse(productImageService.getProductImageByProductDetailId(billProductSellTheMosts.get(i).getId()));
+        }
+        return billProductSellTheMosts;
     }
 }

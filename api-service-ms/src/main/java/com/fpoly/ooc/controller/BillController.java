@@ -59,6 +59,17 @@ public class BillController {
     public ResponseEntity<?> getGrossRevenue(){
         return ResponseEntity.ok(billService.getBillRevenue());
     }
+
+    @GetMapping("/getBillRevenueCompare")
+    public ResponseEntity<?> getBillRevenueCompare(){
+        return ResponseEntity.ok(billService.getRevenueInStoreOnlineCompare());
+    }
+
+    @GetMapping("/getBillProductSellTheMost")
+    public ResponseEntity<?> getBillProductSellTheMost(){
+        return ResponseEntity.ok(billService.getBillProductSellTheMost());
+    }
+
     @GetMapping("/customer/{username}/address")
     public ResponseEntity<?> getListAddressByUserName(@PathVariable("username") String username) {
         return ResponseEntity.ok(billService.getListAddressByUserName(username));

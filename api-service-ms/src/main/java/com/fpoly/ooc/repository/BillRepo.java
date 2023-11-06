@@ -2,6 +2,7 @@ package com.fpoly.ooc.repository;
 
 import com.fpoly.ooc.entity.Address;
 import com.fpoly.ooc.entity.Bill;
+import com.fpoly.ooc.responce.bill.BillProductSellTheMost;
 import com.fpoly.ooc.responce.bill.BillRevenue;
 import com.fpoly.ooc.responce.account.GetListCustomer;
 import com.fpoly.ooc.responce.bill.BillManagementResponse;
@@ -28,6 +29,26 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
             "FROM AddressDetail ad JOIN Address address ON ad.addressDetail.id = address.id " +
             "WHERE ad.accountAddress.username = ?1 ")
     List<Address> getListAddressByUsername(String username);
+
+    @Query("SELECT sum(b.price) from Bill b where b.billType =?1 or ?1 is null")
+    Double getRevenueInStoreOnlineCompare(String type);
+
+    @Query(value = "SELECT pd.id as id, pd.product as product, pd.brand as brand, pd.category as category, pd.button as button," +
+            "pd.material as material, pd.collar as collar, pd.sleeve as sleeve, pd.pattern as pattern, " +
+            "pd.form as form, pd.size as size, pd.color as color, pd.shirtTail as shirtTail, pd.price as price," +
+            "pd.weight as weight, pd.quantity as quantity, pd.descriptionDetail as descriptionDetail, pd.status as status," +
+            "p.promotionMethod as promotionMethod, p.promotionValue as promotionValue, p.promotionCondition as promotionCondition," +
+            "SUM(bd.quantity) as quantitySell " +
+            "FROM BillDetail bd " +
+            "JOIN ProductDetail pd ON pd.id = bd.productDetail.id " +
+            "LEFT JOIN PromotionProduct pp ON pp.productDetailId.id = pd.id " +
+            "LEFT JOIN Promotion p ON pp.promotion.id = p.id " +
+            "WHERE p.status = 'ACTIVE' " +
+            "GROUP BY pd.id, pd.product, pd.brand, pd.category, pd.button, pd.material, pd.collar, pd.sleeve, pd.size," +
+            "pd.color, pd.shirtTail, pd.pattern, pd.form, pd.status, p.promotionMethod, p.promotionValue," +
+            "p.promotionCondition, pd.price, pd.weight, pd.quantity, pd.descriptionDetail",
+            nativeQuery = true)
+    List<BillProductSellTheMost> getBillProductSellTheMost();
 
 
     @Query("SELECT DISTINCT new com.fpoly.ooc.responce.bill.BillManagementResponse(b.id, b.billCode, COUNT(bd.id)," +

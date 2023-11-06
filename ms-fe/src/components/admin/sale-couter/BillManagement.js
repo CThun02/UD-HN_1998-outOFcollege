@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from "react";
 import styles from "./BillManagement.module.css";
-import { Button, Input, Select, Table, Tag, TreeSelect } from "antd";
-import { EyeOutlined, SearchOutlined } from "@ant-design/icons";
+import { Button, Input, Row, Select, Table, Tag, TreeSelect } from "antd";
+import {
+  EyeOutlined,
+  FilterFilled,
+  SearchOutlined,
+  TableOutlined,
+} from "@ant-design/icons";
 import dayjs from "dayjs";
 import { DatePicker, Space } from "antd";
 import axios from "axios";
@@ -90,8 +95,8 @@ const BillManagement = () => {
       title: "Tổng tiền",
       key: "totalPrice",
       render: (text, record) => {
-        return record.totalPrice + record.shipPrice - record.priceReduce
-      }
+        return record.totalPrice + record.shipPrice - record.priceReduce;
+      },
     },
     {
       title: "Ngày tạo",
@@ -110,10 +115,10 @@ const BillManagement = () => {
           object === "Unpaid"
             ? "geekblue"
             : object.toLocaleLowerCase() === "PAID".toLocaleLowerCase()
-              ? "green"
-              : object === "cancel"
-                ? "red"
-                : null;
+            ? "green"
+            : object === "cancel"
+            ? "red"
+            : null;
         return (
           <Space direction="vertical">
             <div style={{ width: "auto", display: "flex" }}>
@@ -121,8 +126,8 @@ const BillManagement = () => {
                 {object === "Unpaid"
                   ? "Chưa thanh toán"
                   : object === "cancel"
-                    ? "Đã hủy"
-                    : "Đã thanh toán"}
+                  ? "Đã hủy"
+                  : "Đã thanh toán"}
               </Tag>
             </div>
           </Space>
@@ -212,21 +217,18 @@ const BillManagement = () => {
   return (
     <div>
       <section className={styles.filter}>
-        <div style={{ width: "400px", marginBottom: "20px" }}>
-          <Input
-            size="large"
-            placeholder="Tìm kiếm hóa đơn"
-            prefix={<SearchOutlined />}
-            onChange={(e) => {
-              setBillCode(e.target.value);
-            }}
-          />
-        </div>
+        <h2 style={{ marginBottom: "10px" }}>
+          <FilterFilled /> Bộ lọc
+        </h2>
+
         <div>
-          <Space direction="vertical" size={12}>
-            <RangePicker presets={rangePresets} onChange={onRangeChange} />
-          </Space>
-          <span style={{ margin: "0 20px" }}>
+          <span style={{ fontWeight: 500 }}>Ngày tạo</span>
+          <RangePicker
+            className={styles.filter_inputSearch}
+            presets={rangePresets}
+            onChange={onRangeChange}
+          />
+          <span style={{ margin: "0 20px", fontWeight: 500 }}>
             Trạng thái
             <Select
               bordered={false}
@@ -242,7 +244,7 @@ const BillManagement = () => {
               <Select.Option value={"cancel"}>Đã huỷ</Select.Option>
             </Select>
           </span>
-          <span>
+          <span style={{ fontWeight: 500 }}>
             Loại hóa đơn
             {/* <Select
                             style={{ width: '12%', borderBottom: '1px solid #ccc' }}
@@ -276,9 +278,23 @@ const BillManagement = () => {
             />
           </span>
         </div>
+        <div style={{ width: "400px", marginTop: "20px" }}>
+          <Input
+            className={styles.filter_inputSearch}
+            size="large"
+            placeholder="Tìm kiếm hóa đơn"
+            prefix={<SearchOutlined />}
+            onChange={(e) => {
+              setBillCode(e.target.value);
+            }}
+          />
+        </div>
       </section>
 
       <section className={styles.content}>
+        <h2 style={{ marginBottom: "10px" }}>
+          <TableOutlined /> Danh sách hóa đơn
+        </h2>
         <Table
           dataSource={data}
           columns={columns}

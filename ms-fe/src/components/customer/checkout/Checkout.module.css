@@ -106,15 +106,6 @@
   padding: 5px;
 }
 
-/* tbody tr {
-  padding-bottom: 5px;
-  border-bottom: 1px solid red;
-} */
-
-/* table {
-  border-spacing: 0 10px;
-} */
-
 .customTr {
   border-bottom: 1px solid #ccc;
   width: 100%;

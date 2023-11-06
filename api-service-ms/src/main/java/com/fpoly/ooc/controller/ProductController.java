@@ -46,8 +46,8 @@ public class ProductController {
     @GetMapping("/getproductfilterByCom")
     public ResponseEntity<?> filterByCom(@RequestParam(defaultValue = "null") String status,
                                          @RequestParam(defaultValue = "null") String keywords){
-            return ResponseEntity.ok(service.getProductFilterByCom(status.equals("null")?null:status,
-                    keywords.equals("null")?null:"%"+keywords+"%"));
+        return ResponseEntity.ok(service.getProductFilterByCom(status.equals("null")?null:status,
+                keywords.equals("null")?null:"%"+keywords+"%"));
     }
 
     @GetMapping("/getproductdetailbyidpd")
@@ -219,7 +219,7 @@ public class ProductController {
             @RequestParam(value = "pageNo", defaultValue = "0") int pageNo,
             @RequestParam(value = "pageSize", defaultValue = "12") int pageSize,
             @RequestBody ProductDetailCondition req
-            ) {
+    ) {
 
         return ResponseEntity.ok(
                 productDetailService.getAllProductDetailShop(

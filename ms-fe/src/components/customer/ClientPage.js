@@ -4,8 +4,11 @@ import Header from "./header/Header";
 import Footer from "./footer/Footer";
 import HomeClient from "./home/index/HomeClient";
 import About from "./about/About";
+import Contact from "./contact/Contact";
+import Checkout from "./checkout/Checkout";
 import Shop from "./shop/Shop";
 import DetailProduct from "./detail-product/DetailProduct";
+import Cart from "./cart/Cart";
 
 function ClientPage() {
   return (
@@ -19,6 +22,10 @@ function ClientPage() {
             <Route index element={<HomeClient />} />
             <Route path="home" element={<HomeClient />} />
             <Route path="about" element={<About />} />
+            <Route path="contact" element={<Contact />} />
+            <Route path="checkout" element={<Checkout />} />
+            <Route path="cart" element={<Cart />} />
+            <Route path="anything" element={<Shop />} />
             <Route path="shopping">
               <Route index element={<Shop />} />
               {/* <Route path=":typeCategory">

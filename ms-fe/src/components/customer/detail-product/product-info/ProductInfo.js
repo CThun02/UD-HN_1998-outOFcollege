@@ -6,9 +6,11 @@ import Quantity from "../../../element/quantity/Quantity";
 import { faCartPlus, faCirclePlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Col, Rate, Row, Space, Tag } from "antd";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import numeral from "numeral";
 import { useState } from "react";
+import { now } from "moment";
+import { useEffect } from "react";
 
 function ProductInfo({
   data,
@@ -19,6 +21,7 @@ function ProductInfo({
   chooseSize,
 }) {
   const [quantity, setQuantity] = useState(1);
+  const navigate = useNavigate();
 
   function handleChangePrice(value) {
     if (!isNaN(value)) {
@@ -30,6 +33,47 @@ function ProductInfo({
   function comparePrice(min, max) {
     return min === max;
   }
+
+  const handleAddToCart = (e) => {
+    e.preventDefault();
+    const existingItem = localStorage.getItem('user');
+
+    if (existingItem) {
+      const existingData = JSON.parse(existingItem);
+      existingData.timeStart = now();
+      let productExists = false;
+      for (let i = 0; i < existingData.productDetails.length; i++) {
+        if (existingData.productDetails[i].data.productDetailId === data.productDetailId) {
+          console.log(`đã vào`, existingData.productDetails[i].quantity)
+          existingData.productDetails[i].quantity += quantity
+          productExists = true;
+          break;
+        }
+      }
+
+      if (!productExists) {
+        existingData.productDetails.push({ data: data, quantity: quantity })
+      }
+
+      localStorage.setItem('user', JSON.stringify(existingData));
+    }
+
+    navigate('/ms-shop/cart');
+  }
+
+  useEffect(() => {
+    const existingItem = localStorage.getItem('user');
+
+    if (!existingItem) {
+      localStorage.setItem(
+        'user',
+        JSON.stringify({
+          timeStart: now(),
+          productDetails: [],
+        })
+      );
+    }
+  }, [])
 
   return (
     <>
@@ -56,17 +100,16 @@ function ProductInfo({
           <Space style={{ width: "100%" }} direction="horizontal" size={28}>
             <div className={styles.money}>
               <span style={{ fontWeight: "600" }}>
-                {`${
-                  comparePrice(
-                    colorsAndSizes.priceProductMin,
-                    colorsAndSizes.priceProductMax
-                  )
-                    ? handleChangePrice(colorsAndSizes.priceProductMin) + "đ"
-                    : handleChangePrice(colorsAndSizes.priceProductMin) +
-                      " - " +
-                      handleChangePrice(colorsAndSizes.priceProductMax) +
-                      "đ"
-                }`}
+                {`${comparePrice(
+                  colorsAndSizes.priceProductMin,
+                  colorsAndSizes.priceProductMax
+                )
+                  ? handleChangePrice(colorsAndSizes.priceProductMin) + "đ"
+                  : handleChangePrice(colorsAndSizes.priceProductMin) +
+                  " - " +
+                  handleChangePrice(colorsAndSizes.priceProductMax) +
+                  "đ"
+                  }`}
               </span>
             </div>
             <div
@@ -165,7 +208,9 @@ function ProductInfo({
         <Row>
           <Col span={12}>
             <div className={styles.btnAddToCart}>
-              <button className={`${styles.btn}`}>
+              <button className={`${styles.btn}`}
+                onClick={(e) => handleAddToCart(e)}
+              >
                 <FontAwesomeIcon
                   icon={faCartPlus}
                   className={styles.iconAddToCart}

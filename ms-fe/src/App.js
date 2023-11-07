@@ -1,11 +1,8 @@
 import "./App.css";
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
-import { useState } from "react";
-import { NotificationProvider } from "./components/element/notification/Notification";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AdminPage from "./components/admin/AdminPage";
 import ClientPage from "./components/customer/ClientPage";
-import NotFoundPage from "./components/element/page/NotFoundPage";
-import { Button, Result } from "antd";
+import { Result } from "antd";
 
 function App() {
   return (

@@ -1,39 +1,80 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import styles from './Cart.module.css'
-import { Button, Col, InputNumber, Row, Table } from 'antd'
+import { Button, Col, InputNumber, Row, Table, notification } from 'antd'
 import { CloseOutlined } from '@ant-design/icons'
 import { Link } from 'react-router-dom'
+import numeral from 'numeral'
 
 
 const Cart = () => {
+    const [productDetails, setProductDetails] = useState(null)
+    const [render, setRender] = useState(null)
+
+    const updateQuantity = (e, index) => {
+        let cart = JSON.parse(localStorage.getItem('user'));
+        let productDetail = cart.productDetails;
+        if (e > productDetail[index].data.colorAndSizeAndQuantity.quantity) {
+            notification.warning({
+                message: "Thông báo",
+                description: "Vượt quá số lượng tồn",
+                duration: 1,
+            });
+            return;
+        }
+
+        productDetail[index].quantity = e;
+        cart.productDetails = productDetail;
+        localStorage.setItem("user", JSON.stringify(cart));
+
+        setRender(Math.random())
+    }
+
+    const deleteProductDetail = (e, index) => {
+        e.preventDefault();
+        let cart = JSON.parse(localStorage.getItem('user'))
+        let productDetails = cart.productDetails;
+        if (index >= 0 && index < productDetails.length) {
+            productDetails.splice(index, 1);
+            cart.productDetails = productDetails;
+            localStorage.setItem('user', JSON.stringify(productDetails))
+            setRender(Math.random())
+        }
+    }
+
+    useEffect(() => {
+        var productDetail = JSON.parse(localStorage.getItem('user'));
+
+        setProductDetails(productDetail.productDetails)
+    }, [render]);
 
     const columns = [
         {
             key: 'product',
             title: 'Thông tin sản phẩm',
-            render: () => {
+            render: (_, record) => {
                 return (
                     <div>
                         <Row>
-                            <Col span={4}>
+                            <Col span={7}>
                                 <div style={{ width: '110px', height: '100px' }}>
-                                    <img style={{ width: '100%', height: '100%' }} src="https://bizweb.dktcdn.net/thumb/compact/100/415/697/products/1-26653769-bf15-498a-bfec-cfe0f350a14c.jpg" alt="Áo Thun Teelab Local Brand Unisex Love Is In The Air TS199"></img>
+                                    <img style={{ width: '100%', height: '100%' }}
+                                        src={record.data.images[0].path} alt="Áo Thun Teelab Local Brand Unisex Love Is In The Air TS199"></img>
                                 </div>
                             </Col>
-                            <Col span={20}>
+                            <Col span={17}>
                                 <div
                                     className="m-5"
                                     style={{
-                                        textAlign: "start",
+                                        textAlign: 'left',
                                         height: "100%",
-                                        justifyContent: "center",
                                     }}
                                 >
                                     <span style={{ fontWeight: "500" }}>
-                                        Áo Thun Teelab Local Brand Unisex Love Is In The Air TS199
+                                        {record.data.productName}
                                     </span>
                                     <br />
-                                    Kem / M
+                                    {record.data.colorAndSizeAndQuantity.colors[0].colorCode}/
+                                    {record.data.colorAndSizeAndQuantity.sizes[0].sizeName}
                                 </div>
                             </Col>
                         </Row>
@@ -44,9 +85,10 @@ const Cart = () => {
         {
             key: 'price',
             title: 'Đơn giá',
-            render: () => {
+            render: (_, record) => {
                 return <div>
-                    500
+                    {numeral(record.data.colorAndSizeAndQuantity.priceProductMin)
+                        .format('0,0') + ' đ'}
                 </div>
             }
         },
@@ -54,11 +96,13 @@ const Cart = () => {
             key: 'quantity',
             title: 'Số lượng',
             width: 200,
-            render: () => {
+            render: (_, record, index) => {
                 return (
                     <InputNumber
                         min={1}
-                        max={5}
+                        value={record.quantity}
+                        max={record.data.quantity}
+                        onChange={(e) => updateQuantity(e, index)}
                     />
                 );
             },
@@ -66,34 +110,24 @@ const Cart = () => {
         {
             key: 'price_total',
             title: 'Thành tiền',
-            render: () => {
+            render: (_, record) => {
                 return <div>
-                    1000
+                    {numeral(record.quantity * record.data.colorAndSizeAndQuantity.priceProductMin)
+                        .format('0,0') + ' đ'}
                 </div>
             }
         },
         {
             key: 'action',
             title: 'Thao tác',
-            render: () => {
+            render: (_, record, index) => {
                 return <div>
-                    <CloseOutlined style={{ cursor: 'pointer' }} />
+                    <CloseOutlined style={{ cursor: 'pointer', color: 'red' }}
+                        onClick={(e) => deleteProductDetail(e, index)} />
                 </div>
             }
         },
     ]
-
-    const dataSource = [
-        {
-            key: '1'
-        },
-        {
-            key: '2'
-        },
-        {
-            key: '3'
-        }
-    ];
 
     return (
         <div className={styles.wrapper}>
@@ -101,7 +135,7 @@ const Cart = () => {
                 <h2 style={{ padding: '10px 0' }}>Giỏ hàng của bạn</h2>
                 <Table
                     columns={columns}
-                    dataSource={dataSource}
+                    dataSource={productDetails}
                     pagination={false}
                 />
                 <Row style={{ marginTop: '20px' }}>

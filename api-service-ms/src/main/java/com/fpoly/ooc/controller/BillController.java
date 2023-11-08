@@ -66,8 +66,25 @@ public class BillController {
     }
 
     @GetMapping("/getBillProductSellTheMost")
-    public ResponseEntity<?> getBillProductSellTheMost(){
-        return ResponseEntity.ok(billService.getBillProductSellTheMost());
+    public ResponseEntity<?> getBillProductSellTheMost(@RequestParam(defaultValue = "0")int quantitySell){
+        return ResponseEntity.ok(billService.getBillProductSellTheMost(quantitySell));
+    }
+
+    @GetMapping("/getBusinessYear")
+    public ResponseEntity<?> getBusinessYear(){
+        return ResponseEntity.ok(billService.getBusinessYear());
+    }
+
+    @GetMapping("/compareRevenueDate")
+    public ResponseEntity<?> compareRevenueDate(@RequestParam Optional<Integer> dayFrom,
+                                                @RequestParam Optional<Integer> monthFrom,
+                                                @RequestParam Optional<Integer> yearFrom,
+                                                @RequestParam Optional<Integer> dayTo,
+                                                @RequestParam Optional<Integer> monthTo,
+                                                @RequestParam Optional<Integer> yearTo){
+        System.out.println("CHeck" +dayFrom.orElse(null));
+        return ResponseEntity.ok(billService.compareRevenueDate(dayFrom.orElse(null), monthFrom.orElse(null),
+                yearFrom.orElse(null), dayTo.orElse(null), monthTo.orElse(null), yearTo.orElse(null)));
     }
 
     @GetMapping("/customer/{username}/address")

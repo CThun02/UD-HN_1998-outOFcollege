@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Pie } from "@ant-design/plots";
 import axios from "axios";
+import Statistic from "antd/es/statistic/Statistic";
+import { Col, Row } from "antd";
 
 const PieChart = () => {
   const [billRevenueCompare, setBillRevenueCompare] = useState({});
@@ -43,7 +45,46 @@ const PieChart = () => {
       })
       .catch((err) => console.log(err));
   }, []);
-  return <Pie {...config} />;
+  return (
+    <>
+      <Pie {...config} />
+      <Row>
+        <Col span={12}>
+          <Statistic
+            title="Doanh thu tại cửa hàng"
+            value={
+              billRevenueCompare.inStoreRevenue?.toLocaleString("vi-VN", {
+                style: "currency",
+                currency: "VND",
+              }) || 0
+            }
+          />
+        </Col>
+        <Col span={12}>
+          <Statistic
+            title="Doanh thu trực tuyến"
+            value={
+              billRevenueCompare.onlineRevenue?.toLocaleString("vi-VN", {
+                style: "currency",
+                currency: "VND",
+              }) || 0
+            }
+          />
+        </Col>
+        <Col span={12}>
+          <Statistic
+            title="Tổng doanh thu"
+            value={
+              billRevenueCompare.totalRevenue?.toLocaleString("vi-VN", {
+                style: "currency",
+                currency: "VND",
+              }) || 0
+            }
+          />
+        </Col>
+      </Row>
+    </>
+  );
 };
 
 export default PieChart;

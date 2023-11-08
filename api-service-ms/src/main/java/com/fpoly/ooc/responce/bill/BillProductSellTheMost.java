@@ -33,6 +33,4 @@ public class BillProductSellTheMost {
     private BigDecimal promotionValue;
     private BigDecimal promotionCondition;
     private List<ProductImageResponse> productImageResponse;
-    private Integer quantitySell;
-
 }

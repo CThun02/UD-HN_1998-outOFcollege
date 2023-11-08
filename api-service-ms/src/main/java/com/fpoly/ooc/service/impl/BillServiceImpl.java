@@ -20,11 +20,10 @@ import com.fpoly.ooc.repository.TimeLineRepo;
 import com.fpoly.ooc.repository.VoucherHistoryRepository;
 import com.fpoly.ooc.request.bill.BillDetailRequest;
 import com.fpoly.ooc.request.bill.BillRequest;
-import com.fpoly.ooc.responce.bill.BillProductSellTheMost;
-import com.fpoly.ooc.responce.bill.BillRevenue;
+import com.fpoly.ooc.responce.bill.*;
 import com.fpoly.ooc.responce.account.GetListCustomer;
-import com.fpoly.ooc.responce.bill.BillManagementResponse;
-import com.fpoly.ooc.responce.bill.BillRevenueCompare;
+import com.fpoly.ooc.responce.product.ProductDetailDisplayResponse;
+import com.fpoly.ooc.responce.product.ProductDetailResponse;
 import com.fpoly.ooc.service.interfaces.BillService;
 import com.fpoly.ooc.service.interfaces.ProductImageServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -175,18 +175,37 @@ public class BillServiceImpl implements BillService {
     @Override
     public BillRevenueCompare getRevenueInStoreOnlineCompare() {
         BillRevenueCompare billRevenueCompare = new BillRevenueCompare();
-        billRevenueCompare.setOnlineRevenue(billRepo.getRevenueInStoreOnlineCompare("Online"));
-        billRevenueCompare.setInStoreRevenue(billRepo.getRevenueInStoreOnlineCompare("In-Store"));
+        billRevenueCompare.setOnlineRevenue(billRepo.getRevenueInStoreOnlineCompare("Online")==null?1:
+                billRepo.getRevenueInStoreOnlineCompare("Online"));
+        billRevenueCompare.setInStoreRevenue(billRepo.getRevenueInStoreOnlineCompare("In-Store")==null?0:
+                billRepo.getRevenueInStoreOnlineCompare("In-Store"));
         billRevenueCompare.setTotalRevenue(billRevenueCompare.getOnlineRevenue()+billRevenueCompare.getInStoreRevenue());
         return billRevenueCompare;
     }
 
     @Override
-    public List<BillProductSellTheMost> getBillProductSellTheMost() {
-        List<BillProductSellTheMost>  billProductSellTheMosts = billRepo.getBillProductSellTheMost();
-        for (int i = 0; i < billProductSellTheMosts.size(); i++) {
-            billProductSellTheMosts.get(i).setProductImageResponse(productImageService.getProductImageByProductDetailId(billProductSellTheMosts.get(i).getId()));
+    public List<ProductDetailDisplayResponse> getBillProductSellTheMost(int quantitysell) {
+        List<ProductDetailResponse>  productSellTheMost = billRepo.getProductSellTheMost(quantitysell);
+        List<ProductDetailDisplayResponse> billProductSellTheMosts = new ArrayList<>();
+        for (int i = 0; i < productSellTheMost.size(); i++) {
+            ProductDetailDisplayResponse response = new ProductDetailDisplayResponse(productSellTheMost.get(i));
+            response.setProductImageResponse(productImageService.getProductImageByProductDetailId(response.getId()));
+            billProductSellTheMosts.add(response);
         }
         return billProductSellTheMosts;
+    }
+
+    @Override
+    public BillRevenueCompareDate compareRevenueDate(Integer dayFrom, Integer monthFrom, Integer yearFrom,
+                                                     Integer dayTo, Integer monthTo, Integer yearTo) {
+        Double revenueFrom = billRepo.getRevenueByTime(dayFrom, monthFrom, yearFrom);
+        Double revenueTo = billRepo.getRevenueByTime(dayTo, monthTo, yearTo);
+        BillRevenueCompareDate billRevenueCompareDate = new BillRevenueCompareDate(revenueFrom, revenueTo);
+        return billRevenueCompareDate;
+    }
+
+    @Override
+    public List<Integer> getBusinessYear() {
+        return billRepo.getBusinessYear();
     }
 }

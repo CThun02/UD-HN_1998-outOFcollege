@@ -4,11 +4,10 @@ import com.fpoly.ooc.dto.BillStatusDTO;
 import com.fpoly.ooc.entity.Address;
 import com.fpoly.ooc.entity.Bill;
 import com.fpoly.ooc.request.bill.BillRequest;
-import com.fpoly.ooc.responce.bill.BillProductSellTheMost;
-import com.fpoly.ooc.responce.bill.BillRevenue;
+import com.fpoly.ooc.responce.bill.*;
 import com.fpoly.ooc.responce.account.GetListCustomer;
-import com.fpoly.ooc.responce.bill.BillManagementResponse;
-import com.fpoly.ooc.responce.bill.BillRevenueCompare;
+import com.fpoly.ooc.responce.product.ProductDetailDisplayResponse;
+import com.fpoly.ooc.responce.product.ProductDetailResponse;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -40,5 +39,11 @@ public interface BillService {
 
     BillRevenueCompare getRevenueInStoreOnlineCompare();
 
-    List<BillProductSellTheMost> getBillProductSellTheMost();
+    List<ProductDetailDisplayResponse> getBillProductSellTheMost(int quantityDisplay);
+
+    public BillRevenueCompareDate compareRevenueDate(Integer dayFrom, Integer monthFrom, Integer yearFrom,
+                                                     Integer dayTo, Integer monthTo, Integer yearTo);
+
+    List<Integer> getBusinessYear();
+
 }

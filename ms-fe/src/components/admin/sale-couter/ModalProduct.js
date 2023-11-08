@@ -21,6 +21,7 @@ const ModalProduct = ({ visible, onCancel, cartId, render }) => {
       <Modal
         title="Tìm kiếm sản phẩm"
         style={{ top: "10px" }}
+        centered
         key={cartId}
         open={visible}
         onCancel={() => {

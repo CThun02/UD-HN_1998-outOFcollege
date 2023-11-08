@@ -1,65 +1,79 @@
-import { Space, Table } from "antd";
+import { Col, Row, Space, Table } from "antd";
 import { useEffect } from "react";
 import { useState } from "react";
+
 const columns = [
   {
     title: "STT",
     dataIndex: "stt",
     key: "stt",
-    width: "5%",
+    width: 50,
   },
   {
     key: "product",
     dataIndex: "product",
     title: "Sản phẩm",
-    width: "20%",
-  },
-  {
-    key: "button",
-    dataIndex: "button",
-    title: "Cúc áo",
-  },
-  {
-    key: "material",
-    dataIndex: "material",
-    title: "Chất liệu",
-    with: 110,
-  },
-  {
-    key: "collar",
-    dataIndex: "collar",
-    title: "Cổ áo",
-  },
-  {
-    key: "shirtTail",
-    dataIndex: "shirtTail",
-    title: "Đuôi áo",
-  },
-  {
-    key: "sleeve",
-    dataIndex: "sleeve",
-    title: "Tay áo",
-  },
-  {
-    key: "size",
-    dataIndex: "size",
-    title: "Kích cỡ",
-  },
-  {
-    key: "color",
-    dataIndex: "color",
-    title: "Màu sắc",
+    render: (product) => {
+      return (
+        <div>
+          <Row>
+            <Col span={4}>
+              <img src={product.path} alt="product" style={{ width: "50px" }} />
+            </Col>
+            <Col span={20}>
+              <Space style={{ width: "100%" }} direction="vertical" size={4}>
+                <div style={{ display: "flex", justifyContent: "flex-start" }}>
+                  <strong>{`${product.productName} - ${product.material} - ${product.collar} - ${product.shirtTail} - ${product.shirtTail} - ${product.sleeve}  `}</strong>
+                </div>
+                <div>
+                  <Space
+                    style={{ width: "100%" }}
+                    direction="vertical"
+                    size={4}
+                  >
+                    <div
+                      style={{ display: "flex", justifyContent: "flex-start" }}
+                    >
+                      <span>Kích cỡ: {product.size}</span>
+                    </div>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "flex-start",
+                        alignContent: "center",
+                      }}
+                    >
+                      Màu sắc:
+                      <div
+                        style={{
+                          backgroundColor: product.color,
+                          width: "20px",
+                          height: "20px",
+                          borderRadius: "50%",
+                          marginLeft: "10px",
+                        }}
+                      ></div>
+                    </div>
+                  </Space>
+                </div>
+              </Space>
+            </Col>
+          </Row>
+        </div>
+      );
+    },
   },
   {
     key: "price",
     dataIndex: "price",
     title: "Giá",
+    width: 200,
   },
   {
     key: "quantity",
     dataIndex: "quantity",
     title: "Số lượng",
-    width: 110,
+    width: 150,
   },
 ];
 
@@ -136,19 +150,21 @@ function TablesProductsDetails({
             dataSource={productsDetails.map((p, index) => ({
               stt: calculateStt(index),
               key: p.productDetailsId,
-              product: p.productName,
-              button: p.buttonTypeName,
-              material: p.materialType,
-              collar: p.collarType,
-              shirtTail: p.shirtTailType,
-              sleeve: p.sleeveType,
-              size: p.size,
-              color: p.color,
+              product: {
+                productName: p.productName,
+                path: p.imageDefault,
+                button: p.buttonTypeName,
+                material: p.materialType,
+                collar: p.collarType,
+                shirtTail: p.shirtTailType,
+                sleeve: p.sleeveType,
+                size: p.size,
+                color: p.color,
+              },
               price: p.price,
               quantity: p.quantity,
               isCheckExistsInPromotion: p.isCheckExistsInPromotion,
             }))}
-            scroll={{ y: 400, x: 1300 }}
             pagination={{
               showSizeChanger: true,
               pageSizeOptions: [5, 10, 15, 20],

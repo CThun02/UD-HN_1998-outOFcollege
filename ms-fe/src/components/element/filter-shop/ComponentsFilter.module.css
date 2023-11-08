@@ -33,6 +33,6 @@ input[type="checkbox"] {
 }
 
 .radio {
-  max-height: 170px;
+  max-height: 160px;
   overflow-y: scroll;
 }

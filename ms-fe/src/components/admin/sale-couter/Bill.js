@@ -15,6 +15,7 @@ import {
   Carousel,
   Segmented,
   Avatar,
+  Badge,
 } from "antd";
 import React, { useEffect, useState } from "react";
 import styles from "./Bill.module.css";
@@ -28,6 +29,7 @@ import {
   QrcodeOutlined,
   UserOutlined,
   ShoppingCartOutlined,
+  WalletOutlined,
 } from "@ant-design/icons";
 import * as Yup from "yup";
 import axios from "axios";
@@ -128,24 +130,66 @@ const Bill = () => {
       render: (text, record, index) => {
         return (
           <Row>
-            <Col span={4}>
-              <Carousel autoplay className={styles.slider}>
-                {record.productDetail.productImageResponse &&
-                  record.productDetail.productImageResponse.map(
-                    (productImage, index) => {
-                      return (
-                        <img
-                          key={productImage.id}
-                          style={{ width: "100px" }}
-                          alt="abc"
-                          src={productImage.path}
-                        />
-                      );
-                    }
-                  )}
-              </Carousel>
+            <Col span={6}>
+              <div
+                style={{
+                  marginTop: "10px",
+                  marginRight: "10px",
+                }}
+              >
+                {record.productDetail.promotionValue !== null ? (
+                  <Badge.Ribbon
+                    text={`Giảm ${
+                      record.productDetail.promotionValue
+                        ? record.productDetail.promotionMethod === "%"
+                          ? record.productDetail.promotionValue +
+                            " " +
+                            record.productDetail.promotionMethod
+                          : record.productDetail.promotionValue.toLocaleString(
+                              "vi-VN",
+                              {
+                                style: "currency",
+                                currency: "VND",
+                              }
+                            )
+                        : null
+                    }`}
+                    color="red"
+                  >
+                    <Carousel className={styles.slider} autoplay>
+                      {record.productDetail.productImageResponse &&
+                        record.productDetail.productImageResponse.map(
+                          (item) => {
+                            return (
+                              <img
+                                key={item.id}
+                                style={{ width: "100%", marginTop: "10px" }}
+                                alt=""
+                                src={item.path}
+                              />
+                            );
+                          }
+                        )}
+                    </Carousel>
+                  </Badge.Ribbon>
+                ) : (
+                  <Carousel className={styles.slider} autoplay>
+                    {record.productDetail.productImageResponse &&
+                      record.productDetail.productImageResponse.map((item) => {
+                        return (
+                          <img
+                            key={item.id}
+                            style={{ width: "100%", marginTop: "10px" }}
+                            alt=""
+                            src={item.path}
+                          />
+                        );
+                      })}
+                  </Carousel>
+                )}
+              </div>
             </Col>
-            <Col span={20}>
+            <Col span={18}>
               <div
                 className="m-5"
                 style={{
@@ -157,11 +201,11 @@ const Bill = () => {
                 <span style={{ fontWeight: "500" }}>
                   {record.productDetail.product.productName +
                     "-" +
-                    record.productDetail.button.buttonName +
-                    "-" +
                     record.productDetail.brand.brandName +
                     "-" +
                     record.productDetail.category.categoryName +
+                    "-" +
+                    record.productDetail.button.buttonName +
                     "-" +
                     record.productDetail.material.materialName +
                     "-" +
@@ -186,7 +230,6 @@ const Bill = () => {
                   ></span>
                   {record.productDetail.color.colorName}
                 </div>
-                <br />
                 <b>Kích cỡ: </b>
                 <span
                   style={{
@@ -220,13 +263,70 @@ const Bill = () => {
       },
     },
     {
+      title: "Đơn giá",
+      dataIndex: "price",
+      key: "price",
+      width: 200,
+
+      render: (text, record, index) => {
+        return (
+          <div style={{ textAlign: "center" }}>
+            {record.productDetail.promotionValue ? (
+              <span style={{ color: "#ccc" }}>
+                <strike>
+                  {record.productDetail.price.toLocaleString("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  })}
+                </strike>
+              </span>
+            ) : (
+              <span>
+                {record.productDetail.price.toLocaleString("vi-VN", {
+                  style: "currency",
+                  currency: "VND",
+                })}
+              </span>
+            )}
+            <br />
+            <span>
+              {record.productDetail.promotionValue
+                ? record.productDetail.promotionMethod === "%"
+                  ? (
+                      (record.productDetail.price *
+                        (100 - Number(record.productDetail.promotionValue))) /
+                      100
+                    ).toLocaleString("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    })
+                  : (
+                      record.productDetail.price -
+                      Number(record.productDetail.promotionValue)
+                    ).toLocaleString("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    })
+                : null}
+            </span>
+          </div>
+        );
+      },
+    },
+    {
       title: "Thành tiền",
       dataIndex: "totalPrice",
       key: "totalPrice",
       width: 200,
-
       render: (text, record, index) => {
-        return <span>{record.productDetail.price * record.quantity}</span>;
+        return (
+          <span>
+            {(record.priceReduce * record.quantity).toLocaleString("vi-VN", {
+              style: "currency",
+              currency: "VND",
+            })}
+          </span>
+        );
       },
     },
     {
@@ -477,7 +577,7 @@ const Bill = () => {
 
   //  giá tiền tạm tính
   const totalPrice = productDetails.reduce((total, product) => {
-    return total + product.productDetail.price * product.quantity;
+    return total + product.priceReduce * product.quantity;
   }, 0);
 
   const voucherPrice = () => {
@@ -667,7 +767,7 @@ const Bill = () => {
     axios
       .get(
         "http://localhost:8080/api/admin/product/getproductdetailbyidpd?productDetailId=" +
-          result
+        result
       )
       .then((response) => {
         var cart = JSON.parse(localStorage.getItem(cartId));
@@ -781,8 +881,8 @@ const Bill = () => {
       amountPaid: typeShipping[index]
         ? 0
         : selectedOption === "2"
-        ? voucherPrice() + shippingFee
-        : amountPaid,
+          ? voucherPrice() + shippingFee
+          : amountPaid,
       billType: "In-Store",
       symbol: typeShipping[index] ? "Shipping" : symbol,
       status: typeShipping[index] ? "Unpaid" : "Paid",
@@ -830,10 +930,9 @@ const Bill = () => {
       for (let i = 0; i < productDetails.length; i++) {
         const billDetail = {
           productDetailId: productDetails[i].productDetail.id,
-          price: productDetails[i].productDetail.price,
+          price: productDetails[i].priceReduce,
           quantity: productDetails[i].quantity,
         };
-
         bill.lstBillDetailRequest.push(billDetail);
       }
 
@@ -943,7 +1042,9 @@ const Bill = () => {
                 <div className={styles.tabContent}>
                   <Row>
                     <Col span={12}>
-                      <h2>Giỏ hàng</h2>
+                      <h2>
+                        <ShoppingCartOutlined /> Giỏ hàng
+                      </h2>
                     </Col>
                     <Col span={12}>
                       <Button
@@ -991,7 +1092,9 @@ const Bill = () => {
                 <div className={styles.infoPayment}>
                   <Row>
                     <Col span={12}>
-                      <h2>Thông tin thanh toán</h2>
+                      <h2>
+                        <WalletOutlined /> Thông tin thanh toán
+                      </h2>
                     </Col>
                     <Col span={12} style={{ textAlign: "right" }}>
                       <Button
@@ -1118,9 +1221,9 @@ const Bill = () => {
                               value={
                                 selectedAddress.city
                                   ? selectedAddress?.city.substring(
-                                      0,
-                                      selectedAddress.city.indexOf("|")
-                                    )
+                                    0,
+                                    selectedAddress.city.indexOf("|")
+                                  )
                                   : undefined
                               }
                             >
@@ -1157,9 +1260,9 @@ const Bill = () => {
                               value={
                                 selectedAddress.district
                                   ? selectedAddress?.district.substring(
-                                      0,
-                                      selectedAddress.district.indexOf("|")
-                                    )
+                                    0,
+                                    selectedAddress.district.indexOf("|")
+                                  )
                                   : undefined
                               }
                             >
@@ -1194,9 +1297,9 @@ const Bill = () => {
                               value={
                                 selectedAddress.ward
                                   ? selectedAddress.ward.substring(
-                                      0,
-                                      selectedAddress.ward.indexOf("|")
-                                    )
+                                    0,
+                                    selectedAddress.ward.indexOf("|")
+                                  )
                                   : undefined
                               }
                             >
@@ -1262,11 +1365,11 @@ const Bill = () => {
                             productDetails.length > 0
                               ? true
                               : notification.error({
-                                  message: "Lỗi",
-                                  description:
-                                    "Chưa có sản phẩm trong giỏ hàng.",
-                                  duration: 2,
-                                })
+                                message: "Lỗi",
+                                description:
+                                  "Chưa có sản phẩm trong giỏ hàng.",
+                                duration: 2,
+                              })
                           )
                         }
                       >
@@ -1406,7 +1509,7 @@ const Bill = () => {
                           )}
                         </Col>
                         {Number(selectedOption) !== 2 &&
-                        !typeShipping[index] ? (
+                          !typeShipping[index] ? (
                           <>
                             <Col span={8} style={{ marginTop: "8px" }}>
                               <span
@@ -1455,7 +1558,7 @@ const Bill = () => {
                           </>
                         ) : null}
                         {Number(selectedOption) !== 2 &&
-                        !typeShipping[index] ? (
+                          !typeShipping[index] ? (
                           <Col span={24}>
                             <Row style={{ marginTop: "8px" }}>
                               <Col span={16}>

@@ -1,0 +1,28 @@
+.divColor {
+  margin-top: 16px;
+}
+
+.chooseColor {
+  display: inline-block;
+  height: 30px;
+  width: 30px;
+  background-color: #000;
+  border-radius: 50%;
+}
+
+.chooseColorActive {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2px;
+  border-radius: 50%;
+}
+
+.chooseColorActive:hover {
+  cursor: pointer;
+}
+
+.spacing {
+  padding-right: 4px;
+  padding-bottom: 4px;
+}

@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -24,5 +25,10 @@ public interface VoucherAccountRepository extends JpaRepository<VoucherAccount, 
             @Param("username") String username,
             @Param("voucherId") Long voucherId
     );
+
+    @Query("select voucherAccount.accountVoucher.username from VoucherAccount voucherAccount " +
+            "where voucherAccount.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and voucherAccount.voucherAccount.id = :voucherId ")
+    List<String> findAccountByVoucherId(@Param("voucherId") Long voucherId);
 
 }

@@ -11,17 +11,16 @@ function SortAndResultSearch({ products, filter, setFilter }) {
         <Row>
           <Col span={20}>
             <p style={{ fontSize: "16px", color: "#111111" }}>
-              Hiển thị {products.length} kết quả
+              Hiển thị <strong>{products.length}</strong> kết quả
             </p>
           </Col>
           <Col span={4}>
             <Select
               style={{ width: "100%" }}
-              defaultValue={null}
+              defaultValue={"up"}
               value={filter.sort}
               onChange={handleChange}
               options={[
-                { value: null, label: "Giá" },
                 { value: "up", label: "Giá thấp đến cao" },
                 { value: "down", label: "Giá cao đến thấp" },
               ]}

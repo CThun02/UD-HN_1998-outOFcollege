@@ -873,9 +873,12 @@ function SaveVoucher() {
                                   <Select
                                     name="objectUse"
                                     className={styles.selectedItem}
-                                    onChange={(e) =>
-                                      setFieldValue("objectUse", e)
-                                    }
+                                    onChange={(e) => {
+                                      setFieldValue("objectUse", e);
+                                      if (e === "member") {
+                                        setFieldValue("isCheckSendEmail", true);
+                                      }
+                                    }}
                                     onBlur={handleBlur}
                                     options={optionsobjectUse}
                                     value={values.objectUse}
@@ -897,13 +900,13 @@ function SaveVoucher() {
                                       "isCheckSendEmail",
                                       e.target.checked
                                     );
-                                    console.log("values: ", e.target.checked);
                                   }}
                                   disabled={
                                     values.status === "INACTIVE" ||
                                     values.status === "ACTIVE" ||
                                     values.status === "CANCEL" ||
-                                    values.status === "ACTIVE"
+                                    values.status === "ACTIVE" ||
+                                    values.objectUse === "member"
                                   }
                                 >
                                   Gửi mã giảm giá cho khách hàng
@@ -915,9 +918,11 @@ function SaveVoucher() {
                                   </div>
                                 )}
                                 <div className={styles.errors}>
-                                  {values.objectUse === "member" &&
-                                  customers.length === 0
-                                    ? "* Vui lòng chọn khách hàng cần gửi."
+                                  {values.usernames?.length === 0
+                                    ? values.objectUse === "member" &&
+                                      customers.length === 0
+                                      ? "* Vui lòng chọn khách hàng cần gửi."
+                                      : ""
                                     : ""}
                                 </div>
                               </Space>
@@ -947,8 +952,10 @@ function SaveVoucher() {
                                   disabled={
                                     values.status === "INACTIVE" ||
                                     values.status === "CANCEL" ||
-                                    (values.objectUse === "member" &&
-                                      customers.length === 0)
+                                    values.usernames.length === 0
+                                      ? values.objectUse === "member" &&
+                                        customers.length === 0
+                                      : false
                                   }
                                 >
                                   Xác nhận

@@ -26,7 +26,6 @@ import java.util.List;
                 select pd.id as 'ProductDetailsId',
                        p.product_code as 'ProductCode',
                        p.product_name as 'ProductName',
-                       pie.path as 'ImageDefault',
                        bt.button_name as 'ButtonName',
                        m.material_name as 'MaterialName',
                        ct.collar_type_name as 'CollarName',
@@ -38,11 +37,16 @@ import java.util.List;
                        pd.quantity as 'Quantity',
                        pd.description_detail as 'Description',
                        pd.status as 'Status',
-                       CASE 
-                       WHEN COUNT(ppd.product_detail_id) > 0 
-                       THEN CAST(1 AS bit) 
-                       ELSE CAST(0 AS bit) 
-                       END AS 'ProductInPromotion'
+                       (
+                            select
+                                CASE
+                                   WHEN COUNT(ppd.product_detail_id) > 0
+                                   THEN CAST(1 AS bit)
+                                   ELSE CAST(0 AS bit)
+                                END
+                            from promotion_product_detail ppd left join promotion p on ppd.promotion_id = p.id
+                            where (ppd.product_detail_id is null or (pd.id = ppd.product_detail_id and p.status = 'ACTIVE'))
+                       ) AS 'ProductInPromotion'
                 from product_detail pd
                          left join product p on pd.product_id = p.id
                          left join button_type bt on pd.button_id = bt.id
@@ -52,9 +56,6 @@ import java.util.List;
                          left join shirt_tail_type stt on pd.shirt_tail_id = stt.id
                          left join size s on pd.size_id = s.id
                          left join color c on pd.color_id = c.id
-                         left join product_image pie on pd.id = pie.product_detail_id
-                         left join promotion_product_detail ppd on pd.id = ppd.product_detail_id
-                         left join promotion pn on ppd.promotion_id = pn.id
                 where pd.status = 'ACTIVE'
                   and p.status = 'ACTIVE'
                   and bt.status = 'ACTIVE'
@@ -64,9 +65,6 @@ import java.util.List;
                   and stt.status = 'ACTIVE'
                   and s.status = 'ACTIVE'
                   and c.status = 'ACTIVE'
-                  and (pie.product_detail_id is null or pie.status = 'ACTIVE')
-                  and (ppd.product_detail_id is null or pn.status not in ('INACTIVE', 'CANCEL'))
-                  and (pie.product_detail_id is null or pie.status = 'ACTIVE')
                   and (p.id in ?1)
                   and (?2 is null or bt.id = ?2)
                   and (?3 is null or m.id = ?3)
@@ -77,13 +75,12 @@ import java.util.List;
                   and (?8 is null or c.id = ?8)
                   and (?9 is null or p.product_name like ?9 or p.product_code like ?9)
                   
-                  group by pd.id, p.product_code, p.product_name, pie.path,
-                           bt.button_name, m.material_name, ct.collar_type_name,
-                           st.seleeve_name, s.size_name, stt.shirt_tail_name, c.color_code,
+                  group by pd.id, p.product_code, p.product_name, bt.button_name, m.material_name,
+                  ct.collar_type_name, st.seleeve_name, s.size_name, stt.shirt_tail_name, c.color_code,
                            pd.price, pd.quantity, pd.description_detail, pd.status
                   ORDER BY
                       CASE
-                          WHEN COUNT(ppd.product_detail_id) > 0 THEN 1
+                          WHEN COUNT(pd.id) > 0 THEN 1
                           ELSE 0
                       END ASC;
                 """,
@@ -92,13 +89,24 @@ import java.util.List;
 
 @NamedNativeQuery(name = "ProductDetail.getAllProductDetailShop",
         query = """
-            SELECT pd.id                as 'ProductDetailId',
-                    c.category_name     as 'CategoryName',
-                    pt.product_name     as 'ProductName',
-                    pn.promotion_method as 'PromotionMethod',
-                    pn.promotion_value  as 'PromotionValue',
-                    pd.price            as 'Price',
-                    COUNT(bd.id)        as 'QuantitySelling'
+            SELECT  pd.id               AS 'ProductDetailId',
+                    pt.id               AS 'ProductId',
+                    br.id               AS 'BrandId',
+                    cy.id               AS 'CategoryId',
+                    patt.id             AS 'PatternId',
+                    f.id                AS 'FormId',
+                    button.id           AS 'ButtonId',
+                    mate.id             AS 'MaterialId',
+                    collar.id           AS 'CollarId',
+                    sleeve.id           AS 'SleeveId',
+                    shirtTail.id        AS 'ShirtTailId',
+                    c.category_name     AS 'CategoryName',
+                    pt.product_name     AS 'ProductName',
+                    br.brand_name       AS 'BrandName',
+                    pn.promotion_method AS 'PromotionMethod',
+                    pn.promotion_value  AS 'PromotionValue',
+                    pd.price            AS 'Price',
+                    COUNT(bd.id)        AS 'QuantitySelling'
 
                     FROM product_detail pd
                     LEFT JOIN product_image pie ON pd.id = pie.product_detail_id
@@ -110,6 +118,15 @@ import java.util.List;
                     LEFT JOIN size se ON se.id = pd.size_id
                     LEFT JOIN promotion_product_detail pp ON pd.id = pp.product_detail_id
                     LEFT JOIN promotion pn ON pn.id = pp.promotion_id
+                    LEFT JOIN brand br ON br.id = pd.brand_id
+                    LEFT JOIN category cy ON cy.id = pd.category_id
+                    LEFT JOIN pattern patt ON patt.id = pd.pattern_id
+                    LEFT JOIN form f ON f.id = pd.form_id
+                    LEFT JOIN button_type button ON button.id = pd.button_id
+                    LEFT JOIN material mate ON mate.id = pd.material_id
+                    LEFT JOIN collar_type collar ON collar.id = pd.collar_id
+                    LEFT JOIN sleeve_type sleeve ON sleeve.id = pd.sleeve_id
+                    LEFT JOIN shirt_tail_type shirtTail ON shirtTail.id = pd.shirt_tail_id
 
                     WHERE
                         pd.status = 'ACTIVE'
@@ -118,16 +135,26 @@ import java.util.List;
                         AND (pp.product_detail_id is null or pp.status = 'ACTIVE')
                         AND pt.status = 'ACTIVE'
                         AND c.status = 'ACTIVE'
+                        AND br.status = 'ACTIVE'
+                        AND cy.status = 'ACTIVE'
+                        AND patt.status = 'ACTIVE'
+                        AND f.status = 'ACTIVE'
+                        AND button.status = 'ACTIVE'
+                        AND mate.status = 'ACTIVE'
+                        AND collar.status = 'ACTIVE'
+                        AND collar.status = 'ACTIVE'
+                        AND sleeve.status = 'ACTIVE'
+                        AND shirtTail.status = 'ACTIVE'
                         AND (pp.promotion_id is null or pn.status = 'ACTIVE')
                         AND (?1 IS NULL OR lower(pt.product_name) LIKE ?1)
-                        AND (?2 IS NULL OR pd.price >= ?2)
-                        AND (?3 IS NULL OR pd.price <= ?3)
+                        AND (?2 IS NULL OR pp.money_after >= ?2 OR pd.price >= ?2)
+                        AND (?3 IS NULL OR pp.money_after <= ?3 OR pd.price <= ?3)
                         AND (?4 = '' OR c.id IN (?8))
                         AND (?5 = '' OR b.id IN (?9))
                         AND (?6 = '' OR cor.id IN (?10))
                         AND (?7 = '' OR se.id IN (?11))
-                    GROUP BY pd.id, c.category_name, pt.product_name, pn.promotion_method,
-                    pn.promotion_value, pd.price
+                    GROUP BY pd.id, pt.id, br.id, cy.id, patt.id, f.id, button.id, mate.id, collar.id, sleeve.id, shirtTail.id,
+                     c.category_name, pt.product_name, br.brand_name, pn.promotion_method, pn.promotion_value, pd.price
                     ORDER BY
                         CASE WHEN ?12 = 'desc' THEN pd.price END DESC,
                         CASE WHEN ?12 = 'asc' THEN pd.price END ASC;
@@ -141,7 +168,6 @@ import java.util.List;
                         @ColumnResult(name = "ProductDetailsId", type = Long.class),
                         @ColumnResult(name = "ProductCode", type = String.class),
                         @ColumnResult(name = "ProductName", type = String.class),
-                        @ColumnResult(name = "ImageDefault", type = String.class),
                         @ColumnResult(name = "ButtonName", type = String.class),
                         @ColumnResult(name = "MaterialName", type = String.class),
                         @ColumnResult(name = "CollarName", type = String.class),
@@ -163,8 +189,19 @@ import java.util.List;
                 targetClass = ProductDetailShop.class,
                 columns = {
                         @ColumnResult(name = "ProductDetailId", type = Long.class),
+                        @ColumnResult(name = "ProductId", type = Long.class),
+                        @ColumnResult(name = "BrandId", type = Long.class),
+                        @ColumnResult(name = "CategoryId", type = Long.class),
+                        @ColumnResult(name = "PatternId", type = Long.class),
+                        @ColumnResult(name = "FormId", type = Long.class),
+                        @ColumnResult(name = "ButtonId", type = Long.class),
+                        @ColumnResult(name = "MaterialId", type = Long.class),
+                        @ColumnResult(name = "CollarId", type = Long.class),
+                        @ColumnResult(name = "SleeveId", type = Long.class),
+                        @ColumnResult(name = "ShirtTailId", type = Long.class),
                         @ColumnResult(name = "CategoryName", type = String.class),
                         @ColumnResult(name = "ProductName", type = String.class),
+                        @ColumnResult(name = "BrandName", type = String.class),
                         @ColumnResult(name = "PromotionMethod", type = String.class),
                         @ColumnResult(name = "PromotionValue", type = BigDecimal.class),
                         @ColumnResult(name = "Price", type = BigDecimal.class),

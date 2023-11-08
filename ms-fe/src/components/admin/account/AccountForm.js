@@ -11,17 +11,12 @@ import {
   DatePicker,
   Button,
   Upload,
-  message,
   notification,
   Tooltip,
   Modal,
   Spin,
 } from "antd";
-import {
-  CheckCircleTwoTone,
-  QrcodeOutlined,
-  ScanOutlined,
-} from "@ant-design/icons";
+import { CheckCircleTwoTone, QrcodeOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { saveImage } from "../../../config/FireBase";

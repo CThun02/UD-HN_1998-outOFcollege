@@ -49,7 +49,6 @@
 .cssHover:hover {
   cursor: pointer;
   bottom: 28px;
-  transition: bottom 0.3s ease-out;
 }
 
 .position {
@@ -82,6 +81,21 @@
 .addToCart {
   background-color: #00b2ff;
   color: #fff;
+  /* opacity: 0; */
+}
+
+.position .absoluteCenter {
+  position: absolute;
+  opacity: 0;
+  /* visibility: hidden; */
+  top: 100px;
+  transition: all 0.3s ease-in-out;
+}
+
+.position:hover .absoluteCenter {
+  opacity: 1;
+  top: 80px;
+  /* visibility: visible; */
 }
 
 .quickView {
@@ -99,7 +113,7 @@
   transition: bottom 1s ease-out;
 }
 
-.hidden {
+/* .hidden {
   display: none;
 }
 
@@ -107,7 +121,7 @@
   position: absolute;
   bottom: 28px;
   transition: bottom 1s ease-out;
-}
+} */
 
 .row {
   margin: 0;

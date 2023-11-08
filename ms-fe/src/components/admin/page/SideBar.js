@@ -7,7 +7,6 @@ import {
   BookOutlined,
   DingtalkOutlined,
   DownOutlined,
-  EuroCircleOutlined,
   FontSizeOutlined,
   FullscreenOutlined,
   HighlightOutlined,

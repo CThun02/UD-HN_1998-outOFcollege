@@ -206,11 +206,17 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
 
         Optional<List<Color>> colors = colorServiceI.findColorsByProductId(req);
         Optional<List<Size>> sizes = sizeServiceI.findSizesByProductId(req);
-
         if(colors.isEmpty() || sizes.isEmpty()) {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND));
         }
 
+        List<Long> productDetailsId =
+                repo.productDetailsId(req.getProductId(), req.getBrandId(), req.getCategoryId(), req.getPatternId(),
+                        req.getFormId(), req.getButtonId(), req.getMaterialId(), req.getCollarId(), req.getSleeveId(),
+                        req.getShirtTailId(), req.getColorId(), req.getSizeId());
+        if(!CollectionUtils.isEmpty(productDetailsId)) {
+            res.setProductDetailsId(productDetailsId);
+        }
         res.setColors(colors.get());
         res.setSizes(sizes.get());
 

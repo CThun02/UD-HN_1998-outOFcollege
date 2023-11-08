@@ -18,6 +18,7 @@ public class GetColorAndSizeAndQuantity {
     private BigDecimal priceProductMin;
     private BigDecimal priceProductMax;
     private Long quantity;
+    private List<Long> productDetailsId;
 
     public GetColorAndSizeAndQuantity(BigDecimal priceProductMin, BigDecimal priceProductMax, Long quantity) {
         this.priceProductMin = priceProductMin;

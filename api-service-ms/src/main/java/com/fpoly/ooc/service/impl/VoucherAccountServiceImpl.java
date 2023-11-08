@@ -16,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @Slf4j
 public class VoucherAccountServiceImpl implements VoucherAccountService {
@@ -48,6 +50,16 @@ public class VoucherAccountServiceImpl implements VoucherAccountService {
                 .orElseThrow(() -> new NotFoundException(ErrorCodeConfig.getMessage(Const.VOUCHER_ACCOUNT_NOT_FOUND)));
         voucherAccount.setStatus(Const.STATUS_USED);
         return voucherAccountRepository.save(voucherAccount);
+    }
+
+    @Override
+    public List<VoucherAccount> voucherAccounts() {
+        return voucherAccountRepository.findAll();
+    }
+
+    @Override
+    public List<String> findAccountByVoucherId(Long voucherId) {
+        return voucherAccountRepository.findAccountByVoucherId(voucherId);
     }
 
     private VoucherAccount getVoucherAccount(VoucherAccountConditionDTO voucherAccountConditionDTO) {

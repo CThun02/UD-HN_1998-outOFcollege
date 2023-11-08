@@ -243,12 +243,26 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
 
     @Override
     public List<ProductsDetailsResponse> findListProductdetailsByListProductId(ProductDetailsDTO dto) {
-        return repo.getProductDetailsTableByConditionDTO(
-                dto.getIdProducts(), dto.getIdButtons(), dto.getIdMaterials(),
-                dto.getIdCollars(), dto.getIdSleeves(), dto.getIdShirtTails(),
-                dto.getIdSizes(), dto.getIdColors(),
-                StringUtils.isEmpty(dto.getSearchText()) ? null : "%" + dto.getSearchText() + "%"
-        );
+        List<ProductsDetailsResponse> productsDetailsResponses = repo.getProductDetailsTableByConditionDTO(
+                                                                    dto.getIdProducts(), dto.getIdButtons(), dto.getIdMaterials(),
+                                                                    dto.getIdCollars(), dto.getIdSleeves(), dto.getIdShirtTails(),
+                                                                    dto.getIdSizes(), dto.getIdColors(),
+                                                                    StringUtils.isEmpty(dto.getSearchText()) ? null : "%" + dto.getSearchText() + "%"
+                                                            );
+
+        if(CollectionUtils.isEmpty(productsDetailsResponses)) {
+            return null;
+        }
+
+        for (ProductsDetailsResponse productDetail: productsDetailsResponses) {
+            List<ProductImageResponse> imageResponse = productImageService.getProductImageByProductDetailId(productDetail.getProductDetailsId());
+            if(CollectionUtils.isEmpty(imageResponse)) {
+                productDetail.setImageDefault(null);
+            } else {
+                productDetail.setImageDefault(imageResponse.get(0).getPath());
+            }
+        }
+        return productsDetailsResponses;
     }
 
     private List<ProductDetailShop> getImageByProductDetailId(List<ProductDetailShop> list) {

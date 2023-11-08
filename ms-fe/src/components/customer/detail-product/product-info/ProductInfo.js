@@ -42,9 +42,8 @@ function ProductInfo({
       const existingData = JSON.parse(existingItem);
       existingData.timeStart = now();
       let productExists = false;
-      for (let i = 0; i < existingData.productDetails.length; i++) {
+      for (let i = 0; i < existingData.productDetails?.length; i++) {
         if (existingData.productDetails[i].data.productDetailId === data.productDetailId) {
-          console.log(`đã vào`, existingData.productDetails[i].quantity)
           existingData.productDetails[i].quantity += quantity
           productExists = true;
           break;

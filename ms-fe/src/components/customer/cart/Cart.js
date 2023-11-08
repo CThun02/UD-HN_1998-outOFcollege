@@ -4,48 +4,16 @@ import { Button, Col, InputNumber, Row, Table, notification } from 'antd'
 import { CloseOutlined } from '@ant-design/icons'
 import { Link } from 'react-router-dom'
 import numeral from 'numeral'
+import Checkout from '../checkout/Checkout'
 
 
 const Cart = () => {
     const [productDetails, setProductDetails] = useState(null)
     const [render, setRender] = useState(null)
-
-    const updateQuantity = (e, index) => {
-        let cart = JSON.parse(localStorage.getItem('user'));
-        let productDetail = cart.productDetails;
-        if (e > productDetail[index].data.colorAndSizeAndQuantity.quantity) {
-            notification.warning({
-                message: "Thông báo",
-                description: "Vượt quá số lượng tồn",
-                duration: 1,
-            });
-            return;
-        }
-
-        productDetail[index].quantity = e;
-        cart.productDetails = productDetail;
-        localStorage.setItem("user", JSON.stringify(cart));
-
-        setRender(Math.random())
-    }
-
-    const deleteProductDetail = (e, index) => {
-        e.preventDefault();
-        let cart = JSON.parse(localStorage.getItem('user'))
-        let productDetails = cart.productDetails;
-        if (index >= 0 && index < productDetails.length) {
-            productDetails.splice(index, 1);
-            cart.productDetails = productDetails;
-            localStorage.setItem('user', JSON.stringify(productDetails))
-            setRender(Math.random())
-        }
-    }
-
-    useEffect(() => {
-        var productDetail = JSON.parse(localStorage.getItem('user'));
-
-        setProductDetails(productDetail.productDetails)
-    }, [render]);
+    const [totalPrice, setTotalPrice] = useState(0)
+    const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+    const [dataBuy, setDataBuy] = useState({})
+    const [loading, setLoading] = useState(true)
 
     const columns = [
         {
@@ -73,8 +41,17 @@ const Cart = () => {
                                         {record.data.productName}
                                     </span>
                                     <br />
-                                    {record.data.colorAndSizeAndQuantity.colors[0].colorCode}/
-                                    {record.data.colorAndSizeAndQuantity.sizes[0].sizeName}
+                                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                                        <div
+                                            style={{
+                                                height: 20,
+                                                width: 20,
+                                                borderRadius: '50%',
+                                                backgroundColor: record.data.colorAndSizeAndQuantity.colors[0].colorCode,
+                                            }}
+                                        ></div>/
+                                        <span>{record.data.colorAndSizeAndQuantity.sizes[0].sizeName}</span>
+                                    </div>
                                 </div>
                             </Col>
                         </Row>
@@ -129,26 +106,107 @@ const Cart = () => {
         },
     ]
 
+    const updateQuantity = (e, index) => {
+        let cart = JSON.parse(localStorage.getItem('user'));
+        let productDetail = cart.productDetails;
+        if (e > productDetail[index].data.colorAndSizeAndQuantity.quantity) {
+            notification.warning({
+                message: "Thông báo",
+                description: "Vượt quá số lượng tồn",
+                duration: 1,
+            });
+            return;
+        }
+
+        productDetail[index].quantity = e;
+        cart.productDetails = productDetail;
+        localStorage.setItem("user", JSON.stringify(cart));
+
+        setRender(Math.random())
+    }
+
+    const deleteProductDetail = (e, index) => {
+        e.preventDefault();
+        let cart = JSON.parse(localStorage.getItem('user'))
+        let productDetails = cart.productDetails;
+        if (index >= 0 && index < productDetails?.length) {
+            productDetails.splice(index, 1);
+            cart.productDetails = productDetails;
+            localStorage.setItem('user', JSON.stringify(cart))
+            setRender(Math.random())
+        }
+    }
+
+    const getAllCart = () => {
+        let productDetail = JSON.parse(localStorage.getItem('user'));
+        setProductDetails(productDetail?.productDetails)
+        let totalPrice = 0;
+        for (let i = 0; i < productDetail?.productDetails?.length; i++) {
+            totalPrice +=
+                productDetail.productDetails[i].data.colorAndSizeAndQuantity.priceProductMin *
+                productDetail.productDetails[i].quantity
+        }
+        setTotalPrice(totalPrice)
+        setLoading(false)
+    }
+
+    const onSelectChange = (selectedKeys) => {
+        setSelectedRowKeys(selectedKeys);
+    };
+
+    const addSelectedToData = (e) => {
+        let newData = []
+        selectedRowKeys.forEach((key) => {
+            let selectedRow = productDetails.find((row) => row.data.productDetailId === key);
+            newData.push(selectedRow);
+        });
+
+        setDataBuy(newData);
+    };
+
+    const rowSelection = {
+        selectedRowKeys,
+        onChange: onSelectChange,
+    };
+
+    useEffect(() => {
+        getAllCart()
+        console.log(dataBuy)
+    }, [render, dataBuy]);
+
     return (
         <div className={styles.wrapper}>
             <div className={styles.container}>
                 <h2 style={{ padding: '10px 0' }}>Giỏ hàng của bạn</h2>
                 <Table
+                    rowSelection={rowSelection}
                     columns={columns}
-                    dataSource={productDetails}
+                    dataSource={
+                        productDetails &&
+                        productDetails.map((record, index) => ({
+                            ...record,
+                            key: record.data.productDetailId,
+                        }))
+                    }
+                    loading={loading}
                     pagination={false}
                 />
                 <Row style={{ marginTop: '20px' }}>
                     <Col span={18}></Col>
                     <Col span={6} style={{ position: 'relative' }}>
                         <span className={styles.left}>Tổng tiền:</span>
-                        <span className={styles.right}>1.000.000</span>
+                        <span className={styles.right}>{numeral(totalPrice).format('0,0') + 'đ'} </span>
                     </Col>
                     <Col span={18}></Col>
                     <Col span={6} style={{ height: '45px', marginTop: '10px', marginBottom: '10px' }}>
-                        <Link to={'/ms-shop/checkout'}>
-                            <Button type='primary' className={styles.btn}>Thanh toán</Button>
-                        </Link>
+                        {/* <Link to={'/ms-shop/checkout'}> */}
+                        <Button type='primary' className={styles.btn}
+                            onClick={(e) => addSelectedToData(e)}
+                        >Thanh toán</Button>
+                        <div style={{ visibility: 'hidden' }}>
+                            <Checkout dataBuy={dataBuy} />
+                        </div>
+                        {/* </Link> */}
                     </Col>
                 </Row>
             </div>

@@ -6,6 +6,7 @@ import com.fpoly.ooc.constant.ErrorCodeConfig;
 import com.fpoly.ooc.dto.EmailDetails;
 import com.fpoly.ooc.dto.VoucherAccountConditionDTO;
 import com.fpoly.ooc.dto.VoucherAndPromotionConditionDTO;
+import com.fpoly.ooc.entity.Account;
 import com.fpoly.ooc.entity.Voucher;
 import com.fpoly.ooc.entity.VoucherAccount;
 import com.fpoly.ooc.exception.NotFoundException;
@@ -14,11 +15,13 @@ import com.fpoly.ooc.request.voucher.DisplayVoucherRequest;
 import com.fpoly.ooc.request.voucher.VoucherRequest;
 import com.fpoly.ooc.responce.account.AccountVoucher;
 import com.fpoly.ooc.responce.voucher.VoucherResponse;
+import com.fpoly.ooc.service.interfaces.AccountService;
 import com.fpoly.ooc.service.interfaces.EmailService;
 import com.fpoly.ooc.service.interfaces.VoucherAccountService;
 import com.fpoly.ooc.service.interfaces.VoucherService;
 import com.fpoly.ooc.util.PageUltil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,10 +33,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -46,7 +51,7 @@ public class VoucherServiceImpl implements VoucherService {
     private EmailService emailService;
 
     @Autowired
-    private AccountServiceImpl accountService;
+    private AccountService accountService;
 
     @Autowired
     private VoucherAccountService voucherAccountService;
@@ -70,7 +75,12 @@ public class VoucherServiceImpl implements VoucherService {
     @Transactional
     @Override
     public Voucher saveOrUpdate(VoucherRequest voucherRequest) {
-        Voucher voucher = convertVoucherRequest(voucherRequest);
+        Voucher voucherDb = null;
+        if(voucherRequest.getVoucherId() != null) {
+            voucherDb = voucherRepository.findById(voucherRequest.getVoucherId()).orElse(null);
+        }
+        Voucher voucher = convertVoucherRequest(voucherRequest, voucherDb);
+        Voucher dbVoucher = voucherRepository.save(voucher);
         String result = null;
 
         if (voucher.getIsSendEmail()) {
@@ -82,11 +92,14 @@ public class VoucherServiceImpl implements VoucherService {
                 }
 
                 voucherRequest.getEmailDetails().setRecipient(emails);
+            } else {
+                List<Account> accounts = voucherRequest.getUsernames()
+                        .stream().map((e) -> accountService.findByUsername(e.getUsername())).toList();
+                List<String> recipient = accounts.stream().map(Account::getEmail).toList();
+                voucherRequest.getEmailDetails().setRecipient(recipient);
             }
             result = emailService.sendSimpleMail(voucherRequest.getEmailDetails(), voucher.getId());
         }
-
-        Voucher dbVoucher = voucherRepository.save(voucher);
 
         if (result != null && result.equals("ERROR")) {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.SEND_EMAIL_ERROR));
@@ -207,8 +220,7 @@ public class VoucherServiceImpl implements VoucherService {
                 .build();
     }
 
-    private Voucher convertVoucherRequest(VoucherRequest request) {
-
+    private Voucher convertVoucherRequest(VoucherRequest request, Voucher voucherDb) {
         Voucher voucher = new Voucher();
 
         if (request.getVoucherName().equalsIgnoreCase(request.getVoucherNameCurrent())) {
@@ -295,12 +307,16 @@ public class VoucherServiceImpl implements VoucherService {
                 StringUtils.isEmpty(request.getVoucherCode()) ? generatorCode() : request.getVoucherCode()
         );
 
-        if (request.getObjectUse().equals("member") && !request.getIsCheckSendEmail()) {
-            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.IS_SEND_EMAIL_MEMBER_REQUIRED));
+        if(voucherDb != null && voucherDb.getIsSendEmail() != request.getIsCheckSendEmail()) {
+            if (request.getObjectUse().equals("member") && !request.getIsCheckSendEmail()) {
+                throw new NotFoundException(ErrorCodeConfig.getMessage(Const.IS_SEND_EMAIL_MEMBER_REQUIRED));
+            }
         }
 
-        if (request.getObjectUse().equals("member") && request.getUsernames().isEmpty()) {
+        if(voucherDb == null) {
+            if (request.getObjectUse().equals("member") && request.getUsernames().isEmpty()) {
                 throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ARRAYS_CUSTOMER_NOT_NULL));
+            }
         }
 
         voucher.setVoucherMethod(request.getVoucherMethod());

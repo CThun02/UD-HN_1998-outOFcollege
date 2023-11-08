@@ -767,7 +767,7 @@ const Bill = () => {
     axios
       .get(
         "http://localhost:8080/api/admin/product/getproductdetailbyidpd?productDetailId=" +
-          result
+        result
       )
       .then((response) => {
         var cart = JSON.parse(localStorage.getItem(cartId));
@@ -881,8 +881,8 @@ const Bill = () => {
       amountPaid: typeShipping[index]
         ? 0
         : selectedOption === "2"
-        ? voucherPrice() + shippingFee
-        : amountPaid,
+          ? voucherPrice() + shippingFee
+          : amountPaid,
       billType: "In-Store",
       symbol: typeShipping[index] ? "Shipping" : symbol,
       status: typeShipping[index] ? "Unpaid" : "Paid",
@@ -1221,9 +1221,9 @@ const Bill = () => {
                               value={
                                 selectedAddress.city
                                   ? selectedAddress?.city.substring(
-                                      0,
-                                      selectedAddress.city.indexOf("|")
-                                    )
+                                    0,
+                                    selectedAddress.city.indexOf("|")
+                                  )
                                   : undefined
                               }
                             >
@@ -1260,9 +1260,9 @@ const Bill = () => {
                               value={
                                 selectedAddress.district
                                   ? selectedAddress?.district.substring(
-                                      0,
-                                      selectedAddress.district.indexOf("|")
-                                    )
+                                    0,
+                                    selectedAddress.district.indexOf("|")
+                                  )
                                   : undefined
                               }
                             >
@@ -1297,9 +1297,9 @@ const Bill = () => {
                               value={
                                 selectedAddress.ward
                                   ? selectedAddress.ward.substring(
-                                      0,
-                                      selectedAddress.ward.indexOf("|")
-                                    )
+                                    0,
+                                    selectedAddress.ward.indexOf("|")
+                                  )
                                   : undefined
                               }
                             >
@@ -1365,11 +1365,11 @@ const Bill = () => {
                             productDetails.length > 0
                               ? true
                               : notification.error({
-                                  message: "Lỗi",
-                                  description:
-                                    "Chưa có sản phẩm trong giỏ hàng.",
-                                  duration: 2,
-                                })
+                                message: "Lỗi",
+                                description:
+                                  "Chưa có sản phẩm trong giỏ hàng.",
+                                duration: 2,
+                              })
                           )
                         }
                       >
@@ -1509,7 +1509,7 @@ const Bill = () => {
                           )}
                         </Col>
                         {Number(selectedOption) !== 2 &&
-                        !typeShipping[index] ? (
+                          !typeShipping[index] ? (
                           <>
                             <Col span={8} style={{ marginTop: "8px" }}>
                               <span
@@ -1558,7 +1558,7 @@ const Bill = () => {
                           </>
                         ) : null}
                         {Number(selectedOption) !== 2 &&
-                        !typeShipping[index] ? (
+                          !typeShipping[index] ? (
                           <Col span={24}>
                             <Row style={{ marginTop: "8px" }}>
                               <Col span={16}>

@@ -34,4 +34,26 @@ public class ProductsDetailsResponse {
     private String descriptionDetail;
     private String status;
     private Boolean isCheckExistsInPromotion;
+
+    public ProductsDetailsResponse(Long productDetailsId, String productCode, String productName,
+                                   String buttonTypeName, String materialType, String collarType,
+                                   String sleeveType, String size, String color, String shirtTailType,
+                                   BigDecimal price, Integer quantity, String descriptionDetail, String status,
+                                   Boolean isCheckExistsInPromotion) {
+        this.productDetailsId = productDetailsId;
+        this.productCode = productCode;
+        this.productName = productName;
+        this.buttonTypeName = buttonTypeName;
+        this.materialType = materialType;
+        this.collarType = collarType;
+        this.sleeveType = sleeveType;
+        this.size = size;
+        this.color = color;
+        this.shirtTailType = shirtTailType;
+        this.price = price;
+        this.quantity = quantity;
+        this.descriptionDetail = descriptionDetail;
+        this.status = status;
+        this.isCheckExistsInPromotion = isCheckExistsInPromotion;
+    }
 }

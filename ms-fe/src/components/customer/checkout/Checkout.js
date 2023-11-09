@@ -23,7 +23,8 @@ const Checkout = (props) => {
     const [shippingFee, setShippingFee] = useState(null)
     const [error, setError] = useState({})
     const [totalPrice, setTotalPrice] = useState(0)
-    const dataBuy = props.dataBuy;
+    const [render, setRender] = useState(null)
+
 
     const handleProvincesChange = (e) => {
         formData.city = e
@@ -325,14 +326,14 @@ const Checkout = (props) => {
     };
 
     const getAllCarts = () => {
-        let carts = JSON.parse(localStorage.getItem('user'))
-        let productDetails = carts.productDetails
-        setProductDetails(productDetails)
+        let carts = JSON.parse(localStorage.getItem('checkout'))
+        console.log(carts)
+        setProductDetails(carts)
         let totalPrice = 0;
-        for (let i = 0; i < productDetails?.length; i++) {
+        for (let i = 0; i < carts?.length; i++) {
             totalPrice +=
-                productDetails[i].data.colorAndSizeAndQuantity.priceProductMin *
-                productDetails[i].quantity
+                carts[i].data.colorAndSizeAndQuantity.priceProductMin *
+                carts[i].quantity
         }
         setTotalPrice(totalPrice)
     }
@@ -346,8 +347,7 @@ const Checkout = (props) => {
         handleShippingFee(100, selectedDistrict, selectedWard);
 
         getAllCarts()
-        console.log(dataBuy)
-    }, [selectedDistrict, selectedWard])
+    }, [selectedDistrict, selectedWard, render])
 
     return (
         <div className={styles.wrapper}>
@@ -578,8 +578,8 @@ const Checkout = (props) => {
                                     </thead>
                                     <tbody >
                                         <Space style={{ width: '100%' }} direction='vertical' size={16}>
-                                            {console.log(dataBuy)}
-                                            {/* {dataBuy.dataBuy && dataBuy.dataBuy?.map((productDetail) => (
+                                            {console.log(productDetails)}
+                                            {productDetails && productDetails?.map((productDetail) => (
                                                 <tr>
                                                     <div style={{ width: '100%' }}>
                                                         <Space style={{ width: '100%', borderBottom: '1px solid #ccc', padding: '8px 8px 10px 8px' }} direction='horizontal' size={16}>
@@ -613,7 +613,7 @@ const Checkout = (props) => {
                                                         </Space>
                                                     </div>
                                                 </tr>
-                                            ))} */}
+                                            ))}
                                         </Space>
                                     </tbody>
                                 </table>

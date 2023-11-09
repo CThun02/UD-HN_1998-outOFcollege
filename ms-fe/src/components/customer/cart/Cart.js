@@ -4,8 +4,6 @@ import { Button, Col, InputNumber, Row, Table, notification } from 'antd'
 import { CloseOutlined } from '@ant-design/icons'
 import { Link } from 'react-router-dom'
 import numeral from 'numeral'
-import Checkout from '../checkout/Checkout'
-
 
 const Cart = () => {
     const [productDetails, setProductDetails] = useState(null)
@@ -19,40 +17,67 @@ const Cart = () => {
         {
             key: 'product',
             title: 'Thông tin sản phẩm',
+            width: 750,
             render: (_, record) => {
                 return (
                     <div>
                         <Row>
-                            <Col span={7}>
+                            <Col span={4}>
                                 <div style={{ width: '110px', height: '100px' }}>
                                     <img style={{ width: '100%', height: '100%' }}
                                         src={record.data.images[0].path} alt="Áo Thun Teelab Local Brand Unisex Love Is In The Air TS199"></img>
                                 </div>
                             </Col>
-                            <Col span={17}>
+                            <Col span={20}>
                                 <div
-                                    className="m-5"
                                     style={{
-                                        textAlign: 'left',
+                                        textAlign: "left",
                                         height: "100%",
                                     }}
                                 >
                                     <span style={{ fontWeight: "500" }}>
-                                        {record.data.productName}
+                                        {record.data.productName +
+                                            "-" +
+                                            record.data.buttonName +
+                                            "-" +
+                                            record.data.brandName +
+                                            "-" +
+                                            record.data.categoryName +
+                                            "-" +
+                                            record.data.materialName +
+                                            "-" +
+                                            record.data.collarTypeName +
+                                            "-" +
+                                            record.data.sleeveName +
+                                            "-" +
+                                            record.data.shirtTailTypeName +
+                                            "-" +
+                                            record.data.patternName +
+                                            "-" +
+                                            record.data.formName}
                                     </span>
                                     <br />
-                                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                                        <div
+                                    <div className={styles.optionColor}>
+                                        <b>Màu sắc: </b>
+                                        <span
                                             style={{
-                                                height: 20,
-                                                width: 20,
-                                                borderRadius: '50%',
                                                 backgroundColor: record.data.colorAndSizeAndQuantity.colors[0].colorCode,
+                                                marginLeft: "8px",
                                             }}
-                                        ></div>/
-                                        <span>{record.data.colorAndSizeAndQuantity.sizes[0].sizeName}</span>
+                                        ></span>
+                                        {record.data.colorAndSizeAndQuantity.colors[0].colorName}
                                     </div>
+                                    <br />
+                                    <b>Kích cỡ: </b>
+                                    <span
+                                        style={{
+                                            marginLeft: "8px",
+                                        }}
+                                    >
+                                        {record.data.colorAndSizeAndQuantity.sizes[0].sizeName}
+                                    </span>
                                 </div>
+
                             </Col>
                         </Row>
                     </div >
@@ -62,6 +87,7 @@ const Cart = () => {
         {
             key: 'price',
             title: 'Đơn giá',
+            with: 300,
             render: (_, record) => {
                 return <div>
                     {numeral(record.data.colorAndSizeAndQuantity.priceProductMin)
@@ -72,7 +98,7 @@ const Cart = () => {
         {
             key: 'quantity',
             title: 'Số lượng',
-            width: 200,
+            width: 100,
             render: (_, record, index) => {
                 return (
                     <InputNumber
@@ -161,7 +187,8 @@ const Cart = () => {
             newData.push(selectedRow);
         });
 
-        setDataBuy(newData);
+
+        localStorage.setItem('checkout', JSON.stringify(newData));
     };
 
     const rowSelection = {
@@ -170,8 +197,8 @@ const Cart = () => {
     };
 
     useEffect(() => {
+        localStorage.removeItem('checkout');
         getAllCart()
-        console.log(dataBuy)
     }, [render, dataBuy]);
 
     return (
@@ -199,14 +226,11 @@ const Cart = () => {
                     </Col>
                     <Col span={18}></Col>
                     <Col span={6} style={{ height: '45px', marginTop: '10px', marginBottom: '10px' }}>
-                        {/* <Link to={'/ms-shop/checkout'}> */}
-                        <Button type='primary' className={styles.btn}
-                            onClick={(e) => addSelectedToData(e)}
-                        >Thanh toán</Button>
-                        <div style={{ visibility: 'hidden' }}>
-                            <Checkout dataBuy={dataBuy} />
-                        </div>
-                        {/* </Link> */}
+                        <Link to={'/ms-shop/checkout'}>
+                            <Button type='primary' className={styles.btn}
+                                onClick={(e) => addSelectedToData(e)}
+                            >Thanh toán</Button>
+                        </Link>
                     </Col>
                 </Row>
             </div>

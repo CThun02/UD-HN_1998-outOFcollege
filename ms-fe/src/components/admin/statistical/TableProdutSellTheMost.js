@@ -31,7 +31,7 @@ const TableProdutSellTheMost = () => {
       render: (text, record, index) => {
         return (
           <Row>
-            <Col span={4}>
+            <Col span={6}>
               <div
                 style={{
                   marginTop: "10px",
@@ -83,7 +83,7 @@ const TableProdutSellTheMost = () => {
                 )}
               </div>
             </Col>
-            <Col span={20}>
+            <Col span={18}>
               <div
                 className="m-5"
                 style={{
@@ -151,7 +151,7 @@ const TableProdutSellTheMost = () => {
       datatIndex: "total",
       title: "Tổng thu",
       render: (text, record, index) => {
-        return record.price;
+        return record.price * record.quantity;
       },
     },
   ];

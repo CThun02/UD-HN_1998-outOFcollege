@@ -1,15 +1,19 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Pie } from "@ant-design/plots";
+import axios from "axios";
+import Statistic from "antd/es/statistic/Statistic";
+import { Col, Row } from "antd";
 
 const PieChart = () => {
+  const [billRevenueCompare, setBillRevenueCompare] = useState({});
   const data = [
     {
       type: "In Store",
-      value: 27,
+      value: billRevenueCompare.inStoreRevenue,
     },
     {
       type: "Online",
-      value: 73,
+      value: billRevenueCompare.onlineRevenue,
     },
   ];
   const config = {
@@ -33,7 +37,54 @@ const PieChart = () => {
       },
     ],
   };
-  return <Pie {...config} />;
+  useEffect(() => {
+    axios
+      .get("http://localhost:8080/api/admin/bill/getBillRevenueCompare")
+      .then((res) => {
+        setBillRevenueCompare(res.data);
+      })
+      .catch((err) => console.log(err));
+  }, []);
+  return (
+    <>
+      <Pie {...config} />
+      <Row>
+        <Col span={12}>
+          <Statistic
+            title="Doanh thu tại cửa hàng"
+            value={
+              billRevenueCompare.inStoreRevenue?.toLocaleString("vi-VN", {
+                style: "currency",
+                currency: "VND",
+              }) || 0
+            }
+          />
+        </Col>
+        <Col span={12}>
+          <Statistic
+            title="Doanh thu trực tuyến"
+            value={
+              billRevenueCompare.onlineRevenue?.toLocaleString("vi-VN", {
+                style: "currency",
+                currency: "VND",
+              }) || 0
+            }
+          />
+        </Col>
+        <Col span={12}>
+          <Statistic
+            title="Tổng doanh thu"
+            value={
+              billRevenueCompare.totalRevenue?.toLocaleString("vi-VN", {
+                style: "currency",
+                currency: "VND",
+              }) || 0
+            }
+          />
+        </Col>
+      </Row>
+    </>
+  );
 };
 
 export default PieChart;

@@ -5,12 +5,11 @@ import { CloseOutlined } from '@ant-design/icons'
 import { Link } from 'react-router-dom'
 import numeral from 'numeral'
 
-const Cart = () => {
+const Cart = (props) => {
     const [productDetails, setProductDetails] = useState(null)
     const [render, setRender] = useState(null)
     const [totalPrice, setTotalPrice] = useState(0)
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-    const [dataBuy, setDataBuy] = useState({})
     const [loading, setLoading] = useState(true)
 
     const columns = [
@@ -23,7 +22,7 @@ const Cart = () => {
                     <div>
                         <Row>
                             <Col span={4}>
-                                <div style={{ width: '110px', height: '100px' }}>
+                                <div style={{}} className="m-5">
                                     <img style={{ width: '100%', height: '100%' }}
                                         src={record.data.images[0].path} alt="Áo Thun Teelab Local Brand Unisex Love Is In The Air TS199"></img>
                                 </div>
@@ -34,6 +33,7 @@ const Cart = () => {
                                         textAlign: "left",
                                         height: "100%",
                                     }}
+                                    className="m-5"
                                 >
                                     <span style={{ fontWeight: "500" }}>
                                         {record.data.productName +
@@ -77,7 +77,6 @@ const Cart = () => {
                                         {record.data.colorAndSizeAndQuantity.sizes[0].sizeName}
                                     </span>
                                 </div>
-
                             </Col>
                         </Row>
                     </div >
@@ -199,7 +198,7 @@ const Cart = () => {
     useEffect(() => {
         localStorage.removeItem('checkout');
         getAllCart()
-    }, [render, dataBuy]);
+    }, [render]);
 
     return (
         <div className={styles.wrapper}>

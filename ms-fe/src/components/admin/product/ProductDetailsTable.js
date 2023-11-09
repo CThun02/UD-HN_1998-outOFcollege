@@ -244,6 +244,7 @@ const ProductDetailsTable = (props) => {
           productDetailCreate.quantity = detail.quantity;
           productDetailCreate.weight = detail.weight;
           productDetailCreate.status = detail.status;
+          productDetailCreate.descriptionDetail = "Description detail";
           if (!productDetailCreate.status.includes("DELETED")) {
             axios
               .post(api + "product/createDetail", productDetailCreate)

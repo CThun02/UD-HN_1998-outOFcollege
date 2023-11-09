@@ -1,8 +1,13 @@
 package com.fpoly.ooc.controller;
 
+import com.fpoly.ooc.config.PaymentConfig;
 import com.fpoly.ooc.dto.BillStatusDTO;
 import com.fpoly.ooc.request.bill.BillRequest;
 import com.fpoly.ooc.service.interfaces.BillService;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.apache.kafka.clients.admin.Config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -17,9 +22,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -56,9 +70,37 @@ public class BillController {
     }
 
     @GetMapping("/getGrossRevenue")
-    public ResponseEntity<?> getGrossRevenue(){
+    public ResponseEntity<?> getGrossRevenue() {
         return ResponseEntity.ok(billService.getBillRevenue());
     }
+
+    @GetMapping("/getBillRevenueCompare")
+    public ResponseEntity<?> getBillRevenueCompare() {
+        return ResponseEntity.ok(billService.getRevenueInStoreOnlineCompare());
+    }
+
+    @GetMapping("/getBillProductSellTheMost")
+    public ResponseEntity<?> getBillProductSellTheMost(@RequestParam(defaultValue = "0") int quantitySell) {
+        return ResponseEntity.ok(billService.getBillProductSellTheMost(quantitySell));
+    }
+
+    @GetMapping("/getBusinessYear")
+    public ResponseEntity<?> getBusinessYear() {
+        return ResponseEntity.ok(billService.getBusinessYear());
+    }
+
+    @GetMapping("/compareRevenueDate")
+    public ResponseEntity<?> compareRevenueDate(@RequestParam Optional<Integer> dayFrom,
+                                                @RequestParam Optional<Integer> monthFrom,
+                                                @RequestParam Optional<Integer> yearFrom,
+                                                @RequestParam Optional<Integer> dayTo,
+                                                @RequestParam Optional<Integer> monthTo,
+                                                @RequestParam Optional<Integer> yearTo) {
+        System.out.println("CHeck" + dayFrom.orElse(null));
+        return ResponseEntity.ok(billService.compareRevenueDate(dayFrom.orElse(null), monthFrom.orElse(null),
+                yearFrom.orElse(null), dayTo.orElse(null), monthTo.orElse(null), yearTo.orElse(null)));
+    }
+
     @GetMapping("/customer/{username}/address")
     public ResponseEntity<?> getListAddressByUserName(@PathVariable("username") String username) {
         return ResponseEntity.ok(billService.getListAddressByUserName(username));

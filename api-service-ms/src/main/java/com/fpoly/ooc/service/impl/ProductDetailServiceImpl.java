@@ -206,11 +206,17 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
 
         Optional<List<Color>> colors = colorServiceI.findColorsByProductId(req);
         Optional<List<Size>> sizes = sizeServiceI.findSizesByProductId(req);
-
         if(colors.isEmpty() || sizes.isEmpty()) {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND));
         }
 
+        List<Long> productDetailsId =
+                repo.productDetailsId(req.getProductId(), req.getBrandId(), req.getCategoryId(), req.getPatternId(),
+                        req.getFormId(), req.getButtonId(), req.getMaterialId(), req.getCollarId(), req.getSleeveId(),
+                        req.getShirtTailId(), req.getColorId(), req.getSizeId());
+        if(!CollectionUtils.isEmpty(productDetailsId)) {
+            res.setProductDetailsId(productDetailsId);
+        }
         res.setColors(colors.get());
         res.setSizes(sizes.get());
 
@@ -243,12 +249,26 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
 
     @Override
     public List<ProductsDetailsResponse> findListProductdetailsByListProductId(ProductDetailsDTO dto) {
-        return repo.getProductDetailsTableByConditionDTO(
-                dto.getIdProducts(), dto.getIdButtons(), dto.getIdMaterials(),
-                dto.getIdCollars(), dto.getIdSleeves(), dto.getIdShirtTails(),
-                dto.getIdSizes(), dto.getIdColors(),
-                StringUtils.isEmpty(dto.getSearchText()) ? null : "%" + dto.getSearchText() + "%"
-        );
+        List<ProductsDetailsResponse> productsDetailsResponses = repo.getProductDetailsTableByConditionDTO(
+                                                                    dto.getIdProducts(), dto.getIdButtons(), dto.getIdMaterials(),
+                                                                    dto.getIdCollars(), dto.getIdSleeves(), dto.getIdShirtTails(),
+                                                                    dto.getIdSizes(), dto.getIdColors(),
+                                                                    StringUtils.isEmpty(dto.getSearchText()) ? null : "%" + dto.getSearchText() + "%"
+                                                            );
+
+        if(CollectionUtils.isEmpty(productsDetailsResponses)) {
+            return null;
+        }
+
+        for (ProductsDetailsResponse productDetail: productsDetailsResponses) {
+            List<ProductImageResponse> imageResponse = productImageService.getProductImageByProductDetailId(productDetail.getProductDetailsId());
+            if(CollectionUtils.isEmpty(imageResponse)) {
+                productDetail.setImageDefault(null);
+            } else {
+                productDetail.setImageDefault(imageResponse.get(0).getPath());
+            }
+        }
+        return productsDetailsResponses;
     }
 
     private List<ProductDetailShop> getImageByProductDetailId(List<ProductDetailShop> list) {

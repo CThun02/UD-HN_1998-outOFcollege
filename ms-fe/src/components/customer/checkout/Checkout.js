@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, } from 'react'
 import styles from './Checkout.module.css'
 import { Button, Col, Input, Modal, Radio, Row, Select, Space, notification } from 'antd'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { UserOutlined } from '@ant-design/icons'
 import axios from 'axios'
 import moment from 'moment/moment'
@@ -12,6 +12,7 @@ import * as yup from 'yup';
 
 
 const Checkout = (props) => {
+    const navigate = useNavigate();
     const [provinces, setProvinces] = useState([])
     const [districts, setDistricts] = useState([])
     const [wards, setWards] = useState([])
@@ -252,12 +253,13 @@ const Checkout = (props) => {
             billCode: generateRandomBillCode(),
             price: totalPrice,
             priceReduce: 0,
-            paymentDetailId: 1,
+            paymentDetailId: formData.paymentDetailId,
             billType: "Online",
             symbol: "Shipping",
             status: "Unpaid",
             note: formData.note,
             lstBillDetailRequest: formData.lstBillDetailRequest,
+            transactionCode: formData.paymentDetailId === 2 ? '' : null,
             voucherCode: null,
         }
 
@@ -270,6 +272,18 @@ const Checkout = (props) => {
             descriptionDetail: formData.addressDetail,
         };
 
+        if (formData.paymentDetailId === 2) {
+            axios.get(`http://localhost:8080/api/client/pay`, {
+                params: {
+                    price: 550000,
+                }
+            }).then((response) => {
+                window.location.href = `${response.data}`
+            }).catch((error) => {
+                console.log(error)
+            })
+        }
+
         try {
             await validate.validate(formData, { abortEarly: false });
             setError({})
@@ -281,7 +295,6 @@ const Checkout = (props) => {
             setError(validationErrors);
             return;
         }
-
         Modal.confirm({
             title: "Xác nhận thanh toán",
             content: "Bạn có chắc chắn muốn thanh toán?",

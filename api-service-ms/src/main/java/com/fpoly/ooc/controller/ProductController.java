@@ -171,7 +171,6 @@ public class ProductController {
                 .findFirst();
         if (!result.isEmpty()) {
             if (!(result.get().getId() == productDetail.getId())) {
-                System.out.println(result.get().getId() + "check" + request.getId());
                 return ResponseEntity.ok(result.get());
             }
         }

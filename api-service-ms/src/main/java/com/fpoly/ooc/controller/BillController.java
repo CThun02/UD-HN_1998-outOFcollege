@@ -55,9 +55,17 @@ public class BillController {
         return ResponseEntity.ok(billService.getListCustomer());
     }
 
+    @GetMapping("/getDataLineChart")
+    public ResponseEntity<?> getDataLineChart(@RequestParam() String years) {
+        if(years.equals("")){
+            return ResponseEntity.ok(null);
+        }
+        return ResponseEntity.ok(billService.getDataLineChart(years));
+    }
+
     @GetMapping("/getGrossRevenue")
-    public ResponseEntity<?> getGrossRevenue(){
-        return ResponseEntity.ok(billService.getBillRevenue());
+    public ResponseEntity<?> getGrossRevenue(@RequestParam(defaultValue = "5") Integer quantityDisplay, @RequestParam() String date){
+        return ResponseEntity.ok(billService.getBillRevenue(quantityDisplay, date));
     }
 
     @GetMapping("/getBillRevenueCompare")
@@ -67,7 +75,7 @@ public class BillController {
 
     @GetMapping("/getBillProductSellTheMost")
     public ResponseEntity<?> getBillProductSellTheMost(@RequestParam(defaultValue = "0")int quantitySell){
-        return ResponseEntity.ok(billService.getBillProductSellTheMost(quantitySell));
+        return ResponseEntity.ok(billService.getProductInBillByStatusAndId(quantitySell, null, "Paid"));
     }
 
     @GetMapping("/getBusinessYear")

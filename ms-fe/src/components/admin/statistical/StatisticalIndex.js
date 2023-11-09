@@ -25,11 +25,13 @@ import {
   Carousel,
   Badge,
   Table,
+  Divider,
 } from "antd";
 import Statistic from "antd/es/statistic/Statistic";
 import PieChart from "./PieChart";
 import TableProdutSellTheMost from "./TableProdutSellTheMost";
 import dayjs from "dayjs";
+import Checkbox from "antd/es/checkbox/Checkbox";
 
 var currentDate = new Date();
 
@@ -39,6 +41,8 @@ var year = currentDate.getFullYear();
 var formattedDateNow = year + "-" + month + "-" + day;
 var formattedDateYesterday = year + "-" + month + "-" + (day - 1);
 const { Option } = Select;
+const CheckboxGroup = Checkbox.Group;
+
 const StatisticalIndex = () => {
   const [data, setData] = useState([]);
   const [billRevenue, setBillRevenue] = useState({});
@@ -51,6 +55,12 @@ const StatisticalIndex = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const [loading, setLoading] = useState(true);
+  const [checkedList, setCheckedList] = useState([year]);
+  const [plainOptions, setPlainOptions] = useState([]);
+  const [dateRevenue, setDateRevenue] = useState(formattedDateNow);
+  const checkAll = plainOptions.length === checkedList.length;
+  const indeterminate =
+    checkedList.length > 0 && checkedList.length < plainOptions.length;
 
   const columns = [
     {
@@ -70,11 +80,11 @@ const StatisticalIndex = () => {
       key: "product",
       datatIndex: "product",
       title: "Sản phẩm",
-      width: "50%",
+      width: "60%",
       render: (text, record, index) => {
         return (
           <Row>
-            <Col span={4} style={{ height: "100%" }}>
+            <Col span={6} style={{ height: "100%" }}>
               <div
                 style={{
                   marginTop: "10px",
@@ -126,7 +136,7 @@ const StatisticalIndex = () => {
                 )}
               </div>
             </Col>
-            <Col span={20} style={{ height: "100%" }}>
+            <Col span={18} style={{ height: "100%" }}>
               <div
                 className="m-5"
                 style={{
@@ -201,12 +211,12 @@ const StatisticalIndex = () => {
 
   const configLineChart = {
     data,
-    xField: "year",
-    yField: "gdp",
-    seriesField: "name",
+    xField: "time",
+    yField: "revenue",
+    seriesField: "typeBill",
     yAxis: {
       label: {
-        formatter: (v) => `${(v / 10e8).toFixed(1)} B`,
+        formatter: (v) => `${(v / 1000000).toFixed(1)} m`,
       },
     },
     legend: {
@@ -216,9 +226,18 @@ const StatisticalIndex = () => {
     animation: {
       appear: {
         animation: "path-in",
-        duration: 5000,
+        duration: 2000,
       },
     },
+  };
+
+  const onChange = (list) => {
+    setCheckedList(list);
+    setRender(Math.random());
+  };
+  const onCheckAllChange = (e) => {
+    setCheckedList(e.target.checked ? plainOptions : []);
+    setRender(Math.random());
   };
 
   function compareRevenue() {
@@ -292,19 +311,32 @@ const StatisticalIndex = () => {
   }
   useEffect(() => {
     axios
-      .get("http://localhost:8080/api/admin/bill/getGrossRevenue")
+      .get(
+        "http://localhost:8080/api/admin/bill/getGrossRevenue?quantityDisplay=" +
+          pageSize +
+          "&date=" +
+          dateRevenue
+      )
       .then((res) => {
+        setLoading(false);
         setBillRevenue(res.data);
+      })
+      .catch((err) => console.log(err));
+    axios
+      .get("http://localhost:8080/api/admin/bill/getBusinessYear")
+      .then((res) => {
+        setPlainOptions(res.data);
       })
       .catch((err) => console.log(err));
     asyncFetch();
     compareRevenue();
-  }, [dateCompare, render]);
+  }, [dateCompare, render, pageSize, dateRevenue]);
 
   const asyncFetch = () => {
     axios
       .get(
-        "https://gw.alipayobjects.com/os/bmw-prod/e00d52f4-2fa6-47ee-a0d7-105dd95bde20.json"
+        "http://localhost:8080/api/admin/bill/getDataLineChart?years=" +
+          checkedList.join(",")
       )
       .then((res) => {
         setData(res.data);
@@ -317,28 +349,34 @@ const StatisticalIndex = () => {
   return (
     <>
       <Row>
-        <Col span={14}>
+        <Col span={16}>
           <div className={`${styles.bgWhite} ${styles.fixHeightDefault} me-5`}>
             <h2>
               <MoneyCollectFilled /> Xem doanh thu
             </h2>
             <Row>
-              <Col span={6}>
+              <Col span={24}>
                 <p style={{ fontWeight: 500 }}>
                   <ClockCircleOutlined /> Thời gian
                 </p>
                 <DatePicker
                   className={styles.input_noneBorder}
-                  style={{ width: "90%" }}
+                  style={{ width: "50%" }}
                   picker={"date"}
                   defaultValue={dayjs(formattedDateNow)}
+                  onChange={(date, dateString) => setDateRevenue(dateString)}
                 />
+              </Col>
+              <Col span={12}>
                 <Statistic
                   style={{ marginTop: "8px" }}
                   title="Đơn hàng bán được"
                   value={billRevenue.billSell || 0}
                 />
+              </Col>
+              <Col span={12}>
                 <Statistic
+                  style={{ marginTop: "8px" }}
                   title="Tổng doanh thu"
                   value={
                     billRevenue.grossRevenue?.toLocaleString("vi-VN", {
@@ -348,7 +386,7 @@ const StatisticalIndex = () => {
                   }
                 />
               </Col>
-              <Col span={18}>
+              <Col span={24}>
                 <p style={{ fontWeight: 500 }}>
                   <TableOutlined /> Sản phẩm bán được
                 </p>
@@ -364,7 +402,14 @@ const StatisticalIndex = () => {
                       setPageSize(pageSize);
                     },
                   }}
-                  scroll={{ y: 360 }}
+                  dataSource={
+                    billRevenue.productDetailDisplay &&
+                    billRevenue.productDetailDisplay.map((record, index) => ({
+                      ...record,
+                      key: record.id,
+                    }))
+                  }
+                  scroll={{ y: 200 }}
                   columns={columns}
                   loading={loading}
                 />
@@ -372,7 +417,48 @@ const StatisticalIndex = () => {
             </Row>
           </div>
         </Col>
-        <Col span={10}>
+        <Col span={8}>
+          <div className={`${styles.bgWhite} me-5`}>
+            <h2>
+              <DoubleRightOutlined /> Tỷ lệ doanh thu
+            </h2>
+            <PieChart />
+          </div>
+        </Col>
+      </Row>
+      <Row>
+        <Col span={24} className={styles.bgWhite}>
+          <h2>
+            <LineChartOutlined /> Thống kê doanh thu
+          </h2>
+          <div style={{ marginTop: "12px" }}>
+            <span style={{ fontWeight: 500 }}>
+              Thời gian{" "}
+              <Checkbox
+                indeterminate={indeterminate}
+                onChange={onCheckAllChange}
+                checked={checkAll}
+              >
+                Tất cả
+              </Checkbox>
+            </span>
+            <CheckboxGroup
+              options={plainOptions}
+              value={checkedList}
+              onChange={onChange}
+            />
+            <Divider />
+          </div>
+          <Line {...configLineChart} />
+          <div style={{ textAlign: "center", margin: "20px 0" }}>
+            <span>
+              <LineChartOutlined />. Biểu đồ thống kê doanh thu theo thời gian
+            </span>
+          </div>
+        </Col>
+      </Row>
+      <Row>
+        <Col span={8}>
           <div className={`${styles.bgWhite} ${styles.fixHeightDefault}`}>
             <Spin
               tip="Loading..."
@@ -446,6 +532,7 @@ const StatisticalIndex = () => {
                     }}
                     type="primary"
                     size="large"
+                    style={{ width: "10%" }}
                   >
                     <CheckCircleOutlined />
                   </Button>
@@ -505,29 +592,6 @@ const StatisticalIndex = () => {
                 </Col>
               </Row>
             </Spin>
-          </div>
-        </Col>
-      </Row>
-      <Row>
-        <Col span={24} className={styles.bgWhite}>
-          <h2>
-            <LineChartOutlined /> Thống kê doanh thu
-          </h2>
-          <Line {...configLineChart} />
-          <div style={{ textAlign: "center", margin: "20px 0" }}>
-            <span>
-              <LineChartOutlined />. Biểu đồ thống kê doanh thu theo thời gian
-            </span>
-          </div>
-        </Col>
-      </Row>
-      <Row>
-        <Col span={8}>
-          <div className={`${styles.bgWhite} me-5`}>
-            <h2>
-              <DoubleRightOutlined /> Tỷ lệ doanh thu
-            </h2>
-            <PieChart />
           </div>
         </Col>
         <Col span={16}>

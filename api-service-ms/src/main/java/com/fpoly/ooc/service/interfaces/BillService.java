@@ -35,15 +35,17 @@ public interface BillService {
 
     Bill findBillByBillId(Long id);
 
-    BillRevenue getBillRevenue();
+    BillRevenueDisplay getBillRevenue(int quantityDisplay, String date);
 
     BillRevenueCompare getRevenueInStoreOnlineCompare();
 
-    List<ProductDetailDisplayResponse> getBillProductSellTheMost(int quantityDisplay);
+    List<ProductDetailDisplayResponse> getProductInBillByStatusAndId(int quantityDisplay, Long id, String status);
 
     public BillRevenueCompareDate compareRevenueDate(Integer dayFrom, Integer monthFrom, Integer yearFrom,
                                                      Integer dayTo, Integer monthTo, Integer yearTo);
 
     List<Integer> getBusinessYear();
+
+    List<BillLineChartResponse> getDataLineChart(String year);
 
 }

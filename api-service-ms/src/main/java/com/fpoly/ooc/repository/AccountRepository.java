@@ -1,5 +1,6 @@
 package com.fpoly.ooc.repository;
 
+import com.fpoly.ooc.dto.UserDTO;
 import com.fpoly.ooc.entity.Account;
 import com.fpoly.ooc.responce.account.AccountResponce;
 import com.fpoly.ooc.responce.account.AccountVoucher;
@@ -36,6 +37,13 @@ public interface AccountRepository extends JpaRepository<Account, String> {
 
     @Query(name = "Account.customerAccountList", nativeQuery = true)
     List<Account> findAllAccount(String username, String email, String numberPhone );
+
+    @Query("select account from Account account " +
+            "left join Role role on account.role.id = role.id " +
+            "where account.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and role.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and (account.username = ?1 or account.email = ?1 or account.numberPhone = ?1)")
+    Account findByLogin(String login);
 
 //        @Query("SELECT new com.fpoly.ooc.responce.account.AccountResponce(a.username,a.avatar,a.fullName,a.)" +
 //                "FROM Account a where a.role=?1")

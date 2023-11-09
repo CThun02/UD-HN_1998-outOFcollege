@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 
 
 public interface BillRevenue {
+    public Long getId();
     public Integer getBillSell();
     public BigDecimal getGrossRevenue();
     public LocalDateTime getCreatedAt();

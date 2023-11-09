@@ -30,10 +30,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -165,11 +166,31 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
-    public BillRevenue getBillRevenue() {
-        LocalDate currentDate = LocalDate.now();
-        LocalDateTime startOfDay = currentDate.atStartOfDay();
-        BillRevenue revenue =  billRepo.getBillRevenue(startOfDay);
-        return revenue;
+    public BillRevenueDisplay getBillRevenue(int quantityDisplay, String dateString) {
+        int yearString = Integer.parseInt(dateString.substring(0, dateString.indexOf("-")));
+        int monthString = Integer.parseInt(dateString.substring(dateString.indexOf("-")+1, dateString.lastIndexOf("-")));
+        int dayString = Integer.parseInt(dateString.substring(dateString.lastIndexOf("-")+1));
+        try {
+            LocalDateTime dateTime = LocalDateTime.of(yearString, monthString, dayString, 00, 00, 00);
+            BillRevenue revenue =  billRepo.getBillRevenue(dateTime);
+            BillRevenueDisplay billRevenueDisplay = new BillRevenueDisplay(revenue);
+            List<ProductDetailDisplayResponse> productDetailDisplayResponses = new ArrayList<>();
+            List<ProductDetailResponse> productDetailResponses = billRepo.getProductInBillByStatusAndIdAndDate
+                    (quantityDisplay, null, null, dateTime, "ACTIVE" )!=null? billRepo.getProductInBillByStatusAndIdAndDate
+                    (quantityDisplay, null, null, dateTime, "ACTIVE"  ): new ArrayList<>();
+            for (int i = 0; i < productDetailResponses.size(); i++) {
+                ProductDetailDisplayResponse response = new ProductDetailDisplayResponse(productDetailResponses.get(i));
+                response.setProductImageResponse(productImageService.getProductImageByProductDetailId(response.getId()));
+                productDetailDisplayResponses.add(response);
+            }
+            billRevenueDisplay.setProductDetailDisplay(productDetailDisplayResponses);
+            return billRevenueDisplay;
+        } catch (DateTimeParseException e) {
+            System.out.println("Không thể chuyển đổi chuỗi thành LocalDateTime. Chuỗi không hợp lệ.");
+            e.printStackTrace();
+            return new BillRevenueDisplay(null);
+        }
+
     }
 
     @Override
@@ -184,8 +205,8 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
-    public List<ProductDetailDisplayResponse> getBillProductSellTheMost(int quantitysell) {
-        List<ProductDetailResponse>  productSellTheMost = billRepo.getProductSellTheMost(quantitysell);
+    public List<ProductDetailDisplayResponse> getProductInBillByStatusAndId(int quantityDisplay, Long id, String status) {
+        List<ProductDetailResponse>  productSellTheMost = billRepo.getProductInBillByStatusAndIdAndDate(quantityDisplay, id, status, null , null );
         List<ProductDetailDisplayResponse> billProductSellTheMosts = new ArrayList<>();
         for (int i = 0; i < productSellTheMost.size(); i++) {
             ProductDetailDisplayResponse response = new ProductDetailDisplayResponse(productSellTheMost.get(i));
@@ -198,8 +219,8 @@ public class BillServiceImpl implements BillService {
     @Override
     public BillRevenueCompareDate compareRevenueDate(Integer dayFrom, Integer monthFrom, Integer yearFrom,
                                                      Integer dayTo, Integer monthTo, Integer yearTo) {
-        Double revenueFrom = billRepo.getRevenueByTime(dayFrom, monthFrom, yearFrom);
-        Double revenueTo = billRepo.getRevenueByTime(dayTo, monthTo, yearTo);
+        Double revenueFrom = billRepo.getRevenueByTime(dayFrom, monthFrom, yearFrom, null);
+        Double revenueTo = billRepo.getRevenueByTime(dayTo, monthTo, yearTo, null);
         BillRevenueCompareDate billRevenueCompareDate = new BillRevenueCompareDate(revenueFrom, revenueTo);
         return billRevenueCompareDate;
     }
@@ -207,5 +228,39 @@ public class BillServiceImpl implements BillService {
     @Override
     public List<Integer> getBusinessYear() {
         return billRepo.getBusinessYear();
+    }
+
+    @Override
+    public List<BillLineChartResponse> getDataLineChart(String years) {
+        List <Integer> listYear;
+        if(years.contains(",")){
+            String[] dataArray = years.split(",");
+            listYear = Arrays.stream(dataArray).map(Integer::parseInt).toList();
+        }else{
+            listYear = List.of(Integer.parseInt(years));
+        }
+        List<BillLineChartResponse> data = new ArrayList<>();
+        LocalDate now = LocalDate.now();
+        int yearNow = now.getYear();
+        for(int j=0; j<listYear.size(); j++){
+            int month = yearNow == listYear.get(j)?now.getMonthValue():12;
+            for(int i=1; i<=month; i++){
+                String type = "Tại quầy";
+                String time = "th"+i+"-"+listYear.get(j);
+                Double revenue = billRepo.getRevenueByTime(null, i, listYear.get(j), "In-Store")==null?0:
+                        billRepo.getRevenueByTime(null, i, listYear.get(j), "In-Store");
+                BillLineChartResponse billRevenue = new BillLineChartResponse(type, time, revenue);
+                data.add(billRevenue);
+            }
+            for(int i=1; i<=month; i++){
+                String type = "Trực tuyến";
+                String time = "th"+i+"-"+listYear.get(j);
+                Double revenue = billRepo.getRevenueByTime(null, i, listYear.get(j), "Online")==null?0:
+                        billRepo.getRevenueByTime(null, i, listYear.get(j), "Online");
+                BillLineChartResponse billRevenue = new BillLineChartResponse(type, time, revenue);
+                data.add(billRevenue);
+            }
+        }
+        return data;
     }
 }

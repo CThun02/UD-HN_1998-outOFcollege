@@ -3,6 +3,7 @@ package com.fpoly.ooc.service.impl;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
 import com.fpoly.ooc.dto.CustomerConditionDTO;
+import com.fpoly.ooc.dto.UserDTO;
 import com.fpoly.ooc.entity.*;
 import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.AccountRepository;
@@ -97,6 +98,11 @@ public class AccountServiceImpl implements AccountService {
                 .build();
         addressDetailRepository.save(addressDetail);
         return createAccount;
+    }
+
+    @Override
+    public Account save(Account request) {
+        return accountRepository.save(request);
     }
 
     @Override
@@ -220,6 +226,11 @@ public class AccountServiceImpl implements AccountService {
         }
 
         return lstAccountDetailResponces;
+    }
+
+    @Override
+    public Account findByLogin(String login) {
+        return accountRepository.findByLogin(login);
     }
 
     private Page<AccountVoucher> page(List<AccountVoucher> inputList, Pageable pageable) {

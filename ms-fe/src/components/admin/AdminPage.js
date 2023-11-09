@@ -13,7 +13,7 @@ import BrandAdmin from "./brand/BrandAdmin";
 import FormAdmin from "./form/FormAdmin";
 import CollarAdmin from "./collar/CollarAdmin";
 import BillManagement from "./sale-couter/BillManagement";
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { Routes, Route, Link } from "react-router-dom";
 import { Button, Col, Result, Row } from "antd";
 import SideBar from "./page/SideBar";
 import NavBar from "./page/NavBar";

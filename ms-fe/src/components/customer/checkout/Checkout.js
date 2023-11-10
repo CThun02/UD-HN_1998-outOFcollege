@@ -1,7 +1,7 @@
 import React, { useEffect, useState, } from 'react'
 import styles from './Checkout.module.css'
 import { Button, Col, Input, Modal, Radio, Row, Select, Space, notification } from 'antd'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { UserOutlined } from '@ant-design/icons'
 import axios from 'axios'
 import moment from 'moment/moment'
@@ -12,7 +12,6 @@ import * as yup from 'yup';
 
 
 const Checkout = (props) => {
-    const navigate = useNavigate();
     const [provinces, setProvinces] = useState([])
     const [districts, setDistricts] = useState([])
     const [wards, setWards] = useState([])
@@ -24,7 +23,6 @@ const Checkout = (props) => {
     const [shippingFee, setShippingFee] = useState(null)
     const [error, setError] = useState({})
     const [totalPrice, setTotalPrice] = useState(0)
-    const [render, setRender] = useState(null)
 
 
     const handleProvincesChange = (e) => {
@@ -272,18 +270,6 @@ const Checkout = (props) => {
             descriptionDetail: formData.addressDetail,
         };
 
-        if (formData.paymentDetailId === 2) {
-            axios.get(`http://localhost:8080/api/client/pay`, {
-                params: {
-                    price: 550000,
-                }
-            }).then((response) => {
-                window.location.href = `${response.data}`
-            }).catch((error) => {
-                console.log(error)
-            })
-        }
-
         try {
             await validate.validate(formData, { abortEarly: false });
             setError({})
@@ -299,6 +285,7 @@ const Checkout = (props) => {
             title: "Xác nhận thanh toán",
             content: "Bạn có chắc chắn muốn thanh toán?",
             async onOk() {
+                setFormData({ ...formData, lstBillDetailRequest: [] })
                 for (let i = 0; i < productDetails?.length; i++) {
                     const billDetail = {
                         productDetailId: productDetails[i].data.productDetailId,
@@ -307,6 +294,8 @@ const Checkout = (props) => {
                     };
                     formData.lstBillDetailRequest.push(billDetail)
                 }
+                console.log(formData.lstBillDetailRequest);
+
                 try {
                     const response = await axios.post(
                         "http://localhost:8080/api/admin/bill",
@@ -325,12 +314,25 @@ const Checkout = (props) => {
                             shipPrice: shippingFee ?? null,
                         }
                     );
+                    if (formData.paymentDetailId === 2) {
+                        axios.get(`http://localhost:8080/api/client/pay`, {
+                            params: {
+                                billId: response.data.id,
+                                price: totalPrice,
+                            }
+                        }).then((response) => {
+                            window.location.href = `${response.data}`
+                        }).catch((error) => {
+                            console.log(error)
+                        })
+                    } else {
+                        notification.success({
+                            message: "Thông báo",
+                            description: "Thanh toán thành công",
+                            duration: 2,
+                        });
+                    }
 
-                    notification.success({
-                        message: "Thông báo",
-                        description: "Thanh toán thành công",
-                        duration: 2,
-                    });
                 } catch (error) {
                     console.log(error);
                 }
@@ -360,7 +362,7 @@ const Checkout = (props) => {
         handleShippingFee(100, selectedDistrict, selectedWard);
 
         getAllCarts()
-    }, [selectedDistrict, selectedWard, render])
+    }, [selectedDistrict, selectedWard])
 
     return (
         <div className={styles.wrapper}>
@@ -591,7 +593,7 @@ const Checkout = (props) => {
                                     </thead>
                                     <tbody >
                                         <Space style={{ width: '100%' }} direction='vertical' size={16}>
-                                            {console.log(productDetails)}
+                                            {/* {console.log(productDetails)} */}
                                             {productDetails && productDetails?.map((productDetail) => (
                                                 <tr>
                                                     <div style={{ width: '100%' }}>

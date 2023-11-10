@@ -15,15 +15,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-/**
- * @author CTT VNPAY
- */
 
 public class PaymentConfig {
 
-
     public static String vnp_PayUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-    public static String vnp_ReturnUrl = "http://localhost:8080/api/client/payment-info";
+    public static String vnp_ReturnUrl = "http://localhost:8080/api/client/callback";
     public static String vnp_TmnCode = "3T4F4FF0";
     public static String secretKey = "XLMUWUSRZEWXCFGOMCNBAGGNLZQEBNDX";
     public static String vnp_ApiUrl = "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction";
@@ -130,6 +126,5 @@ public class PaymentConfig {
         }
         return sb.toString();
     }
-
 
 }

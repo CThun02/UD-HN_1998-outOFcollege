@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styles from "./BillManagement.module.css";
-import { Button, Input, Row, Select, Table, Tag, TreeSelect } from "antd";
+import { Button, Input, Select, Table, Tag, TreeSelect } from "antd";
 import {
   EyeOutlined,
   FilterFilled,
@@ -115,19 +115,19 @@ const BillManagement = () => {
           object === "Unpaid"
             ? "geekblue"
             : object.toLocaleLowerCase() === "PAID".toLocaleLowerCase()
-            ? "green"
-            : object === "cancel"
-            ? "red"
-            : null;
+              ? "green"
+              : object === "Cancel"
+                ? "red"
+                : null;
         return (
           <Space direction="vertical">
             <div style={{ width: "auto", display: "flex" }}>
               <Tag color={color}>
                 {object === "Unpaid"
                   ? "Chưa thanh toán"
-                  : object === "cancel"
-                  ? "Đã hủy"
-                  : "Đã thanh toán"}
+                  : object === "Cancel"
+                    ? "Đã hủy"
+                    : "Đã thanh toán"}
               </Tag>
             </div>
           </Space>

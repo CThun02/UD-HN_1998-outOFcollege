@@ -3,6 +3,10 @@ package com.fpoly.ooc.controller;
 import com.fpoly.ooc.config.PaymentConfig;
 import com.fpoly.ooc.dto.TransactionDTO;
 import com.fpoly.ooc.dto.TransactionData;
+import com.fpoly.ooc.entity.Bill;
+import com.fpoly.ooc.exception.NotFoundException;
+import com.fpoly.ooc.repository.BillRepo;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -11,7 +15,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
@@ -31,10 +37,12 @@ import java.util.TimeZone;
 public class PaymentController {
 
     @Autowired
-    private TransactionDTO dto;
+    private BillRepo billRepo;
 
     @GetMapping("/pay")
-    public String payment(@RequestParam("price") Long price) throws UnsupportedEncodingException {
+    public String payment(@RequestParam("price") Long price,
+                          @RequestParam("billId") String billId)
+            throws UnsupportedEncodingException {
 
         String vnp_Version = "2.1.0";
         String vnp_Command = "pay";
@@ -57,7 +65,7 @@ public class PaymentController {
         vnp_Params.put("vnp_OrderInfo", "Thanh toan don hang:" + vnp_TxnRef);
         vnp_Params.put("vnp_OrderType", orderType);
         vnp_Params.put("vnp_Locale", "vn");
-        vnp_Params.put("vnp_ReturnUrl", PaymentConfig.vnp_ReturnUrl);
+        vnp_Params.put("vnp_ReturnUrl", PaymentConfig.vnp_ReturnUrl + "?billId=" + billId);
         vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
 
         Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
@@ -100,23 +108,29 @@ public class PaymentController {
         return paymentUrl;
     }
 
-    @GetMapping("/payment-info")
-    public ResponseEntity<?> paymentInfo(
-            @RequestParam("vnp_Amount") String amount,
-            @RequestParam("vnp_BankCode") String bankCode,
-            @RequestParam("vnp_TransactionNo") String transactionNo,
-            @RequestParam("vnp_ResponseCode") String response
-    ) {
-        if (response.equals("00")) {
-            dto.setStatus("Ok");
-            dto.setMessage("Successfully");
-            dto.setData(new TransactionData(amount, bankCode, transactionNo));
-        } else {
-            dto.setStatus("No");
-            dto.setMessage("Fail");
-            dto.setData(null);
+    @GetMapping("/callback")
+    public void paymentInfo(
+            @RequestParam Map<String, String> queryParams,
+            HttpServletResponse response
+    ) throws IOException {
+        String responseCode = queryParams.get("vnp_ResponseCode");
+        String bankCode = queryParams.get("vnp_BankCode");
+        String amount = queryParams.get("vnp_Amount");
+        String transactionNo = queryParams.get("vnp_TransactionNo");
+        Long billId = Long.valueOf(queryParams.get("billId"));
+        if ("00".equals(responseCode)) {
+            Bill bill = billRepo.findById(billId).orElseThrow(() -> new NotFoundException("Bill id không tồn tại"));
+            bill.setTransactionCode(transactionNo);
+            bill.setAmountPaid(new BigDecimal(amount));
+            billRepo.save(bill);
+            response.sendRedirect("http://localhost:3000/ms-shop");
+        }else{
+            Bill bill = billRepo.findById(billId).orElseThrow(() -> new NotFoundException("Bill id không tồn tại"));
+            bill.setTransactionCode(transactionNo);
+            bill.setAmountPaid(new BigDecimal(amount));
+            bill.setStatus("Cancel");
+            billRepo.save(bill);
+            response.sendRedirect("http://localhost:3000/ms-shop");
         }
-
-        return ResponseEntity.ok(dto);
     }
 }

@@ -2,10 +2,11 @@ import React, { useEffect, useState } from 'react'
 import styles from './Cart.module.css'
 import { Button, Col, InputNumber, Row, Table, notification } from 'antd'
 import { CloseOutlined } from '@ant-design/icons'
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import numeral from 'numeral'
 
 const Cart = (props) => {
+    const navigate = useNavigate()
     const [productDetails, setProductDetails] = useState(null)
     const [render, setRender] = useState(null)
     const [totalPrice, setTotalPrice] = useState(0)
@@ -186,8 +187,18 @@ const Cart = (props) => {
             newData.push(selectedRow);
         });
 
+        if (newData.length === 0) {
+            console.log(newData)
+            notification.error({
+                message: "Thông báo",
+                description: "Bạn chưa chọn sản phẩm",
+                duration: 2,
+            });
+            return;
+        }
 
         localStorage.setItem('checkout', JSON.stringify(newData));
+        navigate('/ms-shop/checkout')
     };
 
     const rowSelection = {
@@ -225,11 +236,9 @@ const Cart = (props) => {
                     </Col>
                     <Col span={18}></Col>
                     <Col span={6} style={{ height: '45px', marginTop: '10px', marginBottom: '10px' }}>
-                        <Link to={'/ms-shop/checkout'}>
-                            <Button type='primary' className={styles.btn}
-                                onClick={(e) => addSelectedToData(e)}
-                            >Thanh toán</Button>
-                        </Link>
+                        <Button type='primary' className={styles.btn}
+                            onClick={(e) => addSelectedToData(e)}
+                        >Thanh toán</Button>
                     </Col>
                 </Row>
             </div>

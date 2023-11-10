@@ -137,15 +137,16 @@ const Bill = () => {
                   marginRight: "10px",
                 }}
               >
-                {record.productDetail.promotionValue !== null ? (
+                {record.productDetail.promotion.length !== 0 ? (
                   <Badge.Ribbon
                     text={`Giảm ${
-                      record.productDetail.promotionValue
-                        ? record.productDetail.promotionMethod === "%"
-                          ? record.productDetail.promotionValue +
+                      record.productDetail.promotion[0].promotionValue
+                        ? record.productDetail.promotion[0].promotionMethod ===
+                          "%"
+                          ? record.productDetail.promotion[0].promotionValue +
                             " " +
-                            record.productDetail.promotionMethod
-                          : record.productDetail.promotionValue.toLocaleString(
+                            record.productDetail.promotion[0].promotionMethod
+                          : record.productDetail.promotion[0].promotionValue.toLocaleString(
                               "vi-VN",
                               {
                                 style: "currency",

@@ -84,10 +84,8 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
     @Override
     public ProductDetailDisplayResponse getOnePDDisplayById(Long id) {
         ProductDetailResponse productDetailResponse = repo.getProductDetailResponseById(id);
-        ProductDetailDisplayResponse productDetailDisplayResponse = new ProductDetailDisplayResponse(productDetailResponse);
-        List<ProductImageResponse> productImageResponses = productImageService.
-                getProductImageByProductDetailId(productDetailDisplayResponse.getId());
-        productDetailDisplayResponse.setProductImageResponse(productImageResponses);
+        ProductDetailDisplayResponse productDetailDisplayResponse = new ProductDetailDisplayResponse(productDetailResponse,
+                productImageService.getProductImageByProductDetailId(productDetailResponse.getId()));
         return  productDetailDisplayResponse;
     }
 
@@ -101,10 +99,8 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
                 request.getSizeId(), request.getPatternId(), request.getFormId(), request.getBrandId(), request.getCategoryId(),
                 minPrice, maxPrice);
         for (int i = 0; i < productDetailResponses.size(); i++) {
-            ProductDetailDisplayResponse productDetailDisplayResponse = new ProductDetailDisplayResponse(productDetailResponses.get(i));
-            List<ProductImageResponse> productImageResponses = productImageService.
-                    getProductImageByProductDetailId(productDetailDisplayResponse.getId());
-            productDetailDisplayResponse.setProductImageResponse(productImageResponses);
+            ProductDetailDisplayResponse productDetailDisplayResponse = new ProductDetailDisplayResponse(productDetailResponses.get(i),
+                    productImageService.getProductImageByProductDetailId(productDetailResponses.get(i).getId()));
             productDetailDisplayResponses.add(productDetailDisplayResponse);
         }
         return productDetailDisplayResponses;

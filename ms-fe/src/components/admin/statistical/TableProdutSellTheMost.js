@@ -38,16 +38,21 @@ const TableProdutSellTheMost = () => {
                   marginRight: "10px",
                 }}
               >
-                {record.promotionValue !== null ? (
+                {record.promotion.length !== 0 ? (
                   <Badge.Ribbon
                     text={`Giảm ${
-                      record.promotionValue
-                        ? record.promotionMethod === "%"
-                          ? record.promotionValue + " " + record.promotionMethod
-                          : record.promotionValue.toLocaleString("vi-VN", {
-                              style: "currency",
-                              currency: "VND",
-                            })
+                      record.promotion[0].promotionValue
+                        ? record.promotion[0].promotionMethod === "%"
+                          ? record.promotion[0].promotionValue +
+                            " " +
+                            record.promotion[0].promotionMethod
+                          : record.promotion[0].promotionValue.toLocaleString(
+                              "vi-VN",
+                              {
+                                style: "currency",
+                                currency: "VND",
+                              }
+                            )
                         : null
                     }`}
                     color="red"
@@ -157,10 +162,7 @@ const TableProdutSellTheMost = () => {
   ];
   useEffect(() => {
     axios
-      .get(
-        "http://localhost:8080/api/admin/bill/getBillProductSellTheMost?quantitySell=" +
-          pageSize
-      )
+      .get("http://localhost:8080/api/admin/bill/getBillProductSellTheMost")
       .then((res) => {
         setLoading(false);
         setData(res.data);

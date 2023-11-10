@@ -34,4 +34,17 @@ public interface PromotionRepository extends JpaRepository<Promotion, Long> {
             "order by p.createdAt desc ")
     List<PromotionProductResponse> findAllPromotionProductNoCondition();
 
+
+    @Query("select new com.fpoly.ooc.responce.promotion.PromotionProductResponse(" +
+            "p.promotionCode, p.promotionName, CAST(CAST(COUNT(pd.id) AS string) AS integer ), " +
+            "p.promotionMethod, p.promotionValue, p.promotionCondition, " +
+            "p.startDate, p.endDate, p.status) " +
+            "from PromotionProduct pp " +
+            "left join Promotion p on pp.promotion.id = p.id " +
+            "left join ProductDetail pd on pp.productDetailId.id = pd.id where pd.id=?1 and (p.status like ?2 or ?2 is null) " +
+            "group by p.promotionCode, p.promotionName, p.promotionMethod, " +
+            "         p.promotionValue, p.promotionCondition, " +
+            "         p.startDate, p.endDate, p.status, p.createdAt ")
+    List<PromotionProductResponse> getPromotionByProductDetailId(Long pdId, String status);
+
 }

@@ -2,14 +2,19 @@ import { Badge, Col, Popover, Row } from "antd";
 import styles from "./HeaderRight.module.css";
 import { Link } from "react-router-dom";
 import { UserOutlined, ShoppingCartOutlined } from "@ant-design/icons";
+import { getAuthToken, clearAuthToken } from "../../../../service/Token";
 
 const content = (
   <div style={{ width: "100px" }}>
     <p>
-      <Link className={styles.link}>Login</Link>
+      <Link to={"/authen/sign-in"} className={styles.link}>
+        Login
+      </Link>
     </p>
     <p>
-      <Link className={styles.link}>Logout</Link>
+      <Link onClick={clearAuthToken} className={styles.link}>
+        Logout
+      </Link>
     </p>
   </div>
 );
@@ -24,15 +29,19 @@ function HeaderRight() {
             <Row className={styles.margin}>
               <Col span={1}></Col>
               <Col span={7}>
-                <Link to={"/ms-shop/about"} className={styles.link}>Giới thiệu</Link>
+                <Link to={"/ms-shop/about"} className={styles.link}>
+                  Giới thiệu
+                </Link>
               </Col>
               <Col span={7}>
-                <Link to={"/ms-shop/contact"} className={styles.link}>Liên hệ</Link>
+                <Link to={"/ms-shop/contact"} className={styles.link}>
+                  Liên hệ
+                </Link>
               </Col>
               <Col span={7}>
                 <p className={styles.cssParagraph}>$0.00</p>
                 <Badge count={5}>
-                  <Link to={'/ms-shop/cart'} className={styles.link}>
+                  <Link to={"/ms-shop/cart"} className={styles.link}>
                     <ShoppingCartOutlined className={styles.iconSize} />
                   </Link>
                 </Badge>

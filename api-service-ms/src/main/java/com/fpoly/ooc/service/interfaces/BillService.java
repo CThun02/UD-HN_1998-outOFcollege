@@ -4,10 +4,12 @@ import com.fpoly.ooc.dto.BillStatusDTO;
 import com.fpoly.ooc.entity.Address;
 import com.fpoly.ooc.entity.Bill;
 import com.fpoly.ooc.request.bill.BillRequest;
+import com.fpoly.ooc.request.product.ProductDetailRequest;
 import com.fpoly.ooc.responce.bill.*;
 import com.fpoly.ooc.responce.account.GetListCustomer;
 import com.fpoly.ooc.responce.product.ProductDetailDisplayResponse;
 import com.fpoly.ooc.responce.product.ProductDetailResponse;
+import com.fpoly.ooc.responce.product.ProductDetailSellResponse;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -35,15 +37,19 @@ public interface BillService {
 
     Bill findBillByBillId(Long id);
 
-    BillRevenue getBillRevenue();
+    BillRevenueDisplay getBillRevenue(String date);
 
     BillRevenueCompare getRevenueInStoreOnlineCompare();
 
-    List<ProductDetailDisplayResponse> getBillProductSellTheMost(int quantityDisplay);
+    List<ProductDetailSellResponse> getProductInBillByStatusAndId(Long id, String status);
 
     public BillRevenueCompareDate compareRevenueDate(Integer dayFrom, Integer monthFrom, Integer yearFrom,
                                                      Integer dayTo, Integer monthTo, Integer yearTo);
 
     List<Integer> getBusinessYear();
+
+    List<BillLineChartResponse> getDataLineChart(String year);
+
+    List<ProductDetailSellResponse> getProductDetailSellInStore(ProductDetailRequest request, BigDecimal minPrice, BigDecimal maxPrice);
 
 }

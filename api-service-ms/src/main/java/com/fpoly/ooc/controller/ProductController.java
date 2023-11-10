@@ -84,6 +84,8 @@ public class ProductController {
                 (request, minPrice.orElse(null), maxPrice.orElse(null)));
     }
 
+
+
     @GetMapping("/searchProductDetail")
     public ResponseEntity<?> searchProductDetail(@RequestParam String keyWords) {
         return ResponseEntity.ok(productDetailService.searchProductDetail(keyWords));

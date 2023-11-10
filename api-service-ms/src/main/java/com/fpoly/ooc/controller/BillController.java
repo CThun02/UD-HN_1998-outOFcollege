@@ -2,6 +2,7 @@ package com.fpoly.ooc.controller;
 
 import com.fpoly.ooc.dto.BillStatusDTO;
 import com.fpoly.ooc.request.bill.BillRequest;
+import com.fpoly.ooc.request.product.ProductDetailRequest;
 import com.fpoly.ooc.service.interfaces.BillService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -45,6 +47,30 @@ public class BillController {
                 status, billType, symbol));
     }
 
+    @GetMapping("/filterProductDetailSellByIdCom")
+    public ResponseEntity<?> filterProductDetailSellByIdCom(@RequestParam Optional<Long> productId,
+                                                            @RequestParam Optional<Long> buttonId,
+                                                            @RequestParam Optional<Long> materialId,
+                                                            @RequestParam Optional<Long> shirtTailId,
+                                                            @RequestParam Optional<Long> sleeveId,
+                                                            @RequestParam Optional<Long> collarId,
+                                                            @RequestParam Optional<Long> patternId,
+                                                            @RequestParam Optional<Long> formId,
+                                                            @RequestParam Optional<Long> brandId,
+                                                            @RequestParam Optional<Long> categoryId,
+                                                            @RequestParam Optional<Long> colorId,
+                                                            @RequestParam Optional<Long> sizeId,
+                                                            @RequestParam Optional<BigDecimal> minPrice,
+                                                            @RequestParam Optional<BigDecimal> maxPrice) {
+        ProductDetailRequest request = ProductDetailRequest.builder().productId(productId.orElse(null))
+                .brandId(brandId.orElse(null)).buttonId(buttonId.orElse(null)).categoryId(categoryId.orElse(null))
+                .collarId(collarId.orElse(null)).formId(formId.orElse(null)).patternId(patternId.orElse(null))
+                .materialId(materialId.orElse(null)).shirtTailId(shirtTailId.orElse(null)).sleeveId(sleeveId.orElse(null))
+                .colorId(colorId.orElse(null)).sizeId(sizeId.orElse(null)).build();
+        return ResponseEntity.ok(billService.getProductDetailSellInStore
+                (request, minPrice.orElse(null), maxPrice.orElse(null)));
+    }
+
     @PostMapping()
     public ResponseEntity<?> createBill(@RequestBody(required = false) BillRequest request) {
         return ResponseEntity.ok(billService.createBill(request));
@@ -65,7 +91,7 @@ public class BillController {
 
     @GetMapping("/getGrossRevenue")
     public ResponseEntity<?> getGrossRevenue(@RequestParam(defaultValue = "5") Integer quantityDisplay, @RequestParam() String date){
-        return ResponseEntity.ok(billService.getBillRevenue(quantityDisplay, date));
+        return ResponseEntity.ok(billService.getBillRevenue(date));
     }
 
     @GetMapping("/getBillRevenueCompare")
@@ -75,7 +101,7 @@ public class BillController {
 
     @GetMapping("/getBillProductSellTheMost")
     public ResponseEntity<?> getBillProductSellTheMost(@RequestParam(defaultValue = "0")int quantitySell){
-        return ResponseEntity.ok(billService.getProductInBillByStatusAndId(quantitySell, null, "Paid"));
+        return ResponseEntity.ok(billService.getProductInBillByStatusAndId(null, "Paid"));
     }
 
     @GetMapping("/getBusinessYear")

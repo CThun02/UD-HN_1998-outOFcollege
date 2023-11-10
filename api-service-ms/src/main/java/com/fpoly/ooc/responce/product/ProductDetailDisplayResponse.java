@@ -32,12 +32,9 @@ public class ProductDetailDisplayResponse{
     private Integer quantity;
     private String descriptionDetail;
     private String status;
-    private String promotionMethod;
-    private BigDecimal promotionValue;
-    private BigDecimal promotionCondition;
     private List<ProductImageResponse> productImageResponse;
 
-    public ProductDetailDisplayResponse(ProductDetailResponse productDetailResponse) {
+    public ProductDetailDisplayResponse(ProductDetailResponse productDetailResponse, List<ProductImageResponse> images) {
         this.id = productDetailResponse.getId();
         this.product = productDetailResponse.getProduct();
         this.brand = productDetailResponse.getBrand();
@@ -56,8 +53,6 @@ public class ProductDetailDisplayResponse{
         this.quantity = productDetailResponse.getQuantity();
         this.descriptionDetail = productDetailResponse.getDescriptionDetail();
         this.status = productDetailResponse.getStatus();
-        this.promotionMethod = productDetailResponse.getPromotionMethod();
-        this.promotionValue = productDetailResponse.getPromotionValue();
-        this.promotionCondition = productDetailResponse.getPromotionCondition();
+        this.productImageResponse = images;
     }
 }

@@ -1,6 +1,6 @@
 package com.fpoly.ooc.responce.bill;
 
-import com.fpoly.ooc.responce.product.ProductDetailDisplayResponse;
+import com.fpoly.ooc.responce.product.ProductDetailSellResponse;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,7 +15,7 @@ public class BillRevenueDisplay {
     public Integer billSell;
     public BigDecimal grossRevenue;
     public LocalDateTime createdAt;
-    public List<ProductDetailDisplayResponse> productDetailDisplay;
+    public List<ProductDetailSellResponse> productDetailDisplay;
 
     public BillRevenueDisplay(BillRevenue billRevenue) {
         this.billSell = billRevenue.getBillSell();

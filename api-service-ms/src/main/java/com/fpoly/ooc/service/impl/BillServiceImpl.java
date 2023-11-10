@@ -3,15 +3,7 @@ package com.fpoly.ooc.service.impl;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
 import com.fpoly.ooc.dto.BillStatusDTO;
-import com.fpoly.ooc.entity.Account;
-import com.fpoly.ooc.entity.Address;
-import com.fpoly.ooc.entity.Bill;
-import com.fpoly.ooc.entity.BillDetail;
-import com.fpoly.ooc.entity.Payment;
-import com.fpoly.ooc.entity.PaymentDetail;
-import com.fpoly.ooc.entity.ProductDetail;
-import com.fpoly.ooc.entity.Timeline;
-import com.fpoly.ooc.entity.VoucherHistory;
+import com.fpoly.ooc.entity.*;
 import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.BillDetailRepo;
 import com.fpoly.ooc.repository.BillRepo;
@@ -20,11 +12,15 @@ import com.fpoly.ooc.repository.TimeLineRepo;
 import com.fpoly.ooc.repository.VoucherHistoryRepository;
 import com.fpoly.ooc.request.bill.BillDetailRequest;
 import com.fpoly.ooc.request.bill.BillRequest;
+import com.fpoly.ooc.request.product.ProductDetailRequest;
 import com.fpoly.ooc.responce.bill.*;
 import com.fpoly.ooc.responce.account.GetListCustomer;
 import com.fpoly.ooc.responce.product.ProductDetailDisplayResponse;
 import com.fpoly.ooc.responce.product.ProductDetailResponse;
+import com.fpoly.ooc.responce.product.ProductDetailSellResponse;
+import com.fpoly.ooc.responce.product.ProductImageResponse;
 import com.fpoly.ooc.service.interfaces.BillService;
+import com.fpoly.ooc.service.interfaces.ProductDetailServiceI;
 import com.fpoly.ooc.service.interfaces.ProductImageServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -57,6 +53,12 @@ public class BillServiceImpl implements BillService {
 
     @Autowired
     private ProductImageServiceI productImageService;
+
+    @Autowired
+    private PromotionServiceImpl promotionService;
+
+    @Autowired
+    private ProductDetailServiceI productDetailService;
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -166,7 +168,7 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
-    public BillRevenueDisplay getBillRevenue(int quantityDisplay, String dateString) {
+    public BillRevenueDisplay getBillRevenue(String dateString) {
         int yearString = Integer.parseInt(dateString.substring(0, dateString.indexOf("-")));
         int monthString = Integer.parseInt(dateString.substring(dateString.indexOf("-")+1, dateString.lastIndexOf("-")));
         int dayString = Integer.parseInt(dateString.substring(dateString.lastIndexOf("-")+1));
@@ -174,14 +176,16 @@ public class BillServiceImpl implements BillService {
             LocalDateTime dateTime = LocalDateTime.of(yearString, monthString, dayString, 00, 00, 00);
             BillRevenue revenue =  billRepo.getBillRevenue(dateTime);
             BillRevenueDisplay billRevenueDisplay = new BillRevenueDisplay(revenue);
-            List<ProductDetailDisplayResponse> productDetailDisplayResponses = new ArrayList<>();
+            List<ProductDetailSellResponse> productDetailDisplayResponses = new ArrayList<>();
             List<ProductDetailResponse> productDetailResponses = billRepo.getProductInBillByStatusAndIdAndDate
-                    (quantityDisplay, null, null, dateTime, "ACTIVE" )!=null? billRepo.getProductInBillByStatusAndIdAndDate
-                    (quantityDisplay, null, null, dateTime, "ACTIVE"  ): new ArrayList<>();
+                    (null, null, dateTime, "ACTIVE" )!=null? billRepo.getProductInBillByStatusAndIdAndDate
+                    (null, null, dateTime, "ACTIVE"  ): new ArrayList<>();
             for (int i = 0; i < productDetailResponses.size(); i++) {
-                ProductDetailDisplayResponse response = new ProductDetailDisplayResponse(productDetailResponses.get(i));
-                response.setProductImageResponse(productImageService.getProductImageByProductDetailId(response.getId()));
-                productDetailDisplayResponses.add(response);
+                ProductDetailDisplayResponse response = new ProductDetailDisplayResponse(productDetailResponses.get(i),
+                        productImageService.getProductImageByProductDetailId(productDetailResponses.get(i).getId()));
+                ProductDetailSellResponse productDetailSellResponse = new ProductDetailSellResponse(response);
+                productDetailSellResponse.setPromotion(promotionService.getPromotionByProductDetailId(response.getId(), "ACTIVE"));
+                productDetailDisplayResponses.add(productDetailSellResponse);
             }
             billRevenueDisplay.setProductDetailDisplay(productDetailDisplayResponses);
             return billRevenueDisplay;
@@ -205,13 +209,15 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
-    public List<ProductDetailDisplayResponse> getProductInBillByStatusAndId(int quantityDisplay, Long id, String status) {
-        List<ProductDetailResponse>  productSellTheMost = billRepo.getProductInBillByStatusAndIdAndDate(quantityDisplay, id, status, null , null );
-        List<ProductDetailDisplayResponse> billProductSellTheMosts = new ArrayList<>();
+    public List<ProductDetailSellResponse> getProductInBillByStatusAndId(Long id, String status) {
+        List<ProductDetailResponse>  productSellTheMost = billRepo.getProductInBillByStatusAndIdAndDate(id, status, null , null );
+        List<ProductDetailSellResponse> billProductSellTheMosts = new ArrayList<>();
         for (int i = 0; i < productSellTheMost.size(); i++) {
-            ProductDetailDisplayResponse response = new ProductDetailDisplayResponse(productSellTheMost.get(i));
-            response.setProductImageResponse(productImageService.getProductImageByProductDetailId(response.getId()));
-            billProductSellTheMosts.add(response);
+            ProductDetailDisplayResponse response = new ProductDetailDisplayResponse(productSellTheMost.get(i),
+                    productImageService.getProductImageByProductDetailId(productSellTheMost.get(i).getId()));
+            ProductDetailSellResponse productDetailSellResponse = new ProductDetailSellResponse(response);
+            productDetailSellResponse.setPromotion(promotionService.getPromotionByProductDetailId(productSellTheMost.get(i).getId(), "ACTIVE"));
+            billProductSellTheMosts.add(productDetailSellResponse);
         }
         return billProductSellTheMosts;
     }
@@ -262,5 +268,18 @@ public class BillServiceImpl implements BillService {
             }
         }
         return data;
+    }
+
+    @Override
+    public List<ProductDetailSellResponse> getProductDetailSellInStore(ProductDetailRequest request, BigDecimal min, BigDecimal maxPrice) {
+        List<ProductDetailDisplayResponse> productDetailResponses =
+                productDetailService.filterProductDetailsByIdCom(request, min, maxPrice);
+        List<ProductDetailSellResponse> productDetailSellResponses = new ArrayList<>();
+        for (int i = 0; i < productDetailResponses.size(); i++) {
+            ProductDetailSellResponse productDetailSellResponse = new ProductDetailSellResponse(productDetailResponses.get(i));
+            productDetailSellResponse.setPromotion(promotionService.getPromotionByProductDetailId(productDetailResponses.get(i).getId(), "ACTIVE"));
+            productDetailSellResponses.add(productDetailSellResponse);
+        }
+        return productDetailSellResponses;
     }
 }

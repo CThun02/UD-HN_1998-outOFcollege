@@ -30,4 +30,7 @@ public interface PromotionService {
 
     List<PromotionProductResponse> findAllPromotionProductResponse();
 
+    List<PromotionProductResponse> getPromotionByProductDetailId(Long pdId, String status);
+
+
 }

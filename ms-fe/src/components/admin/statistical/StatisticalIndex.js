@@ -91,16 +91,21 @@ const StatisticalIndex = () => {
                   marginRight: "10px",
                 }}
               >
-                {record.promotionValue !== null ? (
+                {record.promotion.kength !== 0 ? (
                   <Badge.Ribbon
                     text={`Giảm ${
-                      record.promotionValue
-                        ? record.promotionMethod === "%"
-                          ? record.promotionValue + " " + record.promotionMethod
-                          : record.promotionValue.toLocaleString("vi-VN", {
-                              style: "currency",
-                              currency: "VND",
-                            })
+                      record.promotion[0].promotionValue
+                        ? record.promotion[0].promotionMethod === "%"
+                          ? record.promotion[0].promotionValue +
+                            " " +
+                            record.promotion[0].promotionMethod
+                          : record.promotion[0].promotionValue.toLocaleString(
+                              "vi-VN",
+                              {
+                                style: "currency",
+                                currency: "VND",
+                              }
+                            )
                         : null
                     }`}
                     color="red"
@@ -204,7 +209,7 @@ const StatisticalIndex = () => {
       datatIndex: "total",
       title: "Tổng thu",
       render: (text, record, index) => {
-        return record.price;
+        return record.price * record.quantity;
       },
     },
   ];
@@ -309,6 +314,21 @@ const StatisticalIndex = () => {
         .catch((err) => console.log(err));
     }
   }
+
+  function getDataLineChart() {
+    axios
+      .get(
+        "http://localhost:8080/api/admin/bill/getDataLineChart?years=" +
+          checkedList.join(",")
+      )
+      .then((res) => {
+        setData(res.data);
+      })
+      .catch((error) => {
+        console.log("Get data failed", error);
+      });
+  }
+
   useEffect(() => {
     axios
       .get(
@@ -328,24 +348,9 @@ const StatisticalIndex = () => {
         setPlainOptions(res.data);
       })
       .catch((err) => console.log(err));
-    asyncFetch();
+    getDataLineChart();
     compareRevenue();
   }, [dateCompare, render, pageSize, dateRevenue]);
-
-  const asyncFetch = () => {
-    axios
-      .get(
-        "http://localhost:8080/api/admin/bill/getDataLineChart?years=" +
-          checkedList.join(",")
-      )
-      .then((res) => {
-        setData(res.data);
-      })
-      .catch((error) => {
-        console.log("Get data failed", error);
-      });
-  };
-
   return (
     <>
       <Row>

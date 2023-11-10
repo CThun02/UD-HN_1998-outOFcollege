@@ -47,27 +47,20 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
     @Query("SELECT distinct YEAR(b.createdAt) from Bill b")
     List<Integer> getBusinessYear();
 
-    @Query("SELECT pd.id AS id, pd.product AS product, pd.brand as brand, pd.category as category, pd.button AS button," +
+    @Query("SELECT DISTINCT pd.id AS id, pd.product AS product, pd.brand as brand, pd.category as category, pd.button AS button," +
             "       pd.material AS material, pd.collar AS collar, pd.sleeve AS sleeve, pd.size AS size," +
-            "       pd.color AS color, pd.shirtTail AS shirtTail, p.promotionMethod as promotionMethod," +
-            "       p.promotionValue as promotionValue, p.promotionCondition as promotionCondition," +
-            "       pd.price AS price, pd.weight as weight, sum(bd.quantity) AS quantity," +
+            "       pd.color AS color, pd.shirtTail AS shirtTail," +
+            "       bd.price AS price, pd.weight as weight, sum(bd.quantity) AS quantity," +
             "       pd.descriptionDetail AS descriptionDetail, pd.pattern as pattern, pd.form as form, pd.status as status " +
             "FROM BillDetail bd " +
             "JOIN ProductDetail pd ON pd.id = bd.productDetail.id " +
-            "LEFT JOIN PromotionProduct pp ON pp.productDetailId.id = pd.id " +
-            "LEFT JOIN Promotion p ON pp.promotion.id = p.id and (p.status = ?5 or ?5 is null)" +
-            "WHERE (bd.bill.status like ?3 or ?3 is null) and (bd.bill.id = ?2 or ?2 is null) " +
-            "AND(bd.bill.createdAt >= ?4 or ?4 is null) " +
-            "GROUP BY pd.id, pd.product, pd.brand, pd.category, pd.button," +
-            "         pd.material, pd.collar, pd.sleeve, pd.size," +
-            "         pd.color, pd.shirtTail, p.promotionMethod," +
-            "         p.promotionValue, p.promotionCondition," +
-            "         pd.weight, pd.descriptionDetail," +
-            "         pd.pattern, pd.form, pd.status, pd.price " +
-            "ORDER BY quantity DESC " +
-            "LIMIT ?1")
-    List<ProductDetailResponse> getProductInBillByStatusAndIdAndDate(Integer quantityDisplay, Long id, String status, LocalDateTime DateFrom, String statusPromotion);
+            "WHERE (bd.bill.status like ?2 or ?2 is null) and (bd.bill.id = ?1 or ?1 is null) " +
+            "AND(bd.bill.createdAt >= ?3 or ?3 is null) " +
+            "GROUP BY pd.id, pd.product, pd.brand, pd.category, pd.button, pd.material, pd.collar, pd.sleeve, pd.size, " +
+            "pd.color, pd.shirtTail, bd.price, pd.weight, pd.descriptionDetail, " +
+            "pd.pattern, pd.form, pd.status " +
+            "ORDER BY quantity DESC ")
+    List<ProductDetailResponse> getProductInBillByStatusAndIdAndDate(Long id, String status, LocalDateTime DateFrom, String statusPromotion);
 
     @Query("SELECT DISTINCT new com.fpoly.ooc.responce.bill.BillManagementResponse(b.id, b.billCode, COUNT(bd.id)," +
             "   b.price, a.fullName, a.numberPhone, b.createdAt, b.billType, b.symbol, b.status, dn.shipPrice," +

@@ -37,7 +37,6 @@ public interface ProductDetailServiceI {
     Optional<Page<ProductDetailShop>> getAllProductDetailShop(ProductDetailCondition req, Pageable pageable);
     Optional<BigDecimal> getPriceMax();
     Optional<GetColorAndSizeAndQuantity> getColorAndSize(GetSizeAndColorRequest req);
-
     Optional<ProductDetailShopResponse> getProductDetailsShop(GetSizeAndColorRequest req);
 
 }

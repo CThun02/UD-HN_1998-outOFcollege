@@ -89,16 +89,21 @@ const ProductDetails = (props) => {
                   marginRight: "10px",
                 }}
               >
-                {record.promotionValue !== null ? (
+                {record.promotion.length !== 0 ? (
                   <Badge.Ribbon
                     text={`Giảm ${
-                      record.promotionValue
-                        ? record.promotionMethod === "%"
-                          ? record.promotionValue + " " + record.promotionMethod
-                          : record.promotionValue.toLocaleString("vi-VN", {
-                              style: "currency",
-                              currency: "VND",
-                            })
+                      record.promotion[0].promotionValue
+                        ? record.promotion[0].promotionMethod === "%"
+                          ? record.promotion[0].promotionValue +
+                            " " +
+                            record.promotion[0].promotionMethod
+                          : record.promotion[0].promotionValue.toLocaleString(
+                              "vi-VN",
+                              {
+                                style: "currency",
+                                currency: "VND",
+                              }
+                            )
                         : null
                     }`}
                     color="red"
@@ -205,7 +210,7 @@ const ProductDetails = (props) => {
       render: (text, record, index) => {
         return (
           <div style={{ textAlign: "center" }}>
-            {record.promotionValue ? (
+            {record.promotion ? (
               <span style={{ color: "#ccc" }}>
                 <strike>
                   {record.price.toLocaleString("vi-VN", {
@@ -224,17 +229,18 @@ const ProductDetails = (props) => {
             )}
             <br />
             <span>
-              {record.promotionValue
-                ? record.promotionMethod === "%"
+              {record.promotion.length !== 0
+                ? record.promotion[0].promotionMethod === "%"
                   ? (
-                      (record.price * (100 - Number(record.promotionValue))) /
+                      (record.price *
+                        (100 - Number(record.promotion[0].promotionValue))) /
                       100
                     ).toLocaleString("vi-VN", {
                       style: "currency",
                       currency: "VND",
                     })
                   : (
-                      record.price - Number(record.promotionValue)
+                      record.price - Number(record.promotion[0].promotionValue)
                     ).toLocaleString("vi-VN", {
                       style: "currency",
                       currency: "VND",
@@ -341,10 +347,12 @@ const ProductDetails = (props) => {
       });
     } else {
       productDetailCreate.productDetail = record;
-      productDetailCreate.priceReduce = record.promotionValue
-        ? record.promotionMethod === "%"
-          ? (record.price * (100 - Number(record.promotionValue))) / 100
-          : record.price - Number(record.promotionValue)
+      productDetailCreate.priceReduce = record.promotion[0].promotionValue
+        ? record.promotion[0].promotionMethod === "%"
+          ? (record.price *
+              (100 - Number(record.promotion[0].promotionValue))) /
+            100
+          : record.price - Number(record.promotion[0].promotionValue)
         : record.price;
       props.productDetailsCreate?.push(productDetailCreate);
       notification.success({
@@ -361,7 +369,7 @@ const ProductDetails = (props) => {
     axios
       .get(
         api +
-          "product/filterProductDetailByIdCom?productId=" +
+          "bill/filterProductDetailSellByIdCom?productId=" +
           product +
           "&brandId=" +
           brand +

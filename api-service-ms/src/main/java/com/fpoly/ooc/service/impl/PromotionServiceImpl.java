@@ -151,6 +151,11 @@ public class PromotionServiceImpl implements PromotionService {
         return promotionRepository.findAllPromotionProductNoCondition();
     }
 
+    @Override
+    public List<PromotionProductResponse> getPromotionByProductDetailId(Long pdId, String status) {
+        return promotionRepository.getPromotionByProductDetailId(pdId, status);
+    }
+
     private Promotion promotion(PromotionRequest request) {
         Promotion promotion = new Promotion();
 

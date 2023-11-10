@@ -288,8 +288,8 @@ const Checkout = (props) => {
                 setFormData({ ...formData, lstBillDetailRequest: [] })
                 for (let i = 0; i < productDetails?.length; i++) {
                     const billDetail = {
-                        productDetailId: productDetails[i].data.productDetailId,
-                        price: productDetails[i].data.colorAndSizeAndQuantity.priceProductMin,
+                        productDetailId: productDetails[i].data[0].id,
+                        price: productDetails[i].data[0].price,
                         quantity: productDetails[i].quantity,
                     };
                     formData.lstBillDetailRequest.push(billDetail)
@@ -347,7 +347,7 @@ const Checkout = (props) => {
         let totalPrice = 0;
         for (let i = 0; i < carts?.length; i++) {
             totalPrice +=
-                carts[i].data.colorAndSizeAndQuantity.priceProductMin *
+                carts[i].data[0].price *
                 carts[i].quantity
         }
         setTotalPrice(totalPrice)
@@ -601,13 +601,29 @@ const Checkout = (props) => {
                                                             <div className={styles.productThumbnail}>
                                                                 <div className={styles.productThumbnailWrapper}>
                                                                     <img
-                                                                        src={productDetail.data.images[0].path} alt="" className={styles.productThumbnailImage} />
+                                                                        src={productDetail.data[0].productImageResponse[0].path} alt="" className={styles.productThumbnailImage} />
                                                                 </div>
                                                                 <span className={styles.productThumbnailQuantity}>{productDetail.quantity}</span>
                                                             </div>
                                                             <div style={{ width: 256 }}>
                                                                 <span >
-                                                                    {productDetail.data.productName}
+                                                                    {productDetail.data[0].product.productName + "-" + productDetail.data[0].button.buttonName +
+                                                                        "-" +
+                                                                        productDetail.data[0].brand.brandName +
+                                                                        "-" +
+                                                                        productDetail.data[0].category.categoryName +
+                                                                        "-" +
+                                                                        productDetail.data[0].material.materialName +
+                                                                        "-" +
+                                                                        productDetail.data[0].collar.collarTypeName +
+                                                                        "-" +
+                                                                        productDetail.data[0].sleeve.sleeveName +
+                                                                        "-" +
+                                                                        productDetail.data[0].shirtTail.shirtTailTypeName +
+                                                                        "-" +
+                                                                        productDetail.data[0].pattern.patternName +
+                                                                        "-" +
+                                                                        productDetail.data[0].form.formName}
                                                                 </span>
                                                                 <div style={{ display: 'flex', alignItems: 'center' }}>
                                                                     <div
@@ -615,14 +631,14 @@ const Checkout = (props) => {
                                                                             height: 20,
                                                                             width: 20,
                                                                             borderRadius: '50%',
-                                                                            backgroundColor: productDetail.data.colorAndSizeAndQuantity.colors[0].colorCode,
+                                                                            backgroundColor: productDetail.data[0].color.colorCode,
                                                                         }}
                                                                     ></div>/
-                                                                    <span>{productDetail.data.colorAndSizeAndQuantity.sizes[0].sizeName}</span>
+                                                                    <span>{productDetail.data[0].size.sizeName}</span>
                                                                 </div>
                                                             </div>
                                                             <div>
-                                                                {numeral(productDetail.data.colorAndSizeAndQuantity.priceProductMin)
+                                                                {numeral(productDetail.data[0].price)
                                                                     .format('0,0') + 'đ'}
                                                             </div>
                                                         </Space>

@@ -91,23 +91,22 @@ const StatisticalIndex = () => {
                   marginRight: "10px",
                 }}
               >
-                {record.promotion.kength !== 0 ? (
+                {record.promotion.length !== 0 ? (
                   <Badge.Ribbon
-                    text={`Giảm ${
-                      record.promotion[0].promotionValue
-                        ? record.promotion[0].promotionMethod === "%"
-                          ? record.promotion[0].promotionValue +
-                            " " +
-                            record.promotion[0].promotionMethod
-                          : record.promotion[0].promotionValue.toLocaleString(
-                              "vi-VN",
-                              {
-                                style: "currency",
-                                currency: "VND",
-                              }
-                            )
-                        : null
-                    }`}
+                    text={`Giảm ${record.promotion[0].promotionValue
+                      ? record.promotion[0].promotionMethod === "%"
+                        ? record.promotion[0].promotionValue +
+                        " " +
+                        record.promotion[0].promotionMethod
+                        : record.promotion[0].promotionValue.toLocaleString(
+                          "vi-VN",
+                          {
+                            style: "currency",
+                            currency: "VND",
+                          }
+                        )
+                      : null
+                      }`}
                     color="red"
                   >
                     <Carousel autoplay>
@@ -295,17 +294,17 @@ const StatisticalIndex = () => {
       axios
         .get(
           "http://localhost:8080/api/admin/bill/compareRevenueDate?dayFrom=" +
-            dayFrom +
-            "&monthFrom=" +
-            monthFrom +
-            "&yearFrom=" +
-            yearFrom +
-            "&yearTo=" +
-            yearTo +
-            "&monthTo=" +
-            monthTo +
-            "&dayTo=" +
-            dayTo
+          dayFrom +
+          "&monthFrom=" +
+          monthFrom +
+          "&yearFrom=" +
+          yearFrom +
+          "&yearTo=" +
+          yearTo +
+          "&monthTo=" +
+          monthTo +
+          "&dayTo=" +
+          dayTo
         )
         .then((res) => {
           setBillRevenueCompare(res.data);
@@ -319,7 +318,7 @@ const StatisticalIndex = () => {
     axios
       .get(
         "http://localhost:8080/api/admin/bill/getDataLineChart?years=" +
-          checkedList.join(",")
+        checkedList.join(",")
       )
       .then((res) => {
         setData(res.data);
@@ -333,9 +332,9 @@ const StatisticalIndex = () => {
     axios
       .get(
         "http://localhost:8080/api/admin/bill/getGrossRevenue?quantityDisplay=" +
-          pageSize +
-          "&date=" +
-          dateRevenue
+        pageSize +
+        "&date=" +
+        dateRevenue
       )
       .then((res) => {
         setLoading(false);
@@ -562,31 +561,31 @@ const StatisticalIndex = () => {
                     title={
                       billRevenueCompare.revenueFrom -
                         billRevenueCompare.revenueTo >
-                      0
+                        0
                         ? "INACTIVE"
                         : "ACTIVE"
                     }
                     value={
                       (Math.abs(
                         billRevenueCompare.revenueFrom -
-                          billRevenueCompare.revenueTo
+                        billRevenueCompare.revenueTo
                       ) /
                         (billRevenueCompare.revenueFrom +
                           billRevenueCompare.revenueTo)) *
-                        100 || 0
+                      100 || 0
                     }
                     precision={2}
                     valueStyle={
                       billRevenueCompare.revenueFrom -
                         billRevenueCompare.revenueTo >
-                      0
+                        0
                         ? { color: "#ff4d4f" }
                         : { color: "#3f8600" }
                     }
                     prefix={
                       billRevenueCompare.revenueFrom -
                         billRevenueCompare.revenueTo >
-                      0 ? (
+                        0 ? (
                         <ArrowDownOutlined />
                       ) : (
                         <ArrowUpOutlined />

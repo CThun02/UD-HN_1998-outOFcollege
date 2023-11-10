@@ -19,6 +19,7 @@ function ProductInfo({
   setChooseSize,
   chooseColor,
   chooseSize,
+  productDetails,
 }) {
   const [quantity, setQuantity] = useState(1);
   const navigate = useNavigate();
@@ -51,13 +52,14 @@ function ProductInfo({
       }
 
       if (!productExists) {
-        existingData.productDetails.push({ data: data, quantity: quantity })
+        existingData.productDetails.push({ data: productDetails, quantity: quantity })
       }
 
       localStorage.setItem('user', JSON.stringify(existingData));
     }
 
     navigate('/ms-shop/cart');
+    console.log(productDetails)
   }
 
   useEffect(() => {

@@ -6,6 +6,7 @@ import com.fpoly.ooc.dto.TransactionData;
 import com.fpoly.ooc.entity.Bill;
 import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.BillRepo;
+import com.fpoly.ooc.repository.TimeLineRepo;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -38,6 +39,9 @@ public class PaymentController {
 
     @Autowired
     private BillRepo billRepo;
+
+    @Autowired
+    private TimeLineRepo timeLineRepo;
 
     @GetMapping("/pay")
     public String payment(@RequestParam("price") Long price,
@@ -122,6 +126,7 @@ public class PaymentController {
             Bill bill = billRepo.findById(billId).orElseThrow(() -> new NotFoundException("Bill id không tồn tại"));
             bill.setTransactionCode(transactionNo);
             bill.setAmountPaid(new BigDecimal(amount));
+            bill.setStatus("Paid");
             billRepo.save(bill);
             response.sendRedirect("http://localhost:3000/ms-shop");
         }else{

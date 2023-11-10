@@ -1,14 +1,9 @@
 package com.fpoly.ooc.controller;
 
-import com.fpoly.ooc.config.PaymentConfig;
 import com.fpoly.ooc.dto.BillStatusDTO;
 import com.fpoly.ooc.request.bill.BillRequest;
 import com.fpoly.ooc.request.product.ProductDetailRequest;
 import com.fpoly.ooc.service.interfaces.BillService;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import org.apache.kafka.clients.admin.Config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -23,19 +18,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -97,14 +83,14 @@ public class BillController {
 
     @GetMapping("/getDataLineChart")
     public ResponseEntity<?> getDataLineChart(@RequestParam() String years) {
-        if(years.equals("")){
+        if (years.equals("")) {
             return ResponseEntity.ok(null);
         }
         return ResponseEntity.ok(billService.getDataLineChart(years));
     }
 
     @GetMapping("/getGrossRevenue")
-    public ResponseEntity<?> getGrossRevenue(@RequestParam(defaultValue = "5") Integer quantityDisplay, @RequestParam() String date){
+    public ResponseEntity<?> getGrossRevenue(@RequestParam(defaultValue = "5") Integer quantityDisplay, @RequestParam() String date) {
         return ResponseEntity.ok(billService.getBillRevenue(date));
     }
 
@@ -114,7 +100,7 @@ public class BillController {
     }
 
     @GetMapping("/getBillProductSellTheMost")
-    public ResponseEntity<?> getBillProductSellTheMost(@RequestParam(defaultValue = "0")int quantitySell){
+    public ResponseEntity<?> getBillProductSellTheMost(@RequestParam(defaultValue = "0") int quantitySell) {
         return ResponseEntity.ok(billService.getProductInBillByStatusAndId(null, "Paid"));
     }
 

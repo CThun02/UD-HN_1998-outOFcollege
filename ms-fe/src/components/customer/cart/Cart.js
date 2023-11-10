@@ -25,7 +25,7 @@ const Cart = (props) => {
                             <Col span={4}>
                                 <div style={{}} className="m-5">
                                     <img style={{ width: '100%', height: '100%' }}
-                                        src={record.data.images[0].path} alt="Áo Thun Teelab Local Brand Unisex Love Is In The Air TS199"></img>
+                                        src={record.data[0].productImageResponse[0].path} alt="Áo Thun Teelab Local Brand Unisex Love Is In The Air TS199"></img>
                                 </div>
                             </Col>
                             <Col span={20}>
@@ -37,36 +37,36 @@ const Cart = (props) => {
                                     className="m-5"
                                 >
                                     <span style={{ fontWeight: "500" }}>
-                                        {record.data.productName +
+                                        {record.data[0].product.productName +
                                             "-" +
-                                            record.data.buttonName +
+                                            record.data[0].button.buttonName +
                                             "-" +
-                                            record.data.brandName +
+                                            record.data[0].brand.brandName +
                                             "-" +
-                                            record.data.categoryName +
+                                            record.data[0].category.categoryName +
                                             "-" +
-                                            record.data.materialName +
+                                            record.data[0].material.materialName +
                                             "-" +
-                                            record.data.collarTypeName +
+                                            record.data[0].collar.collarTypeName +
                                             "-" +
-                                            record.data.sleeveName +
+                                            record.data[0].sleeve.sleeveName +
                                             "-" +
-                                            record.data.shirtTailTypeName +
+                                            record.data[0].shirtTail.shirtTailTypeName +
                                             "-" +
-                                            record.data.patternName +
+                                            record.data[0].pattern.patternName +
                                             "-" +
-                                            record.data.formName}
+                                            record.data[0].form.formName}
                                     </span>
                                     <br />
                                     <div className={styles.optionColor}>
                                         <b>Màu sắc: </b>
                                         <span
                                             style={{
-                                                backgroundColor: record.data.colorAndSizeAndQuantity.colors[0].colorCode,
+                                                backgroundColor: record.data[0].color.colorCode,
                                                 marginLeft: "8px",
                                             }}
                                         ></span>
-                                        {record.data.colorAndSizeAndQuantity.colors[0].colorName}
+                                        {record.data[0].color.colorName}
                                     </div>
                                     <br />
                                     <b>Kích cỡ: </b>
@@ -75,7 +75,7 @@ const Cart = (props) => {
                                             marginLeft: "8px",
                                         }}
                                     >
-                                        {record.data.colorAndSizeAndQuantity.sizes[0].sizeName}
+                                        {record.data[0].size.sizeName}
                                     </span>
                                 </div>
                             </Col>
@@ -90,7 +90,7 @@ const Cart = (props) => {
             with: 300,
             render: (_, record) => {
                 return <div>
-                    {numeral(record.data.colorAndSizeAndQuantity.priceProductMin)
+                    {numeral(record.data[0].price)
                         .format('0,0') + ' đ'}
                 </div>
             }
@@ -115,7 +115,7 @@ const Cart = (props) => {
             title: 'Thành tiền',
             render: (_, record) => {
                 return <div>
-                    {numeral(record.quantity * record.data.colorAndSizeAndQuantity.priceProductMin)
+                    {numeral(record.quantity * record.data[0].price)
                         .format('0,0') + ' đ'}
                 </div>
             }
@@ -135,7 +135,7 @@ const Cart = (props) => {
     const updateQuantity = (e, index) => {
         let cart = JSON.parse(localStorage.getItem('user'));
         let productDetail = cart.productDetails;
-        if (e > productDetail[index].data.colorAndSizeAndQuantity.quantity) {
+        if (e > productDetail[index].data[0].quantity) {
             notification.warning({
                 message: "Thông báo",
                 description: "Vượt quá số lượng tồn",
@@ -169,7 +169,7 @@ const Cart = (props) => {
         let totalPrice = 0;
         for (let i = 0; i < productDetail?.productDetails?.length; i++) {
             totalPrice +=
-                productDetail.productDetails[i].data.colorAndSizeAndQuantity.priceProductMin *
+                productDetail.productDetails[i].data.price *
                 productDetail.productDetails[i].quantity
         }
         setTotalPrice(totalPrice)
@@ -183,7 +183,7 @@ const Cart = (props) => {
     const addSelectedToData = (e) => {
         let newData = []
         selectedRowKeys.forEach((key) => {
-            let selectedRow = productDetails.find((row) => row.data.productDetailId === key);
+            let selectedRow = productDetails.find((row) => row.data[0].id === key);
             newData.push(selectedRow);
         });
 
@@ -209,6 +209,7 @@ const Cart = (props) => {
     useEffect(() => {
         localStorage.removeItem('checkout');
         getAllCart()
+        console.log(productDetails)
     }, [render]);
 
     return (
@@ -222,7 +223,7 @@ const Cart = (props) => {
                         productDetails &&
                         productDetails.map((record, index) => ({
                             ...record,
-                            key: record.data.productDetailId,
+                            key: record.data[0].id,
                         }))
                     }
                     loading={loading}

@@ -12,6 +12,7 @@ import { DatePicker, Space } from "antd";
 import axios from "axios";
 import moment from "moment";
 import { Link } from "react-router-dom";
+import numeral from "numeral";
 const { RangePicker } = DatePicker;
 
 const BillManagement = () => {
@@ -95,7 +96,8 @@ const BillManagement = () => {
       title: "Tổng tiền",
       key: "totalPrice",
       render: (text, record) => {
-        return record.totalPrice + record.shipPrice - record.priceReduce;
+        return numeral(record.totalPrice + record.shipPrice - record.priceReduce)
+          .format('0,0') + 'đ';
       },
     },
     {
@@ -103,7 +105,8 @@ const BillManagement = () => {
       dataIndex: "createdDate",
       key: "createdDate",
       render: (createdDate) => {
-        return moment(createdDate).format(` HH:mm:ss DD/MM/YYYY`);
+        return createdDate[3] + ':' + createdDate[4] + ':' + createdDate[5] + ' ' +
+          createdDate[2] + '/' + createdDate[1] + '/' + createdDate[0];
       },
     },
     {

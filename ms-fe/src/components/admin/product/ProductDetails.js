@@ -91,21 +91,20 @@ const ProductDetails = (props) => {
               >
                 {record.promotion.length !== 0 ? (
                   <Badge.Ribbon
-                    text={`Giảm ${
-                      record.promotion[0].promotionValue
-                        ? record.promotion[0].promotionMethod === "%"
-                          ? record.promotion[0].promotionValue +
-                            " " +
-                            record.promotion[0].promotionMethod
-                          : record.promotion[0].promotionValue.toLocaleString(
-                              "vi-VN",
-                              {
-                                style: "currency",
-                                currency: "VND",
-                              }
-                            )
-                        : null
-                    }`}
+                    text={`Giảm ${record.promotion[0].promotionValue
+                      ? record.promotion[0].promotionMethod === "%"
+                        ? record.promotion[0].promotionValue +
+                        " " +
+                        record.promotion[0].promotionMethod
+                        : record.promotion[0].promotionValue.toLocaleString(
+                          "vi-VN",
+                          {
+                            style: "currency",
+                            currency: "VND",
+                          }
+                        )
+                      : null
+                      }`}
                     color="red"
                   >
                     <Carousel autoplay>
@@ -210,7 +209,7 @@ const ProductDetails = (props) => {
       render: (text, record, index) => {
         return (
           <div style={{ textAlign: "center" }}>
-            {record.promotion ? (
+            {record.promotion.length !== 0 ? (
               <span style={{ color: "#ccc" }}>
                 <strike>
                   {record.price.toLocaleString("vi-VN", {
@@ -232,19 +231,19 @@ const ProductDetails = (props) => {
               {record.promotion.length !== 0
                 ? record.promotion[0].promotionMethod === "%"
                   ? (
-                      (record.price *
-                        (100 - Number(record.promotion[0].promotionValue))) /
-                      100
-                    ).toLocaleString("vi-VN", {
-                      style: "currency",
-                      currency: "VND",
-                    })
+                    (record.price *
+                      (100 - Number(record.promotion[0].promotionValue))) /
+                    100
+                  ).toLocaleString("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  })
                   : (
-                      record.price - Number(record.promotion[0].promotionValue)
-                    ).toLocaleString("vi-VN", {
-                      style: "currency",
-                      currency: "VND",
-                    })
+                    record.price - Number(record.promotion[0].promotionValue)
+                  ).toLocaleString("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  })
                 : null}
             </span>
           </div>
@@ -339,19 +338,18 @@ const ProductDetails = (props) => {
     ) {
       notification.error({
         message: "Thông báo",
-        description: `Số lượng sản phẩm ${
-          productDetailCreate.quantity > 100
-            ? "thêm tối đa 100"
-            : "tồn không đủ"
-        }`,
+        description: `Số lượng sản phẩm ${productDetailCreate.quantity > 100
+          ? "thêm tối đa 100"
+          : "tồn không đủ"
+          }`,
       });
     } else {
       productDetailCreate.productDetail = record;
-      productDetailCreate.priceReduce = record.promotion[0].promotionValue
+      productDetailCreate.priceReduce = record.promotion.length !== 0
         ? record.promotion[0].promotionMethod === "%"
           ? (record.price *
-              (100 - Number(record.promotion[0].promotionValue))) /
-            100
+            (100 - Number(record.promotion[0].promotionValue))) /
+          100
           : record.price - Number(record.promotion[0].promotionValue)
         : record.price;
       props.productDetailsCreate?.push(productDetailCreate);
@@ -369,34 +367,34 @@ const ProductDetails = (props) => {
     axios
       .get(
         api +
-          "bill/filterProductDetailSellByIdCom?productId=" +
-          product +
-          "&brandId=" +
-          brand +
-          "&categoryId=" +
-          category +
-          "&buttonId=" +
-          button +
-          "&materialId=" +
-          material +
-          "&shirtTailId=" +
-          shirtTail +
-          "&sleeveId=" +
-          sleeve +
-          "&collarId=" +
-          collar +
-          "&colorId=" +
-          color +
-          "&sizeId=" +
-          size +
-          "&patternId=" +
-          pattern +
-          "&formId=" +
-          form +
-          "&minPrice=" +
-          price[0] +
-          "&maxPrice=" +
-          price[1]
+        "bill/filterProductDetailSellByIdCom?productId=" +
+        product +
+        "&brandId=" +
+        brand +
+        "&categoryId=" +
+        category +
+        "&buttonId=" +
+        button +
+        "&materialId=" +
+        material +
+        "&shirtTailId=" +
+        shirtTail +
+        "&sleeveId=" +
+        sleeve +
+        "&collarId=" +
+        collar +
+        "&colorId=" +
+        color +
+        "&sizeId=" +
+        size +
+        "&patternId=" +
+        pattern +
+        "&formId=" +
+        form +
+        "&minPrice=" +
+        price[0] +
+        "&maxPrice=" +
+        price[1]
       )
       .then((response) => {
         setProductDetails(response.data);

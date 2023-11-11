@@ -83,29 +83,29 @@ public class BillController {
 
     @GetMapping("/getDataLineChart")
     public ResponseEntity<?> getDataLineChart(@RequestParam() String years) {
-        if(years.equals("")){
+        if (years.equals("")) {
             return ResponseEntity.ok(null);
         }
         return ResponseEntity.ok(billService.getDataLineChart(years));
     }
 
     @GetMapping("/getGrossRevenue")
-    public ResponseEntity<?> getGrossRevenue(@RequestParam(defaultValue = "5") Integer quantityDisplay, @RequestParam() String date){
+    public ResponseEntity<?> getGrossRevenue(@RequestParam(defaultValue = "5") Integer quantityDisplay, @RequestParam() String date) {
         return ResponseEntity.ok(billService.getBillRevenue(date));
     }
 
     @GetMapping("/getBillRevenueCompare")
-    public ResponseEntity<?> getBillRevenueCompare(){
+    public ResponseEntity<?> getBillRevenueCompare() {
         return ResponseEntity.ok(billService.getRevenueInStoreOnlineCompare());
     }
 
     @GetMapping("/getBillProductSellTheMost")
-    public ResponseEntity<?> getBillProductSellTheMost(@RequestParam(defaultValue = "0")int quantitySell){
+    public ResponseEntity<?> getBillProductSellTheMost(@RequestParam(defaultValue = "0") int quantitySell) {
         return ResponseEntity.ok(billService.getProductInBillByStatusAndId(null, "Paid"));
     }
 
     @GetMapping("/getBusinessYear")
-    public ResponseEntity<?> getBusinessYear(){
+    public ResponseEntity<?> getBusinessYear() {
         return ResponseEntity.ok(billService.getBusinessYear());
     }
 
@@ -115,8 +115,8 @@ public class BillController {
                                                 @RequestParam Optional<Integer> yearFrom,
                                                 @RequestParam Optional<Integer> dayTo,
                                                 @RequestParam Optional<Integer> monthTo,
-                                                @RequestParam Optional<Integer> yearTo){
-        System.out.println("CHeck" +dayFrom.orElse(null));
+                                                @RequestParam Optional<Integer> yearTo) {
+        System.out.println("CHeck" + dayFrom.orElse(null));
         return ResponseEntity.ok(billService.compareRevenueDate(dayFrom.orElse(null), monthFrom.orElse(null),
                 yearFrom.orElse(null), dayTo.orElse(null), monthTo.orElse(null), yearTo.orElse(null)));
     }

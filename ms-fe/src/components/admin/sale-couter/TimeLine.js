@@ -342,7 +342,8 @@ const BillTimeLine = (addId) => {
                                 <span >Ngày mua hàng</span>
                             </Col>
                             <Col span={12}>
-                                <SpanBorder child={moment(billInfo.createdDate).format('HH:mm:ss  DD/MM/YYYY')} color={'#1677ff'} />
+                                <SpanBorder child={billInfo.createdDate[3] + ':' + billInfo.createdDate[4] + ':' + billInfo.createdDate[5] + ' ' +
+                                    billInfo.createdDate[2] + '/' + billInfo.createdDate[1] + '/' + billInfo.createdDate[0]} color={'#1677ff'} />
                             </Col>
                         </Row>
                         <Row>

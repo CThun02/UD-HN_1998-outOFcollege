@@ -1,49 +1,48 @@
-
 .material {
-    margin: 25px;
-    background-color: white;
-    padding: 20px 20px;
-    border-radius: 4px;
-    border: 1px solid #edf2f9;
-  }
-  .inputCommon {
-    padding: 0px 100px;
-  }
-  .categoryTable {
-    margin-top: 20px;
-  }
-  .btnCRUD {
-    margin-top: 20px;
-  }
-  .btnSeach {
-    background-color: rgb(55, 135, 255);
-  }
-  .titleSeach {
-    color: white;
-  }
-  .titleTB {
-    margin-bottom: 10px;
-  }
-  .adminMenu {
-    margin-bottom: 10px;
-  }
-  .menu {
-    margin-right: 10px;
-  }
-  /* .btnDetails {
+  background-color: white;
+  padding: 20px 20px;
+  border-radius: 4px;
+  border: 1px solid #edf2f9;
+}
+.inputCommon {
+  padding: 0px 100px;
+}
+.categoryTable {
+  margin-top: 20px;
+}
+.btnCRUD {
+  margin-top: 20px;
+}
+.btnSeach {
+  background-color: rgb(55, 135, 255);
+}
+.titleSeach {
+  color: white;
+}
+.titleTB {
+  margin-bottom: 10px;
+}
+.adminMenu {
+  margin-bottom: 10px;
+}
+.menu {
+  margin-right: 10px;
+}
+/* .btnDetails {
       box-shadow: 4px 4px 10px gray;
     } */
-  
-  .faPlus {
-    background-color: white;
-    border-radius: 50%;
-    border: 1px solid white;
-  }
-  /* .picture {
+
+.faPlus {
+  background-color: white;
+  border-radius: 50%;
+  border: 1px solid white;
+  color: black;
+}
+/* .picture {
       height: 50px;
       width: 50px;
       border-radius: 50%;
     } */
-  .page {
-    margin-top: 20px;
-  }
+.page {
+  margin-top: 20px;
+}

@@ -39,7 +39,7 @@ const ButtonAdmin = function () {
   useEffect(() => {}, [render]);
   return (
     <div className={styles.category}>
-      <div className={styles.radiusFrame}>
+      <div className={styles.customer}>
         <Row className={styles.titleTB}>
           <h3>Danh Sách Cúc Áo</h3>
         </Row>

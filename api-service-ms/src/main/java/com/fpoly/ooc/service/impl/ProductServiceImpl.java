@@ -2,10 +2,8 @@ package com.fpoly.ooc.service.impl;
 
 import com.fpoly.ooc.entity.Product;
 import com.fpoly.ooc.repository.ProductDAORepositoryI;
-import com.fpoly.ooc.responce.product.ProductDetailResponse;
-import com.fpoly.ooc.responce.product.ProductPromotionResponse;
-import com.fpoly.ooc.responce.product.ProductResponse;
-import com.fpoly.ooc.responce.product.ProductTableResponse;
+import com.fpoly.ooc.request.product.ProductDetailRequest;
+import com.fpoly.ooc.responce.product.*;
 import com.fpoly.ooc.service.interfaces.ProductServiceI;
 import com.fpoly.ooc.utilities.UniqueRandomHex;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +11,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -96,4 +96,5 @@ public class ProductServiceImpl implements ProductServiceI {
     public List<Long> findIdsProductsByIdPromotion(Long idPromotion) {
         return repo.findAllByIdPromotion(idPromotion);
     }
+
 }

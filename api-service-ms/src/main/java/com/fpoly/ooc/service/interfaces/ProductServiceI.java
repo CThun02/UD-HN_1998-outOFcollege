@@ -1,13 +1,12 @@
 package com.fpoly.ooc.service.interfaces;
 
 import com.fpoly.ooc.entity.Product;
-import com.fpoly.ooc.responce.product.ProductDetailResponse;
-import com.fpoly.ooc.responce.product.ProductPromotionResponse;
-import com.fpoly.ooc.responce.product.ProductResponse;
-import com.fpoly.ooc.responce.product.ProductTableResponse;
+import com.fpoly.ooc.request.product.ProductDetailRequest;
+import com.fpoly.ooc.responce.product.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface ProductServiceI {

@@ -84,6 +84,8 @@ public class ProductController {
                 (request, minPrice.orElse(null), maxPrice.orElse(null)));
     }
 
+
+
     @GetMapping("/searchProductDetail")
     public ResponseEntity<?> searchProductDetail(@RequestParam String keyWords) {
         return ResponseEntity.ok(productDetailService.searchProductDetail(keyWords));
@@ -170,7 +172,6 @@ public class ProductController {
                 .findFirst();
         if(!result.isEmpty()){
             if(!(result.get().getId() == productDetail.getId())){
-                System.out.println(result.get().getId()+"check"+ request.getId());
                 return ResponseEntity.ok(result.get());
             }
         }

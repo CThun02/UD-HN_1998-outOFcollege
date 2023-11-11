@@ -3,7 +3,6 @@ import {
   Button,
   Carousel,
   Col,
-  message,
   notification,
   Row,
   Select,
@@ -18,7 +17,6 @@ import styles from "./ProductDetails.module.css";
 
 const ProductDetails = (props) => {
   const api = "http://localhost:8080/api/admin/";
-  const [messageApi, contextHolder] = message.useMessage();
   const [products, setProducts] = useState([]);
   const [product, setProduct] = useState("");
   const [button, setButton] = useState("");
@@ -80,6 +78,7 @@ const ProductDetails = (props) => {
       key: "productName",
       dataIndex: "productName",
       title: "Sản phẩm",
+      width: "50%",
       render: (text, record, index) => {
         return (
           <Row>
@@ -87,17 +86,26 @@ const ProductDetails = (props) => {
               <div
                 style={{
                   marginTop: "10px",
+                  marginRight: "10px",
                 }}
               >
-                {record.promotionValue !== null ? (
+                {record.promotion.length !== 0 ? (
                   <Badge.Ribbon
-                    text={`Giảm ${record.promotionValue.toLocaleString(
-                      "vi-VN",
-                      {
-                        style: "currency",
-                        currency: "VND",
-                      }
-                    )}`}
+                    text={`Giảm ${
+                      record.promotion[0].promotionValue
+                        ? record.promotion[0].promotionMethod === "%"
+                          ? record.promotion[0].promotionValue +
+                            " " +
+                            record.promotion[0].promotionMethod
+                          : record.promotion[0].promotionValue.toLocaleString(
+                              "vi-VN",
+                              {
+                                style: "currency",
+                                currency: "VND",
+                              }
+                            )
+                        : null
+                    }`}
                     color="red"
                   >
                     <Carousel autoplay>
@@ -142,6 +150,10 @@ const ProductDetails = (props) => {
               >
                 <span style={{ fontWeight: "500" }}>
                   {record.product.productName +
+                    "-" +
+                    record.brand.brandName +
+                    "-" +
+                    record.category.categoryName +
                     "-" +
                     record.button.buttonName +
                     "-" +
@@ -195,9 +207,48 @@ const ProductDetails = (props) => {
       key: "price",
       dataIndex: "price",
       title: "Giá",
-      width: 110,
       render: (text, record, index) => {
-        return record.price;
+        return (
+          <div style={{ textAlign: "center" }}>
+            {record.promotion ? (
+              <span style={{ color: "#ccc" }}>
+                <strike>
+                  {record.price.toLocaleString("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  })}
+                </strike>
+              </span>
+            ) : (
+              <span>
+                {record.price.toLocaleString("vi-VN", {
+                  style: "currency",
+                  currency: "VND",
+                })}
+              </span>
+            )}
+            <br />
+            <span>
+              {record.promotion.length !== 0
+                ? record.promotion[0].promotionMethod === "%"
+                  ? (
+                      (record.price *
+                        (100 - Number(record.promotion[0].promotionValue))) /
+                      100
+                    ).toLocaleString("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    })
+                  : (
+                      record.price - Number(record.promotion[0].promotionValue)
+                    ).toLocaleString("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    })
+                : null}
+            </span>
+          </div>
+        );
       },
     },
     {
@@ -268,6 +319,7 @@ const ProductDetails = (props) => {
     var productDetailCreate = {
       productDetail: {},
       quantity: quantity,
+      priceReduce: 0,
     };
     for (let i = 0; i < props.productDetailsCreate.length; i++) {
       if (props.productDetailsCreate[i].productDetail.id === record.id) {
@@ -295,6 +347,13 @@ const ProductDetails = (props) => {
       });
     } else {
       productDetailCreate.productDetail = record;
+      productDetailCreate.priceReduce = record.promotion[0].promotionValue
+        ? record.promotion[0].promotionMethod === "%"
+          ? (record.price *
+              (100 - Number(record.promotion[0].promotionValue))) /
+            100
+          : record.price - Number(record.promotion[0].promotionValue)
+        : record.price;
       props.productDetailsCreate?.push(productDetailCreate);
       notification.success({
         message: "Thông báo",
@@ -310,7 +369,7 @@ const ProductDetails = (props) => {
     axios
       .get(
         api +
-          "product/filterProductDetailByIdCom?productId=" +
+          "bill/filterProductDetailSellByIdCom?productId=" +
           product +
           "&brandId=" +
           brand +
@@ -471,7 +530,6 @@ const ProductDetails = (props) => {
 
   return (
     <>
-      {contextHolder}
       <div className={styles.productDetails}>
         <Row className={styles.productDetails__filter}>
           <Col span={4}>

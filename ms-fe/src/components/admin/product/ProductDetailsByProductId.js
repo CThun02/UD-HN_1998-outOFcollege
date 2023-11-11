@@ -1104,9 +1104,13 @@ const ProductDetails = (props) => {
               size={"large"}
             >
               {record.status === "ACTIVE" ? (
-                <DeleteFilled />
+                <DeleteFilled
+                  onClick={() => deleteProductDetail(record, "DELETED")}
+                />
               ) : (
-                <ReloadOutlined />
+                <ReloadOutlined
+                  onClick={() => deleteProductDetail(record, "ACTIVE")}
+                />
               )}
             </Button>
           </>
@@ -1637,6 +1641,23 @@ const ProductDetails = (props) => {
           console.log(err);
         });
         setRender(Math.random);
+      })
+      .catch((err) => {
+        messageApi.error(`Gặp lỗi khi thao tác trên dữ liệu`);
+        console.log(err);
+      });
+  }
+  function deleteProductDetail(productDetail, status) {
+    delete productDetail["key"];
+    productDetail.status = status;
+    axios
+      .put(api + "product/updateProductDetail?method='Deleted'", productDetail)
+      .then((res) => {
+        setRender(Math.random);
+        notification.success({
+          message: "Thông báo",
+          description: `cập nhật sản phẩm thành công!`,
+        });
       })
       .catch((err) => {
         messageApi.error(`Gặp lỗi khi thao tác trên dữ liệu`);

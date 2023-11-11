@@ -38,5 +38,9 @@ public interface AccountService {
 
     List<AccountDetailResponce> getAllCustomer(String keyword);
 
-    Account findByLogin(String subject);
+    Account findLoginByUsername(String username);
+    Account findLoginByEmail(String email);
+    Account findLoginByPhone(String phone);
+
+    Account findAccountByLogin(String login);
 }

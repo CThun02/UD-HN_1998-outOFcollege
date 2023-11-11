@@ -16,9 +16,10 @@ function HeaderRight() {
     return () =>
       token
         .then((data) => {
-          setUser(data.fullName);
+          setUser(data?.fullName);
         })
         .catch((error) => {
+          console.log(error);
           showSuccessNotification({ error }, "login");
         });
   }, []);

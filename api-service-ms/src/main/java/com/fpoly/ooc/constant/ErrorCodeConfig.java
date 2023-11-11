@@ -43,6 +43,8 @@ public class ErrorCodeConfig {
         errors.put("VOUCHER_ACCOUNT_NOT_FOUND", "Không tìm thấy mã giảm giá với tài khoản hiện tại.");
         errors.put("IS_SEND_EMAIL_MEMBER_REQUIRED", "Gửi cho mã giảm giá cho thành viên là bắt buộc.");
         errors.put("ARRAYS_CUSTOMER_NOT_NULL", "Danh sách khách hàng rỗng.");
+        errors.put("JWT_EXCEPTION", "Hết phiên đăng nhập");
+        errors.put("JWT_DECODE_EXCEPTION", "Đăng nhập thất bại");
     }
 
     public static String getMessage(String code) {

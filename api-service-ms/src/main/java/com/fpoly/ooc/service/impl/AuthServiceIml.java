@@ -70,7 +70,11 @@ public class AuthServiceIml implements AuthService {
 
     @Override
     public UserDTO findByLogin(String login) {
-        return null;
+        Account account=  accountService.findByLogin(login);
+        return UserDTO.builder()
+                .fullName(account.getFullName())
+                .username(account.getUsername())
+                .build();
     }
 
     private UserDTO mapperUser(Account account) {

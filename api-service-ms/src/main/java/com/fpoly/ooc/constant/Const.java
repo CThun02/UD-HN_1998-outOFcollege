@@ -49,6 +49,8 @@ public class Const {
     public static final String KAFKA_GROUP_ID = "group-id";
     public static final String TOPIC_VOUCHER = "voucher-cronjob";
     public static final String TOPIC_PROMOTION = "promotion-cronjob";
+    public static final String JWT_EXCEPTION = "JWT_EXCEPTION";
+    public static final String JWT_DECODE_EXCEPTION = "JWT_DECODE_EXCEPTION";
 
     //SORTING
     public static final String SORT_BY_CREATE_AT = "SORT_BY_CREATE_AT";

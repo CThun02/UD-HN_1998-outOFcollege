@@ -1,11 +1,24 @@
 import axios from "axios";
 
-const getAuthToken = () => {
-  return window.localStorage.getItem("auth_token");
-};
+const baseUrl = "http://localhost:8080/api/v1/auth";
+
+async function getAuthToken() {
+  const token = window.localStorage.getItem("auth_token");
+  if (token) {
+    try {
+      const atobToken = atob(token);
+      const res = await axios.get(baseUrl + "/verified/" + atobToken);
+      const data = await res.data;
+      return data;
+    } catch (err) {
+      return err;
+    }
+  }
+  return null;
+}
 
 const setAuthHeader = (token) => {
-  window.localStorage.setItem("auth_token", token);
+  window.localStorage.setItem("auth_token", btoa(token));
 };
 
 const clearAuthToken = () => {

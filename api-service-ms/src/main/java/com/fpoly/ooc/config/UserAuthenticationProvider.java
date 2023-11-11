@@ -9,6 +9,7 @@ import com.fpoly.ooc.service.interfaces.AccountService;
 import com.fpoly.ooc.service.interfaces.AuthService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -20,6 +21,7 @@ import java.util.Date;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class UserAuthenticationProvider {
 
     @Value("${security.jwt.token.secret-key:secret-key}")
@@ -50,6 +52,13 @@ public class UserAuthenticationProvider {
         DecodedJWT decodedJWT = verifier.verify(token);
         UserDTO userDTO = authService.findByLogin(decodedJWT.getSubject());
         return new UsernamePasswordAuthenticationToken(userDTO, null, Collections.emptyList());
+    }
+
+    public UserDTO getUsernameFromToken(String token) {
+        Algorithm algorithm = Algorithm.HMAC256(secretKey);
+        JWTVerifier verifier = JWT.require(algorithm).build();
+        DecodedJWT decodedJWT = verifier.verify(token);
+        return authService.findByLogin(decodedJWT.getSubject());
     }
 
 }

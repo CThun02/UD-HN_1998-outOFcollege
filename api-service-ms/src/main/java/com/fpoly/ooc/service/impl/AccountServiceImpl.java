@@ -229,8 +229,23 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Account findByLogin(String login) {
-        return accountRepository.findByLogin(login);
+    public Account findLoginByUsername(String username) {
+        return accountRepository.findLoginByUsername(username);
+    }
+
+    @Override
+    public Account findLoginByEmail(String email) {
+        return accountRepository.findLoginByEmail(email);
+    }
+
+    @Override
+    public Account findLoginByPhone(String phone) {
+        return accountRepository.findLoginByNumberPhone(phone);
+    }
+
+    @Override
+    public Account findAccountByLogin(String login) {
+        return accountRepository.findAccountByLogin(login);
     }
 
     private Page<AccountVoucher> page(List<AccountVoucher> inputList, Pageable pageable) {

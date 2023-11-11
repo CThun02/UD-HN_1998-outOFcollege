@@ -21,6 +21,6 @@ public class AccountValidConstraint implements ConstraintValidator<AccountValid,
             return true;
         }
 
-        return accountService.findByLogin(value) == null;
+        return accountService.findAccountByLogin(value) == null;
     }
 }

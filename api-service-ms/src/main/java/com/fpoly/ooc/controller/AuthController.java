@@ -7,7 +7,10 @@ import com.fpoly.ooc.request.account.SignUpRequest;
 import com.fpoly.ooc.service.interfaces.AuthService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,6 +39,11 @@ public class AuthController {
         UserDTO createdUser = authService.register(dto);
         createdUser.setToken(userAuthenticationProvider.createToken(dto.getUsername()));
         return ResponseEntity.created(URI.create("/users/" + createdUser.getUsername())).body(createdUser);
+    }
+
+    @GetMapping("/verified/{token}")
+    public ResponseEntity<?> verifiedUser(@PathVariable("token") String token) {
+        return ResponseEntity.ok().body(userAuthenticationProvider.getUsernameFromToken(token));
     }
 
 }

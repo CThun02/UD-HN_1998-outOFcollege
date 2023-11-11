@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styles from "./BillManagement.module.css";
-import { Button, Input, Row, Select, Table, Tag, TreeSelect } from "antd";
+import { Button, Input, Select, Table, Tag, TreeSelect } from "antd";
 import {
   EyeOutlined,
   FilterFilled,
@@ -12,6 +12,7 @@ import { DatePicker, Space } from "antd";
 import axios from "axios";
 import moment from "moment";
 import { Link } from "react-router-dom";
+import numeral from "numeral";
 const { RangePicker } = DatePicker;
 
 const BillManagement = () => {
@@ -95,7 +96,8 @@ const BillManagement = () => {
       title: "Tổng tiền",
       key: "totalPrice",
       render: (text, record) => {
-        return record.totalPrice + record.shipPrice - record.priceReduce;
+        return numeral(record.totalPrice + record.shipPrice - record.priceReduce)
+          .format('0,0') + 'đ';
       },
     },
     {
@@ -103,7 +105,7 @@ const BillManagement = () => {
       dataIndex: "createdDate",
       key: "createdDate",
       render: (createdDate) => {
-        return moment(createdDate).format(` HH:mm:ss DD/MM/YYYY`);
+        return moment(new Date(...createdDate)).format('HH:mm:ss DD/MM/YYYY');
       },
     },
     {
@@ -115,19 +117,19 @@ const BillManagement = () => {
           object === "Unpaid"
             ? "geekblue"
             : object.toLocaleLowerCase() === "PAID".toLocaleLowerCase()
-            ? "green"
-            : object === "cancel"
-            ? "red"
-            : null;
+              ? "green"
+              : object === "Cancel"
+                ? "red"
+                : null;
         return (
           <Space direction="vertical">
             <div style={{ width: "auto", display: "flex" }}>
               <Tag color={color}>
                 {object === "Unpaid"
                   ? "Chưa thanh toán"
-                  : object === "cancel"
-                  ? "Đã hủy"
-                  : "Đã thanh toán"}
+                  : object === "Cancel"
+                    ? "Đã hủy"
+                    : "Đã thanh toán"}
               </Tag>
             </div>
           </Space>

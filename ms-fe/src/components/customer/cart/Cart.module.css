@@ -1,6 +1,7 @@
 .wrapper {
   background-color: #ffffff;
   color: #111111;
+  padding-top: 30px;
 }
 
 .container {
@@ -35,4 +36,14 @@
   text-align: center;
   line-height: 40px;
   border: initial;
+}
+
+.optionColor {
+  display: inline-block;
+}
+
+.optionColor span {
+  padding: 2px 12px;
+  border-radius: 50%;
+  margin-right: 8px;
 }

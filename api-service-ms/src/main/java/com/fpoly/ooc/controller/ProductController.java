@@ -45,18 +45,18 @@ public class ProductController {
 
     @GetMapping("/getproductfilterByCom")
     public ResponseEntity<?> filterByCom(@RequestParam(defaultValue = "null") String status,
-                                         @RequestParam(defaultValue = "null") String keywords){
-        return ResponseEntity.ok(service.getProductFilterByCom(status.equals("null")?null:status,
-                keywords.equals("null")?null:"%"+keywords+"%"));
+                                         @RequestParam(defaultValue = "null") String keywords) {
+        return ResponseEntity.ok(service.getProductFilterByCom(status.equals("null") ? null : status,
+                keywords.equals("null") ? null : "%" + keywords + "%"));
     }
 
     @GetMapping("/getproductdetailbyidpd")
-    public ResponseEntity<?> filterByCom(@RequestParam() Long productDetailId){
+    public ResponseEntity<?> filterByCom(@RequestParam() Long productDetailId) {
         return ResponseEntity.ok(productDetailService.getOnePDDisplayById(productDetailId));
     }
 
     @GetMapping("/getMaxPrice")
-    public ResponseEntity<?> getMaxPrice(@RequestParam Long productId){
+    public ResponseEntity<?> getMaxPrice(@RequestParam Long productId) {
         return ResponseEntity.ok(productDetailService.getMaxPricePDByProductId(productId));
     }
 
@@ -90,8 +90,9 @@ public class ProductController {
     public ResponseEntity<?> searchProductDetail(@RequestParam String keyWords) {
         return ResponseEntity.ok(productDetailService.searchProductDetail(keyWords));
     }
+
     @GetMapping("/getAllProductImages")
-    public List<?> getAllProductImages(){
+    public List<?> getAllProductImages() {
         return productImageService.getAll();
     }
 
@@ -121,7 +122,7 @@ public class ProductController {
     }
 
     @PostMapping("/createProductImg")
-    public ResponseEntity<?> createProductImg(@RequestBody ProductImageRequest request){
+    public ResponseEntity<?> createProductImg(@RequestBody ProductImageRequest request) {
         ProductImage productImage = request.dto();
         return ResponseEntity.ok(productImageService.create(productImage));
     }
@@ -139,7 +140,7 @@ public class ProductController {
                                                  @RequestParam String status,
                                                  @RequestParam(defaultValue = "false") Boolean openAll) {
         Product product = service.getOne(productId);
-        if((openAll && status.equals("ACTIVE")) || status.equals("INACTIVE")){
+        if ((openAll && status.equals("ACTIVE")) || status.equals("INACTIVE")) {
             productDetailService.updateProductDetailsByProductId(productId, status);
         }
         product.setStatus(status);
@@ -149,14 +150,14 @@ public class ProductController {
 
     @PutMapping("/updateProductDetail")
     public ResponseEntity<?> updateProductDetail(@RequestBody ProductDetail productDetail,
-                                                 @RequestParam(name = "method", defaultValue = "Update") String method){
-        if(method.equals("Deleted")){
-            if(productDetail.getStatus().equals("DELETED")){
+                                                 @RequestParam(name = "method", defaultValue = "Update") String method) {
+        if (method.equals("Deleted")) {
+            if (productDetail.getStatus().equals("DELETED")) {
                 productDetail.setDeletedAt(LocalDateTime.now());
-            }else{
+            } else {
                 productDetail.setDeletedAt(null);
             }
-        }else{
+        } else {
             productDetail.setDeletedAt(null);
         }
         ProductDetailRequest request = ProductDetailRequest.builder().productId(productDetail.getProduct().getId())
@@ -170,8 +171,8 @@ public class ProductController {
         Optional<ProductDetailDisplayResponse> result = check.stream()
                 .filter(productDetailGet -> !productDetailGet.getId().equals(productDetail.getId()))
                 .findFirst();
-        if(!result.isEmpty()){
-            if(!(result.get().getId() == productDetail.getId())){
+        if (!result.isEmpty()) {
+            if (!(result.get().getId() == productDetail.getId())) {
                 return ResponseEntity.ok(result.get());
             }
         }
@@ -179,14 +180,14 @@ public class ProductController {
     }
 
     @PutMapping("/updateProductImg")
-    public ResponseEntity<?> updateProductImg(@RequestBody ProductImage request){
+    public ResponseEntity<?> updateProductImg(@RequestBody ProductImage request) {
         ProductImage productImage = productImageService.update(request);
         return ResponseEntity.ok(productImage);
     }
 
 
     @DeleteMapping("/deleteProductImage")
-    public ResponseEntity<?> deleteProductImage(@RequestParam Long id){
+    public ResponseEntity<?> deleteProductImage(@RequestParam Long id) {
         ProductImage productImage = productImageService.getOne(id);
         productImageService.delete(productImage);
         return ResponseEntity.ok("ok");

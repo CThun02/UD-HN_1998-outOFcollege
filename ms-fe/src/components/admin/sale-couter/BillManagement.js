@@ -105,8 +105,7 @@ const BillManagement = () => {
       dataIndex: "createdDate",
       key: "createdDate",
       render: (createdDate) => {
-        return createdDate[3] + ':' + createdDate[4] + ':' + createdDate[5] + ' ' +
-          createdDate[2] + '/' + createdDate[1] + '/' + createdDate[0];
+        return moment(new Date(...createdDate)).format('HH:mm:ss DD/MM/YYYY');
       },
     },
     {

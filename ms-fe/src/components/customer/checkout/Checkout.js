@@ -244,12 +244,41 @@ const Checkout = (props) => {
         });
     };
 
+    const removeProductDetailCart = () => {
+        const cart = JSON.parse(localStorage.getItem('user'));
+        const checkout = JSON.parse(localStorage.getItem('checkout'));
+
+        if (cart && checkout) {
+            const productDetailUpdate = cart.productDetails;
+
+            for (let i = 0; i < productDetailUpdate.length; i++) {
+                const cartProductId = productDetailUpdate[i].data[0].id;
+
+                const isInCheckout = checkout.some(checkoutItem =>
+                    checkoutItem.data[0].id === cartProductId
+                );
+
+                if (isInCheckout) {
+                    productDetailUpdate.splice(i, 1);
+                    i--;
+                }
+
+            }
+
+            // Cập nhật mảng productDetails trong giỏ hàng
+            cart.productDetails = productDetailUpdate;
+
+            // Lưu lại giỏ hàng vào localStorage
+            localStorage.setItem('user', JSON.stringify(cart));
+        }
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         const bill = {
             billCode: generateRandomBillCode(),
-            price: totalPrice,
+            price: totalPrice + shippingFee,
             priceReduce: 0,
             paymentDetailId: formData.paymentDetailId,
             billType: "Online",
@@ -281,6 +310,7 @@ const Checkout = (props) => {
             setError(validationErrors);
             return;
         }
+
         Modal.confirm({
             title: "Xác nhận thanh toán",
             content: "Bạn có chắc chắn muốn thanh toán?",
@@ -332,12 +362,16 @@ const Checkout = (props) => {
                             duration: 2,
                         });
                     }
+                    localStorage.removeItem('checkout');
 
                 } catch (error) {
                     console.log(error);
                 }
             },
         });
+
+        removeProductDetailCart()
+
     };
 
     const getAllCarts = () => {
@@ -675,7 +709,7 @@ const Checkout = (props) => {
                                                 Phí vận chuyển
                                             </td>
                                             <td style={{ textAlign: 'right' }}>
-                                                {numeral(shippingFee).format('0,0 đ')}
+                                                {numeral(shippingFee).format('0,0 đ') + 'đ'}
                                             </td>
                                         </tr>
 
@@ -684,7 +718,7 @@ const Checkout = (props) => {
                                                 Giảm giá
                                             </td>
                                             <td style={{ textAlign: 'right' }}>
-                                                {numeral(shippingFee).format('0,0 đ')}
+                                                0đ
                                             </td>
                                         </tr>
 

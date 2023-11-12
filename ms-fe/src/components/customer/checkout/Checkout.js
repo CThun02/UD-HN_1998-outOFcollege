@@ -324,7 +324,6 @@ const Checkout = (props) => {
                     };
                     formData.lstBillDetailRequest.push(billDetail)
                 }
-                console.log(formData.lstBillDetailRequest);
 
                 try {
                     const response = await axios.post(
@@ -340,6 +339,8 @@ const Checkout = (props) => {
                         {
                             billId: response.data.id,
                             addressId: responseAddress.data.id,
+                            name: formData.fullName,
+                            phoneNumber: formData.phoneNumber,
                             shipDate: leadtime ?? null,
                             shipPrice: shippingFee ?? null,
                         }

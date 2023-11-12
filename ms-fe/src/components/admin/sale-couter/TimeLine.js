@@ -218,9 +218,7 @@ const BillTimeLine = (addId) => {
                                                     ? 'Đã xác nhận'
                                                     : data.status === '3'
                                                         ? 'Đã đóng gói & đang được giao' : 'Giao hàng thành công'}
-                                        subtitle={moment(data.createdDate)
-                                            .format("HH:mm:ss DD/MM/YYYY")}
-                                    />
+                                        subtitle={data.createdDate} />
                                 ))}
                             </Timeline>
                         ) : (
@@ -236,9 +234,7 @@ const BillTimeLine = (addId) => {
                                             FaRegCheckCircle
                                         )}
                                         title={data.status === '1' ? 'Chờ xác nhận' : data.status === '2' ? 'Thanh toán thành công' : data.status === '0' ? 'Đã hủy' : ''}
-                                        subtitle={moment(data.createdDate)
-                                            .format("HH:mm:ss DD/MM/YYYY")}
-                                    />
+                                        subtitle={data.createdDate} />
                                 ))}
                             </Timeline>
                         )}
@@ -342,8 +338,7 @@ const BillTimeLine = (addId) => {
                                 <span >Ngày mua hàng</span>
                             </Col>
                             <Col span={12}>
-                                <SpanBorder child={billInfo.createdDate[3] + ':' + billInfo.createdDate[4] + ':' + billInfo.createdDate[5] + ' ' +
-                                    billInfo.createdDate[2] + '/' + billInfo.createdDate[1] + '/' + billInfo.createdDate[0]} color={'#1677ff'} />
+                                <SpanBorder child={billInfo.createdDate} color={'#1677ff'} />
                             </Col>
                         </Row>
                         <Row>

@@ -44,7 +44,7 @@ function ProductInfo({
       existingData.timeStart = now();
       let productExists = false;
       for (let i = 0; i < existingData.productDetails?.length; i++) {
-        if (existingData.productDetails[i].data.productDetailId === data.productDetailId) {
+        if (existingData.productDetails[i].data[0].id === productDetails[0].id) {
           existingData.productDetails[i].quantity += quantity
           productExists = true;
           break;
@@ -59,7 +59,6 @@ function ProductInfo({
     }
 
     navigate('/ms-shop/cart');
-    console.log(productDetails)
   }
 
   useEffect(() => {

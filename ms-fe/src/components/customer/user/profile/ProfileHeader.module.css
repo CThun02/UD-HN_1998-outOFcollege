@@ -1,0 +1,40 @@
+.width {
+  width: 80%;
+}
+
+.center {
+  display: flex;
+  justify-content: center;
+}
+
+.image {
+  background-image: url("../../../../../public/user-detail/user-detail.png");
+  height: 50vh;
+  width: 100%;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+}
+
+.position {
+  position: relative;
+}
+
+.absolute {
+  position: absolute;
+  bottom: 50px;
+  left: 300px;
+}
+
+.textColor {
+  color: #fff;
+}
+
+.textSize {
+  font-size: 1rem;
+}
+
+.textHeader {
+  font-size: 1.5rem;
+  font-weight: 400;
+}

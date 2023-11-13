@@ -30,7 +30,12 @@ public class AuthServiceIml implements AuthService {
 
     @Override
     public UserDTO login(CredentialsDTO dto) {
-        Account account = accountService.findByLogin(dto.getLogin());
+        Account account = accountService.findAccountByLogin(dto.getLogin());
+
+        if(account == null) {
+            throw new LoginException(ErrorCodeConfig.getMessage(Const.JWT_LOGIN_ERROR), HttpStatus.BAD_REQUEST);
+        }
+
         if (passwordEncoder.matches(CharBuffer.wrap(dto.getPassword()), account.getPassword())) {
             return mapperUser(account);
         }
@@ -39,10 +44,20 @@ public class AuthServiceIml implements AuthService {
 
     @Override
     public UserDTO register(SignUpRequest signUp) {
-        Account account = accountService.findByLogin(signUp.getUsername());
+        Account accountByUsername = accountService.findLoginByUsername(signUp.getUsername());
+        Account accountByEmail = accountService.findLoginByUsername(signUp.getEmail());
+        Account accountByPhoneNumber = accountService.findLoginByUsername(signUp.getPhoneNumber());
 
-        if (account != null) {
-            throw new LoginException("Tên đăng nhập đã tồn tại", HttpStatus.BAD_REQUEST);
+        if (accountByUsername != null) {
+            throw new LoginException(ErrorCodeConfig.getMessage(Const.JWT_USER_ALREADY_EXIST), HttpStatus.BAD_REQUEST);
+        }
+
+        if (accountByEmail != null) {
+            throw new LoginException(ErrorCodeConfig.getMessage(Const.JWT_EMAIL_ALREADY_EXIST), HttpStatus.BAD_REQUEST);
+        }
+
+        if (accountByPhoneNumber != null) {
+            throw new LoginException(ErrorCodeConfig.getMessage(Const.JWT_PHONE_NUMBER_ALREADY_EXIST), HttpStatus.BAD_REQUEST);
         }
 
         Role role = roleService.findRoleByName(signUp.getRole().toUpperCase());
@@ -70,7 +85,11 @@ public class AuthServiceIml implements AuthService {
 
     @Override
     public UserDTO findByLogin(String login) {
-        return null;
+        Account account=  accountService.findAccountByLogin(login);
+        return UserDTO.builder()
+                .fullName(account.getFullName())
+                .username(account.getUsername())
+                .build();
     }
 
     private UserDTO mapperUser(Account account) {

@@ -42,8 +42,29 @@ public interface AccountRepository extends JpaRepository<Account, String> {
             "left join Role role on account.role.id = role.id " +
             "where account.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
             "and role.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
-            "and (account.username = ?1 or account.email = ?1 or account.numberPhone = ?1)")
-    Account findByLogin(String login);
+            "and account.username = ?1")
+    Account findLoginByUsername(String username);
+
+    @Query("select account from Account account " +
+            "left join Role role on account.role.id = role.id " +
+            "where account.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and role.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and account.email = ?1")
+    Account findLoginByEmail(String email);
+
+    @Query("select account from Account account " +
+            "left join Role role on account.role.id = role.id " +
+            "where account.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and role.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and account.numberPhone = ?1")
+    Account findLoginByNumberPhone(String phone);
+
+    @Query("select account from Account account " +
+            "left join Role role on account.role.id = role.id " +
+            "where account.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and role.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and (account.numberPhone = ?1 or account.email = ?1 or account.username = ?1)")
+    Account findAccountByLogin(String login);
 
 //        @Query("SELECT new com.fpoly.ooc.responce.account.AccountResponce(a.username,a.avatar,a.fullName,a.)" +
 //                "FROM Account a where a.role=?1")

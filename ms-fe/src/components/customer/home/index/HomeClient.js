@@ -24,7 +24,7 @@ function HomeClient() {
     function () {
       let isCheck = true;
       async function notification() {
-        if (successMessage && isCheck === true && context === "login") {
+        if (successMessage !== "" && isCheck === true && context === "login") {
           apiNotification.success({
             message: `Success`,
             description: `${successMessage}`,
@@ -53,7 +53,7 @@ function HomeClient() {
       }
     }
 
-    getBestSellings();
+    return () => getBestSellings();
   }, []);
 
   useEffect(() => {
@@ -69,7 +69,7 @@ function HomeClient() {
       }
     }
 
-    getNewProduct();
+    return () => getNewProduct();
   }, []);
 
   function handleScrollTop() {

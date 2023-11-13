@@ -49,6 +49,12 @@ public class Const {
     public static final String KAFKA_GROUP_ID = "group-id";
     public static final String TOPIC_VOUCHER = "voucher-cronjob";
     public static final String TOPIC_PROMOTION = "promotion-cronjob";
+    public static final String JWT_EXCEPTION = "JWT_EXCEPTION";
+    public static final String JWT_DECODE_EXCEPTION = "JWT_DECODE_EXCEPTION";
+    public static final String JWT_USER_ALREADY_EXIST = "JWT_USER_ALREADY_EXIST";
+    public static final String JWT_EMAIL_ALREADY_EXIST = "JWT_EMAIL_ALREADY_EXIST";
+    public static final String JWT_PHONE_NUMBER_ALREADY_EXIST = "JWT_PHONE_NUMBER_ALREADY_EXIST";
+    public static final String JWT_LOGIN_ERROR = "JWT_LOGIN_ERROR";
 
     //SORTING
     public static final String SORT_BY_CREATE_AT = "SORT_BY_CREATE_AT";

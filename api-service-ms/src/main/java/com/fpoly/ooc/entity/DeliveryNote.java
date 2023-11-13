@@ -37,6 +37,12 @@ public class DeliveryNote extends BaseEntity {
     @JoinColumn(name = "bill_id")
     private Bill bill;
 
+    @Column(name = "name")
+    private String name;
+
+    @Column(name = "number_phone")
+    private String phoneNumber;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "address_id")
     private Address address;

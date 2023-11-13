@@ -1,15 +1,13 @@
 package com.fpoly.ooc.controller;
 
 import com.fpoly.ooc.config.PaymentConfig;
-import com.fpoly.ooc.dto.TransactionDTO;
-import com.fpoly.ooc.dto.TransactionData;
 import com.fpoly.ooc.entity.Bill;
+import com.fpoly.ooc.entity.Timeline;
 import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.BillRepo;
 import com.fpoly.ooc.repository.TimeLineRepo;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -129,12 +127,16 @@ public class PaymentController {
             bill.setStatus("Paid");
             billRepo.save(bill);
             response.sendRedirect("http://localhost:3000/ms-shop");
-        }else{
+        } else {
             Bill bill = billRepo.findById(billId).orElseThrow(() -> new NotFoundException("Bill id không tồn tại"));
             bill.setTransactionCode(transactionNo);
             bill.setAmountPaid(new BigDecimal(amount));
             bill.setStatus("Cancel");
             billRepo.save(bill);
+            Timeline timeline = new Timeline();
+            timeline.setBill(bill);
+            timeline.setStatus("0");
+            timeLineRepo.save(timeline);
             response.sendRedirect("http://localhost:3000/ms-shop");
         }
     }

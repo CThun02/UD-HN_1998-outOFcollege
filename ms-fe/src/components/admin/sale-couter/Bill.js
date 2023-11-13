@@ -140,19 +140,19 @@ const Bill = () => {
                 {record.productDetail.promotion.length !== 0 ? (
                   <Badge.Ribbon
                     text={`Giảm ${record.productDetail.promotion[0].promotionValue
-                        ? record.productDetail.promotion[0].promotionMethod ===
-                          "%"
-                          ? record.productDetail.promotion[0].promotionValue +
-                          " " +
-                          record.productDetail.promotion[0].promotionMethod
-                          : record.productDetail.promotion[0].promotionValue.toLocaleString(
-                            "vi-VN",
-                            {
-                              style: "currency",
-                              currency: "VND",
-                            }
-                          )
-                        : null
+                      ? record.productDetail.promotion[0].promotionMethod ===
+                        "%"
+                        ? record.productDetail.promotion[0].promotionValue +
+                        " " +
+                        record.productDetail.promotion[0].promotionMethod
+                        : record.productDetail.promotion[0].promotionValue.toLocaleString(
+                          "vi-VN",
+                          {
+                            style: "currency",
+                            currency: "VND",
+                          }
+                        )
+                      : null
                       }`}
                     color="red"
                   >
@@ -859,6 +859,7 @@ const Bill = () => {
 
     getProductDetails();
     initializeModalStates();
+    console.log(account)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     cartId,
@@ -987,6 +988,8 @@ const Bill = () => {
                 {
                   billId: response.data.id,
                   addressId: account ? selectedAddress?.id : addressId,
+                  name: account ? account.fullName : fullname,
+                  phoneNumber: account ? account.numberPhone : phoneNumber,
                   shipDate: switchChange[index] === true ? leadtime : null,
                   shipPrice: switchChange[index] === true ? shippingFee : null,
                 }

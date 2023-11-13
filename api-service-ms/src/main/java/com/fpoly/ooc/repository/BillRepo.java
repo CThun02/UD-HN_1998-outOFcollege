@@ -39,10 +39,10 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
             "(:monthParam IS NULL OR MONTH(b.createdAt) = :monthParam) AND " +
             "(:yearParam IS NULL OR YEAR(b.createdAt) = :yearParam)  AND b.status like 'Paid' " +
             "AND (b.billType like :billType or :billType is null)")
-    Double  getRevenueByTime(@Param("dayParam") Integer day,
-                             @Param("monthParam") Integer month,
-                             @Param("yearParam") Integer year,
-                             @Param("billType") String billType);
+    Double getRevenueByTime(@Param("dayParam") Integer day,
+                            @Param("monthParam") Integer month,
+                            @Param("yearParam") Integer year,
+                            @Param("billType") String billType);
 
     @Query("SELECT distinct YEAR(b.createdAt) from Bill b")
     List<Integer> getBusinessYear();
@@ -63,8 +63,8 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
     List<ProductDetailResponse> getProductInBillByStatusAndIdAndDate(Long id, String status, LocalDateTime DateFrom, String statusPromotion);
 
     @Query("SELECT DISTINCT new com.fpoly.ooc.responce.bill.BillManagementResponse(b.id, b.billCode, COUNT(bd.id)," +
-            "   b.price, a.fullName, a.numberPhone, b.createdAt, b.billType, b.symbol, b.status, dn.shipPrice," +
-            "   b.priceReduce, b.createdBy) " +
+            "   b.price, dn.name, dn.phoneNumber, b.createdAt, b.billType, b.symbol, b.status, dn.shipPrice," +
+            "   b.priceReduce, b.createdBy, a.fullName, a.numberPhone) " +
             "FROM Bill b LEFT JOIN Account a ON a.username = b.account.username " +
             "   LEFT JOIN BillDetail bd ON b.id = bd.bill.id " +
             "   LEFT JOIN DeliveryNote dn ON dn.bill.id = b.id " +
@@ -74,8 +74,9 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
             "   AND (:status IS NULL OR b.status LIKE %:status%) " +
             "   AND (:billType IS NULL OR b.billType LIKE %:billType%) " +
             "   AND (:symbol IS NULL OR b.symbol LIKE %:symbol%) " +
-            "GROUP BY b.id, b.billCode, b.price, a.fullName, b.createdAt, b.billType, b.status," +
-            "    b.symbol, dn.shipPrice, b.priceReduce, a.numberPhone, b.createdBy " +
+            "GROUP BY b.id, b.billCode, b.price, b.createdAt, b.billType, b.status, " +
+            "    b.symbol, dn.shipPrice, b.priceReduce, dn.name, dn.phoneNumber, b.createdBy, " +
+            "    a.fullName, a.numberPhone " +
             "ORDER BY b.createdAt DESC ")
     List<BillManagementResponse> getAllBillManagement(
             @Param("billCode") String billCode,

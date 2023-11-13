@@ -61,7 +61,7 @@ public class BillServiceImpl implements BillService {
     @Autowired
     private ProductDetailServiceI productDetailService;
 
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     @Override
     public Bill createBill(BillRequest request) {
         Account accountBuilder = null;
@@ -105,11 +105,18 @@ public class BillServiceImpl implements BillService {
                 .build();
         paymentDetailRepo.save(paymentDetail);
 
-        for (int i = 0; i < 2; i++) {
-            String n = String.valueOf((i + 1));
+        if (request.getBillType().equals("In-Store")) {
+            for (int i = 0; i < 2; i++) {
+                String n = String.valueOf((i + 1));
+                Timeline timeline = new Timeline();
+                timeline.setBill(bill);
+                timeline.setStatus(n);
+                timeLineRepo.save(timeline);
+            }
+        } else {
             Timeline timeline = new Timeline();
             timeline.setBill(bill);
-            timeline.setStatus(n);
+            timeline.setStatus("1");
             timeLineRepo.save(timeline);
         }
 
@@ -171,16 +178,16 @@ public class BillServiceImpl implements BillService {
     @Override
     public BillRevenueDisplay getBillRevenue(String dateString) {
         int yearString = Integer.parseInt(dateString.substring(0, dateString.indexOf("-")));
-        int monthString = Integer.parseInt(dateString.substring(dateString.indexOf("-")+1, dateString.lastIndexOf("-")));
-        int dayString = Integer.parseInt(dateString.substring(dateString.lastIndexOf("-")+1));
+        int monthString = Integer.parseInt(dateString.substring(dateString.indexOf("-") + 1, dateString.lastIndexOf("-")));
+        int dayString = Integer.parseInt(dateString.substring(dateString.lastIndexOf("-") + 1));
         try {
             LocalDateTime dateTime = LocalDateTime.of(yearString, monthString, dayString, 00, 00, 00);
-            BillRevenue revenue =  billRepo.getBillRevenue(dateTime);
+            BillRevenue revenue = billRepo.getBillRevenue(dateTime);
             BillRevenueDisplay billRevenueDisplay = new BillRevenueDisplay(revenue);
             List<ProductDetailSellResponse> productDetailDisplayResponses = new ArrayList<>();
             List<ProductDetailResponse> productDetailResponses = billRepo.getProductInBillByStatusAndIdAndDate
-                    (null, null, dateTime, "ACTIVE" )!=null? billRepo.getProductInBillByStatusAndIdAndDate
-                    (null, null, dateTime, "ACTIVE"  ): new ArrayList<>();
+                    (null, null, dateTime, "ACTIVE") != null ? billRepo.getProductInBillByStatusAndIdAndDate
+                    (null, null, dateTime, "ACTIVE") : new ArrayList<>();
             for (int i = 0; i < productDetailResponses.size(); i++) {
                 ProductDetailDisplayResponse response = new ProductDetailDisplayResponse(productDetailResponses.get(i),
                         productImageService.getProductImageByProductDetailId(productDetailResponses.get(i).getId()));
@@ -201,17 +208,17 @@ public class BillServiceImpl implements BillService {
     @Override
     public BillRevenueCompare getRevenueInStoreOnlineCompare() {
         BillRevenueCompare billRevenueCompare = new BillRevenueCompare();
-        billRevenueCompare.setOnlineRevenue(billRepo.getRevenueInStoreOnlineCompare("Online")==null?1:
+        billRevenueCompare.setOnlineRevenue(billRepo.getRevenueInStoreOnlineCompare("Online") == null ? 1 :
                 billRepo.getRevenueInStoreOnlineCompare("Online"));
-        billRevenueCompare.setInStoreRevenue(billRepo.getRevenueInStoreOnlineCompare("In-Store")==null?0:
+        billRevenueCompare.setInStoreRevenue(billRepo.getRevenueInStoreOnlineCompare("In-Store") == null ? 0 :
                 billRepo.getRevenueInStoreOnlineCompare("In-Store"));
-        billRevenueCompare.setTotalRevenue(billRevenueCompare.getOnlineRevenue()+billRevenueCompare.getInStoreRevenue());
+        billRevenueCompare.setTotalRevenue(billRevenueCompare.getOnlineRevenue() + billRevenueCompare.getInStoreRevenue());
         return billRevenueCompare;
     }
 
     @Override
     public List<ProductDetailSellResponse> getProductInBillByStatusAndId(Long id, String status) {
-        List<ProductDetailResponse>  productSellTheMost = billRepo.getProductInBillByStatusAndIdAndDate(id, status, null , null );
+        List<ProductDetailResponse> productSellTheMost = billRepo.getProductInBillByStatusAndIdAndDate(id, status, null, null);
         List<ProductDetailSellResponse> billProductSellTheMosts = new ArrayList<>();
         for (int i = 0; i < productSellTheMost.size(); i++) {
             ProductDetailDisplayResponse response = new ProductDetailDisplayResponse(productSellTheMost.get(i),
@@ -239,30 +246,30 @@ public class BillServiceImpl implements BillService {
 
     @Override
     public List<BillLineChartResponse> getDataLineChart(String years) {
-        List <Integer> listYear;
-        if(years.contains(",")){
+        List<Integer> listYear;
+        if (years.contains(",")) {
             String[] dataArray = years.split(",");
             listYear = Arrays.stream(dataArray).map(Integer::parseInt).toList();
-        }else{
+        } else {
             listYear = List.of(Integer.parseInt(years));
         }
         List<BillLineChartResponse> data = new ArrayList<>();
         LocalDate now = LocalDate.now();
         int yearNow = now.getYear();
-        for(int j=0; j<listYear.size(); j++){
-            int month = yearNow == listYear.get(j)?now.getMonthValue():12;
-            for(int i=1; i<=month; i++){
+        for (int j = 0; j < listYear.size(); j++) {
+            int month = yearNow == listYear.get(j) ? now.getMonthValue() : 12;
+            for (int i = 1; i <= month; i++) {
                 String type = "Tại quầy";
-                String time = "th"+i+"-"+listYear.get(j);
-                Double revenue = billRepo.getRevenueByTime(null, i, listYear.get(j), "In-Store")==null?0:
+                String time = "th" + i + "-" + listYear.get(j);
+                Double revenue = billRepo.getRevenueByTime(null, i, listYear.get(j), "In-Store") == null ? 0 :
                         billRepo.getRevenueByTime(null, i, listYear.get(j), "In-Store");
                 BillLineChartResponse billRevenue = new BillLineChartResponse(type, time, revenue);
                 data.add(billRevenue);
             }
-            for(int i=1; i<=month; i++){
+            for (int i = 1; i <= month; i++) {
                 String type = "Trực tuyến";
-                String time = "th"+i+"-"+listYear.get(j);
-                Double revenue = billRepo.getRevenueByTime(null, i, listYear.get(j), "Online")==null?0:
+                String time = "th" + i + "-" + listYear.get(j);
+                Double revenue = billRepo.getRevenueByTime(null, i, listYear.get(j), "Online") == null ? 0 :
                         billRepo.getRevenueByTime(null, i, listYear.get(j), "Online");
                 BillLineChartResponse billRevenue = new BillLineChartResponse(type, time, revenue);
                 data.add(billRevenue);

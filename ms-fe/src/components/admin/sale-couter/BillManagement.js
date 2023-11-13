@@ -81,22 +81,39 @@ const BillManagement = () => {
     },
     {
       title: "Tên khách hàng",
-      dataIndex: "fullName",
       key: "fullName",
-      render: (fullName) => {
-        return fullName || "Khách lẻ";
+      render: (text, record) => {
+        let colorAccount =
+          record.accountName
+            ? "green"
+            : "geekblue"
+        return (
+          <Space direction="vertical" style={{ width: "auto" }}>
+            <div style={{ display: "block" }}>
+              <div>
+                {record.accountName ? record.accountName : record.fullName}
+              </div>
+              <Tag color={colorAccount}>
+                {record.accountName ? "Thành viên" : "khách lẻ"}
+              </Tag>
+            </div>
+          </Space>
+        )
       },
     },
     {
       title: "Số điện thoại",
       dataIndex: "phoneNumber",
       key: "phoneNumber",
+      render: (text, record) => {
+        return record.accountPhoneNumber ? record.accountPhoneNumber : record.phoneNumber
+      }
     },
     {
       title: "Tổng tiền",
       key: "totalPrice",
       render: (text, record) => {
-        return numeral(record.totalPrice + record.shipPrice - record.priceReduce)
+        return numeral(record.totalPrice + record.shipPrice - record?.priceReduce)
           .format('0,0') + 'đ';
       },
     },
@@ -241,9 +258,9 @@ const BillManagement = () => {
               defaultValue={""}
             >
               <Select.Option value={""}>Tất cả</Select.Option>
-              <Select.Option value={"active"}>Chưa thanh toán</Select.Option>
-              <Select.Option value={"paid"}>Đã thanh toán</Select.Option>
-              <Select.Option value={"cancel"}>Đã huỷ</Select.Option>
+              <Select.Option value={"Unpaid"}>Chưa thanh toán</Select.Option>
+              <Select.Option value={"Paid"}>Đã thanh toán</Select.Option>
+              <Select.Option value={"Cancel"}>Đã huỷ</Select.Option>
             </Select>
           </span>
           <span style={{ fontWeight: 500 }}>

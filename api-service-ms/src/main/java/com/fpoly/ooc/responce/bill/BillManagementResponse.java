@@ -23,7 +23,7 @@ public class BillManagementResponse {
     private String fullName;
 
     private String phoneNumber;
-    
+
     private LocalDateTime createdDate;
 
     private String billType;
@@ -33,9 +33,13 @@ public class BillManagementResponse {
     private String status;
 
     private BigDecimal shipPrice;
-    
+
     private BigDecimal priceReduce;
 
     private String employee;
+
+    private String accountName;
+
+    private String accountPhoneNumber;
 
 }

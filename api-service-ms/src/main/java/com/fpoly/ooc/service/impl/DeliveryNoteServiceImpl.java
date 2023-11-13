@@ -20,6 +20,8 @@ public class DeliveryNoteServiceImpl implements DeliveryNoteService {
         DeliveryNote deliveryNote = DeliveryNote.builder()
                 .bill(Bill.builder().id(request.getBillId()).build())
                 .address(Address.builder().id(request.getAddressId()).build())
+                .name(request.getName())
+                .phoneNumber(request.getPhoneNumber())
                 .shipPrice(request.getShipPrice())
                 .shipDate(request.getShipDate())
                 .dateOfReceipt(request.getDateOfreceipt())

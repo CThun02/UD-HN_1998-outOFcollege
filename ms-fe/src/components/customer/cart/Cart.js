@@ -25,7 +25,7 @@ const Cart = (props) => {
                             <Col span={4}>
                                 <div style={{}} className="m-5">
                                     <img style={{ width: '100%', height: '100%' }}
-                                        src={record.data[0].productImageResponse[0].path} alt="Áo Thun Teelab Local Brand Unisex Love Is In The Air TS199"></img>
+                                        src={record?.data[0]?.productImageResponse[0].path} alt="Áo Thun Teelab Local Brand Unisex Love Is In The Air TS199"></img>
                                 </div>
                             </Col>
                             <Col span={20}>
@@ -37,36 +37,36 @@ const Cart = (props) => {
                                     className="m-5"
                                 >
                                     <span style={{ fontWeight: "500" }}>
-                                        {record.data[0].product.productName +
+                                        {record?.data[0]?.product.productName +
                                             "-" +
-                                            record.data[0].button.buttonName +
+                                            record?.data[0]?.button.buttonName +
                                             "-" +
-                                            record.data[0].brand.brandName +
+                                            record?.data[0]?.brand.brandName +
                                             "-" +
-                                            record.data[0].category.categoryName +
+                                            record?.data[0]?.category.categoryName +
                                             "-" +
-                                            record.data[0].material.materialName +
+                                            record?.data[0]?.material.materialName +
                                             "-" +
-                                            record.data[0].collar.collarTypeName +
+                                            record?.data[0]?.collar.collarTypeName +
                                             "-" +
-                                            record.data[0].sleeve.sleeveName +
+                                            record?.data[0]?.sleeve.sleeveName +
                                             "-" +
-                                            record.data[0].shirtTail.shirtTailTypeName +
+                                            record?.data[0]?.shirtTail.shirtTailTypeName +
                                             "-" +
-                                            record.data[0].pattern.patternName +
+                                            record?.data[0]?.pattern.patternName +
                                             "-" +
-                                            record.data[0].form.formName}
+                                            record?.data[0]?.form.formName}
                                     </span>
                                     <br />
                                     <div className={styles.optionColor}>
                                         <b>Màu sắc: </b>
                                         <span
                                             style={{
-                                                backgroundColor: record.data[0].color.colorCode,
+                                                backgroundColor: record?.data[0]?.color.colorCode,
                                                 marginLeft: "8px",
                                             }}
                                         ></span>
-                                        {record.data[0].color.colorName}
+                                        {record?.data[0]?.color.colorName}
                                     </div>
                                     <br />
                                     <b>Kích cỡ: </b>
@@ -75,7 +75,7 @@ const Cart = (props) => {
                                             marginLeft: "8px",
                                         }}
                                     >
-                                        {record.data[0].size.sizeName}
+                                        {record?.data[0]?.size.sizeName}
                                     </span>
                                 </div>
                             </Col>
@@ -90,7 +90,7 @@ const Cart = (props) => {
             with: 300,
             render: (_, record) => {
                 return <div>
-                    {numeral(record.data[0].price)
+                    {numeral(record.data[0]?.price)
                         .format('0,0') + ' đ'}
                 </div>
             }
@@ -115,7 +115,7 @@ const Cart = (props) => {
             title: 'Thành tiền',
             render: (_, record) => {
                 return <div>
-                    {numeral(record.quantity * record.data[0].price)
+                    {numeral(record.quantity * record.data[0]?.price)
                         .format('0,0') + ' đ'}
                 </div>
             }
@@ -166,29 +166,32 @@ const Cart = (props) => {
     const getAllCart = () => {
         let productDetail = JSON.parse(localStorage.getItem('user'));
         setProductDetails(productDetail?.productDetails)
-        let totalPrice = 0;
-        for (let i = 0; i < productDetail?.productDetails?.length; i++) {
-            totalPrice +=
-                productDetail.productDetails[i].data.price *
-                productDetail.productDetails[i].quantity
-        }
-        setTotalPrice(totalPrice)
         setLoading(false)
     }
 
     const onSelectChange = (selectedKeys) => {
+        let totalPrice = 0;
+
+        for (let i = 0; i < productDetails.length; i++) {
+            const row = productDetails[i];
+            if (selectedKeys.includes(row?.data[0]?.id)) {
+                totalPrice += row.data[0].price * row.quantity;
+            }
+        }
+
+        setTotalPrice(totalPrice)
         setSelectedRowKeys(selectedKeys);
     };
 
     const addSelectedToData = (e) => {
+        e.preventDefault()
         let newData = []
         selectedRowKeys.forEach((key) => {
-            let selectedRow = productDetails.find((row) => row.data[0].id === key);
+            let selectedRow = productDetails.find((row) => row?.data[0]?.id === key);
             newData.push(selectedRow);
         });
 
         if (newData.length === 0) {
-            console.log(newData)
             notification.error({
                 message: "Thông báo",
                 description: "Bạn chưa chọn sản phẩm",
@@ -209,7 +212,6 @@ const Cart = (props) => {
     useEffect(() => {
         localStorage.removeItem('checkout');
         getAllCart()
-        console.log(productDetails)
     }, [render]);
 
     return (
@@ -223,7 +225,7 @@ const Cart = (props) => {
                         productDetails &&
                         productDetails.map((record, index) => ({
                             ...record,
-                            key: record.data[0].id,
+                            key: record?.data[0]?.id,
                         }))
                     }
                     loading={loading}

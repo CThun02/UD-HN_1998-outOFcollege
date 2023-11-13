@@ -113,16 +113,6 @@
   transition: bottom 1s ease-out;
 }
 
-/* .hidden {
-  display: none;
-}
-
-.absolute {
-  position: absolute;
-  bottom: 28px;
-  transition: bottom 1s ease-out;
-} */
-
 .row {
   margin: 0;
   padding: 0;

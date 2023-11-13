@@ -349,7 +349,7 @@ const Checkout = (props) => {
                         axios.get(`http://localhost:8080/api/client/pay`, {
                             params: {
                                 billId: response.data.id,
-                                price: totalPrice,
+                                price: totalPrice + shippingFee,
                             }
                         }).then((response) => {
                             window.location.href = `${response.data}`

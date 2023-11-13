@@ -87,31 +87,15 @@ const BillManagement = () => {
           record.accountName
             ? "green"
             : "geekblue"
-        let color =
-          record.fullName
-            ? "green"
-            : "geekblue"
         return (
           <Space direction="vertical" style={{ width: "auto" }}>
             <div style={{ display: "block" }}>
-              {record.symbol !== 'Shipping' &&
-                <div>
-                  {record.accountName ? record.accountName : "Khách lẻ"}
-                </div>}
-              {record.symbol === 'Shipping' &&
-                <div>
-                  {record.fullName ? record.fullName : "Khách lẻ"}
-                </div>}
-              <>
-                {record.symbol === 'Shipping' && <Tag color={color}>
-                  {record.fullName ? "Khách lẻ" : "Thành viên"}
-                </Tag>}
-                {record.symbol !== 'Shipping' &&
-                  <Tag color={colorAccount}>
-                    {record.accountName ? "Thành viên" : "Khách lẻ"}
-                  </Tag>
-                }
-              </>
+              <div>
+                {record.accountName ? record.accountName : record.fullName}
+              </div>
+              <Tag color={colorAccount}>
+                {record.accountName ? "Thành viên" : "khách lẻ"}
+              </Tag>
             </div>
           </Space>
         )

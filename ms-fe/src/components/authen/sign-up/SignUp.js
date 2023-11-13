@@ -30,7 +30,7 @@ function SignUp() {
       const data = await res.data;
       const status = await res.status;
 
-      if (status === 200) {
+      if (status === 201) {
         setAuthHeader(data.token);
       }
       showSuccessNotification("Đăng kí thành công", "login");
@@ -45,7 +45,7 @@ function SignUp() {
 
   return (
     <div className={styles.background}>
-      {contextHolder}
+      {contextHolder ? contextHolder : null}
       <div className={styles.content}>
         <div className={styles.parrentDiv}>
           <div className={styles.image}></div>

@@ -1,6 +1,7 @@
 package com.fpoly.ooc.repository;
 
 import com.fpoly.ooc.dto.UserDTO;
+import com.fpoly.ooc.dto.UserInfomationDTO;
 import com.fpoly.ooc.entity.Account;
 import com.fpoly.ooc.responce.account.AccountResponce;
 import com.fpoly.ooc.responce.account.AccountVoucher;
@@ -69,4 +70,11 @@ public interface AccountRepository extends JpaRepository<Account, String> {
 //        @Query("SELECT new com.fpoly.ooc.responce.account.AccountResponce(a.username,a.avatar,a.fullName,a.)" +
 //                "FROM Account a where a.role=?1")
 //    List<Account> seach(String username);
+
+    @Query("""
+        select new com.fpoly.ooc.dto.UserInfomationDTO(user.username, user.password,
+        user.fullName, user.email, user.numberPhone, user.gender, user.dob) from Account user
+        where user.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE and user.username = ?1
+    """)
+    UserInfomationDTO userInfomationByUsername(String username);
 }

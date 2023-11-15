@@ -2,7 +2,7 @@ import { Avatar, Space } from "antd";
 import styles from "./ProfileHeader.module.css";
 import { UserOutlined } from "@ant-design/icons";
 
-function ProfileHeader() {
+function ProfileHeader({ user }) {
   const hour = new Date().getHours();
   return (
     <div className={styles.background}>
@@ -31,16 +31,16 @@ function ProfileHeader() {
                   className={`${styles.textColor} ${styles.textSize}`}
                   style={{ fontSize: "2rem", fontWeight: "400" }}
                 >
-                  Nguyen Van A
+                  {user?.userInfomationDTO?.fullName}
                 </span>
                 <span className={`${styles.textColor} ${styles.textSize}`}>
-                  Username
+                  {user?.userInfomationDTO?.username}
                 </span>
                 <span className={`${styles.textColor} ${styles.textSize}`}>
-                  Số điện thoại
+                  {user?.userInfomationDTO?.phoneNumber}
                 </span>
                 <span className={`${styles.textColor} ${styles.textSize}`}>
-                  Email
+                  {user?.userInfomationDTO?.email}
                 </span>
               </Space>
             </div>

@@ -1,0 +1,22 @@
+.width {
+  width: 80%;
+}
+
+.content {
+  display: flex;
+  justify-content: center;
+}
+
+.textSize {
+  font-size: 1rem;
+}
+
+.textColor {
+  color: #111111;
+}
+
+.followingContent {
+  border: 1px solid #ccc;
+  padding: 15px 20px;
+  border-radius: 6px;
+}

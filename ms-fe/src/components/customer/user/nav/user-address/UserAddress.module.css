@@ -28,3 +28,9 @@
   color: red;
   transition: 0.3s linear;
 }
+
+.starIcon:hover {
+  cursor: pointer;
+  color: orangered;
+  transition: 0.3s linear;
+}

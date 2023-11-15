@@ -11,12 +11,17 @@ import { useState } from "react";
 function HeaderRight() {
   const { showSuccessNotification } = useContext(NotificationContext);
   const [user, setUser] = useState("");
+  const [usernameEncode, setUsernameEncode] = useState("");
   const token = getAuthToken();
   useEffect(() => {
     return () =>
       token
         .then((data) => {
           setUser(data?.fullName);
+
+          const enCodeData = btoa(JSON.stringify(data?.username));
+          const convertPath = enCodeData.replace(/\//g, "-----");
+          setUsernameEncode(convertPath);
         })
         .catch((error) => {
           console.log(error);
@@ -82,7 +87,10 @@ function HeaderRight() {
                       <span>Xin chào, </span> <strong>{user}</strong>
                     </div>
                   ) : null}
-                  <Link className={styles.link}>
+                  <Link
+                    to={"/ms-shop/user/" + usernameEncode}
+                    className={styles.link}
+                  >
                     <Popover
                       content={content}
                       placement="bottomLeft"

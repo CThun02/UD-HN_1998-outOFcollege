@@ -2,7 +2,7 @@ import { Avatar, Button, Col, Row, Space } from "antd";
 import styles from "./UserInfoDetail.module.css";
 import { EditOutlined, UserOutlined } from "@ant-design/icons";
 
-function UserInfoDetail() {
+function UserInfoDetail({ user }) {
   return (
     <div className={styles.userInfoDetail}>
       <div className={styles.content}>
@@ -31,13 +31,31 @@ function UserInfoDetail() {
           <div className={styles.body}>
             <Row style={{ margin: 0 }}>
               <Col span={16} style={{ borderRight: "1px solid #ccc" }}>
-                <RowUserInfo title={"Tên đăng nhập"} data={"ndtoi"} />
-                <RowUserInfo title={"Mật khẩu"} data={"********"} />
-                <RowUserInfo title={"Họ và tên"} data={"Nguyen dinh toi"} />
-                <RowUserInfo title={"Email"} data={"ndtoi@gmail.com"} />
-                <RowUserInfo title={"Số điện thoại"} data={"0337970185"} />
-                <RowUserInfo title={"Giới tính"} data={"Nam"} />
-                <RowUserInfo title={"Ngày sinh"} data={"ndtoi"} />
+                <RowUserInfo
+                  title={"Tên đăng nhập"}
+                  data={user?.userInfomationDTO?.username}
+                />
+                <RowUserInfo title={"Mật khẩu"} data={"**********"} />
+                <RowUserInfo
+                  title={"Họ và tên"}
+                  data={user?.userInfomationDTO?.fullName}
+                />
+                <RowUserInfo
+                  title={"Email"}
+                  data={user?.userInfomationDTO?.email}
+                />
+                <RowUserInfo
+                  title={"Số điện thoại"}
+                  data={user?.userInfomationDTO?.phoneNumber}
+                />
+                <RowUserInfo
+                  title={"Giới tính"}
+                  data={user?.userInfomationDTO?.gender}
+                />
+                <RowUserInfo
+                  title={"Ngày sinh"}
+                  data={user?.userInfomationDTO?.date}
+                />
               </Col>
               <Col span={8}>
                 <div className={styles.center}>
@@ -71,11 +89,15 @@ function UserInfoDetail() {
 function RowUserInfo({ title, data }) {
   return (
     <Row>
-      <Col span={12} className={`${styles.textSize}`}>
+      <Col span={8} className={`${styles.textSize}`}>
         {title}
       </Col>
-      <Col span={12} className={`${styles.textSize} ${styles.textColor}`}>
-        {data ? data : "<Không có dữ liệu>"}
+      <Col span={16} className={`${styles.textSize} ${styles.textColor}`}>
+        {data ? (
+          data
+        ) : (
+          <span style={{ fontStyle: "italic" }}>{`<Không có dữ liệu>`}</span>
+        )}
       </Col>
     </Row>
   );

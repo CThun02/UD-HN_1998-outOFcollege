@@ -4,6 +4,8 @@ import { Button, Col, InputNumber, Row, Table, notification } from 'antd'
 import { CloseOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import numeral from 'numeral'
+import { getAuthToken } from '../../../service/Token'
+import axios from 'axios'
 
 const Cart = (props) => {
     const navigate = useNavigate()
@@ -12,6 +14,11 @@ const Cart = (props) => {
     const [totalPrice, setTotalPrice] = useState(0)
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
     const [loading, setLoading] = useState(true)
+    const [user, setUser] = useState(null)
+    const [carts, setCarts] = useState([])
+    const token = getAuthToken();
+
+    const cartAPI = 'http://localhost:8080/api/admin/cart';
 
     const columns = [
         {
@@ -167,6 +174,7 @@ const Cart = (props) => {
         let productDetail = JSON.parse(localStorage.getItem('user'));
         setProductDetails(productDetail?.productDetails)
         setLoading(false)
+        setRender(1)
     }
 
     const onSelectChange = (selectedKeys) => {
@@ -209,10 +217,54 @@ const Cart = (props) => {
         onChange: onSelectChange,
     };
 
+    const getCartAPI = (username) => {
+        axios.get(`${cartAPI}`, {
+            params: {
+                username: username
+            }
+        }).then((response) => {
+            setCarts(response.data)
+        }).catch((error) => {
+            console.log(error)
+        })
+    }
     useEffect(() => {
-        localStorage.removeItem('checkout');
-        getAllCart()
+        const fetchData = async () => {
+            try {
+
+                const data = await token;
+
+                if (data) {
+                    getCartAPI(data?.username);
+                    const cart = {
+                        username: data?.username,
+                        lstCartDetail: [],
+                    };
+
+                    if (productDetails) {
+                        for (let i = 0; i < productDetails.length; i++) {
+                            cart.lstCartDetail.push({
+                                productDetailId: productDetails[i].data[0].id,
+                                quantity: productDetails[i].quantity,
+                            });
+                        }
+                    }
+
+                    const response = await axios.post(`${cartAPI}`, cart);
+                    console.log(response.data);
+                }
+
+                localStorage.removeItem('checkout');
+                console.log(user);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+        getAllCart();
+
+        fetchData();
     }, [render]);
+
 
     return (
         <div className={styles.wrapper}>

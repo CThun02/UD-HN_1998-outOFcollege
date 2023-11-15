@@ -386,11 +386,13 @@ const Bill = () => {
     },
   ];
 
-  const [selectedOption, setSelectedOption] = useState(1);
+  const [selectedOption, setSelectedOption] = useState([1]);
 
-  const handleOptionChange = (value) => {
-    setInputError("");
-    setSelectedOption(value);
+  const handleOptionChange = (value, index) => {
+    const visible = [...selectedOption]
+    visible[index] = value
+    console.log(visible[index])
+    setSelectedOption(visible);
     if (value === "2") {
       setAmountPaid(0);
     }
@@ -878,7 +880,7 @@ const Bill = () => {
     const visible = [...showAddress];
     visible[index] = checked;
     setTypeShipping(visible);
-    setSelectedOption(1);
+    setSelectedOption([1]);
   };
 
   const [errors, setErrors] = useState({});
@@ -890,19 +892,19 @@ const Bill = () => {
       priceReduce: totalPrice - voucherPrice(),
       amountPaid: typeShipping[index]
         ? 0
-        : selectedOption === "2"
+        : selectedOption[index] === "2"
           ? voucherPrice() + shippingFee
           : amountPaid,
       billType: "In-Store",
       symbol: typeShipping[index] ? "Shipping" : symbol,
       status: typeShipping[index] ? "Unpaid" : "Paid",
       note: note,
-      paymentDetailId: selectedOption,
+      paymentDetailId: selectedOption[index],
       lstBillDetailRequest: [],
       addressId: selectedAddress?.id,
       fullname: selectedAddress?.fullName,
       phoneNumber: selectedAddress.numberPhone,
-      transactionCode: selectedOption === "2" ? transactionCode : null,
+      transactionCode: selectedOption[index] === "2" ? transactionCode : null,
       voucherCode: voucherAdd?.voucherCode,
       createdBy: "user3",
     };
@@ -929,10 +931,10 @@ const Bill = () => {
         description: "Không có sản phẩm nào trong giỏ hàng.",
         duration: 2,
       });
-    } else if (selectedOption === 2 && transactionCode === "") {
+    } else if (selectedOption[index] === 2 && transactionCode === "") {
       return setInputError("Mã giao dịch không được để trống");
     } else if (
-      selectedOption !== "2" &&
+      selectedOption[index] !== "2" &&
       ((remainAmount < 0 && !typeShipping[index]) || isNaN(remainAmount))
     ) {
       return setInputError("Tiền không đủ");
@@ -1340,21 +1342,22 @@ const Bill = () => {
                             value={selectedAddress?.descriptionDetail}
                           />
                         </Col>
-                        <Col span={6} style={{ marginLeft: "30px" }}>
-                          <img
-                            src={logoGhn}
-                            alt="logo"
-                            style={{ width: "90px", height: "80px" }}
-                          />
-                        </Col>
 
-                        {switchChange[index] && (
-                          <h3>
-                            Ngày giao hàng dự kiến:{" "}
-                            {moment(leadtime).format("DD/MM/YYYY") || ""}
-                          </h3>
-                        )}
                       </Row>
+                      {switchChange[index] && leadtime && (
+                        <h3>
+                          Ngày giao hàng dự kiến:{" "}
+                          {moment(leadtime).format("DD/MM/YYYY") || ""}
+                        </h3>
+                      )}
+                      <div>
+                        <img
+                          src={logoGhn}
+                          alt="logo"
+                          style={{ width: "90px", height: "80px" }}
+                        />
+                      </div>
+
                     </Col>
                     <Col span={8} offset={1}>
                       <Switch onChange={(e) => handleChangSwitch(e, index)} />
@@ -1520,7 +1523,7 @@ const Bill = () => {
                             </span>
                           )}
                         </Col>
-                        {Number(selectedOption) !== 2 &&
+                        {Number(selectedOption[index]) !== 2 &&
                           !typeShipping[index] ? (
                           <>
                             <Col span={8} style={{ marginTop: "8px" }}>
@@ -1553,7 +1556,7 @@ const Bill = () => {
                             </Col>
                           </>
                         ) : null}
-                        {Number(selectedOption) === 2 ? (
+                        {Number(selectedOption[index]) === 2 ? (
                           <>
                             <Input
                               placeholder="Nhập mã giao dịch"
@@ -1569,7 +1572,7 @@ const Bill = () => {
                             </span>
                           </>
                         ) : null}
-                        {Number(selectedOption) !== 2 &&
+                        {Number(selectedOption[index]) !== 2 &&
                           !typeShipping[index] ? (
                           <Col span={24}>
                             <Row style={{ marginTop: "8px" }}>
@@ -1607,7 +1610,7 @@ const Bill = () => {
                             <Segmented
                               options={options}
                               style={{ marginBottom: "20px" }}
-                              onChange={handleOptionChange}
+                              onChange={(e) => handleOptionChange(e, index)}
                             >
                               {options.map((option) => (
                                 <div key={option.value}>{option.label}</div>

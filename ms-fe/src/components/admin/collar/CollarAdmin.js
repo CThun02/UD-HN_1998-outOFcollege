@@ -39,7 +39,7 @@ const CollarAdmin = function () {
     <div className={styles.material}>
       <div className={styles.radiusFrame}>
         <Row className={styles.titleTB}>
-          <h3>Danh Sách Chất Liệu</h3>
+          <h3>Danh Sách Cổ Áo</h3>
         </Row>
         <Row className={styles.adminMenu}>
           <Col span={10}>

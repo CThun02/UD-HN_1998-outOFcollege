@@ -4,16 +4,16 @@ import UserInfoDetail from "./UserInfoDetail";
 import FollowingOrder from "./following-order/FollowingOrder";
 import Address from "./user-address/Address";
 
-function ContentProfile({ tab, user }) {
+function ContentProfile({ tab, user, setIsRender }) {
   return (
     <div className={styles.profile}>
       <div className={styles.content}>
         <div className={styles.width}>
           {tab === "userInfo" && (
             <Space direction="vertical" size={50} style={{ width: "100%" }}>
-              <UserInfoDetail user={user} />
+              <UserInfoDetail user={user} setIsRender={setIsRender} />
               <div className={styles.address}>
-                <Address address={user.addressDTO} />
+                <Address address={user.addressDTO} setIsRender={setIsRender} />
               </div>
             </Space>
           )}

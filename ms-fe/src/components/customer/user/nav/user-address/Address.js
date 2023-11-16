@@ -1,10 +1,10 @@
 import UserAddress from "./UserAddress";
 import styles from "./Address.module.css";
-import { Col, Row, Space } from "antd";
+import { Col, Form, Input, Modal, Row, Space } from "antd";
 import { PlusCircleOutlined } from "@ant-design/icons";
+import { useState } from "react";
 
-function Address({ address }) {
-  console.log("address: ", address);
+function Address({ address, setIsRender }) {
   return (
     <div className={styles.address}>
       <div className={styles.content}>
@@ -14,7 +14,7 @@ function Address({ address }) {
               <Col span={23}>
                 <h2 className={styles.textColor}>Địa chỉ</h2>
               </Col>
-              {address.length < 3 && (
+              {address?.length < 3 && (
                 <Col
                   span={1}
                   style={{
@@ -35,29 +35,116 @@ function Address({ address }) {
           </div>
 
           <div className={styles.body}>
-            <Row
-              direction="horizontal"
-              style={{ width: "100%", margin: 0 }}
-              size={12}
-            >
+            <Space style={{ width: "100%" }} direction="vertical" size={24}>
               {address?.map((address, i) => (
-                <Col
+                <UserAddress
+                  address={address}
+                  index={i}
                   key={address.idAddress}
-                  span={8}
-                  style={{ padding: "0 10px" }}
-                >
-                  <UserAddress
-                    address={address}
-                    index={i}
-                    key={address.idAddress}
-                  />
-                </Col>
+                  setIsRender={setIsRender}
+                />
               ))}
-            </Row>
+            </Space>
           </div>
         </Space>
       </div>
     </div>
+  );
+}
+
+function SaveAddress({ setIsModalOpen, isModalOpen }) {
+  const [form] = Form.useForm();
+  const [userUpdate, setUserUpdate] = useState({
+    city: "",
+    district: "",
+    ward: "",
+    street: "",
+    email: "",
+    phoneNumber: "",
+    fullName: "",
+    addressDetail: "",
+    defaultAddress: "",
+  });
+
+  const handleOk = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
+
+  return (
+    <Modal
+      centered
+      title="Lưu địa chỉ"
+      open={isModalOpen}
+      onOk={handleOk}
+      onCancel={handleCancel}
+    >
+      <Form form={form}>
+        <Space direction="vertical" style={{ width: "100%" }}>
+          <Form.Item
+            name={"fullName"}
+            rules={[
+              {
+                required: true,
+                message: "* Họ và tên không được bỏ trống",
+                whitespace: true,
+              },
+            ]}
+          >
+            <Input
+              name={"fullName"}
+              placeholder="Họ và tên"
+              size="large"
+              className={styles.input}
+            />
+          </Form.Item>
+          <Form.Item
+            name={"phoneNumber"}
+            rules={[
+              {
+                required: true,
+                message: "* Số điện thoại không được bỏ trống",
+                whitespace: true,
+              },
+              {
+                pattern: /^0\d{9}$/,
+                message: "* Số điện thoại chỉ chứa 10 số và bắt đầu bằng số 0",
+              },
+            ]}
+          >
+            <Input
+              name={"phoneNumber"}
+              placeholder="Số điện thoại"
+              size="large"
+              className={styles.input}
+            />
+          </Form.Item>
+          <Form.Item
+            name={"email"}
+            rules={[
+              {
+                type: "email",
+                message: "* Vui lòng nhập đúng định dạng Email",
+              },
+              {
+                required: true,
+                message: "* Không được bỏ trống",
+              },
+            ]}
+          >
+            <Input
+              name="email"
+              placeholder="Email"
+              size="large"
+              className={styles.input}
+            />
+          </Form.Item>
+        </Space>
+      </Form>
+    </Modal>
   );
 }
 

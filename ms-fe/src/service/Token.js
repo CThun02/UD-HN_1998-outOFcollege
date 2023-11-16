@@ -14,7 +14,6 @@ async function getAuthToken() {
       return err;
     }
   }
-  return null;
 }
 
 const setAuthHeader = (token) => {
@@ -29,12 +28,12 @@ axios.defaults.baseURL = "http://localhost:8080";
 axios.defaults.headers.post["Content-Type"] = "application/json";
 
 const request = async (method, url, data) => {
+  const token = window.localStorage.getItem("auth_token");
   let headers = {};
-
-  if (getAuthToken() !== null && getAuthToken() !== "null") {
-    headers = { Authorization: `Bearer ${getAuthToken()}` };
+  if (token) {
+    const atobToken = atob(token);
+    headers = { Authorization: `Bearer ${atobToken}` };
   }
-
   try {
     const response = await axios({
       method: method,
@@ -42,7 +41,6 @@ const request = async (method, url, data) => {
       headers: headers,
       data: data,
     });
-
     return response.data;
   } catch (error) {
     console.error("Request error:", error);

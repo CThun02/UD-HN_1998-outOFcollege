@@ -10,6 +10,8 @@ const baseUrl = "http://localhost:8080/api/client/user";
 function UserDetail() {
   const { username } = useParams();
   const [user, setUser] = useState({});
+  const [isRender, setIsRender] = useState(true);
+
   const convertData = username.replace(/-----/g, "/");
   const decode64 = atob(convertData);
   const decodeData = JSON.parse(decode64);
@@ -21,13 +23,13 @@ function UserDetail() {
       setUser(data);
     }
     return () => getUserDetail();
-  }, [decodeData]);
+  }, [decodeData, isRender]);
 
   return (
     <div>
       <div>
         <ProfileHeader user={user} />
-        <NavUser user={user} />
+        <NavUser user={user} setIsRender={setIsRender} />
       </div>
     </div>
   );

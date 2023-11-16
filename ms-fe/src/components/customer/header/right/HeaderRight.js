@@ -9,13 +9,13 @@ import { useEffect } from "react";
 import { useState } from "react";
 
 function HeaderRight() {
-  const { showSuccessNotification } = useContext(NotificationContext);
-  const [user, setUser] = useState("");
+  // const { showSuccessNotification } = useContext(NotificationContext);
+  const [user, setUser] = useState("aaa");
   const [usernameEncode, setUsernameEncode] = useState("");
-  const token = getAuthToken();
+
   useEffect(() => {
     return () =>
-      token
+      getAuthToken()
         .then((data) => {
           setUser(data?.fullName);
 
@@ -25,7 +25,6 @@ function HeaderRight() {
         })
         .catch((error) => {
           console.log(error);
-          showSuccessNotification({ error }, "login");
         });
   }, []);
 
@@ -84,21 +83,23 @@ function HeaderRight() {
                 <Space>
                   {user ? (
                     <div>
-                      <span>Xin chào, </span> <strong>{user}</strong>
+                      <span>Xin chào, </span>{" "}
+                      <Link
+                        to={"/ms-shop/user/" + usernameEncode}
+                        className={styles.link}
+                      >
+                        <strong>{user}</strong>
+                      </Link>
                     </div>
                   ) : null}
-                  <Link
-                    to={"/ms-shop/user/" + usernameEncode}
-                    className={styles.link}
+
+                  <Popover
+                    content={content}
+                    placement="bottomLeft"
+                    trigger="hover"
                   >
-                    <Popover
-                      content={content}
-                      placement="bottomLeft"
-                      trigger="hover"
-                    >
-                      <UserOutlined className={styles.iconSize} />
-                    </Popover>
-                  </Link>
+                    <UserOutlined className={styles.iconSize} />
+                  </Popover>
                 </Space>
               </Col>
             </Row>

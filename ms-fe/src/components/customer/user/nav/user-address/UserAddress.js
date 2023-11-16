@@ -1,16 +1,38 @@
-import { Col, Row, Space, Tag } from "antd";
+import { Col, Popconfirm, Row, Space, Tag, message } from "antd";
 import styles from "./UserAddress.module.css";
 import { DeleteOutlined, EditOutlined, StarOutlined } from "@ant-design/icons";
+import { request } from "../../../../../service/Token";
+import { useEffect, useState } from "react";
 
-function UserAddress({ address, index }) {
-  console.log("address", address.idAddress, "index", index);
+const baseUrl = "http://localhost:8080/api/client/user";
+
+function UserAddress({ address, index, setIsRender }) {
+  function handleSetDefaultAddress(value) {
+    request("POST", baseUrl + "/update-address", {
+      ...value,
+      defaultAddress: true,
+    });
+    setIsRender((render) => !render);
+  }
+
+  const confirm = (value) => {
+    console.log(value);
+    request("DELETE", baseUrl + "/delete-address?addressId=" + value, {});
+    setIsRender((render) => !render);
+  };
+
+  const cancel = (e) => {
+    console.log(e);
+    message.error("Click on No");
+  };
+
   return (
     <div className={styles.userAddress}>
       <div className={styles.content}>
         <Space direction="vertical" size={24} style={{ width: "100%" }}>
           <div className={styles.title}>
             <Row style={{ margin: 0 }}>
-              <Col span={16}>
+              <Col span={21}>
                 <Space
                   style={{ width: "100%" }}
                   size={12}
@@ -29,34 +51,40 @@ function UserAddress({ address, index }) {
               </Col>
 
               <Col
-                span={8}
+                span={3}
                 style={{
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
                 }}
               >
-                <Space
-                  direction="horizontal"
-                  style={{ width: "100%" }}
-                  size={18}
-                >
-                  {!address.defaultAddress && (
-                    <StarOutlined
+                <Space direction="horizontal" size={18}>
+                  <Popconfirm
+                    title="Xác nhận"
+                    description="Bạn chắc chắn muốn xóa địa chỉ này?"
+                    onConfirm={() => confirm(address.idAddress)}
+                    onCancel={cancel}
+                    okText="Yes"
+                    cancelText="No"
+                  >
+                    <DeleteOutlined
                       style={{ fontSize: "1.25rem" }}
-                      className={styles.starIcon}
+                      className={styles.deleteAddress}
                     />
-                  )}
+                  </Popconfirm>
 
                   <EditOutlined
                     style={{ fontSize: "1.25rem" }}
                     className={styles.addressEdit}
                   />
 
-                  <DeleteOutlined
-                    style={{ fontSize: "1.25rem" }}
-                    className={styles.deleteAddress}
-                  />
+                  {!address.defaultAddress && (
+                    <StarOutlined
+                      style={{ fontSize: "1.25rem" }}
+                      className={styles.starIcon}
+                      onClick={() => handleSetDefaultAddress(address)}
+                    />
+                  )}
                 </Space>
               </Col>
             </Row>

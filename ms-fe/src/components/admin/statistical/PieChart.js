@@ -2,10 +2,17 @@ import React, { useEffect, useState } from "react";
 import { Pie } from "@ant-design/plots";
 import axios from "axios";
 import Statistic from "antd/es/statistic/Statistic";
-import { Col, Row } from "antd";
+import { Col, DatePicker, Row, Select } from "antd";
+import dayjs from "dayjs";
+import styles from "./StatisticalIndex.module.css";
+import { ClockCircleOutlined } from "@ant-design/icons";
 
-const PieChart = () => {
+const { Option } = Select;
+const PieChart = ({ formattedDateNow }) => {
   const [billRevenueCompare, setBillRevenueCompare] = useState({});
+  const [datePercentCompare, setDatePercentCompare] =
+    useState(formattedDateNow);
+  const [selectTypeDate, setSelectTypeDate] = useState("year");
   const data = [
     {
       type: "In Store",
@@ -38,15 +45,64 @@ const PieChart = () => {
     ],
   };
   useEffect(() => {
+    var day = "";
+    var month = "";
+    var year = datePercentCompare.substring(0, 4);
+    if (selectTypeDate === "date") {
+      month = datePercentCompare.substring(
+        datePercentCompare.indexOf("-") + 1,
+        datePercentCompare.lastIndexOf("-")
+      );
+      day = datePercentCompare.substring(
+        datePercentCompare.lastIndexOf("-") + 1
+      );
+    } else if (selectTypeDate === "month") {
+      month = datePercentCompare.substring(
+        datePercentCompare.indexOf("-") + 1,
+        datePercentCompare.lastIndexOf("-") === datePercentCompare.indexOf("-")
+          ? datePercentCompare.length
+          : datePercentCompare.lastIndexOf("-")
+      );
+    }
     axios
-      .get("http://localhost:8080/api/admin/bill/getBillRevenueCompare")
+      .get(
+        "http://localhost:8080/api/admin/bill/getBillRevenueCompare?day=" +
+          day +
+          "&month=" +
+          month +
+          "&year=" +
+          year
+      )
       .then((res) => {
         setBillRevenueCompare(res.data);
       })
       .catch((err) => console.log(err));
-  }, []);
+  }, [datePercentCompare, selectTypeDate]);
   return (
-    <>
+    <div>
+      <p style={{ fontWeight: 500, marginTop: "12px" }}>
+        <ClockCircleOutlined /> Thời gian
+      </p>
+      <Select
+        value={selectTypeDate}
+        onChange={(event) => {
+          setDatePercentCompare(formattedDateNow);
+          setSelectTypeDate(event);
+        }}
+        style={{ width: "20%" }}
+        bordered={false}
+      >
+        <Option value="date">Date</Option>
+        <Option value="month">Month</Option>
+        <Option value="year">Year</Option>
+      </Select>
+      <DatePicker
+        className={styles.input_noneBorder}
+        style={{ width: "80%" }}
+        picker={selectTypeDate}
+        value={dayjs(datePercentCompare)}
+        onChange={(date, dateString) => setDatePercentCompare(dateString)}
+      />
       <Pie {...config} />
       <Row>
         <Col span={12}>
@@ -83,7 +139,7 @@ const PieChart = () => {
           />
         </Col>
       </Row>
-    </>
+    </div>
   );
 };
 

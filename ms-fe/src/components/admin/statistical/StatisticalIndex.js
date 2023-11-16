@@ -31,7 +31,6 @@ import Statistic from "antd/es/statistic/Statistic";
 import PieChart from "./PieChart";
 import TableProdutSellTheMost from "./TableProdutSellTheMost";
 import dayjs from "dayjs";
-import Checkbox from "antd/es/checkbox/Checkbox";
 
 var currentDate = new Date();
 
@@ -41,7 +40,6 @@ var year = currentDate.getFullYear();
 var formattedDateNow = year + "-" + month + "-" + day;
 var formattedDateYesterday = year + "-" + month + "-" + (day - 1);
 const { Option } = Select;
-const CheckboxGroup = Checkbox.Group;
 
 const StatisticalIndex = () => {
   const [data, setData] = useState([]);
@@ -50,18 +48,22 @@ const StatisticalIndex = () => {
   const [dateCompare, setDateCompare] = useState("date");
   const [dateValueFrom, setDateValueFrom] = useState(formattedDateYesterday);
   const [dateValueTo, setDateValueTo] = useState(formattedDateNow);
+  const [dateLineChartValueFrom, setDateLineChartValueFrom] = useState(
+    formattedDateYesterday
+  );
+  const [dateLineChartValueTo, setDateLineChartValueTo] =
+    useState(formattedDateNow);
   const [isLoading, setIsLoading] = useState(false);
   const [render, setRender] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const [loading, setLoading] = useState(true);
-  const [checkedList, setCheckedList] = useState([year]);
-  const [plainOptions, setPlainOptions] = useState([]);
   const [dateRevenue, setDateRevenue] = useState(formattedDateNow);
-  const checkAll = plainOptions.length === checkedList.length;
-  const indeterminate =
-    checkedList.length > 0 && checkedList.length < plainOptions.length;
-
+  const [selectTypeDateProduct, setSelectTypeDateproduct] = useState("year");
+  const [dateProductSellTheMost, setDateProductSellTheMost] =
+    useState(formattedDateNow);
+  const [typeDateBillRevenue, setTypeDateBillRevenue] = useState("date");
+  const [typeDateLineChart, setTypeDateLineChart] = useState("date");
   const columns = [
     {
       key: "#",
@@ -93,20 +95,21 @@ const StatisticalIndex = () => {
               >
                 {record.promotion.length !== 0 ? (
                   <Badge.Ribbon
-                    text={`Giảm ${record.promotion[0].promotionValue
-                      ? record.promotion[0].promotionMethod === "%"
-                        ? record.promotion[0].promotionValue +
-                        " " +
-                        record.promotion[0].promotionMethod
-                        : record.promotion[0].promotionValue.toLocaleString(
-                          "vi-VN",
-                          {
-                            style: "currency",
-                            currency: "VND",
-                          }
-                        )
-                      : null
-                      }`}
+                    text={`Giảm ${
+                      record.promotion[0].promotionValue
+                        ? record.promotion[0].promotionMethod === "%"
+                          ? record.promotion[0].promotionValue +
+                            " " +
+                            record.promotion[0].promotionMethod
+                          : record.promotion[0].promotionValue.toLocaleString(
+                              "vi-VN",
+                              {
+                                style: "currency",
+                                currency: "VND",
+                              }
+                            )
+                        : null
+                    }`}
                     color="red"
                   >
                     <Carousel autoplay>
@@ -235,15 +238,6 @@ const StatisticalIndex = () => {
     },
   };
 
-  const onChange = (list) => {
-    setCheckedList(list);
-    setRender(Math.random());
-  };
-  const onCheckAllChange = (e) => {
-    setCheckedList(e.target.checked ? plainOptions : []);
-    setRender(Math.random());
-  };
-
   function compareRevenue() {
     if (dateValueFrom === "" || dateValueTo === "") {
       notification.error({
@@ -294,17 +288,17 @@ const StatisticalIndex = () => {
       axios
         .get(
           "http://localhost:8080/api/admin/bill/compareRevenueDate?dayFrom=" +
-          dayFrom +
-          "&monthFrom=" +
-          monthFrom +
-          "&yearFrom=" +
-          yearFrom +
-          "&yearTo=" +
-          yearTo +
-          "&monthTo=" +
-          monthTo +
-          "&dayTo=" +
-          dayTo
+            dayFrom +
+            "&monthFrom=" +
+            monthFrom +
+            "&yearFrom=" +
+            yearFrom +
+            "&yearTo=" +
+            yearTo +
+            "&monthTo=" +
+            monthTo +
+            "&dayTo=" +
+            dayTo
         )
         .then((res) => {
           setBillRevenueCompare(res.data);
@@ -315,41 +309,113 @@ const StatisticalIndex = () => {
   }
 
   function getDataLineChart() {
-    axios
-      .get(
-        "http://localhost:8080/api/admin/bill/getDataLineChart?years=" +
-        checkedList.join(",")
-      )
-      .then((res) => {
-        setData(res.data);
-      })
-      .catch((error) => {
-        console.log("Get data failed", error);
-      });
-  }
+    console.log(dateLineChartValueFrom, dateLineChartValueTo);
+    var dateFrom = new Date(dateLineChartValueFrom);
+    var dateTo = new Date(dateLineChartValueTo);
+    var yearFrom = dateFrom.getFullYear();
+    var yearTo = dateTo.getFullYear();
+    var monthFrom = "";
+    var monthTo = "";
+    var dayFrom = "";
+    var dayTo = "";
+    if (typeDateLineChart === "month") {
+      monthFrom = dateFrom.getMonth() + 1;
+      monthTo = dateTo.getMonth() + 1;
+      dayFrom = "";
+      dayTo = "";
+    } else if (typeDateLineChart === "date") {
+      dayFrom = dateFrom.getDate();
+      dayTo = dateTo.getDate();
+      monthFrom = dateFrom.getMonth() + 1;
+      monthTo = dateTo.getMonth() + 1;
+    } else {
+      dayFrom = "";
+      dayTo = "";
+      monthFrom = "";
+      monthTo = "";
+    }
 
-  useEffect(() => {
+    if (dateFrom.getTime() > dateTo.getTime()) {
+      notification.error({
+        message: "Thông báo",
+        description:
+          "Thời gian bắt đầu phải bé hơn hoặc bằng thời gian kết thúc",
+      });
+      setIsLoading(false);
+    } else {
+      console.log(yearFrom, monthFrom, dayFrom);
+      console.log(yearTo, monthTo, dayTo);
+      axios
+        .get(
+          "http://localhost:8080/api/admin/bill/getDataLineChart?dayFrom=" +
+            dayFrom +
+            "&monthFrom=" +
+            monthFrom +
+            "&yearFrom=" +
+            yearFrom +
+            "&yearTo=" +
+            yearTo +
+            "&monthTo=" +
+            monthTo +
+            "&dayTo=" +
+            dayTo
+        )
+        .then((res) => {
+          setData(res.data);
+        })
+        .catch((error) => {
+          console.log("Get data failed", error);
+        });
+    }
+  }
+  function getDataRevenue() {
+    var day = "";
+    var month = "";
+    var year = dateRevenue.substring(0, 4);
+    if (typeDateBillRevenue === "date") {
+      month = dateRevenue.substring(
+        dateRevenue.indexOf("-") + 1,
+        dateRevenue.lastIndexOf("-")
+      );
+      day = dateRevenue.substring(dateRevenue.lastIndexOf("-") + 1);
+    } else if (typeDateBillRevenue === "month") {
+      month = dateRevenue.substring(
+        dateRevenue.indexOf("-") + 1,
+        dateRevenue.lastIndexOf("-") === dateRevenue.indexOf("-")
+          ? dateRevenue.length
+          : dateRevenue.lastIndexOf("-")
+      );
+    }
     axios
       .get(
-        "http://localhost:8080/api/admin/bill/getGrossRevenue?quantityDisplay=" +
-        pageSize +
-        "&date=" +
-        dateRevenue
+        "http://localhost:8080/api/admin/bill/getGrossRevenue?day=" +
+          day +
+          "&month=" +
+          month +
+          "&year=" +
+          year
       )
       .then((res) => {
         setLoading(false);
         setBillRevenue(res.data);
       })
       .catch((err) => console.log(err));
-    axios
-      .get("http://localhost:8080/api/admin/bill/getBusinessYear")
-      .then((res) => {
-        setPlainOptions(res.data);
-      })
-      .catch((err) => console.log(err));
+  }
+
+  useEffect(() => {
+    getDataRevenue();
     getDataLineChart();
     compareRevenue();
-  }, [dateCompare, render, pageSize, dateRevenue]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    dateCompare,
+    render,
+    dateRevenue,
+    typeDateBillRevenue,
+    dateLineChartValueFrom,
+    dateLineChartValueTo,
+    typeDateLineChart,
+  ]);
   return (
     <>
       <Row>
@@ -360,14 +426,27 @@ const StatisticalIndex = () => {
             </h2>
             <Row>
               <Col span={24}>
-                <p style={{ fontWeight: 500 }}>
+                <p style={{ fontWeight: 500, marginTop: "12px" }}>
                   <ClockCircleOutlined /> Thời gian
                 </p>
+                <Select
+                  value={typeDateBillRevenue}
+                  onChange={(event) => {
+                    setDateRevenue(formattedDateNow);
+                    setTypeDateBillRevenue(event);
+                  }}
+                  style={{ width: "10%" }}
+                  bordered={false}
+                >
+                  <Option value="date">Date</Option>
+                  <Option value="month">Month</Option>
+                  <Option value="year">Year</Option>
+                </Select>
                 <DatePicker
                   className={styles.input_noneBorder}
                   style={{ width: "50%" }}
-                  picker={"date"}
-                  defaultValue={dayjs(formattedDateNow)}
+                  picker={typeDateBillRevenue}
+                  value={dayjs(dateRevenue)}
                   onChange={(date, dateString) => setDateRevenue(dateString)}
                 />
               </Col>
@@ -410,7 +489,7 @@ const StatisticalIndex = () => {
                     billRevenue.productDetailDisplay &&
                     billRevenue.productDetailDisplay.map((record, index) => ({
                       ...record,
-                      key: record.id,
+                      key: index,
                     }))
                   }
                   scroll={{ y: 200 }}
@@ -426,7 +505,7 @@ const StatisticalIndex = () => {
             <h2>
               <DoubleRightOutlined /> Tỷ lệ doanh thu
             </h2>
-            <PieChart />
+            <PieChart formattedDateNow={formattedDateNow} />
           </div>
         </Col>
       </Row>
@@ -437,19 +516,39 @@ const StatisticalIndex = () => {
           </h2>
           <div style={{ marginTop: "12px" }}>
             <span style={{ fontWeight: 500 }}>
-              Thời gian{" "}
-              <Checkbox
-                indeterminate={indeterminate}
-                onChange={onCheckAllChange}
-                checked={checkAll}
-              >
-                Tất cả
-              </Checkbox>
-            </span>
-            <CheckboxGroup
-              options={plainOptions}
-              value={checkedList}
-              onChange={onChange}
+              <ClockCircleOutlined />
+              Thời gian
+            </span>{" "}
+            <br />
+            <Select
+              value={typeDateLineChart}
+              onChange={(event) => {
+                setTypeDateLineChart(event);
+              }}
+              style={{ width: "10%" }}
+              bordered={false}
+            >
+              <Option value="date">Date</Option>
+              <Option value="month">Month</Option>
+              <Option value="year">Year</Option>
+            </Select>
+            <DatePicker
+              className={styles.input_noneBorder}
+              style={{ width: "45%" }}
+              picker={typeDateLineChart}
+              onChange={(date, dateString) =>
+                setDateLineChartValueFrom(dateString)
+              }
+              value={dayjs(dateLineChartValueFrom)}
+            />
+            <DatePicker
+              className={styles.input_noneBorder}
+              style={{ width: "45%" }}
+              picker={typeDateLineChart}
+              value={dayjs(dateLineChartValueTo)}
+              onChange={(date, dateString) =>
+                setDateLineChartValueTo(dateString)
+              }
             />
             <Divider />
           </div>
@@ -561,31 +660,31 @@ const StatisticalIndex = () => {
                     title={
                       billRevenueCompare.revenueFrom -
                         billRevenueCompare.revenueTo >
-                        0
+                      0
                         ? "INACTIVE"
                         : "ACTIVE"
                     }
                     value={
                       (Math.abs(
                         billRevenueCompare.revenueFrom -
-                        billRevenueCompare.revenueTo
+                          billRevenueCompare.revenueTo
                       ) /
                         (billRevenueCompare.revenueFrom +
                           billRevenueCompare.revenueTo)) *
-                      100 || 0
+                        100 || 0
                     }
                     precision={2}
                     valueStyle={
                       billRevenueCompare.revenueFrom -
                         billRevenueCompare.revenueTo >
-                        0
+                      0
                         ? { color: "#ff4d4f" }
                         : { color: "#3f8600" }
                     }
                     prefix={
                       billRevenueCompare.revenueFrom -
                         billRevenueCompare.revenueTo >
-                        0 ? (
+                      0 ? (
                         <ArrowDownOutlined />
                       ) : (
                         <ArrowUpOutlined />
@@ -603,8 +702,40 @@ const StatisticalIndex = () => {
             <h2>
               <UserOutlined /> Sản phẩm mua nhiều nhất
             </h2>
+            <p style={{ fontWeight: 500, marginTop: "12px" }}>
+              <ClockCircleOutlined /> Thời gian
+            </p>
+            <Select
+              value={selectTypeDateProduct}
+              onChange={(event) => {
+                setDateProductSellTheMost(formattedDateNow);
+                setSelectTypeDateproduct(event);
+              }}
+              style={{ width: "20%" }}
+              bordered={false}
+            >
+              <Option value="date">Date</Option>
+              <Option value="month">Month</Option>
+              <Option value="year">Year</Option>
+            </Select>
+            <DatePicker
+              className={styles.input_noneBorder}
+              style={{ width: "80%" }}
+              picker={selectTypeDateProduct}
+              value={dayjs(dateProductSellTheMost)}
+              onChange={(date, dateString) => {
+                setDateProductSellTheMost(dateString);
+              }}
+            />
+
             <div style={{ margin: "20px 0" }}>
-              <TableProdutSellTheMost />
+              <p style={{ fontWeight: 500, marginBottom: "12px" }}>
+                <TableOutlined /> Danh sách sản phẩm
+              </p>
+              <TableProdutSellTheMost
+                date={dateProductSellTheMost}
+                type={selectTypeDateProduct}
+              />
             </div>
           </div>
         </Col>

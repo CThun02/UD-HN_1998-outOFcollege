@@ -15,6 +15,7 @@ public class BillRevenueDisplay {
     public Integer billSell;
     public BigDecimal grossRevenue;
     public LocalDateTime createdAt;
+    public Integer billSellUnpaid;
     public List<ProductDetailSellResponse> productDetailDisplay;
 
     public BillRevenueDisplay(BillRevenue billRevenue) {

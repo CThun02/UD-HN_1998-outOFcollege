@@ -24,10 +24,11 @@ public interface CartDetailRepo extends JpaRepository<CartDetail, Long> {
 //            "JOIN pd.color color")
 //    List<CartResponse> getAllCart();
 
-    @Query("SELECT NEW com.fpoly.ooc.responce.cart.CartDetailResponse(pd.product.id, pd.id, pd.brand.brandName," +
+    @Query("SELECT NEW com.fpoly.ooc.responce.cart.CartDetailResponse(pd.product.id, pd.id, pd.product.productName, pd.brand.brandName," +
             "   pd.category.categoryName, pd.pattern.patternName, pd.form.formName, pd.button.buttonName, " +
             "   pd.material.materialName, pd.collar.collarTypeName, pd.sleeve.sleeveName, pd.shirtTail.shirtTailTypeName," +
-            "   pd.size.sizeName, pd.color.colorName, pd.price, pd.quantity, pd.weight, cd.quantity) " +
+            "   pd.size.sizeName, pd.color.colorName, pd.color.colorCode, pd.price, pd.quantity, pd.weight, cd.quantity," +
+            "   cd.id) " +
             "FROM Cart c JOIN CartDetail cd ON c.id = cd.cart.id " +
             "   JOIN ProductDetail pd ON pd.id = cd.productDetail.id " +
             "   WHERE c.account.username like :username " +

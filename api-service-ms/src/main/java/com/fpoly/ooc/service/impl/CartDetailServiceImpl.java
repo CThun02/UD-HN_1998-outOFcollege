@@ -18,6 +18,7 @@ import com.fpoly.ooc.responce.promotion.PromotionProductResponse;
 import com.fpoly.ooc.service.interfaces.AccountService;
 import com.fpoly.ooc.service.interfaces.CartDetailService;
 import com.fpoly.ooc.service.interfaces.PromotionService;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -81,33 +82,33 @@ public class CartDetailServiceImpl implements CartDetailService {
 
         Cart existingCart = cartRepo.findCartByAccount(account);
 
-            for (CartDetailRequest cartDetailRequest : request.getLstCartDetail()) {
-                boolean found = false;
-
-                for (CartDetail existingCartDetail : existingCart.getCartDetailList()) {
-                    if (existingCartDetail.getProductDetail().getId().equals(cartDetailRequest.getProductDetailId())) {
-                        existingCartDetail.setQuantity(existingCartDetail.getQuantity() + cartDetailRequest.getQuantity());
-                        found = true;
-                        break;
-                    }
+        for (CartDetailRequest cartDetailRequest : request.getLstCartDetail()) {
+            boolean found = false;
+            for (CartDetail existingCartDetail : existingCart.getCartDetailList()) {
+                if (existingCartDetail.getProductDetail().getId().equals(cartDetailRequest.getProductDetailId())) {
+//                    existingCartDetail.setQuantity(existingCartDetail.getQuantity() + cartDetailRequest.getQuantity());
+                    found = true;
+                    break;
                 }
+            }
 
-                if (!found) {
-                    CartDetail cartDetail = CartDetail.builder()
-                            .productDetail(ProductDetail.builder()
-                                    .id(cartDetailRequest.getProductDetailId())
-                                    .build())
-                            .cart(existingCart)
-                            .quantity(cartDetailRequest.getQuantity())
-                            .build();
+            if (!found) {
+                CartDetail cartDetail = CartDetail.builder()
+                        .productDetail(ProductDetail.builder()
+                                .id(cartDetailRequest.getProductDetailId())
+                                .build())
+                        .cart(existingCart)
+                        .quantity(cartDetailRequest.getQuantity())
+                        .build();
 
-                    cartDetailRepo.save(cartDetail);
-                }
+                cartDetailRepo.save(cartDetail);
+            }
         }
 
         return existingCart;
     }
 
+    @Transactional
     @Override
     public Cart createCart(String username) {
         Account account = accountService.findLoginByUsername(username);
@@ -115,12 +116,34 @@ public class CartDetailServiceImpl implements CartDetailService {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.USER_NOT_FOUND));
         }
 
-        Cart cart = Cart.builder()
-                .account(account)
-                .cartDetailList(new ArrayList<>())
-                .build();
+        Cart existingCart = cartRepo.findCartByAccount(account);
+        if (existingCart != null) {
+            return null;
+        } else {
+            Cart cart = Cart.builder()
+                    .account(account)
+                    .cartDetailList(new ArrayList<>())
+                    .build();
+            return cartRepo.save(cart);
+        }
+    }
 
-        return cartRepo.save(cart);
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public CartDetail updateQuantity(Long cartDetailId, Integer quantity) {
+        CartDetail cartDetail = cartDetailRepo.findById(cartDetailId)
+                .orElseThrow(() -> new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND)));
+        cartDetail.setQuantity(quantity);
+        return cartDetailRepo.save(cartDetail);
+    }
+
+    @Transactional
+    @Override
+    public CartDetail deleteProductDetailFromCart(Long cartDetailId) {
+        CartDetail cartDetail = cartDetailRepo.findById(cartDetailId)
+                .orElseThrow(() -> new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND)));
+        cartDetailRepo.deleteById(cartDetailId);
+        return cartDetail;
     }
 
 }

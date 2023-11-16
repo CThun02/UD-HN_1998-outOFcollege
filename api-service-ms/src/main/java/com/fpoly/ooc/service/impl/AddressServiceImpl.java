@@ -45,4 +45,9 @@ public class AddressServiceImpl implements AddressServiceI {
     public void updateAddressDefault(Long addressId, Boolean value) {
         repo.updateAddressDefault(addressId, value);
     }
+
+    @Override
+    public List<Address> getListAddress(String username) {
+        return repo.getListAddress(username);
+    }
 }

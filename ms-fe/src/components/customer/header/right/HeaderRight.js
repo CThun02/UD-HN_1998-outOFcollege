@@ -20,7 +20,7 @@ function HeaderRight() {
       token
         .then((data) => {
           setUser(data?.fullName);
-          setData(data.username);
+          setData(data?.username);
         })
         .catch((error) => {
           console.log(error);

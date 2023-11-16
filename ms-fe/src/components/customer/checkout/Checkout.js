@@ -1,7 +1,7 @@
 import React, { useEffect, useState, } from 'react'
 import styles from './Checkout.module.css'
 import { Button, Col, Input, Modal, Radio, Row, Select, Space, notification } from 'antd'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { UserOutlined } from '@ant-design/icons'
 import axios from 'axios'
 import moment from 'moment/moment'
@@ -9,6 +9,7 @@ import numeral from 'numeral'
 import TextArea from 'antd/es/input/TextArea'
 import FloatingLabels from '../../element/FloatingLabels/FloatingLabels'
 import * as yup from 'yup';
+import { getAuthToken } from '../../../service/Token'
 
 
 const Checkout = (props) => {
@@ -23,7 +24,17 @@ const Checkout = (props) => {
     const [shippingFee, setShippingFee] = useState(null)
     const [error, setError] = useState({})
     const [totalPrice, setTotalPrice] = useState(0)
-
+    const token = getAuthToken();
+    const [dataToken, setDataToken] = useState(null)
+    const [address, setAddress] = useState([])
+    const [defaultAddress, setDefaultAddress] = useState({
+        fullName: '',
+        sdt: '',
+        city: '',
+        district: '',
+        ward: '',
+        descriptionDetail: ''
+    })
 
     const handleProvincesChange = (e) => {
         formData.city = e
@@ -273,6 +284,19 @@ const Checkout = (props) => {
         }
     }
 
+    const getAddress = async () => {
+        const data = await token;
+        if (token) {
+            await axios.get(`http://localhost:8080/api/admin/address?username=${data?.username}`)
+                .then((response) => {
+                    setAddress(response.data)
+                    setDefaultAddress(response.data.filter((item) => item.defaultaddress === true)[0])
+                }).catch((error) => {
+                    console.log(error)
+                })
+        }
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -372,18 +396,25 @@ const Checkout = (props) => {
         });
 
         removeProductDetailCart()
-
     };
 
-    const getAllCarts = () => {
+    const getAllCarts = async () => {
+        const data = await token;
+        setDataToken(data)
         let carts = JSON.parse(localStorage.getItem('checkout'))
-        console.log(carts)
         setProductDetails(carts)
         let totalPrice = 0;
-        for (let i = 0; i < carts?.length; i++) {
-            totalPrice +=
-                carts[i].data[0].price *
-                carts[i].quantity
+        if (data) {
+            for (let i = 0; i < carts?.length; i++) {
+                totalPrice += carts[i].cartDetailResponse.priceProductDetail
+                    * carts[i].cartDetailResponse.quantity;
+            }
+        } else {
+            for (let i = 0; i < carts?.length; i++) {
+                totalPrice +=
+                    carts[i].data[0].price *
+                    carts[i].quantity
+            }
         }
         setTotalPrice(totalPrice)
     }
@@ -393,9 +424,20 @@ const Checkout = (props) => {
         fetchProvince();
         fetchDistrict();
         fetchWard();
-        handleShippingOrderLeadtime(selectedDistrict, selectedWard);
-        handleShippingFee(100, selectedDistrict, selectedWard);
+        let city = defaultAddress.city.substring(0, defaultAddress.city.indexOf('|') + 0);
+        let district = defaultAddress.district.substring(1 + defaultAddress.district.indexOf("|"));
+        let ward = defaultAddress.ward.substring(1 + defaultAddress.ward.indexOf("|"));
 
+        if (dataToken) {
+            console.log(123)
+            console.log(district)
+            handleShippingOrderLeadtime(district, ward);
+            handleShippingFee(100, district, ward);
+        } else {
+            handleShippingOrderLeadtime(selectedDistrict, selectedWard);
+            handleShippingFee(100, selectedDistrict, selectedWard);
+        }
+        getAddress()
         getAllCarts()
     }, [selectedDistrict, selectedWard])
 
@@ -416,9 +458,9 @@ const Checkout = (props) => {
                                         </span>
                                     </Col>
                                     <Col span={6} style={{ paddingTop: 5 }}>
-                                        <span style={{ fontSize: '15px', fontWeight: 500 }}>
-                                            <UserOutlined />Đăng nhập
-                                        </span>
+                                        {!token && <span style={{ fontSize: '15px', fontWeight: 500 }}>
+                                            <Link style={{ color: '#111111' }} to={'/authen/sign-in'}><UserOutlined />Đăng nhập</Link>
+                                        </span>}
                                     </Col>
                                 </Row>
 
@@ -428,12 +470,13 @@ const Checkout = (props) => {
                                         <FloatingLabels
                                             label="Họ tên"
                                             zIndex={true}
-                                            value={formData.fullName}
+                                            value={dataToken ? defaultAddress.fullName : formData.fullName}
                                         >
                                             <Input
                                                 size='large'
                                                 name='fullName'
                                                 onChange={handleChange}
+                                                value={dataToken ? defaultAddress.fullName : undefined}
                                                 allowClear
                                             />
                                             {error.fullName && <div className={styles.errorText}>{error.fullName}</div>}
@@ -443,12 +486,13 @@ const Checkout = (props) => {
                                         <FloatingLabels
                                             label="Số điện thoại"
                                             zIndex={true}
-                                            value={formData.phoneNumber}
+                                            value={dataToken ? defaultAddress.fullName : formData.phoneNumber}
                                         >
                                             <Input
                                                 size='large'
                                                 name='phoneNumber'
                                                 onChange={handleChange}
+                                                value={dataToken ? defaultAddress.sdt : undefined}
                                                 allowClear
                                             />
                                             {error.phoneNumber && <div className={styles.errorText}>{error.phoneNumber}</div>}
@@ -458,7 +502,7 @@ const Checkout = (props) => {
                                         <FloatingLabels
                                             label="Tỉnh/thành phố"
                                             zIndex={true}
-                                            value={formData.city}
+                                            value={dataToken ? defaultAddress.city : formData.city}
                                         >
                                             <Select
                                                 showSearch
@@ -471,7 +515,7 @@ const Checkout = (props) => {
                                                 filterSort={(optionA, optionB) =>
                                                     (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
                                                 }
-                                                value={formData.city}
+                                                value={dataToken ? defaultAddress.city.substring(0, defaultAddress.city.indexOf('|')) : formData.city}
                                                 allowClear
                                                 onChange={(e) => handleProvincesChange(e)}
                                                 options={provinces.map((province) => ({
@@ -486,7 +530,7 @@ const Checkout = (props) => {
                                         <FloatingLabels
                                             label="Quận/huyện"
                                             zIndex={true}
-                                            value={formData.district}
+                                            value={dataToken ? defaultAddress.district : formData.district}
                                         >
                                             <Select
                                                 showSearch
@@ -494,7 +538,7 @@ const Checkout = (props) => {
                                                     height: 45,
                                                     width: 380,
                                                 }}
-                                                value={formData.district}
+                                                value={dataToken ? defaultAddress?.district.substring(0, defaultAddress.district.indexOf('|')) : formData.district}
                                                 optionFilterProp="children"
                                                 filterOption={(input, option) => (option?.label ?? '').includes(input)}
                                                 filterSort={(optionA, optionB) =>
@@ -514,7 +558,7 @@ const Checkout = (props) => {
                                         <FloatingLabels
                                             label="Phường xã"
                                             zIndex={true}
-                                            value={formData.ward}
+                                            value={dataToken ? defaultAddress.ward : formData.ward}
                                         >
                                             <Select
                                                 showSearch
@@ -522,7 +566,7 @@ const Checkout = (props) => {
                                                     height: 45,
                                                     width: 380,
                                                 }}
-                                                value={formData.ward}
+                                                value={dataToken ? defaultAddress.ward.substring(0, defaultAddress.ward.indexOf('|')) : formData.ward}
                                                 optionFilterProp="children"
                                                 filterOption={(input, option) => (option?.label ?? '').includes(input)}
                                                 filterSort={(optionA, optionB) =>
@@ -542,11 +586,12 @@ const Checkout = (props) => {
                                         <FloatingLabels
                                             label="Địa chỉ chi tiết"
                                             zIndex={true}
-                                            value={formData.addressDetail}
+                                            value={dataToken ? defaultAddress.descriptionDetail : formData.addressDetail}
                                         >
                                             <Input
                                                 size='large'
                                                 name='addressDetail'
+                                                value={dataToken ? defaultAddress.descriptionDetail : undefined}
                                                 onChange={handleChange}
                                                 allowClear
                                             />
@@ -626,62 +671,117 @@ const Checkout = (props) => {
                                             <th className={styles.visuallyHidden}>Đơn giá</th>
                                         </tr>
                                     </thead>
-                                    <tbody >
-                                        <Space style={{ width: '100%' }} direction='vertical' size={16}>
-                                            {/* {console.log(productDetails)} */}
-                                            {productDetails && productDetails?.map((productDetail) => (
-                                                <tr>
-                                                    <div style={{ width: '100%' }}>
-                                                        <Space style={{ width: '100%', borderBottom: '1px solid #ccc', padding: '8px 8px 10px 8px' }} direction='horizontal' size={16}>
-                                                            <div className={styles.productThumbnail}>
-                                                                <div className={styles.productThumbnailWrapper}>
-                                                                    <img
-                                                                        src={productDetail.data[0].productImageResponse[0].path} alt="" className={styles.productThumbnailImage} />
+                                    {dataToken
+                                        ? <tbody >
+                                            <Space style={{ width: '100%' }} direction='vertical' size={16}>
+                                                {productDetails && productDetails?.map((productDetail) => (
+                                                    <tr>
+                                                        <div style={{ width: '100%' }}>
+                                                            <Space style={{ width: '100%', borderBottom: '1px solid #ccc', padding: '8px 8px 10px 8px' }} direction='horizontal' size={16}>
+                                                                <div className={styles.productThumbnail}>
+                                                                    <div className={styles.productThumbnailWrapper}>
+                                                                        <img
+                                                                            src={productDetail?.productImageResponse[0].path} alt="" className={styles.productThumbnailImage} />
+                                                                    </div>
+                                                                    <span className={styles.productThumbnailQuantity}>{productDetail?.cartDetailResponse.quantity}</span>
                                                                 </div>
-                                                                <span className={styles.productThumbnailQuantity}>{productDetail.quantity}</span>
-                                                            </div>
-                                                            <div style={{ width: 256 }}>
-                                                                <span >
-                                                                    {productDetail.data[0].product.productName + "-" + productDetail.data[0].button.buttonName +
-                                                                        "-" +
-                                                                        productDetail.data[0].brand.brandName +
-                                                                        "-" +
-                                                                        productDetail.data[0].category.categoryName +
-                                                                        "-" +
-                                                                        productDetail.data[0].material.materialName +
-                                                                        "-" +
-                                                                        productDetail.data[0].collar.collarTypeName +
-                                                                        "-" +
-                                                                        productDetail.data[0].sleeve.sleeveName +
-                                                                        "-" +
-                                                                        productDetail.data[0].shirtTail.shirtTailTypeName +
-                                                                        "-" +
-                                                                        productDetail.data[0].pattern.patternName +
-                                                                        "-" +
-                                                                        productDetail.data[0].form.formName}
-                                                                </span>
-                                                                <div style={{ display: 'flex', alignItems: 'center' }}>
-                                                                    <div
-                                                                        style={{
-                                                                            height: 20,
-                                                                            width: 20,
-                                                                            borderRadius: '50%',
-                                                                            backgroundColor: productDetail.data[0].color.colorCode,
-                                                                        }}
-                                                                    ></div>/
-                                                                    <span>{productDetail.data[0].size.sizeName}</span>
+                                                                <div style={{ width: 256 }}>
+                                                                    <span >
+                                                                        {productDetail.cartDetailResponse.productName + "-" + productDetail.cartDetailResponse.buttonName +
+                                                                            "-" +
+                                                                            productDetail.cartDetailResponse.brandName +
+                                                                            "-" +
+                                                                            productDetail.cartDetailResponse.categoryName +
+                                                                            "-" +
+                                                                            productDetail.cartDetailResponse.materialName +
+                                                                            "-" +
+                                                                            productDetail.cartDetailResponse.collarTypeName +
+                                                                            "-" +
+                                                                            productDetail.cartDetailResponse.sleeveName +
+                                                                            "-" +
+                                                                            productDetail.cartDetailResponse.shirtTailTypeName +
+                                                                            "-" +
+                                                                            productDetail.cartDetailResponse.patternName +
+                                                                            "-" +
+                                                                            productDetail.cartDetailResponse.formName}
+                                                                    </span>
+                                                                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                                                                        <div
+                                                                            style={{
+                                                                                height: 20,
+                                                                                width: 20,
+                                                                                borderRadius: '50%',
+                                                                                backgroundColor: productDetail.cartDetailResponse.colorCode,
+                                                                            }}
+                                                                        ></div>/
+                                                                        <span>{productDetail.cartDetailResponse.sizeName}</span>
+                                                                    </div>
                                                                 </div>
-                                                            </div>
-                                                            <div>
-                                                                {numeral(productDetail.data[0].price)
-                                                                    .format('0,0') + 'đ'}
-                                                            </div>
-                                                        </Space>
-                                                    </div>
-                                                </tr>
-                                            ))}
-                                        </Space>
-                                    </tbody>
+                                                                <div>
+                                                                    {numeral(productDetail.cartDetailResponse.priceProductDetail)
+                                                                        .format('0,0') + 'đ'}
+                                                                </div>
+                                                            </Space>
+                                                        </div>
+                                                    </tr>
+                                                ))}
+                                            </Space>
+                                        </tbody>
+                                        : <tbody >
+                                            <Space style={{ width: '100%' }} direction='vertical' size={16}>
+                                                {productDetails && productDetails?.map((productDetail) => (
+                                                    <tr>
+                                                        <div style={{ width: '100%' }}>
+                                                            <Space style={{ width: '100%', borderBottom: '1px solid #ccc', padding: '8px 8px 10px 8px' }} direction='horizontal' size={16}>
+                                                                <div className={styles.productThumbnail}>
+                                                                    <div className={styles.productThumbnailWrapper}>
+                                                                        <img
+                                                                            src={productDetail.data[0].productImageResponse[0].path} alt="" className={styles.productThumbnailImage} />
+                                                                    </div>
+                                                                    <span className={styles.productThumbnailQuantity}>{productDetail.quantity}</span>
+                                                                </div>
+                                                                <div style={{ width: 256 }}>
+                                                                    <span >
+                                                                        {productDetail.data[0].product.productName + "-" + productDetail.data[0].button.buttonName +
+                                                                            "-" +
+                                                                            productDetail.data[0].brand.brandName +
+                                                                            "-" +
+                                                                            productDetail.data[0].category.categoryName +
+                                                                            "-" +
+                                                                            productDetail.data[0].material.materialName +
+                                                                            "-" +
+                                                                            productDetail.data[0].collar.collarTypeName +
+                                                                            "-" +
+                                                                            productDetail.data[0].sleeve.sleeveName +
+                                                                            "-" +
+                                                                            productDetail.data[0].shirtTail.shirtTailTypeName +
+                                                                            "-" +
+                                                                            productDetail.data[0].pattern.patternName +
+                                                                            "-" +
+                                                                            productDetail.data[0].form.formName}
+                                                                    </span>
+                                                                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                                                                        <div
+                                                                            style={{
+                                                                                height: 20,
+                                                                                width: 20,
+                                                                                borderRadius: '50%',
+                                                                                backgroundColor: productDetail.data[0].color.colorCode,
+                                                                            }}
+                                                                        ></div>/
+                                                                        <span>{productDetail.data[0].size.sizeName}</span>
+                                                                    </div>
+                                                                </div>
+                                                                <div>
+                                                                    {numeral(productDetail.data[0].price)
+                                                                        .format('0,0') + 'đ'}
+                                                                </div>
+                                                            </Space>
+                                                        </div>
+                                                    </tr>
+                                                ))}
+                                            </Space>
+                                        </tbody>}
                                 </table>
                             </div>
                             <div style={{ borderTop: '1px solid rgba(175,175,175,.34)', padding: '10px' }}>

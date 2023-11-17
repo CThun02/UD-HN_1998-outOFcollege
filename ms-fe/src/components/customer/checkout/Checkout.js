@@ -10,7 +10,7 @@ import TextArea from 'antd/es/input/TextArea'
 import FloatingLabels from '../../element/FloatingLabels/FloatingLabels'
 import * as yup from 'yup';
 import { getAuthToken } from '../../../service/Token'
-
+import ModalAddress from '../../admin/sale-couter/ModalAddress.js'
 
 const Checkout = (props) => {
     const [provinces, setProvinces] = useState([])
@@ -35,6 +35,9 @@ const Checkout = (props) => {
         ward: '',
         descriptionDetail: ''
     })
+    const [render, setRender] = useState(null)
+
+    const [showAdd, setShowAdd] = useState(false);
 
     const handleProvincesChange = (e) => {
         formData.city = e
@@ -255,6 +258,14 @@ const Checkout = (props) => {
         });
     };
 
+    const handleChangeDefaultAdd = (e) => {
+        const { name, value } = e.target;
+        setDefaultAddress({
+            ...defaultAddress,
+            [name]: value,
+        });
+    };
+
     const removeProductDetailCart = () => {
         const cart = JSON.parse(localStorage.getItem('user'));
         const checkout = JSON.parse(localStorage.getItem('checkout'));
@@ -289,8 +300,17 @@ const Checkout = (props) => {
         if (token) {
             await axios.get(`http://localhost:8080/api/admin/address?username=${data?.username}`)
                 .then((response) => {
-                    setAddress(response.data)
-                    setDefaultAddress(response.data.filter((item) => item.defaultaddress === true)[0])
+                    if (response.data) {
+                        let addd = response.data.filter((item) => item.defaultaddress === true)[0];
+                        setAddress(response.data)
+                        if (addd) {
+                            setDefaultAddress(addd)
+                            let district = addd.district.substring(1 + addd.district.indexOf("|"));
+                            let ward = addd.ward.substring(1 + addd.ward.indexOf("|"));
+                            handleShippingOrderLeadtime(Number(district), ward);
+                            handleShippingFee(100, district, ward);
+                        }
+                    }
                 }).catch((error) => {
                     console.log(error)
                 })
@@ -424,22 +444,17 @@ const Checkout = (props) => {
         fetchProvince();
         fetchDistrict();
         fetchWard();
-        let city = defaultAddress.city.substring(0, defaultAddress.city.indexOf('|') + 0);
-        let district = defaultAddress.district.substring(1 + defaultAddress.district.indexOf("|"));
-        let ward = defaultAddress.ward.substring(1 + defaultAddress.ward.indexOf("|"));
-
-        if (dataToken) {
-            console.log(123)
-            console.log(district)
-            handleShippingOrderLeadtime(district, ward);
-            handleShippingFee(100, district, ward);
-        } else {
+        if (!dataToken) {
             handleShippingOrderLeadtime(selectedDistrict, selectedWard);
             handleShippingFee(100, selectedDistrict, selectedWard);
         }
         getAddress()
         getAllCarts()
-    }, [selectedDistrict, selectedWard])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedDistrict,
+        selectedWard,
+        render
+    ])
 
     return (
         <div className={styles.wrapper}>
@@ -456,9 +471,21 @@ const Checkout = (props) => {
                                         <span style={{ fontSize: '20px', fontWeight: 500 }}>
                                             Thông tin đơn hàng
                                         </span>
+                                        {dataToken && <Button type='primary'
+                                            onClick={() => setShowAdd(true)}
+                                            style={{ margin: '12px 0' }}>
+                                            Chọn địa chỉ
+                                        </Button>}
+                                        <ModalAddress
+                                            isModalOpen={showAdd}
+                                            handleCancel={() => setShowAdd(false)}
+                                            address={address}
+                                            selectedAddress={setDefaultAddress}
+                                            render={setRender}
+                                        />
                                     </Col>
                                     <Col span={6} style={{ paddingTop: 5 }}>
-                                        {!token && <span style={{ fontSize: '15px', fontWeight: 500 }}>
+                                        {!dataToken && <span style={{ fontSize: '15px', fontWeight: 500 }}>
                                             <Link style={{ color: '#111111' }} to={'/authen/sign-in'}><UserOutlined />Đăng nhập</Link>
                                         </span>}
                                     </Col>
@@ -475,8 +502,8 @@ const Checkout = (props) => {
                                             <Input
                                                 size='large'
                                                 name='fullName'
-                                                onChange={handleChange}
-                                                value={dataToken ? defaultAddress.fullName : undefined}
+                                                onChange={dataToken ? handleChangeDefaultAdd : handleChange}
+                                                value={dataToken ? defaultAddress.fullName : formData.fullName}
                                                 allowClear
                                             />
                                             {error.fullName && <div className={styles.errorText}>{error.fullName}</div>}
@@ -486,13 +513,13 @@ const Checkout = (props) => {
                                         <FloatingLabels
                                             label="Số điện thoại"
                                             zIndex={true}
-                                            value={dataToken ? defaultAddress.fullName : formData.phoneNumber}
+                                            value={dataToken ? defaultAddress.sdt : formData.phoneNumber}
                                         >
                                             <Input
                                                 size='large'
-                                                name='phoneNumber'
-                                                onChange={handleChange}
-                                                value={dataToken ? defaultAddress.sdt : undefined}
+                                                name={`${dataToken ? 'sdt' : 'phoneNumber'}`}
+                                                onChange={dataToken ? handleChangeDefaultAdd : handleChange}
+                                                value={dataToken ? defaultAddress.sdt : formData.phoneNumber}
                                                 allowClear
                                             />
                                             {error.phoneNumber && <div className={styles.errorText}>{error.phoneNumber}</div>}
@@ -515,9 +542,17 @@ const Checkout = (props) => {
                                                 filterSort={(optionA, optionB) =>
                                                     (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
                                                 }
-                                                value={dataToken ? defaultAddress.city.substring(0, defaultAddress.city.indexOf('|')) : formData.city}
+                                                name="city"
+                                                value={dataToken ? defaultAddress.city?.substring(0, defaultAddress.city.indexOf('|')) : formData.city}
                                                 allowClear
-                                                onChange={(e) => handleProvincesChange(e)}
+                                                onChange={(e) => {
+                                                    dataToken ?
+                                                        handleChangeDefaultAdd(
+                                                            {
+                                                                target: { name: 'city', value: e }
+                                                            })
+                                                        : handleProvincesChange(e)
+                                                }}
                                                 options={provinces.map((province) => ({
                                                     value: province.ProvinceName + '|' + province.ProvinceID,
                                                     label: province.ProvinceName,
@@ -538,13 +573,18 @@ const Checkout = (props) => {
                                                     height: 45,
                                                     width: 380,
                                                 }}
-                                                value={dataToken ? defaultAddress?.district.substring(0, defaultAddress.district.indexOf('|')) : formData.district}
+                                                value={dataToken ? defaultAddress?.district?.substring(0, defaultAddress.district.indexOf('|')) : formData.district}
                                                 optionFilterProp="children"
                                                 filterOption={(input, option) => (option?.label ?? '').includes(input)}
                                                 filterSort={(optionA, optionB) =>
                                                     (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
                                                 }
-                                                onChange={(e) => handleDistrictChange(e)}
+                                                onChange={(e) => dataToken ?
+                                                    handleChangeDefaultAdd(
+                                                        {
+                                                            target: { name: 'district', value: e }
+                                                        })
+                                                    : handleDistrictChange(e)}
                                                 options={districts?.map((district) => ({
                                                     value: district.DistrictName + '|' + district.DistrictID,
                                                     label: district.DistrictName,
@@ -566,14 +606,19 @@ const Checkout = (props) => {
                                                     height: 45,
                                                     width: 380,
                                                 }}
-                                                value={dataToken ? defaultAddress.ward.substring(0, defaultAddress.ward.indexOf('|')) : formData.ward}
+                                                value={dataToken ? defaultAddress.ward?.substring(0, defaultAddress.ward.indexOf('|')) : formData.ward}
                                                 optionFilterProp="children"
                                                 filterOption={(input, option) => (option?.label ?? '').includes(input)}
                                                 filterSort={(optionA, optionB) =>
                                                     (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
                                                 }
+                                                onChange={(e) => dataToken ?
+                                                    handleChangeDefaultAdd(
+                                                        {
+                                                            target: { name: 'ward', value: e }
+                                                        })
+                                                    : handleWardChange(e)}
                                                 allowClear
-                                                onChange={(e) => handleWardChange(e)}
                                                 options={wards?.map((ward) => ({
                                                     value: ward.WardName + '|' + ward.WardCode,
                                                     label: ward.WardName,
@@ -591,7 +636,7 @@ const Checkout = (props) => {
                                             <Input
                                                 size='large'
                                                 name='addressDetail'
-                                                value={dataToken ? defaultAddress.descriptionDetail : undefined}
+                                                value={dataToken ? defaultAddress.descriptionDetail : formData.addressDetail}
                                                 onChange={handleChange}
                                                 allowClear
                                             />

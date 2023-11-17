@@ -63,17 +63,6 @@ const ReturnIndex = () => {
       },
     },
     {
-      title: "Tổng tiền",
-      key: "totalPrice",
-      render: (text, record) => {
-        return (
-          numeral(
-            record.totalPrice + record.shipPrice - record?.priceReduce
-          ).format("0,0") + "đ"
-        );
-      },
-    },
-    {
       title: "Ngày tạo",
       dataIndex: "createdDate",
       key: "createdDate",
@@ -126,7 +115,7 @@ const ReturnIndex = () => {
                     : "Đang đợi"}
                 </span>
               ),
-              key: id,
+              key: id === "1" ? "RETURNS" : id === "2" ? "RETURNC" : "RETURNW",
               children: (
                 <div style={{ padding: "8px" }}>
                   <span style={{ fontWeight: 500 }}>

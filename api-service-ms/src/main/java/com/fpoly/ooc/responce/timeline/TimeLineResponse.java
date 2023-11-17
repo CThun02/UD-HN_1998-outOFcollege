@@ -1,5 +1,6 @@
 package com.fpoly.ooc.responce.timeline;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,6 +21,7 @@ public class TimeLineResponse {
 
     private String status;
 
+    @JsonFormat(pattern = "HH:mm:ss dd/MM/yyyy ")
     private LocalDateTime createdDate;
 
     private String createdBy;
@@ -30,6 +32,7 @@ public class TimeLineResponse {
 
     private String billStatus;
 
+    @JsonFormat(pattern = "HH:mm:ss dd/MM/yyyy ")
     private LocalDateTime completionDate;
 
     private BigDecimal totalPrice;

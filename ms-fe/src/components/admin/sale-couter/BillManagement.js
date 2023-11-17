@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styles from "./BillManagement.module.css";
-import { Button, Input, Row, Select, Table, Tag, TreeSelect } from "antd";
+import { Button, Input, Select, Table, Tag, TreeSelect } from "antd";
 import {
   EyeOutlined,
   FilterFilled,
@@ -13,6 +13,7 @@ import axios from "axios";
 import moment from "moment";
 import { Link } from "react-router-dom";
 import { getToken } from "../../../service/Token";
+import numeral from "numeral";
 const { RangePicker } = DatePicker;
 
 const BillManagement = () => {
@@ -81,22 +82,42 @@ const BillManagement = () => {
     },
     {
       title: "Tên khách hàng",
-      dataIndex: "fullName",
       key: "fullName",
-      render: (fullName) => {
-        return fullName || "Khách lẻ";
+      render: (text, record) => {
+        let colorAccount = record.accountName ? "green" : "geekblue";
+        return (
+          <Space direction="vertical" style={{ width: "auto" }}>
+            <div style={{ display: "block" }}>
+              <div>
+                {record.accountName ? record.accountName : record.fullName}
+              </div>
+              <Tag color={colorAccount}>
+                {record.accountName ? "Thành viên" : "khách lẻ"}
+              </Tag>
+            </div>
+          </Space>
+        );
       },
     },
     {
       title: "Số điện thoại",
       dataIndex: "phoneNumber",
       key: "phoneNumber",
+      render: (text, record) => {
+        return record.accountPhoneNumber
+          ? record.accountPhoneNumber
+          : record.phoneNumber;
+      },
     },
     {
       title: "Tổng tiền",
       key: "totalPrice",
       render: (text, record) => {
-        return record.totalPrice + record.shipPrice - record.priceReduce;
+        return (
+          numeral(
+            record.totalPrice + record.shipPrice - record?.priceReduce
+          ).format("0,0") + "đ"
+        );
       },
     },
     {
@@ -104,7 +125,7 @@ const BillManagement = () => {
       dataIndex: "createdDate",
       key: "createdDate",
       render: (createdDate) => {
-        return moment(createdDate).format(` HH:mm:ss DD/MM/YYYY`);
+        return moment(new Date(...createdDate)).format("HH:mm:ss DD/MM/YYYY");
       },
     },
     {
@@ -117,7 +138,7 @@ const BillManagement = () => {
             ? "geekblue"
             : object.toLocaleLowerCase() === "PAID".toLocaleLowerCase()
             ? "green"
-            : object === "cancel"
+            : object === "Cancel"
             ? "red"
             : null;
         return (
@@ -126,7 +147,7 @@ const BillManagement = () => {
               <Tag color={color}>
                 {object === "Unpaid"
                   ? "Chưa thanh toán"
-                  : object === "cancel"
+                  : object === "Cancel"
                   ? "Đã hủy"
                   : "Đã thanh toán"}
               </Tag>
@@ -162,17 +183,11 @@ const BillManagement = () => {
     };
     console.log(params);
     axios
-      .get(
-        `http://localhost:8080/api/admin/bill`,
-        {
-          params: params,
+      .get(`http://localhost:8080/api/admin/bill`, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
         },
-        {
-          headers: {
-            Authorization: `Bearer ${getToken()}`,
-          },
-        }
-      )
+      })
       .then((response) => {
         setData(response.data);
         setLoading(false);
@@ -219,6 +234,7 @@ const BillManagement = () => {
       setBillType(newValue);
     }
   };
+
   useEffect(() => {
     fetchData();
   }, [billCode, startDate, endDate, status, billType, symbol]);
@@ -248,9 +264,9 @@ const BillManagement = () => {
               defaultValue={""}
             >
               <Select.Option value={""}>Tất cả</Select.Option>
-              <Select.Option value={"active"}>Chưa thanh toán</Select.Option>
-              <Select.Option value={"paid"}>Đã thanh toán</Select.Option>
-              <Select.Option value={"cancel"}>Đã huỷ</Select.Option>
+              <Select.Option value={"Unpaid"}>Chưa thanh toán</Select.Option>
+              <Select.Option value={"Paid"}>Đã thanh toán</Select.Option>
+              <Select.Option value={"Cancel"}>Đã huỷ</Select.Option>
             </Select>
           </span>
           <span style={{ fontWeight: 500 }}>

@@ -45,6 +45,7 @@ function DetailProduct() {
   const [collarId, setCollarId] = useState(0);
   const [sleeveId, setSleeveId] = useState(0);
   const [shirtTailId, setShirtTailId] = useState(0);
+  const [getProductDetail, setGetProductDetail] = useState({})
 
   useEffect(() => {
     async function getProductDetails() {
@@ -80,6 +81,45 @@ function DetailProduct() {
     }
     getProductDetails();
   }, [id]);
+
+  useEffect(() => {
+    const getProductDetails = () => {
+      axios.get(`http://localhost:8080/api/admin/bill/filterProductDetailSellByIdCom`,
+        {
+          params: {
+            materialId: materialId,
+            shirtTailId: shirtTailId,
+            sleeveId: sleeveId,
+            collarId: collarId,
+            patternId: patternId,
+            formId: formId,
+            brandId: brandId,
+            categoryId: categoryId,
+            colorId: chooseColor?.id,
+            sizeId: chooseSize?.id,
+          }
+        })
+        .then((response) => {
+          setGetProductDetail(response.data)
+        }).catch((error) => {
+          console.log(error)
+        })
+    }
+    getProductDetails()
+  }, [productId,
+    chooseColor,
+    chooseSize,
+    brandId,
+    categoryId,
+    patternId,
+    formId,
+    buttonId,
+    materialId,
+    collarId,
+    sleeveId,
+    shirtTailId
+  ])
+
 
   useEffect(() => {
     if (
@@ -154,6 +194,7 @@ function DetailProduct() {
                     setChooseSize={setChooseSize}
                     chooseColor={chooseColor}
                     chooseSize={chooseSize}
+                    productDetails={getProductDetail}
                   />
                   <Divider className={styles.spacing} />
                 </div>

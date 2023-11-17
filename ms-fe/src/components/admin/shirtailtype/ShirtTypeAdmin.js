@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Select, Input, Row, Col, Form, DatePicker, Modal, Button } from "antd";
+import { Input, Row, Col, Form, Modal, Button } from "antd";
 import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
 import ShirtTypeTable from "./ShirtTypeTable";
 import styles from "../categorystyles/CategoryStyles.module.css";
 import axios from "axios";
 import { getToken } from "../../../service/Token";
-const { Option } = Select;
 
 const ShirtTailAdmin = function () {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -44,7 +42,7 @@ const ShirtTailAdmin = function () {
   useEffect(() => {}, [render]);
   return (
     <div className={styles.category}>
-      <div className={styles.radiusFrame}>
+      <div className={styles.customer}>
         <Row className={styles.titleTB}>
           <h3>Danh Sách Đuôi Áo</h3>
         </Row>

@@ -20,6 +20,10 @@ public class DeliveryNoteRequest {
 
     private Long addressId;
 
+    private String name;
+
+    private String phoneNumber;
+
     private LocalDateTime shipDate;
 
     private LocalDateTime dateOfreceipt;

@@ -37,18 +37,19 @@ public interface BillService {
 
     Bill findBillByBillId(Long id);
 
-    BillRevenueDisplay getBillRevenue(String date);
+    BillRevenueDisplay getBillRevenue(Integer day, Integer month, Integer year);
 
-    BillRevenueCompare getRevenueInStoreOnlineCompare();
+    BillRevenueCompare getRevenueInStoreOnlineCompare(Integer day, Integer month, Integer year);
 
-    List<ProductDetailSellResponse> getProductInBillByStatusAndId(Long id, String status);
+    List<ProductDetailSellResponse> getProductInBillByStatusAndId(Long id, Integer day, Integer month, Integer year);
 
     public BillRevenueCompareDate compareRevenueDate(Integer dayFrom, Integer monthFrom, Integer yearFrom,
                                                      Integer dayTo, Integer monthTo, Integer yearTo);
 
     List<Integer> getBusinessYear();
 
-    List<BillLineChartResponse> getDataLineChart(String year);
+    List<BillLineChartResponse> getDataLineChart(Integer dayFrom, Integer monthFrom, Integer yearFrom,
+                                                 Integer dayTo, Integer monthTo, Integer yearTo);
 
     List<ProductDetailSellResponse> getProductDetailSellInStore(ProductDetailRequest request, BigDecimal minPrice, BigDecimal maxPrice);
 

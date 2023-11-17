@@ -4,7 +4,7 @@ import axios from "axios";
 import styles from "./StatisticalIndex.module.css";
 import { getToken } from "../../../service/Token";
 
-const TableProdutSellTheMost = () => {
+const TableProdutSellTheMost = ({ date, type }) => {
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
@@ -162,12 +162,34 @@ const TableProdutSellTheMost = () => {
     },
   ];
   useEffect(() => {
+    var day = "";
+    var month = "";
+    var year = date.substring(0, 4);
+    if (type === "date") {
+      month = date.substring(date.indexOf("-") + 1, date.lastIndexOf("-"));
+      day = date.substring(date.lastIndexOf("-") + 1);
+    } else if (type === "month") {
+      month = date.substring(
+        date.indexOf("-") + 1,
+        date.lastIndexOf("-") === date.indexOf("-")
+          ? date.length
+          : date.lastIndexOf("-")
+      );
+    }
     axios
-      .get("http://localhost:8080/api/admin/bill/getBillProductSellTheMost", {
-        headers: {
-          Authorization: `Bearer ${getToken()}`,
-        },
-      })
+      .get(
+        "http://localhost:8080/api/admin/bill/getBillProductSellTheMost?day=" +
+          day +
+          "&month=" +
+          month +
+          "&year=" +
+          year,
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
+      )
       .then((res) => {
         setLoading(false);
         setData(res.data);
@@ -175,7 +197,7 @@ const TableProdutSellTheMost = () => {
       .catch((err) => {
         console.log(err);
       });
-  }, [pageSize]);
+  }, [pageSize, date, type]);
   return (
     <>
       <Table

@@ -1,8 +1,6 @@
-import { text } from "@fortawesome/fontawesome-svg-core";
 import { Button, Col, Modal, Row, Table } from "antd";
-import axios from "axios";
 import styles from "./search.module.css";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Input from "antd/es/input/Input";
 import { SearchOutlined } from "@ant-design/icons";
 
@@ -78,7 +76,7 @@ const ModalAddress = ({
               className={styles.filter_inputSearch}
               placeholder="Nhập địa chỉ"
               prefix={<SearchOutlined />}
-              onChange={(event) => {}}
+              onChange={(event) => { }}
             />
           </Col>
           <Col span={24}>

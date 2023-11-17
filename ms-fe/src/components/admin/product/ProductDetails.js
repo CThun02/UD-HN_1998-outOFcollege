@@ -211,7 +211,7 @@ const ProductDetails = (props) => {
       render: (text, record, index) => {
         return (
           <div style={{ textAlign: "center" }}>
-            {record.promotion ? (
+            {record.promotion.length !== 0 ? (
               <span style={{ color: "#ccc" }}>
                 <strike>
                   {record.price.toLocaleString("vi-VN", {
@@ -348,13 +348,14 @@ const ProductDetails = (props) => {
       });
     } else {
       productDetailCreate.productDetail = record;
-      productDetailCreate.priceReduce = record.promotion[0].promotionValue
-        ? record.promotion[0].promotionMethod === "%"
-          ? (record.price *
-              (100 - Number(record.promotion[0].promotionValue))) /
-            100
-          : record.price - Number(record.promotion[0].promotionValue)
-        : record.price;
+      productDetailCreate.priceReduce =
+        record.promotion.length !== 0
+          ? record.promotion[0].promotionMethod === "%"
+            ? (record.price *
+                (100 - Number(record.promotion[0].promotionValue))) /
+              100
+            : record.price - Number(record.promotion[0].promotionValue)
+          : record.price;
       props.productDetailsCreate?.push(productDetailCreate);
       notification.success({
         message: "Thông báo",

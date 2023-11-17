@@ -34,10 +34,15 @@ public class WebSecurityConfig {
                 .sessionManagement((e) -> e.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers(HttpMethod.POST, "api/v1/auth/login", "api/v1/auth/signup").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/admin/**").hasRole("EMPLOYEE")
-                        .requestMatchers(HttpMethod.GET, "/api/admin/**").hasRole("EMPLOYEE")
-                        .requestMatchers(HttpMethod.PUT, "/api/admin/**").hasRole("EMPLOYEE")
-                        .requestMatchers(HttpMethod.DELETE, "/api/admin/**").hasRole("EMPLOYEE")
+                        .requestMatchers(HttpMethod.POST, "/api/admin/account/**").hasRole("EMPLOYEE")
+                        .requestMatchers(HttpMethod.GET, "/api/admin/account/**").hasRole("EMPLOYEE")
+                        .requestMatchers(HttpMethod.PUT, "/api/admin/account/**").hasRole("EMPLOYEE")
+                        .requestMatchers(HttpMethod.DELETE, "/api/admin/account/**").hasRole("EMPLOYEE")
+                        .requestMatchers(HttpMethod.POST, "/api/admin/bill/**").hasRole("EMPLOYEE")
+                        .requestMatchers(HttpMethod.GET, "/api/admin/bill/**").hasRole("EMPLOYEE")
+                        .requestMatchers(HttpMethod.PUT, "/api/admin/bill/**").hasRole("EMPLOYEE")
+                        .requestMatchers(HttpMethod.DELETE, "/api/admin/bill/**").hasRole("EMPLOYEE")
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().permitAll());
         return http.build();
     }

@@ -54,7 +54,7 @@ const PatternAdmin = function () {
     <div className={styles.material}>
       <div className={styles.radiusFrame}>
         <Row className={styles.titleTB}>
-          <h3>Danh Sách Chất Liệu</h3>
+          <h3>Danh Sách Họa tiết</h3>
         </Row>
         <Row className={styles.adminMenu}>
           <Col span={10}>
@@ -73,7 +73,7 @@ const PatternAdmin = function () {
                 onClick={handleAdd}
               >
                 <PlusOutlined className={styles.faPlus} />
-                <span className={styles.titleSeach}>Thêm Loại Vải</span>
+                <span className={styles.titleSeach}>Thêm Họa tiết</span>
               </Button>
             </Col>
           </Col>

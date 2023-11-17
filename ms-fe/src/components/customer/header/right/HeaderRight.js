@@ -6,18 +6,19 @@ import { getAuthToken, clearAuthToken } from "../../../../service/Token";
 import { NotificationContext } from "../../../element/notification/NotificationAuthen";
 import { useEffect } from "react";
 import { useState } from "react";
+import axios from "axios";
 
 function HeaderRight() {
   // const { showSuccessNotification } = useContext(NotificationContext);
   const [user, setUser] = useState("");
   const [usernameEncode, setUsernameEncode] = useState("");
-
+  const [data, setData] = useState(null);
+  const cartAPI = "http://localhost:8080/api/admin/cart";
   useEffect(() => {
     return () =>
       getAuthToken()
         .then((data) => {
           setUser(data?.fullName);
-
           const enCodeData = btoa(JSON.stringify(data?.username));
           const convertPath = enCodeData.replace(/\//g, "-----");
           setUsernameEncode(convertPath);
@@ -53,6 +54,16 @@ function HeaderRight() {
     </div>
   );
 
+  const handleCreateCartByUsername = () => {
+    if (data) {
+      try {
+        const response = axios.post(`${cartAPI}/createCart?username=` + data);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
   return (
     <div className={styles.flex}>
       <Row className={styles.margin}>
@@ -73,7 +84,11 @@ function HeaderRight() {
               <Col span={4}>
                 <p className={styles.cssParagraph}>$0.00</p>
                 <Badge count={5}>
-                  <Link to={"/ms-shop/cart"} className={styles.link}>
+                  <Link
+                    to={"/ms-shop/cart"}
+                    onClick={() => handleCreateCartByUsername()}
+                    className={styles.link}
+                  >
                     <ShoppingCartOutlined className={styles.iconSize} />
                   </Link>
                 </Badge>

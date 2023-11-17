@@ -81,7 +81,7 @@ const ProductCreateDetails = () => {
     status: "ACTIVE",
   });
   const [productDetail, setProductDetail] = useState({
-    productId: "null",
+    productId: "",
     buttonId: " ",
     materialId: " ",
     collarId: " ",
@@ -148,7 +148,9 @@ const ProductCreateDetails = () => {
               setLoadingProduct(false);
               handleSetProduct("description", " ");
               setmodalProductCreate(false);
+              setProduct(res.data);
               setRender(Math.random());
+              handleSetProductDetail("productId", res.data.id);
               notification.open({
                 message: "Thông báo",
                 description: "Thêm mới sản phẩm thành công",
@@ -260,7 +262,6 @@ const ProductCreateDetails = () => {
         });
     }
   }
-  console.log("spam");
   function handleSetProductDetailCom(field, value) {
     if (field === "button") {
       setButton(value);
@@ -1091,8 +1092,12 @@ const ProductCreateDetails = () => {
                                 )
                             }
                             onChange={(index) => {
-                              selectProduct(index);
+                              setProduct(
+                                productList?.filter((item) => item.id === index)
+                              );
+                              handleSetProductDetail("productId", index);
                             }}
+                            value={productDetail.productId}
                           >
                             {productList &&
                               productList.map((item, index) => {
@@ -1100,7 +1105,7 @@ const ProductCreateDetails = () => {
                                   <Select.Option
                                     key={item.id}
                                     label={item.productName}
-                                    value={index}
+                                    value={item.id}
                                   >
                                     {item.productName}
                                   </Select.Option>

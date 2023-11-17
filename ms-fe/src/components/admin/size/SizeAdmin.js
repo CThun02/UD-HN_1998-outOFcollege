@@ -44,7 +44,7 @@ const SizeAdmin = function () {
 
   return (
     <div className={styles.category}>
-      <div className={styles.radiusFrame}>
+      <div className={styles.customer}>
         <Row className={styles.titleTB}>
           <h3>Danh Sách Kích Thước</h3>
         </Row>

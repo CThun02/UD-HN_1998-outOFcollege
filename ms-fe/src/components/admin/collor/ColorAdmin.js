@@ -62,7 +62,7 @@ const CollorAdmin = function () {
   useEffect(() => {}, [render]);
   return (
     <div className={styles.category}>
-      <div className={styles.radiusFrame}>
+      <div className={styles.customer}>
         <Row className={styles.titleTB}>
           <h3>Danh Sách Màu Sắc</h3>
         </Row>
@@ -105,7 +105,6 @@ const CollorAdmin = function () {
               ]}
             >
               <ColorPicker
-                color={colorCode}
                 showText
                 onChange={(e) => setColorCode(e.toHexString())}
               />

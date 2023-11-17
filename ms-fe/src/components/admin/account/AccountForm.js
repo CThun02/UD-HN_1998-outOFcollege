@@ -50,7 +50,7 @@ const MyForm = (props) => {
     ward: " ",
     password: "12345",
     descriptionDetail: " ",
-    dob: " ",
+    dob: "",
     gender: true,
     idRole: roleId,
   });
@@ -70,7 +70,6 @@ const MyForm = (props) => {
   };
 
   const handleScan = (result) => {
-    console.log(result);
     let value = result;
     const idNo = value.substring(0, value.indexOf("|"));
     const fullName = value.substring(
@@ -398,9 +397,25 @@ const MyForm = (props) => {
                     <h6>Mã định danh</h6>
                     <Input
                       value={accountScan.idNo}
-                      onChange={(event) =>
-                        handleSetAccountScan("idNo", event.target.value)
-                      }
+                      onChange={(event) => {
+                        handleSetAccountScan(
+                          "idNo",
+                          event.target.value.replace(/[^\d]/g, "")
+                        );
+                      }}
+                      onBlur={(event) => {
+                        if (event.target.value.length !== 12) {
+                          notification.error({
+                            message: "Thông báo",
+                            description: "Mã định danh phải là 12 số",
+                          });
+                        } else {
+                          handleSetAccountScan(
+                            "idNo",
+                            event.target.value.trim()
+                          );
+                        }
+                      }}
                       status={accountScan.idNo === "" ? "error" : ""}
                     />
                   </div>
@@ -427,22 +442,39 @@ const MyForm = (props) => {
                     <h6>Ngày sinh</h6>
                     <DatePicker
                       value={
-                        accountScan.dob === "" || accountScan.dob === " "
+                        accountScan.dob === "" || accountScan.dob === null
                           ? null
                           : dayjs(accountScan.dob)
                       }
                       style={{ width: "100%" }}
                       onChange={(event) => {
+                        var currenYear = new Date().getFullYear();
+                        if (currenYear - event.toDate().getFullYear() < 16) {
+                          notification.error({
+                            message: "Thông báo",
+                            description: `${
+                              roleId === 1
+                                ? "Nhân viên không đủ điều kiện tham gia"
+                                : "Khách hàng không đủ điều kiện tham gia"
+                            }`,
+                          });
+                        }
                         handleSetAccountScan(
                           "dob",
-                          event === null ? "" : event
+                          new Date().getFullYear() -
+                            event.toDate().getFullYear() <
+                            16
+                            ? null
+                            : event
                         );
                       }}
-                      status={
-                        accountScan.dob === "" || accountScan.dob === null
-                          ? "error"
-                          : ""
-                      }
+                      onBlur={(event) => {
+                        handleSetAccountScan(
+                          "dob",
+                          event.target.value === "" ? null : event.target.value
+                        );
+                      }}
+                      status={accountScan.dob === null ? "error" : ""}
                     />
                   </div>
                 </Col>
@@ -452,7 +484,10 @@ const MyForm = (props) => {
                     <Input
                       value={accountScan.email}
                       onChange={(event) =>
-                        handleSetAccountScan("email", event.target.value)
+                        handleSetAccountScan("email", event.target.value.trim())
+                      }
+                      onBlur={(event) =>
+                        handleSetAccountScan("email", event.target.value.trim())
                       }
                       required={true}
                       status={accountScan.email === "" ? "error" : ""}
@@ -471,6 +506,12 @@ const MyForm = (props) => {
                       onChange={(event) =>
                         handleSetAccountScan("fullName", event.target.value)
                       }
+                      onBlur={(event) =>
+                        handleSetAccountScan(
+                          "fullName",
+                          event.target.value.trim()
+                        )
+                      }
                       status={accountScan.fullName === "" ? "error" : ""}
                     />
                   </div>
@@ -481,7 +522,16 @@ const MyForm = (props) => {
                     <Input
                       value={accountScan.numberPhone}
                       onChange={(event) =>
-                        handleSetAccountScan("numberPhone", event.target.value)
+                        handleSetAccountScan(
+                          "numberPhone",
+                          event.target.value.trim().replace(/[^\d]/g, "")
+                        )
+                      }
+                      onBlur={(event) =>
+                        handleSetAccountScan(
+                          "numberPhone",
+                          event.target.value.trim()
+                        )
                       }
                       status={accountScan.numberPhone === "" ? "error" : ""}
                     />
@@ -491,11 +541,10 @@ const MyForm = (props) => {
                   <div className="m-5">
                     <h6>Địa chỉ chi tiết</h6>
                     <Input
-                      value={accountScan.descriptionDetail}
-                      onChange={(event) =>
+                      onBlur={(event) =>
                         handleSetAccountScan(
                           "descriptionDetail",
-                          event.target.value
+                          event.target.value.trim()
                         )
                       }
                       status={

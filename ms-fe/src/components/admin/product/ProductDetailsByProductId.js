@@ -1099,19 +1099,27 @@ const ProductDetails = (props) => {
               <EditFilled />
             </Button>
             <Button
-              onClick={() => {}}
+              onClick={() => {
+                confirm({
+                  centered: true,
+                  title: `Xóa sản phẩm`,
+                  content: "Xác nhận Xóa",
+                  onOk() {
+                    deleteProductDetail(
+                      record,
+                      record.status === "ACTIVE" ? "DELETED" : "ACTIVE"
+                    );
+                  },
+                });
+              }}
               className="ms-5"
               type="primary"
               size={"large"}
             >
               {record.status === "ACTIVE" ? (
-                <DeleteFilled
-                  onClick={() => deleteProductDetail(record, "DELETED")}
-                />
+                <DeleteFilled />
               ) : (
-                <ReloadOutlined
-                  onClick={() => deleteProductDetail(record, "ACTIVE")}
-                />
+                <ReloadOutlined />
               )}
             </Button>
           </>
@@ -1737,6 +1745,7 @@ const ProductDetails = (props) => {
   function deleteProductDetail(productDetail, status) {
     delete productDetail["key"];
     productDetail.status = status;
+
     axios
       .put(
         api + "product/updateProductDetail?method='Deleted'",

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import VoucherList from "./VoucherList";
 import axios from "axios";
 import "./global.css";
+import { getToken } from "../../../service/Token";
 
 const baseUrl = "http://localhost:8080/api/admin/vouchers";
 
@@ -40,7 +41,12 @@ function FormUsingVoucher({
         };
         const res = await axios.post(
           baseUrl + "/display-modal-using",
-          condition
+          condition,
+          {
+            headers: {
+              Authorization: `Bearer ${getToken()}`,
+            },
+          }
         );
         const data = await res.data;
         setVouchers(data);

@@ -5,6 +5,7 @@ import { Table, Space, Button, Modal, Input, message, Switch } from "antd";
 import { useEffect, useState } from "react";
 import styles from "./CollarStyle.module.css";
 import axios from "axios";
+import { getToken } from "../../../service/Token";
 
 const CollarTable = function (props) {
   const [data, setData] = useState([]);
@@ -35,9 +36,17 @@ const CollarTable = function (props) {
   const handleUpdate = () => {
     let collarType = {};
     axios
-      .put(`http://localhost:8080/api/admin/collar/edit/${id}`, {
-        collarTypeName,
-      })
+      .put(
+        `http://localhost:8080/api/admin/collar/edit/${id}`,
+        {
+          collarTypeName,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
+      )
       .then((response) => {
         setShowDetailsModal(false);
         setRender(Math.random);
@@ -52,9 +61,17 @@ const CollarTable = function (props) {
     const updatedStatusValue = statusUpdate ? "ACTIVE" : "INACTIVE"; // Cập nhật trạng thái dựa trên giá trị của statusUpdate
 
     axios
-      .put(`http://localhost:8080/api/admin/collar/update/${id}`, {
-        status: updatedStatusValue,
-      })
+      .put(
+        `http://localhost:8080/api/admin/collar/update/${id}`,
+        {
+          status: updatedStatusValue,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
+      )
       .then((response) => {
         setRender(Math.random);
         setTimeout(() => {
@@ -69,7 +86,11 @@ const CollarTable = function (props) {
   };
   const handleConfirmDelete = () => {
     axios
-      .delete(`http://localhost:8080/api/admin/collar/delete/${selectedData}`)
+      .delete(`http://localhost:8080/api/admin/collar/delete/${selectedData}`, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((response) => {
         // Xoá dữ liệu thành công
         // Cập nhật lại danh sách dữ liệu sau khi xoá
@@ -83,7 +104,11 @@ const CollarTable = function (props) {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:8080/api/admin/collar`)
+      .get(`http://localhost:8080/api/admin/collar`, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((response) => {
         setData(response.data);
         console.log(response.data);

@@ -47,6 +47,8 @@ public class ErrorCodeConfig {
         errors.put("JWT_DECODE_EXCEPTION", "Đăng nhập thất bại");
         errors.put("JWT_USER_ALREADY_EXIST", "Tên đăng nhập đã tồn tại");
         errors.put("JWT_LOGIN_ERROR", "Tài khoản hoặc mật khẩu không chính xác");
+        errors.put("PASSWORD_NOT_CORRECT", "Mật khẩu không chính xác");
+        errors.put("ADDRESS_NOT_FOUND", "Địa chỉ không chính xác");
     }
 
     public static String getMessage(String code) {

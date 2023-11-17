@@ -11,8 +11,15 @@ async function getAuthToken() {
       const data = await res.data;
       return data;
     } catch (err) {
-      return err;
+      window.localStorage.removeItem("auth_token");
     }
+  }
+}
+
+function getToken() {
+  const token = window.localStorage.getItem("auth_token");
+  if (token) {
+    return atob(token);
   }
   return null;
 }
@@ -29,12 +36,12 @@ axios.defaults.baseURL = "http://localhost:8080";
 axios.defaults.headers.post["Content-Type"] = "application/json";
 
 const request = async (method, url, data) => {
+  const token = window.localStorage.getItem("auth_token");
   let headers = {};
-
-  if (getAuthToken() !== null && getAuthToken() !== "null") {
-    headers = { Authorization: `Bearer ${getAuthToken()}` };
+  if (token) {
+    const atobToken = atob(token);
+    headers = { Authorization: `Bearer ${atobToken}` };
   }
-
   try {
     const response = await axios({
       method: method,
@@ -42,7 +49,6 @@ const request = async (method, url, data) => {
       headers: headers,
       data: data,
     });
-
     return response.data;
   } catch (error) {
     console.error("Request error:", error);
@@ -59,4 +65,11 @@ const fetchData = async () => {
   }
 };
 
-export { getAuthToken, setAuthHeader, request, fetchData, clearAuthToken };
+export {
+  getAuthToken,
+  setAuthHeader,
+  request,
+  fetchData,
+  clearAuthToken,
+  getToken,
+};

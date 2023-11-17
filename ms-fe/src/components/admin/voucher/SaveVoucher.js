@@ -31,6 +31,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { NotificationContext } from "../../element/notification/Notification";
 import axios from "axios";
 import ModalAddCustomer from "./ModalAddCustomer";
+import { getToken } from "../../../service/Token";
 
 const options = [
   { label: "VND", value: "vnd" },
@@ -202,42 +203,52 @@ function SaveVoucher() {
           setIsLoading(true);
           if (voucher) {
             await axios
-              .post(baseUrl + "add", {
-                ...voucher,
-                startDate: moment(voucher?.startDate.$d).format(
-                  "YYYY-MM-DDTHH:mm:ss.SSS"
-                ),
-                endDate: moment(voucher?.endDate.$d).format(
-                  "YYYY-MM-DDTHH:mm:ss.SSS"
-                ),
-                limitQuantity: isNaN(voucher?.limitQuantity)
-                  ? Number.parseInt(voucher?.limitQuantity?.replace(/,/g, ""))
-                  : voucher?.limitQuantity,
-                voucherValue: isNaN(voucher?.voucherValue)
-                  ? Number.parseInt(voucher?.voucherValue?.replace(/,/g, ""))
-                  : voucher?.voucherValue,
-                voucherValueMax: isNaN(voucher?.voucherValueMax)
-                  ? Number.parseInt(voucher?.voucherValueMax?.replace(/,/g, ""))
-                  : voucher?.voucherValueMax,
-                voucherCondition: isNaN(voucher?.voucherCondition)
-                  ? Number.parseInt(
-                      voucher?.voucherCondition?.replace(/,/g, "")
-                    )
-                  : voucher?.voucherCondition,
-                voucherId: voucher?.voucherId ? voucher?.voucherId : "",
-                voucherCode: voucher?.voucherCode ? voucher?.voucherCode : "",
-                voucherCurrentName: voucher?.voucherCurrentName,
-                objectUse: voucher?.objectUse,
-                emailDetails: {
-                  messageBody:
-                    "Hi bạn, \n Men's Shirt Shop gửi bạn voucher đặc biệt: \n\t1. Mã voucher: ASDFSAF724, Bạn có thể lên shop hoặc tới cửa hàng để sử dụng voucher này.\nThanks.",
-                  subject: "Men's Shirt Shop",
-                  attachment: null,
-                  recipient: [],
+              .post(
+                baseUrl + "add",
+                {
+                  ...voucher,
+                  startDate: moment(voucher?.startDate.$d).format(
+                    "YYYY-MM-DDTHH:mm:ss.SSS"
+                  ),
+                  endDate: moment(voucher?.endDate.$d).format(
+                    "YYYY-MM-DDTHH:mm:ss.SSS"
+                  ),
+                  limitQuantity: isNaN(voucher?.limitQuantity)
+                    ? Number.parseInt(voucher?.limitQuantity?.replace(/,/g, ""))
+                    : voucher?.limitQuantity,
+                  voucherValue: isNaN(voucher?.voucherValue)
+                    ? Number.parseInt(voucher?.voucherValue?.replace(/,/g, ""))
+                    : voucher?.voucherValue,
+                  voucherValueMax: isNaN(voucher?.voucherValueMax)
+                    ? Number.parseInt(
+                        voucher?.voucherValueMax?.replace(/,/g, "")
+                      )
+                    : voucher?.voucherValueMax,
+                  voucherCondition: isNaN(voucher?.voucherCondition)
+                    ? Number.parseInt(
+                        voucher?.voucherCondition?.replace(/,/g, "")
+                      )
+                    : voucher?.voucherCondition,
+                  voucherId: voucher?.voucherId ? voucher?.voucherId : "",
+                  voucherCode: voucher?.voucherCode ? voucher?.voucherCode : "",
+                  voucherCurrentName: voucher?.voucherCurrentName,
+                  objectUse: voucher?.objectUse,
+                  emailDetails: {
+                    messageBody:
+                      "Hi bạn, \n Men's Shirt Shop gửi bạn voucher đặc biệt: \n\t1. Mã voucher: ASDFSAF724, Bạn có thể lên shop hoặc tới cửa hàng để sử dụng voucher này.\nThanks.",
+                    subject: "Men's Shirt Shop",
+                    attachment: null,
+                    recipient: [],
+                  },
+                  isCheckSendEmail: voucher?.isCheckSendEmail,
+                  usernames: voucher?.voucherId ? differentList : usernames,
                 },
-                isCheckSendEmail: voucher?.isCheckSendEmail,
-                usernames: voucher?.voucherId ? differentList : usernames,
-              })
+                {
+                  headers: {
+                    Authorization: `Bearer ${getToken()}`,
+                  },
+                }
+              )
               .then(() => {
                 setIsLoading(false);
                 navigate("/api/admin/vouchers");
@@ -272,61 +283,67 @@ function SaveVoucher() {
     function () {
       if (code) {
         async function getVoucher() {
-          await axios.get(baseUrl + code).then((res) => {
-            const {
-              voucherId,
-              voucherCode,
-              voucherName,
-              voucherMethod,
-              voucherValue,
-              voucherValueMax,
-              limitQuantity,
-              voucherCondition,
-              startDate,
-              endDate,
-              status,
-              objectUse,
-              isCheckSendEmail,
-              emailDetails,
-              usernames,
-            } = res.data;
+          await axios
+            .get(baseUrl + code, {
+              headers: {
+                Authorization: `Bearer ${getToken()}`,
+              },
+            })
+            .then((res) => {
+              const {
+                voucherId,
+                voucherCode,
+                voucherName,
+                voucherMethod,
+                voucherValue,
+                voucherValueMax,
+                limitQuantity,
+                voucherCondition,
+                startDate,
+                endDate,
+                status,
+                objectUse,
+                isCheckSendEmail,
+                emailDetails,
+                usernames,
+              } = res.data;
 
-            ref.current.setFieldValue("voucherId", voucherId);
-            ref.current.setFieldValue("voucherCode", voucherCode);
-            ref.current.setFieldValue("voucherName", voucherName);
-            ref.current.setFieldValue("voucherNameCurrent", voucherName);
-            ref.current.setFieldValue("voucherMethod", voucherMethod);
-            ref.current.setFieldValue(
-              "voucherValue",
-              handleChangeNumber(voucherValue)
-            );
-            ref.current.setFieldValue(
-              "voucherValueMax",
-              handleChangeNumber(voucherValueMax)
-            );
-            ref.current.setFieldValue(
-              "limitQuantity",
-              handleChangeNumber(limitQuantity)
-            );
-            ref.current.setFieldValue(
-              "voucherCondition",
-              handleChangeNumber(voucherCondition)
-            );
-            ref.current.setFieldValue(
-              "startDate",
-              dayjs(moment(startDate).format(dateFormat), dateFormat)
-            );
-            ref.current.setFieldValue(
-              "endDate",
-              dayjs(moment(endDate).format(dateFormat), dateFormat)
-            );
-            ref.current.setFieldValue("status", status);
-            ref.current.setFieldValue("objectUse", objectUse);
-            ref.current.setFieldValue("isCheckSendEmail", isCheckSendEmail);
-            ref.current.setFieldValue("emailDetails", emailDetails);
-            ref.current.setFieldValue("usernames", usernames);
-            ref.current.setFieldValue("usernamesCurrent", usernames);
-          });
+              ref.current.setFieldValue("voucherId", voucherId);
+              ref.current.setFieldValue("voucherCode", voucherCode);
+              ref.current.setFieldValue("voucherName", voucherName);
+              ref.current.setFieldValue("voucherNameCurrent", voucherName);
+              ref.current.setFieldValue("voucherMethod", voucherMethod);
+              ref.current.setFieldValue(
+                "voucherValue",
+                handleChangeNumber(voucherValue)
+              );
+              ref.current.setFieldValue(
+                "voucherValueMax",
+                handleChangeNumber(voucherValueMax)
+              );
+              ref.current.setFieldValue(
+                "limitQuantity",
+                handleChangeNumber(limitQuantity)
+              );
+              ref.current.setFieldValue(
+                "voucherCondition",
+                handleChangeNumber(voucherCondition)
+              );
+              ref.current.setFieldValue(
+                "startDate",
+                dayjs(moment(startDate).format(dateFormat), dateFormat)
+              );
+              ref.current.setFieldValue(
+                "endDate",
+                dayjs(moment(endDate).format(dateFormat), dateFormat)
+              );
+              ref.current.setFieldValue("status", status);
+              ref.current.setFieldValue("objectUse", objectUse);
+              ref.current.setFieldValue("isCheckSendEmail", isCheckSendEmail);
+              ref.current.setFieldValue("emailDetails", emailDetails);
+              ref.current.setFieldValue("usernames", usernames);
+              ref.current.setFieldValue("usernamesCurrent", usernames);
+            });
         }
         getVoucher();
       }

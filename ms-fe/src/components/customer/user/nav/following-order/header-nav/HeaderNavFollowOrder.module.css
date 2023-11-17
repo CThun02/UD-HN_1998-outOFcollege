@@ -1,0 +1,40 @@
+.width {
+  width: 80%;
+}
+
+.content {
+  display: flex;
+  justify-content: center;
+}
+
+.center {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.textSize {
+  font-size: 1rem;
+}
+
+.textColor {
+  color: #111111;
+}
+
+.span {
+  padding: 10px 16px;
+}
+
+.span:hover {
+  cursor: pointer;
+  transition: 0.3s linear;
+  color: #39a7ff;
+}
+
+/* .active {
+  border-bottom: 2px solid #39a7ff;
+} */
+
+.input {
+  padding-left: 20px;
+  padding-right: 20px;
+}

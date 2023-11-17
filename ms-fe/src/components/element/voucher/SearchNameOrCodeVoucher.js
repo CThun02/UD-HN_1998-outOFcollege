@@ -2,6 +2,7 @@ import { AutoComplete } from "antd";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import OptionVoucher from "./OptionVoucher";
+import { getToken } from "../../../service/Token";
 
 const baseUrl = "http://localhost:8080/api/admin/vouchers";
 const image = "/vouchers/voucher_img.png";
@@ -24,7 +25,12 @@ function SearchNameOrCodeVoucher({ username, priceBill, setVoucher, voucher }) {
         };
         const res = await axios.post(
           baseUrl + "/display-modal-using",
-          condition
+          condition,
+          {
+            headers: {
+              Authorization: `Bearer ${getToken()}`,
+            },
+          }
         );
         const data = await res.data;
         const arrays = data?.map((e) => ({

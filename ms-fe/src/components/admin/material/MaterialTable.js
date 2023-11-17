@@ -4,6 +4,7 @@ import { Table, Space, Button, Modal, Input, Switch, message } from "antd";
 import { useEffect, useState } from "react";
 import styles from "../categorystyles/CategoryStyles.module.css";
 import axios from "axios";
+import { getToken } from "../../../service/Token";
 
 const MaterialTable = function (props) {
   const [data, setData] = useState([]);
@@ -34,7 +35,14 @@ const MaterialTable = function (props) {
   };
   const handleConfirmDelete = () => {
     axios
-      .delete(`http://localhost:8080/api/admin/material/delete/${selectedData}`)
+      .delete(
+        `http://localhost:8080/api/admin/material/delete/${selectedData}`,
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
+      )
       .then((response) => {
         // Xoá dữ liệu thành công
         // Cập nhật lại danh sách dữ liệu sau khi xoá
@@ -48,9 +56,17 @@ const MaterialTable = function (props) {
 
   const handleUpdate = () => {
     axios
-      .put(`http://localhost:8080/api/admin/material/edit/${id}`, {
-        materialName,
-      })
+      .put(
+        `http://localhost:8080/api/admin/material/edit/${id}`,
+        {
+          materialName,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
+      )
       .then((response) => {
         // Đóng modal
         setShowDetailsModal(false);
@@ -65,9 +81,17 @@ const MaterialTable = function (props) {
     const updatedStatusValue = statusUpdate ? "ACTIVE" : "INACTIVE"; // Cập nhật trạng thái dựa trên giá trị của statusUpdate
 
     axios
-      .put(`http://localhost:8080/api/admin/material/updateStatus/${id}`, {
-        status: updatedStatusValue,
-      })
+      .put(
+        `http://localhost:8080/api/admin/material/updateStatus/${id}`,
+        {
+          status: updatedStatusValue,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
+      )
       .then((response) => {
         setRender(Math.random);
         if (statusUpdate) {
@@ -83,7 +107,11 @@ const MaterialTable = function (props) {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:8080/api/admin/material`)
+      .get(`http://localhost:8080/api/admin/material`, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((response) => {
         setData(response.data);
         console.log(response.data);

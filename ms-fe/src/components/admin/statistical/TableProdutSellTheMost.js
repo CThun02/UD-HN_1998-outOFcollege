@@ -2,6 +2,7 @@ import { Badge, Carousel, Col, Row, Table } from "antd";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import styles from "./StatisticalIndex.module.css";
+import { getToken } from "../../../service/Token";
 
 const TableProdutSellTheMost = ({ date, type }) => {
   const [data, setData] = useState([]);
@@ -182,7 +183,12 @@ const TableProdutSellTheMost = ({ date, type }) => {
           "&month=" +
           month +
           "&year=" +
-          year
+          year,
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
       )
       .then((res) => {
         setLoading(false);

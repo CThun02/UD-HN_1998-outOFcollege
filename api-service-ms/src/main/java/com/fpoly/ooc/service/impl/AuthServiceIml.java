@@ -19,6 +19,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.nio.CharBuffer;
+import java.util.Arrays;
+import java.util.Collections;
 
 @AllArgsConstructor
 @Service
@@ -86,16 +88,20 @@ public class AuthServiceIml implements AuthService {
     @Override
     public UserDTO findByLogin(String login) {
         Account account=  accountService.findAccountByLogin(login);
+        System.out.println("AccountAccountAccount: " + roleService.findRoleNameByUsername(account.getUsername()));
         return UserDTO.builder()
                 .fullName(account.getFullName())
                 .username(account.getUsername())
+                .roles(roleService.findRoleNameByUsername(account.getUsername()))
                 .build();
     }
 
     private UserDTO mapperUser(Account account) {
+        System.out.println("AccountAccountAccount: " + roleService.findRoleNameByUsername(account.getUsername()));
         return UserDTO.builder()
                 .username(account.getUsername())
                 .fullName(account.getFullName())
+                .roles(roleService.findRoleNameByUsername(account.getUsername()))
                 .build();
     }
 

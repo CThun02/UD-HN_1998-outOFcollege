@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { Input, Row, Col, Button, Modal, Form, message} from "antd";
+import { Input, Row, Col, Button, Modal, Form, message } from "antd";
 import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
 import CategoryTable from "./CategoryTable";
 import styles from "./CategoryStyle.module.css";
 import axios from "axios";
+import { getToken } from "../../../service/Token";
 
 const CategoryAdmin = function () {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -21,7 +22,11 @@ const CategoryAdmin = function () {
     values.status = "ACTIVE";
     // Gọi API để thêm dữ liệu
     axios
-      .post("http://localhost:8080/api/admin/category/create", values)
+      .post("http://localhost:8080/api/admin/category/create", values, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((response) => {
         // Xử lý thành công
         console.log("Thêm thành công");

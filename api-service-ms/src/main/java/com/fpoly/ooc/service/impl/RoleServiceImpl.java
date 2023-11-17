@@ -6,6 +6,8 @@ import com.fpoly.ooc.service.interfaces.RoleService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @AllArgsConstructor
 @Service
 public class RoleServiceImpl implements RoleService {
@@ -15,5 +17,10 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public Role findRoleByName(String name) {
         return roleRepository.findRoleByRoleName(name);
+    }
+
+    @Override
+    public List<String> findRoleNameByUsername(String username) {
+        return roleRepository.findRoleNameByUsername(username);
     }
 }

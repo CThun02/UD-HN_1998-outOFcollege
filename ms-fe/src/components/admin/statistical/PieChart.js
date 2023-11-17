@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Pie } from "@ant-design/plots";
 import axios from "axios";
 import Statistic from "antd/es/statistic/Statistic";
+import { getToken } from "../../../service/Token";
 import { Col, DatePicker, Row, Select } from "antd";
 import dayjs from "dayjs";
 import styles from "./StatisticalIndex.module.css";
@@ -65,14 +66,11 @@ const PieChart = ({ formattedDateNow }) => {
       );
     }
     axios
-      .get(
-        "http://localhost:8080/api/admin/bill/getBillRevenueCompare?day=" +
-          day +
-          "&month=" +
-          month +
-          "&year=" +
-          year
-      )
+      .get("http://localhost:8080/api/admin/bill/getBillRevenueCompare", {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((res) => {
         setBillRevenueCompare(res.data);
       })

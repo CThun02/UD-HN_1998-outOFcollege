@@ -5,6 +5,7 @@ import { Table, Space, Button, Modal, Input, message, Switch } from "antd";
 import { useEffect, useState } from "react";
 import styles from "./BrandStyle.module.css";
 import axios from "axios";
+import { getToken } from "../../../service/Token";
 
 const BrandTable = function (props) {
   const [data, setData] = useState([]);
@@ -34,9 +35,17 @@ const BrandTable = function (props) {
   const handleUpdate = () => {
     let brand = {};
     axios
-      .put(`http://localhost:8080/api/admin/brand/edit/${id}`, {
-        brandName,
-      })
+      .put(
+        `http://localhost:8080/api/admin/brand/edit/${id}`,
+        {
+          brandName,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
+      )
       .then((response) => {
         // Đóng modal
         setShowDetailsModal(false);
@@ -51,9 +60,17 @@ const BrandTable = function (props) {
     const updatedStatusValue = statusUpdate ? "ACTIVE" : "INACTIVE"; // Cập nhật trạng thái dựa trên giá trị của statusUpdate
 
     axios
-      .put(`http://localhost:8080/api/admin/brand/update/${id}`, {
-        status: updatedStatusValue,
-      })
+      .put(
+        `http://localhost:8080/api/admin/brand/update/${id}`,
+        {
+          status: updatedStatusValue,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
+      )
       .then((response) => {
         setRender(Math.random);
         setTimeout(() => {
@@ -69,7 +86,11 @@ const BrandTable = function (props) {
 
   const handleConfirmDelete = () => {
     axios
-      .delete(`http://localhost:8080/api/admin/brand/delete/${selectedData}`)
+      .delete(`http://localhost:8080/api/admin/brand/delete/${selectedData}`, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((response) => {
         // Xoá dữ liệu thành công
         // Cập nhật lại danh sách dữ liệu sau khi xoá
@@ -83,7 +104,11 @@ const BrandTable = function (props) {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:8080/api/admin/brand`)
+      .get(`http://localhost:8080/api/admin/brand`, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((response) => {
         setData(response.data);
         console.log(response.data);

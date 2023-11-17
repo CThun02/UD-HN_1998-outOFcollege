@@ -12,6 +12,7 @@ import { DatePicker, Space } from "antd";
 import axios from "axios";
 import moment from "moment";
 import { Link } from "react-router-dom";
+import { getToken } from "../../../service/Token";
 import numeral from "numeral";
 const { RangePicker } = DatePicker;
 
@@ -83,10 +84,7 @@ const BillManagement = () => {
       title: "Tên khách hàng",
       key: "fullName",
       render: (text, record) => {
-        let colorAccount =
-          record.accountName
-            ? "green"
-            : "geekblue"
+        let colorAccount = record.accountName ? "green" : "geekblue";
         return (
           <Space direction="vertical" style={{ width: "auto" }}>
             <div style={{ display: "block" }}>
@@ -98,7 +96,7 @@ const BillManagement = () => {
               </Tag>
             </div>
           </Space>
-        )
+        );
       },
     },
     {
@@ -106,15 +104,20 @@ const BillManagement = () => {
       dataIndex: "phoneNumber",
       key: "phoneNumber",
       render: (text, record) => {
-        return record.accountPhoneNumber ? record.accountPhoneNumber : record.phoneNumber
-      }
+        return record.accountPhoneNumber
+          ? record.accountPhoneNumber
+          : record.phoneNumber;
+      },
     },
     {
       title: "Tổng tiền",
       key: "totalPrice",
       render: (text, record) => {
-        return numeral(record.totalPrice + record.shipPrice - record?.priceReduce)
-          .format('0,0') + 'đ';
+        return (
+          numeral(
+            record.totalPrice + record.shipPrice - record?.priceReduce
+          ).format("0,0") + "đ"
+        );
       },
     },
     {
@@ -122,7 +125,7 @@ const BillManagement = () => {
       dataIndex: "createdDate",
       key: "createdDate",
       render: (createdDate) => {
-        return moment(new Date(...createdDate)).format('HH:mm:ss DD/MM/YYYY');
+        return moment(new Date(...createdDate)).format("HH:mm:ss DD/MM/YYYY");
       },
     },
     {
@@ -134,10 +137,10 @@ const BillManagement = () => {
           object === "Unpaid"
             ? "geekblue"
             : object.toLocaleLowerCase() === "PAID".toLocaleLowerCase()
-              ? "green"
-              : object === "Cancel"
-                ? "red"
-                : null;
+            ? "green"
+            : object === "Cancel"
+            ? "red"
+            : null;
         return (
           <Space direction="vertical">
             <div style={{ width: "auto", display: "flex" }}>
@@ -145,8 +148,8 @@ const BillManagement = () => {
                 {object === "Unpaid"
                   ? "Chưa thanh toán"
                   : object === "Cancel"
-                    ? "Đã hủy"
-                    : "Đã thanh toán"}
+                  ? "Đã hủy"
+                  : "Đã thanh toán"}
               </Tag>
             </div>
           </Space>
@@ -181,7 +184,9 @@ const BillManagement = () => {
     console.log(params);
     axios
       .get(`http://localhost:8080/api/admin/bill`, {
-        params: params,
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
       })
       .then((response) => {
         setData(response.data);

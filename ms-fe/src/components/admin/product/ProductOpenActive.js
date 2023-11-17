@@ -4,6 +4,7 @@ import Modal from "antd/es/modal/Modal";
 import axios from "axios";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { getToken } from "../../../service/Token";
 
 const ProductOpenActive = ({ product, onCancel, open, render }) => {
   const navigate = useNavigate();
@@ -21,7 +22,12 @@ const ProductOpenActive = ({ product, onCancel, open, render }) => {
           "&status=" +
           (activeProduct === true ? "ACTIVE" : "INACTIVE") +
           "&openAll=" +
-          openAll
+          openAll,
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
       )
       .then((response) => {
         messageApi.success(

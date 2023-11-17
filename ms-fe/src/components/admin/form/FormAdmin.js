@@ -5,6 +5,7 @@ import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
 import FormTable from "./FormTable";
 import styles from "./FormStyle.module.css";
 import axios from "axios";
+import { getToken } from "../../../service/Token";
 
 const FormAdmin = function () {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -22,7 +23,11 @@ const FormAdmin = function () {
     values.status = "ACTIVE";
     // Gọi API để thêm dữ liệu
     axios
-      .post("http://localhost:8080/api/admin/form/create", values)
+      .post("http://localhost:8080/api/admin/form/create", values, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((response) => {
         // Xử lý thành công
         console.log("Thêm thành công");

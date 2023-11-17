@@ -90,13 +90,14 @@ public class AccountServiceImpl implements AccountService {
                 .district(request.getDistrict())
                 .ward(request.getWard())
                 .build();
-        Address createAddress = addressRepository.save(address);
-
-        AddressDetail addressDetail = AddressDetail.builder()
-                .accountAddress(createAccount)
-                .addressDetail(createAddress)
-                .build();
-        addressDetailRepository.save(addressDetail);
+        if(!address.getCity().equals("empty") || !address.getDistrict().equals("empty") ||!address.getWard().equals("empty")){
+            Address createAddress = addressRepository.save(address);
+            AddressDetail addressDetail = AddressDetail.builder()
+                    .accountAddress(createAccount)
+                    .addressDetail(createAddress)
+                    .build();
+            addressDetailRepository.save(addressDetail);
+        }
         return createAccount;
     }
 
@@ -143,7 +144,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public AccountDetailResponce detail(String username) {
         List<AddressDetail> accountAddressDetails = addressDetailService.getAddressDetailsByUsername(username);
-        Account account = accountAddressDetails.get(0).getAccountAddress();
+        Account account = accountRepository.findById(username).orElse(null);
         if (account == null) {
             throw new IllegalArgumentException("username không tồn tại");
         }

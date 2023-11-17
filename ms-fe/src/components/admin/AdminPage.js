@@ -30,6 +30,7 @@ import SaveVoucher from "./voucher/SaveVoucher";
 import StatisticalIndex from "./statistical/StatisticalIndex";
 import { useState } from "react";
 import { NotificationProvider } from "../element/notification/Notification";
+import ReturnIndex from "./return/ReturnIndex";
 
 function AdminPage() {
   const [message, setMessage] = useState("");
@@ -64,7 +65,10 @@ function AdminPage() {
                 </Route>
                 {/* Đơn hàng */}
                 <Route path="order" element={<BillManagement />}></Route>
-                {/* Thu chi */}
+                {/* Trả hàng */}
+                <Route path="return">
+                  <Route index element={<ReturnIndex />}></Route>
+                </Route>
                 {/* ví dụ path= san-pham/hien-thi ->  
                       path="income-and-expenses"
                       element="income-and-expenses"

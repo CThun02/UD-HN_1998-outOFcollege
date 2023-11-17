@@ -229,6 +229,7 @@ const BillManagement = () => {
       setBillType(newValue);
     }
   };
+
   useEffect(() => {
     fetchData();
   }, [billCode, startDate, endDate, status, billType, symbol]);

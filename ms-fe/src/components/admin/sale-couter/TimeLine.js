@@ -59,8 +59,8 @@ const BillTimeLine = (addId) => {
 
     const handleOkConFirm = (note) => {
         handleCreateTimeline(note, action === 'cancel' ? '0' : null);
-        if (billInfo.symbol === 'Shipping' && timelines.length === 3 && billInfo.status !== 'Paid') {
-            handleUpdateBillStatus(action === 'cancel' ? 'cancel' : 'paid', billInfo.totalPrice + billInfo?.shipPrice - billInfo.priceReduce);
+        if (billInfo.symbol === 'Shipping') {
+            handleUpdateBillStatus(action === 'cancel' ? 'Cancel' : 'Paid', 0);
         }
         setIsModalConfirm(false);
     };

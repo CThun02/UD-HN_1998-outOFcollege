@@ -11,7 +11,7 @@ async function getAuthToken() {
       const data = await res.data;
       return data;
     } catch (err) {
-      console.log("err: ", err);
+      window.localStorage.removeItem("auth_token");
     }
   }
 }

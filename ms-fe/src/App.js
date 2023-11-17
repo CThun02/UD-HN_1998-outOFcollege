@@ -15,7 +15,11 @@ function App() {
             <Route index element={<ClientPage />} />
             <Route path="api/*" element={<AdminPage />} />
             <Route path="ms-shop/*" element={<ClientPage />} />
-            <Route path="authen/*" element={<Authen />} />
+            <Route path="authen/*" element={<Authen isAuthenAdmin={false} />} />
+            <Route
+              path="authen/admin/*"
+              element={<Authen isAuthenAdmin={true} />}
+            />
             <Route
               path="*"
               element={

@@ -3,14 +3,13 @@ import styles from "./HeaderRight.module.css";
 import { Link } from "react-router-dom";
 import { UserOutlined, ShoppingCartOutlined } from "@ant-design/icons";
 import { getAuthToken, clearAuthToken } from "../../../../service/Token";
-import { useContext } from "react";
 import { NotificationContext } from "../../../element/notification/NotificationAuthen";
 import { useEffect } from "react";
 import { useState } from "react";
 
 function HeaderRight() {
   // const { showSuccessNotification } = useContext(NotificationContext);
-  const [user, setUser] = useState("aaa");
+  const [user, setUser] = useState("");
   const [usernameEncode, setUsernameEncode] = useState("");
 
   useEffect(() => {

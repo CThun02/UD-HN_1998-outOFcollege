@@ -14,6 +14,7 @@ import Modal from "antd/es/modal/Modal";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import styles from "./ProductDetails.module.css";
+import { getToken } from "../../../service/Token";
 
 const ProductDetails = (props) => {
   const api = "http://localhost:8080/api/admin/";
@@ -396,7 +397,12 @@ const ProductDetails = (props) => {
           "&minPrice=" +
           price[0] +
           "&maxPrice=" +
-          price[1]
+          price[1],
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
       )
       .then((response) => {
         setProductDetails(response.data);
@@ -413,7 +419,11 @@ const ProductDetails = (props) => {
   useEffect(() => {
     filter();
     axios
-      .get(api + "brand")
+      .get(api + "brand", {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((res) => {
         setBrands(res.data);
       })
@@ -421,7 +431,11 @@ const ProductDetails = (props) => {
         console.log(error);
       });
     axios
-      .get(api + "category")
+      .get(api + "category", {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((res) => {
         setCategories(res.data);
       })
@@ -429,7 +443,11 @@ const ProductDetails = (props) => {
         console.log(error);
       });
     axios
-      .get(api + "product/getproductfilterByCom")
+      .get(api + "product/getproductfilterByCom", {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((response) => {
         setProducts(response.data);
         setLoading(false);
@@ -438,7 +456,11 @@ const ProductDetails = (props) => {
         console.log(error);
       });
     axios
-      .get(api + "size")
+      .get(api + "size", {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((response) => {
         setSizes(response.data);
       })
@@ -446,7 +468,11 @@ const ProductDetails = (props) => {
         console.log(error);
       });
     axios
-      .get(api + "color")
+      .get(api + "color", {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((response) => {
         setColors(response.data);
       })
@@ -454,7 +480,11 @@ const ProductDetails = (props) => {
         console.log(error);
       });
     axios
-      .get(api + "button")
+      .get(api + "button", {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((response) => {
         setButtons(response.data);
       })
@@ -462,7 +492,11 @@ const ProductDetails = (props) => {
         console.log(error);
       });
     axios
-      .get(api + "material")
+      .get(api + "material", {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((response) => {
         setMaterials(response.data);
       })
@@ -470,7 +504,11 @@ const ProductDetails = (props) => {
         console.log(error);
       });
     axios
-      .get(api + "collar")
+      .get(api + "collar", {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((response) => {
         setCollars(response.data);
       })
@@ -478,7 +516,11 @@ const ProductDetails = (props) => {
         console.log(error);
       });
     axios
-      .get(api + "pattern")
+      .get(api + "pattern", {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((response) => {
         setPatterns(response.data);
       })
@@ -486,7 +528,11 @@ const ProductDetails = (props) => {
         console.log(error);
       });
     axios
-      .get(api + "form")
+      .get(api + "form", {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((response) => {
         setForms(response.data);
       })
@@ -494,7 +540,11 @@ const ProductDetails = (props) => {
         console.log(error);
       });
     axios
-      .get(api + "shirt-tail")
+      .get(api + "shirt-tail", {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((response) => {
         setshirtTails(response.data);
       })
@@ -502,7 +552,11 @@ const ProductDetails = (props) => {
         console.log(error);
       });
     axios
-      .get(api + "sleeve")
+      .get(api + "sleeve", {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((response) => {
         setSleeves(response.data);
       })

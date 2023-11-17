@@ -5,6 +5,7 @@ import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
 import MaterialTable from "./MaterialTable";
 import styles from "../categorystyles/CategoryStyles.module.css";
 import axios from "axios";
+import { getToken } from "../../../service/Token";
 const { Option } = Select;
 const MaterialAdmin = function () {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -22,7 +23,11 @@ const MaterialAdmin = function () {
     values.status = "ACTIVE";
     // Gọi API để thêm dữ liệu
     axios
-      .post("http://localhost:8080/api/admin/material/create", values)
+      .post("http://localhost:8080/api/admin/material/create", values, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((response) => {
         // Xử lý thành công
         console.log("Thêm thành công");

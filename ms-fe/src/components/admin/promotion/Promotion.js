@@ -28,6 +28,7 @@ import { useContext } from "react";
 import { NotificationContext } from "../../element/notification/Notification";
 import numeral from "numeral";
 import SockJs from "../../../service/SockJs";
+import { getToken } from "../../../service/Token";
 
 const baseUrl = "http://localhost:8080/api/admin/promotion-product/";
 const basePromotionUrl = "http://localhost:8080/api/admin/promotion/";
@@ -161,7 +162,11 @@ function Promotion() {
         async function changeStatusPromotion() {
           try {
             await axios
-              .get(basePromotionUrl + "update-status/" + value[0])
+              .get(basePromotionUrl + "update-status/" + value[0], {
+                headers: {
+                  Authorization: `Bearer ${getToken()}`,
+                },
+              })
               .then((res) => {
                 apiNotification.success({
                   message: `Success`,
@@ -224,7 +229,12 @@ function Promotion() {
                   pageSize
                 : baseUrl
             }`,
-            filter
+            filter,
+            {
+              headers: {
+                Authorization: `Bearer ${getToken()}`,
+              },
+            }
           );
 
           const data = res.data;

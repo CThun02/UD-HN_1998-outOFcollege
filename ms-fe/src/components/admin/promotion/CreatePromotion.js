@@ -27,6 +27,7 @@ import { useContext } from "react";
 import { NotificationContext } from "../../element/notification/Notification";
 import TableProduct from "./TableProduct";
 import ProductsDetails from "../../element/products-details/ProductsDetails";
+import { getToken } from "../../../service/Token";
 
 const { confirm } = Modal;
 
@@ -151,7 +152,11 @@ function CreatePromotion() {
                 productDetailIds: onDeleteProductDetailIds,
               };
               await axios
-                .post(baseUrlPromotionProduct + "delete", dto)
+                .post(baseUrlPromotionProduct + "delete", dto, {
+                  headers: {
+                    Authorization: `Bearer ${getToken()}`,
+                  },
+                })
                 .then((res) => console.log(res))
                 .catch((e) => console.log("deleteError: ", e));
             }
@@ -162,29 +167,37 @@ function CreatePromotion() {
           setIsLoading(true);
           if (promotion) {
             await axios
-              .post(baseUrl + "save", {
-                ...promotion,
-                startDate: moment(promotion?.startDate.$d).format(
-                  "YYYY-MM-DDTHH:mm:ss.SSS"
-                ),
-                endDate: moment(promotion?.endDate.$d).format(
-                  "YYYY-MM-DDTHH:mm:ss.SSS"
-                ),
-                promotionValue: isNaN(promotion?.promotionValue)
-                  ? Number.parseInt(
-                      promotion?.promotionValue?.replace(/,/g, "")
-                    )
-                  : promotion?.promotionValue,
-                promotionId: promotion?.promotionId
-                  ? promotion?.promotionId
-                  : "",
-                promotionCode: promotion?.promotionCode
-                  ? promotion?.promotionCode
-                  : "",
-                promotionName: promotion?.promotionName,
-                promotionNameCurrent: promotion?.promotionNameCurrent,
-                productDetailIds: productsDetailsId,
-              })
+              .post(
+                baseUrl + "save",
+                {
+                  ...promotion,
+                  startDate: moment(promotion?.startDate.$d).format(
+                    "YYYY-MM-DDTHH:mm:ss.SSS"
+                  ),
+                  endDate: moment(promotion?.endDate.$d).format(
+                    "YYYY-MM-DDTHH:mm:ss.SSS"
+                  ),
+                  promotionValue: isNaN(promotion?.promotionValue)
+                    ? Number.parseInt(
+                        promotion?.promotionValue?.replace(/,/g, "")
+                      )
+                    : promotion?.promotionValue,
+                  promotionId: promotion?.promotionId
+                    ? promotion?.promotionId
+                    : "",
+                  promotionCode: promotion?.promotionCode
+                    ? promotion?.promotionCode
+                    : "",
+                  promotionName: promotion?.promotionName,
+                  promotionNameCurrent: promotion?.promotionNameCurrent,
+                  productDetailIds: productsDetailsId,
+                },
+                {
+                  headers: {
+                    Authorization: `Bearer ${getToken()}`,
+                  },
+                }
+              )
               .then(() => {
                 setIsLoading(false);
                 navigate("/api/admin/promotion");
@@ -221,42 +234,51 @@ function CreatePromotion() {
     function () {
       if (code) {
         async function getPromotion() {
-          await axios.get(baseUrl + code).then((res) => {
-            const {
-              promotionId,
-              promotionCode,
-              promotionName,
-              promotionMethod,
-              promotionValue,
-              startDate,
-              endDate,
-              status,
-              productDetailIds,
-              productIdsResponse,
-            } = res.data;
+          await axios
+            .get(baseUrl + code, {
+              headers: {
+                Authorization: `Bearer ${getToken()}`,
+              },
+            })
+            .then((res) => {
+              const {
+                promotionId,
+                promotionCode,
+                promotionName,
+                promotionMethod,
+                promotionValue,
+                startDate,
+                endDate,
+                status,
+                productDetailIds,
+                productIdsResponse,
+              } = res.data;
 
-            ref.current.setFieldValue("promotionId", promotionId);
-            ref.current.setFieldValue("promotionCode", promotionCode);
-            ref.current.setFieldValue("promotionName", promotionName);
-            ref.current.setFieldValue("promotionMethod", promotionMethod);
-            ref.current.setFieldValue(
-              "promotionValue",
-              handleChangeNumber(promotionValue)
-            );
-            ref.current.setFieldValue(
-              "startDate",
-              dayjs(moment(startDate).format(dateFormat), dateFormat)
-            );
-            ref.current.setFieldValue(
-              "endDate",
-              dayjs(moment(endDate).format(dateFormat), dateFormat)
-            );
-            ref.current.setFieldValue("status", status);
-            ref.current.setFieldValue("productsDetailsIdDb", productDetailIds);
-            setProductsDetailsId(productDetailIds);
-            setProductsId(productIdsResponse);
-            setStatus(status);
-          });
+              ref.current.setFieldValue("promotionId", promotionId);
+              ref.current.setFieldValue("promotionCode", promotionCode);
+              ref.current.setFieldValue("promotionName", promotionName);
+              ref.current.setFieldValue("promotionMethod", promotionMethod);
+              ref.current.setFieldValue(
+                "promotionValue",
+                handleChangeNumber(promotionValue)
+              );
+              ref.current.setFieldValue(
+                "startDate",
+                dayjs(moment(startDate).format(dateFormat), dateFormat)
+              );
+              ref.current.setFieldValue(
+                "endDate",
+                dayjs(moment(endDate).format(dateFormat), dateFormat)
+              );
+              ref.current.setFieldValue("status", status);
+              ref.current.setFieldValue(
+                "productsDetailsIdDb",
+                productDetailIds
+              );
+              setProductsDetailsId(productDetailIds);
+              setProductsId(productIdsResponse);
+              setStatus(status);
+            });
         }
         getPromotion();
       }

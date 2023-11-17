@@ -11,9 +11,17 @@ async function getAuthToken() {
       const data = await res.data;
       return data;
     } catch (err) {
-      return err;
+      console.log("err: ", err);
     }
   }
+}
+
+function getToken() {
+  const token = window.localStorage.getItem("auth_token");
+  if (token) {
+    return atob(token);
+  }
+  return null;
 }
 
 const setAuthHeader = (token) => {
@@ -57,4 +65,11 @@ const fetchData = async () => {
   }
 };
 
-export { getAuthToken, setAuthHeader, request, fetchData, clearAuthToken };
+export {
+  getAuthToken,
+  setAuthHeader,
+  request,
+  fetchData,
+  clearAuthToken,
+  getToken,
+};

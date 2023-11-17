@@ -32,6 +32,7 @@ import PieChart from "./PieChart";
 import TableProdutSellTheMost from "./TableProdutSellTheMost";
 import dayjs from "dayjs";
 import Checkbox from "antd/es/checkbox/Checkbox";
+import { getToken } from "../../../service/Token";
 
 var currentDate = new Date();
 
@@ -305,7 +306,12 @@ const StatisticalIndex = () => {
             "&monthTo=" +
             monthTo +
             "&dayTo=" +
-            dayTo
+            dayTo,
+          {
+            headers: {
+              Authorization: `Bearer ${getToken()}`,
+            },
+          }
         )
         .then((res) => {
           setBillRevenueCompare(res.data);
@@ -319,7 +325,12 @@ const StatisticalIndex = () => {
     axios
       .get(
         "http://localhost:8080/api/admin/bill/getDataLineChart?years=" +
-          checkedList.join(",")
+          checkedList.join(","),
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
       )
       .then((res) => {
         setData(res.data);
@@ -335,7 +346,12 @@ const StatisticalIndex = () => {
         "http://localhost:8080/api/admin/bill/getGrossRevenue?quantityDisplay=" +
           pageSize +
           "&date=" +
-          dateRevenue
+          dateRevenue,
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
       )
       .then((res) => {
         setLoading(false);
@@ -343,7 +359,11 @@ const StatisticalIndex = () => {
       })
       .catch((err) => console.log(err));
     axios
-      .get("http://localhost:8080/api/admin/bill/getBusinessYear")
+      .get("http://localhost:8080/api/admin/bill/getBusinessYear", {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((res) => {
         setPlainOptions(res.data);
       })

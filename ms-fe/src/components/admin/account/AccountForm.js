@@ -27,6 +27,7 @@ import {
 } from "../product/ValidateForm";
 import dayjs from "dayjs";
 import QRReader from "../../../service/QRReader";
+import { getToken } from "../../../service/Token";
 // Nhập ảnh mã QR
 const MyForm = (props) => {
   const navigate = useNavigate();
@@ -174,7 +175,12 @@ const MyForm = (props) => {
                 "http://localhost:8080/api/admin/account/getByEmailOrNumberPhoneOrIdNo?idRole=" +
                   roleId +
                   "&keyWords=" +
-                  accountScan.idNo
+                  accountScan.idNo,
+                {
+                  headers: {
+                    Authorization: `Bearer ${getToken()}`,
+                  },
+                }
               )
               .then((response) => {
                 if (
@@ -187,7 +193,12 @@ const MyForm = (props) => {
                       "http://localhost:8080/api/admin/account/getByEmailOrNumberPhoneOrIdNo?idRole=" +
                         roleId +
                         "&keyWords=" +
-                        accountScan.email
+                        accountScan.email,
+                      {
+                        headers: {
+                          Authorization: `Bearer ${getToken()}`,
+                        },
+                      }
                     )
                     .then((response) => {
                       if (
@@ -200,7 +211,12 @@ const MyForm = (props) => {
                             "http://localhost:8080/api/admin/account/getByEmailOrNumberPhoneOrIdNo?idRole=" +
                               roleId +
                               "&keyWords=" +
-                              accountScan.numberPhone
+                              accountScan.numberPhone,
+                            {
+                              headers: {
+                                Authorization: `Bearer ${getToken()}`,
+                              },
+                            }
                           )
                           .then((response) => {
                             if (
@@ -221,7 +237,12 @@ const MyForm = (props) => {
                                     axios
                                       .post(
                                         "http://localhost:8080/api/admin/account/create",
-                                        accountScan
+                                        accountScan,
+                                        {
+                                          headers: {
+                                            Authorization: `Bearer ${getToken()}`,
+                                          },
+                                        }
                                       )
                                       .then(() => {
                                         notification.open({

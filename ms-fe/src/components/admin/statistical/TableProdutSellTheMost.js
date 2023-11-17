@@ -2,6 +2,7 @@ import { Badge, Carousel, Col, Row, Table } from "antd";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import styles from "./StatisticalIndex.module.css";
+import { getToken } from "../../../service/Token";
 
 const TableProdutSellTheMost = () => {
   const [data, setData] = useState([]);
@@ -162,7 +163,11 @@ const TableProdutSellTheMost = () => {
   ];
   useEffect(() => {
     axios
-      .get("http://localhost:8080/api/admin/bill/getBillProductSellTheMost")
+      .get("http://localhost:8080/api/admin/bill/getBillProductSellTheMost", {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((res) => {
         setLoading(false);
         setData(res.data);

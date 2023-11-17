@@ -43,6 +43,7 @@ import QRReader from "../../../service/QRReader";
 import FormUsingVoucher from "../../element/voucher/FormUsingVoucher";
 import numeral from "numeral";
 import SearchNameOrCodeVoucher from "../../element/voucher/SearchNameOrCodeVoucher";
+import { getToken } from "../../../service/Token";
 
 const Bill = () => {
   var initialItems = [];
@@ -756,7 +757,11 @@ const Bill = () => {
   const getListAddressByUsername = (username) => {
     if (username) {
       axios
-        .get(`http://localhost:8080/api/admin/account/detail/${username}`)
+        .get(`http://localhost:8080/api/admin/account/detail/${username}`, {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        })
         .then((response) => {
           setAddress(response.data);
         })
@@ -769,7 +774,12 @@ const Bill = () => {
     axios
       .get(
         "http://localhost:8080/api/admin/product/getproductdetailbyidpd?productDetailId=" +
-          result
+          result,
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
       )
       .then((response) => {
         var cart = JSON.parse(localStorage.getItem(cartId));
@@ -959,7 +969,12 @@ const Bill = () => {
               setErrors({});
               const response = await axios.post(
                 "http://localhost:8080/api/admin/address",
-                billAddress
+                billAddress,
+                {
+                  headers: {
+                    Authorization: `Bearer ${getToken()}`,
+                  },
+                }
               );
               addressId = response.data.id;
             } catch (error) {
@@ -980,7 +995,12 @@ const Bill = () => {
           try {
             const response = await axios.post(
               "http://localhost:8080/api/admin/bill",
-              bill
+              bill,
+              {
+                headers: {
+                  Authorization: `Bearer ${getToken()}`,
+                },
+              }
             );
             if (switchChange[index]) {
               await axios.post(
@@ -990,6 +1010,11 @@ const Bill = () => {
                   addressId: account ? selectedAddress?.id : addressId,
                   shipDate: switchChange[index] === true ? leadtime : null,
                   shipPrice: switchChange[index] === true ? shippingFee : null,
+                },
+                {
+                  headers: {
+                    Authorization: `Bearer ${getToken()}`,
+                  },
                 }
               );
             }

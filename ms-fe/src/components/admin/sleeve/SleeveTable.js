@@ -4,6 +4,7 @@ import { Table, Space, Button, Modal, Input, message, Switch } from "antd";
 import { useEffect, useState } from "react";
 import styles from "../categorystyles/CategoryStyles.module.css";
 import axios from "axios";
+import { getToken } from "../../../service/Token";
 
 const SleeveTable = function (props) {
   const [data, setData] = useState([]);
@@ -34,7 +35,11 @@ const SleeveTable = function (props) {
   };
   const handleConfirmDelete = () => {
     axios
-      .delete(`http://localhost:8080/api/admin/sleeve/delete/${selectedData}`)
+      .delete(`http://localhost:8080/api/admin/sleeve/delete/${selectedData}`, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((response) => {
         // Xoá dữ liệu thành công
         // Cập nhật lại danh sách dữ liệu sau khi xoá
@@ -48,9 +53,17 @@ const SleeveTable = function (props) {
 
   const handleUpdate = () => {
     axios
-      .put(`http://localhost:8080/api/admin/sleeve/edit/${id}`, {
-        sleeveName,
-      })
+      .put(
+        `http://localhost:8080/api/admin/sleeve/edit/${id}`,
+        {
+          sleeveName,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
+      )
       .then((response) => {
         // Cập nhật lại danh sách dữ liệu sau khi cập nhật thành công
         // Đóng modal
@@ -66,9 +79,17 @@ const SleeveTable = function (props) {
     const updatedStatusValue = statusUpdate ? "ACTIVE" : "INACTIVE"; // Cập nhật trạng thái dựa trên giá trị của statusUpdate
 
     axios
-      .put(`http://localhost:8080/api/admin/sleeve/updateStatus/${id}`, {
-        status: updatedStatusValue,
-      })
+      .put(
+        `http://localhost:8080/api/admin/sleeve/updateStatus/${id}`,
+        {
+          status: updatedStatusValue,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
+      )
       .then((response) => {
         setRender(Math.random);
         if (statusUpdate) {
@@ -84,7 +105,11 @@ const SleeveTable = function (props) {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:8080/api/admin/sleeve`)
+      .get(`http://localhost:8080/api/admin/sleeve`, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((response) => {
         setData(response.data);
         console.log(response.data);

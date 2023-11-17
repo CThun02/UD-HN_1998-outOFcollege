@@ -28,6 +28,7 @@ import axios from "axios";
 import moment from "moment";
 import { NotificationContext } from "../../element/notification/Notification";
 import SockJs from "../../../service/SockJs";
+import { getToken } from "../../../service/Token";
 
 const baseUrl = "http://localhost:8080/api/admin/vouchers/";
 
@@ -76,7 +77,11 @@ function Voucher() {
         async function changeStatusVoucher() {
           try {
             await axios
-              .put(baseUrl + "update/" + value[0])
+              .put(baseUrl + "update/" + value[0], {
+                headers: {
+                  Authorization: `Bearer ${getToken()}`,
+                },
+              })
               .then((res) => {
                 apiNotification.success({
                   message: `Success`,
@@ -130,7 +135,12 @@ function Voucher() {
                   pageSize
                 : baseUrl
             }`,
-            filter
+            filter,
+            {
+              headers: {
+                Authorization: `Bearer ${getToken()}`,
+              },
+            }
           );
 
           const data = await res.data;

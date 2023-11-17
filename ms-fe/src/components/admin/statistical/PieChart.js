@@ -3,6 +3,7 @@ import { Pie } from "@ant-design/plots";
 import axios from "axios";
 import Statistic from "antd/es/statistic/Statistic";
 import { Col, Row } from "antd";
+import { getToken } from "../../../service/Token";
 
 const PieChart = () => {
   const [billRevenueCompare, setBillRevenueCompare] = useState({});
@@ -39,7 +40,11 @@ const PieChart = () => {
   };
   useEffect(() => {
     axios
-      .get("http://localhost:8080/api/admin/bill/getBillRevenueCompare")
+      .get("http://localhost:8080/api/admin/bill/getBillRevenueCompare", {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((res) => {
         setBillRevenueCompare(res.data);
       })

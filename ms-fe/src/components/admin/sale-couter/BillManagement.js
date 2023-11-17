@@ -12,6 +12,7 @@ import { DatePicker, Space } from "antd";
 import axios from "axios";
 import moment from "moment";
 import { Link } from "react-router-dom";
+import { getToken } from "../../../service/Token";
 const { RangePicker } = DatePicker;
 
 const BillManagement = () => {
@@ -161,9 +162,17 @@ const BillManagement = () => {
     };
     console.log(params);
     axios
-      .get(`http://localhost:8080/api/admin/bill`, {
-        params: params,
-      })
+      .get(
+        `http://localhost:8080/api/admin/bill`,
+        {
+          params: params,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
+      )
       .then((response) => {
         setData(response.data);
         setLoading(false);

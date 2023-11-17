@@ -12,6 +12,7 @@ import axios from "axios";
 import Input from "antd/es/input/Input";
 import { Link } from "react-router-dom";
 import ProductOpenActive from "./ProductOpenActive";
+import { getToken } from "../../../service/Token";
 
 const ProductIndex = () => {
   const api = "http://localhost:8080/api/admin/";
@@ -102,7 +103,12 @@ const ProductIndex = () => {
           "product/getproductfilterByCom?status=" +
           status +
           "&keywords=" +
-          keywords
+          keywords,
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
       )
       .then((res) => {
         setProductsTable(res.data);
@@ -120,7 +126,12 @@ const ProductIndex = () => {
           "product/updateProductStatus?productId=" +
           product.id +
           "&status=" +
-          "INACTIVE"
+          "INACTIVE",
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
       )
       .then((response) => {
         setTimeout(() => {

@@ -3,11 +3,14 @@ import SignIn from "./sign-in/SignIn";
 import SignUp from "./sign-up/SignUp";
 import { Result, Button } from "antd";
 
-function Authen() {
+function Authen({ isAuthenAdmin }) {
   return (
     <div>
       <Routes>
-        <Route path="sign-in" element={<SignIn />} />
+        <Route
+          path="sign-in"
+          element={<SignIn isAuthenAdmin={isAuthenAdmin} />}
+        />
         <Route path="sign-up" element={<SignUp />} />
         <Route
           path="*"

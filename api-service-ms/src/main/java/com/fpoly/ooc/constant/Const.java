@@ -39,6 +39,8 @@ public class Const {
     public static final String VOUCHER_ACCOUNT_NOT_FOUND = "VOUCHER_ACCOUNT_NOT_FOUND";
     public static final String IS_SEND_EMAIL_MEMBER_REQUIRED = "IS_SEND_EMAIL_MEMBER_REQUIRED";
     public static final String ARRAYS_CUSTOMER_NOT_NULL = "ARRAYS_CUSTOMER_NOT_NULL";
+    public static final String PASSWORD_NOT_CORRECT = "PASSWORD_NOT_CORRECT";
+    public static final String ADDRESS_NOT_FOUND = "ADDRESS_NOT_FOUND";
 
 
     //ErrorCode

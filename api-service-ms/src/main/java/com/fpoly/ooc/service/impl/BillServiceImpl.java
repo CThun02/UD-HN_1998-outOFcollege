@@ -221,11 +221,6 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
-    public List<Integer> getBusinessYear() {
-        return billRepo.getBusinessYear();
-    }
-
-    @Override
     public List<BillLineChartResponse> getDataLineChart(Integer dayFrom, Integer monthFrom, Integer yearFrom,
                                                         Integer dayTo, Integer monthTo, Integer yearTo) {
         List<Integer> listYear = new ArrayList<>();

@@ -4,6 +4,7 @@ import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
 import BrandTable from "./BrandTable";
 import styles from "./BrandStyle.module.css";
 import axios from "axios";
+import { getToken } from "../../../service/Token";
 
 const BrandAdmin = function () {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -21,7 +22,11 @@ const BrandAdmin = function () {
     values.status = "ACTIVE";
     // Gọi API để thêm dữ liệu
     axios
-      .post("http://localhost:8080/api/admin/brand/create", values)
+      .post("http://localhost:8080/api/admin/brand/create", values, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((response) => {
         // Xử lý thành công
         console.log("Thêm thành công");

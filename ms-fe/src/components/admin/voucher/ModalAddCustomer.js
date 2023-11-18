@@ -16,6 +16,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import FloatingLabels from "../../element/FloatingLabels/FloatingLabels";
 import styles from "./ModalAddCustomer.module.css";
+import { getToken } from "../../../service/Token";
 
 const columns = [
   {
@@ -111,7 +112,12 @@ function ModalAddCustomer({
                   pageSize
                 : baseCustomersUrl + "voucher"
             }`,
-            filterCustomer
+            filterCustomer,
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
           )
           .then((res) => {
             setTotalElements(res.data.totalElements);

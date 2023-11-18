@@ -31,6 +31,7 @@ import Statistic from "antd/es/statistic/Statistic";
 import PieChart from "./PieChart";
 import TableProdutSellTheMost from "./TableProdutSellTheMost";
 import dayjs from "dayjs";
+import { getToken } from "../../../service/Token";
 
 var currentDate = new Date();
 
@@ -298,7 +299,12 @@ const StatisticalIndex = () => {
             "&monthTo=" +
             monthTo +
             "&dayTo=" +
-            dayTo
+            dayTo,
+          {
+            headers: {
+              Authorization: `Bearer ${getToken()}`,
+            },
+          }
         )
         .then((res) => {
           setBillRevenueCompare(res.data);
@@ -393,7 +399,12 @@ const StatisticalIndex = () => {
           "&month=" +
           month +
           "&year=" +
-          year
+          year,
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
       )
       .then((res) => {
         setLoading(false);

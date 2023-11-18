@@ -46,14 +46,11 @@ public interface BillService {
     public BillRevenueCompareDate compareRevenueDate(Integer dayFrom, Integer monthFrom, Integer yearFrom,
                                                      Integer dayTo, Integer monthTo, Integer yearTo);
 
-    List<Integer> getBusinessYear();
-
     List<BillLineChartResponse> getDataLineChart(Integer dayFrom, Integer monthFrom, Integer yearFrom,
                                                  Integer dayTo, Integer monthTo, Integer yearTo);
 
     List<ProductDetailSellResponse> getProductDetailSellInStore(ProductDetailRequest request, BigDecimal minPrice, BigDecimal maxPrice);
 
     List<BillReturnRequestResponse> getReturnRequestByStatus(String status);
-
 
 }

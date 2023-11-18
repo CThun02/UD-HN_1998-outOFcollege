@@ -48,9 +48,6 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
                             @Param("yearParam") Integer year,
                             @Param("billType") String billType);
 
-    @Query("SELECT distinct YEAR(b.createdAt) from Bill b")
-    List<Integer> getBusinessYear();
-
     @Query("SELECT pd.id AS id, pd.product AS product, pd.brand as brand, pd.category as category, pd.button AS button," +
             "       pd.material AS material, pd.collar AS collar, pd.sleeve AS sleeve, pd.size AS size," +
             "       pd.color AS color, pd.shirtTail AS shirtTail," +

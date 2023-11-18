@@ -4,6 +4,7 @@ import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
 import ShirtTypeTable from "./ShirtTypeTable";
 import styles from "../categorystyles/CategoryStyles.module.css";
 import axios from "axios";
+import { getToken } from "../../../service/Token";
 
 const ShirtTailAdmin = function () {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -21,7 +22,11 @@ const ShirtTailAdmin = function () {
     values.status = "ACTIVE";
     // Gọi API để thêm dữ liệu
     axios
-      .post("http://localhost:8080/api/admin/shirt-tail/create", values)
+      .post("http://localhost:8080/api/admin/shirt-tail/create", values, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((response) => {
         // Xử lý thành công
         console.log("Thêm thành công");
@@ -34,7 +39,7 @@ const ShirtTailAdmin = function () {
       });
   };
 
-  useEffect(() => { }, [render]);
+  useEffect(() => {}, [render]);
   return (
     <div className={styles.category}>
       <div className={styles.customer}>

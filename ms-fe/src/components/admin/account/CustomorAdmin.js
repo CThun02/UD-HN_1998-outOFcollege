@@ -10,6 +10,7 @@ import {
 import CustomerTable from "./CustomerAdminTable";
 import styles from "./styles/CustomerIndex.module.css";
 import axios from "axios";
+import { getToken } from "../../../service/Token";
 
 const CustomerAddminIndex = function (props) {
   const [value, setValue] = useState(1);
@@ -32,7 +33,12 @@ const CustomerAddminIndex = function (props) {
         "http://localhost:8080/api/admin/account/viewAll?roleId=" +
           roleId +
           "&keyword=" +
-          keyword
+          keyword,
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
       )
       .then((response) => {
         setData(response.data);

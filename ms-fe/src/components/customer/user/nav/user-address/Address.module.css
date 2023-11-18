@@ -1,0 +1,22 @@
+.content {
+  padding: 10px 32px;
+  padding-bottom: 24px;
+}
+
+.title {
+  padding: 10px 0;
+}
+
+.title {
+  border-bottom: 1px solid #ccc;
+}
+
+.textColor {
+  color: #111111;
+}
+
+.plusIcon:hover {
+  cursor: pointer;
+  color: #39a7ff;
+  transition: 0.3s linear;
+}

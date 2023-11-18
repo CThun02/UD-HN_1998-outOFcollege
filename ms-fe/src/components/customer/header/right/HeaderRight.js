@@ -3,28 +3,28 @@ import styles from "./HeaderRight.module.css";
 import { Link } from "react-router-dom";
 import { UserOutlined, ShoppingCartOutlined } from "@ant-design/icons";
 import { getAuthToken, clearAuthToken } from "../../../../service/Token";
-import { useContext } from "react";
 import { NotificationContext } from "../../../element/notification/NotificationAuthen";
 import { useEffect } from "react";
 import { useState } from "react";
 import axios from "axios";
 
 function HeaderRight() {
-  const { showSuccessNotification } = useContext(NotificationContext);
+  // const { showSuccessNotification } = useContext(NotificationContext);
   const [user, setUser] = useState("");
+  const [usernameEncode, setUsernameEncode] = useState("");
   const [data, setData] = useState(null);
-  const cartAPI = 'http://localhost:8080/api/admin/cart';
-  const token = getAuthToken();
+  const cartAPI = "http://localhost:8080/api/admin/cart";
   useEffect(() => {
     return () =>
-      token
+      getAuthToken()
         .then((data) => {
           setUser(data?.fullName);
-          setData(data?.username);
+          const enCodeData = btoa(JSON.stringify(data?.username));
+          const convertPath = enCodeData.replace(/\//g, "-----");
+          setUsernameEncode(convertPath);
         })
         .catch((error) => {
           console.log(error);
-          showSuccessNotification({ error }, "login");
         });
   }, []);
 
@@ -84,7 +84,11 @@ function HeaderRight() {
               <Col span={4}>
                 <p className={styles.cssParagraph}>$0.00</p>
                 <Badge count={5}>
-                  <Link to={"/ms-shop/cart"} onClick={() => handleCreateCartByUsername()} className={styles.link}>
+                  <Link
+                    to={"/ms-shop/cart"}
+                    onClick={() => handleCreateCartByUsername()}
+                    className={styles.link}
+                  >
                     <ShoppingCartOutlined className={styles.iconSize} />
                   </Link>
                 </Badge>
@@ -93,18 +97,23 @@ function HeaderRight() {
                 <Space>
                   {user ? (
                     <div>
-                      <span>Xin chào, </span> <strong>{user}</strong>
+                      <span>Xin chào, </span>{" "}
+                      <Link
+                        to={"/ms-shop/user/" + usernameEncode}
+                        className={styles.link}
+                      >
+                        <strong>{user}</strong>
+                      </Link>
                     </div>
                   ) : null}
-                  <Link className={styles.link}>
-                    <Popover
-                      content={content}
-                      placement="bottomLeft"
-                      trigger="hover"
-                    >
-                      <UserOutlined className={styles.iconSize} />
-                    </Popover>
-                  </Link>
+
+                  <Popover
+                    content={content}
+                    placement="bottomLeft"
+                    trigger="hover"
+                  >
+                    <UserOutlined className={styles.iconSize} />
+                  </Popover>
                 </Space>
               </Col>
             </Row>

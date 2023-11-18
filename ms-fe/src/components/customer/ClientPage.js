@@ -9,6 +9,7 @@ import Checkout from "./checkout/Checkout";
 import Shop from "./shop/Shop";
 import DetailProduct from "./detail-product/DetailProduct";
 import Cart from "./cart/Cart";
+import UserDetail from "./user/UserDetail";
 
 function ClientPage() {
   return (
@@ -26,6 +27,7 @@ function ClientPage() {
             <Route path="checkout" element={<Checkout />} />
             <Route path="cart" element={<Cart />} />
             <Route path="anything" element={<Shop />} />
+            <Route path="user/:username" element={<UserDetail />} />
             <Route path="shopping">
               <Route index element={<Shop />} />
               {/* <Route path=":typeCategory">

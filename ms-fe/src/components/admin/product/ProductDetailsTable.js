@@ -24,6 +24,7 @@ import {
 import { saveImage } from "../../../config/FireBase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
+import { getToken } from "../../../service/Token";
 
 var imgList = [];
 const ProductDetailsTable = (props) => {
@@ -136,7 +137,11 @@ const ProductDetailsTable = (props) => {
               productImageCreate.productDetailId = productDetail.id;
               productImageCreate.path = url;
               axios
-                .post(api + "product/createProductImg", productImageCreate)
+                .post(api + "product/createProductImg", productImageCreate, {
+                  headers: {
+                    Authorization: `Bearer ${getToken()}`,
+                  },
+                })
                 .then((res) => {})
                 .catch((err) => {
                   console.log(err);
@@ -247,7 +252,11 @@ const ProductDetailsTable = (props) => {
           productDetailCreate.descriptionDetail = "Description detail";
           if (!productDetailCreate.status.includes("DELETED")) {
             axios
-              .post(api + "product/createDetail", productDetailCreate)
+              .post(api + "product/createDetail", productDetailCreate, {
+                headers: {
+                  Authorization: `Bearer ${getToken()}`,
+                },
+              })
               .then((response) => {
                 if (
                   response.data !== "" &&

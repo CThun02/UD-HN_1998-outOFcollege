@@ -24,6 +24,7 @@ import {
 import { FormOutlined, CheckCircleTwoTone } from "@ant-design/icons";
 import { useParams } from "react-router-dom";
 import TextArea from "antd/es/input/TextArea";
+import { getToken } from "../../../service/Token";
 const DetailForm = (props) => {
   var roleId = props.roleId;
   const [data, setData] = useState({
@@ -118,7 +119,11 @@ const DetailForm = (props) => {
 
   const fetchCustomerData = async () => {
     axios
-      .get(`http://localhost:8080/api/admin/account/detail/${username}`)
+      .get(`http://localhost:8080/api/admin/account/detail/${username}`, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((response) => {
         setData(response.data);
         setAddress(response.data.accountAddress);
@@ -184,7 +189,12 @@ const DetailForm = (props) => {
               "http://localhost:8080/api/admin/account/updateAddressDefault?id=" +
                 add.id +
                 "&value=" +
-                true
+                true,
+              {
+                headers: {
+                  Authorization: `Bearer ${getToken()}`,
+                },
+              }
             )
             .then(() => {
               notification.success({
@@ -201,7 +211,12 @@ const DetailForm = (props) => {
               "http://localhost:8080/api/admin/account/updateAddressDefault?id=" +
                 add.id +
                 "&value=" +
-                false
+                false,
+              {
+                headers: {
+                  Authorization: `Bearer ${getToken()}`,
+                },
+              }
             )
             .catch(() => {
               console.log("Lỗi khi đặt địa chỉ mặc định");
@@ -226,7 +241,12 @@ const DetailForm = (props) => {
           await axios
             .put(
               `http://localhost:8080/api/admin/account/update/${data.username}`,
-              data
+              data,
+              {
+                headers: {
+                  Authorization: `Bearer ${getToken()}`,
+                },
+              }
             )
             .then(() => {
               setLoadingUdpate(false);
@@ -259,7 +279,12 @@ const DetailForm = (props) => {
         axios
           .put(
             "http://localhost:8080/api/admin/account/updateAdress",
-            addressUpdate
+            addressUpdate,
+            {
+              headers: {
+                Authorization: `Bearer ${getToken()}`,
+              },
+            }
           )
           .then(() => {
             setLoadingUdpateADD(false);
@@ -290,7 +315,12 @@ const DetailForm = (props) => {
           .put(
             "http://localhost:8080/api/admin/account/createAddress?userName=" +
               data.username,
-            addressCreate
+            addressCreate,
+            {
+              headers: {
+                Authorization: `Bearer ${getToken()}`,
+              },
+            }
           )
           .then((res) => {
             setLoadingUdpateADD(false);

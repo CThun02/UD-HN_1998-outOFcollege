@@ -3,6 +3,7 @@ import axios from "axios";
 import numeral from "numeral";
 import { useState } from "react";
 import { useEffect } from "react";
+import { getToken } from "../../../service/Token";
 
 const columns = [
   {
@@ -85,7 +86,11 @@ function TableProduct({ productsId, setProductsId, values, status }) {
 
   useEffect(() => {
     async function getProducts() {
-      const res = await axios.get(baseUrl + "/promotion");
+      const res = await axios.get(baseUrl + "/promotion", {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      });
       setData(res.data);
     }
 

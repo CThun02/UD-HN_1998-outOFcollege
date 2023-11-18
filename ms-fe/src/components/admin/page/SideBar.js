@@ -28,10 +28,15 @@ import {
   UserSwitchOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+import { getToken } from "../../../service/Token";
 
 const SideBar = () => {
+  const token = getToken();
   const navigate = useNavigate();
   const href = "/api/admin/";
+  if (!token) {
+    navigate("/authen/admin/sign-in");
+  }
   const handelClick = (key) => {
     switch (key) {
       case "thongKe":

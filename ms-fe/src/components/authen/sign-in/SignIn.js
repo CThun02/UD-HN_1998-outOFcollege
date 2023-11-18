@@ -22,7 +22,7 @@ const googleLogo = "/logo/google.png";
 
 const baseUrl = "http://localhost:8080/api/v1/auth/login";
 
-function SignIn() {
+function SignIn({ isAuthenAdmin }) {
   const [form] = Form.useForm();
   const [login, setLogin] = useState({
     login: "",
@@ -33,6 +33,7 @@ function SignIn() {
   const [api, contextHolder] = notification.useNotification();
 
   async function handleOnSubmit() {
+    console.log(login);
     try {
       const res = await axios.post(baseUrl, login);
       const data = await res.data;
@@ -43,7 +44,7 @@ function SignIn() {
       }
 
       showSuccessNotification("Đăng nhập thành công", "login");
-      navigate("/ms-shop/home");
+      navigate(isAuthenAdmin ? "/api/admin" : "/ms-shop/home");
     } catch (err) {
       api.error({
         message: `Đã xảy ra lỗi`,
@@ -114,10 +115,12 @@ function SignIn() {
                     Xác nhận
                   </Button>
                 </div>
-                <div className={styles.center}>
-                  <Link to={"/authen/re-password"}>Quên mật khẩu?</Link>
-                  <Link to={"/authen/sign-up"}>Đăng kí tài khoản</Link>
-                </div>
+                {isAuthenAdmin === false && (
+                  <div className={styles.center}>
+                    <Link to={"/authen/re-password"}>Quên mật khẩu?</Link>
+                    <Link to={"/authen/sign-up"}>Đăng kí tài khoản</Link>
+                  </div>
+                )}
                 <div>
                   <Divider
                     style={{ margin: "0", color: "#B0A695", fontWeight: 400 }}

@@ -4,6 +4,7 @@ import { Table, Space, Button, Modal, Input, Switch, message } from "antd";
 import { useEffect, useState } from "react";
 import styles from "../categorystyles/CategoryStyles.module.css";
 import axios from "axios";
+import { getToken } from "../../../service/Token";
 
 const ShirtTypeTable = function (props) {
   const [data, setData] = useState([]);
@@ -21,9 +22,17 @@ const ShirtTypeTable = function (props) {
 
   const handleUpdate = () => {
     axios
-      .put(`http://localhost:8080/api/admin/shirt-tail/edit/${id}`, {
-        shirtTailTypeName,
-      })
+      .put(
+        `http://localhost:8080/api/admin/shirt-tail/edit/${id}`,
+        {
+          shirtTailTypeName,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
+      )
       .then((response) => {
         // Đóng modal
         setShowDetailsModal(false);
@@ -38,9 +47,17 @@ const ShirtTypeTable = function (props) {
     const updatedStatusValue = statusUpdate ? "ACTIVE" : "INACTIVE"; // Cập nhật trạng thái dựa trên giá trị của statusUpdate
 
     axios
-      .put(`http://localhost:8080/api/admin/shirt-tail/updateStatus/${id}`, {
-        status: updatedStatusValue,
-      })
+      .put(
+        `http://localhost:8080/api/admin/shirt-tail/updateStatus/${id}`,
+        {
+          status: updatedStatusValue,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
+      )
       .then((response) => {
         setRender(Math.random);
         if (statusUpdate) {
@@ -69,7 +86,12 @@ const ShirtTypeTable = function (props) {
   const handleConfirmDelete = () => {
     axios
       .delete(
-        `http://localhost:8080/api/admin/shirt-tail/delete/${selectedData}`
+        `http://localhost:8080/api/admin/shirt-tail/delete/${selectedData}`,
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
       )
       .then((response) => {
         // Xoá dữ liệu thành công
@@ -84,7 +106,11 @@ const ShirtTypeTable = function (props) {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:8080/api/admin/shirt-tail`)
+      .get(`http://localhost:8080/api/admin/shirt-tail`, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((response) => {
         setData(response.data);
         console.log(response.data);

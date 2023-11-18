@@ -187,132 +187,47 @@ const MyForm = (props) => {
                 currentTimeInMillis + "_" + accountScan.numberPhone
               }`
             );
-
-            axios
-              .get(
-                "http://localhost:8080/api/admin/account/getByEmailOrNumberPhoneOrIdNo?idRole=" +
-                  roleId +
-                  "&keyWords=" +
-                  accountScan.idNo,
-                {
-                  headers: {
-                    Authorization: `Bearer ${getToken()}`,
-                  },
-                }
-              )
-              .then((response) => {
-                if (
-                  response.data === undefined ||
-                  response.data === null ||
-                  response.data === "" ||
-                  roleId === 2
-                ) {
+            uploadBytes(imgRef, imageFile)
+              .then(() => {
+                return getDownloadURL(imgRef);
+              })
+              .then((url) => {
+                accountScan.image = url;
+              })
+              .then(() => {
+                try {
+                  // Gửi yêu cầu POST đến API
                   axios
-                    .get(
-                      "http://localhost:8080/api/admin/account/getByEmailOrNumberPhoneOrIdNo?idRole=" +
-                        roleId +
-                        "&keyWords=" +
-                        accountScan.email,
+                    .post(
+                      "http://localhost:8080/api/admin/account/create",
+                      accountScan,
                       {
                         headers: {
                           Authorization: `Bearer ${getToken()}`,
                         },
                       }
                     )
-                    .then((response) => {
-                      if (
-                        response.data === undefined ||
-                        response.data === null ||
-                        response.data === ""
-                      ) {
-                        axios
-                          .get(
-                            "http://localhost:8080/api/admin/account/getByEmailOrNumberPhoneOrIdNo?idRole=" +
-                              roleId +
-                              "&keyWords=" +
-                              accountScan.numberPhone,
-                            {
-                              headers: {
-                                Authorization: `Bearer ${getToken()}`,
-                              },
-                            }
-                          )
-                          .then((response) => {
-                            if (
-                              response.data === undefined ||
-                              response.data === null ||
-                              response.data === ""
-                            ) {
-                              uploadBytes(imgRef, imageFile)
-                                .then(() => {
-                                  return getDownloadURL(imgRef);
-                                })
-                                .then((url) => {
-                                  accountScan.image = url;
-                                })
-                                .then(() => {
-                                  try {
-                                    // Gửi yêu cầu POST đến API
-                                    axios
-                                      .post(
-                                        "http://localhost:8080/api/admin/account/create",
-                                        accountScan,
-                                        {
-                                          headers: {
-                                            Authorization: `Bearer ${getToken()}`,
-                                          },
-                                        }
-                                      )
-                                      .then(() => {
-                                        notification.open({
-                                          message: "Thông báo",
-                                          description: `Thêm mới ${
-                                            Number(roleId) === 1
-                                              ? "nhân viên"
-                                              : "khách hàng"
-                                          } thành công`,
-                                          icon: (
-                                            <CheckCircleTwoTone twoToneColor="#52c41a" />
-                                          ),
-                                        });
-                                        navigate(
-                                          `/api/admin/${
-                                            Number(roleId) === 1
-                                              ? "employee"
-                                              : "customer"
-                                          }`
-                                        );
-                                      });
-                                  } catch (error) {
-                                    console.error(error);
-                                  }
-                                })
-                                .catch((error) => {
-                                  console.error("Lỗi khi tải lên ảnh:", error);
-                                });
-                            } else {
-                              notification.error({
-                                message: "Thông báo",
-                                description: "Số điện thoại đã tồn tại",
-                              });
-                              setLoading(false);
-                            }
-                          });
-                      } else {
-                        notification.error({
-                          message: "Thông báo",
-                          description: "Email đã tồn tại",
-                        });
-                        setLoading(false);
-                      }
+                    .then(() => {
+                      notification.open({
+                        message: "Thông báo",
+                        description: `Thêm mới ${
+                          Number(roleId) === 1 ? "nhân viên" : "khách hàng"
+                        } thành công`,
+                        icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
+                      });
+                      navigate(
+                        `/api/admin/${
+                          Number(roleId) === 1 ? "employee" : "customer"
+                        }`
+                      );
                     });
-                } else {
-                  notification.error({
-                    message: "Thông báo",
-                    description: "Mã định danh đã tồn tại",
-                  });
-                  setLoading(false);
+                } catch (error) {
+                  const status = error;
+                  console.error(error);
                 }
+              })
+              .catch((error) => {
+                console.error("Lỗi khi tải lên ảnh:", error);
               });
             setLoading(true);
           },

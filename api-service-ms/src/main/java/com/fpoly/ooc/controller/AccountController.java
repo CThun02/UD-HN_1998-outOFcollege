@@ -54,15 +54,18 @@ public class AccountController {
         return ResponseEntity.ok(service.detail(username));
     }
 
-    @GetMapping("/getByEmailOrNumberPhoneOrIdNo")
-    public ResponseEntity<?> getByEmailOrNumberPhoneOrIdNo(@RequestParam String keyWords, @RequestParam Long idRole) {
-        return ResponseEntity.ok(service.getAccountByEmailOrIdNoOrNumberPhone(idRole, keyWords));
-    }
-
     @PostMapping("create")
     public ResponseEntity<?> save(@RequestBody AccountRequest request) {
-        service.save(request);
-        return ResponseEntity.ok("ok");
+        if(service.getAccountByEmailOrIdNoOrNumberPhone(request.getIdRole().longValue(), request.getIdNo())!=null){
+            return ResponseEntity.badRequest().body("Mã định đã tồn tại");
+        }else if(service.getAccountByEmailOrIdNoOrNumberPhone(request.getIdRole().longValue(), request.getNumberPhone())!=null){
+            return ResponseEntity.badRequest().body("Số điện thoại đã tồn tại");
+        }else if(service.getAccountByEmailOrIdNoOrNumberPhone(request.getIdRole().longValue(), request.getEmail())!=null){
+            return ResponseEntity.badRequest().body("Email đã tồn tại");
+        }else{
+            service.save(request);
+            return ResponseEntity.ok("ok");
+        }
     }
 
     @PutMapping("update/{username}")

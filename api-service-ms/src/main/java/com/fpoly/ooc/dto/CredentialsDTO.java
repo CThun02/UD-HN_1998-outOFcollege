@@ -14,4 +14,5 @@ public class CredentialsDTO {
     private String login;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private char[] password;
+    private String role;
 }

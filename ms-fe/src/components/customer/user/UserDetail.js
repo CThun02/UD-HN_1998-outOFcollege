@@ -2,12 +2,15 @@ import { useEffect, useState } from "react";
 import styles from "./UserDetail.module.css";
 import NavUser from "./nav/NavUser";
 import ProfileHeader from "./profile/ProfileHeader";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
+import { getToken } from "../../../service/Token";
 
 const baseUrl = "http://localhost:8080/api/client/user";
 
 function UserDetail() {
+  const token = getToken(false);
+  const navigate = useNavigate();
   const { username } = useParams();
   const [user, setUser] = useState({});
   const [isRender, setIsRender] = useState(true);
@@ -24,6 +27,10 @@ function UserDetail() {
     }
     return () => getUserDetail();
   }, [decodeData, isRender]);
+
+  if (!token) {
+    navigate("/ms-shop/home");
+  }
 
   return (
     <div>

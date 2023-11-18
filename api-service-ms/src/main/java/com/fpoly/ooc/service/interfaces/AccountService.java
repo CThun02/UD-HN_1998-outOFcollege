@@ -42,5 +42,5 @@ public interface AccountService {
     Account findLoginByEmail(String email);
     Account findLoginByPhone(String phone);
 
-    Account findAccountByLogin(String login);
+    Account findAccountByLogin(String login, String role);
 }

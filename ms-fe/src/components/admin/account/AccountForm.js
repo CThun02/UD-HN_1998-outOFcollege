@@ -30,6 +30,7 @@ import QRReader from "../../../service/QRReader";
 import { getToken } from "../../../service/Token";
 // Nhập ảnh mã QR
 const MyForm = (props) => {
+  const [api, contextHolder] = notification.useNotification();
   const navigate = useNavigate();
   let roleId = props.roleId;
   const [imageFile, setImageFile] = useState(null);
@@ -265,10 +266,26 @@ const MyForm = (props) => {
                                       });
                                   } catch (error) {
                                     console.error(error);
+                                    const status = error?.response?.status;
+                                    if (status === 403) {
+                                      api.error({
+                                        message: "Lỗi",
+                                        description:
+                                          "Bạn không có quyền xem nội dung này",
+                                      });
+                                    }
                                   }
                                 })
                                 .catch((error) => {
                                   console.error("Lỗi khi tải lên ảnh:", error);
+                                  const status = error?.response?.data?.status;
+                                  if (status === 403) {
+                                    api.error({
+                                      message: "Lỗi",
+                                      description:
+                                        "Bạn không có quyền xem nội dung này",
+                                    });
+                                  }
                                 });
                             } else {
                               notification.error({
@@ -327,7 +344,7 @@ const MyForm = (props) => {
         console.error(error);
       }
     };
-    fetchProvinces();
+    return () => fetchProvinces();
   }, [render]);
 
   return (

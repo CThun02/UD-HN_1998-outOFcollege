@@ -256,12 +256,22 @@ function SaveVoucher() {
               })
               .catch((err) => {
                 setIsLoading(false);
-                const error = err.response.data;
-                setErrorsServer(error);
-                apiNotification.error({
-                  message: `Lỗi`,
-                  description: `${err.response.data.message}`,
-                });
+                const error = err?.response?.data;
+                if (error?.status === 403) {
+                  apiNotification.error({
+                    message: "Lỗi",
+                    description: "Bạn không có quyền chỉnh sửa nội dung này",
+                  });
+                  return;
+                }
+
+                if (error?.status === 400) {
+                  setErrorsServer(error);
+                  apiNotification.error({
+                    message: `Lỗi`,
+                    description: `${err.response.data.message}`,
+                  });
+                }
               });
           } else {
             setIsLoading(false);
@@ -343,9 +353,19 @@ function SaveVoucher() {
               ref.current.setFieldValue("emailDetails", emailDetails);
               ref.current.setFieldValue("usernames", usernames);
               ref.current.setFieldValue("usernamesCurrent", usernames);
+            })
+            .catch((err) => {
+              const status = err?.response?.data?.status;
+              if (status === 403) {
+                apiNotification.error({
+                  message: "Lỗi",
+                  description: "Bạn không có quyền xem nội dung này",
+                });
+                return;
+              }
             });
         }
-        getVoucher();
+        return () => getVoucher();
       }
     },
     [code]

@@ -89,7 +89,7 @@ function SignUp() {
                     },
                     ({ getFieldValue }) => ({
                       validator(_, value) {
-                        if (value.length >= 10) {
+                        if (value.length >= 10 && value.length < 16) {
                           if (
                             /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/.test(value)
                           ) {
@@ -99,7 +99,16 @@ function SignUp() {
                               "* Mật khẩu chứa kí tự in hoa và kí tự thường và số"
                             );
                           }
+                        } else if (value.length < 10 && value.length > 0) {
+                          return Promise.reject(
+                            "* Mật khẩu từ 10 tới 16 kí tự"
+                          );
                         } else {
+                          if (value.length > 16) {
+                            return Promise.reject(
+                              "* Mật khẩu không quá 16 kí tự"
+                            );
+                          }
                           return Promise.resolve();
                         }
                       },

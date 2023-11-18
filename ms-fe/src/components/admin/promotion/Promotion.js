@@ -39,6 +39,7 @@ function Promotion() {
   const [promotions, setPromotions] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isRender, setIsRender] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
 
   //paging
   const [totalElements, setTotalElements] = useState(1);
@@ -168,13 +169,25 @@ function Promotion() {
                 },
               })
               .then((res) => {
+                setIsAdmin(true);
                 apiNotification.success({
                   message: `Success`,
                   description: `Thao tác thành công`,
                 });
                 setIsRender(res.data);
               })
-              .catch((err) => console.log("Exception: ", err));
+              .catch((err) => {
+                setIsLoading(false);
+                setIsAdmin(false);
+                const status = err?.response?.data?.status;
+                if (status === 403) {
+                  apiNotification.error({
+                    message: "Lỗi",
+                    description: "Bạn không có quyền xem nội dung này",
+                  });
+                  return;
+                }
+              });
           } catch (err) {
             console.log("Error: ", err);
           }
@@ -240,16 +253,24 @@ function Promotion() {
           const data = res.data;
           setPromotions(data.content);
           setTotalElements(data.totalElements);
-
+          setIsAdmin(true);
           setIsLoading(false);
         } catch (err) {
-          setIsLoading(false);
-          setPromotions([]);
-          console.log("Error: ", err);
+          const status = err?.response?.data?.status;
+          if (status === 403) {
+            setIsLoading(false);
+            setIsAdmin(false);
+            apiNotification.error({
+              message: "Lỗi",
+              description: "Bạn không có quyền xem nội dung này",
+            });
+            setPromotions([]);
+            return;
+          }
         }
       }
 
-      getPromotions();
+      return () => getPromotions();
     },
     [codeOrName, startDate, endDate, status, pageNo, pageSize, isRender]
   );

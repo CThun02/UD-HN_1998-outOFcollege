@@ -1,19 +1,23 @@
-import { Badge, Col, Popover, Row, Space } from "antd";
+import { Badge, Col, Popover, Row, Space, notification } from "antd";
 import styles from "./HeaderRight.module.css";
 import { Link } from "react-router-dom";
 import { UserOutlined, ShoppingCartOutlined } from "@ant-design/icons";
 import { getAuthToken, clearAuthToken } from "../../../../service/Token";
 import { NotificationContext } from "../../../element/notification/NotificationAuthen";
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { useState } from "react";
 import axios from "axios";
+
+// url không để trong Components
+const cartAPI = "http://localhost:8080/api/admin/cart";
 
 function HeaderRight() {
   // const { showSuccessNotification } = useContext(NotificationContext);
   const [user, setUser] = useState("");
   const [usernameEncode, setUsernameEncode] = useState("");
   const [data, setData] = useState(null);
-  const cartAPI = "http://localhost:8080/api/admin/cart";
+  const [apiNotification, contextHolder] = notification.useNotification();
+
   useEffect(() => {
     return () =>
       getAuthToken()
@@ -36,6 +40,10 @@ function HeaderRight() {
             onClick={() => {
               clearAuthToken();
               setUser("");
+              apiNotification.info({
+                message: "Success",
+                description: "Đăng xuất thành công!",
+              });
             }}
             className={styles.link}
           >
@@ -66,6 +74,7 @@ function HeaderRight() {
 
   return (
     <div className={styles.flex}>
+      {contextHolder}
       <Row className={styles.margin}>
         <Col span={24}>
           <div className={styles.lineHeight}>

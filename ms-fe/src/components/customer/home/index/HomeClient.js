@@ -11,7 +11,7 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import { NotificationContext } from "../../../element/notification/NotificationAuthen";
 
-const baseUrl = "http://localhost:8080/api/admin/product";
+const baseUrl = "http://localhost:8080/api/client/product";
 
 function HomeClient() {
   const [bestSellings, setBestSellings] = useState([]);

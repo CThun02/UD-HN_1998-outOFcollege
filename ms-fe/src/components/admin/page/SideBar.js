@@ -30,7 +30,7 @@ import { useNavigate } from "react-router-dom";
 import { getToken } from "../../../service/Token";
 
 const SideBar = () => {
-  const token = getToken();
+  const token = getToken(true);
   const navigate = useNavigate();
   const href = "/api/admin/";
   if (!token) {

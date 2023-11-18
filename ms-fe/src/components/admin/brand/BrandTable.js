@@ -1,7 +1,16 @@
 import React from "react";
 import { FormOutlined, DeleteFilled } from "@ant-design/icons";
 
-import { Table, Space, Button, Modal, Input, message, Switch } from "antd";
+import {
+  Table,
+  Space,
+  Button,
+  Modal,
+  Input,
+  message,
+  Switch,
+  notification,
+} from "antd";
 import { useEffect, useState } from "react";
 import styles from "./BrandStyle.module.css";
 import axios from "axios";
@@ -10,9 +19,9 @@ import { getToken } from "../../../service/Token";
 const BrandTable = function (props) {
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [messageApi, contextHolder] = message.useMessage();
   const [showModal, setShowModal] = useState(false);
   const [selectedData, setSelectedData] = useState(null);
+  const [api, contextHolderNotification] = notification.useNotification();
 
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [brandName, setBrandName] = useState("");
@@ -52,7 +61,15 @@ const BrandTable = function (props) {
         setRender(Math.random);
         message.success("Cập nhật thành công");
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        const status = err?.response?.data?.status;
+        if (status === 403) {
+          api.error({
+            message: "Lỗi",
+            description: "Bạn không có quyền xem nội dung này",
+          });
+        }
+      });
   };
   const handleUpdateStatus = (id, statusUpdate) => {
     let mess = statusUpdate ? "Đang hoạt động" : "Ngưng hoạt động";
@@ -74,12 +91,20 @@ const BrandTable = function (props) {
       .then((response) => {
         setRender(Math.random);
         setTimeout(() => {
-          messageApi.success(mess, 2);
+          api.success(mess, 2);
         }, 500);
       })
       .catch((error) => {
+        const status = error?.response?.data?.status;
+        if (status === 403) {
+          api.error({
+            message: "Lỗi",
+            description: "Bạn không có quyền xem nội dung này",
+          });
+          return;
+        }
         setTimeout(() => {
-          messageApi.error(`Cập nhật trạng thái thất bại`, 2);
+          api.error(`Cập nhật trạng thái thất bại`, 2);
         }, 500);
       });
   };
@@ -99,26 +124,46 @@ const BrandTable = function (props) {
         // Đóng modal
         setShowModal(false);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        const status = err?.response?.data?.status;
+        if (status === 403) {
+          api.error({
+            message: "Lỗi",
+            description: "Bạn không có quyền xem nội dung này",
+          });
+          return;
+        }
+      });
   };
 
   useEffect(() => {
-    axios
-      .get(`http://localhost:8080/api/admin/brand`, {
-        headers: {
-          Authorization: `Bearer ${getToken()}`,
-        },
-      })
-      .then((response) => {
-        setData(response.data);
-        console.log(response.data);
-      })
-      .catch((err) => console.log(err));
+    return () =>
+      axios
+        .get(`http://localhost:8080/api/admin/brand`, {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        })
+        .then((response) => {
+          setData(response.data);
+          console.log(response.data);
+        })
+        .catch((err) => {
+          const status = err?.response?.data?.status;
+          if (status === 403) {
+            api.error({
+              message: "Lỗi",
+              description: "Bạn không có quyền xem nội dung này",
+            });
+            return;
+          }
+        });
   }, [props.renderTable, render]);
 
   return (
     <div>
       {console.log(data)}
+      {contextHolderNotification}
       <Table
         pagination={{
           showSizeChanger: true,
@@ -217,7 +262,6 @@ const BrandTable = function (props) {
       >
         <p>Bạn có chắc chắn muốn xoá dữ liệu này?</p>
       </Modal>
-      {contextHolder}
     </div>
   );
 };

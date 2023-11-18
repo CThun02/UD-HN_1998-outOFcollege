@@ -9,6 +9,10 @@ public class Const {
     public static final String STATUS_UPCOMING = "UPCOMING";
     public static final String STATUS_CANCEL = "CANCEL";
     public static final String STATUS_USED = "USED";
+    // role
+    public static final String ROLE_EMPLOYEE = "ROLE_EMPLOYEE";
+    public static final String ROLE_CUSTOMER = "ROLE_CUSTOMER";
+    public static final String ROLE_ADMIN = "ROLE_ADMIN";
 
     //error code
     public static final String CODE_NOT_FOUND = "CODE_NOT_FOUND";

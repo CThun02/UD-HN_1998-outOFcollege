@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Col, Input, Row, Select, Space } from "antd";
+import { Col, Input, Row, Select, Space, notification } from "antd";
 import { faFilter } from "@fortawesome/free-solid-svg-icons";
 import styles from "./FilterProductsDetails.module.css";
 import { useEffect, useState } from "react";
@@ -29,6 +29,7 @@ function FilterProductsDetails({ setProductsDetails, productsId }) {
   const [dataShirtsTailsType, setDataShirtsTailsType] = useState([]);
   const [dataSizes, setDataSizes] = useState([]);
   const [dataColors, setdataColors] = useState([]);
+  const [apiNotification, contextHolder] = notification.useNotification();
 
   useEffect(() => {
     async function getButtons() {
@@ -37,7 +38,14 @@ function FilterProductsDetails({ setProductsDetails, productsId }) {
         const data = await res.data;
         setDataButtons(data);
       } catch (e) {
-        console.log("Error: ", e);
+        const status = e?.response?.data?.status;
+        if (status === 403) {
+          apiNotification.error({
+            message: "Lỗi",
+            description: "Bạn không có quyền xem nội dung này",
+          });
+          return;
+        }
       }
     }
 
@@ -47,7 +55,14 @@ function FilterProductsDetails({ setProductsDetails, productsId }) {
         const data = await res.data;
         setDataMaterialsId(data);
       } catch (e) {
-        console.log("Error: ", e);
+        const status = e?.response?.data?.status;
+        if (status === 403) {
+          apiNotification.error({
+            message: "Lỗi",
+            description: "Bạn không có quyền xem nội dung này",
+          });
+          return;
+        }
       }
     }
 
@@ -57,7 +72,14 @@ function FilterProductsDetails({ setProductsDetails, productsId }) {
         const data = await res.data;
         setDataCollarsId(data);
       } catch (e) {
-        console.log("Error: ", e);
+        const status = e?.response?.data?.status;
+        if (status === 403) {
+          apiNotification.error({
+            message: "Lỗi",
+            description: "Bạn không có quyền xem nội dung này",
+          });
+          return;
+        }
       }
     }
 
@@ -67,7 +89,14 @@ function FilterProductsDetails({ setProductsDetails, productsId }) {
         const data = await res.data;
         setDataSleevesId(data);
       } catch (e) {
-        console.log("Error: ", e);
+        const status = e?.response?.data?.status;
+        if (status === 403) {
+          apiNotification.error({
+            message: "Lỗi",
+            description: "Bạn không có quyền xem nội dung này",
+          });
+          return;
+        }
       }
     }
 
@@ -77,7 +106,14 @@ function FilterProductsDetails({ setProductsDetails, productsId }) {
         const data = await res.data;
         setDataShirtsTailsType(data);
       } catch (e) {
-        console.log("Error: ", e);
+        const status = e?.response?.data?.status;
+        if (status === 403) {
+          apiNotification.error({
+            message: "Lỗi",
+            description: "Bạn không có quyền xem nội dung này",
+          });
+          return;
+        }
       }
     }
 
@@ -87,7 +123,14 @@ function FilterProductsDetails({ setProductsDetails, productsId }) {
         const data = await res.data;
         setDataSizes(data);
       } catch (e) {
-        console.log("Error: ", e);
+        const status = e?.response?.data?.status;
+        if (status === 403) {
+          apiNotification.error({
+            message: "Lỗi",
+            description: "Bạn không có quyền xem nội dung này",
+          });
+          return;
+        }
       }
     }
 
@@ -97,17 +140,26 @@ function FilterProductsDetails({ setProductsDetails, productsId }) {
         const data = await res.data;
         setdataColors(data);
       } catch (e) {
-        console.log("Error: ", e);
+        const status = e?.response?.data?.status;
+        if (status === 403) {
+          apiNotification.error({
+            message: "Lỗi",
+            description: "Bạn không có quyền xem nội dung này",
+          });
+          return;
+        }
       }
     }
 
-    getButtons();
-    getMaterials();
-    getCollars();
-    getSleeves();
-    getShirtTails();
-    getSizes();
-    getColors();
+    return () => {
+      getButtons();
+      getMaterials();
+      getCollars();
+      getSleeves();
+      getShirtTails();
+      getSizes();
+      getColors();
+    };
   }, []);
 
   function changeData(value) {
@@ -139,12 +191,19 @@ function FilterProductsDetails({ setProductsDetails, productsId }) {
           filter
         );
 
-        const data = res.data;
+        const data = await res.data;
 
         setProductsDetails(data);
         console.log("data: ", data);
       } catch (err) {
-        console.log("Error: filter products details: " + err.message);
+        const status = err?.response?.data?.status;
+        if (status === 403) {
+          apiNotification.error({
+            message: "Lỗi",
+            description: "Bạn không có quyền xem nội dung này",
+          });
+          return;
+        }
       }
     }
 

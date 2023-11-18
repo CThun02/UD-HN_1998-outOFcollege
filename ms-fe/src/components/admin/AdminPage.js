@@ -34,7 +34,7 @@ import { getToken } from "../../service/Token";
 
 function AdminPage() {
   const [message, setMessage] = useState("");
-  const token = getToken();
+  const token = getToken(true);
 
   if (!token) {
     window.location.href = "/authen/admin/sign-in";

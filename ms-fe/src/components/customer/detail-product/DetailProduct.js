@@ -23,7 +23,7 @@ const items = [
   },
 ];
 
-const baseUrl = "http://localhost:8080/api/admin/product";
+const baseUrl = "http://localhost:8080/api/client/product";
 
 function DetailProduct() {
   const { id } = useParams();
@@ -45,7 +45,7 @@ function DetailProduct() {
   const [collarId, setCollarId] = useState(0);
   const [sleeveId, setSleeveId] = useState(0);
   const [shirtTailId, setShirtTailId] = useState(0);
-  const [getProductDetail, setGetProductDetail] = useState({})
+  const [getProductDetail, setGetProductDetail] = useState({});
 
   useEffect(() => {
     async function getProductDetails() {
@@ -84,29 +84,34 @@ function DetailProduct() {
 
   useEffect(() => {
     const getProductDetails = () => {
-      axios.get(`http://localhost:8080/api/admin/bill/filterProductDetailSellByIdCom`,
-        {
-          params: {
-            materialId: materialId,
-            shirtTailId: shirtTailId,
-            sleeveId: sleeveId,
-            collarId: collarId,
-            patternId: patternId,
-            formId: formId,
-            brandId: brandId,
-            categoryId: categoryId,
-            colorId: chooseColor?.id,
-            sizeId: chooseSize?.id,
+      axios
+        .get(
+          `http://localhost:8080/api/admin/bill/filterProductDetailSellByIdCom`,
+          {
+            params: {
+              materialId: materialId,
+              shirtTailId: shirtTailId,
+              sleeveId: sleeveId,
+              collarId: collarId,
+              patternId: patternId,
+              formId: formId,
+              brandId: brandId,
+              categoryId: categoryId,
+              colorId: chooseColor?.id,
+              sizeId: chooseSize?.id,
+            },
           }
-        })
+        )
         .then((response) => {
-          setGetProductDetail(response.data)
-        }).catch((error) => {
-          console.log(error)
+          setGetProductDetail(response.data);
         })
-    }
-    getProductDetails()
-  }, [productId,
+        .catch((error) => {
+          console.log(error);
+        });
+    };
+    getProductDetails();
+  }, [
+    productId,
     chooseColor,
     chooseSize,
     brandId,
@@ -117,9 +122,8 @@ function DetailProduct() {
     materialId,
     collarId,
     sleeveId,
-    shirtTailId
-  ])
-
+    shirtTailId,
+  ]);
 
   useEffect(() => {
     if (

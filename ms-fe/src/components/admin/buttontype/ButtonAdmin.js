@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Select, Input, Row, Col, Form, DatePicker, Modal, Button } from "antd";
+import { Input, Row, Col, Form, Modal, Button, notification } from "antd";
 import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
 import ButtonTable from "./ButtonTable";
 import styles from "../categorystyles/CategoryStyles.module.css";
@@ -9,7 +8,7 @@ import { getToken } from "../../../service/Token";
 
 const ButtonAdmin = function () {
   const [isModalVisible, setIsModalVisible] = useState(false);
-
+  const [api, contextHolder] = notification.useNotification();
   const [render, setRender] = useState();
 
   const handleAdd = () => {
@@ -38,12 +37,21 @@ const ButtonAdmin = function () {
       .catch((error) => {
         // Xử lý lỗi
         console.error("Lỗi khi thêm dữ liệu", error);
+        const status = error?.response?.data?.status;
+        if (status === 403) {
+          api.error({
+            message: "Lỗi",
+            description: "Bạn không có quyền xem nội dung này",
+          });
+          return;
+        }
       });
   };
 
   useEffect(() => {}, [render]);
   return (
     <div className={styles.category}>
+      {contextHolder}
       <div className={styles.customer}>
         <Row className={styles.titleTB}>
           <h3>Danh Sách Cúc Áo</h3>

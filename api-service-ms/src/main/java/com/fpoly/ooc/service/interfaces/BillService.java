@@ -53,4 +53,7 @@ public interface BillService {
 
     List<ProductDetailSellResponse> getProductDetailSellInStore(ProductDetailRequest request, BigDecimal minPrice, BigDecimal maxPrice);
 
+    List<BillReturnRequestResponse> getReturnRequestByStatus(String status);
+
+
 }

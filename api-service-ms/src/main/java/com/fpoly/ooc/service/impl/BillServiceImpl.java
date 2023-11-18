@@ -284,4 +284,9 @@ public class BillServiceImpl implements BillService {
         }
         return productDetailSellResponses;
     }
+
+    @Override
+    public List<BillReturnRequestResponse> getReturnRequestByStatus(String status) {
+        return billRepo.getReturnRequestByStatus(status);
+    }
 }

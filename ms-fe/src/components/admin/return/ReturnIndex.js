@@ -6,17 +6,21 @@ import {
   ClockCircleOutlined,
   TableOutlined,
   EyeOutlined,
+  SearchOutlined,
 } from "@ant-design/icons";
 import { Button, Space, Table, Tabs, Tag } from "antd";
+import Input from "antd/es/input/Input";
 import Link from "antd/es/typography/Link";
+import axios from "axios";
 import moment from "moment";
-import numeral from "numeral";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./ReturnIndex.module.css";
 
 const ReturnIndex = () => {
+  const api = "http://localhost:8080/api/admin/bill";
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
+  const [status, setStatus] = useState("RETURNS");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const columns = [
@@ -45,17 +49,17 @@ const ReturnIndex = () => {
     },
     {
       title: "Tên khách hàng",
-      key: "fullName",
+      key: "customerName",
       render: (text, record) => {
-        let colorAccount = record.accountName ? "green" : "geekblue";
+        let colorAccount = record.customerName ? "green" : "geekblue";
         return (
           <Space direction="vertical" style={{ width: "auto" }}>
             <div style={{ display: "block" }}>
               <div>
-                {record.accountName ? record.accountName : record.fullName}
+                {record.customerName ? record.customerName : record.fullName}
               </div>
               <Tag color={colorAccount}>
-                {record.accountName ? "Thành viên" : "khách lẻ"}
+                {record.customerName ? "Thành viên" : "khách lẻ"}
               </Tag>
             </div>
           </Space>
@@ -64,10 +68,10 @@ const ReturnIndex = () => {
     },
     {
       title: "Ngày tạo",
-      dataIndex: "createdDate",
-      key: "createdDate",
-      render: (createdDate) => {
-        return moment(new Date(...createdDate)).format("HH:mm:ss DD/MM/YYYY");
+      dataIndex: "createdAt",
+      key: "createdAt",
+      render: (createdAt) => {
+        return createdAt;
       },
     },
     {
@@ -84,20 +88,41 @@ const ReturnIndex = () => {
       },
     },
   ];
+
+  useEffect(() => {
+    setLoading(true);
+    axios
+      .get(api + "/getReturnRequestByStatus?status=" + status)
+      .then((response) => {
+        setLoading(false);
+        setData(response.data);
+      })
+      .catch((err) => console.log(err));
+  }, [status]);
+
   return (
     <>
       <div className={styles.returnIndex}>
         <h2>
           <FilterFilled /> Bộ lọc
         </h2>
+        <div style={{ width: "400px", margin: "20px 0" }}>
+          <Input
+            className={styles.filter_inputSearch}
+            size="large"
+            placeholder="Tìm kiếm hóa đơn"
+            prefix={<SearchOutlined />}
+            onChange={(e) => {}}
+          />
+        </div>
       </div>
       <div className={styles.returnIndex} style={{ marginTop: "25px" }}>
         <h2>
           <CarOutlined /> Yêu cầu trả hàng
         </h2>
         <Tabs
-          defaultActiveKey="2"
-          onChange={(e) => console.log(e)}
+          defaultActiveKey={status}
+          onChange={(e) => setStatus(e)}
           items={[
             CheckCircleOutlined,
             CloseCircleOutlined,

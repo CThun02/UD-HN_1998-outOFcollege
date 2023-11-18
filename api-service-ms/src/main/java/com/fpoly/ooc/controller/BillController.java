@@ -3,6 +3,7 @@ package com.fpoly.ooc.controller;
 import com.fpoly.ooc.dto.BillStatusDTO;
 import com.fpoly.ooc.request.bill.BillRequest;
 import com.fpoly.ooc.request.product.ProductDetailRequest;
+import com.fpoly.ooc.responce.bill.BillReturnRequestResponse;
 import com.fpoly.ooc.service.interfaces.BillService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -22,6 +23,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -129,6 +131,11 @@ public class BillController {
                                                 @RequestParam Optional<Integer> yearTo) {
         return ResponseEntity.ok(billService.compareRevenueDate(dayFrom.orElse(null), monthFrom.orElse(null),
                 yearFrom.orElse(null), dayTo.orElse(null), monthTo.orElse(null), yearTo.orElse(null)));
+    }
+
+    @GetMapping("/getReturnRequestByStatus")
+    public ResponseEntity<?> getReturnRequestByStatus(@RequestParam() String status) {
+        return ResponseEntity.ok(billService.getReturnRequestByStatus(status));
     }
 
     @GetMapping("/customer/{username}/address")

@@ -17,7 +17,7 @@ const items = [
   },
 ];
 
-const baseUrl = "http://localhost:8080/api/admin/product";
+const baseUrl = "http://localhost:8080/api/client/product";
 
 function Shop() {
   // data

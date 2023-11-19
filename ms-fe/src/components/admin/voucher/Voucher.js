@@ -28,7 +28,7 @@ import axios from "axios";
 import moment from "moment";
 import { NotificationContext } from "../../element/notification/Notification";
 import SockJs from "../../../service/SockJs";
-import { getToken } from "../../../service/Token";
+import { getToken, request } from "../../../service/Token";
 
 const baseUrl = "http://localhost:8080/api/admin/vouchers/";
 
@@ -42,6 +42,7 @@ function Voucher() {
   const [searchStatus, setSearchStatus] = useState("ALL");
 
   const [isLoading, setIsLoading] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(true);
 
   //voucher list
   const [vouchers, setVouchers] = useState([]);
@@ -88,8 +89,20 @@ function Voucher() {
                   description: `Thao tác thành công`,
                 });
                 setReload(res.data);
+                setIsAdmin(true);
               })
-              .catch((err) => console.log("Exception: ", err));
+              .catch((err) => {
+                setIsLoading(false);
+                const status = err?.response?.data?.status;
+                if (status === 403) {
+                  apiNotification.error({
+                    message: "Lỗi",
+                    description: "Bạn không có quyền chỉnh sửa nội dung này",
+                  });
+                  setIsAdmin(false);
+                  return;
+                }
+              });
           } catch (err) {
             console.log("Error: ", err);
           }
@@ -147,14 +160,23 @@ function Voucher() {
 
           setTotalElements(data.totalElements);
           setVouchers(data.content);
-          console.log("res: ", res);
-        } catch (error) {
-          console.error(error.message);
+          setIsAdmin(true);
+        } catch (err) {
+          setIsLoading(false);
+          const status = err?.response?.data?.status;
+          if (status === 403) {
+            apiNotification.error({
+              message: "Lỗi",
+              description: "Bạn không có quyền xem nội dung này",
+            });
+            setVouchers([]);
+            setIsAdmin(false);
+            return;
+          }
         }
-        setIsLoading(false);
       }
 
-      fetchData();
+      return () => fetchData();
     },
     [
       searchNameOrCode,
@@ -276,7 +298,7 @@ function Voucher() {
   return (
     <div className={styles.voucher}>
       {contextHolder}
-      <SockJs setValues={setVouchers} connectTo={"voucher"} />
+      <SockJs setValues={setVouchers} connectTo={"voucher"} isAdmin={isAdmin} />
       <FilterVoucherAndPromotion
         searchNameOrCode={searchNameOrCode}
         setSearchNameOrCode={setSearchNameOrCode}

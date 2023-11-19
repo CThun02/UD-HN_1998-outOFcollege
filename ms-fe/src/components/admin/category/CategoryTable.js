@@ -1,6 +1,15 @@
 import React from "react";
 import { FormOutlined, DeleteFilled } from "@ant-design/icons";
-import { Table, Space, Button, Modal, Input, message, Switch } from "antd";
+import {
+  Table,
+  Space,
+  Button,
+  Modal,
+  Input,
+  message,
+  Switch,
+  notification,
+} from "antd";
 import { useEffect, useState } from "react";
 import styles from "./CategoryStyle.module.css";
 import axios from "axios";
@@ -9,7 +18,7 @@ import { getToken } from "../../../service/Token";
 const CategoryTable = function (props) {
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [messageApi, contextHolder] = message.useMessage();
+  const [api, contextHolder] = notification.useNotification();
 
   const [showModal, setShowModal] = useState(false);
   const [selectedData, setSelectedData] = useState(null);
@@ -49,7 +58,16 @@ const CategoryTable = function (props) {
         setRender(Math.random);
         message.success("Cập nhật thành công");
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        const status = err?.response?.data?.status;
+        if (status === 403) {
+          api.error({
+            message: "Lỗi",
+            description: "Bạn không có quyền xem nội dung này",
+          });
+          return;
+        }
+      });
   };
   const handleUpdateStatus = (id, statusUpdate) => {
     let mess = statusUpdate ? "Đang hoạt động" : "Ngưng hoạt động";
@@ -71,12 +89,20 @@ const CategoryTable = function (props) {
       .then((response) => {
         setRender(Math.random);
         setTimeout(() => {
-          messageApi.success(mess, 2);
+          api.success(mess, 2);
         }, 500);
       })
       .catch((error) => {
+        const status = error?.response?.data?.status;
+        if (status === 403) {
+          api.error({
+            message: "Lỗi",
+            description: "Bạn không có quyền xem nội dung này",
+          });
+          return;
+        }
         setTimeout(() => {
-          messageApi.error(`Cập nhật trạng thái thất bại`, 2);
+          api.error(`Cập nhật trạng thái thất bại`, 2);
         }, 500);
       });
   };

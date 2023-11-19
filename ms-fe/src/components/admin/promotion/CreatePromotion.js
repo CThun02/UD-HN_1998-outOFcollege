@@ -158,7 +158,17 @@ function CreatePromotion() {
                   },
                 })
                 .then((res) => console.log(res))
-                .catch((e) => console.log("deleteError: ", e));
+                .catch((e) => {
+                  isLoading(false);
+                  const status = e?.response?.data?.status;
+                  if (status === 403) {
+                    apiNotification.error({
+                      message: "Lỗi",
+                      description: "Bạn không có quyền chỉnh sửa nội dung này",
+                    });
+                    return;
+                  }
+                });
             }
 
             deleteProductDetail();
@@ -204,14 +214,24 @@ function CreatePromotion() {
                 showSuccessNotification("Thao tác thành công", "promotion");
               })
               .catch((err) => {
-                console.log("err: ", err);
                 setIsLoading(false);
                 const error = err?.response?.data;
-                setErrorsServer(error);
-                apiNotification.error({
-                  message: `Lỗi`,
-                  description: `${err?.response?.data?.message}`,
-                });
+
+                if (error?.status === 403) {
+                  apiNotification.error({
+                    message: "Lỗi",
+                    description: "Bạn không có quyền chỉnh sửa nội dung này",
+                  });
+                  return;
+                }
+
+                if (error?.status === 400) {
+                  setErrorsServer(error);
+                  apiNotification.error({
+                    message: `Lỗi`,
+                    description: `${err?.response?.data?.message}`,
+                  });
+                }
               });
           } else {
             console.log("ERROR");
@@ -278,9 +298,19 @@ function CreatePromotion() {
               setProductsDetailsId(productDetailIds);
               setProductsId(productIdsResponse);
               setStatus(status);
+            })
+            .catch((err) => {
+              const status = err?.response?.data?.status;
+              if (status === 403) {
+                apiNotification.error({
+                  message: "Lỗi",
+                  description: "Bạn không có quyền xem nội dung này",
+                });
+                return;
+              }
             });
         }
-        getPromotion();
+        return () => getPromotion();
       }
     },
     [code]

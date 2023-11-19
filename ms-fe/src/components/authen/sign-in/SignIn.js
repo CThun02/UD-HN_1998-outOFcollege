@@ -27,6 +27,7 @@ function SignIn({ isAuthenAdmin }) {
   const [login, setLogin] = useState({
     login: "",
     password: "",
+    role: isAuthenAdmin ? "ROLE_ADMIN" : "ROLE_CUSTOMER",
   });
   const navigate = useNavigate();
   const { showSuccessNotification } = useContext(NotificationContext);
@@ -40,7 +41,7 @@ function SignIn({ isAuthenAdmin }) {
       const status = await res.status;
 
       if (status === 200) {
-        setAuthHeader(data.token);
+        setAuthHeader(data.token, isAuthenAdmin);
       }
 
       showSuccessNotification("Đăng nhập thành công", "login");

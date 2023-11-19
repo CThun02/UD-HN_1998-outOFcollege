@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Input, Row, Col, Radio, Button } from "antd";
+import { Input, Row, Col, Radio, Button, notification } from "antd";
 import {
   SearchOutlined,
   PlusOutlined,
@@ -15,6 +15,7 @@ import { getToken } from "../../../service/Token";
 const CustomerAddminIndex = function (props) {
   const [value, setValue] = useState(1);
   const [data, setData] = useState([]);
+  const [api, contextHolder] = notification.useNotification();
 
   const navigate = useNavigate();
   const handleAddAccount = () => {
@@ -43,15 +44,27 @@ const CustomerAddminIndex = function (props) {
       .then((response) => {
         setData(response.data);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        const status = err?.response?.data?.status;
+        if (status === 403) {
+          api.error({
+            message: "Lỗi",
+            description: "Bạn không có quyền xem nội dung này",
+          });
+
+          setData([]);
+          return;
+        }
+      });
   }
 
   useEffect(() => {
-    filter("");
+    return () => filter("");
   }, [roleId]);
 
   return (
     <>
+      {contextHolder}
       <div className={styles.customer}>
         <h2>
           <FilterFilled /> Bộ lọc

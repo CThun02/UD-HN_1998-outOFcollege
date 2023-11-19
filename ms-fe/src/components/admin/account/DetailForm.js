@@ -129,7 +129,19 @@ const DetailForm = (props) => {
         setAddress(response.data.accountAddress);
         setAddressUpdate(response.data.accountAddress[0]);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        const status = err?.response?.data?.status;
+        if (status === 403) {
+          messageApi.error({
+            message: "Lỗi",
+            description: "Bạn không có quyền xem nội dung này",
+          });
+
+          setData({});
+          setAddress([]);
+          setAddressUpdate([]);
+        }
+      });
   };
   const fetchDistricts = async (value) => {
     await axios
@@ -202,8 +214,15 @@ const DetailForm = (props) => {
                 description: `Đặt địa chỉ mặc định thành công`,
               });
             })
-            .catch(() => {
+            .catch((err) => {
               message.error("Lỗi khi đặt địa chỉ mặc định");
+              const status = err?.response?.data?.status;
+              if (status === 403) {
+                messageApi.error({
+                  message: "Lỗi",
+                  description: "Bạn không có quyền xem nội dung này",
+                });
+              }
             });
         } else {
           axios
@@ -218,8 +237,19 @@ const DetailForm = (props) => {
                 },
               }
             )
-            .catch(() => {
+            .catch((err) => {
               console.log("Lỗi khi đặt địa chỉ mặc định");
+              const status = err?.response?.data?.status;
+              if (status === 403) {
+                messageApi.error({
+                  message: "Lỗi",
+                  description: "Bạn không có quyền xem nội dung này",
+                });
+
+                setData({});
+                setAddress([]);
+                setAddressUpdate([]);
+              }
             });
         }
       }
@@ -333,8 +363,15 @@ const DetailForm = (props) => {
               icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
             });
           })
-          .catch(() => {
+          .catch((err) => {
             messageApi.error("Thêm mới địa chỉ Thất bại!", 2);
+            const status = err?.response?.data?.status;
+            if (status === 403) {
+              messageApi.error({
+                message: "Lỗi",
+                description: "Bạn không có quyền xem nội dung này",
+              });
+            }
           });
       },
     });

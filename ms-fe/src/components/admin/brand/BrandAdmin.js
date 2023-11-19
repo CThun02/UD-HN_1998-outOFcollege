@@ -1,5 +1,14 @@
 import React, { useState } from "react";
-import { Input, Row, Col, Button, Form, Modal, message } from "antd";
+import {
+  Input,
+  Row,
+  Col,
+  Button,
+  Form,
+  Modal,
+  message,
+  notification,
+} from "antd";
 import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
 import BrandTable from "./BrandTable";
 import styles from "./BrandStyle.module.css";
@@ -9,6 +18,7 @@ import { getToken } from "../../../service/Token";
 const BrandAdmin = function () {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [render, setRender] = useState();
+  const [api, contextHolder] = notification.useNotification();
 
   const handleAdd1 = () => {
     setIsModalVisible(true);
@@ -37,6 +47,14 @@ const BrandAdmin = function () {
       .catch((error) => {
         // Xử lý lỗi
         console.error("Lỗi khi thêm dữ liệu", error);
+        const status = error?.response?.data?.status;
+        if (status === 403) {
+          api.error({
+            message: "Lỗi",
+            description: "Bạn không có quyền xem nội dung này",
+          });
+          return;
+        }
       });
   };
 
@@ -44,6 +62,7 @@ const BrandAdmin = function () {
 
   return (
     <div className={styles.material}>
+      {contextHolder}
       <div className={styles.radiusFrame}>
         <Row className={styles.titleTB}>
           <h3>Danh Sách Chất Liệu</h3>

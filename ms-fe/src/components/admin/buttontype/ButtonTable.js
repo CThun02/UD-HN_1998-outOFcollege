@@ -1,6 +1,6 @@
 import React from "react";
 import { FormOutlined, DeleteFilled } from "@ant-design/icons";
-import { Table, Space, Button, Switch, Modal, Input, message } from "antd";
+import { Table, Space, Button, Switch, Modal, Input, notification } from "antd";
 import { useEffect, useState } from "react";
 import styles from "../categorystyles/CategoryStyles.module.css";
 import axios from "axios";
@@ -9,7 +9,6 @@ import { getToken } from "../../../service/Token";
 const ButtonTable = function (props) {
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [messageApi, contextHolder] = message.useMessage();
   const [showModal, setShowModal] = useState(false);
   const [selectedData, setSelectedData] = useState(null);
   const [render, setRender] = useState();
@@ -17,6 +16,7 @@ const ButtonTable = function (props) {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [buttonName, setButtonName] = useState("");
   const [id, setid] = useState("");
+  const [api, contextHolder] = notification.useNotification();
 
   const handleDetails = (item) => {
     setSelectedItem(item);
@@ -44,7 +44,16 @@ const ButtonTable = function (props) {
         // Đóng modal
         setShowModal(false);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        const status = err?.response?.data?.status;
+        if (status === 403) {
+          api.error({
+            message: "Lỗi",
+            description: "Bạn không có quyền xem nội dung này",
+          });
+          return;
+        }
+      });
   };
 
   const handleUpdateStatus = (id, statusUpdate) => {
@@ -67,13 +76,21 @@ const ButtonTable = function (props) {
       .then((response) => {
         setRender(Math.random);
         if (statusUpdate) {
-          messageApi.success(mess, 2);
+          api.success(mess, 2);
         } else {
-          messageApi.error(mess, 2);
+          api.error(mess, 2);
         }
       })
       .catch((error) => {
-        messageApi.error(`Cập nhật trạng thái thất bại`, 2);
+        const status = error?.response?.data?.status;
+        if (status === 403) {
+          api.error({
+            message: "Lỗi",
+            description: "Bạn không có quyền xem nội dung này",
+          });
+          return;
+        }
+        api.error(`Cập nhật trạng thái thất bại`, 2);
       });
   };
 
@@ -95,21 +112,40 @@ const ButtonTable = function (props) {
         setShowDetailsModal(false);
         setRender(Math.random);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        const status = err?.response?.data?.status;
+        if (status === 403) {
+          api.error({
+            message: "Lỗi",
+            description: "Bạn không có quyền xem nội dung này",
+          });
+          return;
+        }
+      });
   };
 
   useEffect(() => {
-    axios
-      .get(`http://localhost:8080/api/admin/button`, {
-        headers: {
-          Authorization: `Bearer ${getToken()}`,
-        },
-      })
-      .then((response) => {
-        setData(response.data);
-        console.log(response.data);
-      })
-      .catch((err) => console.log(err));
+    return () =>
+      axios
+        .get(`http://localhost:8080/api/admin/button`, {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        })
+        .then((response) => {
+          setData(response.data);
+          console.log(response.data);
+        })
+        .catch((err) => {
+          const status = err?.response?.data?.status;
+          if (status === 403) {
+            api.error({
+              message: "Lỗi",
+              description: "Bạn không có quyền xem nội dung này",
+            });
+            return;
+          }
+        });
   }, [props.renderTable, render]);
   return (
     <div>

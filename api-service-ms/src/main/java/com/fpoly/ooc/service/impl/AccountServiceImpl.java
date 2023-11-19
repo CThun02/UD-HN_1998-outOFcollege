@@ -245,8 +245,20 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Account findAccountByLogin(String login) {
-        return accountRepository.findAccountByLogin(login);
+    public Account findAccountByLogin(String login, String role) {
+        if(role == null) {
+            return accountRepository.findUserByLogin(login);
+        }
+
+        if(role.equalsIgnoreCase(Const.ROLE_CUSTOMER)) {
+            return accountRepository.findAccountCustomerByLogin(login);
+        }
+
+        if(role.equalsIgnoreCase(Const.ROLE_EMPLOYEE) || role.equalsIgnoreCase(Const.ROLE_ADMIN)) {
+            return accountRepository.findEmployeeAndAdmintByLogin(login);
+        }
+
+        return null;
     }
 
     private Page<AccountVoucher> page(List<AccountVoucher> inputList, Pageable pageable) {

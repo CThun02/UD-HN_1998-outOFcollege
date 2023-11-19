@@ -64,8 +64,16 @@ public interface AccountRepository extends JpaRepository<Account, String> {
             "left join Role role on account.role.id = role.id " +
             "where account.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
             "and role.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
-            "and (account.numberPhone = ?1 or account.email = ?1 or account.username = ?1)")
-    Account findAccountByLogin(String login);
+            "and (account.numberPhone = ?1 or account.email = ?1 or account.username = ?1) " +
+            "and (role.roleName = com.fpoly.ooc.constant.Const.ROLE_CUSTOMER)")
+    Account findAccountCustomerByLogin(String login);
+
+    @Query("select account from Account account " +
+            "left join Role role on account.role.id = role.id " +
+            "where account.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and role.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and (account.numberPhone = ?1 or account.email = ?1 or account.username = ?1) ")
+    Account findUserByLogin(String login);
 
 //        @Query("SELECT new com.fpoly.ooc.responce.account.AccountResponce(a.username,a.avatar,a.fullName,a.)" +
 //                "FROM Account a where a.role=?1")
@@ -77,4 +85,12 @@ public interface AccountRepository extends JpaRepository<Account, String> {
         where user.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE and user.username = ?1
     """)
     UserInfomationDTO userInfomationByUsername(String username);
+
+    @Query("select account from Account account " +
+            "left join Role role on account.role.id = role.id " +
+            "where account.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and role.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and (account.numberPhone = ?1 or account.email = ?1 or account.username = ?1) " +
+            "and (role.roleName = com.fpoly.ooc.constant.Const.ROLE_EMPLOYEE or role.roleName = com.fpoly.ooc.constant.Const.ROLE_ADMIN)")
+    Account findEmployeeAndAdmintByLogin(String login);
 }

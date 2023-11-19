@@ -19,7 +19,7 @@ const NavBar = () => {
       <p>
         <Link
           onClick={() => {
-            clearAuthToken();
+            clearAuthToken(true);
             setUser("");
           }}
           className={styles.link}
@@ -32,7 +32,7 @@ const NavBar = () => {
 
   useEffect(() => {
     return () =>
-      getAuthToken()
+      getAuthToken(true)
         .then((data) => {
           setUser(data?.fullName);
         })

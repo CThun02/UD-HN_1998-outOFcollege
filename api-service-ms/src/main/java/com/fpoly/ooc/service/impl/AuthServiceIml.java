@@ -32,7 +32,7 @@ public class AuthServiceIml implements AuthService {
 
     @Override
     public UserDTO login(CredentialsDTO dto) {
-        Account account = accountService.findAccountByLogin(dto.getLogin());
+        Account account = accountService.findAccountByLogin(dto.getLogin(), dto.getRole());
 
         if(account == null) {
             throw new LoginException(ErrorCodeConfig.getMessage(Const.JWT_LOGIN_ERROR), HttpStatus.BAD_REQUEST);
@@ -87,8 +87,7 @@ public class AuthServiceIml implements AuthService {
 
     @Override
     public UserDTO findByLogin(String login) {
-        Account account=  accountService.findAccountByLogin(login);
-        System.out.println("AccountAccountAccount: " + roleService.findRoleNameByUsername(account.getUsername()));
+        Account account=  accountService.findAccountByLogin(login, null);
         return UserDTO.builder()
                 .fullName(account.getFullName())
                 .username(account.getUsername())
@@ -97,7 +96,6 @@ public class AuthServiceIml implements AuthService {
     }
 
     private UserDTO mapperUser(Account account) {
-        System.out.println("AccountAccountAccount: " + roleService.findRoleNameByUsername(account.getUsername()));
         return UserDTO.builder()
                 .username(account.getUsername())
                 .fullName(account.getFullName())

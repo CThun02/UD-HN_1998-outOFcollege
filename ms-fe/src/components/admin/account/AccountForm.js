@@ -30,6 +30,7 @@ import QRReader from "../../../service/QRReader";
 import { getToken } from "../../../service/Token";
 // Nhập ảnh mã QR
 const MyForm = (props) => {
+  const [api, contextHolder] = notification.useNotification();
   const navigate = useNavigate();
   let roleId = props.roleId;
   const [imageFile, setImageFile] = useState(null);
@@ -262,7 +263,7 @@ const MyForm = (props) => {
         console.error(error);
       }
     };
-    fetchProvinces();
+    return () => fetchProvinces();
   }, [render]);
 
   return (

@@ -441,19 +441,27 @@ const DetailForm = (props) => {
             </Col>
             <Col span={24}>
               <div className="m-5">
-                <span>Username</span>
+                <span>
+                  Username{" "}
+                  {roleId === 1 ? <span style={{ color: "red" }}>*</span> : ""}
+                </span>
                 <Input type="text" name="username" value={data.username} />
               </div>
             </Col>
             <Col span={24}>
               <div className="m-5">
-                <span>Mã định danh</span>
+                <span>
+                  Mã định danh{" "}
+                  {roleId === 1 ? <span style={{ color: "red" }}>*</span> : ""}
+                </span>
                 <Input type="text" name="idNo" value={data.idNo} />
               </div>
             </Col>
             <Col span={24}>
               <div className="m-5">
-                <span>Tên nhân viên</span>
+                <span>
+                  Họ và tên <span style={{ color: "red" }}>*</span>
+                </span>
                 <Input
                   value={data.fullName}
                   onChange={(event) => {
@@ -464,11 +472,13 @@ const DetailForm = (props) => {
             </Col>
             <Col span={24}>
               <div className="m-5">
-                <span>Ngày sinh</span>
+                <span>
+                  Ngày sinh <span style={{ color: "red" }}>*</span>
+                </span>
                 <DatePicker
                   allowClear={false}
                   style={{ width: "100%" }}
-                  value={dayjs(data.dob)}
+                  value={data.dob === null ? null : dayjs(data.dob)}
                   onChange={(event) => {
                     handleChange("dob", event);
                   }}
@@ -477,7 +487,9 @@ const DetailForm = (props) => {
             </Col>
             <Col span={24}>
               <div className="m-5">
-                <span>Giới Tính: </span>
+                <span>
+                  Giới Tính <span style={{ color: "red" }}>*</span>:
+                </span>
                 <Radio.Group
                   value={data.gender}
                   onChange={(event) => {
@@ -491,7 +503,9 @@ const DetailForm = (props) => {
             </Col>
             <Col span={24}>
               <div className="m-5">
-                <span>Email</span>
+                <span>
+                  Email <span style={{ color: "red" }}>*</span>
+                </span>
                 <Input
                   value={data.email}
                   onChange={(event) => {
@@ -502,7 +516,9 @@ const DetailForm = (props) => {
             </Col>
             <Col span={24}>
               <div className="m-5">
-                <span>Số điện thoại</span>
+                <span>
+                  Số điện thoại <span style={{ color: "red" }}>*</span>
+                </span>
                 <Input
                   value={data.numberPhone}
                   onChange={(event) => {
@@ -548,7 +564,7 @@ const DetailForm = (props) => {
                       <Row>
                         <Col span={8}>
                           <div className="m-5">
-                            <h6>Họ và tên</h6>
+                            <h6>Họ và tên </h6>
                             <Input
                               defaultValue={item.fullName}
                               onChange={(event) => {

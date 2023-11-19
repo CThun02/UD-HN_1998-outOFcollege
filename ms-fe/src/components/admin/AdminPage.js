@@ -30,6 +30,7 @@ import SaveVoucher from "./voucher/SaveVoucher";
 import StatisticalIndex from "./statistical/StatisticalIndex";
 import { useState } from "react";
 import { NotificationProvider } from "../element/notification/Notification";
+import ReturnIndex from "./return/ReturnIndex";
 import { getToken } from "../../service/Token";
 
 function AdminPage() {
@@ -58,6 +59,11 @@ function AdminPage() {
                     path="statistical"
                     element={<StatisticalIndex />}
                   ></Route>
+                  {/* Trả hàng */}
+                  <Route path="return">
+                    <Route index element={<ReturnIndex />}></Route>
+                  </Route>
+                  {/* ví dụ path= san-pham/hien-thi ->  
                   {/* Tại quầy */}
                   <Route path="counter-sales">
                     <Route index element={<Bill />}></Route>

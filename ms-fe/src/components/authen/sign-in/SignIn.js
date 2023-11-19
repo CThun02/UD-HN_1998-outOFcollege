@@ -34,6 +34,7 @@ function SignIn({ isAuthenAdmin }) {
   const [api, contextHolder] = notification.useNotification();
 
   async function handleOnSubmit() {
+    console.log(login);
     try {
       const res = await axios.post(baseUrl, login);
       const data = await res.data;

@@ -3,6 +3,7 @@ package com.fpoly.ooc.repository;
 import com.fpoly.ooc.entity.Address;
 import com.fpoly.ooc.entity.Bill;
 import com.fpoly.ooc.responce.bill.BillProductSellTheMost;
+import com.fpoly.ooc.responce.bill.BillReturnRequestResponse;
 import com.fpoly.ooc.responce.bill.BillRevenue;
 import com.fpoly.ooc.responce.account.GetListCustomer;
 import com.fpoly.ooc.responce.bill.BillManagementResponse;
@@ -47,9 +48,6 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
                             @Param("yearParam") Integer year,
                             @Param("billType") String billType);
 
-    @Query("SELECT distinct YEAR(b.createdAt) from Bill b")
-    List<Integer> getBusinessYear();
-
     @Query("SELECT pd.id AS id, pd.product AS product, pd.brand as brand, pd.category as category, pd.button AS button," +
             "       pd.material AS material, pd.collar AS collar, pd.sleeve AS sleeve, pd.size AS size," +
             "       pd.color AS color, pd.shirtTail AS shirtTail," +
@@ -67,6 +65,13 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
             "ORDER BY quantity DESC ")
     List<ProductDetailResponse> getProductInBillByStatusAndIdAndDate(Long id,
                                                                      Integer day, Integer month, Integer year);
+
+
+    @Query("select b.billCode as billCode, b.createdBy as employee" +
+            ", d.name as customerName, b.createdAt as createdAt, b.status as status from Bill b " +
+            "join DeliveryNote d on d.bill.id = b.id" +
+            " where b.status like ?1")
+    List<BillReturnRequestResponse> getReturnRequestByStatus(String status);
 
     @Query("SELECT DISTINCT new com.fpoly.ooc.responce.bill.BillManagementResponse(b.id, b.billCode, COUNT(bd.id)," +
             "   b.price, dn.name, dn.phoneNumber, b.createdAt, b.billType, b.symbol, b.status, dn.shipPrice," +

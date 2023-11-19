@@ -5,6 +5,7 @@ import { Menu } from "antd";
 import {
   AuditOutlined,
   BookOutlined,
+  CarOutlined,
   DingtalkOutlined,
   DownOutlined,
   FontSizeOutlined,
@@ -46,6 +47,9 @@ const SideBar = () => {
         break;
       case "donHang":
         navigate(href + "order");
+        break;
+      case "traHang":
+        navigate(href + "return");
         break;
       case "sanPhamChiTiet":
         navigate(href + "product");
@@ -127,6 +131,11 @@ const SideBar = () => {
                 label: "Quản lý đơn hàng",
                 icon: <ShoppingCartOutlined />,
                 key: "donHang",
+              },
+              {
+                label: "Trả hàng",
+                icon: <CarOutlined />,
+                key: "traHang",
               },
               {
                 label: "Quản lý sản phẩm",

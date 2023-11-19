@@ -56,7 +56,8 @@ public class AccountController {
 
     @PostMapping("create")
     public ResponseEntity<?> save(@RequestBody AccountRequest request) {
-        if(service.getAccountByEmailOrIdNoOrNumberPhone(request.getIdRole().longValue(), request.getIdNo())!=null){
+        if(service.getAccountByEmailOrIdNoOrNumberPhone(request.getIdRole().longValue(), request.getIdNo())!=null
+        && (request.getIdRole() != 2 || !request.getIdNo().equals("empty"))){
             return ResponseEntity.badRequest().body("Mã định đã tồn tại");
         }else if(service.getAccountByEmailOrIdNoOrNumberPhone(request.getIdRole().longValue(), request.getNumberPhone())!=null){
             return ResponseEntity.badRequest().body("Số điện thoại đã tồn tại");

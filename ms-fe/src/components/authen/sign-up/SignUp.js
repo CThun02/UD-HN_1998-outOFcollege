@@ -18,7 +18,7 @@ function SignUp() {
     email: "",
     phoneNumber: "",
     fullName: "",
-    role: "customer",
+    role: "ROLE_CUSTOMER",
   });
   const [api, contextHolder] = notification.useNotification();
   const navigate = useNavigate();

@@ -1,4 +1,4 @@
-package com.fpoly.ooc.controller;
+package com.fpoly.ooc.controller.client;
 
 import com.fpoly.ooc.config.UserAuthenticationProvider;
 import com.fpoly.ooc.constant.Const;

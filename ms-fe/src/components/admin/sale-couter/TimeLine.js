@@ -1,4 +1,4 @@
-import { Button, Carousel, Col, Divider, Row, Table } from "antd";
+import { Button, Carousel, Col, Divider, Row, Table, notification } from "antd";
 import { useEffect, useState } from "react";
 import { Timeline, TimelineEvent } from "@mailtop/horizontal-timeline";
 import {
@@ -34,14 +34,20 @@ const BillTimeLine = (addId) => {
         await axios
             .post(`http://localhost:8080/api/admin/timeline/${billId}`, values, {
                 headers: {
-                    Authorization: `Bearer ${getToken()}`,
+                    Authorization: `Bearer ${getToken(true)}`,
                 },
             })
             .then((response) => {
                 setTimelines([...timelines, response.data]);
             })
             .catch((error) => {
-                console.log(error);
+                const status = error.response.status;
+                if (status === 403) {
+                    notification.error({
+                        message: "Thông báo",
+                        description: "Bạn không có quyền truy cập!",
+                    });
+                }
             });
     };
 
@@ -55,7 +61,7 @@ const BillTimeLine = (addId) => {
                 },
                 {
                     headers: {
-                        Authorization: `Bearer ${getToken()}`,
+                        Authorization: `Bearer ${getToken(true)}`,
                     },
                 }
             )
@@ -63,7 +69,13 @@ const BillTimeLine = (addId) => {
                 setRender(response.data.amountPaid);
             })
             .catch((error) => {
-                console.log(error);
+                const status = error.response.status;
+                if (status === 403) {
+                    notification.error({
+                        message: "Thông báo",
+                        description: "Bạn không có quyền truy cập!",
+                    });
+                }
             });
     };
 
@@ -102,31 +114,43 @@ const BillTimeLine = (addId) => {
         axios
             .get(`http://localhost:8080/api/admin/timeline/${billId}`, {
                 headers: {
-                    Authorization: `Bearer ${getToken()}`,
+                    Authorization: `Bearer ${getToken(true)}`,
                 },
             })
             .then((response) => {
                 setTimelines(response.data);
             })
             .catch((error) => {
-                console.log(error);
+                const status = error.response.status;
+                if (status === 403) {
+                    notification.error({
+                        message: "Thông báo",
+                        description: "Bạn không có quyền truy cập!",
+                    });
+                }
             });
         axios
             .get(`http://localhost:8080/api/admin/timeline/${billId}/product`, {
                 headers: {
-                    Authorization: `Bearer ${getToken()}`,
+                    Authorization: `Bearer ${getToken(true)}`,
                 },
             })
             .then((response) => {
                 setTimelinesPoduct(response.data);
             })
             .catch((error) => {
-                console.log(error);
+                const status = error.response.status;
+                if (status === 403) {
+                    notification.error({
+                        message: "Thông báo",
+                        description: "Bạn không có quyền truy cập!",
+                    });
+                }
             });
         axios
             .get(`http://localhost:8080/api/admin/timeline/${billId}/info`, {
                 headers: {
-                    Authorization: `Bearer ${getToken()}`,
+                    Authorization: `Bearer ${getToken(true)}`,
                 },
             })
             .then((response) => {
@@ -134,7 +158,13 @@ const BillTimeLine = (addId) => {
                 console.log(response.data);
             })
             .catch((error) => {
-                console.log(error);
+                const status = error.response.status;
+                if (status === 403) {
+                    notification.error({
+                        message: "Thông báo",
+                        description: "Bạn không có quyền truy cập!",
+                    });
+                }
             });
     }, [billId, render]);
 

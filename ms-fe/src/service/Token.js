@@ -25,23 +25,23 @@ async function getAuthToken(isAuthenAdmin) {
 
   const token = isAuthenAdmin
     ? hAdmin +
-      dAdmin +
-      mAdmin +
-      fAdmin +
-      gAdmin +
-      jAdmin +
-      zAdmin +
-      xAdmin +
-      wAdmin
+    dAdmin +
+    mAdmin +
+    fAdmin +
+    gAdmin +
+    jAdmin +
+    zAdmin +
+    xAdmin +
+    wAdmin
     : hClient +
-      dClient +
-      mClient +
-      fClient +
-      gClient +
-      jClient +
-      zClient +
-      xClient +
-      wClient;
+    dClient +
+    mClient +
+    fClient +
+    gClient +
+    jClient +
+    zClient +
+    xClient +
+    wClient;
 
   if (token) {
     try {
@@ -79,23 +79,23 @@ function getToken(isAuthenAdmin) {
 
   const token = isAuthenAdmin
     ? hAdmin +
-      dAdmin +
-      mAdmin +
-      fAdmin +
-      gAdmin +
-      jAdmin +
-      zAdmin +
-      xAdmin +
-      wAdmin
+    dAdmin +
+    mAdmin +
+    fAdmin +
+    gAdmin +
+    jAdmin +
+    zAdmin +
+    xAdmin +
+    wAdmin
     : hClient +
-      dClient +
-      mClient +
-      fClient +
-      gClient +
-      jClient +
-      zClient +
-      xClient +
-      wClient;
+    dClient +
+    mClient +
+    fClient +
+    gClient +
+    jClient +
+    zClient +
+    xClient +
+    wClient;
   if (token) {
     return token;
   }

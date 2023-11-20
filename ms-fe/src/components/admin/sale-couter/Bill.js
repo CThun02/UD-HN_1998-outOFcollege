@@ -143,19 +143,19 @@ const Bill = () => {
                 {record.productDetail.promotion.length !== 0 ? (
                   <Badge.Ribbon
                     text={`Giảm ${record.productDetail.promotion[0].promotionValue
-                        ? record.productDetail.promotion[0].promotionMethod ===
-                          "%"
-                          ? record.productDetail.promotion[0].promotionValue +
-                          " " +
-                          record.productDetail.promotion[0].promotionMethod
-                          : record.productDetail.promotion[0].promotionValue.toLocaleString(
-                            "vi-VN",
-                            {
-                              style: "currency",
-                              currency: "VND",
-                            }
-                          )
-                        : null
+                      ? record.productDetail.promotion[0].promotionMethod ===
+                        "%"
+                        ? record.productDetail.promotion[0].promotionValue +
+                        " " +
+                        record.productDetail.promotion[0].promotionMethod
+                        : record.productDetail.promotion[0].promotionValue.toLocaleString(
+                          "vi-VN",
+                          {
+                            style: "currency",
+                            currency: "VND",
+                          }
+                        )
+                      : null
                       }`}
                     color="red"
                   >
@@ -755,14 +755,20 @@ const Bill = () => {
       axios
         .get(`http://localhost:8080/api/admin/account/detail/${username}`, {
           headers: {
-            Authorization: `Bearer ${getToken()}`,
+            Authorization: `Bearer ${getToken(true)}`,
           },
         })
         .then((response) => {
           setAddress(response.data);
         })
         .catch((error) => {
-          console.log(error);
+          const status = error.response.status;
+          if (status === 403) {
+            notification.error({
+              message: "Thông báo",
+              description: "Bạn không có quyền truy cập!",
+            });
+          }
         });
     }
   };
@@ -773,7 +779,7 @@ const Bill = () => {
         result,
         {
           headers: {
-            Authorization: `Bearer ${getToken()}`,
+            Authorization: `Bearer ${getToken(true)}`,
           },
         }
       )
@@ -829,7 +835,13 @@ const Bill = () => {
         });
       })
       .catch((err) => {
-        console.log(err);
+        const status = err.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
       });
     setRendered(Math.random());
   };
@@ -969,7 +981,7 @@ const Bill = () => {
                 billAddress,
                 {
                   headers: {
-                    Authorization: `Bearer ${getToken()}`,
+                    Authorization: `Bearer ${getToken(true)}`,
                   },
                 }
               );
@@ -995,7 +1007,7 @@ const Bill = () => {
               bill,
               {
                 headers: {
-                  Authorization: `Bearer ${getToken()}`,
+                  Authorization: `Bearer ${getToken(true)}`,
                 },
               }
             );
@@ -1012,7 +1024,7 @@ const Bill = () => {
                 },
                 {
                   headers: {
-                    Authorization: `Bearer ${getToken()}`,
+                    Authorization: `Bearer ${getToken(true)}`,
                   },
                 }
               );
@@ -1025,7 +1037,13 @@ const Bill = () => {
             navigate(`/api/admin/order`);
             remove(activeKey);
           } catch (error) {
-            console.log(error);
+            const status = error.response.status;
+            if (status === 403) {
+              notification.error({
+                message: "Thông báo",
+                description: "Bạn không có quyền truy cập!",
+              });
+            }
           }
         },
       });

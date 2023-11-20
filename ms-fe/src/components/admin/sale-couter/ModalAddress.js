@@ -95,7 +95,13 @@ const ModalAddress = ({
         .then((response) => {
           setAddress(response.data)
         }).catch((error) => {
-          console.log(error)
+          const status = error.response.status;
+          if (status === 403) {
+            notification.error({
+              message: "Thông báo",
+              description: "Bạn không có quyền truy cập!",
+            });
+          }
         })
     }
   }

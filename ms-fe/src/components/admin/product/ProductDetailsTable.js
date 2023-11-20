@@ -236,6 +236,7 @@ const ProductDetailsTable = (props) => {
   }
 
   function createProductDetails() {
+    var check = false;
     confirm({
       centered: true,
       title: `Thêm mới các sản phẩm`,
@@ -280,10 +281,14 @@ const ProductDetailsTable = (props) => {
               })
               .catch((error) => {
                 console.log(error);
+                notification.error({
+                  message: "Thông báo",
+                  description: "Thêm mới các chi tiết sản phẩm Thất bại",
+                });
+                return;
               });
           }
         }
-
         setRender(props.productDetails);
         setTimeout(() => {
           notification.open({

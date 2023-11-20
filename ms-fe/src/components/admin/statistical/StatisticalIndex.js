@@ -212,7 +212,10 @@ const StatisticalIndex = () => {
       datatIndex: "total",
       title: "Tổng thu",
       render: (text, record, index) => {
-        return record.price * record.quantity;
+        return (record.price * record.quantity)?.toLocaleString("vi-VN", {
+          style: "currency",
+          currency: "VND",
+        });
       },
     },
   ];
@@ -302,7 +305,7 @@ const StatisticalIndex = () => {
             dayTo,
           {
             headers: {
-              Authorization: `Bearer ${getToken()}`,
+              Authorization: `Bearer ${getToken(true)}`,
             },
           }
         )
@@ -310,12 +313,20 @@ const StatisticalIndex = () => {
           setBillRevenueCompare(res.data);
           setIsLoading(false);
         })
-        .catch((err) => console.log(err));
+        .catch((err) => {
+          const status = err.response.status;
+          if (status === 403) {
+            notification.error({
+              message: "Thông báo",
+              description: "Bạn không có quyền truy cập!",
+            });
+          }
+          console.log(err);
+        });
     }
   }
 
   function getDataLineChart() {
-    console.log(dateLineChartValueFrom, dateLineChartValueTo);
     var dateFrom = new Date(dateLineChartValueFrom);
     var dateTo = new Date(dateLineChartValueTo);
     var yearFrom = dateFrom.getFullYear();
@@ -349,8 +360,6 @@ const StatisticalIndex = () => {
       });
       setIsLoading(false);
     } else {
-      console.log(yearFrom, monthFrom, dayFrom);
-      console.log(yearTo, monthTo, dayTo);
       axios
         .get(
           "http://localhost:8080/api/admin/bill/getDataLineChart?dayFrom=" +
@@ -364,13 +373,24 @@ const StatisticalIndex = () => {
             "&monthTo=" +
             monthTo +
             "&dayTo=" +
-            dayTo
+            dayTo,
+          {
+            headers: {
+              Authorization: `Bearer ${getToken(true)}`,
+            },
+          }
         )
         .then((res) => {
           setData(res.data);
         })
         .catch((error) => {
-          console.log("Get data failed", error);
+          const status = error.response.status;
+          if (status === 403) {
+            notification.error({
+              message: "Thông báo",
+              description: "Bạn không có quyền truy cập!",
+            });
+          }
         });
     }
   }
@@ -402,7 +422,7 @@ const StatisticalIndex = () => {
           year,
         {
           headers: {
-            Authorization: `Bearer ${getToken()}`,
+            Authorization: `Bearer ${getToken(true)}`,
           },
         }
       )
@@ -410,7 +430,16 @@ const StatisticalIndex = () => {
         setLoading(false);
         setBillRevenue(res.data);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        const status = err.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
+        console.log(err);
+      });
   }
 
   useEffect(() => {
@@ -655,15 +684,23 @@ const StatisticalIndex = () => {
                 <Col span={12}>
                   <Statistic
                     title={`Doanh thu ${dateValueFrom}`}
-                    value={billRevenueCompare.revenueFrom || 0}
-                    suffix="VND"
+                    value={
+                      billRevenueCompare.revenueFrom?.toLocaleString("vi-VN", {
+                        style: "currency",
+                        currency: "VND",
+                      }) || 0
+                    }
                   />
                 </Col>
                 <Col span={12}>
                   <Statistic
                     title={`Doanh thu ${dateValueTo}`}
-                    value={billRevenueCompare.revenueTo || 0}
-                    suffix="VND"
+                    value={
+                      billRevenueCompare.revenueTo?.toLocaleString("vi-VN", {
+                        style: "currency",
+                        currency: "VND",
+                      }) || 0
+                    }
                   />
                 </Col>
                 <Col span={24}>

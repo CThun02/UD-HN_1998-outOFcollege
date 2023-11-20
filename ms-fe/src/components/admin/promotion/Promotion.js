@@ -165,7 +165,7 @@ function Promotion() {
             await axios
               .get(basePromotionUrl + "update-status/" + value[0], {
                 headers: {
-                  Authorization: `Bearer ${getToken()}`,
+                  Authorization: `Bearer ${getToken(true)}`,
                 },
               })
               .then((res) => {
@@ -245,7 +245,7 @@ function Promotion() {
             filter,
             {
               headers: {
-                Authorization: `Bearer ${getToken()}`,
+                Authorization: `Bearer ${getToken(true)}`,
               },
             }
           );

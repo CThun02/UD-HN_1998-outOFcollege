@@ -34,7 +34,7 @@ const BrandAdmin = function () {
     axios
       .post("http://localhost:8080/api/admin/brand/create", values, {
         headers: {
-          Authorization: `Bearer ${getToken()}`,
+          Authorization: `Bearer ${getToken(true)}`,
         },
       })
       .then((response) => {

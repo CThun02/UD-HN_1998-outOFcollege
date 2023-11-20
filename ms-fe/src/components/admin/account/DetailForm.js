@@ -121,7 +121,7 @@ const DetailForm = (props) => {
     axios
       .get(`http://localhost:8080/api/admin/account/detail/${username}`, {
         headers: {
-          Authorization: `Bearer ${getToken()}`,
+          Authorization: `Bearer ${getToken(true)}`,
         },
       })
       .then((response) => {
@@ -204,7 +204,7 @@ const DetailForm = (props) => {
                 true,
               {
                 headers: {
-                  Authorization: `Bearer ${getToken()}`,
+                  Authorization: `Bearer ${getToken(true)}`,
                 },
               }
             )
@@ -233,7 +233,7 @@ const DetailForm = (props) => {
                 false,
               {
                 headers: {
-                  Authorization: `Bearer ${getToken()}`,
+                  Authorization: `Bearer ${getToken(true)}`,
                 },
               }
             )
@@ -274,7 +274,7 @@ const DetailForm = (props) => {
               data,
               {
                 headers: {
-                  Authorization: `Bearer ${getToken()}`,
+                  Authorization: `Bearer ${getToken(true)}`,
                 },
               }
             )
@@ -312,7 +312,7 @@ const DetailForm = (props) => {
             addressUpdate,
             {
               headers: {
-                Authorization: `Bearer ${getToken()}`,
+                Authorization: `Bearer ${getToken(true)}`,
               },
             }
           )
@@ -348,7 +348,7 @@ const DetailForm = (props) => {
             addressCreate,
             {
               headers: {
-                Authorization: `Bearer ${getToken()}`,
+                Authorization: `Bearer ${getToken(true)}`,
               },
             }
           )

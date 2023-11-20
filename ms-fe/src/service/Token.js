@@ -49,9 +49,27 @@ async function getAuthToken(isAuthenAdmin) {
       const data = await res.data;
       return data;
     } catch (err) {
-      window.localStorage.removeItem(
-        isAuthenAdmin ? "auth_token_admin" : "auth_token"
-      );
+      if (isAuthenAdmin) {
+        window.localStorage.removeItem("a_abc");
+        window.localStorage.removeItem("w_href");
+        window.localStorage.removeItem("b_a-a");
+        window.localStorage.removeItem("id_vi");
+        window.localStorage.removeItem("bop_sp");
+        window.localStorage.removeItem("bo-o");
+        window.localStorage.removeItem("ws-a");
+        window.localStorage.removeItem("ms-s");
+        window.localStorage.removeItem("k-a1");
+      } else {
+        window.localStorage.removeItem("c1");
+        window.localStorage.removeItem("6s");
+        window.localStorage.removeItem("b91s");
+        window.localStorage.removeItem("3652s");
+        window.localStorage.removeItem("b8563s");
+        window.localStorage.removeItem("a6523");
+        window.localStorage.removeItem("685a102a");
+        window.localStorage.removeItem("msss2a");
+        window.localStorage.removeItem("k2641");
+      }
     }
   }
 }

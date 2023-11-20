@@ -90,7 +90,7 @@ function TableProduct({ productsId, setProductsId, values, status }) {
       try {
         const res = await axios.get(baseUrl + "/promotion", {
           headers: {
-            Authorization: `Bearer ${getToken()}`,
+            Authorization: `Bearer ${getToken(true)}`,
           },
         });
         const data = await res.data;

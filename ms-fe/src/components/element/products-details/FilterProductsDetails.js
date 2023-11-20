@@ -7,7 +7,7 @@ import axios from "axios";
 import FloatingLabels from "../FloatingLabels/FloatingLabels";
 import { SearchOutlined } from "@ant-design/icons";
 
-const baseUrl = "http://localhost:8080/api/admin/product";
+const baseUrl = "http://localhost:8080/api/client/product";
 const baseUrlItem = "http://localhost:8080/api/admin";
 
 function FilterProductsDetails({ setProductsDetails, productsId }) {

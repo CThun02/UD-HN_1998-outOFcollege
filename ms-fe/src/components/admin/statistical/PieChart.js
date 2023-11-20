@@ -3,7 +3,7 @@ import { Pie } from "@ant-design/plots";
 import axios from "axios";
 import Statistic from "antd/es/statistic/Statistic";
 import { getToken } from "../../../service/Token";
-import { Col, DatePicker, Row, Select } from "antd";
+import { Col, DatePicker, Row, Select, notification } from "antd";
 import dayjs from "dayjs";
 import styles from "./StatisticalIndex.module.css";
 import { ClockCircleOutlined } from "@ant-design/icons";
@@ -66,15 +66,32 @@ const PieChart = ({ formattedDateNow }) => {
       );
     }
     axios
-      .get("http://localhost:8080/api/admin/bill/getBillRevenueCompare", {
-        headers: {
-          Authorization: `Bearer ${getToken()}`,
-        },
-      })
+      .get(
+        "http://localhost:8080/api/admin/bill/getBillRevenueCompare?day=" +
+          day +
+          "&month=" +
+          month +
+          "&year=" +
+          year,
+        {
+          headers: {
+            Authorization: `Bearer ${getToken(true)}`,
+          },
+        }
+      )
       .then((res) => {
         setBillRevenueCompare(res.data);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        const status = err.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
+        console.log(err);
+      });
   }, [datePercentCompare, selectTypeDate]);
   return (
     <div>

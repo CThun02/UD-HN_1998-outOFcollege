@@ -80,7 +80,7 @@ function Voucher() {
             await axios
               .put(baseUrl + "update/" + value[0], {
                 headers: {
-                  Authorization: `Bearer ${getToken()}`,
+                  Authorization: `Bearer ${getToken(true)}`,
                 },
               })
               .then((res) => {
@@ -151,13 +151,14 @@ function Voucher() {
             filter,
             {
               headers: {
-                Authorization: `Bearer ${getToken()}`,
+                Authorization: `Bearer ${getToken(true)}`,
               },
             }
           );
 
           const data = await res.data;
 
+          setIsLoading(false);
           setTotalElements(data.totalElements);
           setVouchers(data.content);
           setIsAdmin(true);

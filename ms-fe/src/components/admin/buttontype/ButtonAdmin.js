@@ -25,7 +25,7 @@ const ButtonAdmin = function () {
     axios
       .post("http://localhost:8080/api/admin/button/create", values, {
         headers: {
-          Authorization: `Bearer ${getToken()}`,
+          Authorization: `Bearer ${getToken(true)}`,
         },
       })
       .then((response) => {

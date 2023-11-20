@@ -154,7 +154,7 @@ function CreatePromotion() {
               await axios
                 .post(baseUrlPromotionProduct + "delete", dto, {
                   headers: {
-                    Authorization: `Bearer ${getToken()}`,
+                    Authorization: `Bearer ${getToken(true)}`,
                   },
                 })
                 .then((res) => console.log(res))
@@ -204,7 +204,7 @@ function CreatePromotion() {
                 },
                 {
                   headers: {
-                    Authorization: `Bearer ${getToken()}`,
+                    Authorization: `Bearer ${getToken(true)}`,
                   },
                 }
               )
@@ -257,7 +257,7 @@ function CreatePromotion() {
           await axios
             .get(baseUrl + code, {
               headers: {
-                Authorization: `Bearer ${getToken()}`,
+                Authorization: `Bearer ${getToken(true)}`,
               },
             })
             .then((res) => {

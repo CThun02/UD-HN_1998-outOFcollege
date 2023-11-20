@@ -51,7 +51,7 @@ const BrandTable = function (props) {
         },
         {
           headers: {
-            Authorization: `Bearer ${getToken()}`,
+            Authorization: `Bearer ${getToken(true)}`,
           },
         }
       )
@@ -84,7 +84,7 @@ const BrandTable = function (props) {
         },
         {
           headers: {
-            Authorization: `Bearer ${getToken()}`,
+            Authorization: `Bearer ${getToken(true)}`,
           },
         }
       )
@@ -113,7 +113,7 @@ const BrandTable = function (props) {
     axios
       .delete(`http://localhost:8080/api/admin/brand/delete/${selectedData}`, {
         headers: {
-          Authorization: `Bearer ${getToken()}`,
+          Authorization: `Bearer ${getToken(true)}`,
         },
       })
       .then((response) => {
@@ -141,7 +141,7 @@ const BrandTable = function (props) {
       axios
         .get(`http://localhost:8080/api/admin/brand`, {
           headers: {
-            Authorization: `Bearer ${getToken()}`,
+            Authorization: `Bearer ${getToken(true)}`,
           },
         })
         .then((response) => {

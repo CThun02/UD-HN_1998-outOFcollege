@@ -1,6 +1,15 @@
 import React from "react";
 import { FormOutlined, DeleteFilled } from "@ant-design/icons";
-import { Table, Space, Button, Modal, Input, Switch, message } from "antd";
+import {
+  Table,
+  Space,
+  Button,
+  Modal,
+  Input,
+  Switch,
+  message,
+  notification,
+} from "antd";
 import { useEffect, useState } from "react";
 import styles from "../categorystyles/CategoryStyles.module.css";
 import axios from "axios";
@@ -51,7 +60,15 @@ const MaterialTable = function (props) {
         // Đóng modal
         setShowModal(false);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        const status = err.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
+      });
   };
 
   const handleUpdate = () => {
@@ -72,7 +89,15 @@ const MaterialTable = function (props) {
         setShowDetailsModal(false);
         setRender(Math.random);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        const status = err.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
+      });
   };
 
   const handleUpdateStatus = (id, statusUpdate) => {
@@ -88,7 +113,7 @@ const MaterialTable = function (props) {
         },
         {
           headers: {
-            Authorization: `Bearer ${getToken()}`,
+            Authorization: `Bearer ${getToken(true)}`,
           },
         }
       )
@@ -100,7 +125,15 @@ const MaterialTable = function (props) {
           messageApi.error(mess, 2);
         }
       })
-      .catch((error) => {
+      .catch((err) => {
+        const status = err.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+          return;
+        }
         messageApi.error(`Cập nhật trạng thái thất bại`, 2);
       });
   };
@@ -109,14 +142,22 @@ const MaterialTable = function (props) {
     axios
       .get(`http://localhost:8080/api/admin/material`, {
         headers: {
-          Authorization: `Bearer ${getToken()}`,
+          Authorization: `Bearer ${getToken(true)}`,
         },
       })
       .then((response) => {
         setData(response.data);
         console.log(response.data);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        const status = err.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
+      });
   }, [props.renderTable, render]);
 
   return (

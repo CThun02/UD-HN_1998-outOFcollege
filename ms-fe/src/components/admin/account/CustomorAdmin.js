@@ -37,7 +37,7 @@ const CustomerAddminIndex = function (props) {
           keyword,
         {
           headers: {
-            Authorization: `Bearer ${getToken()}`,
+            Authorization: `Bearer ${getToken(true)}`,
           },
         }
       )

@@ -1,6 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Select, Input, Row, Col, Form, DatePicker, Modal, Button } from "antd";
+import {
+  Select,
+  Input,
+  Row,
+  Col,
+  Form,
+  DatePicker,
+  Modal,
+  Button,
+  notification,
+} from "antd";
 import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
 import SleeveTable from "./SleeveTable";
 import styles from "../categorystyles/CategoryStyles.module.css";
@@ -25,7 +35,7 @@ const SleeveAdmin = function () {
     axios
       .post("http://localhost:8080/api/admin/sleeve/create", values, {
         headers: {
-          Authorization: `Bearer ${getToken()}`,
+          Authorization: `Bearer ${getToken(true)}`,
         },
       })
       .then((response) => {
@@ -36,7 +46,13 @@ const SleeveAdmin = function () {
       })
       .catch((error) => {
         // Xử lý lỗi
-        console.error("Lỗi khi thêm dữ liệu", error);
+        const status = error.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
       });
   };
 

@@ -196,10 +196,6 @@ function SaveVoucher() {
             return result;
           }, []);
 
-          console.log("Values: ", differentList);
-          console.log("usernamesCurrent: ", usernamesCurrent);
-          console.log("usernames: ", usernames);
-
           setIsLoading(true);
           if (voucher) {
             await axios
@@ -245,7 +241,7 @@ function SaveVoucher() {
                 },
                 {
                   headers: {
-                    Authorization: `Bearer ${getToken()}`,
+                    Authorization: `Bearer ${getToken(true)}`,
                   },
                 }
               )
@@ -296,7 +292,7 @@ function SaveVoucher() {
           await axios
             .get(baseUrl + code, {
               headers: {
-                Authorization: `Bearer ${getToken()}`,
+                Authorization: `Bearer ${getToken(true)}`,
               },
             })
             .then((res) => {

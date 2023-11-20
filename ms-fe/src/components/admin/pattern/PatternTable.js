@@ -1,7 +1,16 @@
 import React from "react";
 import { FormOutlined, DeleteFilled } from "@ant-design/icons";
 
-import { Table, Space, Button, Modal, Input, message, Switch } from "antd";
+import {
+  Table,
+  Space,
+  Button,
+  Modal,
+  Input,
+  message,
+  Switch,
+  notification,
+} from "antd";
 import { useEffect, useState } from "react";
 import styles from "./PatternlStyle.module.css";
 import axios from "axios";
@@ -58,7 +67,16 @@ const PatternTable = function (props) {
         // Hiển thị thông báo thành công
         message.success("Cập nhật thành công");
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        const status = err.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+          return;
+        }
+      });
   };
   const handleUpdateStatus = (id, statusUpdate) => {
     let mess = statusUpdate ? "Đang hoạt động" : "Ngưng hoạt động";
@@ -84,6 +102,14 @@ const PatternTable = function (props) {
         }, 500);
       })
       .catch((error) => {
+        const status = error.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+          return;
+        }
         setTimeout(() => {
           messageApi.error(`Cập nhật trạng thái thất bại`, 2);
         }, 500);
@@ -96,7 +122,7 @@ const PatternTable = function (props) {
         `http://localhost:8080/api/admin/pattern/delete/${selectedData}`,
         {
           headers: {
-            Authorization: `Bearer ${getToken()}`,
+            Authorization: `Bearer ${getToken(true)}`,
           },
         }
       )
@@ -108,21 +134,39 @@ const PatternTable = function (props) {
         // Đóng modal
         setShowModal(false);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        const status = err.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+          return;
+        }
+      });
   };
 
   useEffect(() => {
     axios
       .get(`http://localhost:8080/api/admin/pattern`, {
         headers: {
-          Authorization: `Bearer ${getToken()}`,
+          Authorization: `Bearer ${getToken(true)}`,
         },
       })
       .then((response) => {
         setData(response.data);
         console.log(response.data);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        const status = err.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+          return;
+        }
+      });
   }, [props.renderTable, render]);
 
   return (

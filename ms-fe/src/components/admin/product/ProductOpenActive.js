@@ -51,14 +51,12 @@ const ProductOpenActive = ({ product, onCancel, open, render }) => {
   return (
     <Modal
       footer={null}
-      onCancel={() => {
-        navigate("/api/admin/product");
-      }}
+      onCancel={onCancel}
       centered
       open={open}
     >
       {contextHolder}
-      <h6>Sản phẩm đang tạm ngưng kinh doanh</h6>
+      <h6> Sản phẩm đang tạm ngưng kinh doanh</h6 >
       <p>Vui lòng mở kinh doanh ở bên dưới!</p>
       <div
         style={{
@@ -97,7 +95,7 @@ const ProductOpenActive = ({ product, onCancel, open, render }) => {
           Xác nhận
         </Button>
       </div>
-    </Modal>
+    </Modal >
   );
 };
 

@@ -10,12 +10,16 @@ import com.fpoly.ooc.repository.TimeLineRepo;
 import com.fpoly.ooc.request.timeline.TimeLinerequest;
 import com.fpoly.ooc.responce.bill.BillInfoResponse;
 import com.fpoly.ooc.responce.timeline.TimeLineResponse;
+import com.fpoly.ooc.responce.timeline.TimelineProductDisplayResponse;
 import com.fpoly.ooc.responce.timeline.TimelineProductResponse;
+import com.fpoly.ooc.service.interfaces.ProductDetailServiceI;
+import com.fpoly.ooc.service.interfaces.ProductImageServiceI;
 import com.fpoly.ooc.service.interfaces.TimeLineService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -26,6 +30,9 @@ public class TimeLineServiceImpl implements TimeLineService {
 
     @Autowired
     private BillRepo billRepo;
+
+    @Autowired
+    private ProductImageServiceI productImageServiceI;
 
     @Override
     public List<TimeLineResponse> getAllTimeLineByBillId(Long id) {
@@ -67,8 +74,15 @@ public class TimeLineServiceImpl implements TimeLineService {
     }
 
     @Override
-    public List<TimelineProductResponse> getTimelineProductByBillId(Long id) {
-        return timeLineRepo.getTimelineProductByBillId(id);
+    public List<TimelineProductDisplayResponse> getTimelineProductByBillId(Long id) {
+        List<TimelineProductResponse> lstTimelineProductResponses = timeLineRepo.getTimelineProductByBillId(id);
+        List<TimelineProductDisplayResponse> list = new ArrayList<>();
+        for (int i = 0; i < lstTimelineProductResponses.size(); i++) {
+            TimelineProductDisplayResponse response = new TimelineProductDisplayResponse(lstTimelineProductResponses.get(i));
+            response.setProductImageResponses(productImageServiceI.getProductImageByProductDetailId(response.getProductDetailId()));
+            list.add(response);
+        }
+        return list;
     }
 
     @Override

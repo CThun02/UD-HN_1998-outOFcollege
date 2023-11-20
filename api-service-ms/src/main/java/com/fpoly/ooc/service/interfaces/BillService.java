@@ -3,6 +3,7 @@ package com.fpoly.ooc.service.interfaces;
 import com.fpoly.ooc.dto.BillStatusDTO;
 import com.fpoly.ooc.entity.Address;
 import com.fpoly.ooc.entity.Bill;
+import com.fpoly.ooc.entity.BillDetail;
 import com.fpoly.ooc.request.bill.BillRequest;
 import com.fpoly.ooc.request.product.ProductDetailRequest;
 import com.fpoly.ooc.responce.bill.*;

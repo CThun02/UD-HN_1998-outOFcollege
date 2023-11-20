@@ -67,7 +67,7 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
                                                                      Integer day, Integer month, Integer year);
 
 
-    @Query("select b.billCode as billCode, b.createdBy as employee" +
+    @Query("select b.id as billId, b.billCode as billCode, b.createdBy as employee" +
             ", d.name as customerName, b.createdAt as createdAt, b.status as status from Bill b " +
             "join DeliveryNote d on d.bill.id = b.id" +
             " where b.status like ?1")

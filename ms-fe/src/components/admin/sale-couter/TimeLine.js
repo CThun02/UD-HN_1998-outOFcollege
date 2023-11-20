@@ -139,6 +139,7 @@ const BillTimeLine = (addId) => {
                 setTimelinesPoduct(response.data);
             })
             .catch((error) => {
+                console.log(error)
                 const status = error.response.status;
                 if (status === 403) {
                     notification.error({
@@ -181,21 +182,21 @@ const BillTimeLine = (addId) => {
         {
             key: "productName",
             title: "Sản phẩm",
-            width: 800,
+            width: '50%',
             render: (text, record, index) => {
                 return (
                     <Row>
                         {console.log(record)}
                         <Col span={4}>
                             <Carousel autoplay className={styles.slider}>
-                                {record.productDetailImages &&
-                                    record.productDetailImages.map((productImage, index) => {
+                                {record.productImageResponses &&
+                                    record.productImageResponses.map((productImage, index) => {
                                         return (
                                             <img
                                                 key={index}
                                                 style={{ width: "100px" }}
                                                 alt="abc"
-                                                src={productImage}
+                                                src={productImage.path}
                                             />
                                         );
                                     })}
@@ -262,7 +263,22 @@ const BillTimeLine = (addId) => {
             title: "Giá",
             dataIndex: "productPrice",
             key: "productPrice",
+            render: (price) => {
+                return price.toLocaleString("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                })
+            }
         },
+        {
+            title: 'Thao tác',
+            key: 'action',
+            render: (text, render) => {
+                let checkShippingSuccess = timelines.some(item => item.status === '4')
+                return checkShippingSuccess && <Button type="primary"
+                    onClick={() => showModalConfirm()}> Trả hàng</Button >
+            }
+        }
     ];
     return (
         <>
@@ -297,9 +313,7 @@ const BillTimeLine = (addId) => {
                                                                 ? "Đã đóng gói & đang được giao"
                                                                 : "Giao hàng thành công"
                                             }
-                                            subtitle={moment(data.createdDate).format(
-                                                "HH:mm:ss DD/MM/YYYY"
-                                            )}
+                                            subtitle={data.createdDate}
                                         />
                                     ))}
                             </Timeline>
@@ -325,9 +339,7 @@ const BillTimeLine = (addId) => {
                                                             ? "Đã hủy"
                                                             : ""
                                             }
-                                            subtitle={moment(data.createdDate).format(
-                                                "HH:mm:ss DD/MM/YYYY"
-                                            )}
+                                            subtitle={data.createdDate}
                                         />
                                     ))}
                             </Timeline>
@@ -359,7 +371,6 @@ const BillTimeLine = (addId) => {
                             </Button>
                         </>
                     )}
-                    {console.log("timeline", timelines.length)}
                     {billInfo?.symbol !== "Received" &&
                         timelines.length !== 4 &&
                         timelines.length !== 5 &&
@@ -450,9 +461,7 @@ const BillTimeLine = (addId) => {
                             </Col>
                             <Col span={12}>
                                 <SpanBorder
-                                    child={moment(billInfo.createdDate).format(
-                                        "HH:mm:ss  DD/MM/YYYY"
-                                    )}
+                                    child={billInfo.createdDate}
                                     color={"#1677ff"}
                                 />
                             </Col>

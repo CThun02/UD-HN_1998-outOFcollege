@@ -40,8 +40,7 @@ const ModalDetail = ({ isModalOpen, handleOk, handleCancel, timelineDetail, symb
             dataIndex: 'createdDate',
             key: 'createdDate',
             render: (createdDate) => {
-                return moment(createdDate)
-                    .format('DD/MM/YYYY HH:mm')
+                return createdDate
             }
         },
         {

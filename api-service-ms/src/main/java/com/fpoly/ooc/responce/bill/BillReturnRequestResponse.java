@@ -6,6 +6,7 @@ import com.fpoly.ooc.entity.Account;
 import java.time.LocalDateTime;
 
 public interface BillReturnRequestResponse {
+    Long getBillId();
     String getBillCode();
     String getEmployee();
     String getCustomerName();

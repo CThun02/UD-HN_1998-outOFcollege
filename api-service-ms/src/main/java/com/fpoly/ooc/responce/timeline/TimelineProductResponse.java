@@ -11,6 +11,10 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class TimelineProductResponse {
 
+    private Long productDetailId;
+
+    private Long billDetailId;
+
     private String productName;
 
     private Integer quantity;
@@ -36,4 +40,9 @@ public class TimelineProductResponse {
     private String productFormName;
 
     private String productPatternName;
+
+    private String productBrandName;
+
+    private String productCateGoryName;
+    
 }

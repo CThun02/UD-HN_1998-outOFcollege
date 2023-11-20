@@ -10,12 +10,12 @@ import {
 } from "@ant-design/icons";
 import { Button, Space, Table, Tabs, Tag, notification } from "antd";
 import Input from "antd/es/input/Input";
-import Link from "antd/es/typography/Link";
 import axios from "axios";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import styles from "./ReturnIndex.module.css";
 import { getToken } from "../../../service/Token";
+import { Link } from "react-router-dom";
 
 const ReturnIndex = () => {
   const api = "http://localhost:8080/api/admin/bill";
@@ -103,6 +103,7 @@ const ReturnIndex = () => {
         setData(response.data);
       })
       .catch((err) => {
+        console.log(err)
         const status = err.response.status;
         if (status === 403) {
           notification.error({
@@ -125,7 +126,7 @@ const ReturnIndex = () => {
             size="large"
             placeholder="Tìm kiếm hóa đơn"
             prefix={<SearchOutlined />}
-            onChange={(e) => {}}
+            onChange={(e) => { }}
           />
         </div>
       </div>
@@ -149,8 +150,8 @@ const ReturnIndex = () => {
                   {id === "1"
                     ? "Thành công"
                     : id === "2"
-                    ? "Đã hủy"
-                    : "Đang đợi"}
+                      ? "Đã hủy"
+                      : "Đang đợi"}
                 </span>
               ),
               key: id === "1" ? "RETURNS" : id === "2" ? "RETURNC" : "RETURNW",

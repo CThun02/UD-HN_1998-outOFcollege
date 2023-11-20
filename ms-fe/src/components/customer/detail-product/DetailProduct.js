@@ -86,7 +86,7 @@ function DetailProduct({ setRenderHeader }) {
     const getProductDetails = () => {
       axios
         .get(
-          `http://localhost:8080/api/admin/bill/filterProductDetailSellByIdCom`,
+          `http://localhost:8080/api/client/filterProductDetailSellByIdCom`,
           {
             params: {
               materialId: materialId,

@@ -2,7 +2,7 @@ import { Input, Space } from "antd";
 import styles from "./HeaderNavFollowOrder.module.css";
 import { SearchOutlined } from "@ant-design/icons";
 
-function HeaderNavFollowOrder() {
+function HeaderNavFollowOrder({ setStatus }) {
   return (
     <div className={styles.headerNavFollowOrder}>
       <div className={styles.content}>
@@ -11,31 +11,37 @@ function HeaderNavFollowOrder() {
             <div className={styles.center}>
               <span
                 className={`${styles.textSize} ${styles.textColor} ${styles.span} ${styles.active}`}
+                onClick={() => setStatus(null)}
               >
                 Tất cả
               </span>
               <span
                 className={`${styles.textSize} ${styles.textColor} ${styles.span} ${styles.active}`}
+                onClick={() => setStatus(1)}
               >
                 Chờ xác nhận
               </span>
               <span
                 className={`${styles.textSize} ${styles.textColor} ${styles.span} ${styles.active}`}
+                onClick={() => setStatus(2)}
               >
-                Chờ vận chuyển
+                Đã xác nhận
               </span>
               <span
                 className={`${styles.textSize} ${styles.textColor} ${styles.span} ${styles.active}`}
+                onClick={() => setStatus(3)}
               >
-                Chờ giao hàng
+                Đang giao hàng
               </span>
               <span
                 className={`${styles.textSize} ${styles.textColor} ${styles.span} ${styles.active}`}
+                onClick={() => setStatus(4)}
               >
                 Hoàn thành
               </span>
               <span
                 className={`${styles.textSize} ${styles.textColor} ${styles.span} ${styles.active}`}
+                onClick={() => setStatus(0)}
               >
                 Đã hủy
               </span>
@@ -51,8 +57,8 @@ function HeaderNavFollowOrder() {
             </div>
           </Space>
         </div>
-      </div>
-    </div>
+      </div >
+    </div >
   );
 }
 

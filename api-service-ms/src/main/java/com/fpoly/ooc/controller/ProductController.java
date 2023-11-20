@@ -91,6 +91,11 @@ public class ProductController {
         return ResponseEntity.ok(productDetailService.searchProductDetail(keyWords));
     }
 
+    @GetMapping("/promotion")
+    public ResponseEntity<?> findProductPromotion() {
+        return ResponseEntity.ok(service.findProductPromotion());
+    }
+
     @GetMapping("/getAllProductImages")
     public List<?> getAllProductImages() {
         return productImageService.getAll();

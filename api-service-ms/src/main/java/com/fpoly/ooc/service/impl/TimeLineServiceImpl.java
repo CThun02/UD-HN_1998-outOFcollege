@@ -2,6 +2,7 @@ package com.fpoly.ooc.service.impl;
 
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
+import com.fpoly.ooc.entity.Account;
 import com.fpoly.ooc.entity.Bill;
 import com.fpoly.ooc.entity.Timeline;
 import com.fpoly.ooc.exception.NotFoundException;
@@ -9,10 +10,13 @@ import com.fpoly.ooc.repository.BillRepo;
 import com.fpoly.ooc.repository.TimeLineRepo;
 import com.fpoly.ooc.request.timeline.TimeLinerequest;
 import com.fpoly.ooc.responce.bill.BillInfoResponse;
+import com.fpoly.ooc.responce.product.ProductDetailDisplayResponse;
+import com.fpoly.ooc.responce.product.ProductDetailResponse;
+import com.fpoly.ooc.responce.product.ProductImageResponse;
 import com.fpoly.ooc.responce.timeline.TimeLineResponse;
 import com.fpoly.ooc.responce.timeline.TimelineProductDisplayResponse;
 import com.fpoly.ooc.responce.timeline.TimelineProductResponse;
-import com.fpoly.ooc.service.interfaces.ProductDetailServiceI;
+import com.fpoly.ooc.service.interfaces.AccountService;
 import com.fpoly.ooc.service.interfaces.ProductImageServiceI;
 import com.fpoly.ooc.service.interfaces.TimeLineService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +37,9 @@ public class TimeLineServiceImpl implements TimeLineService {
 
     @Autowired
     private ProductImageServiceI productImageServiceI;
+
+    @Autowired
+    private AccountService accountService;
 
     @Override
     public List<TimeLineResponse> getAllTimeLineByBillId(Long id) {
@@ -88,6 +95,23 @@ public class TimeLineServiceImpl implements TimeLineService {
     @Override
     public BillInfoResponse getBillInfoByBillId(Long id) {
         return timeLineRepo.getBillInfoByIdBillId(id);
+    }
+
+    @Override
+    public List<ProductDetailDisplayResponse> getListTimelineByUser(String username, String phoneNumber, String email, String status) {
+        List<ProductDetailDisplayResponse> productDetailDisplayResponses = new ArrayList<>();
+        List<Long> billIdLongs = timeLineRepo.getBillIdByUserNameOrPhoneNumberOrEmail(username, phoneNumber, email, status);
+        for (int i = 0; i < billIdLongs.size(); i++) {
+            List<ProductDetailResponse> productDetailResponses = billRepo.getProductDetailByBillId(billIdLongs.get(i));
+            for (int j = 0; j < productDetailResponses.size(); j++) {
+                List<ProductImageResponse> productImageResponses = productImageServiceI.getProductImageByProductDetailId(productDetailResponses.get(j).getId());
+                ProductDetailDisplayResponse productDetailDisplayResponse = new
+                        ProductDetailDisplayResponse(productDetailResponses.get(j),
+                        productImageResponses==null?new ArrayList<>() : productImageResponses);
+                productDetailDisplayResponses.add(productDetailDisplayResponse);
+            }
+        }
+        return productDetailDisplayResponses;
     }
 
 

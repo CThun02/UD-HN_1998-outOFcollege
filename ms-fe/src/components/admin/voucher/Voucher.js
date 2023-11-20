@@ -158,6 +158,7 @@ function Voucher() {
 
           const data = await res.data;
 
+          setIsLoading(false);
           setTotalElements(data.totalElements);
           setVouchers(data.content);
           setIsAdmin(true);

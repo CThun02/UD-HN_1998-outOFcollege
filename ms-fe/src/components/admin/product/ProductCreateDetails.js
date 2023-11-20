@@ -297,11 +297,6 @@ const ProductCreateDetails = () => {
     }
   }
 
-  function selectProduct(index) {
-    setProduct(productList[index]);
-    handleSetProductDetail("productId", productList[index].id);
-  }
-
   function renderProductDetails() {
     let list = [];
     if (colorsCreate.length > 0 && sizesCreate.length > 0) {

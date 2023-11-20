@@ -78,7 +78,7 @@ function Voucher() {
         async function changeStatusVoucher() {
           try {
             await axios
-              .put(baseUrl + "update/" + value[0], {
+              .put(baseUrl + "update/" + value[0], null, {
                 headers: {
                   Authorization: `Bearer ${getToken(true)}`,
                 },
@@ -299,7 +299,7 @@ function Voucher() {
   return (
     <div className={styles.voucher}>
       {contextHolder}
-      <SockJs setValues={setVouchers} connectTo={"voucher"} isAdmin={isAdmin} />
+      <SockJs setValues={setVouchers} connectTo={"voucher"} />
       <FilterVoucherAndPromotion
         searchNameOrCode={searchNameOrCode}
         setSearchNameOrCode={setSearchNameOrCode}

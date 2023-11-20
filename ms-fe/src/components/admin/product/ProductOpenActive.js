@@ -1,4 +1,4 @@
-import { Button, message, Switch } from "antd";
+import { Button, message, notification, Switch } from "antd";
 import Checkbox from "antd/es/checkbox/Checkbox";
 import Modal from "antd/es/modal/Modal";
 import axios from "axios";
@@ -17,15 +17,15 @@ const ProductOpenActive = ({ product, onCancel, open, render }) => {
     axios
       .put(
         api +
-          "product/updateProductStatus?productId=" +
-          product.id +
-          "&status=" +
-          (activeProduct === true ? "ACTIVE" : "INACTIVE") +
-          "&openAll=" +
-          openAll,
+        "product/updateProductStatus?productId=" +
+        product.id +
+        "&status=" +
+        (activeProduct === true ? "ACTIVE" : "INACTIVE") +
+        "&openAll=" +
+        openAll,
         {
           headers: {
-            Authorization: `Bearer ${getToken()}`,
+            Authorization: `Bearer ${getToken(true)}`,
           },
         }
       )
@@ -38,6 +38,13 @@ const ProductOpenActive = ({ product, onCancel, open, render }) => {
         render();
       })
       .catch((error) => {
+        const status = error.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
         messageApi.error(`Cập nhật trạng thái thất bại`, 2);
       });
   }

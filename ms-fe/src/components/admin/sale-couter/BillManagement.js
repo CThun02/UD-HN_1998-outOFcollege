@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styles from "./BillManagement.module.css";
-import { Button, Input, Select, Table, Tag, TreeSelect } from "antd";
+import { Button, Input, Select, Table, Tag, TreeSelect, notification } from "antd";
 import {
   EyeOutlined,
   FilterFilled,
@@ -137,10 +137,10 @@ const BillManagement = () => {
           object === "Unpaid"
             ? "geekblue"
             : object.toLocaleLowerCase() === "PAID".toLocaleLowerCase()
-            ? "green"
-            : object === "Cancel"
-            ? "red"
-            : null;
+              ? "green"
+              : object === "Cancel"
+                ? "red"
+                : null;
         return (
           <Space direction="vertical">
             <div style={{ width: "auto", display: "flex" }}>
@@ -148,8 +148,8 @@ const BillManagement = () => {
                 {object === "Unpaid"
                   ? "Chưa thanh toán"
                   : object === "Cancel"
-                  ? "Đã hủy"
-                  : "Đã thanh toán"}
+                    ? "Đã hủy"
+                    : "Đã thanh toán"}
               </Tag>
             </div>
           </Space>
@@ -183,9 +183,9 @@ const BillManagement = () => {
     };
     console.log(params);
     axios
-      .get(`http://localhost:8080/api/admin/bill`, {
+      .get(`http://localhost:8080/api/admin/bill?billCode=${billCode}&startDate=${startDate}&endDate=${endDate}&status=${status}&billType=${billType}&symbol=${symbol}`, {
         headers: {
-          Authorization: `Bearer ${getToken()}`,
+          Authorization: `Bearer ${getToken(true)}`,
         },
       })
       .then((response) => {
@@ -193,7 +193,13 @@ const BillManagement = () => {
         setLoading(false);
       })
       .catch((error) => {
-        console.log(error);
+        const status = error.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
         setLoading(false);
       });
   };

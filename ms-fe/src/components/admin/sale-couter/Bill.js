@@ -126,12 +126,14 @@ const Bill = () => {
       },
     },
     {
-      key: "productName",
+      key: "product",
+      datatIndex: "product",
       title: "Sản phẩm",
+      width: "50%",
       render: (text, record, index) => {
         return (
-          <Row>
-            <Col span={6}>
+          <Row style={{ width: "100%" }}>
+            <Col span={6} style={{ height: "100%" }}>
               <div
                 style={{
                   marginTop: "10px",
@@ -140,42 +142,39 @@ const Bill = () => {
               >
                 {record.productDetail.promotion.length !== 0 ? (
                   <Badge.Ribbon
-                    text={`Giảm ${
-                      record.productDetail.promotion[0].promotionValue
-                        ? record.productDetail.promotion[0].promotionMethod ===
-                          "%"
-                          ? record.productDetail.promotion[0].promotionValue +
-                            " " +
-                            record.productDetail.promotion[0].promotionMethod
-                          : record.productDetail.promotion[0].promotionValue.toLocaleString(
-                              "vi-VN",
-                              {
-                                style: "currency",
-                                currency: "VND",
-                              }
-                            )
-                        : null
-                    }`}
+                    text={`Giảm ${record.productDetail.promotion[0].promotionValue
+                      ? record.productDetail.promotion[0].promotionMethod ===
+                        "%"
+                        ? record.productDetail.promotion[0].promotionValue +
+                        " " +
+                        record.productDetail.promotion[0].promotionMethod
+                        : record.productDetail.promotion[0].promotionValue.toLocaleString(
+                          "vi-VN",
+                          {
+                            style: "currency",
+                            currency: "VND",
+                          }
+                        )
+                      : null
+                      }`}
                     color="red"
                   >
-                    <Carousel className={styles.slider} autoplay>
+                    <Carousel style={{ maxWidth: "300px" }} autoplay>
                       {record.productDetail.productImageResponse &&
-                        record.productDetail.productImageResponse.map(
-                          (item) => {
-                            return (
-                              <img
-                                key={item.id}
-                                style={{ width: "100%", marginTop: "10px" }}
-                                alt=""
-                                src={item.path}
-                              />
-                            );
-                          }
-                        )}
+                        record.productDetail.productImageResponse.map((item) => {
+                          return (
+                            <img
+                              key={item.id}
+                              style={{ width: "100%", marginTop: "10px" }}
+                              alt=""
+                              src={item.path}
+                            />
+                          );
+                        })}
                     </Carousel>
                   </Badge.Ribbon>
                 ) : (
-                  <Carousel className={styles.slider} autoplay>
+                  <Carousel style={{ maxWidth: "300px" }} autoplay>
                     {record.productDetail.productImageResponse &&
                       record.productDetail.productImageResponse.map((item) => {
                         return (
@@ -191,7 +190,7 @@ const Bill = () => {
                 )}
               </div>
             </Col>
-            <Col span={18}>
+            <Col span={18} style={{ height: "100%" }}>
               <div
                 className="m-5"
                 style={{
@@ -251,7 +250,6 @@ const Bill = () => {
       title: "Số lượng",
       dataIndex: "quantity",
       key: "quantity",
-      width: 200,
       render: (text, record, index) => {
         return (
           <InputNumber
@@ -269,7 +267,6 @@ const Bill = () => {
       title: "Đơn giá",
       dataIndex: "price",
       key: "price",
-      width: 200,
 
       render: (text, record, index) => {
         return (
@@ -296,20 +293,20 @@ const Bill = () => {
               {record.productDetail.promotionValue
                 ? record.productDetail.promotionMethod === "%"
                   ? (
-                      (record.productDetail.price *
-                        (100 - Number(record.productDetail.promotionValue))) /
-                      100
-                    ).toLocaleString("vi-VN", {
-                      style: "currency",
-                      currency: "VND",
-                    })
+                    (record.productDetail.price *
+                      (100 - Number(record.productDetail.promotionValue))) /
+                    100
+                  ).toLocaleString("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  })
                   : (
-                      record.productDetail.price -
-                      Number(record.productDetail.promotionValue)
-                    ).toLocaleString("vi-VN", {
-                      style: "currency",
-                      currency: "VND",
-                    })
+                    record.productDetail.price -
+                    Number(record.productDetail.promotionValue)
+                  ).toLocaleString("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  })
                 : null}
             </span>
           </div>
@@ -320,7 +317,6 @@ const Bill = () => {
       title: "Thành tiền",
       dataIndex: "totalPrice",
       key: "totalPrice",
-      width: 200,
       render: (text, record, index) => {
         return (
           <span>
@@ -335,8 +331,6 @@ const Bill = () => {
     {
       title: "Thao tác",
       key: "action",
-      width: 200,
-
       render: (text, record, index) => (
         <Space size="middle">
           <Button
@@ -761,14 +755,20 @@ const Bill = () => {
       axios
         .get(`http://localhost:8080/api/admin/account/detail/${username}`, {
           headers: {
-            Authorization: `Bearer ${getToken()}`,
+            Authorization: `Bearer ${getToken(true)}`,
           },
         })
         .then((response) => {
           setAddress(response.data);
         })
         .catch((error) => {
-          console.log(error);
+          const status = error.response.status;
+          if (status === 403) {
+            notification.error({
+              message: "Thông báo",
+              description: "Bạn không có quyền truy cập!",
+            });
+          }
         });
     }
   };
@@ -776,10 +776,10 @@ const Bill = () => {
     axios
       .get(
         "http://localhost:8080/api/admin/product/getproductdetailbyidpd?productDetailId=" +
-          result,
+        result,
         {
           headers: {
-            Authorization: `Bearer ${getToken()}`,
+            Authorization: `Bearer ${getToken(true)}`,
           },
         }
       )
@@ -815,8 +815,8 @@ const Bill = () => {
             priceReduce: response.data.promotionValue
               ? response.data.promotionMethod === "%"
                 ? (response.data.price *
-                    (100 - Number(response.data.promotionValue))) /
-                  100
+                  (100 - Number(response.data.promotionValue))) /
+                100
                 : response.data.price - Number(response.data.promotionValue)
               : response.data.price,
           });
@@ -835,7 +835,13 @@ const Bill = () => {
         });
       })
       .catch((err) => {
-        console.log(err);
+        const status = err.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
       });
     setRendered(Math.random());
   };
@@ -904,8 +910,8 @@ const Bill = () => {
       amountPaid: typeShipping[index]
         ? 0
         : selectedOption[index] === "2"
-        ? voucherPrice() + shippingFee
-        : amountPaid,
+          ? voucherPrice() + shippingFee
+          : amountPaid,
       billType: "In-Store",
       symbol: typeShipping[index] ? "Shipping" : symbol,
       status: typeShipping[index] ? "Unpaid" : "Paid",
@@ -975,7 +981,7 @@ const Bill = () => {
                 billAddress,
                 {
                   headers: {
-                    Authorization: `Bearer ${getToken()}`,
+                    Authorization: `Bearer ${getToken(true)}`,
                   },
                 }
               );
@@ -1001,7 +1007,7 @@ const Bill = () => {
               bill,
               {
                 headers: {
-                  Authorization: `Bearer ${getToken()}`,
+                  Authorization: `Bearer ${getToken(true)}`,
                 },
               }
             );
@@ -1018,7 +1024,7 @@ const Bill = () => {
                 },
                 {
                   headers: {
-                    Authorization: `Bearer ${getToken()}`,
+                    Authorization: `Bearer ${getToken(true)}`,
                   },
                 }
               );
@@ -1031,7 +1037,13 @@ const Bill = () => {
             navigate(`/api/admin/order`);
             remove(activeKey);
           } catch (error) {
-            console.log(error);
+            const status = error.response.status;
+            if (status === 403) {
+              notification.error({
+                message: "Thông báo",
+                description: "Bạn không có quyền truy cập!",
+              });
+            }
           }
         },
       });
@@ -1261,9 +1273,9 @@ const Bill = () => {
                               value={
                                 selectedAddress.city
                                   ? selectedAddress?.city.substring(
-                                      0,
-                                      selectedAddress.city.indexOf("|")
-                                    )
+                                    0,
+                                    selectedAddress.city.indexOf("|")
+                                  )
                                   : undefined
                               }
                             >
@@ -1300,9 +1312,9 @@ const Bill = () => {
                               value={
                                 selectedAddress.district
                                   ? selectedAddress?.district.substring(
-                                      0,
-                                      selectedAddress.district.indexOf("|")
-                                    )
+                                    0,
+                                    selectedAddress.district.indexOf("|")
+                                  )
                                   : undefined
                               }
                             >
@@ -1337,9 +1349,9 @@ const Bill = () => {
                               value={
                                 selectedAddress.ward
                                   ? selectedAddress.ward.substring(
-                                      0,
-                                      selectedAddress.ward.indexOf("|")
-                                    )
+                                    0,
+                                    selectedAddress.ward.indexOf("|")
+                                  )
                                   : undefined
                               }
                             >
@@ -1404,11 +1416,11 @@ const Bill = () => {
                             productDetails.length > 0
                               ? true
                               : notification.error({
-                                  message: "Lỗi",
-                                  description:
-                                    "Chưa có sản phẩm trong giỏ hàng.",
-                                  duration: 2,
-                                })
+                                message: "Lỗi",
+                                description:
+                                  "Chưa có sản phẩm trong giỏ hàng.",
+                                duration: 2,
+                              })
                           )
                         }
                       >
@@ -1548,7 +1560,7 @@ const Bill = () => {
                           )}
                         </Col>
                         {Number(selectedOption[index]) !== 2 &&
-                        !typeShipping[index] ? (
+                          !typeShipping[index] ? (
                           <>
                             <Col span={8} style={{ marginTop: "8px" }}>
                               <span
@@ -1597,7 +1609,7 @@ const Bill = () => {
                           </>
                         ) : null}
                         {Number(selectedOption[index]) !== 2 &&
-                        !typeShipping[index] ? (
+                          !typeShipping[index] ? (
                           <Col span={24}>
                             <Row style={{ marginTop: "8px" }}>
                               <Col span={16}>

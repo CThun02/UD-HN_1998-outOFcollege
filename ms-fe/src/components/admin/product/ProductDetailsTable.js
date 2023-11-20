@@ -67,42 +67,42 @@ const ProductDetailsTable = (props) => {
       while (j < allProductDetailsCopy.length) {
         if (
           allProductDetailsCopy[i].brand.id ===
-            allProductDetailsCopy[j].brand.id &&
+          allProductDetailsCopy[j].brand.id &&
           allProductDetailsCopy[i].category.id ===
-            allProductDetailsCopy[j].category.id &&
+          allProductDetailsCopy[j].category.id &&
           allProductDetailsCopy[i].button.id ===
-            allProductDetailsCopy[j].button.id &&
+          allProductDetailsCopy[j].button.id &&
           allProductDetailsCopy[i].material.id ===
-            allProductDetailsCopy[j].material.id &&
+          allProductDetailsCopy[j].material.id &&
           allProductDetailsCopy[i].sleeve.id ===
-            allProductDetailsCopy[j].sleeve.id &&
+          allProductDetailsCopy[j].sleeve.id &&
           allProductDetailsCopy[i].collar.id ===
-            allProductDetailsCopy[j].collar.id &&
+          allProductDetailsCopy[j].collar.id &&
           allProductDetailsCopy[i].shirtTail.id ===
-            allProductDetailsCopy[j].shirtTail.id &&
+          allProductDetailsCopy[j].shirtTail.id &&
           allProductDetailsCopy[i].color.id ===
-            allProductDetailsCopy[j].color.id &&
+          allProductDetailsCopy[j].color.id &&
           allProductDetailsCopy[i].size.id === allProductDetailsCopy[j].size.id
         ) {
           // Nếu các thuộc tính giống nhau, bỏ qua
           j++;
         } else if (
           allProductDetailsCopy[i].brand.id ===
-            allProductDetailsCopy[j].brand.id &&
+          allProductDetailsCopy[j].brand.id &&
           allProductDetailsCopy[i].category.id ===
-            allProductDetailsCopy[j].category.id &&
+          allProductDetailsCopy[j].category.id &&
           allProductDetailsCopy[i].button.id ===
-            allProductDetailsCopy[j].button.id &&
+          allProductDetailsCopy[j].button.id &&
           allProductDetailsCopy[i].material.id ===
-            allProductDetailsCopy[j].material.id &&
+          allProductDetailsCopy[j].material.id &&
           allProductDetailsCopy[i].sleeve.id ===
-            allProductDetailsCopy[j].sleeve.id &&
+          allProductDetailsCopy[j].sleeve.id &&
           allProductDetailsCopy[i].collar.id ===
-            allProductDetailsCopy[j].collar.id &&
+          allProductDetailsCopy[j].collar.id &&
           allProductDetailsCopy[i].shirtTail.id ===
-            allProductDetailsCopy[j].shirtTail.id &&
+          allProductDetailsCopy[j].shirtTail.id &&
           allProductDetailsCopy[i].color.id ===
-            allProductDetailsCopy[j].color.id
+          allProductDetailsCopy[j].color.id
         ) {
           // Nếu các thuộc tính trừ size giống nhau, thêm vào productDetails và loại bỏ khỏi mảng
           productDetails.push(allProductDetailsCopy.splice(j, 1)[0]);
@@ -139,16 +139,28 @@ const ProductDetailsTable = (props) => {
               axios
                 .post(api + "product/createProductImg", productImageCreate, {
                   headers: {
-                    Authorization: `Bearer ${getToken()}`,
+                    Authorization: `Bearer ${getToken(true)}`,
                   },
                 })
-                .then((res) => {})
+                .then((res) => { })
                 .catch((err) => {
-                  console.log(err);
+                  const status = err.response.status;
+                  if (status === 403) {
+                    notification.error({
+                      message: "Thông báo",
+                      description: "Bạn không có quyền truy cập!",
+                    });
+                  }
                 });
             })
             .catch((err) => {
-              console.log(err);
+              const status = err.response.status;
+              if (status === 403) {
+                notification.error({
+                  message: "Thông báo",
+                  description: "Bạn không có quyền truy cập!",
+                });
+              }
             });
         }
       }
@@ -255,7 +267,7 @@ const ProductDetailsTable = (props) => {
             axios
               .post(api + "product/createDetail", productDetailCreate, {
                 headers: {
-                  Authorization: `Bearer ${getToken()}`,
+                  Authorization: `Bearer ${getToken(true)}`,
                 },
               })
               .then((response) => {
@@ -373,15 +385,15 @@ const ProductDetailsTable = (props) => {
                           onChange={(event) => {
                             uploadImage(
                               product.productName.replaceAll(" ", "_") +
-                                productDetails[0].button.id +
-                                productDetails[0].brand.id +
-                                productDetails[0].category.id +
-                                productDetails[0].material.id +
-                                productDetails[0].collar.id +
-                                productDetails[0].sleeve.id +
-                                productDetails[0].shirtTail.id +
-                                productDetails[0].pattern.id +
-                                productDetails[0].form.id,
+                              productDetails[0].button.id +
+                              productDetails[0].brand.id +
+                              productDetails[0].category.id +
+                              productDetails[0].material.id +
+                              productDetails[0].collar.id +
+                              productDetails[0].sleeve.id +
+                              productDetails[0].shirtTail.id +
+                              productDetails[0].pattern.id +
+                              productDetails[0].form.id,
                               productDetails[0].color,
                               event.target.files
                             );
@@ -526,9 +538,9 @@ const ProductDetailsTable = (props) => {
                                             isDeleted
                                               ? {}
                                               : deleteImageDetail(
-                                                  productDetails[0].color.name,
-                                                  index
-                                                )
+                                                productDetails[0].color.name,
+                                                index
+                                              )
                                           }
                                           key="delete"
                                         />,

@@ -25,7 +25,7 @@ const items = [
 
 const baseUrl = "http://localhost:8080/api/admin/product";
 
-function DetailProduct() {
+function DetailProduct({ setRenderHeader }) {
   const { id } = useParams();
   const convertData = id.replace(/---/g, "/");
   const decode64 = atob(convertData);
@@ -195,6 +195,7 @@ function DetailProduct() {
                     chooseColor={chooseColor}
                     chooseSize={chooseSize}
                     productDetails={getProductDetail}
+                    setRenderHeader={setRenderHeader}
                   />
                   <Divider className={styles.spacing} />
                 </div>

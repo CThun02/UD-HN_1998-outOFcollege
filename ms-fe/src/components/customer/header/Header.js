@@ -4,7 +4,7 @@ import HeaderRight from "../header/right/HeaderRight";
 import styles from "./Header.module.css";
 import { useEffect, useCallback, useState } from "react";
 
-function Header() {
+function Header({ render }) {
   const [position, setPosition] = useState(window.pageYOffset);
   const [visible, setVisible] = useState(true);
   const [checkTop, setCheckTop] = useState(0);
@@ -19,13 +19,12 @@ function Header() {
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  });
+  }, [render]);
 
   return (
     <div
-      className={`${checkTop > 0 ? styles.header : ""} ${
-        visible ? styles.visible : styles.hidden
-      } ${styles.background} `}
+      className={`${checkTop > 0 ? styles.header : ""} ${visible ? styles.visible : styles.hidden
+        } ${styles.background} `}
     >
       <div className={styles.paddingTopAndBottom}>
         <div className={styles.paddingLeftAndRight}>
@@ -34,7 +33,7 @@ function Header() {
               <HeaderLeft />
             </Col>
             <Col span={12}>
-              <HeaderRight />
+              <HeaderRight render={render} />
             </Col>
           </Row>
         </div>

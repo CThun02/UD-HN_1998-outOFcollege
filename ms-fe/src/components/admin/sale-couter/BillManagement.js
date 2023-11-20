@@ -180,9 +180,7 @@ const BillManagement = () => {
     };
     console.log(params);
     axios
-      .get(`http://localhost:8080/api/admin/bill`, {
-        params: params,
-      })
+      .get(`http://localhost:8080/api/admin/bill?billCode=${billCode}&startDate=${startDate}&endDate=${endDate}&status=${status}&billType=${billType}&symbol=${symbol}`)
       .then((response) => {
         setData(response.data);
         setLoading(false);

@@ -9,24 +9,50 @@ import { useEffect } from "react";
 import { useState } from "react";
 import axios from "axios";
 
-function HeaderRight() {
+function HeaderRight(props) {
   const { showSuccessNotification } = useContext(NotificationContext);
   const [user, setUser] = useState("");
   const [data, setData] = useState(null);
-  const cartAPI = 'http://localhost:8080/api/admin/cart';
+  const cartAPI = 'http://localhost:8080/api/client/cart';
   const token = getAuthToken();
+  const [cartIndex, setCartIndex] = useState({
+    quantity: 0,
+    totalPrice: 0
+  })
   useEffect(() => {
     return () =>
       token
         .then((data) => {
           setUser(data?.fullName);
           setData(data?.username);
+          if (data?.username) {
+            axios.get(`http://localhost:8080/api/client/getCartIndex?username=${data?.username}`)
+              .then((res) => {
+                setCartIndex(res.data)
+              })
+              .catch((er) => {
+                console.log(er)
+              })
+          } else {
+            setCartIndex({})
+            const cartIndexLocal = JSON.parse(localStorage.getItem('user'));
+            console.log(cartIndexLocal.productDetails)
+            let totalPrice = 0
+            for (let i = 0; i < cartIndexLocal?.productDetails.length; i++) {
+              totalPrice += Number(cartIndexLocal.productDetails[i].data[0].price * cartIndexLocal.productDetails[i].quantity)
+            }
+            setCartIndex({
+              quantity: cartIndexLocal?.productDetails.length,
+              totalPrice: totalPrice
+            }, Math.random())
+          }
         })
         .catch((error) => {
           console.log(error);
           showSuccessNotification({ error }, "login");
         });
-  }, []);
+  }, [props.render]);
+
 
   const content = (
     <div style={{ width: "100px" }}>
@@ -82,8 +108,15 @@ function HeaderRight() {
                 </Link>
               </Col>
               <Col span={4}>
-                <p className={styles.cssParagraph}>$0.00</p>
-                <Badge count={5}>
+                <p className={styles.cssParagraph}>
+                  {cartIndex.totalPrice?.toLocaleString(
+                    "vi-VN",
+                    {
+                      style: "currency",
+                      currency: "VND",
+                    }
+                  )}</p>
+                <Badge count={cartIndex.quantity}>
                   <Link to={"/ms-shop/cart"} onClick={() => handleCreateCartByUsername()} className={styles.link}>
                     <ShoppingCartOutlined className={styles.iconSize} />
                   </Link>

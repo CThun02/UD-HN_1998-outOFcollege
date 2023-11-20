@@ -13,6 +13,7 @@ import com.fpoly.ooc.request.cart.CartDetailRequest;
 import com.fpoly.ooc.request.cart.CartRequest;
 import com.fpoly.ooc.responce.cart.CartDetailDisplayResponse;
 import com.fpoly.ooc.responce.cart.CartDetailResponse;
+import com.fpoly.ooc.responce.cart.CartIndexResponse;
 import com.fpoly.ooc.responce.product.ProductImageResponse;
 import com.fpoly.ooc.responce.promotion.PromotionProductResponse;
 import com.fpoly.ooc.service.interfaces.AccountService;
@@ -86,7 +87,7 @@ public class CartDetailServiceImpl implements CartDetailService {
             boolean found = false;
             for (CartDetail existingCartDetail : existingCart.getCartDetailList()) {
                 if (existingCartDetail.getProductDetail().getId().equals(cartDetailRequest.getProductDetailId())) {
-//                    existingCartDetail.setQuantity(existingCartDetail.getQuantity() + cartDetailRequest.getQuantity());
+                    existingCartDetail.setQuantity(existingCartDetail.getQuantity() + cartDetailRequest.getQuantity());
                     found = true;
                     break;
                 }
@@ -144,6 +145,11 @@ public class CartDetailServiceImpl implements CartDetailService {
                 .orElseThrow(() -> new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND)));
         cartDetailRepo.deleteById(cartDetailId);
         return cartDetail;
+    }
+
+    @Override
+    public CartIndexResponse getCartIndexz(String username) {
+        return cartRepo.getCartIndex(username);
     }
 
 }

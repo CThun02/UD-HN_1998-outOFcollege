@@ -49,6 +49,7 @@ public interface VoucherRepository extends JpaRepository<Voucher, Long> {
             "where (:voucherCodeOrName is null or lower(v.voucherCode) like :voucherCodeOrName or lower(v.voucherName) like :voucherCodeOrName)" +
             "and (:username is null or (lower(va.accountVoucher.username) = :username and va.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE )) " +
             "and (:priceBill is null or v.voucherCondition <= :priceBill) " +
+            "or v.objectUse like 'all' " +
             "group by v.id, v.voucherCode, v.voucherName, v.voucherValue, v.voucherValueMax, v.voucherMethod, " +
             "v.limitQuantity, v.startDate, v.endDate, v.status, v.objectUse, v.voucherCondition " +
             "order by v.voucherValue desc ")

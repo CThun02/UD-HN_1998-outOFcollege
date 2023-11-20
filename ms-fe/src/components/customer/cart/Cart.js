@@ -17,7 +17,7 @@ const Cart = (props) => {
     const [carts, setCarts] = useState([])
     const token = getAuthToken();
 
-    const cartAPI = 'http://localhost:8080/api/admin/cart';
+    const cartAPI = 'http://localhost:8080/api/client/cart';
 
     const columns = [
         {
@@ -31,7 +31,7 @@ const Cart = (props) => {
                             <Col span={4}>
                                 <div style={{}} className="m-5">
                                     <img style={{ width: '100%', height: '100%' }}
-                                        src={record?.data[0]?.productImageResponse[0].path} alt="Áo Thun Teelab Local Brand Unisex Love Is In The Air TS199"></img>
+                                        src={record?.data[0]?.productImageResponse[0]?.path} alt="Áo Thun Teelab Local Brand Unisex Love Is In The Air TS199"></img>
                                 </div>
                             </Col>
                             <Col span={20}>
@@ -141,8 +141,9 @@ const Cart = (props) => {
     const handleUpdateQuantityApi = (id, value) => {
         axios.put(`${cartAPI}?cartDetailId=${id}&quantity=${value}`)
             .then((response) => {
-                console.log(response);
                 setRender(response.data);
+                props.setRenderHeader(Math.random())
+
             }).catch((error) => {
                 console.log(error);
             })
@@ -152,7 +153,9 @@ const Cart = (props) => {
         axios.delete(`${cartAPI}?cartDetailId=${id}`)
             .then((response) => {
                 console.log(response);
-                setRender(response.data);
+                setRender(Math.random);
+                props.setRenderHeader(Math.random())
+
             }).catch((error) => {
                 console.log(error);
             })
@@ -273,7 +276,7 @@ const Cart = (props) => {
             render: (_, record, index) => {
                 return <div>
                     <CloseOutlined style={{ cursor: 'pointer', color: 'red' }}
-                        onClick={(e) => handleDeleteApi(e)} />
+                        onClick={(e) => handleDeleteApi(record.cartDetailResponse.cartDetailId)} />
                 </div>
             }
         },
@@ -296,6 +299,7 @@ const Cart = (props) => {
         localStorage.setItem("user", JSON.stringify(cart));
 
         setRender(Math.random())
+        props.setRenderHeader(Math.random())
     }
 
     const deleteProductDetail = (e, index) => {
@@ -308,6 +312,8 @@ const Cart = (props) => {
             localStorage.setItem('user', JSON.stringify(cart))
             setRender(Math.random())
         }
+        props.setRenderHeader(Math.random())
+
     }
 
     const getAllCart = () => {
@@ -343,7 +349,6 @@ const Cart = (props) => {
             console.error('lỗi click sản phẩm thanh toán:', error);
         }
     };
-
 
     const addSelectedToData = (e) => {
         e.preventDefault()
@@ -404,10 +409,13 @@ const Cart = (props) => {
 
                     if (productDetails) {
                         for (let i = 0; i < productDetails.length; i++) {
-                            cart.lstCartDetail.push({
-                                productDetailId: productDetails[i].data[0].id,
-                                quantity: productDetails[i].quantity,
-                            });
+                            if (productDetails[i].data[0].id !==
+                                carts.cartDetailResponse.productDetailId) {
+                                cart.lstCartDetail.push({
+                                    productDetailId: productDetails[i].data[0].id,
+                                    quantity: productDetails[i].quantity,
+                                });
+                            }
                         }
                     }
 
@@ -421,10 +429,8 @@ const Cart = (props) => {
             }
         };
         getAllCart();
-
-        console.log(carts)
-        console.log(productDetails)
         fetchData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [render]);
 
 

@@ -48,10 +48,10 @@ function Shop() {
       try {
         const res = await axios.post(
           baseUrl +
-            "/product-shop?pageNo=" +
-            (pageNo - 1) +
-            "&pageSize=" +
-            pageSize,
+          "/product-shop?pageNo=" +
+          (pageNo - 1) +
+          "&pageSize=" +
+          pageSize,
           filter
         );
         const data = await res.data;

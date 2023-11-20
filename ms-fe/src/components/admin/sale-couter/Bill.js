@@ -125,12 +125,14 @@ const Bill = () => {
       },
     },
     {
-      key: "productName",
+      key: "product",
+      datatIndex: "product",
       title: "Sản phẩm",
+      width: "50%",
       render: (text, record, index) => {
         return (
-          <Row>
-            <Col span={6}>
+          <Row style={{ width: "100%" }}>
+            <Col span={6} style={{ height: "100%" }}>
               <div
                 style={{
                   marginTop: "10px",
@@ -140,8 +142,7 @@ const Bill = () => {
                 {record.productDetail.promotion.length !== 0 ? (
                   <Badge.Ribbon
                     text={`Giảm ${record.productDetail.promotion[0].promotionValue
-                      ? record.productDetail.promotion[0].promotionMethod ===
-                        "%"
+                      ? record.productDetail.promotion[0].promotionMethod === "%"
                         ? record.productDetail.promotion[0].promotionValue +
                         " " +
                         record.productDetail.promotion[0].promotionMethod
@@ -156,24 +157,22 @@ const Bill = () => {
                       }`}
                     color="red"
                   >
-                    <Carousel className={styles.slider} autoplay>
+                    <Carousel style={{ maxWidth: "300px" }} autoplay>
                       {record.productDetail.productImageResponse &&
-                        record.productDetail.productImageResponse.map(
-                          (item) => {
-                            return (
-                              <img
-                                key={item.id}
-                                style={{ width: "100%", marginTop: "10px" }}
-                                alt=""
-                                src={item.path}
-                              />
-                            );
-                          }
-                        )}
+                        record.productDetail.productImageResponse.map((item) => {
+                          return (
+                            <img
+                              key={item.id}
+                              style={{ width: "100%", marginTop: "10px" }}
+                              alt=""
+                              src={item.path}
+                            />
+                          );
+                        })}
                     </Carousel>
                   </Badge.Ribbon>
                 ) : (
-                  <Carousel className={styles.slider} autoplay>
+                  <Carousel style={{ maxWidth: "300px" }} autoplay>
                     {record.productDetail.productImageResponse &&
                       record.productDetail.productImageResponse.map((item) => {
                         return (
@@ -189,7 +188,7 @@ const Bill = () => {
                 )}
               </div>
             </Col>
-            <Col span={18}>
+            <Col span={18} style={{ height: "100%" }}>
               <div
                 className="m-5"
                 style={{
@@ -249,7 +248,6 @@ const Bill = () => {
       title: "Số lượng",
       dataIndex: "quantity",
       key: "quantity",
-      width: 200,
       render: (text, record, index) => {
         return (
           <InputNumber
@@ -267,7 +265,6 @@ const Bill = () => {
       title: "Đơn giá",
       dataIndex: "price",
       key: "price",
-      width: 200,
 
       render: (text, record, index) => {
         return (
@@ -318,7 +315,6 @@ const Bill = () => {
       title: "Thành tiền",
       dataIndex: "totalPrice",
       key: "totalPrice",
-      width: 200,
       render: (text, record, index) => {
         return (
           <span>
@@ -333,8 +329,6 @@ const Bill = () => {
     {
       title: "Thao tác",
       key: "action",
-      width: 200,
-
       render: (text, record, index) => (
         <Space size="middle">
           <Button

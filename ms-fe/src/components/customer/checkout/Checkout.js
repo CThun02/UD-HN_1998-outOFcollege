@@ -11,6 +11,7 @@ import FloatingLabels from '../../element/FloatingLabels/FloatingLabels'
 import * as yup from 'yup';
 import { getAuthToken } from '../../../service/Token'
 import ModalAddress from '../../admin/sale-couter/ModalAddress.js'
+import FormUsingVoucher from '../../element/voucher/FormUsingVoucher.js';
 
 const Checkout = (props) => {
     const [provinces, setProvinces] = useState([])
@@ -35,9 +36,12 @@ const Checkout = (props) => {
         ward: '',
         descriptionDetail: ''
     })
-    const [render, setRender] = useState(null)
+    const navigate = useNavigate()
 
+    const [render, setRender] = useState(null)
     const [showAdd, setShowAdd] = useState(false);
+    const [voucherAdd, setVoucherAdd] = useState({});
+    const [isOpenFormVoucher, setIsOpenFormVoucher] = useState(false);
 
     const handleProvincesChange = (e) => {
         formData.city = e
@@ -258,14 +262,6 @@ const Checkout = (props) => {
         });
     };
 
-    const handleChangeDefaultAdd = (e) => {
-        const { name, value } = e.target;
-        setDefaultAddress({
-            ...defaultAddress,
-            [name]: value,
-        });
-    };
-
     const removeProductDetailCart = () => {
         const cart = JSON.parse(localStorage.getItem('user'));
         const checkout = JSON.parse(localStorage.getItem('checkout'));
@@ -297,16 +293,17 @@ const Checkout = (props) => {
 
     const getAddress = async () => {
         const data = await token;
-        if (token) {
-            await axios.get(`http://localhost:8080/api/admin/address?username=${data?.username}`)
+        if (data) {
+            await axios.get(`http://localhost:8080/api/client/address?username=${data?.username}`)
                 .then((response) => {
                     if (response.data) {
                         let addd = response.data.filter((item) => item.defaultaddress === true)[0];
                         setAddress(response.data)
                         if (addd) {
                             setDefaultAddress(addd)
-                            let district = addd.district.substring(1 + addd.district.indexOf("|"));
-                            let ward = addd.ward.substring(1 + addd.ward.indexOf("|"));
+                            console.log(addd)
+                            let district = addd.district?.substring(1 + addd.district.indexOf("|"));
+                            let ward = addd.ward?.substring(1 + addd.ward.indexOf("|"));
                             handleShippingOrderLeadtime(Number(district), ward);
                             handleShippingFee(100, district, ward);
                         }
@@ -319,15 +316,15 @@ const Checkout = (props) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         const bill = {
             billCode: generateRandomBillCode(),
-            price: totalPrice + shippingFee,
+            price: voucherPrice() + shippingFee,
             priceReduce: 0,
             paymentDetailId: formData.paymentDetailId,
             billType: "Online",
             symbol: "Shipping",
             status: "Unpaid",
+            accountId: dataToken ? dataToken.username : null,
             note: formData.note,
             lstBillDetailRequest: formData.lstBillDetailRequest,
             transactionCode: formData.paymentDetailId === 2 ? '' : null,
@@ -343,16 +340,18 @@ const Checkout = (props) => {
             descriptionDetail: formData.addressDetail,
         };
 
-        try {
-            await validate.validate(formData, { abortEarly: false });
-            setError({})
-        } catch (errors) {
-            const validationErrors = {};
-            errors.inner.forEach((err) => {
-                validationErrors[err.path] = err.message;
-            });
-            setError(validationErrors);
-            return;
+        if (!dataToken) {
+            try {
+                await validate.validate(formData, { abortEarly: false });
+                setError({})
+            } catch (errors) {
+                const validationErrors = {};
+                errors.inner.forEach((err) => {
+                    validationErrors[err.path] = err.message;
+                });
+                setError(validationErrors);
+                return;
+            }
         }
 
         Modal.confirm({
@@ -360,31 +359,42 @@ const Checkout = (props) => {
             content: "Bạn có chắc chắn muốn thanh toán?",
             async onOk() {
                 setFormData({ ...formData, lstBillDetailRequest: [] })
-                for (let i = 0; i < productDetails?.length; i++) {
-                    const billDetail = {
-                        productDetailId: productDetails[i].data[0].id,
-                        price: productDetails[i].data[0].price,
-                        quantity: productDetails[i].quantity,
-                    };
-                    formData.lstBillDetailRequest.push(billDetail)
+                if (dataToken) {
+                    for (let i = 0; i < productDetails?.length; i++) {
+                        const billDetail = {
+                            productDetailId: productDetails[i].cartDetailResponse.productDetailId,
+                            price: productDetails[i].cartDetailResponse.priceProductDetail,
+                            quantity: productDetails[i].cartDetailResponse.quantity,
+                        };
+                        formData.lstBillDetailRequest.push(billDetail)
+                    }
+                } else {
+                    for (let i = 0; i < productDetails?.length; i++) {
+                        const billDetail = {
+                            productDetailId: productDetails[i].data[0].id,
+                            price: productDetails[i].data[0].price,
+                            quantity: productDetails[i].quantity,
+                        };
+                        formData.lstBillDetailRequest.push(billDetail)
+                    }
                 }
 
                 try {
                     const response = await axios.post(
-                        "http://localhost:8080/api/admin/bill",
+                        "http://localhost:8080/api/client/bill",
                         bill
                     );
                     const responseAddress = await axios.post(
-                        "http://localhost:8080/api/admin/address",
+                        "http://localhost:8080/api/client/address",
                         billAddress
                     );
                     await axios.post(
-                        "http://localhost:8080/api/admin/delivery-note",
+                        "http://localhost:8080/api/client/delivery-note",
                         {
                             billId: response.data.id,
-                            addressId: responseAddress.data.id,
-                            name: formData.fullName,
-                            phoneNumber: formData.phoneNumber,
+                            addressId: dataToken ? defaultAddress?.id : responseAddress.data.id,
+                            name: dataToken ? defaultAddress?.fullName : formData.fullName,
+                            phoneNumber: dataToken ? defaultAddress?.sdt : formData.phoneNumber,
                             shipDate: leadtime ?? null,
                             shipPrice: shippingFee ?? null,
                         }
@@ -408,20 +418,25 @@ const Checkout = (props) => {
                         });
                     }
                     localStorage.removeItem('checkout');
-
+                    navigate(`/ms-shop`)
                 } catch (error) {
                     console.log(error);
                 }
             },
         });
 
-        removeProductDetailCart()
+        if (!dataToken) {
+            removeProductDetailCart()
+        }
     };
 
     const getAllCarts = async () => {
         const data = await token;
         setDataToken(data)
         let carts = JSON.parse(localStorage.getItem('checkout'))
+        if (!carts) {
+            navigate(`/ms-shop`)
+        }
         setProductDetails(carts)
         let totalPrice = 0;
         if (data) {
@@ -439,17 +454,53 @@ const Checkout = (props) => {
         setTotalPrice(totalPrice)
     }
 
+    const voucherPrice = () => {
+        let result = totalPrice;
+
+        if (voucherAdd && voucherAdd.voucherMethod === "vnd") {
+            if (result > (voucherAdd.voucherCondition ?? 0)) {
+                result -= voucherAdd.voucherValue ?? 0;
+            }
+        } else if (voucherAdd && voucherAdd.voucherMethod === "%") {
+            if (result > voucherAdd.voucherCondition) {
+                const discountPercent = voucherAdd.voucherValue ?? 0;
+                const maxDiscount = voucherAdd.voucherValueMax ?? 0;
+                let discount = (totalPrice * discountPercent) / 100;
+                result -= Math.min(discount, maxDiscount);
+            }
+        } else {
+            result = totalPrice;
+        }
+
+        return result;
+    };
+
+    useEffect(() => {
+        getAddress()
+    }, [])
+
     useEffect(() => {
         window.scrollTo(0, 0);
         fetchProvince();
         fetchDistrict();
         fetchWard();
+        getAllCarts()
+
+        console.log(dataToken)
         if (!dataToken) {
             handleShippingOrderLeadtime(selectedDistrict, selectedWard);
             handleShippingFee(100, selectedDistrict, selectedWard);
+        } else {
+            console.log(12)
+            console.log(defaultAddress);
+            let district = defaultAddress.district?.substring(1 + defaultAddress.district.indexOf("|"));
+            let ward = defaultAddress.ward?.substring(1 + defaultAddress.ward.indexOf("|"));
+            console.log(district)
+            console.log(ward)
+            handleShippingOrderLeadtime(Number(district), ward);
+            handleShippingFee(100, district, ward);
+            console.log(shippingFee)
         }
-        getAddress()
-        getAllCarts()
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedDistrict,
         selectedWard,
@@ -502,7 +553,7 @@ const Checkout = (props) => {
                                             <Input
                                                 size='large'
                                                 name='fullName'
-                                                onChange={dataToken ? handleChangeDefaultAdd : handleChange}
+                                                onChange={handleChange}
                                                 value={dataToken ? defaultAddress.fullName : formData.fullName}
                                                 allowClear
                                             />
@@ -518,7 +569,7 @@ const Checkout = (props) => {
                                             <Input
                                                 size='large'
                                                 name={`${dataToken ? 'sdt' : 'phoneNumber'}`}
-                                                onChange={dataToken ? handleChangeDefaultAdd : handleChange}
+                                                onChange={handleChange}
                                                 value={dataToken ? defaultAddress.sdt : formData.phoneNumber}
                                                 allowClear
                                             />
@@ -546,12 +597,7 @@ const Checkout = (props) => {
                                                 value={dataToken ? defaultAddress.city?.substring(0, defaultAddress.city.indexOf('|')) : formData.city}
                                                 allowClear
                                                 onChange={(e) => {
-                                                    dataToken ?
-                                                        handleChangeDefaultAdd(
-                                                            {
-                                                                target: { name: 'city', value: e }
-                                                            })
-                                                        : handleProvincesChange(e)
+                                                    handleProvincesChange(e)
                                                 }}
                                                 options={provinces.map((province) => ({
                                                     value: province.ProvinceName + '|' + province.ProvinceID,
@@ -579,12 +625,7 @@ const Checkout = (props) => {
                                                 filterSort={(optionA, optionB) =>
                                                     (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
                                                 }
-                                                onChange={(e) => dataToken ?
-                                                    handleChangeDefaultAdd(
-                                                        {
-                                                            target: { name: 'district', value: e }
-                                                        })
-                                                    : handleDistrictChange(e)}
+                                                onChange={(e) => handleDistrictChange(e)}
                                                 options={districts?.map((district) => ({
                                                     value: district.DistrictName + '|' + district.DistrictID,
                                                     label: district.DistrictName,
@@ -612,12 +653,7 @@ const Checkout = (props) => {
                                                 filterSort={(optionA, optionB) =>
                                                     (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
                                                 }
-                                                onChange={(e) => dataToken ?
-                                                    handleChangeDefaultAdd(
-                                                        {
-                                                            target: { name: 'ward', value: e }
-                                                        })
-                                                    : handleWardChange(e)}
+                                                onChange={(e) => handleWardChange(e)}
                                                 allowClear
                                                 options={wards?.map((ward) => ({
                                                     value: ward.WardName + '|' + ward.WardCode,
@@ -830,55 +866,67 @@ const Checkout = (props) => {
                                 </table>
                             </div>
                             <div style={{ borderTop: '1px solid rgba(175,175,175,.34)', padding: '10px' }}>
-                                <Button type='primary'>Chọn mã giảm giá</Button>
+                                <Button type='primary' onClick={() => setIsOpenFormVoucher(true)}>Chọn mã giảm giá</Button>
+                                <FormUsingVoucher
+                                    priceBill={totalPrice}
+                                    voucher={voucherAdd}
+                                    setVoucher={setVoucherAdd}
+                                    isOpen={isOpenFormVoucher}
+                                    setIsOpen={setIsOpenFormVoucher}
+                                    username={dataToken?.username}
+                                />
                             </div>
                             <div style={{ borderTop: '1px solid rgba(175,175,175,.34)', padding: '10px' }}>
-                                <table style={{ width: '100%', fontSize: '16px' }} >
-                                    <thead>
-                                        <tr>
-                                            <td><span className={styles.visuallyHidden}>Mô tả</span></td>
-                                            <td><span className={styles.visuallyHidden}>Giá tiền</span></td>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr style={{ marginBottom: '100px' }} >
-                                            <td className={styles.textLeft}>
-                                                Tạm tính
-                                            </td>
-                                            <td style={{ textAlign: 'right' }}>
-                                                {numeral(totalPrice).format('0,0') + 'đ'}
-                                            </td>
-                                        </tr>
+                                <Row>
+                                    <Col span={18} className={styles.textLeft}>
+                                        Tạm tính
+                                    </Col>
+                                    <Col span={6} >
+                                        {numeral(totalPrice).format('0,0') + 'đ'}
+                                    </Col>
+                                    <Col span={18} className={styles.textLeft}>
+                                        Phí vận chuyển
+                                    </Col>
+                                    <Col span={6} >
+                                        {numeral(shippingFee).format('0,0 đ') + 'đ'}
+                                    </Col>
+                                    <Col span={18} className={styles.textLeft}>
+                                        Giảm giá
+                                    </Col>
+                                    <Col span={6} >
+                                        {voucherAdd?.voucherValue
+                                            ? voucherAdd.voucherMethod === "vnd"
+                                                ? voucherAdd?.voucherValue.toLocaleString(
+                                                    "vi-VN",
+                                                    {
+                                                        style: "currency",
+                                                        currency: "VND",
+                                                    }
+                                                )
+                                                : voucherAdd?.voucherValue + "%"
+                                            : "0đ"}
+                                        {voucherAdd.voucherId ? (
+                                            <bttuon
+                                                style={{
+                                                    marginLeft: "20px",
+                                                    color: "green",
+                                                    cursor: "pointer",
+                                                }}
+                                                onClick={() => setVoucherAdd({})}
+                                            >
+                                                ❌
+                                            </bttuon>
+                                        ) : null}
+                                    </Col>
 
-                                        <tr  >
-                                            <td className={styles.textLeft}>
-                                                Phí vận chuyển
-                                            </td>
-                                            <td style={{ textAlign: 'right' }}>
-                                                {numeral(shippingFee).format('0,0 đ') + 'đ'}
-                                            </td>
-                                        </tr>
+                                    <Col span={18} className={styles.textLeft}>
+                                        Tổng cộng
+                                    </Col>
+                                    <Col span={6} >
+                                        {numeral(voucherPrice() + shippingFee).format('0,0') + 'đ'}
+                                    </Col>
+                                </Row>
 
-                                        <tr  >
-                                            <td className={styles.textLeft}>
-                                                Giảm giá
-                                            </td>
-                                            <td style={{ textAlign: 'right' }}>
-                                                0đ
-                                            </td>
-                                        </tr>
-
-                                    </tbody>
-
-                                    <tfoot style={{ borderTop: '100px solid red' }} >
-                                        <tr>
-                                            <th className={styles.textLeft} style={{ borderTop: '1px solid rgba(175, 175, 175, .34)' }}>
-                                                Tổng cộng
-                                            </th>
-                                            <td style={{ textAlign: 'right', borderTop: '1px solid rgba(175, 175, 175, .34)' }} >{numeral(totalPrice + shippingFee).format('0,0') + 'đ'}</td>
-                                        </tr>
-                                    </tfoot>
-                                </table>
                             </div>
                             <div>
                                 <Link to="" style={{ textAlign: 'left' }}> {'< Quay về giỏ hàng'}</Link>

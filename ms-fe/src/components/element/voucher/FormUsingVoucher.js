@@ -76,6 +76,7 @@ function FormUsingVoucher({
           value={voucher}
         >
           {vouchers.map((data) => (
+            data.status !== 'CANCEL' &&
             <VoucherList
               key={data.voucherId}
               data={data}

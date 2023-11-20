@@ -134,7 +134,10 @@ public class ProductController {
         return ResponseEntity.ok(service.update(product));
     }
 
-
+    @GetMapping("/promotion")
+    public ResponseEntity<?> findProductPromotion() {
+        return ResponseEntity.ok(service.findProductPromotion());
+    }
     @PutMapping("/updateProductStatus")
     public ResponseEntity<?> updateProductStatus(@RequestParam Long productId,
                                                  @RequestParam String status,

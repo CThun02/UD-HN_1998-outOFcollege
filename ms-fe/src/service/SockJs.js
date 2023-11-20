@@ -5,7 +5,7 @@ import { over } from "stompjs";
 
 const SOCKET_URL = "http://localhost:8080/ms-app/";
 
-function SockJs({ setValues, connectTo, isAdmin }) {
+function SockJs({ setValues, connectTo }) {
   const [stompClient, setStompClient] = useState();
   const [connected, setConnected] = useState(false);
 
@@ -27,7 +27,7 @@ function SockJs({ setValues, connectTo, isAdmin }) {
 
   const onMessageReceived = (msg) => {
     console.log("New Message Received!!", msg);
-    if (msg.body && isAdmin) {
+    if (msg.body) {
       console.log("New Message Received If!!", msg.body);
 
       setValues(JSON.parse(msg.body));

@@ -23,11 +23,6 @@ public class HomeController {
     private ProductDetailServiceI productDetailService;
     private ProductServiceI productService;
 
-    @GetMapping("/promotion")
-    public ResponseEntity<?> findProductPromotion() {
-        return ResponseEntity.ok(productService.findProductPromotion());
-    }
-
     @PostMapping("/by-product-details-dto")
     public ResponseEntity<?> findProuctDetailsByListIdProduct(
             @RequestBody ProductDetailsDTO dto

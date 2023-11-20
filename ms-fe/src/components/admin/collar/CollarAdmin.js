@@ -1,5 +1,14 @@
 import React, { useState } from "react";
-import { Input, Row, Col, Form, Button, Modal, message } from "antd";
+import {
+  Input,
+  Row,
+  Col,
+  Form,
+  Button,
+  Modal,
+  message,
+  notification,
+} from "antd";
 import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
 import CollarTable from "./CollarTable";
 import styles from "./CollarStyle.module.css";
@@ -24,7 +33,7 @@ const CollarAdmin = function () {
     axios
       .post("http://localhost:8080/api/admin/collar/create", values, {
         headers: {
-          Authorization: `Bearer ${getToken()}`,
+          Authorization: `Bearer ${getToken(true)}`,
         },
       })
       .then((response) => {
@@ -34,9 +43,15 @@ const CollarAdmin = function () {
         setRender(Math.random);
         message.success("Thêm thành công");
       })
-      .catch((error) => {
-        // Xử lý lỗi
-        console.error("Lỗi khi thêm dữ liệu", error);
+      .catch((err) => {
+        const status = err.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
+        console.log(err);
       });
   };
 

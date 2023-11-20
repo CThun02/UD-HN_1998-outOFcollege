@@ -135,7 +135,14 @@ const MyForm = (props) => {
         setDistricts(response.data.data);
       })
       .catch((error) => {
-        console.error(error);
+        const status = error.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
+        console.log(error);
       });
   };
   const fetchWard = async (value) => {
@@ -151,8 +158,15 @@ const MyForm = (props) => {
       .then((response) => {
         setWards(response.data.data);
       })
-      .catch((error) => {
-        console.log(error);
+      .catch((err) => {
+        const status = err.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
+        console.log(err);
       });
   };
 
@@ -203,7 +217,7 @@ const MyForm = (props) => {
                     accountScan,
                     {
                       headers: {
-                        Authorization: `Bearer ${getToken()}`,
+                        Authorization: `Bearer ${getToken(true)}`,
                       },
                     }
                   )
@@ -230,11 +244,23 @@ const MyForm = (props) => {
                         message: "Thông báo",
                         description: `${err.response.data}`,
                       });
+                    } else if (status === 403) {
+                      notification.error({
+                        message: "Thông báo",
+                        description: "Bạn không có quyền truy cập!",
+                      });
                     }
                   });
               })
-              .catch((error) => {
-                console.error("Lỗi khi tải lên ảnh:", error);
+              .catch((err) => {
+                const status = err.response.status;
+                if (status === 403) {
+                  notification.error({
+                    message: "Thông báo",
+                    description: "Bạn không có quyền truy cập!",
+                  });
+                }
+                console.log(err);
               });
             setLoading(true);
           },

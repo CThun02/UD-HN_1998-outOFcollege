@@ -8,13 +8,14 @@ import {
   EyeOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
-import { Button, Space, Table, Tabs, Tag } from "antd";
+import { Button, Space, Table, Tabs, Tag, notification } from "antd";
 import Input from "antd/es/input/Input";
 import Link from "antd/es/typography/Link";
 import axios from "axios";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import styles from "./ReturnIndex.module.css";
+import { getToken } from "../../../service/Token";
 
 const ReturnIndex = () => {
   const api = "http://localhost:8080/api/admin/bill";
@@ -92,12 +93,24 @@ const ReturnIndex = () => {
   useEffect(() => {
     setLoading(true);
     axios
-      .get(api + "/getReturnRequestByStatus?status=" + status)
+      .get(api + "/getReturnRequestByStatus?status=" + status, {
+        headers: {
+          Authorization: `Bearer ${getToken(true)}`,
+        },
+      })
       .then((response) => {
         setLoading(false);
         setData(response.data);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        const status = err.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
+      });
   }, [status]);
 
   return (

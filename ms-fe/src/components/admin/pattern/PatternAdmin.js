@@ -1,5 +1,14 @@
 import React, { useState } from "react";
-import { Input, Row, Col, Form, Button, Modal, message } from "antd";
+import {
+  Input,
+  Row,
+  Col,
+  Form,
+  Button,
+  Modal,
+  message,
+  notification,
+} from "antd";
 import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
 import PatternTable from "./PatternTable";
 import styles from "./PatternlStyle.module.css";
@@ -25,7 +34,7 @@ const PatternAdmin = function () {
     axios
       .post("http://localhost:8080/api/admin/pattern/create", values, {
         headers: {
-          Authorization: `Bearer ${getToken()}`,
+          Authorization: `Bearer ${getToken(true)}`,
         },
       })
       .then((response) => {
@@ -38,6 +47,14 @@ const PatternAdmin = function () {
       })
       .catch((error) => {
         // Xử lý lỗi
+        const status = error.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+          return;
+        }
         if (error.response && error.response.status === 409) {
           // Nếu lỗi trùng tên mẫu, hiển thị thông báo lỗi
           Modal.error({

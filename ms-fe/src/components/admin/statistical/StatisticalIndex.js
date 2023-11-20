@@ -305,7 +305,7 @@ const StatisticalIndex = () => {
             dayTo,
           {
             headers: {
-              Authorization: `Bearer ${getToken()}`,
+              Authorization: `Bearer ${getToken(true)}`,
             },
           }
         )
@@ -313,7 +313,16 @@ const StatisticalIndex = () => {
           setBillRevenueCompare(res.data);
           setIsLoading(false);
         })
-        .catch((err) => console.log(err));
+        .catch((err) => {
+          const status = err.response.status;
+          if (status === 403) {
+            notification.error({
+              message: "Thông báo",
+              description: "Bạn không có quyền truy cập!",
+            });
+          }
+          console.log(err);
+        });
     }
   }
 
@@ -364,13 +373,24 @@ const StatisticalIndex = () => {
             "&monthTo=" +
             monthTo +
             "&dayTo=" +
-            dayTo
+            dayTo,
+          {
+            headers: {
+              Authorization: `Bearer ${getToken(true)}`,
+            },
+          }
         )
         .then((res) => {
           setData(res.data);
         })
         .catch((error) => {
-          console.log("Get data failed", error);
+          const status = error.response.status;
+          if (status === 403) {
+            notification.error({
+              message: "Thông báo",
+              description: "Bạn không có quyền truy cập!",
+            });
+          }
         });
     }
   }
@@ -402,7 +422,7 @@ const StatisticalIndex = () => {
           year,
         {
           headers: {
-            Authorization: `Bearer ${getToken()}`,
+            Authorization: `Bearer ${getToken(true)}`,
           },
         }
       )
@@ -410,7 +430,16 @@ const StatisticalIndex = () => {
         setLoading(false);
         setBillRevenue(res.data);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        const status = err.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
+        console.log(err);
+      });
   }
 
   useEffect(() => {

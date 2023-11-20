@@ -1,7 +1,16 @@
 import React from "react";
 import { FormOutlined, DeleteFilled } from "@ant-design/icons";
 
-import { Table, Space, Button, Modal, Switch, Input, message } from "antd";
+import {
+  Table,
+  Space,
+  Button,
+  Modal,
+  Switch,
+  Input,
+  message,
+  notification,
+} from "antd";
 import { useEffect, useState } from "react";
 import styles from "./FormStyle.module.css";
 import axios from "axios";
@@ -54,7 +63,15 @@ const FormTable = function (props) {
         setRender(Math.random);
         message.success("Cập nhật thành công");
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        const status = err.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
+      });
   };
 
   const handleUpdateStatus = (id, statusUpdate) => {
@@ -80,7 +97,15 @@ const FormTable = function (props) {
           messageApi.success(mess, 2);
         }, 500);
       })
-      .catch((error) => {
+      .catch((err) => {
+        const status = err.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+          return;
+        }
         setTimeout(() => {
           messageApi.error(`Cập nhật trạng thái thất bại`, 2);
         }, 500);
@@ -90,7 +115,7 @@ const FormTable = function (props) {
     axios
       .delete(`http://localhost:8080/api/admin/form/delete/${selectedData}`, {
         headers: {
-          Authorization: `Bearer ${getToken()}`,
+          Authorization: `Bearer ${getToken(true)}`,
         },
       })
       .then((response) => {
@@ -101,21 +126,37 @@ const FormTable = function (props) {
         // Đóng modal
         setShowModal(false);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        const status = err.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
+      });
   };
 
   useEffect(() => {
     axios
       .get(`http://localhost:8080/api/admin/form`, {
         headers: {
-          Authorization: `Bearer ${getToken()}`,
+          Authorization: `Bearer ${getToken(true)}`,
         },
       })
       .then((response) => {
         setData(response.data);
         console.log(response.data);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        const status = err.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
+      });
   }, [props.renderTable, render]);
 
   return (

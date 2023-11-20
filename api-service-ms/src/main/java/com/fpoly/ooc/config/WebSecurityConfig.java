@@ -1,5 +1,6 @@
 package com.fpoly.ooc.config;
 
+import io.micrometer.core.ipc.http.HttpSender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -47,6 +48,8 @@ public class WebSecurityConfig {
                                 "/api/admin/sleeve", "/api/admin/shirt-tail", "/api/admin/size", "/api/admin/color",
                                 "/api/admin/category","/api/admin/brand").permitAll()
                         .requestMatchers(HttpMethod.GET,"api/admin/product/getproductfilterByCom").hasAnyRole("EMPLOYEE", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/admin/promotion-product/").hasAnyRole("EMPLOYEE", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/admin/vouchers/").hasAnyRole("EMPLOYEE", "ADMIN")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().permitAll());
         return http.build();

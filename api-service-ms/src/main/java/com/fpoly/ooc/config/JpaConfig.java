@@ -32,28 +32,35 @@ public class JpaConfig {
     public AuditorAware<String> auditorProvider() {
         return () -> {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            HttpServletRequest request = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
-            String uri = request.getRequestURI();
-            log.info("Authentication: " + uri);
+            ServletRequestAttributes servletRequestAttributes = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes());
+            HttpServletRequest request = null;
 
-            if (uri.contains("admin") && (authentication == null || !authentication.isAuthenticated())) {
-                throw new NotFoundException(ErrorCodeConfig.getMessage(Const.JWT_AUTHENTICATION));
-            }
+            if(servletRequestAttributes != null) {
+                request = servletRequestAttributes.getRequest();
+                String uri = request.getRequestURI();
+                log.info("Authentication: " + uri);
 
-            log.warn("authentication: " + authentication);
+                if (uri.contains("admin") && (authentication == null || !authentication.isAuthenticated())) {
+                    throw new NotFoundException(ErrorCodeConfig.getMessage(Const.JWT_AUTHENTICATION));
+                }
 
-            String user = null;
-            UserDTO userDTO = null;
-            if(authentication.getPrincipal().equals("anonymousUser")
-                    && (uri.contains("client") || uri.contains("/api/v1/auth/signup"))) {
-                user = "CLIENT";
+                log.warn("authentication: " + authentication);
+
+                String user = null;
+                UserDTO userDTO = null;
+                if(authentication.getPrincipal().equals("anonymousUser")
+                        && (uri.contains("client") || uri.contains("/api/v1/auth/signup"))) {
+                    user = "CLIENT";
+                } else {
+                    userDTO = (UserDTO) authentication.getPrincipal();
+                    user = userDTO.getUsername() + "_" + userDTO.getFullName();
+                }
+
+                // return username_fullName
+                return Optional.of(user);
             } else {
-                 userDTO = (UserDTO) authentication.getPrincipal();
-                user = userDTO.getUsername() + "_" + userDTO.getFullName();
+                return Optional.of("SYSTEM");
             }
-
-            // return username_fullName
-            return Optional.of(user);
         };
     }
 }

@@ -9,6 +9,7 @@ import {
   Input,
   ColorPicker,
   message,
+  notification,
 } from "antd";
 import { useEffect, useState } from "react";
 import styles from "../categorystyles/CategoryStyles.module.css";
@@ -46,7 +47,7 @@ const CollorTable = function (props) {
     axios
       .delete(`http://localhost:8080/api/admin/color/delete/${selectedData}`, {
         headers: {
-          Authorization: `Bearer ${getToken()}`,
+          Authorization: `Bearer ${getToken(true)}`,
         },
       })
       .then((response) => {
@@ -57,7 +58,15 @@ const CollorTable = function (props) {
         // Đóng modal
         setShowModal(false);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        const status = err.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
+      });
   };
 
   const handleUpdateStatus = (id, statusUpdate) => {
@@ -85,7 +94,15 @@ const CollorTable = function (props) {
           messageApi.error(mess, 2);
         }
       })
-      .catch((error) => {
+      .catch((err) => {
+        const status = err.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+          return;
+        }
         messageApi.error(`Cập nhật trạng thái thất bại`, 2);
       });
   };
@@ -108,7 +125,15 @@ const CollorTable = function (props) {
         setShowDetailsModal(false);
         setRender(Math.random);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        const status = err.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
+      });
     console.log(colorCode);
     console.log(collorName);
   };
@@ -117,14 +142,22 @@ const CollorTable = function (props) {
     axios
       .get(`http://localhost:8080/api/admin/color`, {
         headers: {
-          Authorization: `Bearer ${getToken()}`,
+          Authorization: `Bearer ${getToken(true)}`,
         },
       })
       .then((response) => {
         setData(response.data);
         console.log(response.data);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        const status = err.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
+      });
   }, [props.renderTable, render]);
 
   return (

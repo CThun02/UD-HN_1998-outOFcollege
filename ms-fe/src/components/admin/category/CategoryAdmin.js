@@ -34,7 +34,7 @@ const CategoryAdmin = function () {
     axios
       .post("http://localhost:8080/api/admin/category/create", values, {
         headers: {
-          Authorization: `Bearer ${getToken()}`,
+          Authorization: `Bearer ${getToken(true)}`,
         },
       })
       .then((response) => {

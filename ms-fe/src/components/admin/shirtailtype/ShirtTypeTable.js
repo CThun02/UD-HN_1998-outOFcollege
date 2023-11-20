@@ -1,6 +1,15 @@
 import React from "react";
 import { FormOutlined, DeleteFilled } from "@ant-design/icons";
-import { Table, Space, Button, Modal, Input, Switch, message } from "antd";
+import {
+  Table,
+  Space,
+  Button,
+  Modal,
+  Input,
+  Switch,
+  message,
+  notification,
+} from "antd";
 import { useEffect, useState } from "react";
 import styles from "../categorystyles/CategoryStyles.module.css";
 import axios from "axios";
@@ -29,7 +38,7 @@ const ShirtTypeTable = function (props) {
         },
         {
           headers: {
-            Authorization: `Bearer ${getToken()}`,
+            Authorization: `Bearer ${getToken(true)}`,
           },
         }
       )
@@ -38,7 +47,15 @@ const ShirtTypeTable = function (props) {
         setShowDetailsModal(false);
         setRender(Math.random);
       })
-      .catch((err) => console.log(err));
+      .catch((error) => {
+        const status = error.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
+      });
   };
 
   const handleUpdateStatus = (id, statusUpdate) => {
@@ -54,7 +71,7 @@ const ShirtTypeTable = function (props) {
         },
         {
           headers: {
-            Authorization: `Bearer ${getToken()}`,
+            Authorization: `Bearer ${getToken(true)}`,
           },
         }
       )
@@ -67,7 +84,13 @@ const ShirtTypeTable = function (props) {
         }
       })
       .catch((error) => {
-        messageApi.error(`Cập nhật trạng thái thất bại`, 2);
+        const status = error.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
       });
   };
   const handleDetails = (item) => {
@@ -89,7 +112,7 @@ const ShirtTypeTable = function (props) {
         `http://localhost:8080/api/admin/shirt-tail/delete/${selectedData}`,
         {
           headers: {
-            Authorization: `Bearer ${getToken()}`,
+            Authorization: `Bearer ${getToken(true)}`,
           },
         }
       )
@@ -101,21 +124,37 @@ const ShirtTypeTable = function (props) {
         // Đóng modal
         setShowModal(false);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        const status = err.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
+      });
   };
 
   useEffect(() => {
     axios
       .get(`http://localhost:8080/api/admin/shirt-tail`, {
         headers: {
-          Authorization: `Bearer ${getToken()}`,
+          Authorization: `Bearer ${getToken(true)}`,
         },
       })
       .then((response) => {
         setData(response.data);
         console.log(response.data);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        const status = err.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
+      });
   }, [props.renderTable, render]);
 
   return (

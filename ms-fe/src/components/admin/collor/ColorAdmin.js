@@ -10,6 +10,7 @@ import {
   Modal,
   Button,
   ColorPicker,
+  notification,
 } from "antd";
 import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
 import CollorTable from "./CollorTable";
@@ -43,7 +44,7 @@ const CollorAdmin = function () {
     axios
       .post("http://localhost:8080/api/admin/color/create", values, {
         headers: {
-          Authorization: `Bearer ${getToken()}`,
+          Authorization: `Bearer ${getToken(true)}`,
         },
       })
       .then((response) => {
@@ -52,9 +53,15 @@ const CollorAdmin = function () {
         setIsModalVisible(false);
         setRender(Math.random);
       })
-      .catch((error) => {
+      .catch((err) => {
         // Xử lý lỗi
-        console.error("Lỗi khi thêm dữ liệu", error);
+        const status = err.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
       });
     console.log(values);
   };

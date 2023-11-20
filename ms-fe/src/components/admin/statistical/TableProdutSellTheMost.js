@@ -1,4 +1,4 @@
-import { Badge, Carousel, Col, Row, Table } from "antd";
+import { Badge, Carousel, Col, Row, Table, notification } from "antd";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import styles from "./StatisticalIndex.module.css";
@@ -189,7 +189,7 @@ const TableProdutSellTheMost = ({ date, type }) => {
           year,
         {
           headers: {
-            Authorization: `Bearer ${getToken()}`,
+            Authorization: `Bearer ${getToken(true)}`,
           },
         }
       )
@@ -198,6 +198,13 @@ const TableProdutSellTheMost = ({ date, type }) => {
         setData(res.data);
       })
       .catch((err) => {
+        const status = err.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
         console.log(err);
       });
   }, [pageSize, date, type]);

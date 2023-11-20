@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Input, Row, Col, Form, Modal, Button } from "antd";
+import { Input, Row, Col, Form, Modal, Button, notification } from "antd";
 import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
 import ShirtTypeTable from "./ShirtTypeTable";
 import styles from "../categorystyles/CategoryStyles.module.css";
@@ -24,7 +24,7 @@ const ShirtTailAdmin = function () {
     axios
       .post("http://localhost:8080/api/admin/shirt-tail/create", values, {
         headers: {
-          Authorization: `Bearer ${getToken()}`,
+          Authorization: `Bearer ${getToken(true)}`,
         },
       })
       .then((response) => {
@@ -35,7 +35,13 @@ const ShirtTailAdmin = function () {
       })
       .catch((error) => {
         // Xử lý lỗi
-        console.error("Lỗi khi thêm dữ liệu", error);
+        const status = error.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
       });
   };
 

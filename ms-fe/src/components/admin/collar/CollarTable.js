@@ -1,7 +1,16 @@
 import React from "react";
 import { FormOutlined, DeleteFilled } from "@ant-design/icons";
 
-import { Table, Space, Button, Modal, Input, message, Switch } from "antd";
+import {
+  Table,
+  Space,
+  Button,
+  Modal,
+  Input,
+  message,
+  Switch,
+  notification,
+} from "antd";
 import { useEffect, useState } from "react";
 import styles from "./CollarStyle.module.css";
 import axios from "axios";
@@ -43,7 +52,7 @@ const CollarTable = function (props) {
         },
         {
           headers: {
-            Authorization: `Bearer ${getToken()}`,
+            Authorization: `Bearer ${getToken(true)}`,
           },
         }
       )
@@ -52,7 +61,16 @@ const CollarTable = function (props) {
         setRender(Math.random);
         message.success("Cập nhật thành công");
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        const status = err.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
+        console.log(err);
+      });
   };
 
   const handleUpdateStatus = (id, statusUpdate) => {
@@ -68,7 +86,7 @@ const CollarTable = function (props) {
         },
         {
           headers: {
-            Authorization: `Bearer ${getToken()}`,
+            Authorization: `Bearer ${getToken(true)}`,
           },
         }
       )
@@ -78,7 +96,14 @@ const CollarTable = function (props) {
           messageApi.success(mess, 2);
         }, 500);
       })
-      .catch((error) => {
+      .catch((err) => {
+        const status = err.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
         setTimeout(() => {
           messageApi.error(`Cập nhật trạng thái thất bại`, 2);
         }, 500);
@@ -88,7 +113,7 @@ const CollarTable = function (props) {
     axios
       .delete(`http://localhost:8080/api/admin/collar/delete/${selectedData}`, {
         headers: {
-          Authorization: `Bearer ${getToken()}`,
+          Authorization: `Bearer ${getToken(true)}`,
         },
       })
       .then((response) => {
@@ -99,21 +124,37 @@ const CollarTable = function (props) {
         // Đóng modal
         setShowModal(false);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        const status = err.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
+      });
   };
 
   useEffect(() => {
     axios
       .get(`http://localhost:8080/api/admin/collar`, {
         headers: {
-          Authorization: `Bearer ${getToken()}`,
+          Authorization: `Bearer ${getToken(true)}`,
         },
       })
       .then((response) => {
         setData(response.data);
         console.log(response.data);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        const status = err.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
+      });
   }, [props.renderTable, render]);
 
   return (

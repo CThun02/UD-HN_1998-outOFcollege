@@ -196,36 +196,42 @@ const MyForm = (props) => {
                 accountScan.image = url;
               })
               .then(() => {
-                try {
-                  // Gửi yêu cầu POST đến API
-                  axios
-                    .post(
-                      "http://localhost:8080/api/admin/account/create",
-                      accountScan,
-                      {
-                        headers: {
-                          Authorization: `Bearer ${getToken()}`,
-                        },
-                      }
-                    )
-                    .then(() => {
-                      notification.open({
-                        message: "Thông báo",
-                        description: `Thêm mới ${
-                          Number(roleId) === 1 ? "nhân viên" : "khách hàng"
-                        } thành công`,
-                        icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
-                      });
-                      navigate(
-                        `/api/admin/${
-                          Number(roleId) === 1 ? "employee" : "customer"
-                        }`
-                      );
+                // Gửi yêu cầu POST đến API
+                axios
+                  .post(
+                    "http://localhost:8080/api/admin/account/create",
+                    accountScan,
+                    {
+                      headers: {
+                        Authorization: `Bearer ${getToken()}`,
+                      },
+                    }
+                  )
+                  .then((res) => {
+                    notification.open({
+                      message: "Thông báo",
+                      description: `Thêm mới ${
+                        Number(roleId) === 1 ? "nhân viên" : "khách hàng"
+                      } thành công`,
+                      icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
                     });
-                } catch (error) {
-                  const status = error;
-                  console.error(error);
-                }
+                    setLoading(false);
+                    navigate(
+                      `/api/admin/${
+                        Number(roleId) === 1 ? "employee" : "customer"
+                      }`
+                    );
+                  })
+                  .catch((err) => {
+                    setLoading(false);
+                    const status = err.response.status;
+                    if (status === 400) {
+                      notification.error({
+                        message: "Thông báo",
+                        description: `${err.response.data}`,
+                      });
+                    }
+                  });
               })
               .catch((error) => {
                 console.error("Lỗi khi tải lên ảnh:", error);

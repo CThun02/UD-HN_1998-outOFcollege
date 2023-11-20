@@ -157,7 +157,10 @@ const TableProdutSellTheMost = ({ date, type }) => {
       datatIndex: "total",
       title: "Tổng thu",
       render: (text, record, index) => {
-        return record.price * record.quantity;
+        return (record.price * record.quantity)?.toLocaleString("vi-VN", {
+          style: "currency",
+          currency: "VND",
+        });
       },
     },
   ];

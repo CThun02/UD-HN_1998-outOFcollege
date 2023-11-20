@@ -66,11 +66,19 @@ const PieChart = ({ formattedDateNow }) => {
       );
     }
     axios
-      .get("http://localhost:8080/api/admin/bill/getBillRevenueCompare", {
-        headers: {
-          Authorization: `Bearer ${getToken()}`,
-        },
-      })
+      .get(
+        "http://localhost:8080/api/admin/bill/getBillRevenueCompare?day=" +
+          day +
+          "&month=" +
+          month +
+          "&year=" +
+          year,
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
+      )
       .then((res) => {
         setBillRevenueCompare(res.data);
       })

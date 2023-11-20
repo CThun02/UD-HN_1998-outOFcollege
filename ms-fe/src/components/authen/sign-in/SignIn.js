@@ -22,28 +22,30 @@ const googleLogo = "/logo/google.png";
 
 const baseUrl = "http://localhost:8080/api/v1/auth/login";
 
-function SignIn() {
+function SignIn({ isAuthenAdmin }) {
   const [form] = Form.useForm();
   const [login, setLogin] = useState({
     login: "",
     password: "",
+    role: isAuthenAdmin ? "ROLE_ADMIN" : "ROLE_CUSTOMER",
   });
   const navigate = useNavigate();
   const { showSuccessNotification } = useContext(NotificationContext);
   const [api, contextHolder] = notification.useNotification();
 
   async function handleOnSubmit() {
+    console.log(login);
     try {
       const res = await axios.post(baseUrl, login);
       const data = await res.data;
       const status = await res.status;
 
       if (status === 200) {
-        setAuthHeader(data.token);
+        setAuthHeader(data.token, isAuthenAdmin);
       }
 
       showSuccessNotification("Đăng nhập thành công", "login");
-      navigate("/ms-shop/home");
+      navigate(isAuthenAdmin ? "/api/admin" : "/ms-shop/home");
     } catch (err) {
       api.error({
         message: `Đã xảy ra lỗi`,
@@ -114,10 +116,12 @@ function SignIn() {
                     Xác nhận
                   </Button>
                 </div>
-                <div className={styles.center}>
-                  <Link to={"/authen/re-password"}>Quên mật khẩu?</Link>
-                  <Link to={"/authen/sign-up"}>Đăng kí tài khoản</Link>
-                </div>
+                {isAuthenAdmin === false && (
+                  <div className={styles.center}>
+                    <Link to={"/authen/re-password"}>Quên mật khẩu?</Link>
+                    <Link to={"/authen/sign-up"}>Đăng kí tài khoản</Link>
+                  </div>
+                )}
                 <div>
                   <Divider
                     style={{ margin: "0", color: "#B0A695", fontWeight: 400 }}

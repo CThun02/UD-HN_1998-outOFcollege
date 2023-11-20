@@ -40,6 +40,7 @@ import {
 } from "firebase/storage";
 import { saveImage } from "../../../config/FireBase";
 import ProductOpenActive from "./ProductOpenActive";
+import { getToken } from "../../../service/Token";
 
 var productDetailsUpdate = [];
 const ProductDetails = (props) => {
@@ -1098,19 +1099,27 @@ const ProductDetails = (props) => {
               <EditFilled />
             </Button>
             <Button
-              onClick={() => {}}
+              onClick={() => {
+                confirm({
+                  centered: true,
+                  title: `Xóa sản phẩm`,
+                  content: "Xác nhận Xóa",
+                  onOk() {
+                    deleteProductDetail(
+                      record,
+                      record.status === "ACTIVE" ? "DELETED" : "ACTIVE"
+                    );
+                  },
+                });
+              }}
               className="ms-5"
               type="primary"
               size={"large"}
             >
               {record.status === "ACTIVE" ? (
-                <DeleteFilled
-                  onClick={() => deleteProductDetail(record, "DELETED")}
-                />
+                <DeleteFilled />
               ) : (
-                <ReloadOutlined
-                  onClick={() => deleteProductDetail(record, "ACTIVE")}
-                />
+                <ReloadOutlined />
               )}
             </Button>
           </>
@@ -1160,7 +1169,11 @@ const ProductDetails = (props) => {
           productImageCreate.productDetailId = productDetail.id;
           productImageCreate.path = url;
           axios
-            .post(api + "product/createProductImg", productImageCreate)
+            .post(api + "product/createProductImg", productImageCreate, {
+              headers: {
+                Authorization: `Bearer ${getToken()}`,
+              },
+            })
             .then((res) => {
               setRender(Math.random());
               setLoadingProductImage(false);
@@ -1188,7 +1201,11 @@ const ProductDetails = (props) => {
     setLoadingUpdateProduct(true);
     if (brandCreate.trim() !== "") {
       axios
-        .post(api + "brand?brandName=" + brandCreate, null)
+        .post(api + "brand?brandName=" + brandCreate, null, {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        })
         .then((res) => {
           if (res.data === "") {
             messageApi.error("Thương hiệu đã tồn tại!", 1);
@@ -1211,7 +1228,11 @@ const ProductDetails = (props) => {
     setLoadingUpdateProduct(true);
     if (categoryCreate.trim() !== "") {
       axios
-        .post(api + "category?categoryName=" + categoryCreate, null)
+        .post(api + "category?categoryName=" + categoryCreate, null, {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        })
         .then((res) => {
           if (res.data === "") {
             messageApi.error("Loại sản phẩm đã tồn tại!", 1);
@@ -1234,7 +1255,11 @@ const ProductDetails = (props) => {
     setLoadingUpdateProduct(true);
     if (patternCreate.trim() !== "") {
       axios
-        .post(api + "pattern?categoryName=" + patternCreate.trim(), null)
+        .post(api + "pattern?categoryName=" + patternCreate.trim(), null, {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        })
         .then((res) => {
           setPatternCreate(" ");
           if (res.data === "") {
@@ -1257,7 +1282,11 @@ const ProductDetails = (props) => {
     setLoadingUpdateProduct(true);
     if (formCreate.trim() !== "") {
       axios
-        .post(api + "form?categoryName=" + formCreate.trim(), null)
+        .post(api + "form?categoryName=" + formCreate.trim(), null, {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        })
         .then((res) => {
           setRender(Math.random);
           if (res.data === "") {
@@ -1280,7 +1309,15 @@ const ProductDetails = (props) => {
     setLoadingUpdateProduct(true);
     if (buttonCreate.trim() !== "") {
       axios
-        .post(api + "button/create", { buttonName: buttonCreate.trim() })
+        .post(
+          api + "button/create",
+          { buttonName: buttonCreate.trim() },
+          {
+            headers: {
+              Authorization: `Bearer ${getToken()}`,
+            },
+          }
+        )
         .then((res) => {
           setRender(Math.random);
           if (res.data === "") {
@@ -1303,7 +1340,15 @@ const ProductDetails = (props) => {
     setLoadingUpdateProduct(true);
     if (materialCreate.trim() !== "") {
       axios
-        .post(api + "material/create", { materialName: materialCreate.trim() })
+        .post(
+          api + "material/create",
+          { materialName: materialCreate.trim() },
+          {
+            headers: {
+              Authorization: `Bearer ${getToken()}`,
+            },
+          }
+        )
         .then((res) => {
           setRender(Math.random);
           if (res.data === "") {
@@ -1326,7 +1371,15 @@ const ProductDetails = (props) => {
     setLoadingUpdateProduct(true);
     if (collarCreate.trim() !== "") {
       axios
-        .post(api + "collar/create", { collarTypeName: collarCreate.trim() })
+        .post(
+          api + "collar/create",
+          { collarTypeName: collarCreate.trim() },
+          {
+            headers: {
+              Authorization: `Bearer ${getToken()}`,
+            },
+          }
+        )
         .then((res) => {
           setRender(Math.random);
           if (res.data === "") {
@@ -1350,7 +1403,12 @@ const ProductDetails = (props) => {
       axios
         .post(
           api + "shirt-tail?shirtTailTypeName=" + shirtTailCreate.trim(),
-          null
+          null,
+          {
+            headers: {
+              Authorization: `Bearer ${getToken()}`,
+            },
+          }
         )
         .then((res) => {
           setRender(Math.random);
@@ -1373,7 +1431,15 @@ const ProductDetails = (props) => {
     setLoadingUpdateProduct(true);
     if (sleeveCreate.trim() !== "") {
       axios
-        .post(api + "sleeve/create", { sleeveName: sleeveCreate.trim() })
+        .post(
+          api + "sleeve/create",
+          { sleeveName: sleeveCreate.trim() },
+          {
+            headers: {
+              Authorization: `Bearer ${getToken()}`,
+            },
+          }
+        )
         .then((res) => {
           setRender(Math.random);
           if (res.data === "") {
@@ -1396,7 +1462,15 @@ const ProductDetails = (props) => {
     setLoadingUpdateProduct(true);
     if (sizeCreate.trim() !== "") {
       axios
-        .post(api + "size/create", { sizeName: sizeCreate.trim() })
+        .post(
+          api + "size/create",
+          { sizeName: sizeCreate.trim() },
+          {
+            headers: {
+              Authorization: `Bearer ${getToken()}`,
+            },
+          }
+        )
         .then((res) => {
           setRender(Math.random);
           if (res.data === "") {
@@ -1422,7 +1496,11 @@ const ProductDetails = (props) => {
       colorCreate.colorCode.trim() !== ""
     ) {
       axios
-        .post(api + "color/create", colorCreate)
+        .post(api + "color/create", colorCreate, {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        })
         .then((res) => {
           if (res.data === "") {
             messageApi.error("Màu sắc đã tồn tại!", 1);
@@ -1499,7 +1577,11 @@ const ProductDetails = (props) => {
       setRender(Math.random());
     } else {
       axios
-        .put(api + "product/updateProductDetail", productDetailUpdateCopy)
+        .put(api + "product/updateProductDetail", productDetailUpdateCopy, {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        })
         .then((res) => {
           if (notifi) {
             setLoadingUpdateProduct(false);
@@ -1581,7 +1663,12 @@ const ProductDetails = (props) => {
           "&minPrice=" +
           price[0] +
           "&maxPrice=" +
-          price[1]
+          price[1],
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
       )
       .then((response) => {
         setProductDetails(response.data);
@@ -1612,7 +1699,11 @@ const ProductDetails = (props) => {
     if (!check) {
       setLoadingUpdateProduct(true);
       axios
-        .put(api + "product/update", productUpdate)
+        .put(api + "product/update", productUpdate, {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        })
         .then((res) => {
           setLoadingUpdateProduct(false);
           setRender(Math.random);
@@ -1633,7 +1724,11 @@ const ProductDetails = (props) => {
 
   function deleteProductImage(productImage) {
     axios
-      .delete(api + "product/deleteProductImage?id=" + productImage.id)
+      .delete(api + "product/deleteProductImage?id=" + productImage.id, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((res) => {
         messageApi.success(`Xóa ảnh thành công`);
         deleteObject(ref(saveImage, productImage.path)).catch((err) => {
@@ -1650,8 +1745,17 @@ const ProductDetails = (props) => {
   function deleteProductDetail(productDetail, status) {
     delete productDetail["key"];
     productDetail.status = status;
+
     axios
-      .put(api + "product/updateProductDetail?method='Deleted'", productDetail)
+      .put(
+        api + "product/updateProductDetail?method='Deleted'",
+        productDetail,
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
+      )
       .then((res) => {
         setRender(Math.random);
         notification.success({
@@ -1667,7 +1771,11 @@ const ProductDetails = (props) => {
 
   useEffect(() => {
     axios
-      .get(api + "product/getMaxPrice?productId=" + productId)
+      .get(api + "product/getMaxPrice?productId=" + productId, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((res) => {
         if (maxPrice !== res.data) {
           const newPrice = [price[0], res.data];
@@ -1680,7 +1788,11 @@ const ProductDetails = (props) => {
       });
     filter();
     axios
-      .get(api + "brand")
+      .get(api + "brand", {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((res) => {
         setBrands(res.data);
       })
@@ -1688,7 +1800,11 @@ const ProductDetails = (props) => {
         console.log(error);
       });
     axios
-      .get(api + "category")
+      .get(api + "category", {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((res) => {
         setCategories(res.data);
       })
@@ -1696,7 +1812,11 @@ const ProductDetails = (props) => {
         console.log(error);
       });
     axios
-      .get(api + "product/getProductEdit?productId=" + productId)
+      .get(api + "product/getProductEdit?productId=" + productId, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((response) => {
         setProduct(response.data);
         setLoading(false);
@@ -1705,7 +1825,11 @@ const ProductDetails = (props) => {
         console.log(error);
       });
     axios
-      .get(api + "size")
+      .get(api + "size", {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((response) => {
         setSizes(response.data);
       })
@@ -1713,7 +1837,11 @@ const ProductDetails = (props) => {
         console.log(error);
       });
     axios
-      .get(api + "color")
+      .get(api + "color", {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((response) => {
         setColors(response.data);
       })
@@ -1721,7 +1849,11 @@ const ProductDetails = (props) => {
         console.log(error);
       });
     axios
-      .get(api + "button")
+      .get(api + "button", {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((response) => {
         setButtons(response.data);
       })
@@ -1729,7 +1861,11 @@ const ProductDetails = (props) => {
         console.log(error);
       });
     axios
-      .get(api + "material")
+      .get(api + "material", {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((response) => {
         setMaterials(response.data);
       })
@@ -1737,7 +1873,11 @@ const ProductDetails = (props) => {
         console.log(error);
       });
     axios
-      .get(api + "collar")
+      .get(api + "collar", {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((response) => {
         setCollars(response.data);
       })
@@ -1745,7 +1885,11 @@ const ProductDetails = (props) => {
         console.log(error);
       });
     axios
-      .get(api + "shirt-tail")
+      .get(api + "shirt-tail", {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((response) => {
         setshirtTails(response.data);
       })
@@ -1753,7 +1897,11 @@ const ProductDetails = (props) => {
         console.log(error);
       });
     axios
-      .get(api + "sleeve")
+      .get(api + "sleeve", {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((response) => {
         setSleeves(response.data);
       })
@@ -1761,7 +1909,11 @@ const ProductDetails = (props) => {
         console.log(error);
       });
     axios
-      .get(api + "pattern")
+      .get(api + "pattern", {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((response) => {
         setPatterns(response.data);
       })
@@ -1769,7 +1921,11 @@ const ProductDetails = (props) => {
         console.log(error);
       });
     axios
-      .get(api + "form")
+      .get(api + "form", {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((response) => {
         setForms(response.data);
       })

@@ -27,6 +27,7 @@ import { useContext } from "react";
 import { NotificationContext } from "../../element/notification/Notification";
 import TableProduct from "./TableProduct";
 import ProductsDetails from "../../element/products-details/ProductsDetails";
+import { getToken } from "../../../service/Token";
 
 const { confirm } = Modal;
 
@@ -151,9 +152,23 @@ function CreatePromotion() {
                 productDetailIds: onDeleteProductDetailIds,
               };
               await axios
-                .post(baseUrlPromotionProduct + "delete", dto)
+                .post(baseUrlPromotionProduct + "delete", dto, {
+                  headers: {
+                    Authorization: `Bearer ${getToken()}`,
+                  },
+                })
                 .then((res) => console.log(res))
-                .catch((e) => console.log("deleteError: ", e));
+                .catch((e) => {
+                  isLoading(false);
+                  const status = e?.response?.data?.status;
+                  if (status === 403) {
+                    apiNotification.error({
+                      message: "Lỗi",
+                      description: "Bạn không có quyền chỉnh sửa nội dung này",
+                    });
+                    return;
+                  }
+                });
             }
 
             deleteProductDetail();
@@ -162,43 +177,61 @@ function CreatePromotion() {
           setIsLoading(true);
           if (promotion) {
             await axios
-              .post(baseUrl + "save", {
-                ...promotion,
-                startDate: moment(promotion?.startDate.$d).format(
-                  "YYYY-MM-DDTHH:mm:ss.SSS"
-                ),
-                endDate: moment(promotion?.endDate.$d).format(
-                  "YYYY-MM-DDTHH:mm:ss.SSS"
-                ),
-                promotionValue: isNaN(promotion?.promotionValue)
-                  ? Number.parseInt(
-                      promotion?.promotionValue?.replace(/,/g, "")
-                    )
-                  : promotion?.promotionValue,
-                promotionId: promotion?.promotionId
-                  ? promotion?.promotionId
-                  : "",
-                promotionCode: promotion?.promotionCode
-                  ? promotion?.promotionCode
-                  : "",
-                promotionName: promotion?.promotionName,
-                promotionNameCurrent: promotion?.promotionNameCurrent,
-                productDetailIds: productsDetailsId,
-              })
+              .post(
+                baseUrl + "save",
+                {
+                  ...promotion,
+                  startDate: moment(promotion?.startDate.$d).format(
+                    "YYYY-MM-DDTHH:mm:ss.SSS"
+                  ),
+                  endDate: moment(promotion?.endDate.$d).format(
+                    "YYYY-MM-DDTHH:mm:ss.SSS"
+                  ),
+                  promotionValue: isNaN(promotion?.promotionValue)
+                    ? Number.parseInt(
+                        promotion?.promotionValue?.replace(/,/g, "")
+                      )
+                    : promotion?.promotionValue,
+                  promotionId: promotion?.promotionId
+                    ? promotion?.promotionId
+                    : "",
+                  promotionCode: promotion?.promotionCode
+                    ? promotion?.promotionCode
+                    : "",
+                  promotionName: promotion?.promotionName,
+                  promotionNameCurrent: promotion?.promotionNameCurrent,
+                  productDetailIds: productsDetailsId,
+                },
+                {
+                  headers: {
+                    Authorization: `Bearer ${getToken()}`,
+                  },
+                }
+              )
               .then(() => {
                 setIsLoading(false);
                 navigate("/api/admin/promotion");
                 showSuccessNotification("Thao tác thành công", "promotion");
               })
               .catch((err) => {
-                console.log("err: ", err);
                 setIsLoading(false);
                 const error = err?.response?.data;
-                setErrorsServer(error);
-                apiNotification.error({
-                  message: `Lỗi`,
-                  description: `${err?.response?.data?.message}`,
-                });
+
+                if (error?.status === 403) {
+                  apiNotification.error({
+                    message: "Lỗi",
+                    description: "Bạn không có quyền chỉnh sửa nội dung này",
+                  });
+                  return;
+                }
+
+                if (error?.status === 400) {
+                  setErrorsServer(error);
+                  apiNotification.error({
+                    message: `Lỗi`,
+                    description: `${err?.response?.data?.message}`,
+                  });
+                }
               });
           } else {
             console.log("ERROR");
@@ -221,44 +254,63 @@ function CreatePromotion() {
     function () {
       if (code) {
         async function getPromotion() {
-          await axios.get(baseUrl + code).then((res) => {
-            const {
-              promotionId,
-              promotionCode,
-              promotionName,
-              promotionMethod,
-              promotionValue,
-              startDate,
-              endDate,
-              status,
-              productDetailIds,
-              productIdsResponse,
-            } = res.data;
+          await axios
+            .get(baseUrl + code, {
+              headers: {
+                Authorization: `Bearer ${getToken()}`,
+              },
+            })
+            .then((res) => {
+              const {
+                promotionId,
+                promotionCode,
+                promotionName,
+                promotionMethod,
+                promotionValue,
+                startDate,
+                endDate,
+                status,
+                productDetailIds,
+                productIdsResponse,
+              } = res.data;
 
-            ref.current.setFieldValue("promotionId", promotionId);
-            ref.current.setFieldValue("promotionCode", promotionCode);
-            ref.current.setFieldValue("promotionName", promotionName);
-            ref.current.setFieldValue("promotionMethod", promotionMethod);
-            ref.current.setFieldValue(
-              "promotionValue",
-              handleChangeNumber(promotionValue)
-            );
-            ref.current.setFieldValue(
-              "startDate",
-              dayjs(moment(startDate).format(dateFormat), dateFormat)
-            );
-            ref.current.setFieldValue(
-              "endDate",
-              dayjs(moment(endDate).format(dateFormat), dateFormat)
-            );
-            ref.current.setFieldValue("status", status);
-            ref.current.setFieldValue("productsDetailsIdDb", productDetailIds);
-            setProductsDetailsId(productDetailIds);
-            setProductsId(productIdsResponse);
-            setStatus(status);
-          });
+              ref.current.setFieldValue("promotionId", promotionId);
+              ref.current.setFieldValue("promotionCode", promotionCode);
+              ref.current.setFieldValue("promotionName", promotionName);
+              ref.current.setFieldValue("promotionMethod", promotionMethod);
+              ref.current.setFieldValue(
+                "promotionValue",
+                handleChangeNumber(promotionValue)
+              );
+              ref.current.setFieldValue(
+                "startDate",
+                dayjs(moment(startDate).format(dateFormat), dateFormat)
+              );
+              ref.current.setFieldValue(
+                "endDate",
+                dayjs(moment(endDate).format(dateFormat), dateFormat)
+              );
+              ref.current.setFieldValue("status", status);
+              ref.current.setFieldValue(
+                "productsDetailsIdDb",
+                productDetailIds
+              );
+              setProductsDetailsId(productDetailIds);
+              setProductsId(productIdsResponse);
+              setStatus(status);
+            })
+            .catch((err) => {
+              const status = err?.response?.data?.status;
+              if (status === 403) {
+                apiNotification.error({
+                  message: "Lỗi",
+                  description: "Bạn không có quyền xem nội dung này",
+                });
+                return;
+              }
+            });
         }
-        getPromotion();
+        return () => getPromotion();
       }
     },
     [code]

@@ -5,6 +5,7 @@ import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
 import SleeveTable from "./SleeveTable";
 import styles from "../categorystyles/CategoryStyles.module.css";
 import axios from "axios";
+import { getToken } from "../../../service/Token";
 const { Option } = Select;
 
 const SleeveAdmin = function () {
@@ -22,7 +23,11 @@ const SleeveAdmin = function () {
     values.status = "ACTIVE";
     // Gọi API để thêm dữ liệu
     axios
-      .post("http://localhost:8080/api/admin/sleeve/create", values)
+      .post("http://localhost:8080/api/admin/sleeve/create", values, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((response) => {
         // Xử lý thành công
         console.log("Thêm thành công");
@@ -39,7 +44,7 @@ const SleeveAdmin = function () {
 
   return (
     <div className={styles.category}>
-      <div className={styles.radiusFrame}>
+      <div className={styles.customer}>
         <Row className={styles.titleTB}>
           <h3>Danh Sách Tay Áo</h3>
         </Row>

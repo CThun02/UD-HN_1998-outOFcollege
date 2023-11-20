@@ -5,6 +5,7 @@ import { Menu } from "antd";
 import {
   AuditOutlined,
   BookOutlined,
+  CarOutlined,
   DingtalkOutlined,
   DownOutlined,
   FontSizeOutlined,
@@ -27,10 +28,15 @@ import {
   UserSwitchOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+import { getToken } from "../../../service/Token";
 
 const SideBar = () => {
+  const token = getToken(true);
   const navigate = useNavigate();
   const href = "/api/admin/";
+  if (!token) {
+    navigate("/authen/admin/sign-in");
+  }
   const handelClick = (key) => {
     switch (key) {
       case "thongKe":
@@ -41,6 +47,9 @@ const SideBar = () => {
         break;
       case "donHang":
         navigate(href + "order");
+        break;
+      case "traHang":
+        navigate(href + "return");
         break;
       case "sanPhamChiTiet":
         navigate(href + "product");
@@ -122,6 +131,11 @@ const SideBar = () => {
                 label: "Quản lý đơn hàng",
                 icon: <ShoppingCartOutlined />,
                 key: "donHang",
+              },
+              {
+                label: "Trả hàng",
+                icon: <CarOutlined />,
+                key: "traHang",
               },
               {
                 label: "Quản lý sản phẩm",

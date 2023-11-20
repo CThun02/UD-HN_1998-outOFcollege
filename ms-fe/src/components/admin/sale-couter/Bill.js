@@ -43,6 +43,7 @@ import QRReader from "../../../service/QRReader";
 import FormUsingVoucher from "../../element/voucher/FormUsingVoucher";
 import numeral from "numeral";
 import SearchNameOrCodeVoucher from "../../element/voucher/SearchNameOrCodeVoucher";
+import { getToken } from "../../../service/Token";
 
 const Bill = () => {
   var initialItems = [];
@@ -142,18 +143,19 @@ const Bill = () => {
                 {record.productDetail.promotion.length !== 0 ? (
                   <Badge.Ribbon
                     text={`Giảm ${record.productDetail.promotion[0].promotionValue
-                      ? record.productDetail.promotion[0].promotionMethod === "%"
-                        ? record.productDetail.promotion[0].promotionValue +
-                        " " +
-                        record.productDetail.promotion[0].promotionMethod
-                        : record.productDetail.promotion[0].promotionValue.toLocaleString(
-                          "vi-VN",
-                          {
-                            style: "currency",
-                            currency: "VND",
-                          }
-                        )
-                      : null
+                        ? record.productDetail.promotion[0].promotionMethod ===
+                          "%"
+                          ? record.productDetail.promotion[0].promotionValue +
+                          " " +
+                          record.productDetail.promotion[0].promotionMethod
+                          : record.productDetail.promotion[0].promotionValue.toLocaleString(
+                            "vi-VN",
+                            {
+                              style: "currency",
+                              currency: "VND",
+                            }
+                          )
+                        : null
                       }`}
                     color="red"
                   >
@@ -383,9 +385,9 @@ const Bill = () => {
   const [selectedOption, setSelectedOption] = useState([1]);
 
   const handleOptionChange = (value, index) => {
-    const visible = [...selectedOption]
-    visible[index] = value
-    console.log(visible[index])
+    const visible = [...selectedOption];
+    visible[index] = value;
+    console.log(visible[index]);
     setSelectedOption(visible);
     if (value === "2") {
       setAmountPaid(0);
@@ -751,7 +753,11 @@ const Bill = () => {
   const getListAddressByUsername = (username) => {
     if (username) {
       axios
-        .get(`http://localhost:8080/api/admin/account/detail/${username}`)
+        .get(`http://localhost:8080/api/admin/account/detail/${username}`, {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        })
         .then((response) => {
           setAddress(response.data);
         })
@@ -764,7 +770,12 @@ const Bill = () => {
     axios
       .get(
         "http://localhost:8080/api/admin/product/getproductdetailbyidpd?productDetailId=" +
-        result
+        result,
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
       )
       .then((response) => {
         var cart = JSON.parse(localStorage.getItem(cartId));
@@ -855,7 +866,7 @@ const Bill = () => {
 
     getProductDetails();
     initializeModalStates();
-    console.log(account)
+    console.log(account);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     cartId,
@@ -955,7 +966,12 @@ const Bill = () => {
               setErrors({});
               const response = await axios.post(
                 "http://localhost:8080/api/admin/address",
-                billAddress
+                billAddress,
+                {
+                  headers: {
+                    Authorization: `Bearer ${getToken()}`,
+                  },
+                }
               );
               addressId = response.data.id;
             } catch (error) {
@@ -976,7 +992,12 @@ const Bill = () => {
           try {
             const response = await axios.post(
               "http://localhost:8080/api/admin/bill",
-              bill
+              bill,
+              {
+                headers: {
+                  Authorization: `Bearer ${getToken()}`,
+                },
+              }
             );
             if (switchChange[index]) {
               await axios.post(
@@ -988,6 +1009,11 @@ const Bill = () => {
                   phoneNumber: account ? account.numberPhone : phoneNumber,
                   shipDate: switchChange[index] === true ? leadtime : null,
                   shipPrice: switchChange[index] === true ? shippingFee : null,
+                },
+                {
+                  headers: {
+                    Authorization: `Bearer ${getToken()}`,
+                  },
                 }
               );
             }
@@ -1336,7 +1362,6 @@ const Bill = () => {
                             value={selectedAddress?.descriptionDetail}
                           />
                         </Col>
-
                       </Row>
                       {switchChange[index] && leadtime && (
                         <h3>
@@ -1351,7 +1376,6 @@ const Bill = () => {
                           style={{ width: "90px", height: "80px" }}
                         />
                       </div>
-
                     </Col>
                     <Col span={8} offset={1}>
                       <Switch onChange={(e) => handleChangSwitch(e, index)} />

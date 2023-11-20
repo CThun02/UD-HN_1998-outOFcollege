@@ -6,7 +6,7 @@ import axios from "axios";
 import ProductsList from "../product-cart/ProductsList";
 import { DoubleLeftOutlined, DoubleRightOutlined } from "@ant-design/icons";
 
-const baseUrl = "http://localhost:8080/api/admin/product";
+const baseUrl = "http://localhost:8080/api/client/product";
 
 function RelatedProducts() {
   // data

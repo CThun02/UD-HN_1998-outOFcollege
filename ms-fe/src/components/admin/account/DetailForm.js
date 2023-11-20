@@ -24,6 +24,7 @@ import {
 import { FormOutlined, CheckCircleTwoTone } from "@ant-design/icons";
 import { useParams } from "react-router-dom";
 import TextArea from "antd/es/input/TextArea";
+import { getToken } from "../../../service/Token";
 const DetailForm = (props) => {
   var roleId = props.roleId;
   const [data, setData] = useState({
@@ -118,13 +119,29 @@ const DetailForm = (props) => {
 
   const fetchCustomerData = async () => {
     axios
-      .get(`http://localhost:8080/api/admin/account/detail/${username}`)
+      .get(`http://localhost:8080/api/admin/account/detail/${username}`, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((response) => {
         setData(response.data);
         setAddress(response.data.accountAddress);
         setAddressUpdate(response.data.accountAddress[0]);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        const status = err?.response?.data?.status;
+        if (status === 403) {
+          messageApi.error({
+            message: "Lỗi",
+            description: "Bạn không có quyền xem nội dung này",
+          });
+
+          setData({});
+          setAddress([]);
+          setAddressUpdate([]);
+        }
+      });
   };
   const fetchDistricts = async (value) => {
     await axios
@@ -184,7 +201,12 @@ const DetailForm = (props) => {
               "http://localhost:8080/api/admin/account/updateAddressDefault?id=" +
                 add.id +
                 "&value=" +
-                true
+                true,
+              {
+                headers: {
+                  Authorization: `Bearer ${getToken()}`,
+                },
+              }
             )
             .then(() => {
               notification.success({
@@ -192,8 +214,15 @@ const DetailForm = (props) => {
                 description: `Đặt địa chỉ mặc định thành công`,
               });
             })
-            .catch(() => {
+            .catch((err) => {
               message.error("Lỗi khi đặt địa chỉ mặc định");
+              const status = err?.response?.data?.status;
+              if (status === 403) {
+                messageApi.error({
+                  message: "Lỗi",
+                  description: "Bạn không có quyền xem nội dung này",
+                });
+              }
             });
         } else {
           axios
@@ -201,10 +230,26 @@ const DetailForm = (props) => {
               "http://localhost:8080/api/admin/account/updateAddressDefault?id=" +
                 add.id +
                 "&value=" +
-                false
+                false,
+              {
+                headers: {
+                  Authorization: `Bearer ${getToken()}`,
+                },
+              }
             )
-            .catch(() => {
+            .catch((err) => {
               console.log("Lỗi khi đặt địa chỉ mặc định");
+              const status = err?.response?.data?.status;
+              if (status === 403) {
+                messageApi.error({
+                  message: "Lỗi",
+                  description: "Bạn không có quyền xem nội dung này",
+                });
+
+                setData({});
+                setAddress([]);
+                setAddressUpdate([]);
+              }
             });
         }
       }
@@ -226,7 +271,12 @@ const DetailForm = (props) => {
           await axios
             .put(
               `http://localhost:8080/api/admin/account/update/${data.username}`,
-              data
+              data,
+              {
+                headers: {
+                  Authorization: `Bearer ${getToken()}`,
+                },
+              }
             )
             .then(() => {
               setLoadingUdpate(false);
@@ -259,7 +309,12 @@ const DetailForm = (props) => {
         axios
           .put(
             "http://localhost:8080/api/admin/account/updateAdress",
-            addressUpdate
+            addressUpdate,
+            {
+              headers: {
+                Authorization: `Bearer ${getToken()}`,
+              },
+            }
           )
           .then(() => {
             setLoadingUdpateADD(false);
@@ -290,7 +345,12 @@ const DetailForm = (props) => {
           .put(
             "http://localhost:8080/api/admin/account/createAddress?userName=" +
               data.username,
-            addressCreate
+            addressCreate,
+            {
+              headers: {
+                Authorization: `Bearer ${getToken()}`,
+              },
+            }
           )
           .then((res) => {
             setLoadingUdpateADD(false);
@@ -303,8 +363,15 @@ const DetailForm = (props) => {
               icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
             });
           })
-          .catch(() => {
+          .catch((err) => {
             messageApi.error("Thêm mới địa chỉ Thất bại!", 2);
+            const status = err?.response?.data?.status;
+            if (status === 403) {
+              messageApi.error({
+                message: "Lỗi",
+                description: "Bạn không có quyền xem nội dung này",
+              });
+            }
           });
       },
     });
@@ -374,19 +441,27 @@ const DetailForm = (props) => {
             </Col>
             <Col span={24}>
               <div className="m-5">
-                <span>Username</span>
+                <span>
+                  Username{" "}
+                  {roleId === 1 ? <span style={{ color: "red" }}>*</span> : ""}
+                </span>
                 <Input type="text" name="username" value={data.username} />
               </div>
             </Col>
             <Col span={24}>
               <div className="m-5">
-                <span>Mã định danh</span>
+                <span>
+                  Mã định danh{" "}
+                  {roleId === 1 ? <span style={{ color: "red" }}>*</span> : ""}
+                </span>
                 <Input type="text" name="idNo" value={data.idNo} />
               </div>
             </Col>
             <Col span={24}>
               <div className="m-5">
-                <span>Tên nhân viên</span>
+                <span>
+                  Họ và tên <span style={{ color: "red" }}>*</span>
+                </span>
                 <Input
                   value={data.fullName}
                   onChange={(event) => {
@@ -397,11 +472,13 @@ const DetailForm = (props) => {
             </Col>
             <Col span={24}>
               <div className="m-5">
-                <span>Ngày sinh</span>
+                <span>
+                  Ngày sinh <span style={{ color: "red" }}>*</span>
+                </span>
                 <DatePicker
                   allowClear={false}
                   style={{ width: "100%" }}
-                  value={dayjs(data.dob)}
+                  value={data.dob === null ? null : dayjs(data.dob)}
                   onChange={(event) => {
                     handleChange("dob", event);
                   }}
@@ -410,7 +487,9 @@ const DetailForm = (props) => {
             </Col>
             <Col span={24}>
               <div className="m-5">
-                <span>Giới Tính: </span>
+                <span>
+                  Giới Tính <span style={{ color: "red" }}>*</span>:
+                </span>
                 <Radio.Group
                   value={data.gender}
                   onChange={(event) => {
@@ -424,7 +503,9 @@ const DetailForm = (props) => {
             </Col>
             <Col span={24}>
               <div className="m-5">
-                <span>Email</span>
+                <span>
+                  Email <span style={{ color: "red" }}>*</span>
+                </span>
                 <Input
                   value={data.email}
                   onChange={(event) => {
@@ -435,7 +516,9 @@ const DetailForm = (props) => {
             </Col>
             <Col span={24}>
               <div className="m-5">
-                <span>Số điện thoại</span>
+                <span>
+                  Số điện thoại <span style={{ color: "red" }}>*</span>
+                </span>
                 <Input
                   value={data.numberPhone}
                   onChange={(event) => {
@@ -481,7 +564,7 @@ const DetailForm = (props) => {
                       <Row>
                         <Col span={8}>
                           <div className="m-5">
-                            <h6>Họ và tên</h6>
+                            <h6>Họ và tên </h6>
                             <Input
                               defaultValue={item.fullName}
                               onChange={(event) => {

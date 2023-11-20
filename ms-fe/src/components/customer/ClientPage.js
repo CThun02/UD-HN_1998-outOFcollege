@@ -10,6 +10,7 @@ import Shop from "./shop/Shop";
 import DetailProduct from "./detail-product/DetailProduct";
 import Cart from "./cart/Cart";
 import { useEffect, useState } from "react";
+import UserDetail from "./user/UserDetail";
 
 function ClientPage() {
   const [render, setRender] = useState(0);
@@ -29,6 +30,7 @@ function ClientPage() {
             <Route path="checkout" element={<Checkout />} />
             <Route path="cart" element={<Cart setRenderHeader={setRender} />} />
             <Route path="anything" element={<Shop />} />
+            <Route path="user/:username" element={<UserDetail />} />
             <Route path="shopping">
               <Route index element={<Shop />} />
               {/* <Route path=":typeCategory">

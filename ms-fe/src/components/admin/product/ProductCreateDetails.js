@@ -22,6 +22,7 @@ import React, { useEffect, useState } from "react";
 import styles from "./ProductCreateDetails.module.css";
 import ProductDetailsTable from "./ProductDetailsTable";
 import { isFormInputEmpty } from "./ValidateForm";
+import { getToken } from "../../../service/Token";
 
 const ProductCreateDetails = () => {
   const api = "http://localhost:8080/api/admin/";
@@ -80,7 +81,7 @@ const ProductCreateDetails = () => {
     status: "ACTIVE",
   });
   const [productDetail, setProductDetail] = useState({
-    productId: "null",
+    productId: "",
     buttonId: " ",
     materialId: " ",
     collarId: " ",
@@ -138,12 +139,18 @@ const ProductCreateDetails = () => {
         onOk() {
           setLoadingProduct(true);
           axios
-            .post(api + "product/create", product)
+            .post(api + "product/create", product, {
+              headers: {
+                Authorization: `Bearer ${getToken()}`,
+              },
+            })
             .then((res) => {
               setLoadingProduct(false);
               handleSetProduct("description", " ");
               setmodalProductCreate(false);
+              setProduct(res.data);
               setRender(Math.random());
+              handleSetProductDetail("productId", res.data.id);
               notification.open({
                 message: "Thông báo",
                 description: "Thêm mới sản phẩm thành công",
@@ -210,7 +217,12 @@ const ProductCreateDetails = () => {
             "&patternId=" +
             productDetailRequest.patternId +
             "&formId=" +
-            productDetailRequest.formId
+            productDetailRequest.formId,
+          {
+            headers: {
+              Authorization: `Bearer ${getToken()}`,
+            },
+          }
         )
         .then((res) => {
           let productDetailsExist = [...res.data];
@@ -250,7 +262,6 @@ const ProductCreateDetails = () => {
         });
     }
   }
-  console.log("spam");
   function handleSetProductDetailCom(field, value) {
     if (field === "button") {
       setButton(value);
@@ -366,7 +377,11 @@ const ProductCreateDetails = () => {
         onOk() {
           setisLoading(true);
           axios
-            .post(api + "pattern?categoryName=" + patternCreate.trim(), null)
+            .post(api + "pattern?categoryName=" + patternCreate.trim(), null, {
+              headers: {
+                Authorization: `Bearer ${getToken()}`,
+              },
+            })
             .then((res) => {
               setPatternCreate(" ");
               if (res.data === "") {
@@ -400,7 +415,12 @@ const ProductCreateDetails = () => {
           axios
             .post(
               api + "shirt-tail?shirtTailTypeName=" + shirtTailCreate.trim(),
-              null
+              null,
+              {
+                headers: {
+                  Authorization: `Bearer ${getToken()}`,
+                },
+              }
             )
             .then((res) => {
               setRender(Math.random);
@@ -433,7 +453,11 @@ const ProductCreateDetails = () => {
         onOk() {
           setisLoading(true);
           axios
-            .post(api + "brand?brandName=" + brandCreate, null)
+            .post(api + "brand?brandName=" + brandCreate, null, {
+              headers: {
+                Authorization: `Bearer ${getToken()}`,
+              },
+            })
             .then((res) => {
               if (res.data === "") {
                 messageApi.error("Thương hiệu đã tồn tại!", 1);
@@ -465,7 +489,11 @@ const ProductCreateDetails = () => {
         onOk() {
           setisLoading(true);
           axios
-            .post(api + "category?categoryName=" + categoryCreate, null)
+            .post(api + "category?categoryName=" + categoryCreate, null, {
+              headers: {
+                Authorization: `Bearer ${getToken()}`,
+              },
+            })
             .then((res) => {
               if (res.data === "") {
                 messageApi.error("Loại sản phẩm đã tồn tại!", 1);
@@ -497,7 +525,11 @@ const ProductCreateDetails = () => {
         onOk() {
           setisLoading(true);
           axios
-            .post(api + "form?categoryName=" + formCreate.trim(), null)
+            .post(api + "form?categoryName=" + formCreate.trim(), null, {
+              headers: {
+                Authorization: `Bearer ${getToken()}`,
+              },
+            })
             .then((res) => {
               setRender(Math.random);
               if (res.data === "") {
@@ -529,7 +561,11 @@ const ProductCreateDetails = () => {
         onOk() {
           setisLoading(true);
           axios
-            .post(api + "form?categoryName=" + formCreate.trim(), null)
+            .post(api + "form?categoryName=" + formCreate.trim(), null, {
+              headers: {
+                Authorization: `Bearer ${getToken()}`,
+              },
+            })
             .then((res) => {
               setRender(Math.random);
               if (res.data === "") {
@@ -561,9 +597,17 @@ const ProductCreateDetails = () => {
         onOk() {
           setisLoading(true);
           axios
-            .post(api + "material/create", {
-              materialName: materialCreate.trim(),
-            })
+            .post(
+              api + "material/create",
+              {
+                materialName: materialCreate.trim(),
+              },
+              {
+                headers: {
+                  Authorization: `Bearer ${getToken()}`,
+                },
+              }
+            )
             .then((res) => {
               setRender(Math.random);
               if (res.data === "") {
@@ -595,9 +639,17 @@ const ProductCreateDetails = () => {
         onOk() {
           setisLoading(true);
           axios
-            .post(api + "collar/create", {
-              collarTypeName: collarCreate.trim(),
-            })
+            .post(
+              api + "collar/create",
+              {
+                collarTypeName: collarCreate.trim(),
+              },
+              {
+                headers: {
+                  Authorization: `Bearer ${getToken()}`,
+                },
+              }
+            )
             .then((res) => {
               setRender(Math.random);
               if (res.data === "") {
@@ -629,7 +681,15 @@ const ProductCreateDetails = () => {
         onOk() {
           setisLoading(true);
           axios
-            .post(api + "sleeve/create", { sleeveName: sleeveCreate.trim() })
+            .post(
+              api + "sleeve/create",
+              { sleeveName: sleeveCreate.trim() },
+              {
+                headers: {
+                  Authorization: `Bearer ${getToken()}`,
+                },
+              }
+            )
             .then((res) => {
               setRender(Math.random);
               if (res.data === "") {
@@ -661,7 +721,15 @@ const ProductCreateDetails = () => {
         onOk() {
           setisLoading(true);
           axios
-            .post(api + "size/create", { sizeName: sizeCreate.trim() })
+            .post(
+              api + "size/create",
+              { sizeName: sizeCreate.trim() },
+              {
+                headers: {
+                  Authorization: `Bearer ${getToken()}`,
+                },
+              }
+            )
             .then((res) => {
               setRender(Math.random);
               if (res.data === "") {
@@ -696,7 +764,11 @@ const ProductCreateDetails = () => {
         onOk() {
           setLoadingColor(true);
           axios
-            .post(api + "color/create", colorCreate)
+            .post(api + "color/create", colorCreate, {
+              headers: {
+                Authorization: `Bearer ${getToken()}`,
+              },
+            })
             .then((res) => {
               setLoadingColor(true);
               setModalColorOpen(false);
@@ -719,7 +791,11 @@ const ProductCreateDetails = () => {
   }
   useEffect(() => {
     axios
-      .get(api + "product/getproductfilterByCom")
+      .get(api + "product/getproductfilterByCom", {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((res) => {
         setProductList(res.data);
       })
@@ -727,7 +803,11 @@ const ProductCreateDetails = () => {
         console.log(err);
       });
     axios
-      .get(api + "brand")
+      .get(api + "brand", {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((res) => {
         setBrands(res.data);
       })
@@ -735,7 +815,11 @@ const ProductCreateDetails = () => {
         console.log(error);
       });
     axios
-      .get(api + "category")
+      .get(api + "category", {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((res) => {
         setCategories(res.data);
       })
@@ -743,7 +827,11 @@ const ProductCreateDetails = () => {
         console.log(error);
       });
     axios
-      .get(api + "size")
+      .get(api + "size", {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((response) => {
         setSizes(response.data);
       })
@@ -751,7 +839,11 @@ const ProductCreateDetails = () => {
         console.log(error);
       });
     axios
-      .get(api + "color")
+      .get(api + "color", {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((response) => {
         setColors(response.data);
       })
@@ -759,7 +851,11 @@ const ProductCreateDetails = () => {
         console.log(error);
       });
     axios
-      .get(api + "button")
+      .get(api + "button", {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((response) => {
         setButtons(response.data);
       })
@@ -767,7 +863,11 @@ const ProductCreateDetails = () => {
         console.log(error);
       });
     axios
-      .get(api + "material")
+      .get(api + "material", {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((response) => {
         setMaterials(response.data);
       })
@@ -775,7 +875,11 @@ const ProductCreateDetails = () => {
         console.log(error);
       });
     axios
-      .get(api + "collar")
+      .get(api + "collar", {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((response) => {
         setCollars(response.data);
       })
@@ -783,7 +887,11 @@ const ProductCreateDetails = () => {
         console.log(error);
       });
     axios
-      .get(api + "shirt-tail")
+      .get(api + "shirt-tail", {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((response) => {
         setshirtTails(response.data);
       })
@@ -791,7 +899,11 @@ const ProductCreateDetails = () => {
         console.log(error);
       });
     axios
-      .get(api + "sleeve")
+      .get(api + "sleeve", {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((response) => {
         setSleeves(response.data);
       })
@@ -800,7 +912,11 @@ const ProductCreateDetails = () => {
       });
 
     axios
-      .get(api + "pattern")
+      .get(api + "pattern", {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((res) => {
         setPatterns(res.data);
       })
@@ -808,7 +924,11 @@ const ProductCreateDetails = () => {
         console.log(error);
       });
     axios
-      .get(api + "form")
+      .get(api + "form", {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((res) => {
         setForms(res.data);
       })
@@ -972,8 +1092,12 @@ const ProductCreateDetails = () => {
                                 )
                             }
                             onChange={(index) => {
-                              selectProduct(index);
+                              setProduct(
+                                productList?.filter((item) => item.id === index)
+                              );
+                              handleSetProductDetail("productId", index);
                             }}
+                            value={productDetail.productId}
                           >
                             {productList &&
                               productList.map((item, index) => {
@@ -981,7 +1105,7 @@ const ProductCreateDetails = () => {
                                   <Select.Option
                                     key={item.id}
                                     label={item.productName}
-                                    value={index}
+                                    value={item.id}
                                   >
                                     {item.productName}
                                   </Select.Option>

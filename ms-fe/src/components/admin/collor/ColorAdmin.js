@@ -15,6 +15,7 @@ import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
 import CollorTable from "./CollorTable";
 import styles from "../categorystyles/CategoryStyles.module.css";
 import axios from "axios";
+import { getToken } from "../../../service/Token";
 const { Option } = Select;
 
 const CollorAdmin = function () {
@@ -40,7 +41,11 @@ const CollorAdmin = function () {
 
     // Gọi API để thêm dữ liệu
     axios
-      .post("http://localhost:8080/api/admin/color/create", values)
+      .post("http://localhost:8080/api/admin/color/create", values, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((response) => {
         // Xử lý thành công
         console.log("Thêm thành công");
@@ -57,7 +62,7 @@ const CollorAdmin = function () {
   useEffect(() => {}, [render]);
   return (
     <div className={styles.category}>
-      <div className={styles.radiusFrame}>
+      <div className={styles.customer}>
         <Row className={styles.titleTB}>
           <h3>Danh Sách Màu Sắc</h3>
         </Row>
@@ -100,7 +105,6 @@ const CollorAdmin = function () {
               ]}
             >
               <ColorPicker
-                color={colorCode}
                 showText
                 onChange={(e) => setColorCode(e.toHexString())}
               />

@@ -90,13 +90,14 @@ public class AccountServiceImpl implements AccountService {
                 .district(request.getDistrict())
                 .ward(request.getWard())
                 .build();
-        Address createAddress = addressRepository.save(address);
-
-        AddressDetail addressDetail = AddressDetail.builder()
-                .accountAddress(createAccount)
-                .addressDetail(createAddress)
-                .build();
-        addressDetailRepository.save(addressDetail);
+        if(!address.getCity().equals("empty") || !address.getDistrict().equals("empty") ||!address.getWard().equals("empty")){
+            Address createAddress = addressRepository.save(address);
+            AddressDetail addressDetail = AddressDetail.builder()
+                    .accountAddress(createAccount)
+                    .addressDetail(createAddress)
+                    .build();
+            addressDetailRepository.save(addressDetail);
+        }
         return createAccount;
     }
 
@@ -143,7 +144,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public AccountDetailResponce detail(String username) {
         List<AddressDetail> accountAddressDetails = addressDetailService.getAddressDetailsByUsername(username);
-        Account account = accountAddressDetails.get(0).getAccountAddress();
+        Account account = accountRepository.findById(username).orElse(null);
         if (account == null) {
             throw new IllegalArgumentException("username không tồn tại");
         }
@@ -244,8 +245,20 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Account findAccountByLogin(String login) {
-        return accountRepository.findAccountByLogin(login);
+    public Account findAccountByLogin(String login, String role) {
+        if(role == null) {
+            return accountRepository.findUserByLogin(login);
+        }
+
+        if(role.equalsIgnoreCase(Const.ROLE_CUSTOMER)) {
+            return accountRepository.findAccountCustomerByLogin(login);
+        }
+
+        if(role.equalsIgnoreCase(Const.ROLE_EMPLOYEE) || role.equalsIgnoreCase(Const.ROLE_ADMIN)) {
+            return accountRepository.findEmployeeAndAdmintByLogin(login);
+        }
+
+        return null;
     }
 
     private Page<AccountVoucher> page(List<AccountVoucher> inputList, Pageable pageable) {

@@ -19,6 +19,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.nio.CharBuffer;
+import java.util.Arrays;
+import java.util.Collections;
 
 @AllArgsConstructor
 @Service
@@ -30,7 +32,7 @@ public class AuthServiceIml implements AuthService {
 
     @Override
     public UserDTO login(CredentialsDTO dto) {
-        Account account = accountService.findAccountByLogin(dto.getLogin());
+        Account account = accountService.findAccountByLogin(dto.getLogin(), dto.getRole());
 
         if(account == null) {
             throw new LoginException(ErrorCodeConfig.getMessage(Const.JWT_LOGIN_ERROR), HttpStatus.BAD_REQUEST);
@@ -85,10 +87,11 @@ public class AuthServiceIml implements AuthService {
 
     @Override
     public UserDTO findByLogin(String login) {
-        Account account=  accountService.findAccountByLogin(login);
+        Account account=  accountService.findAccountByLogin(login, null);
         return UserDTO.builder()
                 .fullName(account.getFullName())
                 .username(account.getUsername())
+                .roles(roleService.findRoleNameByUsername(account.getUsername()))
                 .build();
     }
 
@@ -96,6 +99,7 @@ public class AuthServiceIml implements AuthService {
         return UserDTO.builder()
                 .username(account.getUsername())
                 .fullName(account.getFullName())
+                .roles(roleService.findRoleNameByUsername(account.getUsername()))
                 .build();
     }
 

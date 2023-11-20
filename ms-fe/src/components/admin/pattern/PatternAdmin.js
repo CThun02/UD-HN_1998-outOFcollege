@@ -4,6 +4,7 @@ import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
 import PatternTable from "./PatternTable";
 import styles from "./PatternlStyle.module.css";
 import axios from "axios";
+import { getToken } from "../../../service/Token";
 
 const PatternAdmin = function () {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -22,14 +23,18 @@ const PatternAdmin = function () {
     values.status = "ACTIVE";
     // Gọi API để thêm dữ liệu
     axios
-      .post("http://localhost:8080/api/admin/pattern/create", values)
+      .post("http://localhost:8080/api/admin/pattern/create", values, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((response) => {
         // Xử lý thành công
         console.log("Thêm thành công");
         setIsModalVisible(false);
         setRender(Math.random);
-            // Hiển thị thông báo thành công
-      message.success("Thêm thành công");
+        // Hiển thị thông báo thành công
+        message.success("Thêm thành công");
       })
       .catch((error) => {
         // Xử lý lỗi
@@ -49,7 +54,7 @@ const PatternAdmin = function () {
     <div className={styles.material}>
       <div className={styles.radiusFrame}>
         <Row className={styles.titleTB}>
-          <h3>Danh Sách Chất Liệu</h3>
+          <h3>Danh Sách Họa tiết</h3>
         </Row>
         <Row className={styles.adminMenu}>
           <Col span={10}>
@@ -68,7 +73,7 @@ const PatternAdmin = function () {
                 onClick={handleAdd}
               >
                 <PlusOutlined className={styles.faPlus} />
-                <span className={styles.titleSeach}>Thêm Loại Vải</span>
+                <span className={styles.titleSeach}>Thêm Họa tiết</span>
               </Button>
             </Col>
           </Col>

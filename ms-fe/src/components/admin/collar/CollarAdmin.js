@@ -4,6 +4,7 @@ import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
 import CollarTable from "./CollarTable";
 import styles from "./CollarStyle.module.css";
 import axios from "axios";
+import { getToken } from "../../../service/Token";
 
 const CollarAdmin = function () {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -21,7 +22,11 @@ const CollarAdmin = function () {
     values.status = "ACTIVE";
     // Gọi API để thêm dữ liệu
     axios
-      .post("http://localhost:8080/api/admin/collar/create", values)
+      .post("http://localhost:8080/api/admin/collar/create", values, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((response) => {
         // Xử lý thành công
         console.log("Thêm thành công");
@@ -39,7 +44,7 @@ const CollarAdmin = function () {
     <div className={styles.material}>
       <div className={styles.radiusFrame}>
         <Row className={styles.titleTB}>
-          <h3>Danh Sách Chất Liệu</h3>
+          <h3>Danh Sách Cổ Áo</h3>
         </Row>
         <Row className={styles.adminMenu}>
           <Col span={10}>

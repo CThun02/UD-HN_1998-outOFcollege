@@ -6,6 +6,7 @@ import React from "react";
 import { useState } from "react";
 import { useEffect } from "react";
 import styles from "./search.module.css";
+import { getToken } from "../../../service/Token";
 
 const ModalAccount = ({
   visible,
@@ -83,7 +84,12 @@ const ModalAccount = ({
   function filter(keyword) {
     axios
       .get(
-        `http://localhost:8080/api/admin/account/getAllCustomer?keyword=${keyword}`
+        `http://localhost:8080/api/admin/account/getAllCustomer?keyword=${keyword}`,
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
       )
       .then((response) => {
         setData(response.data);

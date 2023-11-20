@@ -27,8 +27,10 @@ import {
 } from "../product/ValidateForm";
 import dayjs from "dayjs";
 import QRReader from "../../../service/QRReader";
+import { getToken } from "../../../service/Token";
 // Nhập ảnh mã QR
 const MyForm = (props) => {
+  const [api, contextHolder] = notification.useNotification();
   const navigate = useNavigate();
   let roleId = props.roleId;
   const [imageFile, setImageFile] = useState(null);
@@ -39,16 +41,16 @@ const MyForm = (props) => {
   const [loading, setLoading] = useState(false);
   const [visible, setVisible] = useState(false);
   const [accountScan, setAccountScan] = useState({
-    idNo: " ",
+    idNo: roleId === 2 ? generateUniqueRandomHex(12) : " ",
     image: "none",
     fullName: " ",
     email: " ",
     numberPhone: " ",
-    city: " ",
-    district: " ",
-    ward: " ",
+    city: roleId === 2 ? "empty" : " ",
+    district: roleId === 2 ? "empty" : " ",
+    ward: roleId === 2 ? "empty" : " ",
     password: "12345",
-    descriptionDetail: " ",
+    descriptionDetail: roleId === 2 ? "empty" : " ",
     dob: " ",
     gender: true,
     idRole: roleId,
@@ -68,8 +70,26 @@ const MyForm = (props) => {
     setImageUrl(imageUrl);
   };
 
+  function generateRandomHex(length) {
+    return Array.from({ length }, () =>
+      Math.floor(Math.random() * 16).toString(16)
+    ).join("");
+  }
+
+  function generateUniqueRandomHex(length) {
+    var generatedCodes = {};
+
+    while (true) {
+      var code = generateRandomHex(length);
+
+      if (!generatedCodes[code]) {
+        generatedCodes[code] = true;
+        return code;
+      }
+    }
+  }
+
   const handleScan = (result) => {
-    console.log(result);
     let value = result;
     const idNo = value.substring(0, value.indexOf("|"));
     const fullName = value.substring(
@@ -156,7 +176,7 @@ const MyForm = (props) => {
         });
       } else {
         Modal.confirm({
-          title: "Xác nhận cập nhật",
+          title: "Xác nhận thêm mới",
           content: "Bạn có chắc chắn muốn Thêm mới không?",
           okText: "Thêm mới",
           cancelText: "Hủy bỏ",
@@ -168,111 +188,47 @@ const MyForm = (props) => {
                 currentTimeInMillis + "_" + accountScan.numberPhone
               }`
             );
-
-            axios
-              .get(
-                "http://localhost:8080/api/admin/account/getByEmailOrNumberPhoneOrIdNo?idRole=" +
-                  roleId +
-                  "&keyWords=" +
-                  accountScan.idNo
-              )
-              .then((response) => {
-                if (
-                  response.data === undefined ||
-                  response.data === null ||
-                  response.data === ""
-                ) {
+            uploadBytes(imgRef, imageFile)
+              .then(() => {
+                return getDownloadURL(imgRef);
+              })
+              .then((url) => {
+                accountScan.image = url;
+              })
+              .then(() => {
+                try {
+                  // Gửi yêu cầu POST đến API
                   axios
-                    .get(
-                      "http://localhost:8080/api/admin/account/getByEmailOrNumberPhoneOrIdNo?idRole=" +
-                        roleId +
-                        "&keyWords=" +
-                        accountScan.email
-                    )
-                    .then((response) => {
-                      if (
-                        response.data === undefined ||
-                        response.data === null ||
-                        response.data === ""
-                      ) {
-                        axios
-                          .get(
-                            "http://localhost:8080/api/admin/account/getByEmailOrNumberPhoneOrIdNo?idRole=" +
-                              roleId +
-                              "&keyWords=" +
-                              accountScan.numberPhone
-                          )
-                          .then((response) => {
-                            if (
-                              response.data === undefined ||
-                              response.data === null ||
-                              response.data === ""
-                            ) {
-                              uploadBytes(imgRef, imageFile)
-                                .then(() => {
-                                  return getDownloadURL(imgRef);
-                                })
-                                .then((url) => {
-                                  accountScan.image = url;
-                                })
-                                .then(() => {
-                                  try {
-                                    // Gửi yêu cầu POST đến API
-                                    axios
-                                      .post(
-                                        "http://localhost:8080/api/admin/account/create",
-                                        accountScan
-                                      )
-                                      .then(() => {
-                                        notification.open({
-                                          message: "Thông báo",
-                                          description: `Thêm mới ${
-                                            Number(roleId) === 1
-                                              ? "nhân viên"
-                                              : "khách hàng"
-                                          } thành công`,
-                                          icon: (
-                                            <CheckCircleTwoTone twoToneColor="#52c41a" />
-                                          ),
-                                        });
-                                        navigate(
-                                          `/api/admin/${
-                                            Number(roleId) === 1
-                                              ? "employee"
-                                              : "customer"
-                                          }`
-                                        );
-                                      });
-                                  } catch (error) {
-                                    console.error(error);
-                                  }
-                                })
-                                .catch((error) => {
-                                  console.error("Lỗi khi tải lên ảnh:", error);
-                                });
-                            } else {
-                              notification.error({
-                                message: "Thông báo",
-                                description: "Số điện thoại đã tồn tại",
-                              });
-                              setLoading(false);
-                            }
-                          });
-                      } else {
-                        notification.error({
-                          message: "Thông báo",
-                          description: "Email đã tồn tại",
-                        });
-                        setLoading(false);
+                    .post(
+                      "http://localhost:8080/api/admin/account/create",
+                      accountScan,
+                      {
+                        headers: {
+                          Authorization: `Bearer ${getToken()}`,
+                        },
                       }
+                    )
+                    .then(() => {
+                      notification.open({
+                        message: "Thông báo",
+                        description: `Thêm mới ${
+                          Number(roleId) === 1 ? "nhân viên" : "khách hàng"
+                        } thành công`,
+                        icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
+                      });
+                      navigate(
+                        `/api/admin/${
+                          Number(roleId) === 1 ? "employee" : "customer"
+                        }`
+                      );
                     });
-                } else {
-                  notification.error({
-                    message: "Thông báo",
-                    description: "Mã định danh đã tồn tại",
-                  });
-                  setLoading(false);
+                } catch (error) {
+                  const status = error;
+                  console.error(error);
                 }
+              })
+              .catch((error) => {
+                console.error("Lỗi khi tải lên ảnh:", error);
               });
             setLoading(true);
           },
@@ -307,7 +263,7 @@ const MyForm = (props) => {
         console.error(error);
       }
     };
-    fetchProvinces();
+    return () => fetchProvinces();
   }, [render]);
 
   return (
@@ -374,19 +330,49 @@ const MyForm = (props) => {
               <Row style={{ paddingBottom: "16px" }}>
                 <Col span={12}>
                   <div className="m-5">
-                    <h6>Mã định danh</h6>
+                    <h6>
+                      Mã định danh{" "}
+                      {roleId === 1 ? (
+                        <span style={{ color: "red" }}>*</span>
+                      ) : (
+                        ""
+                      )}
+                    </h6>
                     <Input
-                      value={accountScan.idNo}
-                      onChange={(event) =>
-                        handleSetAccountScan("idNo", event.target.value)
-                      }
+                      onChange={(event) => {
+                        handleSetAccountScan(
+                          "idNo",
+                          event.target.value.replace(/[^\d]/g, "")
+                        );
+                      }}
+                      onBlur={(event) => {
+                        if (
+                          event.target.value.length !== 12 &&
+                          event.target.value.trim().length !== 0 &&
+                          roleId === 1
+                        ) {
+                          notification.error({
+                            message: "Thông báo",
+                            description: "Mã định danh phải là 12 số",
+                          });
+                        } else
+                          handleSetAccountScan(
+                            "idNo",
+                            event.target.value.trim().length === 0 &&
+                              roleId === 2
+                              ? "empty"
+                              : event.target.value.trim()
+                          );
+                      }}
                       status={accountScan.idNo === "" ? "error" : ""}
                     />
                   </div>
                 </Col>
                 <Col span={12}>
                   <div className="m-5">
-                    <h6>Giới Tính</h6>
+                    <h6>
+                      Giới Tính <span style={{ color: "red" }}>*</span>
+                    </h6>
                     <Radio.Group
                       value={accountScan.gender}
                       onChange={(event) =>
@@ -403,22 +389,43 @@ const MyForm = (props) => {
               <Row style={{ paddingBottom: "16px" }}>
                 <Col span={12}>
                   <div className="m-5">
-                    <h6>Ngày sinh</h6>
+                    <h6>
+                      Ngày sinh <span style={{ color: "red" }}>*</span>
+                    </h6>
                     <DatePicker
                       value={
-                        accountScan.dob === "" || accountScan.dob === " "
+                        accountScan.dob === " " ||
+                        accountScan.dob === "" ||
+                        accountScan.dob === null
                           ? null
                           : dayjs(accountScan.dob)
                       }
                       style={{ width: "100%" }}
-                      onChange={(event) => {
+                      onChange={(event, eventString) => {
+                        var currenYear = new Date().getFullYear();
+                        if (event !== null) {
+                          if (currenYear - event?.toDate().getFullYear() < 16) {
+                            notification.error({
+                              message: "Thông báo",
+                              description: `${
+                                roleId === 1
+                                  ? "Nhân viên phải trên 16 tuổi"
+                                  : "Khách hàng phải trên 16 tuổi"
+                              }`,
+                            });
+                            return;
+                          }
+                        }
+                        handleSetAccountScan("dob", eventString);
+                      }}
+                      onBlur={(event) => {
                         handleSetAccountScan(
                           "dob",
-                          event === null ? "" : event
+                          event.target.value === "" ? null : event.target.value
                         );
                       }}
                       status={
-                        accountScan.dob === "" || accountScan.dob === null
+                        accountScan.dob === null || accountScan.dob === ""
                           ? "error"
                           : ""
                       }
@@ -427,11 +434,16 @@ const MyForm = (props) => {
                 </Col>
                 <Col span={12}>
                   <div className="m-5">
-                    <h6>Email</h6>
+                    <h6>
+                      Email <span style={{ color: "red" }}>*</span>
+                    </h6>
                     <Input
                       value={accountScan.email}
                       onChange={(event) =>
-                        handleSetAccountScan("email", event.target.value)
+                        handleSetAccountScan("email", event.target.value.trim())
+                      }
+                      onBlur={(event) =>
+                        handleSetAccountScan("email", event.target.value.trim())
                       }
                       required={true}
                       status={accountScan.email === "" ? "error" : ""}
@@ -444,11 +456,19 @@ const MyForm = (props) => {
               <Row style={{ paddingBottom: "16px" }}>
                 <Col span={8}>
                   <div className="m-5">
-                    <h6> Họ và tên</h6>
+                    <h6>
+                      Họ và tên <span style={{ color: "red" }}>*</span>
+                    </h6>
                     <Input
                       value={accountScan.fullName}
                       onChange={(event) =>
                         handleSetAccountScan("fullName", event.target.value)
+                      }
+                      onBlur={(event) =>
+                        handleSetAccountScan(
+                          "fullName",
+                          event.target.value.trim()
+                        )
                       }
                       status={accountScan.fullName === "" ? "error" : ""}
                     />
@@ -456,25 +476,55 @@ const MyForm = (props) => {
                 </Col>
                 <Col span={8}>
                   <div className="m-5">
-                    <h6>Số điện thoại</h6>
+                    <h6>
+                      Số điện thoại <span style={{ color: "red" }}>*</span>
+                    </h6>
                     <Input
                       value={accountScan.numberPhone}
                       onChange={(event) =>
-                        handleSetAccountScan("numberPhone", event.target.value)
+                        handleSetAccountScan(
+                          "numberPhone",
+                          event.target.value.trim().replace(/[^\d]/g, "")
+                        )
                       }
+                      onBlur={(event) => {
+                        if (
+                          (!event.target.value.trim().startsWith(0) ||
+                            event.target.value.trim().length !== 10) &&
+                          event.target.value.trim().length !== 0
+                        ) {
+                          notification.error({
+                            message: "Thông báo",
+                            description: `Số điện thoại phải bắt đầu từ 0 và có 10 số!`,
+                          });
+                          return;
+                        }
+                        handleSetAccountScan(
+                          "numberPhone",
+                          event.target.value.trim()
+                        );
+                      }}
                       status={accountScan.numberPhone === "" ? "error" : ""}
                     />
                   </div>
                 </Col>
                 <Col span={8}>
                   <div className="m-5">
-                    <h6>Địa chỉ chi tiết</h6>
+                    <h6>
+                      Địa chỉ chi tiết{" "}
+                      {roleId === 1 ? (
+                        <span style={{ color: "red" }}>*</span>
+                      ) : (
+                        ""
+                      )}
+                    </h6>
                     <Input
-                      value={accountScan.descriptionDetail}
-                      onChange={(event) =>
+                      onBlur={(event) =>
                         handleSetAccountScan(
                           "descriptionDetail",
-                          event.target.value
+                          event.target.value.trim().length === 0 && roleId === 2
+                            ? "empty"
+                            : event.target.value.trim()
                         )
                       }
                       status={
@@ -489,7 +539,14 @@ const MyForm = (props) => {
               <Row style={{ paddingBottom: "16px" }}>
                 <Col span={8}>
                   <div className="m-5">
-                    <h6>Tỉnh/Thành phố</h6>
+                    <h6>
+                      Tỉnh/Thành phố{" "}
+                      {roleId === 1 ? (
+                        <span style={{ color: "red" }}>*</span>
+                      ) : (
+                        ""
+                      )}
+                    </h6>
                     <Select
                       showSearch
                       style={{ width: "100%" }}
@@ -526,7 +583,14 @@ const MyForm = (props) => {
                 </Col>
                 <Col span={8}>
                   <div className="m-5">
-                    <h6>Quận/huyện</h6>
+                    <h6>
+                      Quận/huyện{" "}
+                      {roleId === 1 ? (
+                        <span style={{ color: "red" }}>*</span>
+                      ) : (
+                        ""
+                      )}
+                    </h6>
                     <Select
                       showSearch
                       style={{ width: "100%" }}
@@ -563,7 +627,14 @@ const MyForm = (props) => {
                 </Col>
                 <Col span={8}>
                   <div className="m-5">
-                    <h6>Xã/Phường/Thị trấn</h6>
+                    <h6>
+                      Xã/Phường/Thị trấn{" "}
+                      {roleId === 1 ? (
+                        <span style={{ color: "red" }}>*</span>
+                      ) : (
+                        ""
+                      )}
+                    </h6>
                     <Select
                       showSearch
                       style={{ width: "100%" }}

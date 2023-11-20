@@ -1,27 +1,31 @@
-import { Badge, Col, Popover, Row, Space } from "antd";
+import { Badge, Col, Popover, Row, Space, notification } from "antd";
 import styles from "./HeaderRight.module.css";
 import { Link } from "react-router-dom";
 import { UserOutlined, ShoppingCartOutlined } from "@ant-design/icons";
 import { getAuthToken, clearAuthToken } from "../../../../service/Token";
-import { useContext } from "react";
 import { NotificationContext } from "../../../element/notification/NotificationAuthen";
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { useState } from "react";
 import axios from "axios";
+const cartAPI = "http://localhost:8080/api/admin/cart";
 
 function HeaderRight(props) {
   const { showSuccessNotification } = useContext(NotificationContext);
+
+  // const { showSuccessNotification } = useContext(NotificationContext);
   const [user, setUser] = useState("");
+  const [usernameEncode, setUsernameEncode] = useState("");
   const [data, setData] = useState(null);
-  const cartAPI = 'http://localhost:8080/api/client/cart';
   const token = getAuthToken();
   const [cartIndex, setCartIndex] = useState({
     quantity: 0,
     totalPrice: 0
   })
+  const [apiNotification, contextHolder] = notification.useNotification();
+
   useEffect(() => {
     return () =>
-      token
+      getAuthToken()
         .then((data) => {
           setUser(data?.fullName);
           setData(data?.username);
@@ -46,10 +50,12 @@ function HeaderRight(props) {
               totalPrice: totalPrice
             }, Math.random())
           }
+          const enCodeData = btoa(JSON.stringify(data?.username));
+          const convertPath = enCodeData.replace(/\//g, "-----");
+          setUsernameEncode(convertPath);
         })
         .catch((error) => {
           console.log(error);
-          showSuccessNotification({ error }, "login");
         });
   }, [props.render]);
 
@@ -62,6 +68,10 @@ function HeaderRight(props) {
             onClick={() => {
               clearAuthToken();
               setUser("");
+              apiNotification.info({
+                message: "Success",
+                description: "Đăng xuất thành công!",
+              });
             }}
             className={styles.link}
           >
@@ -92,6 +102,7 @@ function HeaderRight(props) {
 
   return (
     <div className={styles.flex}>
+      {contextHolder}
       <Row className={styles.margin}>
         <Col span={24}>
           <div className={styles.lineHeight}>
@@ -126,25 +137,30 @@ function HeaderRight(props) {
                 <Space>
                   {user ? (
                     <div>
-                      <span>Xin chào, </span> <strong>{user}</strong>
+                      <span>Xin chào, </span>{" "}
+                      <Link
+                        to={"/ms-shop/user/" + usernameEncode}
+                        className={styles.link}
+                      >
+                        <strong>{user}</strong>
+                      </Link>
                     </div>
                   ) : null}
-                  <Link className={styles.link}>
-                    <Popover
-                      content={content}
-                      placement="bottomLeft"
-                      trigger="hover"
-                    >
-                      <UserOutlined className={styles.iconSize} />
-                    </Popover>
-                  </Link>
+
+                  <Popover
+                    content={content}
+                    placement="bottomLeft"
+                    trigger="hover"
+                  >
+                    <UserOutlined className={styles.iconSize} />
+                  </Popover>
                 </Space>
               </Col>
             </Row>
-          </div>
-        </Col>
-      </Row>
-    </div>
+          </div >
+        </Col >
+      </Row >
+    </div >
   );
 }
 

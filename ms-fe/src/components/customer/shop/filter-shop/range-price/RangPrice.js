@@ -3,7 +3,7 @@ import styles from "./RangPrice.module.css";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-const baseUrl = "http://localhost:8080/api/admin/product/get-price-max";
+const baseUrl = "http://localhost:8080/api/client/product/get-price-max";
 
 function RangPrice({ filter, setFilter }) {
   //default max price range

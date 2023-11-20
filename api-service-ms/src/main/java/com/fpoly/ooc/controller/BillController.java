@@ -3,6 +3,7 @@ package com.fpoly.ooc.controller;
 import com.fpoly.ooc.dto.BillStatusDTO;
 import com.fpoly.ooc.request.bill.BillRequest;
 import com.fpoly.ooc.request.product.ProductDetailRequest;
+import com.fpoly.ooc.responce.bill.BillReturnRequestResponse;
 import com.fpoly.ooc.service.interfaces.BillService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -22,6 +23,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -82,31 +84,42 @@ public class BillController {
     }
 
     @GetMapping("/getDataLineChart")
-    public ResponseEntity<?> getDataLineChart(@RequestParam() String years) {
-        if (years.equals("")) {
-            return ResponseEntity.ok(null);
-        }
-        return ResponseEntity.ok(billService.getDataLineChart(years));
+    public ResponseEntity<?> getDataLineChart(@RequestParam Optional<Integer> dayFrom,
+                                              @RequestParam Optional<Integer> monthFrom,
+                                              @RequestParam Optional<Integer> yearFrom,
+                                              @RequestParam Optional<Integer> dayTo,
+                                              @RequestParam Optional<Integer> monthTo,
+                                              @RequestParam Optional<Integer> yearTo) {
+
+        return ResponseEntity.ok(billService.getDataLineChart(dayFrom.orElse(null), monthFrom.orElse(null),
+                yearFrom.orElse(null), dayTo.orElse(null), monthTo.orElse(null), yearTo.orElse(null)));
     }
 
     @GetMapping("/getGrossRevenue")
-    public ResponseEntity<?> getGrossRevenue(@RequestParam(defaultValue = "5") Integer quantityDisplay, @RequestParam() String date) {
-        return ResponseEntity.ok(billService.getBillRevenue(date));
+    public ResponseEntity<?> getGrossRevenue(
+                                             @RequestParam Optional<Integer> day,
+                                             @RequestParam Optional<Integer> month,
+                                             @RequestParam Optional<Integer> year) {
+        return ResponseEntity.ok(billService.getBillRevenue(day.orElse(null), month.orElse(null), year.orElse(null)));
     }
 
     @GetMapping("/getBillRevenueCompare")
-    public ResponseEntity<?> getBillRevenueCompare() {
-        return ResponseEntity.ok(billService.getRevenueInStoreOnlineCompare());
+    public ResponseEntity<?> getBillRevenueCompare(
+            @RequestParam Optional<Integer> day,
+            @RequestParam Optional<Integer> month,
+            @RequestParam Optional<Integer> year
+    ) {
+        return ResponseEntity.ok(billService.getRevenueInStoreOnlineCompare(day.orElse(null),
+                month.orElse(null),
+                year.orElse(null) ));
     }
 
     @GetMapping("/getBillProductSellTheMost")
-    public ResponseEntity<?> getBillProductSellTheMost(@RequestParam(defaultValue = "0") int quantitySell) {
-        return ResponseEntity.ok(billService.getProductInBillByStatusAndId(null, "Paid"));
-    }
-
-    @GetMapping("/getBusinessYear")
-    public ResponseEntity<?> getBusinessYear() {
-        return ResponseEntity.ok(billService.getBusinessYear());
+    public ResponseEntity<?> getBillProductSellTheMost(
+            @RequestParam Optional<Integer> day,
+            @RequestParam Optional<Integer> month,
+            @RequestParam Optional<Integer> year) {
+        return ResponseEntity.ok(billService.getProductInBillByStatusAndId(null, day.orElse(null), month.orElse(null), year.orElse(null)));
     }
 
     @GetMapping("/compareRevenueDate")
@@ -116,9 +129,13 @@ public class BillController {
                                                 @RequestParam Optional<Integer> dayTo,
                                                 @RequestParam Optional<Integer> monthTo,
                                                 @RequestParam Optional<Integer> yearTo) {
-        System.out.println("CHeck" + dayFrom.orElse(null));
         return ResponseEntity.ok(billService.compareRevenueDate(dayFrom.orElse(null), monthFrom.orElse(null),
                 yearFrom.orElse(null), dayTo.orElse(null), monthTo.orElse(null), yearTo.orElse(null)));
+    }
+
+    @GetMapping("/getReturnRequestByStatus")
+    public ResponseEntity<?> getReturnRequestByStatus(@RequestParam() String status) {
+        return ResponseEntity.ok(billService.getReturnRequestByStatus(status));
     }
 
     @GetMapping("/customer/{username}/address")

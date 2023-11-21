@@ -15,7 +15,7 @@ public interface BillDetailService {
 
     BillDetail createBill(BillDetailRequest request);
 
-    BillDetail updateBill(Long id, BillDetailRequest request);
+    BillDetail updateBill(Long id, String status);
 
     void deleteBill(Long id);
 

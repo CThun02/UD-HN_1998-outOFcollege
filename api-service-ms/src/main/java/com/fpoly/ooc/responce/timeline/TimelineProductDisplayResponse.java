@@ -49,6 +49,8 @@ public class TimelineProductDisplayResponse {
 
     private String productCateGoryName;
 
+    private String billDetailStatus;
+
     private List<ProductImageResponse> productImageResponses;
 
     public TimelineProductDisplayResponse(TimelineProductResponse timelineProductResponse) {
@@ -69,5 +71,6 @@ public class TimelineProductDisplayResponse {
         this.productPatternName = timelineProductResponse.getProductPatternName();
         this.productBrandName = timelineProductResponse.getProductBrandName();
         this.productCateGoryName = timelineProductResponse.getProductCateGoryName();
+        this.billDetailStatus = timelineProductResponse.getBillDetailStatus();
     }
 }

@@ -42,5 +42,4 @@ public class TimelineController {
         return ResponseEntity.ok(timeLineService.createTimeLine(id, request));
     }
 
-
 }

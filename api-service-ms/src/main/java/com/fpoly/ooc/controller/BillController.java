@@ -4,6 +4,9 @@ import com.fpoly.ooc.dto.BillStatusDTO;
 import com.fpoly.ooc.request.bill.BillRequest;
 import com.fpoly.ooc.request.product.ProductDetailRequest;
 import com.fpoly.ooc.responce.bill.BillReturnRequestResponse;
+import com.fpoly.ooc.responce.timeline.TimelineProductDisplayResponse;
+import com.fpoly.ooc.responce.timeline.TimelineProductResponse;
+import com.fpoly.ooc.service.interfaces.BillDetailService;
 import com.fpoly.ooc.service.interfaces.BillService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -33,6 +36,9 @@ public class BillController {
 
     @Autowired
     private BillService billService;
+
+    @Autowired
+    private BillDetailService billDetailService;
 
     @GetMapping("")
     public ResponseEntity<?> getAllBillManagement(
@@ -97,9 +103,9 @@ public class BillController {
 
     @GetMapping("/getGrossRevenue")
     public ResponseEntity<?> getGrossRevenue(
-                                             @RequestParam Optional<Integer> day,
-                                             @RequestParam Optional<Integer> month,
-                                             @RequestParam Optional<Integer> year) {
+            @RequestParam Optional<Integer> day,
+            @RequestParam Optional<Integer> month,
+            @RequestParam Optional<Integer> year) {
         return ResponseEntity.ok(billService.getBillRevenue(day.orElse(null), month.orElse(null), year.orElse(null)));
     }
 
@@ -111,7 +117,7 @@ public class BillController {
     ) {
         return ResponseEntity.ok(billService.getRevenueInStoreOnlineCompare(day.orElse(null),
                 month.orElse(null),
-                year.orElse(null) ));
+                year.orElse(null)));
     }
 
     @GetMapping("/getBillProductSellTheMost")
@@ -153,6 +159,14 @@ public class BillController {
     public ResponseEntity<?> updateBillStatus(@PathVariable("id") Long id,
                                               @RequestBody BillStatusDTO dto) {
         return ResponseEntity.ok(billService.updateBillStatus(dto, id));
+    }
+
+    @PutMapping("/billDetail/change-status")
+    public ResponseEntity<?> changeStatus(@RequestBody List<Long> request, @RequestParam String status) {
+        for (int i = 0; i < request.size(); i++) {
+            billDetailService.updateBill(request.get(i), status);
+        }
+        return null;
     }
 
 }

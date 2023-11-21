@@ -384,52 +384,61 @@ const Cart = (props) => {
         onChange: onSelectChange,
     };
 
-    const getCartAPI = (username) => {
-        axios.get(`${cartAPI}`, {
+    const getCartAPI = async () => {
+        const data = await token;
+
+        await axios.get(`${cartAPI}`, {
             params: {
-                username: username
+                username: data?.username
             }
         }).then((response) => {
             setCarts(response.data)
+            try {
+                if (data) {
+                    const cart = {
+                        username: data?.username,
+                        lstCartDetail: [],
+                    };
+                    if (productDetails) {
+                        console.log(productDetails)
+                        for (let i = 0; i < productDetails.length; i++) {
+                            if (response.data.length === 0) {
+                                cart.lstCartDetail.push({
+                                    productDetailId: productDetails[i].data[0].id,
+                                    quantity: productDetails[i].quantity,
+                                });
+                            } else {
+                                for (let j = 0; j < response.data.length; j++) {
+                                    console.log(productDetails[i].data[0].id)
+                                    console.log(response.data[j].cartDetailResponse)
+                                    if (Number(productDetails[i].data[0].id) !== Number(response.data[j].cartDetailResponse.productDetailId)) {
+                                        cart.lstCartDetail.push({
+                                            productDetailId: productDetails[i].data[0].id,
+                                            quantity: productDetails[i].quantity,
+                                        });
+                                    }
+                                }
+                            }
+                        }
+                        localStorage.removeItem('user')
+                    }
+
+                    const res = axios.post(`${cartAPI}`, cart);
+                }
+
+
+                localStorage.removeItem('checkout');
+            } catch (error) {
+                console.log(error);
+            }
         }).catch((error) => {
             console.log(error)
         })
     }
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const data = await token;
-                if (data) {
-                    getCartAPI(data?.username);
-                    const cart = {
-                        username: data?.username,
-                        lstCartDetail: [],
-                    };
-
-                    if (productDetails) {
-                        for (let i = 0; i < productDetails.length; i++) {
-                            if (productDetails[i].data[0].id !==
-                                carts.cartDetailResponse.productDetailId) {
-                                cart.lstCartDetail.push({
-                                    productDetailId: productDetails[i].data[0].id,
-                                    quantity: productDetails[i].quantity,
-                                });
-                            }
-                        }
-                    }
-
-                    const response = await axios.post(`${cartAPI}`, cart);
-                    console.log(response.data);
-                }
-
-                localStorage.removeItem('checkout');
-            } catch (error) {
-                console.log(error);
-            }
-        };
         getAllCart();
-        fetchData();
+        getCartAPI()
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [render]);
 

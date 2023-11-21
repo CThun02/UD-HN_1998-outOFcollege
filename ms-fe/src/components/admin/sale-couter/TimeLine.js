@@ -2,8 +2,10 @@ import { Button, Carousel, Col, Divider, Row, Table, notification } from "antd";
 import { useEffect, useState } from "react";
 import { Timeline, TimelineEvent } from "@mailtop/horizontal-timeline";
 import {
+    FaClock,
     FaRegCheckCircle,
     FaRegFileAlt,
+    FaRocket,
     FaTimes,
     FaTruck,
 } from "react-icons/fa";
@@ -15,7 +17,7 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 import moment from "moment";
 import numeral from "numeral";
-import { CheckCircleOutlined } from "@ant-design/icons";
+import { CheckCircleOutlined, ReloadOutlined } from "@ant-design/icons";
 import { getToken } from "../../../service/Token";
 
 const BillTimeLine = (addId) => {
@@ -27,18 +29,51 @@ const BillTimeLine = (addId) => {
     const [billInfo, setBillInfo] = useState({});
     const { billId } = useParams();
     const [render, setRender] = useState(null);
+    const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
     // tạo mới timeline
     const handleCreateTimeline = async (note, stauts) => {
         const values = { note: note, status: stauts };
-        await axios
-            .post(`http://localhost:8080/api/admin/timeline/${billId}`, values, {
-                headers: {
-                    Authorization: `Bearer ${getToken(true)}`,
+        for (let i = 0; i < (action === "returns" ? 2 : 1); i++) {
+            await axios
+                .post(`http://localhost:8080/api/admin/timeline/${billId}`, values, {
+                    headers: {
+                        Authorization: `Bearer ${getToken(true)}`,
+                    },
+                })
+                .then((response) => {
+                    setTimelines([...timelines, response.data]);
+                    setRender(response.data)
+                })
+                .catch((error) => {
+                    const status = error.response.status;
+                    if (status === 403) {
+                        notification.error({
+                            message: "Thông báo",
+                            description: "Bạn không có quyền truy cập!",
+                        });
+                    }
+                });
+        }
+
+    };
+
+    const handleUpdateBillStatus = (status, price) => {
+        axios
+            .put(
+                `http://localhost:8080/api/admin/bill/${billId}`,
+                {
+                    status: status,
+                    amountPaid: price,
                 },
-            })
+                {
+                    headers: {
+                        Authorization: `Bearer ${getToken(true)}`,
+                    },
+                }
+            )
             .then((response) => {
-                setTimelines([...timelines, response.data]);
+                setRender(response.data.amountPaid);
             })
             .catch((error) => {
                 const status = error.response.status;
@@ -51,14 +86,12 @@ const BillTimeLine = (addId) => {
             });
     };
 
-    const handleUpdateBillStatus = (status, price) => {
+    const handleUpdateBillDetailStatus = (request, status) => {
         axios
             .put(
-                `http://localhost:8080/api/admin/bill/${billId}`,
-                {
-                    status: status,
-                    amountPaid: price,
-                },
+                `http://localhost:8080/api/admin/bill/billDetail/change-status?status=` + status,
+                request,
+
                 {
                     headers: {
                         Authorization: `Bearer ${getToken(true)}`,
@@ -95,13 +128,27 @@ const BillTimeLine = (addId) => {
             billInfo.status !== "Paid"
         ) {
             handleUpdateBillStatus(
-                action === "cancel" ? "cancel" : "paid",
+                action === "cancel" ? "Cancel" : action === 'returns' ? "ReturnS" : "Paid",
                 billInfo.totalPrice + billInfo?.shipPrice - billInfo.priceReduce
             );
+        } else if (billInfo.symbol === 'Received' && timelines.length === 2) {
+            var productReturn = timelinePoduct.filter(obj1 => selectedRowKeys.find(obj2 => obj1.billDetailId === obj2));
+            productReturn.forEach(obj => {
+                obj.status = "ReturnS";
+            });
+            console.log(productReturn)
+            var priceReturn = productReturn.reduce((accumulator, product) => {
+                return accumulator + product.price;
+            }, 0)
+            handleUpdateBillStatus(
+                "ReturnS",
+                Number(billInfo.totalPrice) - priceReturn
+            );
+            handleUpdateBillDetailStatus(selectedRowKeys, "ReturnS");
+
         }
         setIsModalConfirm(false);
     };
-
     const showModalDetail = () => {
         setIsModalDetail(true);
     };
@@ -109,7 +156,15 @@ const BillTimeLine = (addId) => {
     const handleOkDetail = () => {
         setIsModalDetail(false);
     };
+    const onSelectChange = (newSelectedRowKeys) => {
+        setSelectedRowKeys(newSelectedRowKeys);
+        setRender(Math.random);
+    }
 
+    const rowSelection = {
+        selectedRowKeys,
+        onChange: onSelectChange,
+    };
     useEffect(() => {
         axios
             .get(`http://localhost:8080/api/admin/timeline/${billId}`, {
@@ -139,6 +194,7 @@ const BillTimeLine = (addId) => {
                 setTimelinesPoduct(response.data);
             })
             .catch((error) => {
+                console.log(error)
                 const status = error.response.status;
                 if (status === 403) {
                     notification.error({
@@ -155,7 +211,6 @@ const BillTimeLine = (addId) => {
             })
             .then((response) => {
                 setBillInfo(response.data);
-                console.log(response.data);
             })
             .catch((error) => {
                 const status = error.response.status;
@@ -181,21 +236,20 @@ const BillTimeLine = (addId) => {
         {
             key: "productName",
             title: "Sản phẩm",
-            width: 800,
+            width: '50%',
             render: (text, record, index) => {
                 return (
                     <Row>
-                        {console.log(record)}
                         <Col span={4}>
                             <Carousel autoplay className={styles.slider}>
-                                {record.productDetailImages &&
-                                    record.productDetailImages.map((productImage, index) => {
+                                {record.productImageResponses &&
+                                    record.productImageResponses.map((productImage, index) => {
                                         return (
                                             <img
                                                 key={index}
                                                 style={{ width: "100px" }}
                                                 alt="abc"
-                                                src={productImage}
+                                                src={productImage.path}
                                             />
                                         );
                                     })}
@@ -262,7 +316,13 @@ const BillTimeLine = (addId) => {
             title: "Giá",
             dataIndex: "productPrice",
             key: "productPrice",
-        },
+            render: (price) => {
+                return price.toLocaleString("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                })
+            }
+        }
     ];
     return (
         <>
@@ -297,9 +357,7 @@ const BillTimeLine = (addId) => {
                                                                 ? "Đã đóng gói & đang được giao"
                                                                 : "Giao hàng thành công"
                                             }
-                                            subtitle={moment(data.createdDate).format(
-                                                "HH:mm:ss DD/MM/YYYY"
-                                            )}
+                                            subtitle={data.createdDate}
                                         />
                                     ))}
                             </Timeline>
@@ -308,13 +366,16 @@ const BillTimeLine = (addId) => {
                                 {timelines &&
                                     timelines.map((data) => (
                                         <TimelineEvent
-                                            color={data.status === "0" ? "#FF0000" : "#00cc00"}
+                                            color={data.status === "0" ? "#FF0000" : data.status === '3' ? '#f0ad4e' : "#00cc00"}
                                             icon={
                                                 data.status === "1"
                                                     ? FaRegFileAlt
                                                     : data.status === "0"
                                                         ? FaTimes
-                                                        : FaRegCheckCircle
+                                                        : data.status === '2' ?
+                                                            FaRegCheckCircle :
+                                                            data.status === '3' ? FaClock :
+                                                                data.status === '4' ? FaRocket : null
                                             }
                                             title={
                                                 data.status === "1"
@@ -323,11 +384,10 @@ const BillTimeLine = (addId) => {
                                                         ? "Thanh toán thành công"
                                                         : data.status === "0"
                                                             ? "Đã hủy"
-                                                            : ""
+                                                            : data.status === "3" ? 'Yêu cầu trả hàng' :
+                                                                data.status === "4" ? "Trả hàng thành cồng" : ""
                                             }
-                                            subtitle={moment(data.createdDate).format(
-                                                "HH:mm:ss DD/MM/YYYY"
-                                            )}
+                                            subtitle={data.createdDate}
                                         />
                                     ))}
                             </Timeline>
@@ -335,31 +395,31 @@ const BillTimeLine = (addId) => {
                     </div>
                 </div>
                 <div className={styles.btnHeader} style={{ marginTop: 24 }}>
-                    {billInfo?.symbol === "Received" && timelines.length !== 2 && (
-                        <>
-                            <Button
-                                type="primary"
-                                onClick={() => {
-                                    setAction("confirm");
-                                    showModalConfirm();
-                                }}
-                            >
-                                Xác nhận
-                            </Button>
-                            <Button
-                                type="primary"
-                                danger
-                                style={{ margin: "0 10px" }}
-                                onClick={() => {
-                                    setAction("cancel");
-                                    showModalConfirm();
-                                }}
-                            >
-                                Hủy
-                            </Button>
-                        </>
-                    )}
-                    {console.log("timeline", timelines.length)}
+                    {billInfo?.symbol === "Received" && (timelines.length !== 2 &&
+                        timelines.length !== 4) && (
+                            <>
+                                <Button
+                                    type="primary"
+                                    onClick={() => {
+                                        setAction("confirm");
+                                        showModalConfirm();
+                                    }}
+                                >
+                                    Xác nhận
+                                </Button>
+                                <Button
+                                    type="primary"
+                                    danger
+                                    style={{ margin: "0 10px" }}
+                                    onClick={() => {
+                                        setAction("cancel");
+                                        showModalConfirm();
+                                    }}
+                                >
+                                    Hủy
+                                </Button>
+                            </>
+                        )}
                     {billInfo?.symbol !== "Received" &&
                         timelines.length !== 4 &&
                         timelines.length !== 5 &&
@@ -450,9 +510,7 @@ const BillTimeLine = (addId) => {
                             </Col>
                             <Col span={12}>
                                 <SpanBorder
-                                    child={moment(billInfo.createdDate).format(
-                                        "HH:mm:ss  DD/MM/YYYY"
-                                    )}
+                                    child={billInfo.createdDate}
                                     color={"#1677ff"}
                                 />
                             </Col>
@@ -598,9 +656,41 @@ const BillTimeLine = (addId) => {
                     style={{ marginTop: "10px" }}
                 />
                 <Table
+                    rowSelection={rowSelection}
                     columns={columnProduct}
-                    dataSource={timelinePoduct}
+                    dataSource={
+                        timelinePoduct &&
+                        timelinePoduct.map((record, index) => ({
+                            ...record,
+                            key: record.billDetailId,
+                        }))
+                    }
                     pagination={false}
+                    footer={() => {
+                        let checkShippingSuccess = timelines.some(item => item.status === billInfo.symbol === "Received" ? "2" : '4')
+                        let currentDate = new Date();
+                        let completionDate = null;
+                        if (checkShippingSuccess) {
+                            completionDate = timelines.filter((item) => item.status === billInfo.symbol === "Received" ? "2" : '4')[0].completionDate
+                            let dateParts = completionDate.split(' ');
+                            let time = dateParts[0].split(':');
+                            let dayParts = dateParts[1].split('/');
+                            let formattedDate = new Date(dayParts[2], parseInt(dayParts[1]) - 1, dayParts[0], time[0], time[1], time[2]);
+                            let sevenDaysInMillis = 7 * 24 * 60 * 60 * 1000;
+                            if (currentDate.getTime() - formattedDate.getTime() > sevenDaysInMillis) {
+                                return null;
+                            }
+                        }
+                        return checkShippingSuccess &&
+                            <div style={{ textAlign: "center" }}>
+                                <Button type="primary"
+                                    disabled={selectedRowKeys.length === 0}
+                                    onClick={() => {
+                                        setAction("returns");
+                                        showModalConfirm()
+                                    }}> Trả hàng</Button>
+                            </div>
+                    }}
                 />
                 <div className={styles.timeLineEnd}>
                     <span className={styles.span}>
@@ -636,7 +726,7 @@ const BillTimeLine = (addId) => {
                         </span>
                     </b>
                 </div>
-            </section>
+            </section >
         </>
     );
 };

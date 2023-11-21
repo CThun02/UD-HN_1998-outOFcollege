@@ -3,14 +3,17 @@ package com.fpoly.ooc.controller.client;
 import com.fpoly.ooc.entity.Account;
 import com.fpoly.ooc.entity.Address;
 import com.fpoly.ooc.entity.AddressDetail;
+import com.fpoly.ooc.repository.TimeLineRepo;
 import com.fpoly.ooc.request.DeliveryNoteRequest;
 import com.fpoly.ooc.request.bill.BillRequest;
+import com.fpoly.ooc.request.product.ProductDetailRequest;
 import com.fpoly.ooc.request.voucher.DisplayVoucherRequest;
 import com.fpoly.ooc.service.interfaces.AddressDetailService;
 import com.fpoly.ooc.service.interfaces.AddressServiceI;
 import com.fpoly.ooc.service.interfaces.BillService;
 import com.fpoly.ooc.service.interfaces.CartDetailService;
 import com.fpoly.ooc.service.interfaces.DeliveryNoteService;
+import com.fpoly.ooc.service.interfaces.TimeLineService;
 import com.fpoly.ooc.service.interfaces.VoucherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +25,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.math.BigDecimal;
+import java.util.Optional;
 
 @RestController
 @CrossOrigin("*")
@@ -45,6 +51,9 @@ public class ClientController {
 
     @Autowired
     private CartDetailService cartDetailService;
+
+    @Autowired
+    private TimeLineService timeLineService;
 
     @GetMapping("/address")
     public ResponseEntity<?> getAll(@RequestParam("username") String username) {
@@ -74,7 +83,7 @@ public class ClientController {
         return ResponseEntity.ok(addressDetailService.create(addressDetailCreate));
     }
 
-    @PostMapping("/display-modal-using")
+    @PostMapping("/vouchers/display-modal-using")
     public ResponseEntity<?> displayModalUsingVoucher(@RequestBody DisplayVoucherRequest request) {
         return ResponseEntity.ok(voucherService.findAllVoucherResponseDisplayModalUsing(request));
     }
@@ -82,6 +91,42 @@ public class ClientController {
     @GetMapping("/getCartIndex")
     public ResponseEntity<?> getCartIndex(@RequestParam("username") String username) {
         return ResponseEntity.ok(cartDetailService.getCartIndexz(username));
+    }
+
+    @GetMapping("/filterProductDetailSellByIdCom")
+    public ResponseEntity<?> filterProductDetailSellByIdCom(@RequestParam Optional<Long> productId,
+                                                            @RequestParam Optional<Long> buttonId,
+                                                            @RequestParam Optional<Long> materialId,
+                                                            @RequestParam Optional<Long> shirtTailId,
+                                                            @RequestParam Optional<Long> sleeveId,
+                                                            @RequestParam Optional<Long> collarId,
+                                                            @RequestParam Optional<Long> patternId,
+                                                            @RequestParam Optional<Long> formId,
+                                                            @RequestParam Optional<Long> brandId,
+                                                            @RequestParam Optional<Long> categoryId,
+                                                            @RequestParam Optional<Long> colorId,
+                                                            @RequestParam Optional<Long> sizeId,
+                                                            @RequestParam Optional<BigDecimal> minPrice,
+                                                            @RequestParam Optional<BigDecimal> maxPrice) {
+        ProductDetailRequest request = ProductDetailRequest.builder().productId(productId.orElse(null))
+                .brandId(brandId.orElse(null)).buttonId(buttonId.orElse(null)).categoryId(categoryId.orElse(null))
+                .collarId(collarId.orElse(null)).formId(formId.orElse(null)).patternId(patternId.orElse(null))
+                .materialId(materialId.orElse(null)).shirtTailId(shirtTailId.orElse(null)).sleeveId(sleeveId.orElse(null))
+                .colorId(colorId.orElse(null)).sizeId(sizeId.orElse(null)).build();
+        return ResponseEntity.ok(billService.getProductDetailSellInStore
+                (request, minPrice.orElse(null), maxPrice.orElse(null)));
+    }
+
+
+    @GetMapping("/timelineByUser")
+    public ResponseEntity<?> timelineByUser(@RequestParam("username") String username,
+                                            @RequestParam("phoneNumber") String phoneNumber,
+                                            @RequestParam("email") String email,
+                                            @RequestParam("status") String status) {
+        return ResponseEntity.ok(timeLineService.getListTimelineByUser(username.trim().equals("")?null:username,
+                phoneNumber.trim().equals("")?null:phoneNumber,
+                email.trim().equals("")?null:email,
+                status.trim().equals("")?null:status));
     }
 
 }

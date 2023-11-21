@@ -67,9 +67,9 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
                                                                      Integer day, Integer month, Integer year);
 
 
-    @Query("select b.billCode as billCode, b.createdBy as employee" +
+    @Query("select b.id as billId, b.billCode as billCode, b.createdBy as employee" +
             ", d.name as customerName, b.createdAt as createdAt, b.status as status from Bill b " +
-            "join DeliveryNote d on d.bill.id = b.id" +
+            "left join DeliveryNote d on d.bill.id = b.id" +
             " where b.status like ?1")
     List<BillReturnRequestResponse> getReturnRequestByStatus(String status);
 
@@ -109,4 +109,13 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
             " (?3 IS NULL OR YEAR(b.createdAt) = ?3)")
     BillRevenue getBillRevenue(Integer day, Integer month, Integer year);
 
+    @Query("SELECT pd.id AS id, pd.product AS product, pd.brand as brand, pd.category as category, pd.button AS button," +
+            "       pd.material AS material, pd.collar AS collar, pd.sleeve AS sleeve, pd.size AS size," +
+            "       pd.color AS color, pd.shirtTail AS shirtTail," +
+            "       bd.price AS price, pd.weight as weight, bd.quantity AS quantity, " +
+            "       pd.descriptionDetail AS descriptionDetail, pd.pattern as pattern, pd.form as form, pd.status as status " +
+            "FROM BillDetail bd " +
+            "JOIN ProductDetail pd ON pd.id = bd.productDetail.id " +
+            "WHERE (bd.bill.id = ?1 or ?1 is null)")
+    List<ProductDetailResponse> getProductDetailByBillId(Long id);
 }

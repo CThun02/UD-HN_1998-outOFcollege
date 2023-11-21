@@ -18,4 +18,7 @@ public interface BillDetailRepo extends JpaRepository<BillDetail, Long> {
             "JOIN pd.product p")
     List<BillResponse> getAllBill();
 
+
+//    void updateBillDetail(Long productDetailId, Long billId, String status);
+
 }

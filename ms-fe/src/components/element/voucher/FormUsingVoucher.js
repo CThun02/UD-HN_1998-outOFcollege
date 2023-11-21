@@ -6,7 +6,8 @@ import axios from "axios";
 import "./global.css";
 import { getToken } from "../../../service/Token";
 
-const baseUrl = "http://localhost:8080/api/admin/vouchers";
+const href = window.location.href;
+const baseUrl = `http://localhost:8080/api/${href.includes('admin') ? `admin` : `client`}/vouchers`;
 
 function FormUsingVoucher({
   setIsOpen,

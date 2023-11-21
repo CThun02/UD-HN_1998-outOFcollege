@@ -7,7 +7,7 @@ import { NotificationContext } from "../../../element/notification/NotificationA
 import { useContext, useEffect } from "react";
 import { useState } from "react";
 import axios from "axios";
-const cartAPI = "http://localhost:8080/api/admin/cart";
+const cartAPI = "http://localhost:8080/api/client/cart";
 
 function HeaderRight(props) {
   const { showSuccessNotification } = useContext(NotificationContext);
@@ -73,6 +73,7 @@ function HeaderRight(props) {
                 description: "Đăng xuất thành công!",
               });
             }}
+            to={'/ms-shop'}
             className={styles.link}
           >
             Đăng xuất

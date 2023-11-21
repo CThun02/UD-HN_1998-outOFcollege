@@ -7,6 +7,7 @@ import com.fpoly.ooc.responce.timeline.TimelineProductResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -29,13 +30,23 @@ public interface TimeLineRepo extends JpaRepository<Timeline, Long> {
     List<TimeLineResponse> getTimeLineByBillId(@Param("billId") Long id);
 
     @Query("SELECT new com.fpoly.ooc.responce.timeline.TimelineProductResponse(" +
-            "   pd.product.productName, bd.quantity, bd.price, pd.size.sizeName, pd.color.colorCode," +
+            "   pd.id, bd.id, pd.product.productName, bd.quantity, bd.price, pd.size.sizeName, pd.color.colorCode," +
             "   pd.button.buttonName, pd.collar.collarTypeName, pd.material.materialName, pd.sleeve.sleeveName, " +
-            "   pd.shirtTail.shirtTailTypeName, pd.color.colorName, pd.form.formName, pd.pattern.patternName )" +
+            "   pd.shirtTail.shirtTailTypeName, pd.color.colorName, pd.form.formName, pd.pattern.patternName," +
+            "   pd.brand.brandName, pd.category.categoryName, bd.status )" +
             "FROM ProductDetail pd " +
             "   JOIN BillDetail bd ON bd.productDetail.id = pd.id " +
             "WHERE bd.bill.id = :billId")
     List<TimelineProductResponse> getTimelineProductByBillId(@Param("billId") Long id);
+
+    @Query("SELECT distinct b.id FROM Timeline t join Bill b on b.id = t.bill.id " +
+            " join DeliveryNote d on d.bill.id = b.id where " +
+            " (:username is null or b.account.username =:username)" +
+            " and (:phoneNumber is null or d.phoneNumber =:phoneNumber)" +
+            " and (:email is null or b.account.email =:email) " +
+            " and (:status is null or t.status = :status)")
+    List<Long> getBillIdByUserNameOrPhoneNumberOrEmail(@Param("username") String username, @Param("phoneNumber") String phoneNumber,
+                                                       @Param("email") String email, @Param("status") String status);
 
     @Query("SELECT new com.fpoly.ooc.responce.bill.BillInfoResponse(b.id, b.billCode,b.transactionCode, b.symbol, b.billType, " +
             "    b.price, b.priceReduce, dn.shipPrice, b.amountPaid, dn.shipDate, pd.payment.paymentName, b.createdAt, " +

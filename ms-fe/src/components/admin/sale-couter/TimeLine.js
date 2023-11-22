@@ -18,7 +18,7 @@ import { useParams } from "react-router-dom";
 import moment from "moment";
 import numeral from "numeral";
 import { CheckCircleOutlined, ReloadOutlined } from "@ant-design/icons";
-import { getToken } from "../../../service/Token";
+import { getAuthToken, getToken } from "../../../service/Token";
 
 const BillTimeLine = (addId) => {
     const [isModalConfirm, setIsModalConfirm] = useState(false);
@@ -30,32 +30,31 @@ const BillTimeLine = (addId) => {
     const { billId } = useParams();
     const [render, setRender] = useState(null);
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+    const token = getAuthToken(true);
 
     // tạo mới timeline
     const handleCreateTimeline = async (note, stauts) => {
-        const values = { note: note, status: stauts };
-        for (let i = 0; i < (action === "returns" ? 2 : 1); i++) {
-            await axios
-                .post(`http://localhost:8080/api/admin/timeline/${billId}`, values, {
-                    headers: {
-                        Authorization: `Bearer ${getToken(true)}`,
-                    },
-                })
-                .then((response) => {
-                    setTimelines([...timelines, response.data]);
-                    setRender(response.data)
-                })
-                .catch((error) => {
-                    const status = error.response.status;
-                    if (status === 403) {
-                        notification.error({
-                            message: "Thông báo",
-                            description: "Bạn không có quyền truy cập!",
-                        });
-                    }
-                });
-        }
-
+        const data = await token;
+        const values = { note: note, status: stauts, createdBy: data?.username + '_' + data?.fullName };
+        await axios
+            .post(`http://localhost:8080/api/admin/timeline/${billId}`, values, {
+                headers: {
+                    Authorization: `Bearer ${getToken(true)}`,
+                },
+            })
+            .then((response) => {
+                setTimelines([...timelines, response.data]);
+                setRender(response.data)
+            })
+            .catch((error) => {
+                const status = error.response.status;
+                if (status === 403) {
+                    notification.error({
+                        message: "Thông báo",
+                        description: "Bạn không có quyền truy cập!",
+                    });
+                }
+            });
     };
 
     const handleUpdateBillStatus = (status, price) => {
@@ -122,31 +121,22 @@ const BillTimeLine = (addId) => {
 
     const handleOkConFirm = (note) => {
         handleCreateTimeline(note, action === "cancel" ? "0" : null);
-        if (
-            billInfo.symbol === "Shipping" &&
-            timelines.length === 3 &&
-            billInfo.status !== "Paid"
-        ) {
-            handleUpdateBillStatus(
-                action === "cancel" ? "Cancel" : action === 'returns' ? "ReturnS" : "Paid",
-                billInfo.totalPrice + billInfo?.shipPrice - billInfo.priceReduce
-            );
-        } else if (billInfo.symbol === 'Received' && timelines.length === 2) {
-            var productReturn = timelinePoduct.filter(obj1 => selectedRowKeys.find(obj2 => obj1.billDetailId === obj2));
-            productReturn.forEach(obj => {
-                obj.status = "ReturnS";
-            });
-            console.log(productReturn)
-            var priceReturn = productReturn.reduce((accumulator, product) => {
-                return accumulator + product.price;
-            }, 0)
-            handleUpdateBillStatus(
-                "ReturnS",
-                Number(billInfo.totalPrice) - priceReturn
-            );
-            handleUpdateBillDetailStatus(selectedRowKeys, "ReturnS");
-
-        }
+        // if (
+        // billInfo.symbol === "Shipping" &&
+        // timelines.length === 3 &&
+        // billInfo.status !== "Paid"
+        // ) {
+        console.log(billInfo.symbol, timelines.length)
+        handleUpdateBillStatus(
+            action === "cancel" ? "Cancel" :
+                (((billInfo.symbol === 'Received'
+                    && timelines[timelines.length - 1] === '2') && action !== 'cancel')
+                    || ((billInfo.symbol === 'Shipping'
+                        && timelines[timelines.length - 1].status === '3')
+                        && action !== 'cancel')) ? "Complete" : "1",
+            billInfo.totalPrice + billInfo?.shipPrice - billInfo.priceReduce
+        );
+        // }
         setIsModalConfirm(false);
     };
     const showModalDetail = () => {
@@ -156,15 +146,7 @@ const BillTimeLine = (addId) => {
     const handleOkDetail = () => {
         setIsModalDetail(false);
     };
-    const onSelectChange = (newSelectedRowKeys) => {
-        setSelectedRowKeys(newSelectedRowKeys);
-        setRender(Math.random);
-    }
 
-    const rowSelection = {
-        selectedRowKeys,
-        onChange: onSelectChange,
-    };
     useEffect(() => {
         axios
             .get(`http://localhost:8080/api/admin/timeline/${billId}`, {
@@ -384,8 +366,7 @@ const BillTimeLine = (addId) => {
                                                         ? "Thanh toán thành công"
                                                         : data.status === "0"
                                                             ? "Đã hủy"
-                                                            : data.status === "3" ? 'Yêu cầu trả hàng' :
-                                                                data.status === "4" ? "Trả hàng thành cồng" : ""
+                                                            : ""
                                             }
                                             subtitle={data.createdDate}
                                         />
@@ -656,7 +637,6 @@ const BillTimeLine = (addId) => {
                     style={{ marginTop: "10px" }}
                 />
                 <Table
-                    rowSelection={rowSelection}
                     columns={columnProduct}
                     dataSource={
                         timelinePoduct &&
@@ -666,31 +646,6 @@ const BillTimeLine = (addId) => {
                         }))
                     }
                     pagination={false}
-                    footer={() => {
-                        let checkShippingSuccess = timelines.some(item => item.status === billInfo.symbol === "Received" ? "2" : '4')
-                        let currentDate = new Date();
-                        let completionDate = null;
-                        if (checkShippingSuccess) {
-                            completionDate = timelines.filter((item) => item.status === billInfo.symbol === "Received" ? "2" : '4')[0].completionDate
-                            let dateParts = completionDate.split(' ');
-                            let time = dateParts[0].split(':');
-                            let dayParts = dateParts[1].split('/');
-                            let formattedDate = new Date(dayParts[2], parseInt(dayParts[1]) - 1, dayParts[0], time[0], time[1], time[2]);
-                            let sevenDaysInMillis = 7 * 24 * 60 * 60 * 1000;
-                            if (currentDate.getTime() - formattedDate.getTime() > sevenDaysInMillis) {
-                                return null;
-                            }
-                        }
-                        return checkShippingSuccess &&
-                            <div style={{ textAlign: "center" }}>
-                                <Button type="primary"
-                                    disabled={selectedRowKeys.length === 0}
-                                    onClick={() => {
-                                        setAction("returns");
-                                        showModalConfirm()
-                                    }}> Trả hàng</Button>
-                            </div>
-                    }}
                 />
                 <div className={styles.timeLineEnd}>
                     <span className={styles.span}>

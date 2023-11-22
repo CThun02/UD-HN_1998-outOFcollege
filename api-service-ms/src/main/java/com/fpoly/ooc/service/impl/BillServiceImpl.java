@@ -82,7 +82,6 @@ public class BillServiceImpl implements BillService {
                 .note(request.getNote())
                 .billCode(request.getBillCode())
                 .completionDate(LocalDateTime.now())
-                .createdBy(request.getCreatedBy())
                 .build();
 
         bill.setStatus(request.getStatus());
@@ -177,7 +176,8 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
-    public BillRevenueDisplay getBillRevenue(Integer day, Integer month, Integer year) {;
+    public BillRevenueDisplay getBillRevenue(Integer day, Integer month, Integer year) {
+        ;
         BillRevenue revenue = billRepo.getBillRevenue(day, month, year);
         BillRevenueDisplay billRevenueDisplay = new BillRevenueDisplay(revenue);
         List<ProductDetailSellResponse> productDetailDisplayResponses = this.getProductInBillByStatusAndId(null, day, month, year);
@@ -229,23 +229,23 @@ public class BillServiceImpl implements BillService {
             listYear.add(i);
         }
         for (int i = 0; i < listYear.size(); i++) {
-            if(monthFrom == null && monthTo ==null){
-                addDataLineChart(listYear.get(i), null, null, "y"+listYear.get(i), data);
-            }else{
-                int monthStart = listYear.size()==1?monthFrom: i==0?monthFrom: 1;
-                int monthEnd = listYear.size()==1?monthTo: i==listYear.size()-1?monthTo:12;
-                if(dayFrom == null && dayTo ==null){
+            if (monthFrom == null && monthTo == null) {
+                addDataLineChart(listYear.get(i), null, null, "y" + listYear.get(i), data);
+            } else {
+                int monthStart = listYear.size() == 1 ? monthFrom : i == 0 ? monthFrom : 1;
+                int monthEnd = listYear.size() == 1 ? monthTo : i == listYear.size() - 1 ? monthTo : 12;
+                if (dayFrom == null && dayTo == null) {
                     for (int j = monthStart; j <= monthEnd; j++) {
-                        addDataLineChart(listYear.get(i), j, null, "m"+j+"-y"+listYear.get(i), data);
+                        addDataLineChart(listYear.get(i), j, null, "m" + j + "-y" + listYear.get(i), data);
                     }
-                }else{
+                } else {
                     for (int j = monthStart; j <= monthEnd; j++) {
                         Calendar calendar = Calendar.getInstance();
                         calendar.set(listYear.get(i), j - 1, 1);
-                        int dayEnd = j==monthEnd?dayTo: i == 0 ? dayTo:calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
-                        int dayStart = listYear.size()==1?dayFrom: i == 0? dayFrom : 1;
+                        int dayEnd = j == monthEnd ? dayTo : i == 0 ? dayTo : calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+                        int dayStart = listYear.size() == 1 ? dayFrom : i == 0 ? dayFrom : 1;
                         for (int k = dayStart; k <= dayEnd; k++) {
-                            addDataLineChart(listYear.get(i), j, k, "d"+k+"-m"+j+"-y"+listYear.get(i), data);
+                            addDataLineChart(listYear.get(i), j, k, "d" + k + "-m" + j + "-y" + listYear.get(i), data);
                         }
                     }
                 }
@@ -254,14 +254,14 @@ public class BillServiceImpl implements BillService {
         return data;
     }
 
-    private void addDataLineChart(Integer year, Integer month, Integer day, String time, List <BillLineChartResponse> data){
+    private void addDataLineChart(Integer year, Integer month, Integer day, String time, List<BillLineChartResponse> data) {
         String type = "Tại quầy";
         Double revenue = billRepo.getRevenueByTime(day, month, year, "In-Store") == null ? 0 :
                 billRepo.getRevenueByTime(day, month, year, "In-Store");
         BillLineChartResponse billRevenue = new BillLineChartResponse(type, time, revenue);
         data.add(billRevenue);
         String typeOnline = "Trực tuyến";
-        Double revenueOnline  = billRepo.getRevenueByTime(day, month, year, "Online") == null ? 0 :
+        Double revenueOnline = billRepo.getRevenueByTime(day, month, year, "Online") == null ? 0 :
                 billRepo.getRevenueByTime(day, month, year, "Online");
         BillLineChartResponse billRevenueOnline = new BillLineChartResponse(typeOnline, time, revenueOnline);
         data.add(billRevenueOnline);

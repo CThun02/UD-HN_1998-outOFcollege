@@ -8,7 +8,8 @@ const ModalCreateAddress = ({
     isModalOpen,
     handleAddressOk,
     handleAddressCancel,
-    render
+    render,
+    username
 }) => {
     const [provinces, setProvinces] = useState([])
     const [districts, setDistricts] = useState([])
@@ -138,8 +139,8 @@ const ModalCreateAddress = ({
 
         const data = await token
 
-        console.log(data.username)
-        await axios.put(`http://localhost:8080/api/client/createAddress?userName=${data.username}`, formData).then((response) => {
+        console.log(data?.username)
+        await axios.put(`http://localhost:8080/api/client/createAddress?userName=${username}`, formData).then((response) => {
             console.log(response.data)
         }).catch((error) => {
             console.log(error);

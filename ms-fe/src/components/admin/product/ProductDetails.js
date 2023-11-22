@@ -355,10 +355,7 @@ const ProductDetails = (props) => {
             : record.price - Number(record.promotion[0].promotionValue)
           : record.price;
       props.productDetailsCreate?.push(productDetailCreate);
-      notification.success({
-        message: "Thông báo",
-        description: "Thêm sản phẩm vào giỏ hàng thành công!",
-      });
+
       handleCancelModalQuantity(index);
       props.action();
     }
@@ -406,7 +403,6 @@ const ProductDetails = (props) => {
       .then((response) => {
         setProductDetails(response.data);
         setLoading(false);
-        console.log(response.data);
       })
       .catch((error) => {
         const status = error.response.status;

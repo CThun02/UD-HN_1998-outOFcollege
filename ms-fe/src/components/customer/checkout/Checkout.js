@@ -42,6 +42,7 @@ const Checkout = (props) => {
     const [showAdd, setShowAdd] = useState(false);
     const [voucherAdd, setVoucherAdd] = useState({});
     const [isOpenFormVoucher, setIsOpenFormVoucher] = useState(false);
+    const [username, setUsername] = useState(null)
 
     const handleProvincesChange = (e) => {
         formData.city = e
@@ -293,6 +294,7 @@ const Checkout = (props) => {
 
     const getAddress = async () => {
         const data = await token;
+        setUsername(data?.username);
         if (data) {
             await axios.get(`http://localhost:8080/api/client/address?username=${data?.username}`)
                 .then((response) => {
@@ -533,6 +535,7 @@ const Checkout = (props) => {
                                             address={address}
                                             selectedAddress={setDefaultAddress}
                                             render={setRender}
+                                            username={username}
                                         />
                                     </Col>
                                     <Col span={6} style={{ paddingTop: 5 }}>

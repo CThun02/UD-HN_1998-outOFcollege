@@ -83,6 +83,10 @@ public class CartDetailServiceImpl implements CartDetailService {
 
         Cart existingCart = cartRepo.findCartByAccount(account);
 
+        if(existingCart==null){
+            existingCart = this.createCart(account.getUsername());
+        }
+
         for (CartDetailRequest cartDetailRequest : request.getLstCartDetail()) {
             boolean found = false;
             for (CartDetail existingCartDetail : existingCart.getCartDetailList()) {

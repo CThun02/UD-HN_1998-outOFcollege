@@ -120,6 +120,11 @@ public class BillController {
                 year.orElse(null)));
     }
 
+    @GetMapping("/getGrowthStoreByTime")
+    public ResponseEntity<?> getGrowthStoreByTime(@RequestParam String time) {
+        return ResponseEntity.ok(billService.getGrowthStoreByTime(time));
+    }
+
     @GetMapping("/getBillProductSellTheMost")
     public ResponseEntity<?> getBillProductSellTheMost(
             @RequestParam Optional<Integer> day,

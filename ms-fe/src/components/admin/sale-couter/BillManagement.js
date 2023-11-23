@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
 import styles from "./BillManagement.module.css";
-import { Button, Input, Select, Table, Tag, TreeSelect, notification } from "antd";
+import { Button, Input, Select, Table, Tabs, Tag, TreeSelect, notification } from "antd";
 import {
+  CheckCircleOutlined,
+  ClockCircleOutlined,
+  CloseCircleOutlined,
   EyeOutlined,
   FilterFilled,
   SearchOutlined,
@@ -77,8 +80,12 @@ const BillManagement = () => {
     },
     {
       title: "Tên nhân viên",
-      dataIndex: "employee",
+      // dataIndex: "employee",
       key: "employee",
+      render: (_, record) => {
+        console.log(record)
+        return record.employee?.includes('_') ? record.employee?.substring(record.employee?.indexOf("_") + 1) : record.status === 'Cancel' ? "Đã hủy" : "Chờ xác nhận";
+      }
     },
     {
       title: "Tên khách hàng",
@@ -326,22 +333,66 @@ const BillManagement = () => {
         <h2 style={{ marginBottom: "10px" }}>
           <TableOutlined /> Danh sách hóa đơn
         </h2>
-        <Table
-          dataSource={data}
-          columns={columns}
-          loading={loading}
-          loadingIndicator={<div>Loading...</div>}
-          pagination={{
-            showSizeChanger: true,
-            pageSizeOptions: [5, 10, 15, 20],
-            defaultPageSize: 5,
-            showLessItems: true,
-            style: { marginRight: "10px" },
-            onChange: (currentPage, pageSize) => {
-              setCurrentPage(currentPage);
-              setPageSize(pageSize);
-            },
-          }}
+        <Tabs
+          defaultActiveKey={status}
+          onChange={(e) => setStatus(e)}
+          items={[
+            CheckCircleOutlined,
+            CloseCircleOutlined,
+            ClockCircleOutlined,
+            ClockCircleOutlined,
+            ClockCircleOutlined,
+            ClockCircleOutlined,
+            ClockCircleOutlined,
+          ].map((Icon, i) => {
+            const id = String(i + 1);
+            return {
+              label: (
+                <span>
+                  <Icon />
+                  {id === "1"
+                    ? "Tất cả"
+                    : id === "2"
+                      ? "Chờ xác nhận"
+                      : id === "3"
+                        ? "Đang giao"
+                        : id === "4" ? "Đã hoàn thành"
+                          : id === "5" ? "Đã hủy"
+                            : id === '6' ? "Đã thanh toán"
+                              : id === "7" ? "Chưa thanh toán" : ""}
+
+                </span>
+              ),
+              key: id === "1" ? "" : id === "2" ? "CLIENT" : id === "3" ? "Shipping"
+                : id === "4" ? "Complete" : id === "5" ? "Cancel" : id === "6" ? "Paid"
+                  : id === "7" ? "Unpaid" : "",
+              children: (
+                <div style={{ padding: "8px" }}>
+                  <span style={{ fontWeight: 500 }}>
+                    <TableOutlined /> Danh sách yêu cầu
+                  </span>
+                  <Table
+                    style={{ marginTop: "10px" }}
+                    dataSource={data}
+                    columns={columns}
+                    loading={loading}
+                    loadingIndicator={<div>Loading...</div>}
+                    pagination={{
+                      showSizeChanger: true,
+                      pageSizeOptions: [5, 10, 15, 20],
+                      defaultPageSize: 5,
+                      showLessItems: true,
+                      style: { marginRight: "10px" },
+                      onChange: (currentPage, pageSize) => {
+                        setCurrentPage(currentPage);
+                        setPageSize(pageSize);
+                      },
+                    }}
+                  />
+                </div>
+              ),
+            };
+          })}
         />
       </section>
     </div>

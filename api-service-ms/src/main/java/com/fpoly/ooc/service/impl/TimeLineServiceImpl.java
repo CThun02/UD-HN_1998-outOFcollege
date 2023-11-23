@@ -2,7 +2,6 @@ package com.fpoly.ooc.service.impl;
 
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
-import com.fpoly.ooc.entity.Account;
 import com.fpoly.ooc.entity.Bill;
 import com.fpoly.ooc.entity.Timeline;
 import com.fpoly.ooc.exception.NotFoundException;
@@ -62,6 +61,9 @@ public class TimeLineServiceImpl implements TimeLineService {
         Timeline timeLine = new Timeline();
         timeLine.setBill(bill);
         timeLine.setNote(request.getNote());
+        System.out.println("CHECKMATES"+request.getStatus());
+
+
         if (request.getStatus() == null) {
             List<TimeLineResponse> lst = timeLineRepo.getTimeLineByBillId(billId);
             Integer statusIncrease = 0;
@@ -70,6 +72,7 @@ public class TimeLineServiceImpl implements TimeLineService {
             } else {
                 statusIncrease = Integer.valueOf(lst.get(lst.size() - 1).getStatus());
                 statusIncrease++;
+
             }
 
             timeLine.setStatus(String.valueOf(statusIncrease));
@@ -107,7 +110,7 @@ public class TimeLineServiceImpl implements TimeLineService {
                 List<ProductImageResponse> productImageResponses = productImageServiceI.getProductImageByProductDetailId(productDetailResponses.get(j).getId());
                 ProductDetailDisplayResponse productDetailDisplayResponse = new
                         ProductDetailDisplayResponse(productDetailResponses.get(j),
-                        productImageResponses==null?new ArrayList<>() : productImageResponses);
+                        productImageResponses == null ? new ArrayList<>() : productImageResponses);
                 productDetailDisplayResponses.add(productDetailDisplayResponse);
             }
         }

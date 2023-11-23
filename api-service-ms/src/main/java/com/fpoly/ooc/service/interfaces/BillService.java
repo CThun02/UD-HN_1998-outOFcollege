@@ -54,4 +54,6 @@ public interface BillService {
 
     List<BillReturnRequestResponse> getReturnRequestByStatus(String status);
 
+    BillGrowthResponse getGrowthStoreByTime(String time);
+
 }

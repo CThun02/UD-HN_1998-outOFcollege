@@ -13,7 +13,6 @@ import {
   ArrowDownOutlined,
   TableOutlined,
   ClockCircleOutlined,
-  EuroCircleOutlined,
   EuroOutlined,
 } from "@ant-design/icons";
 import {
@@ -67,6 +66,10 @@ const StatisticalIndex = () => {
     useState(formattedDateNow);
   const [typeDateBillRevenue, setTypeDateBillRevenue] = useState("date");
   const [typeDateLineChart, setTypeDateLineChart] = useState("date");
+  const [growthStoreDayData, setGrowthStoreDayData] = useState(null);
+  const [growthStoreMonthData, setGrowthStoreMonthData] = useState(null);
+  const [growthStoreYearData, setGrowthStoreYearData] = useState(null);
+
   const totalQuantity = billRevenue?.productDetailDisplay?.reduce(
     (total, item) => total + item.quantity,
     0
@@ -401,6 +404,31 @@ const StatisticalIndex = () => {
         });
     }
   }
+
+  async function getGrowthStoreDataByTime(time, setData) {
+    try {
+      const response = await axios.get(
+        "http://localhost:8080/api/admin/bill/getGrowthStoreByTime?time=" +
+          time,
+        {
+          headers: {
+            Authorization: `Bearer ${getToken(true)}`,
+          },
+        }
+      );
+
+      const data = response.data;
+      setData(data);
+      return data;
+    } catch (error) {
+      if (error.response && error.response.status === 403) {
+        notification.error({
+          message: "Thông báo",
+          description: "Bạn không có quyền truy cập!",
+        });
+      }
+    }
+  }
   function getDataRevenue() {
     var day = "";
     var month = "";
@@ -453,6 +481,9 @@ const StatisticalIndex = () => {
     getDataRevenue();
     getDataLineChart();
     compareRevenue();
+    getGrowthStoreDataByTime("date", setGrowthStoreDayData);
+    getGrowthStoreDataByTime("month", setGrowthStoreMonthData);
+    getGrowthStoreDataByTime("year", setGrowthStoreYearData);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     dateCompare,
@@ -485,9 +516,9 @@ const StatisticalIndex = () => {
                   style={{ width: "10%" }}
                   bordered={false}
                 >
-                  <Option value="date">Date</Option>
-                  <Option value="month">Month</Option>
-                  <Option value="year">Year</Option>
+                  <Option value="date">Ngày</Option>
+                  <Option value="month">Tháng</Option>
+                  <Option value="year">Năm</Option>
                 </Select>
                 <DatePicker
                   className={styles.input_noneBorder}
@@ -582,9 +613,9 @@ const StatisticalIndex = () => {
               style={{ width: "10%" }}
               bordered={false}
             >
-              <Option value="date">Date</Option>
-              <Option value="month">Month</Option>
-              <Option value="year">Year</Option>
+              <Option value="date">Ngày</Option>
+              <Option value="month">Tháng</Option>
+              <Option value="year">Năm</Option>
             </Select>
             <DatePicker
               className={styles.input_noneBorder}
@@ -663,9 +694,9 @@ const StatisticalIndex = () => {
                     style={{ width: "20%" }}
                     bordered={false}
                   >
-                    <Option value="date">Date</Option>
-                    <Option value="month">Month</Option>
-                    <Option value="year">Year</Option>
+                    <Option value="date">Ngày</Option>
+                    <Option value="month">Tháng</Option>
+                    <Option value="year">Năm</Option>
                   </Select>
                   <DatePicker
                     className={styles.input_noneBorder}
@@ -759,14 +790,96 @@ const StatisticalIndex = () => {
                   <h2 style={{ margin: "10px 0" }}>
                     <RetweetOutlined /> Tốc độ tăng trưởng
                   </h2>
-                  <div className={styles.growthFrame}>
-                    <h3>
-                      <EuroOutlined />
-                      Doanh thu ngày
-                    </h3>
-                    <h3>80.000.000 đ</h3>
-                    <h3>222.0%</h3>
-                  </div>
+                  <Row className={styles.growthFrame}>
+                    <Col span={12}>
+                      <h3>
+                        <EuroOutlined /> Doanh thu ngày
+                      </h3>
+                    </Col>
+                    <Col span={12}>
+                      <h3>
+                        {growthStoreDayData?.revenue.toLocaleString("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                        })}
+                      </h3>
+                    </Col>
+                    {growthStoreDayData?.growthPercent < 0 ? (
+                      <h3 style={{ color: "rgb(255, 77, 79)" }}>
+                        <ArrowDownOutlined />
+                        {Math.abs(growthStoreDayData?.growthPercent).toFixed(
+                          2
+                        ) + "%"}
+                      </h3>
+                    ) : (
+                      <h3 style={{ color: "rgb(63, 134, 0)" }}>
+                        <ArrowUpOutlined />
+                        {Math.abs(growthStoreDayData?.growthPercent).toFixed(
+                          2
+                        ) + "%"}
+                      </h3>
+                    )}
+                  </Row>
+                  <Row className={styles.growthFrame}>
+                    <Col span={12}>
+                      <h3>
+                        <EuroOutlined /> Doanh thu tháng
+                      </h3>
+                    </Col>
+                    <Col span={12}>
+                      <h3>
+                        {growthStoreMonthData?.revenue.toLocaleString("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                        })}
+                      </h3>
+                    </Col>
+                    {growthStoreMonthData?.growthPercent < 0 ? (
+                      <h3 style={{ color: "rgb(255, 77, 79)" }}>
+                        <ArrowDownOutlined />
+                        {Math.abs(growthStoreMonthData?.growthPercent).toFixed(
+                          2
+                        ) + "%"}
+                      </h3>
+                    ) : (
+                      <h3 style={{ color: "rgb(63, 134, 0)" }}>
+                        <ArrowUpOutlined />
+                        {Math.abs(growthStoreMonthData?.growthPercent).toFixed(
+                          2
+                        ) + "%"}
+                      </h3>
+                    )}
+                  </Row>
+                  <Row className={styles.growthFrame}>
+                    <Col span={12}>
+                      <h3>
+                        <EuroOutlined /> Doanh thu năm
+                      </h3>
+                    </Col>
+                    <Col span={12}>
+                      <h3>
+                        {growthStoreYearData?.revenue.toLocaleString("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                        })}
+                      </h3>
+                    </Col>
+                    {growthStoreYearData?.growthPercent < 0 ? (
+                      <h3 style={{ color: "rgb(255, 77, 79)" }}>
+                        <ArrowDownOutlined />
+                        {Math.abs(growthStoreYearData?.growthPercent).toFixed(
+                          2
+                        ) + "%"}
+                      </h3>
+                    ) : (
+                      <h3 style={{ color: "rgb(63, 134, 0)" }}>
+                        <ArrowUpOutlined />
+                        {Math.abs(growthStoreYearData?.growthPercent).toFixed(
+                          2
+                        ) + "%"}
+                      </h3>
+                    )}
+                  </Row>
                 </Col>
               </Row>
             </Spin>
@@ -789,9 +902,9 @@ const StatisticalIndex = () => {
               style={{ width: "20%" }}
               bordered={false}
             >
-              <Option value="date">Date</Option>
-              <Option value="month">Month</Option>
-              <Option value="year">Year</Option>
+              <Option value="date">Ngày</Option>
+              <Option value="month">Tháng</Option>
+              <Option value="year">Năm</Option>
             </Select>
             <DatePicker
               className={styles.input_noneBorder}

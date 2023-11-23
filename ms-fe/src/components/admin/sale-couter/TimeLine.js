@@ -29,7 +29,6 @@ const BillTimeLine = (addId) => {
     const [billInfo, setBillInfo] = useState({});
     const { billId } = useParams();
     const [render, setRender] = useState(null);
-    const [selectedRowKeys, setSelectedRowKeys] = useState([]);
     const token = getAuthToken(true);
 
     // tạo mới timeline

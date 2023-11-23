@@ -940,7 +940,7 @@ const Bill = () => {
     const bill = {
       billCode: activeKey,
       accountId: account?.username,
-      price: totalPrice,
+      price: voucherPrice(),
       priceReduce: totalPrice - voucherPrice(),
       amountPaid: typeShipping[index]
         ? 0

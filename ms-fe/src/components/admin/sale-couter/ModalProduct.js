@@ -4,11 +4,9 @@ import styles from "./ModalProduct.module.css";
 import ProductDetails from "../product/ProductDetails";
 import { now } from "moment";
 
-const ModalProduct = ({ visible, onCancel, cartId, render }) => {
+const ModalProduct = ({ visible, onCancel, cartId, render, billId }) => {
   var cart = JSON.parse(localStorage.getItem(cartId));
-  let productDetailsCreate = cart.productDetails;
-
-
+  let productDetailsCreate = cart?.productDetails;
 
   function action() {
     var totalPrice = 0;
@@ -30,6 +28,10 @@ const ModalProduct = ({ visible, onCancel, cartId, render }) => {
       });
     }
 
+  }
+
+  const addProductBillDetail = () => {
+    console.log(123)
   }
 
   let notifi = () => {
@@ -61,7 +63,7 @@ const ModalProduct = ({ visible, onCancel, cartId, render }) => {
         width={2000}
       >
         <ProductDetails
-          action={action}
+          action={billId ? addProductBillDetail : action}
           productDetailsCreate={productDetailsCreate}
         />
       </Modal>

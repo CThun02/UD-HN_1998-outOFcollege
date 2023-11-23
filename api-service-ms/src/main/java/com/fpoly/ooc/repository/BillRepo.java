@@ -97,6 +97,7 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
             @Param("billType") String billType,
             @Param("symbol") String symbol);
 
+
     @Modifying
     @Query("UPDATE Bill b SET b.status = :status, b.amountPaid = :amountPaid WHERE b.id = :id")
     Integer update(@Param("status") String status,

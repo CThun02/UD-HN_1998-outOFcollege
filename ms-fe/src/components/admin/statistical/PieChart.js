@@ -16,11 +16,11 @@ const PieChart = ({ formattedDateNow }) => {
   const [selectTypeDate, setSelectTypeDate] = useState("year");
   const data = [
     {
-      type: "In Store",
+      type: "Tại quầy",
       value: billRevenueCompare.inStoreRevenue,
     },
     {
-      type: "Online",
+      type: "Trực tuyến",
       value: billRevenueCompare.onlineRevenue,
     },
   ];

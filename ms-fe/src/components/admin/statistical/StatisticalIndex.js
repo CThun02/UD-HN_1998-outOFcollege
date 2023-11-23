@@ -13,6 +13,8 @@ import {
   ArrowDownOutlined,
   TableOutlined,
   ClockCircleOutlined,
+  EuroCircleOutlined,
+  EuroOutlined,
 } from "@ant-design/icons";
 import {
   Col,
@@ -65,6 +67,11 @@ const StatisticalIndex = () => {
     useState(formattedDateNow);
   const [typeDateBillRevenue, setTypeDateBillRevenue] = useState("date");
   const [typeDateLineChart, setTypeDateLineChart] = useState("date");
+  const totalQuantity = billRevenue?.productDetailDisplay?.reduce(
+    (total, item) => total + item.quantity,
+    0
+  );
+
   const columns = [
     {
       key: "#",
@@ -490,14 +497,14 @@ const StatisticalIndex = () => {
                   onChange={(date, dateString) => setDateRevenue(dateString)}
                 />
               </Col>
-              <Col span={12}>
+              <Col span={8}>
                 <Statistic
                   style={{ marginTop: "8px" }}
                   title="Đơn hàng bán được"
                   value={billRevenue.billSell || 0}
                 />
               </Col>
-              <Col span={12}>
+              <Col span={8}>
                 <Statistic
                   style={{ marginTop: "8px" }}
                   title="Tổng doanh thu"
@@ -509,8 +516,15 @@ const StatisticalIndex = () => {
                   }
                 />
               </Col>
+              <Col span={8}>
+                <Statistic
+                  style={{ marginTop: "8px" }}
+                  title="Số lượng sản phẩm bán được"
+                  value={totalQuantity}
+                />
+              </Col>
               <Col span={24}>
-                <p style={{ fontWeight: 500 }}>
+                <p style={{ fontWeight: 500, marginTop: "20px" }}>
                   <TableOutlined /> Sản phẩm bán được
                 </p>
                 <Table
@@ -740,6 +754,19 @@ const StatisticalIndex = () => {
                     }
                     suffix="%"
                   />
+                </Col>
+                <Col span={24} style={{ marginTop: "10px" }}>
+                  <h2 style={{ margin: "10px 0" }}>
+                    <RetweetOutlined /> Tốc độ tăng trưởng
+                  </h2>
+                  <div className={styles.growthFrame}>
+                    <h3>
+                      <EuroOutlined />
+                      Doanh thu ngày
+                    </h3>
+                    <h3>80.000.000 đ</h3>
+                    <h3>222.0%</h3>
+                  </div>
                 </Col>
               </Row>
             </Spin>

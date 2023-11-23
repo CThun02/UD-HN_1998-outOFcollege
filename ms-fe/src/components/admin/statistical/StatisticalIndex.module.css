@@ -32,3 +32,11 @@
   border-radius: 50%;
   margin-right: 8px;
 }
+
+.growthFrame {
+  border: 1px solid #edf2f9;
+  border-radius: 6px;
+  padding: 20px 10px;
+  display: flex;
+  justify-content: space-between;
+}

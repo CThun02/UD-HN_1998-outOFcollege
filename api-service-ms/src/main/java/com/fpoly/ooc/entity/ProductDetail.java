@@ -65,6 +65,7 @@ import java.util.List;
                   and stt.status = 'ACTIVE'
                   and s.status = 'ACTIVE'
                   and c.status = 'ACTIVE'
+                  and pd.quantity > 0
                   and (p.id in ?1)
                   and (?2 is null or bt.id = ?2)
                   and (?3 is null or m.id = ?3)

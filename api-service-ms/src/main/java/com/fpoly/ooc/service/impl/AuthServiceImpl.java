@@ -19,12 +19,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.nio.CharBuffer;
-import java.util.Arrays;
-import java.util.Collections;
 
 @AllArgsConstructor
 @Service
-public class AuthServiceIml implements AuthService {
+public class AuthServiceImpl implements AuthService {
 
     private AccountService accountService;
     private PasswordEncoder passwordEncoder;
@@ -54,12 +52,12 @@ public class AuthServiceIml implements AuthService {
             throw new LoginException(ErrorCodeConfig.getMessage(Const.JWT_USER_ALREADY_EXIST), HttpStatus.BAD_REQUEST);
         }
 
-        if (accountByEmail != null) {
-            throw new LoginException(ErrorCodeConfig.getMessage(Const.JWT_EMAIL_ALREADY_EXIST), HttpStatus.BAD_REQUEST);
-        }
-
         if (accountByPhoneNumber != null) {
             throw new LoginException(ErrorCodeConfig.getMessage(Const.JWT_PHONE_NUMBER_ALREADY_EXIST), HttpStatus.BAD_REQUEST);
+        }
+
+        if (accountByEmail != null) {
+            throw new LoginException(ErrorCodeConfig.getMessage(Const.JWT_EMAIL_ALREADY_EXIST), HttpStatus.BAD_REQUEST);
         }
 
         Role role = roleService.findRoleByName(signUp.getRole().toUpperCase());

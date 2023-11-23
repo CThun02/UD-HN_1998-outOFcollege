@@ -43,8 +43,9 @@ public interface AccountRepository extends JpaRepository<Account, String> {
             "left join Role role on account.role.id = role.id " +
             "where account.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
             "and role.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
-            "and account.username = ?1")
-    Account findLoginByUsername(String username);
+            "and role.roleName = com.fpoly.ooc.constant.Const.ROLE_CUSTOMER " +
+            "and account.username = ?1 or account.email = ?1 or account.numberPhone = ?1 ")
+    List<Account> findLoginByUsername(String username);
 
     @Query("select account from Account account " +
             "left join Role role on account.role.id = role.id " +

@@ -18,6 +18,7 @@ import com.fpoly.ooc.service.interfaces.AccountService;
 import com.fpoly.ooc.service.interfaces.AddressDetailService;
 import com.fpoly.ooc.utilities.UniqueRandomHex;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -231,7 +232,22 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Account findLoginByUsername(String username) {
-        return accountRepository.findLoginByUsername(username);
+        List<Account> accounts = accountRepository.findLoginByUsername(username);
+
+        if(CollectionUtils.isEmpty(accounts)) {
+            return null;
+        }
+
+        if (accounts.size() > 1) {
+            log.warn("Accounts has return than 1: " + accounts.get(0));
+            return accounts.get(0);
+        }
+
+        if(accounts.size() == 1) {
+            return accounts.get(0);
+        }
+
+        return null;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.fpoly.ooc.responce.bill;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fpoly.ooc.entity.Account;
 
 import java.math.BigDecimal;
@@ -15,7 +16,8 @@ public interface BillResponse {
 
     public String getUserName();
 
-    public LocalDateTime getConpletionDate();
+    @JsonFormat(pattern = "HH:mm:ss dd/MM/yyyy")
+    public LocalDateTime getCompletionDate();
 
     public BigDecimal getPrice();
 
@@ -23,7 +25,12 @@ public interface BillResponse {
 
     public String getSymbol();
 
+    @JsonFormat(pattern = "HH:mm:ss dd/MM/yyyy")
     public LocalDateTime getCreatedAt();
 
     public String getCreatedBy();
+
+    public String getStatus();
+
+    public String getNote();
 }

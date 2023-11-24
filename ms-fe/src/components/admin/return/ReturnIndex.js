@@ -8,6 +8,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { QrcodeOutlined, SearchOutlined } from "@ant-design/icons";
 import logoOOC from "../../../Assets/img/logo/logo_OOC.svg";
 import QRReader from "../../../service/QRReader";
+import dayjs from "dayjs";
 
 const ReturnIndex = () => {
   const api = "http://localhost:8080/api/admin/bill";
@@ -18,12 +19,43 @@ const ReturnIndex = () => {
 
   function searchBill() {
     axios
-      .get(`http://localhost:8080/api/admin/`, {
-        headers: {
-          Authorization: `Bearer ${getToken(true)}`,
-        },
+      .get(
+        `http://localhost:8080/api/admin/bill/getBillByBillCode?billCode=` +
+          billCode,
+        {
+          headers: {
+            Authorization: `Bearer ${getToken(true)}`,
+          },
+        }
+      )
+      .then((response) => {
+        var now = new Date();
+        var sevenDay = 7 * 24 * 60 * 60 * 1000;
+        if (response.data) {
+          if (response.data.status !== "Complete") {
+            notification.error({
+              message: "Thông báo",
+              description: "Hóa đơn chưa hoàn thành để thực hiện hoàn trả!",
+            });
+          } else if (
+            now.getTime() - new Date(response.data.completionDate).getTime() >
+            sevenDay
+          ) {
+            notification.error({
+              message: "Thông báo",
+              description: "Hóa đơn đã vượt quá 7 ngày để hoàn trả!",
+            });
+          } else {
+            navigate("/api/admin/return/return-bill/" + response.data.billCode);
+          }
+        } else {
+          notification.error({
+            message: "Thông báo",
+            description: "Không tìm thấy hóa đơn",
+          });
+        }
+        console.log(response.data);
       })
-      .then((response) => {})
       .catch((error) => {
         const status = error.response.status;
         if (status === 403) {
@@ -55,7 +87,7 @@ const ReturnIndex = () => {
           <Space>
             <Button
               onClick={() => {
-                navigate("/api/admin/return/return-bill");
+                searchBill();
               }}
               type="primary"
               size="large"

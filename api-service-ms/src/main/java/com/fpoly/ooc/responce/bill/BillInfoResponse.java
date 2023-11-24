@@ -40,10 +40,5 @@ public class BillInfoResponse {
     @JsonFormat(pattern = "HH:mm:ss dd/MM/yyyy ")
     private LocalDateTime createdDate;
 
-    private String fullName;
-
-    private String phoneNumber;
-
-    private String address;
 
 }

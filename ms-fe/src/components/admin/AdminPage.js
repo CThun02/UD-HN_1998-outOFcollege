@@ -64,7 +64,10 @@ function AdminPage() {
                   {/* Trả hàng */}
                   <Route path="return">
                     <Route index element={<ReturnIndex />}></Route>
-                    <Route path="return-bill" element={<BillReturn />}></Route>
+                    <Route
+                      path="return-bill/:billCode"
+                      element={<BillReturn />}
+                    ></Route>
                   </Route>
                   {/* ví dụ path= san-pham/hien-thi ->  
                   {/* Tại quầy */}

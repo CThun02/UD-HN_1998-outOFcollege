@@ -25,8 +25,9 @@ public interface BillService {
             LocalDateTime startDate,
             LocalDateTime endDate,
             String status,
-            String billType,
-            String symbol);
+            String symbol,
+            Integer count,
+            String createdBy);
 
     void deleteBill(Long id);
 
@@ -53,5 +54,7 @@ public interface BillService {
     List<ProductDetailSellResponse> getProductDetailSellInStore(ProductDetailRequest request, BigDecimal minPrice, BigDecimal maxPrice);
 
     List<BillReturnRequestResponse> getReturnRequestByStatus(String status);
+
+    BillGrowthResponse getGrowthStoreByTime(String time);
 
 }

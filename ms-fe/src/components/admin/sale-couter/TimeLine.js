@@ -17,7 +17,7 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 import moment from "moment";
 import numeral from "numeral";
-import { CheckCircleOutlined, ReloadOutlined } from "@ant-design/icons";
+import { CheckCircleOutlined } from "@ant-design/icons";
 import { getAuthToken, getToken } from "../../../service/Token";
 
 const BillTimeLine = (addId) => {
@@ -34,7 +34,11 @@ const BillTimeLine = (addId) => {
     // tạo mới timeline
     const handleCreateTimeline = async (note, stauts) => {
         const data = await token;
-        const values = { note: note, status: stauts, createdBy: data?.username + '_' + data?.fullName };
+        const values = {
+            note: note,
+            status: stauts,
+            createdBy: data?.username + "_" + data?.fullName,
+        };
         await axios
             .post(`http://localhost:8080/api/admin/timeline/${billId}`, values, {
                 headers: {
@@ -43,7 +47,7 @@ const BillTimeLine = (addId) => {
             })
             .then((response) => {
                 setTimelines([...timelines, response.data]);
-                setRender(response.data)
+                setRender(response.data);
             })
             .catch((error) => {
                 const status = error.response.status;
@@ -87,7 +91,8 @@ const BillTimeLine = (addId) => {
     const handleUpdateBillDetailStatus = (request, status) => {
         axios
             .put(
-                `http://localhost:8080/api/admin/bill/billDetail/change-status?status=` + status,
+                `http://localhost:8080/api/admin/bill/billDetail/change-status?status=` +
+                status,
                 request,
 
                 {
@@ -125,14 +130,18 @@ const BillTimeLine = (addId) => {
         // timelines.length === 3 &&
         // billInfo.status !== "Paid"
         // ) {
-        console.log(billInfo.symbol, timelines.length)
+        console.log(billInfo.symbol, timelines.length);
         handleUpdateBillStatus(
-            action === "cancel" ? "Cancel" :
-                (((billInfo.symbol === 'Received'
-                    && timelines[timelines.length - 1] === '2') && action !== 'cancel')
-                    || ((billInfo.symbol === 'Shipping'
-                        && timelines[timelines.length - 1].status === '3')
-                        && action !== 'cancel')) ? "Complete" : "1",
+            action === "cancel"
+                ? "Cancel"
+                : (billInfo.symbol === "Received" &&
+                    timelines[timelines.length - 1] === "2" &&
+                    action !== "cancel") ||
+                    (billInfo.symbol === "Shipping" &&
+                        timelines[timelines.length - 1].status === "3" &&
+                        action !== "cancel")
+                    ? "Complete"
+                    : "1",
             billInfo.totalPrice + billInfo?.shipPrice - billInfo.priceReduce
         );
         // }
@@ -175,7 +184,7 @@ const BillTimeLine = (addId) => {
                 setTimelinesPoduct(response.data);
             })
             .catch((error) => {
-                console.log(error)
+                console.log(error);
                 const status = error.response.status;
                 if (status === 403) {
                     notification.error({
@@ -202,6 +211,7 @@ const BillTimeLine = (addId) => {
                     });
                 }
             });
+        console.log(billInfo)
     }, [billId, render]);
 
     const columnProduct = [
@@ -217,7 +227,7 @@ const BillTimeLine = (addId) => {
         {
             key: "productName",
             title: "Sản phẩm",
-            width: '50%',
+            width: "50%",
             render: (text, record, index) => {
                 return (
                     <Row>
@@ -301,9 +311,9 @@ const BillTimeLine = (addId) => {
                 return price.toLocaleString("vi-VN", {
                     style: "currency",
                     currency: "VND",
-                })
-            }
-        }
+                });
+            },
+        },
     ];
     return (
         <>
@@ -328,15 +338,19 @@ const BillTimeLine = (addId) => {
                                                                 : CheckCircleOutlined
                                             }
                                             title={
-                                                data.status === "0"
-                                                    ? "Đã hủy"
-                                                    : data.status === "1"
-                                                        ? "Chờ xác nhận"
-                                                        : data.status === "2"
-                                                            ? "Đã xác nhận"
-                                                            : data.status === "3"
-                                                                ? "Đã đóng gói & đang được giao"
-                                                                : "Giao hàng thành công"
+                                                data.status === "0" ? (
+                                                    <h3>Đã hủy</h3>
+                                                ) : data.status === "1" ? (
+                                                    <h3>Chờ xác nhận</h3>
+                                                ) : data.status === "2" ? (
+                                                    <h3>Đã xác nhận</h3>
+                                                ) : data.status === "3" ? (
+                                                    <h3>
+                                                        Đã đóng gói & <br /> đang được giao
+                                                    </h3>
+                                                ) : (
+                                                    <h3>Giao hàng thành công</h3>
+                                                )
                                             }
                                             subtitle={data.createdDate}
                                         />
@@ -347,16 +361,25 @@ const BillTimeLine = (addId) => {
                                 {timelines &&
                                     timelines.map((data) => (
                                         <TimelineEvent
-                                            color={data.status === "0" ? "#FF0000" : data.status === '3' ? '#f0ad4e' : "#00cc00"}
+                                            color={
+                                                data.status === "0"
+                                                    ? "#FF0000"
+                                                    : data.status === "3"
+                                                        ? "#f0ad4e"
+                                                        : "#00cc00"
+                                            }
                                             icon={
                                                 data.status === "1"
                                                     ? FaRegFileAlt
                                                     : data.status === "0"
                                                         ? FaTimes
-                                                        : data.status === '2' ?
-                                                            FaRegCheckCircle :
-                                                            data.status === '3' ? FaClock :
-                                                                data.status === '4' ? FaRocket : null
+                                                        : data.status === "2"
+                                                            ? FaRegCheckCircle
+                                                            : data.status === "3"
+                                                                ? FaClock
+                                                                : data.status === "4"
+                                                                    ? FaRocket
+                                                                    : null
                                             }
                                             title={
                                                 data.status === "1"
@@ -375,8 +398,9 @@ const BillTimeLine = (addId) => {
                     </div>
                 </div>
                 <div className={styles.btnHeader} style={{ marginTop: 24 }}>
-                    {billInfo?.symbol === "Received" && (timelines.length !== 2 &&
-                        timelines.length !== 4) && (
+                    {billInfo?.symbol === "Received" &&
+                        timelines.length !== 2 &&
+                        timelines.length !== 4 && (
                             <>
                                 <Button
                                     type="primary"
@@ -478,10 +502,16 @@ const BillTimeLine = (addId) => {
                         </Row>
                         <Row>
                             <Col span={12}>
-                                <span>Hình thức mùa hàng</span>
+                                {console.log(billInfo)}
+                                <span>Hình thức mua hàng</span>
                             </Col>
                             <Col span={12}>
-                                <SpanBorder child={billInfo.symbol} color={"#1677ff"} />
+                                <SpanBorder
+                                    child={
+                                        billInfo.billType === "In-store" ? "Tại quầy" : "Trực tuyến"
+                                    }
+                                    color={"#1677ff"}
+                                />
                             </Col>
                         </Row>
                         <Row>
@@ -489,10 +519,7 @@ const BillTimeLine = (addId) => {
                                 <span>Ngày mua hàng</span>
                             </Col>
                             <Col span={12}>
-                                <SpanBorder
-                                    child={billInfo.createdDate}
-                                    color={"#1677ff"}
-                                />
+                                <SpanBorder child={billInfo.createdDate} color={"#1677ff"} />
                             </Col>
                         </Row>
                         <Row>
@@ -654,6 +681,12 @@ const BillTimeLine = (addId) => {
                         <span>{numeral(billInfo.totalPrice).format("0,0") + "đ"}</span>
                     </span>
                     <span className={styles.span}>
+                        <span style={{ width: "198px", display: "inline-block" }}>
+                            Giá vận chuyển:
+                        </span>
+                        <span>{numeral(billInfo.shipPrice).format("0,0") + "đ"}</span>
+                    </span>
+                    <span className={styles.span}>
                         <span style={{ width: "200px", display: "inline-block" }}>
                             Giảm giá:
                         </span>
@@ -680,7 +713,7 @@ const BillTimeLine = (addId) => {
                         </span>
                     </b>
                 </div>
-            </section >
+            </section>
         </>
     );
 };

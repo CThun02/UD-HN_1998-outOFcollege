@@ -202,6 +202,7 @@ const DetailForm = (props) => {
                 add.id +
                 "&value=" +
                 true,
+              null,
               {
                 headers: {
                   Authorization: `Bearer ${getToken(true)}`,
@@ -231,6 +232,7 @@ const DetailForm = (props) => {
                 add.id +
                 "&value=" +
                 false,
+              null,
               {
                 headers: {
                   Authorization: `Bearer ${getToken(true)}`,

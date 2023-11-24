@@ -79,23 +79,27 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
             "FROM Bill b LEFT JOIN Account a ON a.username = b.account.username " +
             "   LEFT JOIN BillDetail bd ON b.id = bd.bill.id " +
             "   LEFT JOIN DeliveryNote dn ON dn.bill.id = b.id " +
+            "   LEFT JOIN Timeline tl ON tl.bill.id = b.id " +
             "WHERE (b.billCode like %:billCode% OR :billCode IS NULL) " +
             "   AND (b.createdAt >= :startDate OR :startDate IS NULL) " +
             "   AND (b.createdAt <= :endDate OR :endDate IS NULL) " +
-            "   AND (:status IS NULL OR b.status LIKE %:status%) " +
-            "   AND (:billType IS NULL OR b.billType LIKE %:billType%) " +
-            "   AND (:symbol IS NULL OR b.symbol LIKE %:symbol%) " +
+            "   AND (:status IS NULL OR b.status LIKE :status) " +
+            "   AND (:createdBy IS NULL OR b.createdBy LIKE :createdBy AND b.status not like 'Cancel') " +
             "GROUP BY b.id, b.billCode, b.price, b.createdAt, b.billType, b.status, " +
             "    b.symbol, dn.shipPrice, b.priceReduce, dn.name, dn.phoneNumber, b.createdBy, " +
             "    a.fullName, a.numberPhone " +
+            "   having (:symbol IS NULL OR (b.symbol like :symbol and b.status not like 'Cancel' " +
+            "       AND (:count IS NULL OR COUNT(tl.id) = :count))) " +
             "ORDER BY b.createdAt DESC ")
     List<BillManagementResponse> getAllBillManagement(
             @Param("billCode") String billCode,
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate,
             @Param("status") String status,
-            @Param("billType") String billType,
-            @Param("symbol") String symbol);
+            @Param("symbol") String symbol,
+            @Param("count") Integer count,
+            @Param("createdBy") String createdBy);
+
 
     @Modifying
     @Query("UPDATE Bill b SET b.status = :status, b.amountPaid = :amountPaid WHERE b.id = :id")

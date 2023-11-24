@@ -46,13 +46,19 @@ public class BillController {
             @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Optional<LocalDate> startDate,
             @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Optional<LocalDate> endDate,
             @RequestParam(value = "status", required = false) String status,
-            @RequestParam(value = "billType", required = false) String billType,
-            @RequestParam(value = "symbol", required = false) String symbol) {
+            @RequestParam(value = "symbol", required = false) String symbol,
+            @RequestParam(value = "count", required = false) Optional<Integer> count,
+            @RequestParam(value = "createdBy", required = false) String createdBy) {
         LocalDateTime startDateTime = startDate.map(date -> LocalDateTime.of(date, LocalTime.MIN)).orElse(null);
         LocalDateTime endDateTime = endDate.map(date -> LocalDateTime.of(date, LocalTime.MAX)).orElse(null);
 
-        return ResponseEntity.ok(billService.getAllBillManagement(billCode, startDateTime, endDateTime,
-                status, billType, symbol));
+        return ResponseEntity.ok(billService.getAllBillManagement(billCode.trim().equals("") ? null : billCode,
+                startDateTime,
+                endDateTime,
+                status.trim().equals("") ? null : status,
+                symbol.trim().equals("") ? null : symbol,
+                count.orElse(null),
+                createdBy.trim().equals("") ? null : createdBy));
     }
 
     @GetMapping("/filterProductDetailSellByIdCom")
@@ -118,6 +124,11 @@ public class BillController {
         return ResponseEntity.ok(billService.getRevenueInStoreOnlineCompare(day.orElse(null),
                 month.orElse(null),
                 year.orElse(null)));
+    }
+
+    @GetMapping("/getGrowthStoreByTime")
+    public ResponseEntity<?> getGrowthStoreByTime(@RequestParam String time) {
+        return ResponseEntity.ok(billService.getGrowthStoreByTime(time));
     }
 
     @GetMapping("/getBillProductSellTheMost")

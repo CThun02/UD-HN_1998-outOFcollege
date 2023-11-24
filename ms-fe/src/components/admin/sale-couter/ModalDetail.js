@@ -47,7 +47,13 @@ const ModalDetail = ({ isModalOpen, handleOk, handleCancel, timelineDetail, symb
         {
             title: 'Người xác nhận',
             dataIndex: 'createdBy',
-            key: 'createdBy'
+            key: 'createdBy',
+            render: (createdBy) => {
+                return <span>
+                    {createdBy?.substring(createdBy.indexOf("_") + 1)} <br />
+                    {createdBy?.substring(0, createdBy.indexOf("_"))}
+                </span>
+            }
         },
         {
             title: 'Ghi chú',
@@ -64,6 +70,7 @@ const ModalDetail = ({ isModalOpen, handleOk, handleCancel, timelineDetail, symb
                 onCancel={handleCancel}
                 footer={null}
                 className={styles.w}
+                title={"Ghi chú hóa đơn"}
             >
                 <Table
                     columns={columns}

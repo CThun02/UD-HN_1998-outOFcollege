@@ -32,6 +32,7 @@ import { useState } from "react";
 import { NotificationProvider } from "../element/notification/Notification";
 import ReturnIndex from "./return/ReturnIndex";
 import { getToken } from "../../service/Token";
+import BillReturn from "./return/BillReturn";
 
 function AdminPage() {
   const [message, setMessage] = useState("");
@@ -62,6 +63,7 @@ function AdminPage() {
                   {/* Trả hàng */}
                   <Route path="return">
                     <Route index element={<ReturnIndex />}></Route>
+                    <Route path="return-bill" element={<BillReturn />}></Route>
                   </Route>
                   {/* ví dụ path= san-pham/hien-thi ->  
                   {/* Tại quầy */}

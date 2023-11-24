@@ -1,34 +1,29 @@
 package com.fpoly.ooc.responce.bill;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.fpoly.ooc.entity.Account;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Date;
 
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
-@Setter
-public class BillResponse {
+public interface BillResponse {
 
-    private Long billId;
+    public Long getId();
 
-    private Long billDetailId;
+    public String getBillCode();
 
-    private Long productDetailId;
+    public String getCustomerName();
 
-    private Integer quantity;
+    public String getUserName();
 
-    private String productName;
+    public LocalDateTime getConpletionDate();
 
-    private BigDecimal price;
+    public BigDecimal getPrice();
 
-    private String status;
+    public String getBillType();
 
-    private LocalDateTime createDate;
+    public String getSymbol();
 
+    public LocalDateTime getCreatedAt();
+
+    public String getCreatedBy();
 }

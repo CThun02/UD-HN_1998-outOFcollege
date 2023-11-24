@@ -19,6 +19,7 @@ import {
   Row,
   Select,
   Slider,
+  Space,
   Spin,
   Table,
   Tooltip,
@@ -1009,8 +1010,6 @@ const ProductDetails = (props) => {
                   </Col>
                   <Col span={6}>
                     <div className="m-5">
-                      {/* qr */}
-                      {console.log(record.id)}
                       <QRCodeSVG width={"100%"} value={record.id + ""} />
                     </div>
                   </Col>
@@ -1085,40 +1084,41 @@ const ProductDetails = (props) => {
                 </Row>
               </Spin>
             </Modal>
-            <Button
-              onClick={() => {
-                setProductDetailUpdate(record);
-                handlesetIsModalUpdateDetail(index, true);
-              }}
-              type="primary"
-              size={"large"}
-            >
-              <EditFilled />
-            </Button>
-            <Button
-              onClick={() => {
-                confirm({
-                  centered: true,
-                  title: `Xóa sản phẩm`,
-                  content: "Xác nhận Xóa",
-                  onOk() {
-                    deleteProductDetail(
-                      record,
-                      record.status === "ACTIVE" ? "DELETED" : "ACTIVE"
-                    );
-                  },
-                });
-              }}
-              className="ms-5"
-              type="primary"
-              size={"large"}
-            >
-              {record.status === "ACTIVE" ? (
-                <DeleteFilled />
-              ) : (
-                <ReloadOutlined />
-              )}
-            </Button>
+            <Space>
+              <Button
+                onClick={() => {
+                  setProductDetailUpdate(record);
+                  handlesetIsModalUpdateDetail(index, true);
+                }}
+                type="primary"
+                size={"large"}
+              >
+                <EditFilled />
+              </Button>
+              <Button
+                onClick={() => {
+                  confirm({
+                    centered: true,
+                    title: `Xóa sản phẩm`,
+                    content: "Xác nhận Xóa",
+                    onOk() {
+                      deleteProductDetail(
+                        record,
+                        record.status === "ACTIVE" ? "DELETED" : "ACTIVE"
+                      );
+                    },
+                  });
+                }}
+                type="primary"
+                size={"large"}
+              >
+                {record.status === "ACTIVE" ? (
+                  <DeleteFilled />
+                ) : (
+                  <ReloadOutlined />
+                )}
+              </Button>
+            </Space>
           </>
         );
       },

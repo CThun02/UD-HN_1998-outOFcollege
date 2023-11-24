@@ -1,10 +1,8 @@
 import {
   Button,
-  Col,
   Divider,
   Form,
   Input,
-  Row,
   Space,
   notification,
 } from "antd";
@@ -15,7 +13,7 @@ import axios from "axios";
 import { useState } from "react";
 import { NotificationContext } from "../../element/notification/NotificationAuthen";
 import { useContext } from "react";
-import { setAuthHeader } from "../../../service/Token";
+import { getToken, setAuthHeader } from "../../../service/Token";
 
 const facebookLogo = "/logo/facebook.png";
 const googleLogo = "/logo/google.png";
@@ -34,18 +32,19 @@ function SignIn({ isAuthenAdmin }) {
   const [api, contextHolder] = notification.useNotification();
 
   async function handleOnSubmit() {
-    console.log(login);
     try {
-      const res = await axios.post(baseUrl, login);
-      const data = await res.data;
-      const status = await res.status;
+      if (!getToken(isAuthenAdmin)) {
+        const res = await axios.post(baseUrl, login);
+        const data = await res.data;
+        const status = await res.status;
 
-      if (status === 200) {
-        setAuthHeader(data.token, isAuthenAdmin);
+        if (status === 200) {
+          setAuthHeader(data.token, isAuthenAdmin);
+        }
+
+        showSuccessNotification("Đăng nhập thành công", "login");
+        navigate(isAuthenAdmin ? "/api/admin" : "/ms-shop/home");
       }
-
-      showSuccessNotification("Đăng nhập thành công", "login");
-      navigate(isAuthenAdmin ? "/api/admin" : "/ms-shop/home");
     } catch (err) {
       api.error({
         message: `Đã xảy ra lỗi`,

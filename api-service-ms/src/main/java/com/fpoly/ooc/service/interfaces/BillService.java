@@ -25,8 +25,9 @@ public interface BillService {
             LocalDateTime startDate,
             LocalDateTime endDate,
             String status,
-            String billType,
-            String symbol);
+            String symbol,
+            Integer count,
+            String createdBy);
 
     void deleteBill(Long id);
 

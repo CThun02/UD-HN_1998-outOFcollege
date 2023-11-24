@@ -136,10 +136,11 @@ public class BillServiceImpl implements BillService {
             LocalDateTime startDate,
             LocalDateTime endDate,
             String status,
-            String billType,
-            String symbol) {
+            String symbol,
+            Integer count,
+            String createdBy) {
         return billRepo.getAllBillManagement(billCode,
-                startDate, endDate, status, billType, symbol);
+                startDate, endDate, status, symbol, count, createdBy);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -291,22 +292,22 @@ public class BillServiceImpl implements BillService {
         Double revenue = 0.0;
         Double revenueBefore = 0.0;
         LocalDate now = LocalDate.now();
-        if(time.equals("date")){
+        if (time.equals("date")) {
             LocalDate before = now.minusDays(1);
             revenue = billRepo.getRevenueByTime(now.getDayOfMonth(), now.getMonthValue(), now.getYear(), null);
             revenueBefore = billRepo.getRevenueByTime(before.getDayOfMonth(), before.getMonthValue(), before.getYear(), null);
-        }else if(time.equals("month")){
+        } else if (time.equals("month")) {
             LocalDate before = now.minusMonths(1);
             revenue = billRepo.getRevenueByTime(null, now.getMonthValue(), now.getYear(), null);
             revenueBefore = billRepo.getRevenueByTime(null, before.getMonthValue(), before.getYear(), null);
-        }else if(time.equals("year")){
+        } else if (time.equals("year")) {
             LocalDate before = now.minusYears(1);
             revenue = billRepo.getRevenueByTime(null, null, now.getYear(), null);
             revenueBefore = billRepo.getRevenueByTime(null, null, before.getYear(), null);
         }
-        revenue = revenue==null?0.0:revenue;
-        revenueBefore = revenueBefore==null?0.0:revenueBefore;
-        double growth = ((revenue - revenueBefore)/(revenueBefore<1?1:revenueBefore))*100;
+        revenue = revenue == null ? 0.0 : revenue;
+        revenueBefore = revenueBefore == null ? 0.0 : revenueBefore;
+        double growth = ((revenue - revenueBefore) / (revenueBefore < 1 ? 1 : revenueBefore)) * 100;
         BillGrowthResponse response = new BillGrowthResponse(BigDecimal.valueOf(revenue), (float) growth);
         return response;
     }

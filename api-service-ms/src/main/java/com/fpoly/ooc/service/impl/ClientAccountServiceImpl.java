@@ -14,8 +14,10 @@ import com.fpoly.ooc.request.account.UserDetailsRequest;
 import com.fpoly.ooc.request.address.AddressRequest;
 import com.fpoly.ooc.service.interfaces.AuthService;
 import com.fpoly.ooc.service.interfaces.ClientAccountService;
+import com.fpoly.ooc.util.CommonUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -78,11 +80,9 @@ public class ClientAccountServiceImpl implements ClientAccountService {
 
     @Override
     public UserInfomationDTO updateUserDetail(UserDetailsRequest request) {
-        Account account = accountRepository.findLoginByUsername(request.getUsername());
+        List<Account> accounts = accountRepository.findLoginByUsername(request.getUsername());
 
-        if (account == null) {
-            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.USER_NOT_FOUND));
-        }
+        Account account = CommonUtils.isValidArraysAccount(accounts);
 
         if (!passwordEncoder.matches(CharBuffer.wrap(request.getPassword()), account.getPassword())) {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.PASSWORD_NOT_CORRECT));
@@ -110,11 +110,10 @@ public class ClientAccountServiceImpl implements ClientAccountService {
 
     @Override
     public UserInfomationDTO getUserDetail(String username) {
-        Account account = accountRepository.findLoginByUsername(username);
+        List<Account> accounts = accountRepository.findLoginByUsername(username);
 
-        if (account == null) {
-            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.USER_NOT_FOUND));
-        }
+        Account account = CommonUtils.isValidArraysAccount(accounts);
+
         return userInfomationDTO(account);
     }
 

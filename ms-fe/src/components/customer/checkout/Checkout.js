@@ -320,7 +320,7 @@ const Checkout = (props) => {
         e.preventDefault();
         const bill = {
             billCode: generateRandomBillCode(),
-            price: voucherPrice() + shippingFee,
+            price: voucherPrice(),
             priceReduce: 0,
             paymentDetailId: formData.paymentDetailId,
             billType: "Online",

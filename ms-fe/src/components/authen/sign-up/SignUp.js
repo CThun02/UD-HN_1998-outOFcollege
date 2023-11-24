@@ -36,9 +36,17 @@ function SignUp() {
       showSuccessNotification("Đăng kí thành công", "login");
       navigate("/ms-shop/home");
     } catch (err) {
+      if (err?.response?.status === 400) {
+        api.error({
+          message: `Đã xảy ra lỗi`,
+          description: `${err.response?.data?.message}`,
+        });
+        return;
+      }
+
       api.error({
         message: `Đã xảy ra lỗi`,
-        description: `${err.response.data?.message}`,
+        description: `${err.response?.data?.message}`,
       });
     }
   }

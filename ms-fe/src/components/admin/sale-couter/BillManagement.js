@@ -24,8 +24,10 @@ const BillManagement = () => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [status, setStatus] = useState("");
+  const [symbol, setSymbol] = useState('')
   const [billType, setBillType] = useState("");
-  const [symbol, setSymbol] = useState("");
+  const [createdBy, setcreatedBy] = useState("");
+  const [count, setCount] = useState('');
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
 
@@ -83,8 +85,12 @@ const BillManagement = () => {
       // dataIndex: "employee",
       key: "employee",
       render: (_, record) => {
-        console.log(record)
-        return record.employee?.includes('_') ? record.employee?.substring(record.employee?.indexOf("_") + 1) : record.status === 'Cancel' ? "Đã hủy" : "Chờ xác nhận";
+        return record.employee?.includes('_') ?
+          <span>
+            {record.employee?.substring(record.employee.indexOf("_") + 1)} <br />
+            {record.employee?.substring(0, record.employee.indexOf("_"))}
+          </span> :
+          record.status === 'Cancel' ? "Đã hủy" : "Chờ xác nhận";
       }
     },
     {
@@ -143,11 +149,11 @@ const BillManagement = () => {
         let color =
           object === "Unpaid"
             ? "geekblue"
-            : object.toLocaleLowerCase() === "PAID".toLocaleLowerCase()
+            : object === "Paid"
               ? "green"
               : object === "Cancel"
                 ? "red"
-                : null;
+                : object === "Complete" ? "green" : null;
         return (
           <Space direction="vertical">
             <div style={{ width: "auto", display: "flex" }}>
@@ -156,7 +162,8 @@ const BillManagement = () => {
                   ? "Chưa thanh toán"
                   : object === "Cancel"
                     ? "Đã hủy"
-                    : "Đã thanh toán"}
+                    : object === "Complete" ? "Đã hoàn thành"
+                      : "Đã thanh toán"}
               </Tag>
             </div>
           </Space>
@@ -185,12 +192,13 @@ const BillManagement = () => {
       startDate: startDate,
       endDate: endDate,
       status: status,
-      billType: billType,
       symbol: symbol,
+      count: count,
+      createdBy: createdBy,
     };
     console.log(params);
     axios
-      .get(`http://localhost:8080/api/admin/bill?billCode=${billCode}&startDate=${startDate}&endDate=${endDate}&status=${status}&billType=${billType}&symbol=${symbol}`, {
+      .get(`http://localhost:8080/api/admin/bill?billCode=${billCode}&startDate=${startDate}&endDate=${endDate}&status=${status}&createdBy=${createdBy}&symbol=${symbol}&count=${count}`, {
         headers: {
           Authorization: `Bearer ${getToken(true)}`,
         },
@@ -241,16 +249,48 @@ const BillManagement = () => {
     setValue(newValue);
     if (newValue === "Shipping" || newValue === "Received") {
       setBillType("In-store");
-      setSymbol(newValue);
+      setcreatedBy(newValue);
     } else {
-      setSymbol("");
+      setcreatedBy("");
       setBillType(newValue);
     }
   };
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     fetchData();
-  }, [billCode, startDate, endDate, status, billType, symbol]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [billCode, startDate, endDate, status, createdBy, symbol, count]);
+
+  const onChangeBill = (e) => {
+    console.log(e)
+    if (e === '') {
+      setStatus('')
+      setcreatedBy('')
+      setSymbol('')
+      setCount('')
+    } else if (e === 'Client') {
+      setcreatedBy('CLIENT');
+      setStatus("")
+      setSymbol('')
+      setCount('')
+    } else if (e === 'Shipping') {
+      setStatus('')
+      setcreatedBy('')
+      setSymbol('Shipping')
+      setCount(3)
+    } else if (e === 'Confirmed') {
+      setStatus('')
+      setcreatedBy('')
+      setSymbol('Shipping')
+      setCount(2)
+    } else {
+      setStatus(e);
+      setcreatedBy("")
+      setSymbol('')
+      setCount('')
+    }
+  }
 
   return (
     <div>
@@ -284,18 +324,6 @@ const BillManagement = () => {
           </span>
           <span style={{ fontWeight: 500 }}>
             Loại hóa đơn
-            {/* <Select
-                            style={{ width: '12%', borderBottom: '1px solid #ccc' }}
-                            onChange={(e) => {
-                                setBillType(e);
-                            }}
-                            bordered={false}
-                            defaultValue={''}
-                        >
-                            <Select.Option value={''}>Tất cả</Select.Option>
-                            <Select.Option value={'In-store'}>Tại quầy</Select.Option>
-                            <Select.Option value={'Online'}>Online</Select.Option>
-                        </Select> */}
             <TreeSelect
               showSearch
               style={{
@@ -335,10 +363,12 @@ const BillManagement = () => {
         </h2>
         <Tabs
           defaultActiveKey={status}
-          onChange={(e) => setStatus(e)}
+          onChange={(e) => onChangeBill(e)
+          }
           items={[
             CheckCircleOutlined,
             CloseCircleOutlined,
+            ClockCircleOutlined,
             ClockCircleOutlined,
             ClockCircleOutlined,
             ClockCircleOutlined,
@@ -350,22 +380,25 @@ const BillManagement = () => {
               label: (
                 <span>
                   <Icon />
-                  {id === "1"
-                    ? "Tất cả"
-                    : id === "2"
-                      ? "Chờ xác nhận"
-                      : id === "3"
-                        ? "Đang giao"
-                        : id === "4" ? "Đã hoàn thành"
-                          : id === "5" ? "Đã hủy"
-                            : id === '6' ? "Đã thanh toán"
-                              : id === "7" ? "Chưa thanh toán" : ""}
+                  {id === "1" ? "Tất cả"
+                    : id === "2" ? "Chờ xác nhận"
+                      : id === '3' ? "Đã xác nhận"
+                        : id === "4" ? "Đang giao"
+                          : id === "5" ? "Đã hoàn thành"
+                            : id === "6" ? "Đã hủy"
+                              : id === '7' ? "Đã thanh toán"
+                                : id === "8" ? "Chưa thanh toán" : ""}
 
                 </span>
               ),
-              key: id === "1" ? "" : id === "2" ? "CLIENT" : id === "3" ? "Shipping"
-                : id === "4" ? "Complete" : id === "5" ? "Cancel" : id === "6" ? "Paid"
-                  : id === "7" ? "Unpaid" : "",
+              key: id === "1" ? ""
+                : id === "2" ? "Client"
+                  : id === '3' ? "Confirmed"
+                    : id === "4" ? "Shipping"
+                      : id === "5" ? "Complete"
+                        : id === "6" ? "Cancel"
+                          : id === "7" ? "Paid"
+                            : id === "8" ? "Unpaid" : '',
               children: (
                 <div style={{ padding: "8px" }}>
                   <span style={{ fontWeight: 500 }}>

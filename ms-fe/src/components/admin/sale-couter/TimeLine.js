@@ -19,6 +19,7 @@ import moment from "moment";
 import numeral from "numeral";
 import { CheckCircleOutlined } from "@ant-design/icons";
 import { getAuthToken, getToken } from "../../../service/Token";
+import ModalBillInfoDisplay from "../../element/bill-info/ModalBillInfoDisplay";
 
 const BillTimeLine = (addId) => {
     const [isModalConfirm, setIsModalConfirm] = useState(false);
@@ -315,8 +316,22 @@ const BillTimeLine = (addId) => {
             },
         },
     ];
+
+    const [open, setOpen] = useState(false)
+    const handleOpen = () => {
+        console.log(true)
+        setOpen(true)
+    }
+
+    const handleCan = () => {
+        setOpen(false)
+    }
+
     return (
         <>
+            {console.log(billInfo.billCode)}
+            <Button onClick={handleOpen}>aaaa</Button>
+            <ModalBillInfoDisplay open={open} cancel={handleCan} billCode={billInfo.billCode} />
             <section className={styles.background}>
                 <div style={{ overflowX: "scroll" }}>
                     <div style={{ width: "fit-content" }}>
@@ -502,7 +517,6 @@ const BillTimeLine = (addId) => {
                         </Row>
                         <Row>
                             <Col span={12}>
-                                {console.log(billInfo)}
                                 <span>Hình thức mua hàng</span>
                             </Col>
                             <Col span={12}>

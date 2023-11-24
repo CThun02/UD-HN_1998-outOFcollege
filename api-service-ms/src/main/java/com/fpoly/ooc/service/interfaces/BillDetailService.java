@@ -5,6 +5,7 @@ import com.fpoly.ooc.entity.BillDetail;
 import com.fpoly.ooc.request.bill.BillDetailRequest;
 import com.fpoly.ooc.responce.bill.BillManagementResponse;
 import com.fpoly.ooc.responce.bill.BillResponse;
+import com.fpoly.ooc.responce.pdf.PdfResponse;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
@@ -18,5 +19,7 @@ public interface BillDetailService {
     BillDetail updateBill(Long id, String status);
 
     void deleteBill(Long id);
+
+    PdfResponse pdfResponse(String billCode);
 
 }

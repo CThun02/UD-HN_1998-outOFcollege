@@ -122,4 +122,7 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
             "JOIN ProductDetail pd ON pd.id = bd.productDetail.id " +
             "WHERE (bd.bill.id = ?1 or ?1 is null)")
     List<ProductDetailResponse> getProductDetailByBillId(Long id);
+
+    Bill findBillByBillCode(String billCode);
+
 }

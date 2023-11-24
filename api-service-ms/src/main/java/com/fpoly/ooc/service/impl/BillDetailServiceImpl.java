@@ -1,13 +1,17 @@
 package com.fpoly.ooc.service.impl;
 
+import com.fpoly.ooc.entity.Bill;
 import com.fpoly.ooc.entity.BillDetail;
 import com.fpoly.ooc.repository.BillDetailRepo;
-import com.fpoly.ooc.repository.BillRepo;
 import com.fpoly.ooc.repository.CartDetailRepo;
 import com.fpoly.ooc.repository.CartRepo;
 import com.fpoly.ooc.request.bill.BillDetailRequest;
 import com.fpoly.ooc.responce.bill.BillResponse;
+import com.fpoly.ooc.responce.pdf.PdfResponse;
+import com.fpoly.ooc.responce.timeline.TimelineProductResponse;
 import com.fpoly.ooc.service.interfaces.BillDetailService;
+import com.fpoly.ooc.service.interfaces.BillService;
+import com.fpoly.ooc.service.interfaces.DeliveryNoteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,19 +19,14 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
+
 public class BillDetailServiceImpl implements BillDetailService {
 
     @Autowired
-    private BillRepo billRepo;
+    private BillService billService;
 
     @Autowired
     private BillDetailRepo billDetailRepo;
-
-    @Autowired
-    private CartRepo cartRepo;
-
-    @Autowired
-    private CartDetailRepo cartDetailRepo;
 
     @Override
     public List<BillResponse> getAll() {
@@ -82,5 +81,22 @@ public class BillDetailServiceImpl implements BillDetailService {
     public void deleteBill(Long id) {
         billDetailRepo.deleteById(id);
     }
+
+    @Override
+    public PdfResponse pdfResponse(String billCode) {
+        Bill bill = billService.getAllBillByCode(billCode);
+        List<TimelineProductResponse> lstProductDT = billDetailRepo.lstProductDT(billCode);
+
+        PdfResponse pdfResponse = PdfResponse.builder()
+                .billCode(billCode)
+                .BillCreatedAt(bill.getCreatedAt())
+                .billCreatedBy(bill.getCreatedBy())
+                .totalPrice(bill.getPrice())
+                .lstProductDetail(lstProductDT)
+                .build();
+
+        return pdfResponse;
+    }
+
 
 }

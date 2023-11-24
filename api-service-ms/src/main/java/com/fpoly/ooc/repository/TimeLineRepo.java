@@ -2,6 +2,7 @@ package com.fpoly.ooc.repository;
 
 import com.fpoly.ooc.entity.Timeline;
 import com.fpoly.ooc.responce.bill.BillInfoResponse;
+import com.fpoly.ooc.responce.bill.BillManagementResponse;
 import com.fpoly.ooc.responce.timeline.TimeLineResponse;
 import com.fpoly.ooc.responce.timeline.TimelineProductResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -39,14 +41,34 @@ public interface TimeLineRepo extends JpaRepository<Timeline, Long> {
             "WHERE bd.bill.id = :billId")
     List<TimelineProductResponse> getTimelineProductByBillId(@Param("billId") Long id);
 
-    @Query("SELECT distinct b.id FROM Timeline t join Bill b on b.id = t.bill.id " +
-            " join DeliveryNote d on d.bill.id = b.id where " +
-            " (:username is null or b.account.username =:username)" +
-            " and (:phoneNumber is null or d.phoneNumber =:phoneNumber)" +
-            " and (:email is null or b.account.email =:email) " +
-            " and (:status is null or t.status = :status)")
-    List<Long> getBillIdByUserNameOrPhoneNumberOrEmail(@Param("username") String username, @Param("phoneNumber") String phoneNumber,
-                                                       @Param("email") String email, @Param("status") String status);
+
+    @Query("SELECT new com.fpoly.ooc.responce.timeline.TimelineProductResponse(" +
+            "   pd.id, bd.id, pd.product.productName, bd.quantity, bd.price, pd.size.sizeName, pd.color.colorCode," +
+            "   pd.button.buttonName, pd.collar.collarTypeName, pd.material.materialName, pd.sleeve.sleeveName, " +
+            "   pd.shirtTail.shirtTailTypeName, pd.color.colorName, pd.form.formName, pd.pattern.patternName," +
+            "   pd.brand.brandName, pd.category.categoryName, bd.status )" +
+            "FROM Bill b  " +
+            "   LEFT JOIN BillDetail bd ON b.id = bd.bill.id " +
+            "   LEFT JOIN Timeline tl ON tl.bill.id = b.id " +
+            "   LEFT JOIN ProductDetail pd ON pd.id = bd.productDetail.id " +
+            "WHERE b.account.username = :username " +
+            "   AND (b.billCode like %:billCode% OR :billCode IS NULL) " +
+            "   AND (:status IS NULL OR b.status LIKE :status) " +
+            "   AND (:createdBy IS NULL OR b.createdBy LIKE :createdBy AND b.status not like 'Cancel') " +
+            "   GROUP BY pd.id, bd.id, pd.product.productName, bd.quantity, bd.price, pd.size.sizeName, pd.color.colorCode, " +
+            "              pd.button.buttonName, pd.collar.collarTypeName, pd.material.materialName, pd.sleeve.sleeveName, " +
+            "              pd.shirtTail.shirtTailTypeName, pd.color.colorName, pd.form.formName, pd.pattern.patternName, " +
+            "               pd.brand.brandName, pd.category.categoryName, bd.status, b.symbol, b.status,b.createdAt " +
+            "HAVING (:symbol IS NULL OR (b.symbol like :symbol and b.status not like 'Cancel' " +
+            "  AND (:count IS NULL OR COUNT(tl.id) = :count))) " +
+            "ORDER BY b.createdAt DESC ")
+    List<TimelineProductResponse> getAllBillByClient(
+            @Param("username") String username,
+            @Param("billCode") String billCode,
+            @Param("status") String status,
+            @Param("symbol") String symbol,
+            @Param("count") Integer count,
+            @Param("createdBy") String createdBy);
 
     @Query("SELECT new com.fpoly.ooc.responce.bill.BillInfoResponse(b.id, b.billCode,b.transactionCode, b.symbol, b.billType, " +
             "    b.price, b.priceReduce, dn.shipPrice, b.amountPaid, dn.shipDate, pd.payment.paymentName, b.createdAt, " +

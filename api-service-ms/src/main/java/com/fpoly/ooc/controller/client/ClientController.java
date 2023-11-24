@@ -3,13 +3,13 @@ package com.fpoly.ooc.controller.client;
 import com.fpoly.ooc.entity.Account;
 import com.fpoly.ooc.entity.Address;
 import com.fpoly.ooc.entity.AddressDetail;
-import com.fpoly.ooc.repository.TimeLineRepo;
 import com.fpoly.ooc.request.DeliveryNoteRequest;
 import com.fpoly.ooc.request.bill.BillRequest;
 import com.fpoly.ooc.request.product.ProductDetailRequest;
 import com.fpoly.ooc.request.voucher.DisplayVoucherRequest;
 import com.fpoly.ooc.service.interfaces.AddressDetailService;
 import com.fpoly.ooc.service.interfaces.AddressServiceI;
+import com.fpoly.ooc.service.interfaces.BillDetailService;
 import com.fpoly.ooc.service.interfaces.BillService;
 import com.fpoly.ooc.service.interfaces.CartDetailService;
 import com.fpoly.ooc.service.interfaces.DeliveryNoteService;
@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -54,6 +55,9 @@ public class ClientController {
 
     @Autowired
     private TimeLineService timeLineService;
+
+    @Autowired
+    private BillDetailService billDetailService;
 
     @GetMapping("/address")
     public ResponseEntity<?> getAll(@RequestParam("username") String username) {
@@ -120,13 +124,25 @@ public class ClientController {
 
     @GetMapping("/timelineByUser")
     public ResponseEntity<?> timelineByUser(@RequestParam("username") String username,
-                                            @RequestParam("phoneNumber") String phoneNumber,
-                                            @RequestParam("email") String email,
-                                            @RequestParam("status") String status) {
-        return ResponseEntity.ok(timeLineService.getListTimelineByUser(username.trim().equals("")?null:username,
-                phoneNumber.trim().equals("")?null:phoneNumber,
-                email.trim().equals("")?null:email,
-                status.trim().equals("")?null:status));
+                                            @RequestParam("billCode") String billCode,
+                                            @RequestParam("status") String status,
+                                            @RequestParam("symbol") String symbol,
+                                            @RequestParam("count") Optional<Integer> count,
+                                            @RequestParam("createdBy") String createdBy
+    ) {
+        return ResponseEntity.ok(timeLineService.getListTimelineByUser(
+                username.trim().equals("") ? null : username,
+                billCode.trim().equals("") ? null : billCode,
+                status.trim().equals("") ? null : status,
+                symbol.trim().equals("") ? null : symbol,
+                count.orElse(null),
+                createdBy.trim().equals("") ? null : createdBy
+        ));
+    }
+
+    @GetMapping("/pdf/{billCode}")
+    public ResponseEntity<?> pdfResponse(@PathVariable("billCode") String billCode) {
+        return ResponseEntity.status(200).body(billDetailService.pdfResponse(billCode));
     }
 
 }

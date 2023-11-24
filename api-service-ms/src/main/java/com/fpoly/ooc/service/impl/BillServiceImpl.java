@@ -155,6 +155,15 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
+    public Bill getAllBillByCode(String billCode) {
+        Bill bill = billRepo.findBillByBillCode(billCode);
+        if (bill == null) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.CODE_NOT_FOUND));
+        }
+        return billRepo.findBillByBillCode(billCode);
+    }
+
+    @Override
     public List<GetListCustomer> getListCustomer() {
         return billRepo.getListCustomer();
     }

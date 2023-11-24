@@ -15,9 +15,12 @@ function FollowingOrderContent({ status }) {
       const data = await token
       await axios.get(`http://localhost:8080/api/client/timelineByUser?username=${data.username}&status=${status}&phoneNumber&email`)
         .then((response) => {
-          setTimelines(response.data)
+          console.log(response.data)
           let totalPrice = 0;
-          totalPrice += response.data.price * response.data.quantity
+          for (let i = 0; i < response.data.length; i++) {
+            totalPrice += response.data[i].price * response.data[i].quantity
+            console.log(totalPrice)
+          }
           setTotalPrice(totalPrice)
         })
         .catch((error) => {
@@ -25,6 +28,8 @@ function FollowingOrderContent({ status }) {
         })
     }
     getAll()
+    console.log(timelines)
+
   }, [status])
 
   return (
@@ -43,7 +48,6 @@ function FollowingOrderContent({ status }) {
                 Chờ giao hàng
               </span>
             </div>
-            {console.log(timelines)}
             {timelines?.length > 0 && timelines.map((timeline) =>
               <Row style={{ margin: 0 }}>
                 <Col span={3}>
@@ -170,10 +174,13 @@ function FollowingOrderContent({ status }) {
                 padding: "10px 0",
               }}
             >
-              <Button type="primary" style={{ marginRight: "20px" }}>
+              {/* <Button type="primary" style={{ marginRight: "20px" }}>
                 Mua lại
-              </Button>
-              <span>Thành tiền {totalPrice}</span>
+              </Button> */}
+              <span>Thành tiền: {totalPrice.toLocaleString("vi-VN", {
+                style: "currency",
+                currency: "VND",
+              })}</span>
             </div>
           </Space>
         </div>

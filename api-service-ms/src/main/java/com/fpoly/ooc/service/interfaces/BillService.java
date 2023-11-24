@@ -57,4 +57,8 @@ public interface BillService {
 
     BillGrowthResponse getGrowthStoreByTime(String time);
 
+    BillResponse getBillByBillCode(String billCode);
+
+    BillReturnResponse getBillReturnByBillCode(String billCode);
+
 }

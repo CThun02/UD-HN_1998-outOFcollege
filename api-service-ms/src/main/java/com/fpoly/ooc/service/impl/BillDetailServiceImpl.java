@@ -1,22 +1,17 @@
 package com.fpoly.ooc.service.impl;
 
-import com.fpoly.ooc.entity.Account;
-import com.fpoly.ooc.entity.Bill;
 import com.fpoly.ooc.entity.BillDetail;
-import com.fpoly.ooc.entity.ProductDetail;
 import com.fpoly.ooc.repository.BillDetailRepo;
 import com.fpoly.ooc.repository.BillRepo;
 import com.fpoly.ooc.repository.CartDetailRepo;
 import com.fpoly.ooc.repository.CartRepo;
 import com.fpoly.ooc.request.bill.BillDetailRequest;
-import com.fpoly.ooc.responce.bill.BillProductResponse;
 import com.fpoly.ooc.responce.bill.BillResponse;
 import com.fpoly.ooc.service.interfaces.BillDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -73,14 +68,14 @@ public class BillDetailServiceImpl implements BillDetailService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public BillDetail updateBill(Long id, BillDetailRequest request) {
+    public BillDetail updateBill(Long id, String status) {
         BillDetail billDetail = billDetailRepo.findById(id).orElse(null);
         if (billDetail == null) {
             throw new IllegalArgumentException("bill detail không tồn tại");
         }
 
-
-        return null;
+        billDetail.setStatus(status);
+        return billDetailRepo.save(billDetail);
     }
 
     @Override

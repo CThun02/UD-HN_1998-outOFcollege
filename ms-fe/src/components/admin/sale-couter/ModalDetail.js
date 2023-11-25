@@ -16,13 +16,14 @@ const ModalDetail = ({ isModalOpen, handleOk, handleCancel, timelineDetail, symb
             dataIndex: 'status',
             key: 'status',
             render: (status) => {
-                if (symbol === 'In-store') {
+                if (symbol === 'Received') {
                     return status === '1'
                         ? 'Chờ xác nhận'
                         : status === '2'
                             ? 'Thanh toán thành công'
                             : status === '0' ? 'Đã hủy'
-                                : ''
+                                : status === '3' ? 'Yêu cầu trả hàng'
+                                    : status === '4' ? 'Trả hàng thành công' : ""
                 } else {
                     return status === '1'
                         ? 'Chờ xác nhận'
@@ -40,14 +41,19 @@ const ModalDetail = ({ isModalOpen, handleOk, handleCancel, timelineDetail, symb
             dataIndex: 'createdDate',
             key: 'createdDate',
             render: (createdDate) => {
-                return moment(createdDate)
-                    .format('DD/MM/YYYY HH:mm')
+                return createdDate
             }
         },
         {
             title: 'Người xác nhận',
             dataIndex: 'createdBy',
-            key: 'createdBy'
+            key: 'createdBy',
+            render: (createdBy) => {
+                return <span>
+                    {createdBy?.substring(createdBy.indexOf("_") + 1)} <br />
+                    {createdBy?.substring(0, createdBy.indexOf("_"))}
+                </span>
+            }
         },
         {
             title: 'Ghi chú',
@@ -64,6 +70,7 @@ const ModalDetail = ({ isModalOpen, handleOk, handleCancel, timelineDetail, symb
                 onCancel={handleCancel}
                 footer={null}
                 className={styles.w}
+                title={"Ghi chú hóa đơn"}
             >
                 <Table
                     columns={columns}

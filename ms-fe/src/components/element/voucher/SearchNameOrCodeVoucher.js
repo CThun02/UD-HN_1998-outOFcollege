@@ -28,7 +28,7 @@ function SearchNameOrCodeVoucher({ username, priceBill, setVoucher, voucher }) {
           condition,
           {
             headers: {
-              Authorization: `Bearer ${getToken()}`,
+              Authorization: `Bearer ${getToken(true)}`,
             },
           }
         );

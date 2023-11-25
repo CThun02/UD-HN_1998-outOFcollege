@@ -1,5 +1,7 @@
 package com.fpoly.ooc.controller;
 
+import com.fpoly.ooc.entity.Bill;
+import com.fpoly.ooc.repository.BillRepo;
 import com.fpoly.ooc.request.timeline.TimeLinerequest;
 import com.fpoly.ooc.service.interfaces.TimeLineService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,9 @@ public class TimelineController {
     @Autowired
     private TimeLineService timeLineService;
 
+    @Autowired
+    private BillRepo billRepo;
+
     @GetMapping("/{id}/info")
     public ResponseEntity<?> getBillInfoByBillId(@PathVariable("id") Long id) {
         return ResponseEntity.ok(timeLineService.getBillInfoByBillId(id));
@@ -39,8 +44,14 @@ public class TimelineController {
     public ResponseEntity<?> createTimelineByBillId(
             @PathVariable("id") Long id,
             @RequestBody(required = false) TimeLinerequest request) {
+        Bill bill;
+        bill = billRepo.findById(id).orElse(null);
+        if (bill != null) {
+            bill.setCreatedBy(request.getCreatedBy());
+            billRepo.saveAndFlush(bill);
+        }
+
         return ResponseEntity.ok(timeLineService.createTimeLine(id, request));
     }
-
 
 }

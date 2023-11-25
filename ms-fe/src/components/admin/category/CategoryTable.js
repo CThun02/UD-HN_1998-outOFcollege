@@ -47,7 +47,7 @@ const CategoryTable = function (props) {
         },
         {
           headers: {
-            Authorization: `Bearer ${getToken()}`,
+            Authorization: `Bearer ${getToken(true)}`,
           },
         }
       )
@@ -82,7 +82,7 @@ const CategoryTable = function (props) {
         },
         {
           headers: {
-            Authorization: `Bearer ${getToken()}`,
+            Authorization: `Bearer ${getToken(true)}`,
           },
         }
       )
@@ -118,7 +118,7 @@ const CategoryTable = function (props) {
         `http://localhost:8080/api/admin/category/delete/${selectedData}`,
         {
           headers: {
-            Authorization: `Bearer ${getToken()}`,
+            Authorization: `Bearer ${getToken(true)}`,
           },
         }
       )

@@ -19,7 +19,10 @@ import com.fpoly.ooc.responce.product.ProductDetailDisplayResponse;
 import com.fpoly.ooc.responce.product.ProductDetailResponse;
 import com.fpoly.ooc.responce.product.ProductDetailSellResponse;
 import com.fpoly.ooc.responce.product.ProductImageResponse;
+import com.fpoly.ooc.responce.timeline.TimelineProductDisplayResponse;
+import com.fpoly.ooc.responce.timeline.TimelineProductResponse;
 import com.fpoly.ooc.service.interfaces.BillService;
+import com.fpoly.ooc.service.interfaces.DeliveryNoteService;
 import com.fpoly.ooc.service.interfaces.ProductDetailServiceI;
 import com.fpoly.ooc.service.interfaces.ProductImageServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +33,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -62,6 +66,9 @@ public class BillServiceImpl implements BillService {
     @Autowired
     private ProductDetailServiceI productDetailService;
 
+    @Autowired
+    private DeliveryNoteService deliveryNoteService;
+
     @Transactional
     @Override
     public Bill createBill(BillRequest request) {
@@ -82,7 +89,6 @@ public class BillServiceImpl implements BillService {
                 .note(request.getNote())
                 .billCode(request.getBillCode())
                 .completionDate(LocalDateTime.now())
-                .createdBy(request.getCreatedBy())
                 .build();
 
         bill.setStatus(request.getStatus());
@@ -136,10 +142,11 @@ public class BillServiceImpl implements BillService {
             LocalDateTime startDate,
             LocalDateTime endDate,
             String status,
-            String billType,
-            String symbol) {
+            String symbol,
+            Integer count,
+            String createdBy) {
         return billRepo.getAllBillManagement(billCode,
-                startDate, endDate, status, billType, symbol);
+                startDate, endDate, status, symbol, count, createdBy);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -177,7 +184,8 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
-    public BillRevenueDisplay getBillRevenue(Integer day, Integer month, Integer year) {;
+    public BillRevenueDisplay getBillRevenue(Integer day, Integer month, Integer year) {
+        ;
         BillRevenue revenue = billRepo.getBillRevenue(day, month, year);
         BillRevenueDisplay billRevenueDisplay = new BillRevenueDisplay(revenue);
         List<ProductDetailSellResponse> productDetailDisplayResponses = this.getProductInBillByStatusAndId(null, day, month, year);
@@ -229,23 +237,23 @@ public class BillServiceImpl implements BillService {
             listYear.add(i);
         }
         for (int i = 0; i < listYear.size(); i++) {
-            if(monthFrom == null && monthTo ==null){
-                addDataLineChart(listYear.get(i), null, null, "y"+listYear.get(i), data);
-            }else{
-                int monthStart = listYear.size()==1?monthFrom: i==0?monthFrom: 1;
-                int monthEnd = listYear.size()==1?monthTo: i==listYear.size()-1?monthTo:12;
-                if(dayFrom == null && dayTo ==null){
+            if (monthFrom == null && monthTo == null) {
+                addDataLineChart(listYear.get(i), null, null, "y" + listYear.get(i), data);
+            } else {
+                int monthStart = listYear.size() == 1 ? monthFrom : i == 0 ? monthFrom : 1;
+                int monthEnd = listYear.size() == 1 ? monthTo : i == listYear.size() - 1 ? monthTo : 12;
+                if (dayFrom == null && dayTo == null) {
                     for (int j = monthStart; j <= monthEnd; j++) {
-                        addDataLineChart(listYear.get(i), j, null, "m"+j+"-y"+listYear.get(i), data);
+                        addDataLineChart(listYear.get(i), j, null, "m" + j + "-y" + listYear.get(i), data);
                     }
-                }else{
+                } else {
                     for (int j = monthStart; j <= monthEnd; j++) {
                         Calendar calendar = Calendar.getInstance();
                         calendar.set(listYear.get(i), j - 1, 1);
-                        int dayEnd = j==monthEnd?dayTo: i == 0 ? dayTo:calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
-                        int dayStart = listYear.size()==1?dayFrom: i == 0? dayFrom : 1;
+                        int dayEnd = j == monthEnd ? dayTo : i == 0 ? dayTo : calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+                        int dayStart = listYear.size() == 1 ? dayFrom : i == 0 ? dayFrom : 1;
                         for (int k = dayStart; k <= dayEnd; k++) {
-                            addDataLineChart(listYear.get(i), j, k, "d"+k+"-m"+j+"-y"+listYear.get(i), data);
+                            addDataLineChart(listYear.get(i), j, k, "d" + k + "-m" + j + "-y" + listYear.get(i), data);
                         }
                     }
                 }
@@ -254,14 +262,14 @@ public class BillServiceImpl implements BillService {
         return data;
     }
 
-    private void addDataLineChart(Integer year, Integer month, Integer day, String time, List <BillLineChartResponse> data){
+    private void addDataLineChart(Integer year, Integer month, Integer day, String time, List<BillLineChartResponse> data) {
         String type = "Tại quầy";
         Double revenue = billRepo.getRevenueByTime(day, month, year, "In-Store") == null ? 0 :
                 billRepo.getRevenueByTime(day, month, year, "In-Store");
         BillLineChartResponse billRevenue = new BillLineChartResponse(type, time, revenue);
         data.add(billRevenue);
         String typeOnline = "Trực tuyến";
-        Double revenueOnline  = billRepo.getRevenueByTime(day, month, year, "Online") == null ? 0 :
+        Double revenueOnline = billRepo.getRevenueByTime(day, month, year, "Online") == null ? 0 :
                 billRepo.getRevenueByTime(day, month, year, "Online");
         BillLineChartResponse billRevenueOnline = new BillLineChartResponse(typeOnline, time, revenueOnline);
         data.add(billRevenueOnline);
@@ -283,5 +291,62 @@ public class BillServiceImpl implements BillService {
     @Override
     public List<BillReturnRequestResponse> getReturnRequestByStatus(String status) {
         return billRepo.getReturnRequestByStatus(status);
+    }
+
+    @Override
+    public BillGrowthResponse getGrowthStoreByTime(String time) {
+        Double revenue = 0.0;
+        Double revenueBefore = 0.0;
+        LocalDate now = LocalDate.now();
+        if (time.equals("date")) {
+            LocalDate before = now.minusDays(1);
+            revenue = billRepo.getRevenueByTime(now.getDayOfMonth(), now.getMonthValue(), now.getYear(), null);
+            revenueBefore = billRepo.getRevenueByTime(before.getDayOfMonth(), before.getMonthValue(), before.getYear(), null);
+        } else if (time.equals("month")) {
+            LocalDate before = now.minusMonths(1);
+            revenue = billRepo.getRevenueByTime(null, now.getMonthValue(), now.getYear(), null);
+            revenueBefore = billRepo.getRevenueByTime(null, before.getMonthValue(), before.getYear(), null);
+        } else if (time.equals("year")) {
+            LocalDate before = now.minusYears(1);
+            revenue = billRepo.getRevenueByTime(null, null, now.getYear(), null);
+            revenueBefore = billRepo.getRevenueByTime(null, null, before.getYear(), null);
+        }
+        revenue = revenue == null ? 0.0 : revenue;
+        revenueBefore = revenueBefore == null ? 0.0 : revenueBefore;
+        double growth = ((revenue - revenueBefore) / (revenueBefore < 1 ? 1 : revenueBefore)) * 100;
+        BillGrowthResponse response = new BillGrowthResponse(BigDecimal.valueOf(revenue), (float) growth);
+        return response;
+    }
+
+    @Override
+    public BillResponse getBillByBillCode(String billCode) {
+        return billRepo.getBillByBillCode(billCode);
+    }
+
+    @Override
+    public BillReturnResponse getBillReturnByBillCode(String billCode) {
+        List<TimelineProductDisplayResponse> lstProduct = new ArrayList<>();
+        BillResponse billResponse = billRepo.getBillByBillCode(billCode);
+        BillReturnResponse billReturnResponse = new BillReturnResponse(billResponse);
+        billReturnResponse.setTimeLines(timeLineRepo.getTimeLineByBillId(billResponse.getId()));
+        List<TimelineProductResponse> timelineProductResponses = timeLineRepo.getTimelineProductByBillId(billReturnResponse.getId());
+        for (int i = 0; i < timelineProductResponses.size(); i++) {
+            TimelineProductDisplayResponse productDisplayResponse = new TimelineProductDisplayResponse(timelineProductResponses.get(i));
+            productDisplayResponse.setProductImageResponses(productImageService.getProductImageByProductDetailId(productDisplayResponse.getProductDetailId()));
+            lstProduct.add(productDisplayResponse);
+        }
+        if(billReturnResponse.getSymbol().equals("Shipping")){
+            DeliveryNote deliveryNote = deliveryNoteService.getDeliveryNoteByBill_Id(billResponse.getId());
+            Address address = deliveryNote.getAddress();
+            billReturnResponse.setAddress(address.getDescriptionDetail()+" "+
+                    address.getWard().substring(0, address.getWard().indexOf("|"))+" "+
+                    address.getDistrict().substring(0, address.getDistrict().indexOf("|")) +" "+
+                    address.getCity().substring(0, address.getCity().indexOf("|")));
+            billReturnResponse.setPhoneNumber(deliveryNote.getPhoneNumber());
+            billReturnResponse.setFullName(deliveryNote.getName());
+            billReturnResponse.setShippingDate(deliveryNote.getShipDate());
+        }
+        billReturnResponse.setBillDetails(lstProduct);
+        return billReturnResponse;
     }
 }

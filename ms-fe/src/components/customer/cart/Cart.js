@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import styles from './Cart.module.css'
-import { Button, Col, InputNumber, Row, Table, notification } from 'antd'
+import { Badge, Button, Carousel, Col, InputNumber, Row, Table, notification } from 'antd'
 import { CloseOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import numeral from 'numeral'
@@ -172,8 +172,40 @@ const Cart = (props) => {
                         <Row>
                             <Col span={4}>
                                 <div style={{}} className="m-5">
-                                    <img style={{ width: '100%', height: '100%' }}
-                                        src={record?.productImageResponse[0].path} alt="Áo Thun Teelab Local Brand Unisex Love Is In The Air TS199"></img>
+                                    <Badge.Ribbon
+                                        text={`Giảm ${record?.promotion[0].promotionValue
+                                            ? record?.promotion[0].promotionMethod ===
+                                                "%"
+                                                ? record.promotion[0].promotionValue +
+                                                " " +
+                                                record.promotion[0].promotionMethod
+                                                : record?.promotion[0].promotionValue.toLocaleString(
+                                                    "vi-VN",
+                                                    {
+                                                        style: "currency",
+                                                        currency: "VND",
+                                                    }
+                                                )
+                                            : null
+                                            }`}
+                                        color="red"
+                                    >
+                                        <Carousel style={{ maxWidth: "300px" }} autoplay>
+                                            {record.productImageResponse &&
+                                                record?.productImageResponse.map(
+                                                    (item) => {
+                                                        return (
+                                                            <img
+                                                                key={item.id}
+                                                                style={{ width: "100%", marginTop: "10px" }}
+                                                                alt=""
+                                                                src={item.path}
+                                                            />
+                                                        );
+                                                    }
+                                                )}
+                                        </Carousel>
+                                    </Badge.Ribbon>
                                 </div>
                             </Col>
                             <Col span={20}>
@@ -263,11 +295,48 @@ const Cart = (props) => {
             key: 'price_total',
             title: 'Thành tiền',
             render: (_, record) => {
-                return <div>
-                    {numeral(record.cartDetailResponse.quantity
-                        * record.cartDetailResponse.priceProductDetail)
-                        .format('0,0') + ' đ'}
-                </div>
+                { console.log(record) }
+                return (
+                    <div style={{ textAlign: "center" }}>
+                        {record.promotion.length !== 0 ? (
+                            <span style={{ color: "#ccc" }}>
+                                <strike>
+                                    {((record?.cartDetailResponse.priceProductDetail) * (record.cartDetailResponse.quantity))?.toLocaleString("vi-VN", {
+                                        style: "currency",
+                                        currency: "VND",
+                                    })}
+                                </strike>
+                            </span>
+                        ) : (
+                            <span>
+                                {(record?.cartDetailResponse.priceProductDetail * record.cartDetailResponse.quantity).toLocaleString("vi-VN", {
+                                    style: "currency",
+                                    currency: "VND",
+                                })}
+                            </span>
+                        )}
+                        <br />
+                        <span>
+                            {record.promotion.length !== 0
+                                ? record?.promotion[0]?.promotionMethod === "%"
+                                    ? (
+                                        ((record.cartDetailResponse.priceProductDetail *
+                                            (100 - Number(record?.promotion[0].promotionValue))) /
+                                            100) * record.cartDetailResponse.quantity
+                                    )?.toLocaleString("vi-VN", {
+                                        style: "currency",
+                                        currency: "VND",
+                                    })
+                                    : (
+                                        (record.cartDetailResponse.priceProductDetail - Number(record?.promotion[0].promotionValue)) * record.cartDetailResponse.quantity
+                                    )?.toLocaleString("vi-VN", {
+                                        style: "currency",
+                                        currency: "VND",
+                                    })
+                                : null}
+                        </span>
+                    </div>
+                );
             }
         },
         {
@@ -330,7 +399,10 @@ const Cart = (props) => {
             if (data) {
                 for (let i = 0; i < carts.length; i++) {
                     if (selectedKeys.includes(carts[i].cartDetailResponse.productDetailId)) {
-                        totalPrice += carts[i].cartDetailResponse.priceProductDetail * carts[i].cartDetailResponse.quantity;
+                        let priceReduced = (carts[i].promotion[0].promotionMethod === 'vnd' ?
+                            carts[i].promotion[0].promotionValue : ((100 - carts[i].promotion[0].value) / 100) * carts[i].cartDetailResponse.priceProductDetail) * carts[i].cartDetailResponse.quantity;
+                        console.log(priceReduced)
+                        totalPrice += carts[i].cartDetailResponse.priceProductDetail * carts[i].cartDetailResponse.quantity - priceReduced;
                     }
                 }
                 setTotalPrice(totalPrice);
@@ -384,52 +456,62 @@ const Cart = (props) => {
         onChange: onSelectChange,
     };
 
-    const getCartAPI = (username) => {
-        axios.get(`${cartAPI}`, {
+    const getCartAPI = async () => {
+        const data = await token;
+
+        await axios.get(`${cartAPI}`, {
             params: {
-                username: username
+                username: data?.username
             }
         }).then((response) => {
             setCarts(response.data)
+            try {
+                if (data) {
+                    const cart = {
+                        username: data?.username,
+                        lstCartDetail: [],
+                    };
+                    if (productDetails) {
+                        console.log(productDetails)
+                        for (let i = 0; i < productDetails.length; i++) {
+                            if (response.data.length === 0) {
+                                cart.lstCartDetail.push({
+                                    productDetailId: productDetails[i].data[0].id,
+                                    quantity: productDetails[i].quantity,
+                                });
+                            } else {
+                                for (let j = 0; j < response.data.length; j++) {
+                                    console.log(productDetails[i].data[0].id)
+                                    console.log(response.data[j].cartDetailResponse)
+                                    if (Number(productDetails[i].data[0].id) !== Number(response.data[j].cartDetailResponse.productDetailId)) {
+                                        cart.lstCartDetail.push({
+                                            productDetailId: productDetails[i].data[0].id,
+                                            quantity: productDetails[i].quantity,
+                                        });
+                                    }
+                                }
+                            }
+                        }
+                        localStorage.removeItem('user')
+                    }
+
+                    const res = axios.post(`${cartAPI}`, cart);
+                }
+
+
+                localStorage.removeItem('checkout');
+            } catch (error) {
+                console.log(error);
+            }
         }).catch((error) => {
             console.log(error)
         })
     }
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const data = await token;
-                if (data) {
-                    getCartAPI(data?.username);
-                    const cart = {
-                        username: data?.username,
-                        lstCartDetail: [],
-                    };
-
-                    if (productDetails) {
-                        for (let i = 0; i < productDetails.length; i++) {
-                            if (productDetails[i].data[0].id !==
-                                carts.cartDetailResponse.productDetailId) {
-                                cart.lstCartDetail.push({
-                                    productDetailId: productDetails[i].data[0].id,
-                                    quantity: productDetails[i].quantity,
-                                });
-                            }
-                        }
-                    }
-
-                    const response = await axios.post(`${cartAPI}`, cart);
-                    console.log(response.data);
-                }
-
-                localStorage.removeItem('checkout');
-            } catch (error) {
-                console.log(error);
-            }
-        };
         getAllCart();
-        fetchData();
+        getCartAPI()
+        console.log(carts)
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [render]);
 

@@ -59,7 +59,7 @@ const CustomerAddminIndex = function (props) {
   }
 
   useEffect(() => {
-    return () => filter("");
+    filter("");
   }, [roleId]);
 
   return (

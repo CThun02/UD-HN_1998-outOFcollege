@@ -51,7 +51,7 @@ function ProductInfo({
         existingData.timeStart = now();
         let productExists = false;
         for (let i = 0; i < existingData.productDetails?.length; i++) {
-          if (existingData.productDetails[i].data[0].id === productDetails[0].id) {
+          if (existingData?.productDetails[i].data[0].id === productDetails[0]?.id) {
             existingData.productDetails[i].quantity += quantity
             productExists = true;
             break;

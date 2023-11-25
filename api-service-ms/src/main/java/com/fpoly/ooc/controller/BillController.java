@@ -3,7 +3,11 @@ package com.fpoly.ooc.controller;
 import com.fpoly.ooc.dto.BillStatusDTO;
 import com.fpoly.ooc.request.bill.BillRequest;
 import com.fpoly.ooc.request.product.ProductDetailRequest;
+import com.fpoly.ooc.responce.bill.BillResponse;
 import com.fpoly.ooc.responce.bill.BillReturnRequestResponse;
+import com.fpoly.ooc.responce.timeline.TimelineProductDisplayResponse;
+import com.fpoly.ooc.responce.timeline.TimelineProductResponse;
+import com.fpoly.ooc.service.interfaces.BillDetailService;
 import com.fpoly.ooc.service.interfaces.BillService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -34,19 +38,28 @@ public class BillController {
     @Autowired
     private BillService billService;
 
+    @Autowired
+    private BillDetailService billDetailService;
+
     @GetMapping("")
     public ResponseEntity<?> getAllBillManagement(
             @RequestParam(value = "billCode", required = false) String billCode,
             @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Optional<LocalDate> startDate,
             @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Optional<LocalDate> endDate,
             @RequestParam(value = "status", required = false) String status,
-            @RequestParam(value = "billType", required = false) String billType,
-            @RequestParam(value = "symbol", required = false) String symbol) {
+            @RequestParam(value = "symbol", required = false) String symbol,
+            @RequestParam(value = "count", required = false) Optional<Integer> count,
+            @RequestParam(value = "createdBy", required = false) String createdBy) {
         LocalDateTime startDateTime = startDate.map(date -> LocalDateTime.of(date, LocalTime.MIN)).orElse(null);
         LocalDateTime endDateTime = endDate.map(date -> LocalDateTime.of(date, LocalTime.MAX)).orElse(null);
 
-        return ResponseEntity.ok(billService.getAllBillManagement(billCode, startDateTime, endDateTime,
-                status, billType, symbol));
+        return ResponseEntity.ok(billService.getAllBillManagement(billCode.trim().equals("") ? null : billCode,
+                startDateTime,
+                endDateTime,
+                status.trim().equals("") ? null : status,
+                symbol.trim().equals("") ? null : symbol,
+                count.orElse(null),
+                createdBy.trim().equals("") ? null : createdBy));
     }
 
     @GetMapping("/filterProductDetailSellByIdCom")
@@ -97,9 +110,9 @@ public class BillController {
 
     @GetMapping("/getGrossRevenue")
     public ResponseEntity<?> getGrossRevenue(
-                                             @RequestParam Optional<Integer> day,
-                                             @RequestParam Optional<Integer> month,
-                                             @RequestParam Optional<Integer> year) {
+            @RequestParam Optional<Integer> day,
+            @RequestParam Optional<Integer> month,
+            @RequestParam Optional<Integer> year) {
         return ResponseEntity.ok(billService.getBillRevenue(day.orElse(null), month.orElse(null), year.orElse(null)));
     }
 
@@ -111,7 +124,12 @@ public class BillController {
     ) {
         return ResponseEntity.ok(billService.getRevenueInStoreOnlineCompare(day.orElse(null),
                 month.orElse(null),
-                year.orElse(null) ));
+                year.orElse(null)));
+    }
+
+    @GetMapping("/getGrowthStoreByTime")
+    public ResponseEntity<?> getGrowthStoreByTime(@RequestParam String time) {
+        return ResponseEntity.ok(billService.getGrowthStoreByTime(time));
     }
 
     @GetMapping("/getBillProductSellTheMost")
@@ -131,6 +149,15 @@ public class BillController {
                                                 @RequestParam Optional<Integer> yearTo) {
         return ResponseEntity.ok(billService.compareRevenueDate(dayFrom.orElse(null), monthFrom.orElse(null),
                 yearFrom.orElse(null), dayTo.orElse(null), monthTo.orElse(null), yearTo.orElse(null)));
+    }
+
+    @GetMapping("/getBillByBillCode")
+    public ResponseEntity<?> getBillByBillCode(@RequestParam String billCode) {
+        return ResponseEntity.ok(billService.getBillByBillCode(billCode));
+    }
+    @GetMapping("/getBillReturnByBillCode")
+    public ResponseEntity<?> getBillReturnByBillCode(@RequestParam String billCode) {
+        return ResponseEntity.ok(billService.getBillReturnByBillCode(billCode));
     }
 
     @GetMapping("/getReturnRequestByStatus")
@@ -153,6 +180,14 @@ public class BillController {
     public ResponseEntity<?> updateBillStatus(@PathVariable("id") Long id,
                                               @RequestBody BillStatusDTO dto) {
         return ResponseEntity.ok(billService.updateBillStatus(dto, id));
+    }
+
+    @PutMapping("/billDetail/change-status")
+    public ResponseEntity<?> changeStatus(@RequestBody List<Long> request, @RequestParam String status) {
+        for (int i = 0; i < request.size(); i++) {
+            billDetailService.updateBill(request.get(i), status);
+        }
+        return null;
     }
 
 }

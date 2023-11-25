@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
 import styles from "./BillManagement.module.css";
-import { Button, Input, Select, Table, Tag, TreeSelect, notification } from "antd";
+import { Button, Input, Select, Table, Tabs, Tag, TreeSelect, notification } from "antd";
 import {
+  CheckCircleOutlined,
+  ClockCircleOutlined,
+  CloseCircleOutlined,
   EyeOutlined,
   FilterFilled,
   SearchOutlined,
@@ -21,8 +24,10 @@ const BillManagement = () => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [status, setStatus] = useState("");
+  const [symbol, setSymbol] = useState('')
   const [billType, setBillType] = useState("");
-  const [symbol, setSymbol] = useState("");
+  const [createdBy, setcreatedBy] = useState("");
+  const [count, setCount] = useState('');
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
 
@@ -77,8 +82,16 @@ const BillManagement = () => {
     },
     {
       title: "Tên nhân viên",
-      dataIndex: "employee",
+      // dataIndex: "employee",
       key: "employee",
+      render: (_, record) => {
+        return record.employee?.includes('_') ?
+          <span>
+            {record.employee?.substring(record.employee.indexOf("_") + 1)} <br />
+            {record.employee?.substring(0, record.employee.indexOf("_"))}
+          </span> :
+          record.status === 'Cancel' ? "Đã hủy" : "Chờ xác nhận";
+      }
     },
     {
       title: "Tên khách hàng",
@@ -136,11 +149,11 @@ const BillManagement = () => {
         let color =
           object === "Unpaid"
             ? "geekblue"
-            : object.toLocaleLowerCase() === "PAID".toLocaleLowerCase()
+            : object === "Paid"
               ? "green"
               : object === "Cancel"
                 ? "red"
-                : null;
+                : object === "Complete" ? "green" : null;
         return (
           <Space direction="vertical">
             <div style={{ width: "auto", display: "flex" }}>
@@ -149,7 +162,8 @@ const BillManagement = () => {
                   ? "Chưa thanh toán"
                   : object === "Cancel"
                     ? "Đã hủy"
-                    : "Đã thanh toán"}
+                    : object === "Complete" ? "Đã hoàn thành"
+                      : "Đã thanh toán"}
               </Tag>
             </div>
           </Space>
@@ -178,12 +192,13 @@ const BillManagement = () => {
       startDate: startDate,
       endDate: endDate,
       status: status,
-      billType: billType,
       symbol: symbol,
+      count: count,
+      createdBy: createdBy,
     };
     console.log(params);
     axios
-      .get(`http://localhost:8080/api/admin/bill?billCode=${billCode}&startDate=${startDate}&endDate=${endDate}&status=${status}&billType=${billType}&symbol=${symbol}`, {
+      .get(`http://localhost:8080/api/admin/bill?billCode=${billCode}&startDate=${startDate}&endDate=${endDate}&status=${status}&createdBy=${createdBy}&symbol=${symbol}&count=${count}`, {
         headers: {
           Authorization: `Bearer ${getToken(true)}`,
         },
@@ -234,16 +249,48 @@ const BillManagement = () => {
     setValue(newValue);
     if (newValue === "Shipping" || newValue === "Received") {
       setBillType("In-store");
-      setSymbol(newValue);
+      setcreatedBy(newValue);
     } else {
-      setSymbol("");
+      setcreatedBy("");
       setBillType(newValue);
     }
   };
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     fetchData();
-  }, [billCode, startDate, endDate, status, billType, symbol]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [billCode, startDate, endDate, status, createdBy, symbol, count]);
+
+  const onChangeBill = (e) => {
+    console.log(e)
+    if (e === '') {
+      setStatus('')
+      setcreatedBy('')
+      setSymbol('')
+      setCount('')
+    } else if (e === 'Client') {
+      setcreatedBy('CLIENT');
+      setStatus("")
+      setSymbol('')
+      setCount('')
+    } else if (e === 'Shipping') {
+      setStatus('')
+      setcreatedBy('')
+      setSymbol('Shipping')
+      setCount(3)
+    } else if (e === 'Confirmed') {
+      setStatus('')
+      setcreatedBy('')
+      setSymbol('Shipping')
+      setCount(2)
+    } else {
+      setStatus(e);
+      setcreatedBy("")
+      setSymbol('')
+      setCount('')
+    }
+  }
 
   return (
     <div>
@@ -277,18 +324,6 @@ const BillManagement = () => {
           </span>
           <span style={{ fontWeight: 500 }}>
             Loại hóa đơn
-            {/* <Select
-                            style={{ width: '12%', borderBottom: '1px solid #ccc' }}
-                            onChange={(e) => {
-                                setBillType(e);
-                            }}
-                            bordered={false}
-                            defaultValue={''}
-                        >
-                            <Select.Option value={''}>Tất cả</Select.Option>
-                            <Select.Option value={'In-store'}>Tại quầy</Select.Option>
-                            <Select.Option value={'Online'}>Online</Select.Option>
-                        </Select> */}
             <TreeSelect
               showSearch
               style={{
@@ -326,22 +361,71 @@ const BillManagement = () => {
         <h2 style={{ marginBottom: "10px" }}>
           <TableOutlined /> Danh sách hóa đơn
         </h2>
-        <Table
-          dataSource={data}
-          columns={columns}
-          loading={loading}
-          loadingIndicator={<div>Loading...</div>}
-          pagination={{
-            showSizeChanger: true,
-            pageSizeOptions: [5, 10, 15, 20],
-            defaultPageSize: 5,
-            showLessItems: true,
-            style: { marginRight: "10px" },
-            onChange: (currentPage, pageSize) => {
-              setCurrentPage(currentPage);
-              setPageSize(pageSize);
-            },
-          }}
+        <Tabs
+          defaultActiveKey={status}
+          onChange={(e) => onChangeBill(e)
+          }
+          items={[
+            CheckCircleOutlined,
+            CloseCircleOutlined,
+            ClockCircleOutlined,
+            ClockCircleOutlined,
+            ClockCircleOutlined,
+            ClockCircleOutlined,
+            ClockCircleOutlined,
+            ClockCircleOutlined,
+          ].map((Icon, i) => {
+            const id = String(i + 1);
+            return {
+              label: (
+                <span>
+                  <Icon />
+                  {id === "1" ? "Tất cả"
+                    : id === "2" ? "Chờ xác nhận"
+                      : id === '3' ? "Đã xác nhận"
+                        : id === "4" ? "Đang giao"
+                          : id === "5" ? "Đã hoàn thành"
+                            : id === "6" ? "Đã hủy"
+                              : id === '7' ? "Đã thanh toán"
+                                : id === "8" ? "Chưa thanh toán" : ""}
+
+                </span>
+              ),
+              key: id === "1" ? ""
+                : id === "2" ? "Client"
+                  : id === '3' ? "Confirmed"
+                    : id === "4" ? "Shipping"
+                      : id === "5" ? "Complete"
+                        : id === "6" ? "Cancel"
+                          : id === "7" ? "Paid"
+                            : id === "8" ? "Unpaid" : '',
+              children: (
+                <div style={{ padding: "8px" }}>
+                  <span style={{ fontWeight: 500 }}>
+                    <TableOutlined /> Danh sách yêu cầu
+                  </span>
+                  <Table
+                    style={{ marginTop: "10px" }}
+                    dataSource={data}
+                    columns={columns}
+                    loading={loading}
+                    loadingIndicator={<div>Loading...</div>}
+                    pagination={{
+                      showSizeChanger: true,
+                      pageSizeOptions: [5, 10, 15, 20],
+                      defaultPageSize: 5,
+                      showLessItems: true,
+                      style: { marginRight: "10px" },
+                      onChange: (currentPage, pageSize) => {
+                        setCurrentPage(currentPage);
+                        setPageSize(pageSize);
+                      },
+                    }}
+                  />
+                </div>
+              ),
+            };
+          })}
         />
       </section>
     </div>

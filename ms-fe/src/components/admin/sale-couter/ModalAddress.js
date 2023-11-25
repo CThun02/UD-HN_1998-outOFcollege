@@ -14,8 +14,8 @@ const ModalAddress = ({
   handleCancel,
   render,
   selectedAddress,
+  username
 }) => {
-  const token = getAuthToken()
   const [renderAddress, setRenderAddress] = useState(null)
   const [address, setAddress] = useState([])
   const [currentPage, setCurrentPage] = useState(1);
@@ -89,9 +89,8 @@ const ModalAddress = ({
   };
 
   const getAddress = async () => {
-    const data = await token;
-    if (data) {
-      await axios.get(`http://localhost:8080/api/client/address?username=${data?.username}`)
+    if (username) {
+      await axios.get(`http://localhost:8080/api/client/address?username=${username}`)
         .then((response) => {
           setAddress(response.data)
         }).catch((error) => {
@@ -108,7 +107,7 @@ const ModalAddress = ({
 
   useEffect(() => {
     getAddress();
-  }, [renderAddress])
+  }, [renderAddress, username])
 
   return (
     <div>
@@ -142,6 +141,7 @@ const ModalAddress = ({
               handleAddressOk={handleAddressOk}
               handleAddressCancel={handleAddressCancel}
               render={setRenderAddress}
+              username={username}
             />
           </Col>
           <Col span={24}>

@@ -1232,7 +1232,7 @@ const ProductCreateDetails = () => {
                             }
                             onChange={(index) => {
                               setProduct(
-                                productList?.filter((item) => item.id === index)
+                                productList?.find((item) => item.id === index)
                               );
                               handleSetProductDetail("productId", index);
                             }}

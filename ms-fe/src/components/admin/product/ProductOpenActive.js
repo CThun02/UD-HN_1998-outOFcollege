@@ -17,12 +17,13 @@ const ProductOpenActive = ({ product, onCancel, open, render }) => {
     axios
       .put(
         api +
-        "product/updateProductStatus?productId=" +
-        product.id +
-        "&status=" +
-        (activeProduct === true ? "ACTIVE" : "INACTIVE") +
-        "&openAll=" +
-        openAll,
+          "product/updateProductStatus?productId=" +
+          product.id +
+          "&status=" +
+          (activeProduct === true ? "ACTIVE" : "INACTIVE") +
+          "&openAll=" +
+          openAll,
+        null,
         {
           headers: {
             Authorization: `Bearer ${getToken(true)}`,
@@ -49,16 +50,9 @@ const ProductOpenActive = ({ product, onCancel, open, render }) => {
       });
   }
   return (
-    <Modal
-      footer={null}
-      onCancel={() => {
-        navigate("/api/admin/product");
-      }}
-      centered
-      open={open}
-    >
+    <Modal footer={null} onCancel={onCancel} centered open={open}>
       {contextHolder}
-      <h6>Sản phẩm đang tạm ngưng kinh doanh</h6>
+      <h6> Sản phẩm đang tạm ngưng kinh doanh</h6>
       <p>Vui lòng mở kinh doanh ở bên dưới!</p>
       <div
         style={{

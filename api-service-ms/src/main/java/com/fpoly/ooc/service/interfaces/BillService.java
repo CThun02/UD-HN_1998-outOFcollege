@@ -3,6 +3,7 @@ package com.fpoly.ooc.service.interfaces;
 import com.fpoly.ooc.dto.BillStatusDTO;
 import com.fpoly.ooc.entity.Address;
 import com.fpoly.ooc.entity.Bill;
+import com.fpoly.ooc.entity.BillDetail;
 import com.fpoly.ooc.request.bill.BillRequest;
 import com.fpoly.ooc.request.product.ProductDetailRequest;
 import com.fpoly.ooc.responce.bill.*;
@@ -24,8 +25,9 @@ public interface BillService {
             LocalDateTime startDate,
             LocalDateTime endDate,
             String status,
-            String billType,
-            String symbol);
+            String symbol,
+            Integer count,
+            String createdBy);
 
     void deleteBill(Long id);
 
@@ -52,5 +54,11 @@ public interface BillService {
     List<ProductDetailSellResponse> getProductDetailSellInStore(ProductDetailRequest request, BigDecimal minPrice, BigDecimal maxPrice);
 
     List<BillReturnRequestResponse> getReturnRequestByStatus(String status);
+
+    BillGrowthResponse getGrowthStoreByTime(String time);
+
+    BillResponse getBillByBillCode(String billCode);
+
+    BillReturnResponse getBillReturnByBillCode(String billCode);
 
 }

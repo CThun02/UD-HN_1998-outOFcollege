@@ -25,4 +25,6 @@ public class BillDetailRequest {
 
     private String note;
 
+    private String status;
+
 }

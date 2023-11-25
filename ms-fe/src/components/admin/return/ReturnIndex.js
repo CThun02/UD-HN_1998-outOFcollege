@@ -4,11 +4,10 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import styles from "./ReturnIndex.module.css";
 import { getToken } from "../../../service/Token";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { QrcodeOutlined, SearchOutlined } from "@ant-design/icons";
 import logoOOC from "../../../Assets/img/logo/logo_OOC.svg";
 import QRReader from "../../../service/QRReader";
-import dayjs from "dayjs";
 
 const ReturnIndex = () => {
   const api = "http://localhost:8080/api/admin/bill";

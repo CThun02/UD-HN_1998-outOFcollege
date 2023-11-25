@@ -1650,6 +1650,7 @@ const ProductDetails = (props) => {
         description: "Vui lòng không để trống các trường",
       });
       setRender(Math.random());
+      setLoadingUpdateProduct(false);
     } else {
       axios
         .put(api + "product/updateProductDetail", productDetailUpdateCopy, {
@@ -1676,6 +1677,7 @@ const ProductDetails = (props) => {
           }
         })
         .catch((err) => {
+          setLoadingUpdateProduct(false);
           const status = err.response.status;
           if (status === 403) {
             notification.error({

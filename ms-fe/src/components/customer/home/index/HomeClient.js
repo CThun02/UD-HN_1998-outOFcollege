@@ -10,6 +10,7 @@ import { ArrowUpOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { NotificationContext } from "../../../element/notification/NotificationAuthen";
+import SockJs from "../../../../service/SockJs";
 
 const baseUrl = "http://localhost:8080/api/client/product";
 
@@ -80,6 +81,11 @@ function HomeClient() {
   }
   return (
     <div style={{ backgroundColor: "#fff" }}>
+      <SockJs
+        setValues={setBestSellings}
+        connectTo={"bestSellingProduct-topic"}
+      />
+      <SockJs setValues={setNewProducts} connectTo={"newProduct-topic"} />
       {contextHolder}
       <Slider />
       <Banner />

@@ -1,4 +1,4 @@
-import { Badge, Button, Card, Col, Rate, Row, Space } from "antd";
+import { Badge, Button, Card, Rate, Row, Space } from "antd";
 import styles from "./ProductsList.module.css";
 import numeral from "numeral";
 import { Link } from "react-router-dom";
@@ -23,26 +23,26 @@ function ProductsList({ data, span }) {
     ? data.promotionMethod === "vnd"
       ? "vnd"
       : data.promotionMethod === "%"
-        ? "%"
-        : null
+      ? "%"
+      : null
     : null;
 
   const price =
     isMethod === "vnd"
       ? data.priceProduct - data.promotionReduce
       : isMethod === "%"
-        ? data.priceProduct - data.priceProduct * (data.promotionReduce / 100)
-        : null;
+      ? data.priceProduct - data.priceProduct * (data.promotionReduce / 100)
+      : null;
   return (
-    <Col span={span} className={`${styles.centerd} ${styles.marginBottom}`}>
+    <div className={`${styles.centerd} ${styles.marginBottom}`}>
       <Badge.Ribbon
         text={
           isMethod && price
             ? isMethod === "vnd"
               ? numeral(data.promotionReduce).format("0,0") + "đ"
               : isMethod === "%"
-                ? data.promotionReduce + "%"
-                : null
+              ? data.promotionReduce + "%"
+              : null
             : null
         }
         color="#FF9130"
@@ -58,8 +58,9 @@ function ProductsList({ data, span }) {
             style={{ width: "270px", border: "none" }}
             cover={
               <div
-                className={`${styles.position} ${data?.productImages[0]?.path ? "" : styles.fixed
-                  }`}
+                className={`${styles.position} ${
+                  data?.productImages[0]?.path ? "" : styles.fixed
+                }`}
                 onMouseLeave={() => handleMouseOut(false)}
                 onMouseEnter={() => handleMouseIn(true)}
               >
@@ -70,8 +71,9 @@ function ProductsList({ data, span }) {
                   className={`${styles.cssHover} ${styles.imageSize} `}
                 />
                 <div
-                  className={`${styles.transition} ${active ? styles.absolute : styles.hidden
-                    }`}
+                  className={`${styles.transition} ${
+                    active ? styles.absolute : styles.hidden
+                  }`}
                   onMouseEnter={() => handleMouseIn(true)}
                 >
                   <div
@@ -139,7 +141,7 @@ function ProductsList({ data, span }) {
           </Card>
         </Link>
       </Badge.Ribbon>
-    </Col>
+    </div>
   );
 }
 

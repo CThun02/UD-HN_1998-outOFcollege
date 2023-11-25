@@ -1,5 +1,6 @@
 package com.fpoly.ooc.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.entity.SleeveType;
 import com.fpoly.ooc.request.sleevetype.SleeveTypeRequest;
 import com.fpoly.ooc.service.interfaces.SleeveServiceI;
@@ -22,7 +23,7 @@ public class SleeveController {
     }
 
     @PostMapping("create")
-    public ResponseEntity<?> create(@RequestBody SleeveType sleeveType) {
+    public ResponseEntity<?> create(@RequestBody SleeveType sleeveType) throws JsonProcessingException {
         return ResponseEntity.ok(service.create(sleeveType));
     }
 

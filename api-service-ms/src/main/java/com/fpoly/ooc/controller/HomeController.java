@@ -32,7 +32,6 @@ public class HomeController {
 
     @GetMapping("/best-selling")
     public ResponseEntity<?> getBestSellingProduct() {
-        System.out.println("best");
         return ResponseEntity.ok(productDetailService.getProductDetailBestSelling());
     }
 
@@ -43,15 +42,10 @@ public class HomeController {
 
     @PostMapping("/product-shop")
     public ResponseEntity<?> findAllProductDetailShop(
-            @RequestParam(value = "pageNo", defaultValue = "0") int pageNo,
-            @RequestParam(value = "pageSize", defaultValue = "12") int pageSize,
             @RequestBody ProductDetailCondition req
     ) {
 
-        return ResponseEntity.ok(
-                productDetailService.getAllProductDetailShop(
-                        req, PageRequest.of(pageNo, pageSize))
-        );
+        return ResponseEntity.ok(productDetailService.getAllProductDetailShop(req));
     }
 
     @GetMapping("/get-price-max")

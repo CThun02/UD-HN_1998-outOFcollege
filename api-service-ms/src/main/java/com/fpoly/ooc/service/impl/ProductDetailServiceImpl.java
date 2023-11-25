@@ -1,5 +1,6 @@
 package com.fpoly.ooc.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.common.Commons;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
@@ -21,6 +22,7 @@ import com.fpoly.ooc.service.interfaces.ColorServiceI;
 import com.fpoly.ooc.service.interfaces.ProductDetailServiceI;
 import com.fpoly.ooc.service.interfaces.ProductImageServiceI;
 import com.fpoly.ooc.service.interfaces.SizeServiceI;
+import com.fpoly.ooc.service.kafka.KafkaUtil;
 import com.fpoly.ooc.util.PageUltil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -41,26 +43,28 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
     private ProductImageServiceI productImageService;
     private ColorServiceI colorServiceI;
     private SizeServiceI sizeServiceI;
+    private KafkaUtil kafkaUtil;
 
     @Autowired
     public ProductDetailServiceImpl(ProductDetailDAORepositoryI repo, ProductImageServiceI productImageService,
-                                    ColorServiceI colorServiceI, SizeServiceI sizeServiceI) {
+                                    ColorServiceI colorServiceI, SizeServiceI sizeServiceI, KafkaUtil kafkaUtil) {
         this.repo = repo;
         this.productImageService = productImageService;
         this.colorServiceI = colorServiceI;
         this.sizeServiceI = sizeServiceI;
+        this.kafkaUtil = kafkaUtil;
     }
 
     @Override
-    public ProductDetail create(ProductDetail productDetail) {
-        return repo.save(productDetail);
+    public ProductDetail create(ProductDetail productDetail) throws JsonProcessingException {
+        return kafkaUtil.sendingObjectWithKafka(productDetail, Const.TOPIC_PRODUCT_DETAIL);
     }
 
     @Override
-    public ProductDetail update(ProductDetail productDetail) {
+    public ProductDetail update(ProductDetail productDetail) throws JsonProcessingException {
         ProductDetail productDetailtCheck = this.getOne(productDetail.getId());
         if (productDetailtCheck != null) {
-            productDetailtCheck = repo.save(productDetail);
+            productDetailtCheck = kafkaUtil.sendingObjectWithKafka(productDetail, Const.TOPIC_PRODUCT_DETAIL);
         }
         return productDetailtCheck;
     }
@@ -142,7 +146,7 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
     }
 
     @Override
-    public Optional<Page<ProductDetailShop>> getAllProductDetailShop(ProductDetailCondition req, Pageable pageable) {
+    public Optional<List<ProductDetailShop>> getAllProductDetailShop(ProductDetailCondition req) {
 
         String cateStr = "";
         String brandStr = "";
@@ -178,9 +182,7 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
                 req.getProductName(), req.getMinPrice(), req.getMaxPrice(), cateStr, brandStr, colorStr, sizeStr,
                 req.getCategories(), req.getBrands(), req.getColors(), req.getSizes(), sort
         ));
-        return Optional.of(
-                (Page<ProductDetailShop>) PageUltil.page(result, pageable)
-        );
+        return Optional.of(result);
     }
 
     @Override

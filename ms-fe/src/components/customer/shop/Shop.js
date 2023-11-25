@@ -1,4 +1,4 @@
-import { Col, Divider, Pagination, Row, Spin } from "antd";
+import { Col, Divider, List, Row, Spin } from "antd";
 import styles from "./Shop.module.css";
 import FilterShop from "./filter-shop/FilterShop";
 import ProductsList from "../../element/product-cart/ProductsList";
@@ -7,6 +7,7 @@ import BreadCrumb from "../../element/bread-crumb/BreadCrumb";
 import { Link } from "react-router-dom";
 import SortAndResultSearch from "./sort-and-result/SortAndResultSearch";
 import axios from "axios";
+import SockJs from "../../../service/SockJs";
 
 const items = [
   {
@@ -37,7 +38,6 @@ function Shop() {
   //page
   const [pageNo, setPageNo] = useState(1);
   const [pageSize, setPageSize] = useState(12);
-  const [totalElements, setTotalElements] = useState(-1);
 
   //loading
   const [isLoading, setIsLoading] = useState(false);
@@ -46,18 +46,10 @@ function Shop() {
     setIsLoading(true);
     async function getProducts() {
       try {
-        const res = await axios.post(
-          baseUrl +
-          "/product-shop?pageNo=" +
-          (pageNo - 1) +
-          "&pageSize=" +
-          pageSize,
-          filter
-        );
+        const res = await axios.post(baseUrl + "/product-shop", filter);
         const data = await res.data;
 
-        setProducts(data.content);
-        setTotalElements(data.totalElements);
+        setProducts(data);
         setIsLoading(false);
       } catch (err) {
         console.log(err);
@@ -67,6 +59,11 @@ function Shop() {
     getProducts();
   }, [pageNo, pageSize, filter]);
 
+  function handlePageSize(current, size) {
+    setPageNo(current);
+    setPageSize(size);
+  }
+
   return (
     <Spin
       tip="Loading..."
@@ -74,6 +71,7 @@ function Shop() {
       size="large"
       style={{ width: "100%" }}
     >
+      <SockJs setValues={setProducts} connectTo={"productDetailShop-topic"} />
       <div className={styles.shop}>
         <div className={styles.breadCrumb}>
           <BreadCrumb title={"Shop"} items={items} />
@@ -96,22 +94,26 @@ function Shop() {
                   products={products}
                 />
                 <Row>
-                  {products.map((product) => (
-                    <ProductsList
-                      span={8}
-                      key={product.productDetailId}
-                      data={product}
-                    />
-                  ))}
+                  <List
+                    grid={{ gutter: 16, column: 3 }}
+                    dataSource={products}
+                    renderItem={(item) => (
+                      <List.Item>
+                        <ProductsList data={item} key={item.productDetailId} />
+                      </List.Item>
+                    )}
+                    pagination={{
+                      showSizeChanger: true,
+                      pageSizeOptions: [9, 12, 15, 18],
+                      pageSize: pageSize,
+                      showLessItems: true,
+                      style: { marginRight: "10px" },
+                      onChange: (currentPage, pageSize) => {
+                        handlePageSize(currentPage, pageSize);
+                      },
+                    }}
+                  />
                 </Row>
-                <Pagination
-                  current={pageNo}
-                  pageSize={pageSize}
-                  pageSizeOptions={[9, 12, 15, 18]}
-                  total={totalElements}
-                  onChange={(e) => setPageNo(e)}
-                  onShowSizeChange={(e, v) => setPageSize(v)}
-                />
               </Col>
             </Row>
           </div>

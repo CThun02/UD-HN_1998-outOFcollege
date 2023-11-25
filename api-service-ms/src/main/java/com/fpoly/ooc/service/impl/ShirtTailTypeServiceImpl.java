@@ -1,5 +1,6 @@
 package com.fpoly.ooc.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
 import com.fpoly.ooc.entity.ShirtTailType;
@@ -7,6 +8,7 @@ import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.ShirtTailTypeDAORepository;
 import com.fpoly.ooc.request.shirttailtype.ShirtTailTypeRequest;
 import com.fpoly.ooc.service.interfaces.ShirtTailTypeServiceI;
+import com.fpoly.ooc.service.kafka.KafkaUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,12 +19,14 @@ import java.util.Optional;
 public class ShirtTailTypeServiceImpl implements ShirtTailTypeServiceI {
     @Autowired
     private ShirtTailTypeDAORepository repo;
+    @Autowired
+    private KafkaUtil kafkaUtil;
 
     @Override
-    public ShirtTailType create(ShirtTailType shirtTailType) {
+    public ShirtTailType create(ShirtTailType shirtTailType) throws JsonProcessingException {
         ShirtTailType check = repo.findFirstByShirtTailTypeName(shirtTailType.getShirtTailTypeName());
         if(check==null){
-            return repo.save(shirtTailType);
+            return kafkaUtil.sendingObjectWithKafka(shirtTailType, Const.TOPIC_SHIRT_TAILS);
         }
         return null;
     }
@@ -34,7 +38,11 @@ public class ShirtTailTypeServiceImpl implements ShirtTailTypeServiceI {
         return optional.map(o -> {
             o.setShirtTailTypeName(shirtTailType.getShirtTailTypeName());
             o.setStatus(shirtTailType.getStatus());
-            return repo.save(o);
+            try {
+                return kafkaUtil.sendingObjectWithKafka(shirtTailType, Const.TOPIC_SHIRT_TAILS);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
         }).orElse(null);
     }
 

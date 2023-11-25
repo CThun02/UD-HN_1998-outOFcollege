@@ -1,5 +1,6 @@
 package com.fpoly.ooc.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.entity.CollarType;
 import com.fpoly.ooc.entity.Form;
 import com.fpoly.ooc.request.form.FormRequest;
@@ -23,12 +24,12 @@ public class FormController {
     }
 
     @PostMapping("")
-    public ResponseEntity<?> create(@RequestParam String categoryName){
+    public ResponseEntity<?> create(@RequestParam String categoryName) throws JsonProcessingException {
         Form form = Form.builder().formName(categoryName).build();
         return ResponseEntity.ok(service.create(form));
     }
     @PostMapping("create")
-    public ResponseEntity<?> create(@RequestBody Form form){
+    public ResponseEntity<?> create(@RequestBody Form form) throws JsonProcessingException {
         return ResponseEntity.ok(service.create(form));
     }
 

@@ -1,5 +1,6 @@
 package com.fpoly.ooc.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
 import com.fpoly.ooc.entity.Color;
@@ -8,6 +9,7 @@ import com.fpoly.ooc.repository.ColorDAORepository;
 import com.fpoly.ooc.request.color.ColorRequest;
 import com.fpoly.ooc.request.productDetail.GetSizeAndColorRequest;
 import com.fpoly.ooc.service.interfaces.ColorServiceI;
+import com.fpoly.ooc.service.kafka.KafkaUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,12 +20,14 @@ import java.util.Optional;
 public class ColorServiceImpl implements ColorServiceI {
     @Autowired
     private ColorDAORepository repo;
+    @Autowired
+    private KafkaUtil kafkaUtil;
 
     @Override
-    public Color create(Color color) {
+    public Color create(Color color) throws JsonProcessingException {
         Color existColor = repo.findFirstByColorCodeOrColorName(color.getColorCode(), color.getColorName());
         if (existColor == null) {
-            return repo.save(color);
+            return kafkaUtil.sendingObjectWithKafka(color, Const.TOPIC_COLOR);
         }
         return null;
     }
@@ -41,7 +45,11 @@ public class ColorServiceImpl implements ColorServiceI {
             o.setColorCode(color.getColorCode());
             o.setColorName(color.getColorName());
             o.setStatus(color.getStatus());
-            return repo.save(o);
+            try {
+                return kafkaUtil.sendingObjectWithKafka(color, Const.TOPIC_COLOR);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
         }).orElseThrow(() ->
                 new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND)));
     }

@@ -1,4 +1,4 @@
-package com.fpoly.ooc.job.listener;
+package com.fpoly.ooc.service.job.listener;
 
 import com.fpoly.ooc.constant.Const;
 import lombok.extern.slf4j.Slf4j;

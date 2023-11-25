@@ -1,10 +1,13 @@
 package com.fpoly.ooc.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.entity.Product;
 import com.fpoly.ooc.repository.ProductDAORepositoryI;
 import com.fpoly.ooc.request.product.ProductDetailRequest;
 import com.fpoly.ooc.responce.product.*;
 import com.fpoly.ooc.service.interfaces.ProductServiceI;
+import com.fpoly.ooc.service.kafka.KafkaUtil;
 import com.fpoly.ooc.utilities.UniqueRandomHex;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -21,9 +24,11 @@ public class ProductServiceImpl implements ProductServiceI {
 
     @Autowired
     private ProductDAORepositoryI repo;
+    @Autowired
+    private KafkaUtil kafkaUtil;
 
     @Override
-    public Product create(Product product) {
+    public Product create(Product product) throws JsonProcessingException {
         while(true){
             String productCode= "PRO_"+ UniqueRandomHex.generateUniqueRandomHex();
             productCode = productCode.replace("#", "");
@@ -33,14 +38,14 @@ public class ProductServiceImpl implements ProductServiceI {
                 break;
             }
         };
-        return repo.save(product);
+        return kafkaUtil.sendingObjectWithKafka(product, Const.TOPIC_PRODUCT);
     }
 
     @Override
-    public Product update(Product product) {
+    public Product update(Product product) throws JsonProcessingException {
         Product productCheck = this.getOne(product.getId());
         if(productCheck != null){
-            productCheck = repo.save(product);
+            productCheck = kafkaUtil.sendingObjectWithKafka(product, Const.TOPIC_PRODUCT);
         }
         return productCheck;
     }

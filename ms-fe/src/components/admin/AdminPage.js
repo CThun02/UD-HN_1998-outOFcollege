@@ -13,7 +13,7 @@ import BrandAdmin from "./brand/BrandAdmin";
 import FormAdmin from "./form/FormAdmin";
 import CollarAdmin from "./collar/CollarAdmin";
 import BillManagement from "./sale-couter/BillManagement";
-import { Routes, Route, Link } from "react-router-dom";
+import { Routes, Route, Link, useNavigate } from "react-router-dom";
 import { Button, Col, Result, Row } from "antd";
 import SideBar from "./page/SideBar";
 import NavBar from "./page/NavBar";
@@ -32,13 +32,15 @@ import { useState } from "react";
 import { NotificationProvider } from "../element/notification/Notification";
 import ReturnIndex from "./return/ReturnIndex";
 import { getToken } from "../../service/Token";
+import BillReturn from "./return/BillReturn";
 
 function AdminPage() {
   const [message, setMessage] = useState("");
   const token = getToken(true);
+  const navigate = useNavigate();
 
   if (!token) {
-    window.location.href = "/authen/admin/sign-in";
+    navigate("/authen/admin/sign-in");
   }
   return (
     <NotificationProvider>
@@ -62,6 +64,10 @@ function AdminPage() {
                   {/* Trả hàng */}
                   <Route path="return">
                     <Route index element={<ReturnIndex />}></Route>
+                    <Route
+                      path="return-bill/:billCode"
+                      element={<BillReturn />}
+                    ></Route>
                   </Route>
                   {/* ví dụ path= san-pham/hien-thi ->  
                   {/* Tại quầy */}

@@ -45,7 +45,7 @@ function FormUsingVoucher({
           condition,
           {
             headers: {
-              Authorization: `Bearer ${getToken()}`,
+              Authorization: `Bearer ${getToken(true)}`,
             },
           }
         );

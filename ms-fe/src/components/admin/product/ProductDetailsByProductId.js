@@ -19,6 +19,7 @@ import {
   Row,
   Select,
   Slider,
+  Space,
   Spin,
   Table,
   Tooltip,
@@ -41,6 +42,7 @@ import {
 import { saveImage } from "../../../config/FireBase";
 import ProductOpenActive from "./ProductOpenActive";
 import { getToken } from "../../../service/Token";
+import { QRCodeSVG } from "qrcode.react";
 
 var productDetailsUpdate = [];
 const ProductDetails = (props) => {
@@ -1008,13 +1010,7 @@ const ProductDetails = (props) => {
                   </Col>
                   <Col span={6}>
                     <div className="m-5">
-                      <img
-                        alt=""
-                        style={{ width: "100%" }}
-                        src={
-                          "https://cdn.britannica.com/17/155017-050-9AC96FC8/Example-QR-code.jpg"
-                        }
-                      />
+                      <QRCodeSVG width={"100%"} value={record.id + ""} />
                     </div>
                   </Col>
                   {record.productImageResponse &&
@@ -1088,40 +1084,41 @@ const ProductDetails = (props) => {
                 </Row>
               </Spin>
             </Modal>
-            <Button
-              onClick={() => {
-                setProductDetailUpdate(record);
-                handlesetIsModalUpdateDetail(index, true);
-              }}
-              type="primary"
-              size={"large"}
-            >
-              <EditFilled />
-            </Button>
-            <Button
-              onClick={() => {
-                confirm({
-                  centered: true,
-                  title: `Xóa sản phẩm`,
-                  content: "Xác nhận Xóa",
-                  onOk() {
-                    deleteProductDetail(
-                      record,
-                      record.status === "ACTIVE" ? "DELETED" : "ACTIVE"
-                    );
-                  },
-                });
-              }}
-              className="ms-5"
-              type="primary"
-              size={"large"}
-            >
-              {record.status === "ACTIVE" ? (
-                <DeleteFilled />
-              ) : (
-                <ReloadOutlined />
-              )}
-            </Button>
+            <Space>
+              <Button
+                onClick={() => {
+                  setProductDetailUpdate(record);
+                  handlesetIsModalUpdateDetail(index, true);
+                }}
+                type="primary"
+                size={"large"}
+              >
+                <EditFilled />
+              </Button>
+              <Button
+                onClick={() => {
+                  confirm({
+                    centered: true,
+                    title: `Xóa sản phẩm`,
+                    content: "Xác nhận Xóa",
+                    onOk() {
+                      deleteProductDetail(
+                        record,
+                        record.status === "ACTIVE" ? "DELETED" : "ACTIVE"
+                      );
+                    },
+                  });
+                }}
+                type="primary"
+                size={"large"}
+              >
+                {record.status === "ACTIVE" ? (
+                  <DeleteFilled />
+                ) : (
+                  <ReloadOutlined />
+                )}
+              </Button>
+            </Space>
           </>
         );
       },
@@ -1653,6 +1650,7 @@ const ProductDetails = (props) => {
         description: "Vui lòng không để trống các trường",
       });
       setRender(Math.random());
+      setLoadingUpdateProduct(false);
     } else {
       axios
         .put(api + "product/updateProductDetail", productDetailUpdateCopy, {
@@ -1679,6 +1677,7 @@ const ProductDetails = (props) => {
           }
         })
         .catch((err) => {
+          setLoadingUpdateProduct(false);
           const status = err.response.status;
           if (status === 403) {
             notification.error({
@@ -1720,34 +1719,34 @@ const ProductDetails = (props) => {
     axios
       .get(
         api +
-        "product/filterProductDetailByIdCom?productId=" +
-        productId +
-        "&brandId=" +
-        brand +
-        "&categoryId=" +
-        category +
-        "&buttonId=" +
-        button +
-        "&materialId=" +
-        material +
-        "&shirtTailId=" +
-        shirtTail +
-        "&sleeveId=" +
-        sleeve +
-        "&collarId=" +
-        collar +
-        "&colorId=" +
-        color +
-        "&sizeId=" +
-        size +
-        "&patternId=" +
-        pattern +
-        "&formId=" +
-        form +
-        "&minPrice=" +
-        price[0] +
-        "&maxPrice=" +
-        price[1],
+          "product/filterProductDetailByIdCom?productId=" +
+          productId +
+          "&brandId=" +
+          brand +
+          "&categoryId=" +
+          category +
+          "&buttonId=" +
+          button +
+          "&materialId=" +
+          material +
+          "&shirtTailId=" +
+          shirtTail +
+          "&sleeveId=" +
+          sleeve +
+          "&collarId=" +
+          collar +
+          "&colorId=" +
+          color +
+          "&sizeId=" +
+          size +
+          "&patternId=" +
+          pattern +
+          "&formId=" +
+          form +
+          "&minPrice=" +
+          price[0] +
+          "&maxPrice=" +
+          price[1],
         {
           headers: {
             Authorization: `Bearer ${getToken(true)}`,
@@ -2146,7 +2145,7 @@ const ProductDetails = (props) => {
       <ProductOpenActive
         product={product}
         render={() => setRender(Math.random())}
-        onCancel={() => { }}
+        onCancel={() => {}}
         open={product?.status === "INACTIVE"}
       />
       <Spin

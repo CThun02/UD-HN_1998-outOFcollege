@@ -5,7 +5,16 @@ import {
   SearchOutlined,
   TableOutlined,
 } from "@ant-design/icons";
-import { Col, Row, Table, Button, Switch, Radio, message, notification } from "antd";
+import {
+  Col,
+  Row,
+  Table,
+  Button,
+  Switch,
+  Radio,
+  message,
+  notification,
+} from "antd";
 import React, { useEffect, useState } from "react";
 import styles from "./ProductIndex.module.css";
 import axios from "axios";
@@ -100,10 +109,10 @@ const ProductIndex = () => {
     axios
       .get(
         api +
-        "product/getproductfilterByCom?status=" +
-        status +
-        "&keywords=" +
-        keywords,
+          "product/getproductfilterByCom?status=" +
+          status +
+          "&keywords=" +
+          keywords,
         {
           headers: {
             Authorization: `Bearer ${getToken(true)}`,
@@ -129,10 +138,11 @@ const ProductIndex = () => {
     axios
       .put(
         api +
-        "product/updateProductStatus?productId=" +
-        product.id +
-        "&status=" +
-        "INACTIVE",
+          "product/updateProductStatus?productId=" +
+          product.id +
+          "&status=" +
+          "INACTIVE",
+        null,
         {
           headers: {
             Authorization: `Bearer ${getToken(true)}`,

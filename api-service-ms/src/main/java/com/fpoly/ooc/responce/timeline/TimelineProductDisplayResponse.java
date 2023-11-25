@@ -51,6 +51,10 @@ public class TimelineProductDisplayResponse {
 
     private String billDetailStatus;
 
+    private String numberPhone;
+
+    private String address;
+
     private List<ProductImageResponse> productImageResponses;
 
     public TimelineProductDisplayResponse(TimelineProductResponse timelineProductResponse) {

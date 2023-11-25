@@ -2,11 +2,8 @@ package com.fpoly.ooc.repository;
 
 import com.fpoly.ooc.entity.Address;
 import com.fpoly.ooc.entity.Bill;
-import com.fpoly.ooc.responce.bill.BillProductSellTheMost;
-import com.fpoly.ooc.responce.bill.BillReturnRequestResponse;
-import com.fpoly.ooc.responce.bill.BillRevenue;
+import com.fpoly.ooc.responce.bill.*;
 import com.fpoly.ooc.responce.account.GetListCustomer;
-import com.fpoly.ooc.responce.bill.BillManagementResponse;
 import com.fpoly.ooc.responce.product.ProductDetailResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -79,23 +76,27 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
             "FROM Bill b LEFT JOIN Account a ON a.username = b.account.username " +
             "   LEFT JOIN BillDetail bd ON b.id = bd.bill.id " +
             "   LEFT JOIN DeliveryNote dn ON dn.bill.id = b.id " +
+            "   LEFT JOIN Timeline tl ON tl.bill.id = b.id " +
             "WHERE (b.billCode like %:billCode% OR :billCode IS NULL) " +
             "   AND (b.createdAt >= :startDate OR :startDate IS NULL) " +
             "   AND (b.createdAt <= :endDate OR :endDate IS NULL) " +
-            "   AND (:status IS NULL OR b.status LIKE %:status%) " +
-            "   AND (:billType IS NULL OR b.billType LIKE %:billType%) " +
-            "   AND (:symbol IS NULL OR b.symbol LIKE %:symbol%) " +
+            "   AND (:status IS NULL OR b.status LIKE :status) " +
+            "   AND (:createdBy IS NULL OR b.createdBy LIKE :createdBy AND b.status not like 'Cancel') " +
             "GROUP BY b.id, b.billCode, b.price, b.createdAt, b.billType, b.status, " +
             "    b.symbol, dn.shipPrice, b.priceReduce, dn.name, dn.phoneNumber, b.createdBy, " +
             "    a.fullName, a.numberPhone " +
+            "   having (:symbol IS NULL OR (b.symbol like :symbol and b.status not like 'Cancel' " +
+            "       AND (:count IS NULL OR COUNT(tl.id) = :count))) " +
             "ORDER BY b.createdAt DESC ")
     List<BillManagementResponse> getAllBillManagement(
             @Param("billCode") String billCode,
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate,
             @Param("status") String status,
-            @Param("billType") String billType,
-            @Param("symbol") String symbol);
+            @Param("symbol") String symbol,
+            @Param("count") Integer count,
+            @Param("createdBy") String createdBy);
+
 
     @Modifying
     @Query("UPDATE Bill b SET b.status = :status, b.amountPaid = :amountPaid WHERE b.id = :id")
@@ -118,4 +119,11 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
             "JOIN ProductDetail pd ON pd.id = bd.productDetail.id " +
             "WHERE (bd.bill.id = ?1 or ?1 is null)")
     List<ProductDetailResponse> getProductDetailByBillId(Long id);
+
+    @Query("Select b.id as id, b.billCode as billCode, a.fullName as customerName, a.username as userName, " +
+            "b.completionDate as completionDate, b.price as price, b.billType as billType, b.symbol as symbol" +
+            ", b.createdAt as createdAt, b.createdBy as createdBy, b.status as status, b.note as note from Bill b " +
+            "left join Account a on b.account.username = a.username " +
+            "left join DeliveryNote d on d.bill.id = b.id where  b.billCode = ?1")
+    BillResponse getBillByBillCode(String billCode);
 }

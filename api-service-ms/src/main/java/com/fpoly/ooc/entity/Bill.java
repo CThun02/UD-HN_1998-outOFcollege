@@ -68,9 +68,6 @@ public class Bill extends BaseEntity {
     @Column(name = "note")
     private String note;
 
-    @Column(name = "created_by")
-    private String createdBy;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id", referencedColumnName = "username")
     private Account account;

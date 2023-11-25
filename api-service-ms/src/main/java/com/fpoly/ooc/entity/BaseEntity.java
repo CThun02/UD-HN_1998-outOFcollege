@@ -31,7 +31,7 @@ public abstract class BaseEntity implements Serializable {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     protected LocalDateTime createdAt;
 
-    @Column(name = "created_by", updatable = false)
+    @Column(name = "created_by", updatable = true)
     @CreatedBy
     protected String createdBy;
 

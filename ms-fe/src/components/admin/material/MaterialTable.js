@@ -48,7 +48,7 @@ const MaterialTable = function (props) {
         `http://localhost:8080/api/admin/material/delete/${selectedData}`,
         {
           headers: {
-            Authorization: `Bearer ${getToken()}`,
+            Authorization: `Bearer ${getToken(true)}`,
           },
         }
       )
@@ -80,7 +80,7 @@ const MaterialTable = function (props) {
         },
         {
           headers: {
-            Authorization: `Bearer ${getToken()}`,
+            Authorization: `Bearer ${getToken(true)}`,
           },
         }
       )

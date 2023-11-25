@@ -16,11 +16,11 @@ const PieChart = ({ formattedDateNow }) => {
   const [selectTypeDate, setSelectTypeDate] = useState("year");
   const data = [
     {
-      type: "In Store",
+      type: "Tại quầy",
       value: billRevenueCompare.inStoreRevenue,
     },
     {
-      type: "Online",
+      type: "Trực tuyến",
       value: billRevenueCompare.onlineRevenue,
     },
   ];
@@ -107,9 +107,9 @@ const PieChart = ({ formattedDateNow }) => {
         style={{ width: "20%" }}
         bordered={false}
       >
-        <Option value="date">Date</Option>
-        <Option value="month">Month</Option>
-        <Option value="year">Year</Option>
+        <Option value="date">Ngày</Option>
+        <Option value="month">Tháng</Option>
+        <Option value="year">Năm</Option>
       </Select>
       <DatePicker
         className={styles.input_noneBorder}

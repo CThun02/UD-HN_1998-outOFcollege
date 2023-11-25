@@ -56,7 +56,11 @@ function CustomerTable(props) {
             render: (_, image) => (
               <>
                 <Avatar
-                  src={image.image}
+                  src={
+                    image.image
+                      ? image.image
+                      : "https://img.freepik.com/premium-vector/camera-with-plus-sign-icon_625445-191.jpg?w=2000"
+                  }
                   style={{
                     boxShadow: "rgba(100, 100, 111, 0.2) 0px 5px 25px 0px",
                   }}

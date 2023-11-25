@@ -19,7 +19,10 @@ import com.fpoly.ooc.responce.product.ProductDetailDisplayResponse;
 import com.fpoly.ooc.responce.product.ProductDetailResponse;
 import com.fpoly.ooc.responce.product.ProductDetailSellResponse;
 import com.fpoly.ooc.responce.product.ProductImageResponse;
+import com.fpoly.ooc.responce.timeline.TimelineProductDisplayResponse;
+import com.fpoly.ooc.responce.timeline.TimelineProductResponse;
 import com.fpoly.ooc.service.interfaces.BillService;
+import com.fpoly.ooc.service.interfaces.DeliveryNoteService;
 import com.fpoly.ooc.service.interfaces.ProductDetailServiceI;
 import com.fpoly.ooc.service.interfaces.ProductImageServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +65,9 @@ public class BillServiceImpl implements BillService {
 
     @Autowired
     private ProductDetailServiceI productDetailService;
+
+    @Autowired
+    private DeliveryNoteService deliveryNoteService;
 
     @Transactional
     @Override
@@ -156,11 +162,7 @@ public class BillServiceImpl implements BillService {
 
     @Override
     public Bill getAllBillByCode(String billCode) {
-        Bill bill = billRepo.findBillByBillCode(billCode);
-        if (bill == null) {
-            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.CODE_NOT_FOUND));
-        }
-        return billRepo.findBillByBillCode(billCode);
+        return null;
     }
 
     @Override
@@ -319,5 +321,37 @@ public class BillServiceImpl implements BillService {
         double growth = ((revenue - revenueBefore) / (revenueBefore < 1 ? 1 : revenueBefore)) * 100;
         BillGrowthResponse response = new BillGrowthResponse(BigDecimal.valueOf(revenue), (float) growth);
         return response;
+    }
+
+    @Override
+    public BillResponse getBillByBillCode(String billCode) {
+        return billRepo.getBillByBillCode(billCode);
+    }
+
+    @Override
+    public BillReturnResponse getBillReturnByBillCode(String billCode) {
+        List<TimelineProductDisplayResponse> lstProduct = new ArrayList<>();
+        BillResponse billResponse = billRepo.getBillByBillCode(billCode);
+        BillReturnResponse billReturnResponse = new BillReturnResponse(billResponse);
+        billReturnResponse.setTimeLines(timeLineRepo.getTimeLineByBillId(billResponse.getId()));
+        List<TimelineProductResponse> timelineProductResponses = timeLineRepo.getTimelineProductByBillId(billReturnResponse.getId());
+        for (int i = 0; i < timelineProductResponses.size(); i++) {
+            TimelineProductDisplayResponse productDisplayResponse = new TimelineProductDisplayResponse(timelineProductResponses.get(i));
+            productDisplayResponse.setProductImageResponses(productImageService.getProductImageByProductDetailId(productDisplayResponse.getProductDetailId()));
+            lstProduct.add(productDisplayResponse);
+        }
+        if(billReturnResponse.getSymbol().equals("Shipping")){
+            DeliveryNote deliveryNote = deliveryNoteService.getDeliveryNoteByBill_Id(billResponse.getId());
+            Address address = deliveryNote.getAddress();
+            billReturnResponse.setAddress(address.getDescriptionDetail()+" "+
+                    address.getWard().substring(0, address.getWard().indexOf("|"))+" "+
+                    address.getDistrict().substring(0, address.getDistrict().indexOf("|")) +" "+
+                    address.getCity().substring(0, address.getCity().indexOf("|")));
+            billReturnResponse.setPhoneNumber(deliveryNote.getPhoneNumber());
+            billReturnResponse.setFullName(deliveryNote.getName());
+            billReturnResponse.setShippingDate(deliveryNote.getShipDate());
+        }
+        billReturnResponse.setBillDetails(lstProduct);
+        return billReturnResponse;
     }
 }

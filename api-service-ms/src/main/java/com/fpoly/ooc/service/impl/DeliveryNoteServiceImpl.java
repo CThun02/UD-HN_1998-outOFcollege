@@ -29,4 +29,9 @@ public class DeliveryNoteServiceImpl implements DeliveryNoteService {
 
         return deliveryNoteRepo.save(deliveryNote);
     }
+
+    @Override
+    public DeliveryNote getDeliveryNoteByBill_Id(Long billId) {
+        return deliveryNoteRepo.getDeliveryNoteByBill_Id(billId);
+    }
 }

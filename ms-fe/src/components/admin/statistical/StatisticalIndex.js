@@ -905,17 +905,40 @@ const StatisticalIndex = () => {
               <Option value="date">Ngày</Option>
               <Option value="month">Tháng</Option>
               <Option value="year">Năm</Option>
+              <Option value="other">Tùy chọn</Option>
             </Select>
-            <DatePicker
-              className={styles.input_noneBorder}
-              style={{ width: "80%" }}
-              picker={selectTypeDateProduct}
-              value={dayjs(dateProductSellTheMost)}
-              onChange={(date, dateString) => {
-                setDateProductSellTheMost(dateString);
-              }}
-            />
-
+            {selectTypeDateProduct === "other" ? (
+              <div style={{ width: "80%", display: "inline-block" }}>
+                <DatePicker
+                  className={styles.input_noneBorder}
+                  style={{ width: "50%" }}
+                  picker={"date"}
+                  value={dayjs(dateProductSellTheMost)}
+                  onChange={(date, dateString) => {
+                    setDateProductSellTheMost(dateString);
+                  }}
+                />
+                <DatePicker
+                  className={styles.input_noneBorder}
+                  style={{ width: "50%" }}
+                  picker={"date"}
+                  value={dayjs(dateProductSellTheMost)}
+                  onChange={(date, dateString) => {
+                    setDateProductSellTheMost(dateString);
+                  }}
+                />
+              </div>
+            ) : (
+              <DatePicker
+                className={styles.input_noneBorder}
+                style={{ width: "80%" }}
+                picker={selectTypeDateProduct}
+                value={dayjs(dateProductSellTheMost)}
+                onChange={(date, dateString) => {
+                  setDateProductSellTheMost(dateString);
+                }}
+              />
+            )}
             <div style={{ margin: "20px 0" }}>
               <p style={{ fontWeight: 500, marginBottom: "12px" }}>
                 <TableOutlined /> Danh sách sản phẩm

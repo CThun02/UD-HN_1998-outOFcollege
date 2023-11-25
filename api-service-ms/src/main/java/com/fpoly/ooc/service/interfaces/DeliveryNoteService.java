@@ -6,5 +6,6 @@ import com.fpoly.ooc.request.DeliveryNoteRequest;
 public interface DeliveryNoteService {
 
     DeliveryNote createDeliveryNote(DeliveryNoteRequest request);
+    DeliveryNote getDeliveryNoteByBill_Id(Long billId);
 
 }

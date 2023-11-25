@@ -2,7 +2,7 @@ import React from "react";
 import { Modal } from "antd";
 import { useZxing } from "react-zxing";
 
-const QRReader = ({ visible, onCancel, setData }) => {
+const QRReader = ({ visible, onCancel, setData, title }) => {
   const { ref } = useZxing({
     onDecodeResult: (result) => {
       setData(result.getText());
@@ -12,7 +12,7 @@ const QRReader = ({ visible, onCancel, setData }) => {
 
   return (
     <Modal
-      title="Tìm kiếm sản phẩm"
+      title={title}
       visible={visible}
       onCancel={() => {
         onCancel();

@@ -2,11 +2,8 @@ package com.fpoly.ooc.repository;
 
 import com.fpoly.ooc.entity.Address;
 import com.fpoly.ooc.entity.Bill;
-import com.fpoly.ooc.responce.bill.BillProductSellTheMost;
-import com.fpoly.ooc.responce.bill.BillReturnRequestResponse;
-import com.fpoly.ooc.responce.bill.BillRevenue;
+import com.fpoly.ooc.responce.bill.*;
 import com.fpoly.ooc.responce.account.GetListCustomer;
-import com.fpoly.ooc.responce.bill.BillManagementResponse;
 import com.fpoly.ooc.responce.product.ProductDetailResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -123,6 +120,12 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
             "WHERE (bd.bill.id = ?1 or ?1 is null)")
     List<ProductDetailResponse> getProductDetailByBillId(Long id);
 
-    Bill findBillByBillCode(String billCode);
 
+    @Query("Select b.id as id, b.billCode as billCode, a.fullName as customerName, a.username as userName, " +
+            "b.completionDate as completionDate, b.price as price, b.amountPaid as amountPaid," +
+            " d.shipPrice as shippingPrice, b.billType as billType, b.symbol as symbol" +
+            ", b.createdAt as createdAt, b.createdBy as createdBy, b.status as status, b.note as note from Bill b " +
+            "left join Account a on b.account.username = a.username " +
+            "left join DeliveryNote d on d.bill.id = b.id where  b.billCode = ?1")
+    BillResponse getBillByBillCode(String billCode);
 }

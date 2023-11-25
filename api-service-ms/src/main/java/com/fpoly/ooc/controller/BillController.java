@@ -3,6 +3,7 @@ package com.fpoly.ooc.controller;
 import com.fpoly.ooc.dto.BillStatusDTO;
 import com.fpoly.ooc.request.bill.BillRequest;
 import com.fpoly.ooc.request.product.ProductDetailRequest;
+import com.fpoly.ooc.responce.bill.BillResponse;
 import com.fpoly.ooc.responce.bill.BillReturnRequestResponse;
 import com.fpoly.ooc.responce.timeline.TimelineProductDisplayResponse;
 import com.fpoly.ooc.responce.timeline.TimelineProductResponse;
@@ -148,6 +149,15 @@ public class BillController {
                                                 @RequestParam Optional<Integer> yearTo) {
         return ResponseEntity.ok(billService.compareRevenueDate(dayFrom.orElse(null), monthFrom.orElse(null),
                 yearFrom.orElse(null), dayTo.orElse(null), monthTo.orElse(null), yearTo.orElse(null)));
+    }
+
+    @GetMapping("/getBillByBillCode")
+    public ResponseEntity<?> getBillByBillCode(@RequestParam String billCode) {
+        return ResponseEntity.ok(billService.getBillByBillCode(billCode));
+    }
+    @GetMapping("/getBillReturnByBillCode")
+    public ResponseEntity<?> getBillReturnByBillCode(@RequestParam String billCode) {
+        return ResponseEntity.ok(billService.getBillReturnByBillCode(billCode));
     }
 
     @GetMapping("/getReturnRequestByStatus")

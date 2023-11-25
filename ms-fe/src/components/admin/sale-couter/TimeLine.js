@@ -201,6 +201,7 @@ const BillTimeLine = (addId) => {
                 },
             })
             .then((response) => {
+                console.log(response)
                 setBillInfo(response.data);
             })
             .catch((error) => {
@@ -212,7 +213,6 @@ const BillTimeLine = (addId) => {
                     });
                 }
             });
-        console.log(billInfo)
     }, [billId, render]);
 
     const columnProduct = [
@@ -329,7 +329,6 @@ const BillTimeLine = (addId) => {
 
     return (
         <>
-            {console.log(billInfo.billCode)}
             <Button onClick={handleOpen}>aaaa</Button>
             <ModalBillInfoDisplay open={open} cancel={handleCan} billCode={billInfo.billCode} />
             <section className={styles.background}>

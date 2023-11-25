@@ -1,8 +1,9 @@
-import { Pagination, Space, Table } from "antd";
+import { Pagination, Space, Table, notification } from "antd";
 import axios from "axios";
 import numeral from "numeral";
 import { useState } from "react";
 import { useEffect } from "react";
+import { getToken } from "../../../service/Token";
 
 const columns = [
   {
@@ -40,6 +41,7 @@ const baseUrl = "http://localhost:8080/api/admin/product";
 
 function TableProduct({ productsId, setProductsId, values, status }) {
   const [data, setData] = useState([]);
+  const [apiNotification, contextHolder] = notification.useNotification();
 
   //paging
   const [pageNo, setPageNo] = useState(1);
@@ -85,15 +87,32 @@ function TableProduct({ productsId, setProductsId, values, status }) {
 
   useEffect(() => {
     async function getProducts() {
-      const res = await axios.get(baseUrl + "/promotion");
-      setData(res.data);
+      try {
+        const res = await axios.get(baseUrl + "/promotion", {
+          headers: {
+            Authorization: `Bearer ${getToken(true)}`,
+          },
+        });
+        const data = await res.data;
+        setData(data);
+      } catch (e) {
+        const status = e?.response?.data?.status;
+        if (status === 403) {
+          apiNotification.error({
+            message: "Lỗi",
+            description: "Bạn không có quyền xem nội dung này",
+          });
+          return;
+        }
+      }
     }
 
-    getProducts();
+    return () => getProducts();
   }, []);
 
   return (
     <div>
+      {contextHolder}
       <Table
         rowSelection={{ type: "checkbox", ...rowSelection }}
         columns={columns}

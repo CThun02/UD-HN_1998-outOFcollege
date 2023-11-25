@@ -1,17 +1,46 @@
-import { Breadcrumb, Button, Space } from "antd";
+import { Breadcrumb, Button, Popover, Space } from "antd";
 import React from "react";
 import styles from "./NavBar.module.css";
 import {
   BellOutlined,
   HomeOutlined,
   MenuFoldOutlined,
-  SearchOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import Input from "antd/es/input/Input";
-import Link from "antd/es/typography/Link";
+import { useState } from "react";
+import { useEffect } from "react";
+import { clearAuthToken, getAuthToken } from "../../../service/Token";
+import { Link } from "react-router-dom";
 
 const NavBar = () => {
+  const [user, setUser] = useState("");
+  const content = (
+    <div style={{ width: "100px" }}>
+      <p>
+        <Link
+          onClick={() => {
+            clearAuthToken(true);
+            setUser("");
+          }}
+          className={styles.link}
+        >
+          Đăng xuất
+        </Link>
+      </p>
+    </div>
+  );
+
+  useEffect(() => {
+    return () =>
+      getAuthToken(true)
+        .then((data) => {
+          setUser(data?.fullName);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+  }, []);
+
   return (
     <>
       <div className={styles.navBar}>
@@ -38,6 +67,19 @@ const NavBar = () => {
             />
           </Space>
           <Space>
+            {user && (
+              <>
+                <span>Xin chào,</span>
+
+                <Popover
+                  content={content}
+                  placement="bottomLeft"
+                  trigger="hover"
+                >
+                  <strong>{user}</strong>
+                </Popover>
+              </>
+            )}
             <Button className={styles.navBar__button}>
               <BellOutlined />
             </Button>

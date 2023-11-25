@@ -1,10 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Select, Input, Row, Col, Form, DatePicker, Modal, Button } from "antd";
+import {
+  Select,
+  Input,
+  Row,
+  Col,
+  Form,
+  DatePicker,
+  Modal,
+  Button,
+  notification,
+} from "antd";
 import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
 import MaterialTable from "./MaterialTable";
 import styles from "../categorystyles/CategoryStyles.module.css";
 import axios from "axios";
+import { getToken } from "../../../service/Token";
 const { Option } = Select;
 const MaterialAdmin = function () {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -22,16 +33,26 @@ const MaterialAdmin = function () {
     values.status = "ACTIVE";
     // Gọi API để thêm dữ liệu
     axios
-      .post("http://localhost:8080/api/admin/material/create", values)
+      .post("http://localhost:8080/api/admin/material/create", values, {
+        headers: {
+          Authorization: `Bearer ${getToken(true)}`,
+        },
+      })
       .then((response) => {
         // Xử lý thành công
         console.log("Thêm thành công");
         setIsModalVisible(false);
         setRender(Math.random);
       })
-      .catch((error) => {
+      .catch((err) => {
         // Xử lý lỗi
-        console.error("Lỗi khi thêm dữ liệu", error);
+        const status = err.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
       });
   };
 
@@ -39,7 +60,7 @@ const MaterialAdmin = function () {
 
   return (
     <div className={styles.category}>
-      <div className={styles.radiusFrame}>
+      <div className={styles.customer}>
         <Row className={styles.titleTB}>
           <h3>Danh Sách Chất Liệu</h3>
         </Row>

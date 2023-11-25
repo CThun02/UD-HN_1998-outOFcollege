@@ -22,6 +22,7 @@ import React, { useEffect, useState } from "react";
 import styles from "./ProductCreateDetails.module.css";
 import ProductDetailsTable from "./ProductDetailsTable";
 import { isFormInputEmpty } from "./ValidateForm";
+import { getToken } from "../../../service/Token";
 
 const ProductCreateDetails = () => {
   const api = "http://localhost:8080/api/admin/";
@@ -80,7 +81,7 @@ const ProductCreateDetails = () => {
     status: "ACTIVE",
   });
   const [productDetail, setProductDetail] = useState({
-    productId: "null",
+    productId: "",
     buttonId: " ",
     materialId: " ",
     collarId: " ",
@@ -138,12 +139,18 @@ const ProductCreateDetails = () => {
         onOk() {
           setLoadingProduct(true);
           axios
-            .post(api + "product/create", product)
+            .post(api + "product/create", product, {
+              headers: {
+                Authorization: `Bearer ${getToken(true)}`,
+              },
+            })
             .then((res) => {
               setLoadingProduct(false);
               handleSetProduct("description", " ");
               setmodalProductCreate(false);
+              setProduct(res.data);
               setRender(Math.random());
+              handleSetProductDetail("productId", res.data.id);
               notification.open({
                 message: "Thông báo",
                 description: "Thêm mới sản phẩm thành công",
@@ -151,7 +158,13 @@ const ProductCreateDetails = () => {
               });
             })
             .catch((err) => {
-              console.log(err);
+              const status = err.response.status;
+              if (status === 403) {
+                notification.error({
+                  message: "Thông báo",
+                  description: "Bạn không có quyền truy cập!",
+                });
+              }
             });
         },
         onCancel() {
@@ -191,26 +204,31 @@ const ProductCreateDetails = () => {
       axios
         .get(
           api +
-            "product/filterProductDetailByIdCom?productId=" +
-            productDetailRequest.productId +
-            "&buttonId=" +
-            productDetailRequest.buttonId +
-            "&materialId=" +
-            productDetailRequest.materialId +
-            "&shirtTailId=" +
-            productDetailRequest.shirtTailId +
-            "&sleeveId=" +
-            productDetailRequest.sleeveId +
-            "&collarId=" +
-            productDetailRequest.collarId +
-            "&brandId=" +
-            productDetailRequest.brandId +
-            "&categoryId=" +
-            productDetailRequest.categoryId +
-            "&patternId=" +
-            productDetailRequest.patternId +
-            "&formId=" +
-            productDetailRequest.formId
+          "product/filterProductDetailByIdCom?productId=" +
+          productDetailRequest.productId +
+          "&buttonId=" +
+          productDetailRequest.buttonId +
+          "&materialId=" +
+          productDetailRequest.materialId +
+          "&shirtTailId=" +
+          productDetailRequest.shirtTailId +
+          "&sleeveId=" +
+          productDetailRequest.sleeveId +
+          "&collarId=" +
+          productDetailRequest.collarId +
+          "&brandId=" +
+          productDetailRequest.brandId +
+          "&categoryId=" +
+          productDetailRequest.categoryId +
+          "&patternId=" +
+          productDetailRequest.patternId +
+          "&formId=" +
+          productDetailRequest.formId,
+          {
+            headers: {
+              Authorization: `Bearer ${getToken(true)}`,
+            },
+          }
         )
         .then((res) => {
           let productDetailsExist = [...res.data];
@@ -250,7 +268,6 @@ const ProductCreateDetails = () => {
         });
     }
   }
-  console.log("spam");
   function handleSetProductDetailCom(field, value) {
     if (field === "button") {
       setButton(value);
@@ -284,11 +301,6 @@ const ProductCreateDetails = () => {
     ) {
       setRender(Math.random());
     }
-  }
-
-  function selectProduct(index) {
-    setProduct(productList[index]);
-    handleSetProductDetail("productId", productList[index].id);
   }
 
   function renderProductDetails() {
@@ -366,7 +378,11 @@ const ProductCreateDetails = () => {
         onOk() {
           setisLoading(true);
           axios
-            .post(api + "pattern?categoryName=" + patternCreate.trim(), null)
+            .post(api + "pattern?categoryName=" + patternCreate.trim(), null, {
+              headers: {
+                Authorization: `Bearer ${getToken(true)}`,
+              },
+            })
             .then((res) => {
               setPatternCreate(" ");
               if (res.data === "") {
@@ -378,10 +394,16 @@ const ProductCreateDetails = () => {
               setisLoading(false);
             })
             .catch((err) => {
-              console.log(err);
+              const status = err.response.status;
+              if (status === 403) {
+                notification.error({
+                  message: "Thông báo",
+                  description: "Bạn không có quyền truy cập!",
+                });
+              }
             });
         },
-        onCancel() {},
+        onCancel() { },
       });
     } else {
       messageApi.error("Vui lòng nhập hoạt tiết!", 1);
@@ -400,7 +422,12 @@ const ProductCreateDetails = () => {
           axios
             .post(
               api + "shirt-tail?shirtTailTypeName=" + shirtTailCreate.trim(),
-              null
+              null,
+              {
+                headers: {
+                  Authorization: `Bearer ${getToken(true)}`,
+                },
+              }
             )
             .then((res) => {
               setRender(Math.random);
@@ -413,10 +440,16 @@ const ProductCreateDetails = () => {
               setisLoading(false);
             })
             .catch((err) => {
-              console.log(err);
+              const status = err.response.status;
+              if (status === 403) {
+                notification.error({
+                  message: "Thông báo",
+                  description: "Bạn không có quyền truy cập!",
+                });
+              }
             });
         },
-        onCancel() {},
+        onCancel() { },
       });
     } else {
       messageApi.error("Vui lòng nhập dáng áo!", 1);
@@ -433,7 +466,11 @@ const ProductCreateDetails = () => {
         onOk() {
           setisLoading(true);
           axios
-            .post(api + "brand?brandName=" + brandCreate, null)
+            .post(api + "brand?brandName=" + brandCreate, null, {
+              headers: {
+                Authorization: `Bearer ${getToken(true)}`,
+              },
+            })
             .then((res) => {
               if (res.data === "") {
                 messageApi.error("Thương hiệu đã tồn tại!", 1);
@@ -445,10 +482,16 @@ const ProductCreateDetails = () => {
               setBrandCreate(" ");
             })
             .catch((err) => {
-              console.log(err);
+              const status = err.response.status;
+              if (status === 403) {
+                notification.error({
+                  message: "Thông báo",
+                  description: "Bạn không có quyền truy cập!",
+                });
+              }
             });
         },
-        onCancel() {},
+        onCancel() { },
       });
     } else {
       messageApi.error("Vui lòng nhập thương hiệu!", 1);
@@ -465,7 +508,11 @@ const ProductCreateDetails = () => {
         onOk() {
           setisLoading(true);
           axios
-            .post(api + "category?categoryName=" + categoryCreate, null)
+            .post(api + "category?categoryName=" + categoryCreate, null, {
+              headers: {
+                Authorization: `Bearer ${getToken(true)}`,
+              },
+            })
             .then((res) => {
               if (res.data === "") {
                 messageApi.error("Loại sản phẩm đã tồn tại!", 1);
@@ -477,10 +524,16 @@ const ProductCreateDetails = () => {
               setisLoading(false);
             })
             .catch((err) => {
-              console.log(err);
+              const status = err.response.status;
+              if (status === 403) {
+                notification.error({
+                  message: "Thông báo",
+                  description: "Bạn không có quyền truy cập!",
+                });
+              }
             });
         },
-        onCancel() {},
+        onCancel() { },
       });
     } else {
       messageApi.error("Vui lòng nhập loại sản phẩm!", 1);
@@ -497,7 +550,11 @@ const ProductCreateDetails = () => {
         onOk() {
           setisLoading(true);
           axios
-            .post(api + "form?categoryName=" + formCreate.trim(), null)
+            .post(api + "form?categoryName=" + formCreate.trim(), null, {
+              headers: {
+                Authorization: `Bearer ${getToken(true)}`,
+              },
+            })
             .then((res) => {
               setRender(Math.random);
               if (res.data === "") {
@@ -509,10 +566,16 @@ const ProductCreateDetails = () => {
               setisLoading(false);
             })
             .catch((err) => {
-              console.log(err);
+              const status = err.response.status;
+              if (status === 403) {
+                notification.error({
+                  message: "Thông báo",
+                  description: "Bạn không có quyền truy cập!",
+                });
+              }
             });
         },
-        onCancel() {},
+        onCancel() { },
       });
     } else {
       messageApi.error("Vui lòng nhập dáng áo!", 1);
@@ -529,7 +592,11 @@ const ProductCreateDetails = () => {
         onOk() {
           setisLoading(true);
           axios
-            .post(api + "form?categoryName=" + formCreate.trim(), null)
+            .post(api + "form?categoryName=" + formCreate.trim(), null, {
+              headers: {
+                Authorization: `Bearer ${getToken(true)}`,
+              },
+            })
             .then((res) => {
               setRender(Math.random);
               if (res.data === "") {
@@ -541,10 +608,16 @@ const ProductCreateDetails = () => {
               setisLoading(false);
             })
             .catch((err) => {
-              console.log(err);
+              const status = err.response.status;
+              if (status === 403) {
+                notification.error({
+                  message: "Thông báo",
+                  description: "Bạn không có quyền truy cập!",
+                });
+              }
             });
         },
-        onCancel() {},
+        onCancel() { },
       });
     } else {
       messageApi.error("Vui lòng nhập nút áo!", 1);
@@ -561,9 +634,17 @@ const ProductCreateDetails = () => {
         onOk() {
           setisLoading(true);
           axios
-            .post(api + "material/create", {
-              materialName: materialCreate.trim(),
-            })
+            .post(
+              api + "material/create",
+              {
+                materialName: materialCreate.trim(),
+              },
+              {
+                headers: {
+                  Authorization: `Bearer ${getToken(true)}`,
+                },
+              }
+            )
             .then((res) => {
               setRender(Math.random);
               if (res.data === "") {
@@ -575,10 +656,16 @@ const ProductCreateDetails = () => {
               setisLoading(false);
             })
             .catch((err) => {
-              console.log(err);
+              const status = err.response.status;
+              if (status === 403) {
+                notification.error({
+                  message: "Thông báo",
+                  description: "Bạn không có quyền truy cập!",
+                });
+              }
             });
         },
-        onCancel() {},
+        onCancel() { },
       });
     } else {
       messageApi.error("Vui lòng nhập chất liệu!", 1);
@@ -595,9 +682,17 @@ const ProductCreateDetails = () => {
         onOk() {
           setisLoading(true);
           axios
-            .post(api + "collar/create", {
-              collarTypeName: collarCreate.trim(),
-            })
+            .post(
+              api + "collar/create",
+              {
+                collarTypeName: collarCreate.trim(),
+              },
+              {
+                headers: {
+                  Authorization: `Bearer ${getToken(true)}`,
+                },
+              }
+            )
             .then((res) => {
               setRender(Math.random);
               if (res.data === "") {
@@ -609,10 +704,16 @@ const ProductCreateDetails = () => {
               setisLoading(false);
             })
             .catch((err) => {
-              console.log(err);
+              const status = err.response.status;
+              if (status === 403) {
+                notification.error({
+                  message: "Thông báo",
+                  description: "Bạn không có quyền truy cập!",
+                });
+              }
             });
         },
-        onCancel() {},
+        onCancel() { },
       });
     } else {
       messageApi.error("Vui lòng nhập cổ áo!", 1);
@@ -629,7 +730,15 @@ const ProductCreateDetails = () => {
         onOk() {
           setisLoading(true);
           axios
-            .post(api + "sleeve/create", { sleeveName: sleeveCreate.trim() })
+            .post(
+              api + "sleeve/create",
+              { sleeveName: sleeveCreate.trim() },
+              {
+                headers: {
+                  Authorization: `Bearer ${getToken(true)}`,
+                },
+              }
+            )
             .then((res) => {
               setRender(Math.random);
               if (res.data === "") {
@@ -641,10 +750,16 @@ const ProductCreateDetails = () => {
               setisLoading(false);
             })
             .catch((err) => {
-              console.log(err);
+              const status = err.response.status;
+              if (status === 403) {
+                notification.error({
+                  message: "Thông báo",
+                  description: "Bạn không có quyền truy cập!",
+                });
+              }
             });
         },
-        onCancel() {},
+        onCancel() { },
       });
     } else {
       messageApi.error("Vui lòng nhập tay áo!", 1);
@@ -661,7 +776,15 @@ const ProductCreateDetails = () => {
         onOk() {
           setisLoading(true);
           axios
-            .post(api + "size/create", { sizeName: sizeCreate.trim() })
+            .post(
+              api + "size/create",
+              { sizeName: sizeCreate.trim() },
+              {
+                headers: {
+                  Authorization: `Bearer ${getToken(true)}`,
+                },
+              }
+            )
             .then((res) => {
               setRender(Math.random);
               if (res.data === "") {
@@ -673,10 +796,16 @@ const ProductCreateDetails = () => {
               setisLoading(false);
             })
             .catch((err) => {
-              console.log(err);
+              const status = err.response.status;
+              if (status === 403) {
+                notification.error({
+                  message: "Thông báo",
+                  description: "Bạn không có quyền truy cập!",
+                });
+              }
             });
         },
-        onCancel() {},
+        onCancel() { },
       });
     } else {
       messageApi.error("Vui lòng nhập kích cỡ!", 1);
@@ -696,7 +825,11 @@ const ProductCreateDetails = () => {
         onOk() {
           setLoadingColor(true);
           axios
-            .post(api + "color/create", colorCreate)
+            .post(api + "color/create", colorCreate, {
+              headers: {
+                Authorization: `Bearer ${getToken(true)}`,
+              },
+            })
             .then((res) => {
               setLoadingColor(true);
               setModalColorOpen(false);
@@ -708,10 +841,16 @@ const ProductCreateDetails = () => {
               }
             })
             .catch((err) => {
-              console.log(err);
+              const status = err.response.status;
+              if (status === 403) {
+                notification.error({
+                  message: "Thông báo",
+                  description: "Bạn không có quyền truy cập!",
+                });
+              }
             });
         },
-        onCancel() {},
+        onCancel() { },
       });
     } else {
       messageApi.error("Vui lòng nhập màu sắc!", 1);
@@ -719,101 +858,221 @@ const ProductCreateDetails = () => {
   }
   useEffect(() => {
     axios
-      .get(api + "product/getproductfilterByCom")
+      .get(api + "product/getproductfilterByCom", {
+        headers: {
+          Authorization: `Bearer ${getToken(true)}`,
+        },
+      })
       .then((res) => {
         setProductList(res.data);
       })
       .catch((err) => {
-        console.log(err);
+        const status = err.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
       });
     axios
-      .get(api + "brand")
+      .get(api + "brand", {
+        headers: {
+          Authorization: `Bearer ${getToken(true)}`,
+        },
+      })
       .then((res) => {
         setBrands(res.data);
       })
       .catch((error) => {
-        console.log(error);
+        const status = error.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
       });
     axios
-      .get(api + "category")
+      .get(api + "category", {
+        headers: {
+          Authorization: `Bearer ${getToken(true)}`,
+        },
+      })
       .then((res) => {
         setCategories(res.data);
       })
       .catch((error) => {
-        console.log(error);
+        const status = error.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
       });
     axios
-      .get(api + "size")
+      .get(api + "size", {
+        headers: {
+          Authorization: `Bearer ${getToken(true)}`,
+        },
+      })
       .then((response) => {
         setSizes(response.data);
       })
       .catch((error) => {
-        console.log(error);
+        const status = error.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
       });
     axios
-      .get(api + "color")
+      .get(api + "color", {
+        headers: {
+          Authorization: `Bearer ${getToken(true)}`,
+        },
+      })
       .then((response) => {
         setColors(response.data);
       })
       .catch((error) => {
-        console.log(error);
+        const status = error.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
       });
     axios
-      .get(api + "button")
+      .get(api + "button", {
+        headers: {
+          Authorization: `Bearer ${getToken(true)}`,
+        },
+      })
       .then((response) => {
         setButtons(response.data);
       })
       .catch((error) => {
-        console.log(error);
+        const status = error.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
       });
     axios
-      .get(api + "material")
+      .get(api + "material", {
+        headers: {
+          Authorization: `Bearer ${getToken(true)}`,
+        },
+      })
       .then((response) => {
         setMaterials(response.data);
       })
       .catch((error) => {
-        console.log(error);
+        const status = error.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
       });
     axios
-      .get(api + "collar")
+      .get(api + "collar", {
+        headers: {
+          Authorization: `Bearer ${getToken(true)}`,
+        },
+      })
       .then((response) => {
         setCollars(response.data);
       })
       .catch((error) => {
-        console.log(error);
+        const status = error.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
       });
     axios
-      .get(api + "shirt-tail")
+      .get(api + "shirt-tail", {
+        headers: {
+          Authorization: `Bearer ${getToken(true)}`,
+        },
+      })
       .then((response) => {
         setshirtTails(response.data);
       })
       .catch((error) => {
-        console.log(error);
+        const status = error.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
       });
     axios
-      .get(api + "sleeve")
+      .get(api + "sleeve", {
+        headers: {
+          Authorization: `Bearer ${getToken(true)}`,
+        },
+      })
       .then((response) => {
         setSleeves(response.data);
       })
       .catch((error) => {
-        console.log(error);
+        const status = error.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
       });
 
     axios
-      .get(api + "pattern")
+      .get(api + "pattern", {
+        headers: {
+          Authorization: `Bearer ${getToken(true)}`,
+        },
+      })
       .then((res) => {
         setPatterns(res.data);
       })
       .catch((error) => {
-        console.log(error);
+        const status = error.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
       });
     axios
-      .get(api + "form")
+      .get(api + "form", {
+        headers: {
+          Authorization: `Bearer ${getToken(true)}`,
+        },
+      })
       .then((res) => {
         setForms(res.data);
       })
       .catch((error) => {
-        console.log(error);
+        const status = error.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
       });
     getProductDetailsExist();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -972,8 +1231,12 @@ const ProductCreateDetails = () => {
                                 )
                             }
                             onChange={(index) => {
-                              selectProduct(index);
+                              setProduct(
+                                productList?.find((item) => item.id === index)
+                              );
+                              handleSetProductDetail("productId", index);
                             }}
+                            value={productDetail.productId}
                           >
                             {productList &&
                               productList.map((item, index) => {
@@ -981,7 +1244,7 @@ const ProductCreateDetails = () => {
                                   <Select.Option
                                     key={item.id}
                                     label={item.productName}
-                                    value={index}
+                                    value={item.id}
                                   >
                                     {item.productName}
                                   </Select.Option>
@@ -1688,8 +1951,8 @@ const ProductCreateDetails = () => {
           </Row>
         </div>
         {product.productId !== null &&
-        colorsCreate.length > 0 &&
-        productDetailsCreate.length > 0 ? (
+          colorsCreate.length > 0 &&
+          productDetailsCreate.length > 0 ? (
           <ProductDetailsTable
             setLoading={setisLoading}
             product={product}

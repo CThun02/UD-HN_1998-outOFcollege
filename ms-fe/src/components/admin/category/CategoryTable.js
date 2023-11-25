@@ -1,15 +1,24 @@
 import React from "react";
 import { FormOutlined, DeleteFilled } from "@ant-design/icons";
-import { Table, Space, Button, Modal, Input,message,Switch } from "antd";
+import {
+  Table,
+  Space,
+  Button,
+  Modal,
+  Input,
+  message,
+  Switch,
+  notification,
+} from "antd";
 import { useEffect, useState } from "react";
 import styles from "./CategoryStyle.module.css";
 import axios from "axios";
-
+import { getToken } from "../../../service/Token";
 
 const CategoryTable = function (props) {
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [messageApi, contextHolder] = message.useMessage();
+  const [api, contextHolder] = notification.useNotification();
 
   const [showModal, setShowModal] = useState(false);
   const [selectedData, setSelectedData] = useState(null);
@@ -31,9 +40,17 @@ const CategoryTable = function (props) {
   const handleUpdate = () => {
     let category = {};
     axios
-      .put(`http://localhost:8080/api/admin/category/edit/${id}`, {
-        categoryName,
-      })
+      .put(
+        `http://localhost:8080/api/admin/category/edit/${id}`,
+        {
+          categoryName,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
+      )
       .then((response) => {
         // Cập nhật lại danh sách dữ liệu sau khi cập nhật thành công
 
@@ -41,7 +58,16 @@ const CategoryTable = function (props) {
         setRender(Math.random);
         message.success("Cập nhật thành công");
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        const status = err?.response?.data?.status;
+        if (status === 403) {
+          api.error({
+            message: "Lỗi",
+            description: "Bạn không có quyền xem nội dung này",
+          });
+          return;
+        }
+      });
   };
   const handleUpdateStatus = (id, statusUpdate) => {
     let mess = statusUpdate ? "Đang hoạt động" : "Ngưng hoạt động";
@@ -49,18 +75,34 @@ const CategoryTable = function (props) {
     const updatedStatusValue = statusUpdate ? "ACTIVE" : "INACTIVE"; // Cập nhật trạng thái dựa trên giá trị của statusUpdate
 
     axios
-      .put(`http://localhost:8080/api/admin/category/update/${id}`, {
-        status: updatedStatusValue,
-      })
+      .put(
+        `http://localhost:8080/api/admin/category/update/${id}`,
+        {
+          status: updatedStatusValue,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
+      )
       .then((response) => {
         setRender(Math.random);
         setTimeout(() => {
-          messageApi.success(mess, 2);
+          api.success(mess, 2);
         }, 500);
       })
       .catch((error) => {
+        const status = error?.response?.data?.status;
+        if (status === 403) {
+          api.error({
+            message: "Lỗi",
+            description: "Bạn không có quyền xem nội dung này",
+          });
+          return;
+        }
         setTimeout(() => {
-          messageApi.error(`Cập nhật trạng thái thất bại`, 2);
+          api.error(`Cập nhật trạng thái thất bại`, 2);
         }, 500);
       });
   };
@@ -72,7 +114,14 @@ const CategoryTable = function (props) {
 
   const handleConfirmDelete = () => {
     axios
-      .delete(`http://localhost:8080/api/admin/category/delete/${selectedData}`)
+      .delete(
+        `http://localhost:8080/api/admin/category/delete/${selectedData}`,
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
+      )
       .then((response) => {
         // Xoá dữ liệu thành công
         // Cập nhật lại danh sách dữ liệu sau khi xoá
@@ -81,12 +130,25 @@ const CategoryTable = function (props) {
         // Đóng modal
         setShowModal(false);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        const status = err.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
+        console.log(err);
+      });
   };
 
   useEffect(() => {
     axios
-      .get(`http://localhost:8080/api/admin/category`)
+      .get(`http://localhost:8080/api/admin/category`, {
+        headers: {
+          Authorization: `Bearer ${getToken(true)}`,
+        },
+      })
       .then((response) => {
         setData(response.data);
         console.log(response.data);
@@ -98,13 +160,13 @@ const CategoryTable = function (props) {
     <div>
       {console.log(data)}
       <Table
-           pagination={{
-            showSizeChanger: true,
-            pageSizeOptions: [5, 10, 15, 20],
-            defaultPageSize: 5,
-            showLessItems: true,
-            style: { marginRight: "10px" },
-          }}
+        pagination={{
+          showSizeChanger: true,
+          pageSizeOptions: [5, 10, 15, 20],
+          defaultPageSize: 5,
+          showLessItems: true,
+          style: { marginRight: "10px" },
+        }}
         dataSource={data}
         columns={[
           {

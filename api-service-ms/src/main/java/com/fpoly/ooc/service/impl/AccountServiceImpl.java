@@ -3,6 +3,7 @@ package com.fpoly.ooc.service.impl;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
 import com.fpoly.ooc.dto.CustomerConditionDTO;
+import com.fpoly.ooc.dto.UserDTO;
 import com.fpoly.ooc.entity.*;
 import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.AccountRepository;
@@ -89,14 +90,20 @@ public class AccountServiceImpl implements AccountService {
                 .district(request.getDistrict())
                 .ward(request.getWard())
                 .build();
-        Address createAddress = addressRepository.save(address);
-
-        AddressDetail addressDetail = AddressDetail.builder()
-                .accountAddress(createAccount)
-                .addressDetail(createAddress)
-                .build();
-        addressDetailRepository.save(addressDetail);
+        if(!address.getCity().equals("empty") || !address.getDistrict().equals("empty") ||!address.getWard().equals("empty")){
+            Address createAddress = addressRepository.save(address);
+            AddressDetail addressDetail = AddressDetail.builder()
+                    .accountAddress(createAccount)
+                    .addressDetail(createAddress)
+                    .build();
+            addressDetailRepository.save(addressDetail);
+        }
         return createAccount;
+    }
+
+    @Override
+    public Account save(Account request) {
+        return accountRepository.save(request);
     }
 
     @Override
@@ -137,7 +144,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public AccountDetailResponce detail(String username) {
         List<AddressDetail> accountAddressDetails = addressDetailService.getAddressDetailsByUsername(username);
-        Account account = accountAddressDetails.get(0).getAccountAddress();
+        Account account = accountRepository.findById(username).orElse(null);
         if (account == null) {
             throw new IllegalArgumentException("username không tồn tại");
         }
@@ -220,6 +227,38 @@ public class AccountServiceImpl implements AccountService {
         }
 
         return lstAccountDetailResponces;
+    }
+
+    @Override
+    public Account findLoginByUsername(String username) {
+        return accountRepository.findLoginByUsername(username);
+    }
+
+    @Override
+    public Account findLoginByEmail(String email) {
+        return accountRepository.findLoginByEmail(email);
+    }
+
+    @Override
+    public Account findLoginByPhone(String phone) {
+        return accountRepository.findLoginByNumberPhone(phone);
+    }
+
+    @Override
+    public Account findAccountByLogin(String login, String role) {
+        if(role == null) {
+            return accountRepository.findUserByLogin(login);
+        }
+
+        if(role.equalsIgnoreCase(Const.ROLE_CUSTOMER)) {
+            return accountRepository.findAccountCustomerByLogin(login);
+        }
+
+        if(role.equalsIgnoreCase(Const.ROLE_EMPLOYEE) || role.equalsIgnoreCase(Const.ROLE_ADMIN)) {
+            return accountRepository.findEmployeeAndAdmintByLogin(login);
+        }
+
+        return null;
     }
 
     private Page<AccountVoucher> page(List<AccountVoucher> inputList, Pageable pageable) {

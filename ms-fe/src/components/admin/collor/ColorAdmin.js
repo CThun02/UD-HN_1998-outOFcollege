@@ -10,11 +10,13 @@ import {
   Modal,
   Button,
   ColorPicker,
+  notification,
 } from "antd";
 import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
 import CollorTable from "./CollorTable";
 import styles from "../categorystyles/CategoryStyles.module.css";
 import axios from "axios";
+import { getToken } from "../../../service/Token";
 const { Option } = Select;
 
 const CollorAdmin = function () {
@@ -40,16 +42,26 @@ const CollorAdmin = function () {
 
     // Gọi API để thêm dữ liệu
     axios
-      .post("http://localhost:8080/api/admin/color/create", values)
+      .post("http://localhost:8080/api/admin/color/create", values, {
+        headers: {
+          Authorization: `Bearer ${getToken(true)}`,
+        },
+      })
       .then((response) => {
         // Xử lý thành công
         console.log("Thêm thành công");
         setIsModalVisible(false);
         setRender(Math.random);
       })
-      .catch((error) => {
+      .catch((err) => {
         // Xử lý lỗi
-        console.error("Lỗi khi thêm dữ liệu", error);
+        const status = err.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
       });
     console.log(values);
   };
@@ -57,7 +69,7 @@ const CollorAdmin = function () {
   useEffect(() => {}, [render]);
   return (
     <div className={styles.category}>
-      <div className={styles.radiusFrame}>
+      <div className={styles.customer}>
         <Row className={styles.titleTB}>
           <h3>Danh Sách Màu Sắc</h3>
         </Row>
@@ -100,7 +112,6 @@ const CollorAdmin = function () {
               ]}
             >
               <ColorPicker
-                color={colorCode}
                 showText
                 onChange={(e) => setColorCode(e.toHexString())}
               />

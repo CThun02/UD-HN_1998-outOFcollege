@@ -1,20 +1,45 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Banner from "../banner/Banner";
 import Slider from "../slider/Slider";
 import TypeCategory from "../type-category/TypeCategory";
 import ImageTree from "../image/ImageTree";
 import FirstPayBill from "../fisrt-pay/FirstPayBill";
 import BestSellingAndNewProduct from "../best-selling-and-new-product/BestSellingProduct";
-import { FloatButton } from "antd";
+import { FloatButton, notification } from "antd";
 import { ArrowUpOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import { NotificationContext } from "../../../element/notification/NotificationAuthen";
 
-const baseUrl = "http://localhost:8080/api/admin/product";
+const baseUrl = "http://localhost:8080/api/client/product";
 
 function HomeClient() {
   const [bestSellings, setBestSellings] = useState([]);
   const [newProducs, setNewProducts] = useState([]);
+  const [apiNotification, contextHolder] = notification.useNotification();
+  const { successMessage, clearNotification, context } =
+    useContext(NotificationContext);
+
+  useEffect(
+    function () {
+      let isCheck = true;
+      async function notification() {
+        if (successMessage !== "" && isCheck === true && context === "login") {
+          apiNotification.success({
+            message: `Success`,
+            description: `${successMessage}`,
+          });
+          clearNotification();
+        }
+      }
+
+      return () => {
+        notification(true);
+        isCheck = false;
+      };
+    },
+    [successMessage, clearNotification, apiNotification, context]
+  );
 
   useEffect(() => {
     async function getBestSellings() {
@@ -28,7 +53,7 @@ function HomeClient() {
       }
     }
 
-    getBestSellings();
+    return () => getBestSellings();
   }, []);
 
   useEffect(() => {
@@ -44,7 +69,7 @@ function HomeClient() {
       }
     }
 
-    getNewProduct();
+    return () => getNewProduct();
   }, []);
 
   function handleScrollTop() {
@@ -55,6 +80,7 @@ function HomeClient() {
   }
   return (
     <div style={{ backgroundColor: "#fff" }}>
+      {contextHolder}
       <Slider />
       <Banner />
       <BestSellingAndNewProduct

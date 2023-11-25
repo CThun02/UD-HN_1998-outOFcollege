@@ -15,6 +15,7 @@ import {
   Carousel,
   Segmented,
   Avatar,
+  Badge,
 } from "antd";
 import React, { useEffect, useState } from "react";
 import styles from "./Bill.module.css";
@@ -28,6 +29,7 @@ import {
   QrcodeOutlined,
   UserOutlined,
   ShoppingCartOutlined,
+  WalletOutlined,
 } from "@ant-design/icons";
 import * as Yup from "yup";
 import axios from "axios";
@@ -41,6 +43,7 @@ import QRReader from "../../../service/QRReader";
 import FormUsingVoucher from "../../element/voucher/FormUsingVoucher";
 import numeral from "numeral";
 import SearchNameOrCodeVoucher from "../../element/voucher/SearchNameOrCodeVoucher";
+import { getToken } from "../../../service/Token";
 
 const Bill = () => {
   var initialItems = [];
@@ -123,29 +126,71 @@ const Bill = () => {
       },
     },
     {
-      key: "productName",
+      key: "product",
+      datatIndex: "product",
       title: "Sản phẩm",
+      width: "50%",
       render: (text, record, index) => {
         return (
-          <Row>
-            <Col span={4}>
-              <Carousel autoplay className={styles.slider}>
-                {record.productDetail.productImageResponse &&
-                  record.productDetail.productImageResponse.map(
-                    (productImage, index) => {
-                      return (
-                        <img
-                          key={productImage.id}
-                          style={{ width: "100px" }}
-                          alt="abc"
-                          src={productImage.path}
-                        />
-                      );
-                    }
-                  )}
-              </Carousel>
+          <Row style={{ width: "100%" }}>
+            <Col span={6} style={{ height: "100%" }}>
+              <div
+                style={{
+                  marginTop: "10px",
+                  marginRight: "10px",
+                }}
+              >
+                {record.productDetail.promotion.length !== 0 ? (
+                  <Badge.Ribbon
+                    text={`Giảm ${record.productDetail.promotion[0].promotionValue
+                      ? record.productDetail.promotion[0].promotionMethod ===
+                        "%"
+                        ? record.productDetail.promotion[0].promotionValue +
+                        " " +
+                        record.productDetail.promotion[0].promotionMethod
+                        : record.productDetail.promotion[0].promotionValue.toLocaleString(
+                          "vi-VN",
+                          {
+                            style: "currency",
+                            currency: "VND",
+                          }
+                        )
+                      : null
+                      }`}
+                    color="red"
+                  >
+                    <Carousel style={{ maxWidth: "300px" }} autoplay>
+                      {record.productDetail.productImageResponse &&
+                        record.productDetail.productImageResponse.map((item) => {
+                          return (
+                            <img
+                              key={item.id}
+                              style={{ width: "100%", marginTop: "10px" }}
+                              alt=""
+                              src={item.path}
+                            />
+                          );
+                        })}
+                    </Carousel>
+                  </Badge.Ribbon>
+                ) : (
+                  <Carousel style={{ maxWidth: "300px" }} autoplay>
+                    {record.productDetail.productImageResponse &&
+                      record.productDetail.productImageResponse.map((item) => {
+                        return (
+                          <img
+                            key={item.id}
+                            style={{ width: "100%", marginTop: "10px" }}
+                            alt=""
+                            src={item.path}
+                          />
+                        );
+                      })}
+                  </Carousel>
+                )}
+              </div>
             </Col>
-            <Col span={20}>
+            <Col span={18} style={{ height: "100%" }}>
               <div
                 className="m-5"
                 style={{
@@ -157,11 +202,11 @@ const Bill = () => {
                 <span style={{ fontWeight: "500" }}>
                   {record.productDetail.product.productName +
                     "-" +
-                    record.productDetail.button.buttonName +
-                    "-" +
                     record.productDetail.brand.brandName +
                     "-" +
                     record.productDetail.category.categoryName +
+                    "-" +
+                    record.productDetail.button.buttonName +
                     "-" +
                     record.productDetail.material.materialName +
                     "-" +
@@ -205,7 +250,6 @@ const Bill = () => {
       title: "Số lượng",
       dataIndex: "quantity",
       key: "quantity",
-      width: 200,
       render: (text, record, index) => {
         return (
           <InputNumber
@@ -220,20 +264,73 @@ const Bill = () => {
       },
     },
     {
+      title: "Đơn giá",
+      dataIndex: "price",
+      key: "price",
+
+      render: (text, record, index) => {
+        return (
+          <div style={{ textAlign: "center" }}>
+            {record.productDetail.promotionValue ? (
+              <span style={{ color: "#ccc" }}>
+                <strike>
+                  {record.productDetail.price.toLocaleString("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  })}
+                </strike>
+              </span>
+            ) : (
+              <span>
+                {record.productDetail.price.toLocaleString("vi-VN", {
+                  style: "currency",
+                  currency: "VND",
+                })}
+              </span>
+            )}
+            <br />
+            <span>
+              {record.productDetail.promotionValue
+                ? record.productDetail.promotionMethod === "%"
+                  ? (
+                    (record.productDetail.price *
+                      (100 - Number(record.productDetail.promotionValue))) /
+                    100
+                  ).toLocaleString("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  })
+                  : (
+                    record.productDetail.price -
+                    Number(record.productDetail.promotionValue)
+                  ).toLocaleString("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  })
+                : null}
+            </span>
+          </div>
+        );
+      },
+    },
+    {
       title: "Thành tiền",
       dataIndex: "totalPrice",
       key: "totalPrice",
-      width: 200,
-
       render: (text, record, index) => {
-        return <span>{record.productDetail.price * record.quantity}</span>;
+        return (
+          <span>
+            {(record.priceReduce * record.quantity).toLocaleString("vi-VN", {
+              style: "currency",
+              currency: "VND",
+            })}
+          </span>
+        );
       },
     },
     {
       title: "Thao tác",
       key: "action",
-      width: 200,
-
       render: (text, record, index) => (
         <Space size="middle">
           <Button
@@ -285,11 +382,13 @@ const Bill = () => {
     },
   ];
 
-  const [selectedOption, setSelectedOption] = useState(1);
+  const [selectedOption, setSelectedOption] = useState([1]);
 
-  const handleOptionChange = (value) => {
-    setInputError("");
-    setSelectedOption(value);
+  const handleOptionChange = (value, index) => {
+    const visible = [...selectedOption];
+    visible[index] = value;
+    console.log(visible[index]);
+    setSelectedOption(visible);
     if (value === "2") {
       setAmountPaid(0);
     }
@@ -477,7 +576,7 @@ const Bill = () => {
 
   //  giá tiền tạm tính
   const totalPrice = productDetails.reduce((total, product) => {
-    return total + product.productDetail.price * product.quantity;
+    return total + product.priceReduce * product.quantity;
   }, 0);
 
   const voucherPrice = () => {
@@ -489,9 +588,9 @@ const Bill = () => {
       }
     } else if (voucherAdd && voucherAdd.voucherMethod === "%") {
       if (result > voucherAdd.voucherCondition) {
-        const maxDiscount =
-          (totalPrice * (voucherAdd.voucherValueMax ?? 0)) / 100; // Giới hạn giảm giá tối đa là 50%
-        const discount = (totalPrice * (voucherAdd.voucherValue ?? 0)) / 100;
+        const discountPercent = voucherAdd.voucherValue ?? 0;
+        const maxDiscount = voucherAdd.voucherValueMax ?? 0;
+        let discount = (totalPrice * discountPercent) / 100;
         result -= Math.min(discount, maxDiscount);
       }
     } else {
@@ -654,12 +753,22 @@ const Bill = () => {
   const getListAddressByUsername = (username) => {
     if (username) {
       axios
-        .get(`http://localhost:8080/api/admin/account/detail/${username}`)
+        .get(`http://localhost:8080/api/admin/account/detail/${username}`, {
+          headers: {
+            Authorization: `Bearer ${getToken(true)}`,
+          },
+        })
         .then((response) => {
           setAddress(response.data);
         })
         .catch((error) => {
-          console.log(error);
+          const status = error.response.status;
+          if (status === 403) {
+            notification.error({
+              message: "Thông báo",
+              description: "Bạn không có quyền truy cập!",
+            });
+          }
         });
     }
   };
@@ -667,7 +776,12 @@ const Bill = () => {
     axios
       .get(
         "http://localhost:8080/api/admin/product/getproductdetailbyidpd?productDetailId=" +
-          result
+        result,
+        {
+          headers: {
+            Authorization: `Bearer ${getToken(true)}`,
+          },
+        }
       )
       .then((response) => {
         var cart = JSON.parse(localStorage.getItem(cartId));
@@ -698,6 +812,13 @@ const Bill = () => {
           productDetails.push({
             productDetail: response.data,
             quantity: 1,
+            priceReduce: response.data.promotionValue
+              ? response.data.promotionMethod === "%"
+                ? (response.data.price *
+                  (100 - Number(response.data.promotionValue))) /
+                100
+                : response.data.price - Number(response.data.promotionValue)
+              : response.data.price,
           });
         }
         cart = {
@@ -705,6 +826,7 @@ const Bill = () => {
           timeStart: now(),
           account: cart.account,
         };
+        console.log(cart);
         localStorage.setItem(cartId, JSON.stringify(cart));
         notification.success({
           message: "Thông báo",
@@ -713,7 +835,13 @@ const Bill = () => {
         });
       })
       .catch((err) => {
-        console.log(err);
+        const status = err.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
       });
     setRendered(Math.random());
   };
@@ -750,6 +878,7 @@ const Bill = () => {
 
     getProductDetails();
     initializeModalStates();
+    console.log(account);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     cartId,
@@ -768,7 +897,7 @@ const Bill = () => {
     const visible = [...showAddress];
     visible[index] = checked;
     setTypeShipping(visible);
-    setSelectedOption(1);
+    setSelectedOption([1]);
   };
 
   const [errors, setErrors] = useState({});
@@ -780,19 +909,19 @@ const Bill = () => {
       priceReduce: totalPrice - voucherPrice(),
       amountPaid: typeShipping[index]
         ? 0
-        : selectedOption === "2"
-        ? voucherPrice() + shippingFee
-        : amountPaid,
+        : selectedOption[index] === "2"
+          ? voucherPrice() + shippingFee
+          : amountPaid,
       billType: "In-Store",
       symbol: typeShipping[index] ? "Shipping" : symbol,
       status: typeShipping[index] ? "Unpaid" : "Paid",
       note: note,
-      paymentDetailId: selectedOption,
+      paymentDetailId: selectedOption[index],
       lstBillDetailRequest: [],
       addressId: selectedAddress?.id,
       fullname: selectedAddress?.fullName,
       phoneNumber: selectedAddress.numberPhone,
-      transactionCode: selectedOption === "2" ? transactionCode : null,
+      transactionCode: selectedOption[index] === "2" ? transactionCode : null,
       voucherCode: voucherAdd?.voucherCode,
       createdBy: "user3",
     };
@@ -819,10 +948,10 @@ const Bill = () => {
         description: "Không có sản phẩm nào trong giỏ hàng.",
         duration: 2,
       });
-    } else if (selectedOption === 2 && transactionCode === "") {
+    } else if (selectedOption[index] === 2 && transactionCode === "") {
       return setInputError("Mã giao dịch không được để trống");
     } else if (
-      selectedOption !== "2" &&
+      selectedOption[index] !== "2" &&
       ((remainAmount < 0 && !typeShipping[index]) || isNaN(remainAmount))
     ) {
       return setInputError("Tiền không đủ");
@@ -830,10 +959,9 @@ const Bill = () => {
       for (let i = 0; i < productDetails.length; i++) {
         const billDetail = {
           productDetailId: productDetails[i].productDetail.id,
-          price: productDetails[i].productDetail.price,
+          price: productDetails[i].priceReduce,
           quantity: productDetails[i].quantity,
         };
-
         bill.lstBillDetailRequest.push(billDetail);
       }
 
@@ -850,7 +978,12 @@ const Bill = () => {
               setErrors({});
               const response = await axios.post(
                 "http://localhost:8080/api/admin/address",
-                billAddress
+                billAddress,
+                {
+                  headers: {
+                    Authorization: `Bearer ${getToken(true)}`,
+                  },
+                }
               );
               addressId = response.data.id;
             } catch (error) {
@@ -871,7 +1004,12 @@ const Bill = () => {
           try {
             const response = await axios.post(
               "http://localhost:8080/api/admin/bill",
-              bill
+              bill,
+              {
+                headers: {
+                  Authorization: `Bearer ${getToken(true)}`,
+                },
+              }
             );
             if (switchChange[index]) {
               await axios.post(
@@ -879,8 +1017,15 @@ const Bill = () => {
                 {
                   billId: response.data.id,
                   addressId: account ? selectedAddress?.id : addressId,
+                  name: account ? account.fullName : fullname,
+                  phoneNumber: account ? account.numberPhone : phoneNumber,
                   shipDate: switchChange[index] === true ? leadtime : null,
                   shipPrice: switchChange[index] === true ? shippingFee : null,
+                },
+                {
+                  headers: {
+                    Authorization: `Bearer ${getToken(true)}`,
+                  },
                 }
               );
             }
@@ -892,7 +1037,13 @@ const Bill = () => {
             navigate(`/api/admin/order`);
             remove(activeKey);
           } catch (error) {
-            console.log(error);
+            const status = error.response.status;
+            if (status === 403) {
+              notification.error({
+                message: "Thông báo",
+                description: "Bạn không có quyền truy cập!",
+              });
+            }
           }
         },
       });
@@ -943,7 +1094,9 @@ const Bill = () => {
                 <div className={styles.tabContent}>
                   <Row>
                     <Col span={12}>
-                      <h2>Giỏ hàng</h2>
+                      <h2>
+                        <ShoppingCartOutlined /> Giỏ hàng
+                      </h2>
                     </Col>
                     <Col span={12}>
                       <Button
@@ -991,7 +1144,9 @@ const Bill = () => {
                 <div className={styles.infoPayment}>
                   <Row>
                     <Col span={12}>
-                      <h2>Thông tin thanh toán</h2>
+                      <h2>
+                        <WalletOutlined /> Thông tin thanh toán
+                      </h2>
                     </Col>
                     <Col span={12} style={{ textAlign: "right" }}>
                       <Button
@@ -1118,9 +1273,9 @@ const Bill = () => {
                               value={
                                 selectedAddress.city
                                   ? selectedAddress?.city.substring(
-                                      0,
-                                      selectedAddress.city.indexOf("|")
-                                    )
+                                    0,
+                                    selectedAddress.city.indexOf("|")
+                                  )
                                   : undefined
                               }
                             >
@@ -1157,9 +1312,9 @@ const Bill = () => {
                               value={
                                 selectedAddress.district
                                   ? selectedAddress?.district.substring(
-                                      0,
-                                      selectedAddress.district.indexOf("|")
-                                    )
+                                    0,
+                                    selectedAddress.district.indexOf("|")
+                                  )
                                   : undefined
                               }
                             >
@@ -1194,9 +1349,9 @@ const Bill = () => {
                               value={
                                 selectedAddress.ward
                                   ? selectedAddress.ward.substring(
-                                      0,
-                                      selectedAddress.ward.indexOf("|")
-                                    )
+                                    0,
+                                    selectedAddress.ward.indexOf("|")
+                                  )
                                   : undefined
                               }
                             >
@@ -1225,21 +1380,20 @@ const Bill = () => {
                             value={selectedAddress?.descriptionDetail}
                           />
                         </Col>
-                        <Col span={6} style={{ marginLeft: "30px" }}>
-                          <img
-                            src={logoGhn}
-                            alt="logo"
-                            style={{ width: "90px", height: "80px" }}
-                          />
-                        </Col>
-
-                        {switchChange[index] && (
-                          <h3>
-                            Ngày giao hàng dự kiến:{" "}
-                            {moment(leadtime).format("DD/MM/YYYY") || ""}
-                          </h3>
-                        )}
                       </Row>
+                      {switchChange[index] && leadtime && (
+                        <h3>
+                          Ngày giao hàng dự kiến:{" "}
+                          {moment(leadtime).format("DD/MM/YYYY") || ""}
+                        </h3>
+                      )}
+                      <div>
+                        <img
+                          src={logoGhn}
+                          alt="logo"
+                          style={{ width: "90px", height: "80px" }}
+                        />
+                      </div>
                     </Col>
                     <Col span={8} offset={1}>
                       <Switch onChange={(e) => handleChangSwitch(e, index)} />
@@ -1262,11 +1416,11 @@ const Bill = () => {
                             productDetails.length > 0
                               ? true
                               : notification.error({
-                                  message: "Lỗi",
-                                  description:
-                                    "Chưa có sản phẩm trong giỏ hàng.",
-                                  duration: 2,
-                                })
+                                message: "Lỗi",
+                                description:
+                                  "Chưa có sản phẩm trong giỏ hàng.",
+                                duration: 2,
+                              })
                           )
                         }
                       >
@@ -1405,8 +1559,8 @@ const Bill = () => {
                             </span>
                           )}
                         </Col>
-                        {Number(selectedOption) !== 2 &&
-                        !typeShipping[index] ? (
+                        {Number(selectedOption[index]) !== 2 &&
+                          !typeShipping[index] ? (
                           <>
                             <Col span={8} style={{ marginTop: "8px" }}>
                               <span
@@ -1438,7 +1592,7 @@ const Bill = () => {
                             </Col>
                           </>
                         ) : null}
-                        {Number(selectedOption) === 2 ? (
+                        {Number(selectedOption[index]) === 2 ? (
                           <>
                             <Input
                               placeholder="Nhập mã giao dịch"
@@ -1454,8 +1608,8 @@ const Bill = () => {
                             </span>
                           </>
                         ) : null}
-                        {Number(selectedOption) !== 2 &&
-                        !typeShipping[index] ? (
+                        {Number(selectedOption[index]) !== 2 &&
+                          !typeShipping[index] ? (
                           <Col span={24}>
                             <Row style={{ marginTop: "8px" }}>
                               <Col span={16}>
@@ -1492,7 +1646,7 @@ const Bill = () => {
                             <Segmented
                               options={options}
                               style={{ marginBottom: "20px" }}
-                              onChange={handleOptionChange}
+                              onChange={(e) => handleOptionChange(e, index)}
                             >
                               {options.map((option) => (
                                 <div key={option.value}>{option.label}</div>

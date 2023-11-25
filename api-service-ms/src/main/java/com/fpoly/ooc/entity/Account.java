@@ -36,7 +36,7 @@ import java.util.List;
                        account.phone_number as 'phoneNumber'
                 from account
                          left join role on account.role_id = role.id
-                where role.role_name = 'CUSTOMER' and account.status = 'ACTIVE'
+                where role.role_name = 'ROLE_CUSTOMER' and account.status = 'ACTIVE'
                 and (?1 is null
                     or lower(account.username) like ?1
                     or lower(account.full_name) like ?1

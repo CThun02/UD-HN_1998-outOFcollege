@@ -5,13 +5,14 @@ import {
   SearchOutlined,
   TableOutlined,
 } from "@ant-design/icons";
-import { Col, Row, Table, Button, Switch, Radio, message } from "antd";
+import { Col, Row, Table, Button, Switch, Radio, message, notification } from "antd";
 import React, { useEffect, useState } from "react";
 import styles from "./ProductIndex.module.css";
 import axios from "axios";
 import Input from "antd/es/input/Input";
 import { Link } from "react-router-dom";
 import ProductOpenActive from "./ProductOpenActive";
+import { getToken } from "../../../service/Token";
 
 const ProductIndex = () => {
   const api = "http://localhost:8080/api/admin/";
@@ -99,17 +100,28 @@ const ProductIndex = () => {
     axios
       .get(
         api +
-          "product/getproductfilterByCom?status=" +
-          status +
-          "&keywords=" +
-          keywords
+        "product/getproductfilterByCom?status=" +
+        status +
+        "&keywords=" +
+        keywords,
+        {
+          headers: {
+            Authorization: `Bearer ${getToken(true)}`,
+          },
+        }
       )
       .then((res) => {
         setProductsTable(res.data);
         setLoading(false);
       })
       .catch((error) => {
-        console.log(error);
+        const status = error.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
       });
   }
 
@@ -117,10 +129,15 @@ const ProductIndex = () => {
     axios
       .put(
         api +
-          "product/updateProductStatus?productId=" +
-          product.id +
-          "&status=" +
-          "INACTIVE"
+        "product/updateProductStatus?productId=" +
+        product.id +
+        "&status=" +
+        "INACTIVE",
+        {
+          headers: {
+            Authorization: `Bearer ${getToken(true)}`,
+          },
+        }
       )
       .then((response) => {
         setTimeout(() => {
@@ -132,6 +149,13 @@ const ProductIndex = () => {
         }, 500);
       })
       .catch((error) => {
+        const status = error.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
         messageApi.error(`Cập nhật trạng thái thất bại`, 2);
       });
   }

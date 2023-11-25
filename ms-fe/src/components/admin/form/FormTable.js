@@ -1,10 +1,20 @@
 import React from "react";
 import { FormOutlined, DeleteFilled } from "@ant-design/icons";
 
-import { Table, Space, Button, Modal, Switch, Input, message } from "antd";
+import {
+  Table,
+  Space,
+  Button,
+  Modal,
+  Switch,
+  Input,
+  message,
+  notification,
+} from "antd";
 import { useEffect, useState } from "react";
 import styles from "./FormStyle.module.css";
 import axios from "axios";
+import { getToken } from "../../../service/Token";
 
 const FormTable = function (props) {
   const [data, setData] = useState([]);
@@ -34,9 +44,17 @@ const FormTable = function (props) {
   };
   const handleUpdate = () => {
     axios
-      .put(`http://localhost:8080/api/admin/form/edit/${id}`, {
-        formName,
-      })
+      .put(
+        `http://localhost:8080/api/admin/form/edit/${id}`,
+        {
+          formName,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
+      )
       .then((response) => {
         // Cập nhật lại danh sách dữ liệu sau khi cập nhật thành công
 
@@ -45,7 +63,15 @@ const FormTable = function (props) {
         setRender(Math.random);
         message.success("Cập nhật thành công");
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        const status = err.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
+      });
   };
 
   const handleUpdateStatus = (id, statusUpdate) => {
@@ -54,16 +80,32 @@ const FormTable = function (props) {
     const updatedStatusValue = statusUpdate ? "ACTIVE" : "INACTIVE"; // Cập nhật trạng thái dựa trên giá trị của statusUpdate
 
     axios
-      .put(`http://localhost:8080/api/admin/form/update/${id}`, {
-        status: updatedStatusValue,
-      })
+      .put(
+        `http://localhost:8080/api/admin/form/update/${id}`,
+        {
+          status: updatedStatusValue,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
+      )
       .then((response) => {
         setRender(Math.random);
         setTimeout(() => {
           messageApi.success(mess, 2);
         }, 500);
       })
-      .catch((error) => {
+      .catch((err) => {
+        const status = err.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+          return;
+        }
         setTimeout(() => {
           messageApi.error(`Cập nhật trạng thái thất bại`, 2);
         }, 500);
@@ -71,7 +113,11 @@ const FormTable = function (props) {
   };
   const handleConfirmDelete = () => {
     axios
-      .delete(`http://localhost:8080/api/admin/form/delete/${selectedData}`)
+      .delete(`http://localhost:8080/api/admin/form/delete/${selectedData}`, {
+        headers: {
+          Authorization: `Bearer ${getToken(true)}`,
+        },
+      })
       .then((response) => {
         // Xoá dữ liệu thành công
         // Cập nhật lại danh sách dữ liệu sau khi xoá
@@ -80,17 +126,37 @@ const FormTable = function (props) {
         // Đóng modal
         setShowModal(false);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        const status = err.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
+      });
   };
 
   useEffect(() => {
     axios
-      .get(`http://localhost:8080/api/admin/form`)
+      .get(`http://localhost:8080/api/admin/form`, {
+        headers: {
+          Authorization: `Bearer ${getToken(true)}`,
+        },
+      })
       .then((response) => {
         setData(response.data);
         console.log(response.data);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        const status = err.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
+      });
   }, [props.renderTable, render]);
 
   return (

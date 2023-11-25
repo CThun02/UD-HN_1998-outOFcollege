@@ -16,13 +16,14 @@ const ModalDetail = ({ isModalOpen, handleOk, handleCancel, timelineDetail, symb
             dataIndex: 'status',
             key: 'status',
             render: (status) => {
-                if (symbol === 'In-store') {
+                if (symbol === 'Received') {
                     return status === '1'
                         ? 'Chờ xác nhận'
                         : status === '2'
                             ? 'Thanh toán thành công'
                             : status === '0' ? 'Đã hủy'
-                                : ''
+                                : status === '3' ? 'Yêu cầu trả hàng'
+                                    : status === '4' ? 'Trả hàng thành công' : ""
                 } else {
                     return status === '1'
                         ? 'Chờ xác nhận'
@@ -40,8 +41,7 @@ const ModalDetail = ({ isModalOpen, handleOk, handleCancel, timelineDetail, symb
             dataIndex: 'createdDate',
             key: 'createdDate',
             render: (createdDate) => {
-                return moment(createdDate)
-                    .format('DD/MM/YYYY HH:mm')
+                return createdDate
             }
         },
         {

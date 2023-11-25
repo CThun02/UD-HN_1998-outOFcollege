@@ -4,8 +4,10 @@ import { useEffect, useState } from "react";
 import VoucherList from "./VoucherList";
 import axios from "axios";
 import "./global.css";
+import { getToken } from "../../../service/Token";
 
-const baseUrl = "http://localhost:8080/api/admin/vouchers";
+const href = window.location.href;
+const baseUrl = `http://localhost:8080/api/${href.includes('admin') ? `admin` : `client`}/vouchers`;
 
 function FormUsingVoucher({
   setIsOpen,
@@ -40,7 +42,12 @@ function FormUsingVoucher({
         };
         const res = await axios.post(
           baseUrl + "/display-modal-using",
-          condition
+          condition,
+          {
+            headers: {
+              Authorization: `Bearer ${getToken()}`,
+            },
+          }
         );
         const data = await res.data;
         setVouchers(data);
@@ -76,6 +83,7 @@ function FormUsingVoucher({
           value={voucher}
         >
           {vouchers.map((data) => (
+            data.status !== 'CANCEL' &&
             <VoucherList
               key={data.voucherId}
               data={data}

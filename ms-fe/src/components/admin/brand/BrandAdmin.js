@@ -1,13 +1,24 @@
 import React, { useState } from "react";
-import { Input, Row, Col, Button, Form, Modal, message } from "antd";
+import {
+  Input,
+  Row,
+  Col,
+  Button,
+  Form,
+  Modal,
+  message,
+  notification,
+} from "antd";
 import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
 import BrandTable from "./BrandTable";
 import styles from "./BrandStyle.module.css";
 import axios from "axios";
+import { getToken } from "../../../service/Token";
 
 const BrandAdmin = function () {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [render, setRender] = useState();
+  const [api, contextHolder] = notification.useNotification();
 
   const handleAdd1 = () => {
     setIsModalVisible(true);
@@ -21,7 +32,11 @@ const BrandAdmin = function () {
     values.status = "ACTIVE";
     // Gọi API để thêm dữ liệu
     axios
-      .post("http://localhost:8080/api/admin/brand/create", values)
+      .post("http://localhost:8080/api/admin/brand/create", values, {
+        headers: {
+          Authorization: `Bearer ${getToken(true)}`,
+        },
+      })
       .then((response) => {
         // Xử lý thành công
         console.log("Thêm thành công");
@@ -32,6 +47,14 @@ const BrandAdmin = function () {
       .catch((error) => {
         // Xử lý lỗi
         console.error("Lỗi khi thêm dữ liệu", error);
+        const status = error?.response?.data?.status;
+        if (status === 403) {
+          api.error({
+            message: "Lỗi",
+            description: "Bạn không có quyền xem nội dung này",
+          });
+          return;
+        }
       });
   };
 
@@ -39,6 +62,7 @@ const BrandAdmin = function () {
 
   return (
     <div className={styles.material}>
+      {contextHolder}
       <div className={styles.radiusFrame}>
         <Row className={styles.titleTB}>
           <h3>Danh Sách Chất Liệu</h3>

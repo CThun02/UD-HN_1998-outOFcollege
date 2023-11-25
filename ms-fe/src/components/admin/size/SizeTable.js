@@ -1,9 +1,10 @@
 import React from "react";
 import { FormOutlined, DeleteFilled } from "@ant-design/icons";
-import { Table, Space, Button, Modal, Input, Switch, message } from "antd";
+import { Table, Space, Button, Modal, Input, Switch, message, notification } from "antd";
 import { useEffect, useState } from "react";
 import styles from "../categorystyles/CategoryStyles.module.css";
 import axios from "axios";
+import { getToken } from "../../../service/Token";
 
 const SizeTable = function (props) {
   const [data, setData] = useState([]);
@@ -35,7 +36,11 @@ const SizeTable = function (props) {
 
   const handleConfirmDelete = () => {
     axios
-      .delete(`http://localhost:8080/api/admin/size/delete/${selectedData}`)
+      .delete(`http://localhost:8080/api/admin/size/delete/${selectedData}`, {
+        headers: {
+          Authorization: `Bearer ${getToken(true)}`,
+        },
+      })
       .then((response) => {
         // Xoá dữ liệu thành công
         // Cập nhật lại danh sách dữ liệu sau khi xoá
@@ -49,9 +54,17 @@ const SizeTable = function (props) {
 
   const handleUpdate = () => {
     axios
-      .put(`http://localhost:8080/api/admin/size/edit/${id}`, {
-        sizeName,
-      })
+      .put(
+        `http://localhost:8080/api/admin/size/edit/${id}`,
+        {
+          sizeName,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
+      )
       .then((response) => {
         // Đóng modal
         setShowDetailsModal(false);
@@ -66,9 +79,17 @@ const SizeTable = function (props) {
     const updatedStatusValue = statusUpdate ? "ACTIVE" : "INACTIVE"; // Cập nhật trạng thái dựa trên giá trị của statusUpdate
 
     axios
-      .put(`http://localhost:8080/api/admin/size/updateStatus/${id}`, {
-        status: updatedStatusValue,
-      })
+      .put(
+        `http://localhost:8080/api/admin/size/updateStatus/${id}`,
+        {
+          status: updatedStatusValue,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
+      )
       .then((response) => {
         setRender(Math.random);
         if (statusUpdate) {
@@ -84,12 +105,24 @@ const SizeTable = function (props) {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:8080/api/admin/size`)
+      .get(`http://localhost:8080/api/admin/size`, {
+        headers: {
+          Authorization: `Bearer ${getToken(true)}`,
+        },
+      })
       .then((response) => {
         setData(response.data);
         console.log(response.data);
       })
-      .catch((err) => console.log(err));
+      .catch((error) => {
+        const status = error.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
+      });
   }, [props.renderTable, render]);
 
   return (

@@ -1,10 +1,20 @@
 import React, { useState } from "react";
 
-import { Input, Row, Col, Form, Button, Modal, message } from "antd";
+import {
+  Input,
+  Row,
+  Col,
+  Form,
+  Button,
+  Modal,
+  message,
+  notification,
+} from "antd";
 import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
 import FormTable from "./FormTable";
 import styles from "./FormStyle.module.css";
 import axios from "axios";
+import { getToken } from "../../../service/Token";
 
 const FormAdmin = function () {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -22,7 +32,11 @@ const FormAdmin = function () {
     values.status = "ACTIVE";
     // Gọi API để thêm dữ liệu
     axios
-      .post("http://localhost:8080/api/admin/form/create", values)
+      .post("http://localhost:8080/api/admin/form/create", values, {
+        headers: {
+          Authorization: `Bearer ${getToken(true)}`,
+        },
+      })
       .then((response) => {
         // Xử lý thành công
         console.log("Thêm thành công");
@@ -30,9 +44,16 @@ const FormAdmin = function () {
         setRender(Math.random);
         message.success("Thêm thành công");
       })
-      .catch((error) => {
+      .catch((err) => {
         // Xử lý lỗi
-        console.error("Lỗi khi thêm dữ liệu", error);
+        const status = err.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
+        console.error("Lỗi khi thêm dữ liệu", err);
       });
   };
 
@@ -40,7 +61,7 @@ const FormAdmin = function () {
     <div className={styles.material}>
       <div className={styles.radiusFrame}>
         <Row className={styles.titleTB}>
-          <h3>Danh Sách Chất Liệu</h3>
+          <h3>Danh Sách Kiểu dáng</h3>
         </Row>
         <Row className={styles.adminMenu}>
           <Col span={10}>

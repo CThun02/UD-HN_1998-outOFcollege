@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Select, Input, Row, Col, Form, DatePicker, Modal, Button } from "antd";
+import { Input, Row, Col, Form, Modal, Button, notification } from "antd";
 import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
 import ShirtTypeTable from "./ShirtTypeTable";
 import styles from "../categorystyles/CategoryStyles.module.css";
 import axios from "axios";
-const { Option } = Select;
+import { getToken } from "../../../service/Token";
 
 const ShirtTailAdmin = function () {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -23,7 +22,11 @@ const ShirtTailAdmin = function () {
     values.status = "ACTIVE";
     // Gọi API để thêm dữ liệu
     axios
-      .post("http://localhost:8080/api/admin/shirt-tail/create", values)
+      .post("http://localhost:8080/api/admin/shirt-tail/create", values, {
+        headers: {
+          Authorization: `Bearer ${getToken(true)}`,
+        },
+      })
       .then((response) => {
         // Xử lý thành công
         console.log("Thêm thành công");
@@ -32,14 +35,20 @@ const ShirtTailAdmin = function () {
       })
       .catch((error) => {
         // Xử lý lỗi
-        console.error("Lỗi khi thêm dữ liệu", error);
+        const status = error.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
       });
   };
 
   useEffect(() => {}, [render]);
   return (
     <div className={styles.category}>
-      <div className={styles.radiusFrame}>
+      <div className={styles.customer}>
         <Row className={styles.titleTB}>
           <h3>Danh Sách Đuôi Áo</h3>
         </Row>

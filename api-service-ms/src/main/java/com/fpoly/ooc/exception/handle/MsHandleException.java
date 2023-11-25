@@ -1,7 +1,12 @@
 package com.fpoly.ooc.exception.handle;
 
+import com.auth0.jwt.exceptions.JWTDecodeException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.fpoly.ooc.constant.Const;
+import com.fpoly.ooc.constant.ErrorCodeConfig;
+import com.fpoly.ooc.dto.ErrorDTO;
 import com.fpoly.ooc.exception.ErrorMessageResponse;
+import com.fpoly.ooc.exception.LoginException;
 import com.fpoly.ooc.exception.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +14,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.format.DateTimeParseException;
@@ -55,6 +61,33 @@ public class MsHandleException {
     public ResponseEntity<ErrorMessageResponse> dateTimeParseException(DateTimeParseException ex) {
 
         return new ResponseEntity<>(new ErrorMessageResponse(HttpStatus.BAD_REQUEST, ex.getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(value = { LoginException.class })
+    @ResponseBody
+    public ResponseEntity<ErrorDTO> handleException(LoginException ex) {
+        return ResponseEntity
+                .status(ex.getStatus())
+                .body(ErrorDTO.builder().message(ex.getMessage()).build());
+    }
+
+    @ExceptionHandler(value = {TokenExpiredException.class})
+    public ResponseEntity<ErrorDTO> handleJWTException(TokenExpiredException ex) {
+        return ResponseEntity
+                .status(409)
+                .body(
+                        ErrorDTO.builder()
+                                .message(ErrorCodeConfig.getMessage(Const.JWT_EXCEPTION)
+                                ).build());
+    }
+    @ExceptionHandler(value = {JWTDecodeException.class})
+    public ResponseEntity<ErrorDTO> handleJWTDecodeException(JWTDecodeException ex) {
+        return ResponseEntity
+                .status(409)
+                .body(
+                        ErrorDTO.builder()
+                                .message(ErrorCodeConfig.getMessage(Const.JWT_EXCEPTION)
+                                ).build());
     }
 
 }

@@ -15,11 +15,7 @@ public class CartRequest {
 
     private Long cartId;
 
-    private String accountId;
-
-    private Long productDetailId;
-
-    private Integer quantity;
+    private String username;
 
     private List<CartDetailRequest> LstCartDetail;
 

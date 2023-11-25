@@ -17,14 +17,11 @@ import java.math.BigDecimal;
 import java.util.List;
 @Repository
 public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail, Long> {
-    @Query("SELECT pd.id AS id, pd.product AS product, pd.brand as brand, pd.category as category, pd.button AS button" +
+    @Query("SELECT DISTINCT pd.id AS id, pd.product AS product, pd.brand as brand, pd.category as category, pd.button AS button" +
             ", pd.material AS material, pd.collar AS collar, pd.sleeve AS sleeve" +
-            ", pd.size AS size, pd.color AS color, pd.shirtTail AS shirtTail, p.promotionMethod as promotionMethod" +
-            ", p.promotionValue as promotionValue, p.promotionCondition as promotionCondition" +
+            ", pd.size AS size, pd.color AS color, pd.shirtTail AS shirtTail"+
             ", pd.price AS price, pd.weight as weight, pd.quantity AS quantity, pd.descriptionDetail AS descriptionDetail" +
             ", pd.pattern as pattern, pd.form as form, pd.status as status FROM ProductDetail pd " +
-            "left join PromotionProduct pp on pp.productDetailId.id = pd.id " +
-            "left join Promotion  p on p.id = pp.promotion.id AND  p.status = 'ACTIVE'" +
             "WHERE (pd.product.id = ?1 OR ?1 IS NULL) " +
             "AND (pd.button.id = ?2 OR ?2 IS NULL) AND (pd.material.id = ?3 OR ?3 IS NULL) " +
             "AND (pd.shirtTail.id = ?4 OR ?4 IS NULL) AND (pd.sleeve.id = ?5 OR ?5 IS NULL) " +
@@ -39,11 +36,14 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
                                                                    Long brandId, Long categoryId, BigDecimal minPrice,
                                                                    BigDecimal maxPrice);
 
-    @Query("SELECT pd.id AS id, pd.product AS product, pd.brand as brand, pd.category as category, pd.button AS button" +
+    @Query("SELECT DISTINCT pd.id AS id, pd.product AS product, pd.brand as brand, pd.category as category, pd.button AS button" +
             ", pd.material AS material, pd.collar AS collar, pd.sleeve AS sleeve" +
-            ", pd.size AS size, pd.color AS color, pd.shirtTail AS shirtTail" +
+            ", pd.size AS size, pd.color AS color, pd.shirtTail AS shirtTail, p.promotionMethod as promotionMethod" +
+            ", p.promotionValue as promotionValue, p.promotionCondition as promotionCondition" +
             ", pd.price AS price, pd.weight as weight, pd.quantity AS quantity, pd.descriptionDetail AS descriptionDetail" +
-            ", pd.pattern as pattern, pd.form as form, pd.status as status FROM ProductDetail pd " +
+            ", pd.pattern as pattern, pd.form as form, pd.status as status FROM ProductDetail pd "+
+            "left join PromotionProduct pp on pp.productDetailId.id = pd.id " +
+            "left join Promotion  p on p.id = pp.promotion.id AND  p.status = 'ACTIVE'"+
             "WHERE (pd.id = ?1 OR ?1 IS NULL) ")
     public ProductDetailResponse getProductDetailResponseById(Long productDetailId);
 
@@ -298,4 +298,56 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
                                                             @Param("collarId") Long collarId,
                                                             @Param("sleeveId") Long sleeveId,
                                                             @Param("shirtId") Long shirtId);
+
+    @Query("select productDetail.id " +
+            "from ProductDetail productDetail " +
+            "left join Product product on productDetail.product.id = product.id " +
+            "left join Color color on productDetail.color.id = color.id " +
+            "left join Size s on productDetail.size.id = s.id " +
+            "left join Brand b on productDetail.brand.id = b.id " +
+            "left join Category cate on productDetail.category.id = cate.id " +
+            "left join Pattern patt on productDetail.pattern.id = patt.id " +
+            "left join Form form on productDetail.form.id = form.id " +
+            "left join ButtonType button on productDetail.button.id = button.id " +
+            "left join Material mate on productDetail.material.id = mate.id " +
+            "left join CollarType collar on productDetail.collar.id = collar.id " +
+            "left join SleeveType sleeve on productDetail.sleeve.id = sleeve.id " +
+            "left join ShirtTailType shirt on productDetail.shirtTail.id = shirt.id " +
+            "where " +
+            "productDetail.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and color.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and s.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and b.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and cate.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and patt.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and form.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and button.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and mate.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and collar.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and sleeve.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and shirt.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and product.id = :productId " +
+            "and (b.id = :brandId) " +
+            "and (cate.id = :categoryId) " +
+            "and (patt.id = :patternId) " +
+            "and (form.id = :formId) " +
+            "and (button.id = :buttonId) " +
+            "and (mate.id = :materialId) " +
+            "and (collar.id = :collarId) " +
+            "and (sleeve.id = :sleeveId) " +
+            "and (shirt.id = :shirtId) " +
+            "and (color.id  = :colorId)" +
+            "and (s.id = :sizeId) ")
+    List<Long> productDetailsId(@Param("productId") Long productId,
+                                @Param("brandId") Long brandId,
+                                @Param("categoryId") Long categoryId,
+                                @Param("patternId") Long patternId,
+                                @Param("formId") Long formId,
+                                @Param("buttonId") Long buttonId,
+                                @Param("materialId") Long materialId,
+                                @Param("collarId") Long collarId,
+                                @Param("sleeveId") Long sleeveId,
+                                @Param("shirtId") Long shirtId,
+                                @Param("colorId") Long colorId,
+                                @Param("sizeId") Long sizeId);
 }

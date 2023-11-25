@@ -1,11 +1,12 @@
 .paddingTopAndBottom {
+  display: flex;
+  justify-content: center;
   padding-top: 15px;
   padding-bottom: 15px;
 }
 
 .paddingLeftAndRight {
-  padding-left: 35px;
-  padding-right: 35px;
+  width: 90%;
 }
 
 .header {

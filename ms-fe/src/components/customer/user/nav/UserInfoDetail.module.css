@@ -1,0 +1,42 @@
+.content {
+  padding: 10px 32px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.textColor {
+  color: #111111;
+}
+
+.title {
+  border-bottom: 1px solid #ccc;
+  padding: 0 0 6px 0;
+}
+
+.title h2 {
+  color: #111111;
+}
+
+.center {
+  display: flex;
+  justify-content: center;
+  padding: 5px;
+}
+
+.textSize {
+  font-size: 1rem;
+}
+
+.addressEdit:hover {
+  cursor: pointer;
+  color: #39a7ff;
+  transition: 0.3s linear;
+}
+
+.btnColor {
+  background-color: #39a7ff;
+}
+
+.input {
+  padding: 10px 15px;
+}

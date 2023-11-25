@@ -11,11 +11,13 @@ import {
   Space,
   Spin,
   Table,
+  notification,
 } from "antd";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import FloatingLabels from "../../element/FloatingLabels/FloatingLabels";
 import styles from "./ModalAddCustomer.module.css";
+import { getToken } from "../../../service/Token";
 
 const columns = [
   {
@@ -74,6 +76,7 @@ function ModalAddCustomer({
   const [isLoading, setIsLoading] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [gender, setGender] = useState("all");
+  const [api, contextHolder] = notification.useNotification();
 
   const [selectedRows, setSelectedRows] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -111,7 +114,12 @@ function ModalAddCustomer({
                   pageSize
                 : baseCustomersUrl + "voucher"
             }`,
-            filterCustomer
+            filterCustomer,
+            {
+              headers: {
+                Authorization: `Bearer ${getToken(true)}`,
+              },
+            }
           )
           .then((res) => {
             setTotalElements(res.data.totalElements);
@@ -120,10 +128,27 @@ function ModalAddCustomer({
             setIsLoading(false);
             console.log(res.data.content);
           })
-          .catch((err) => console.log(err));
+          .catch((err) => {
+            const status = err?.response?.data?.status;
+            if (status === 403) {
+              api.error({
+                message: "Lỗi",
+                description: "Bạn không có quyền xem nội dung này",
+              });
+              return;
+            }
+
+            if (status === 400) {
+              api.error({
+                message: "Lỗi",
+                description: "Vui lòng nhập đúng định dạng",
+              });
+              return;
+            }
+          });
       }
 
-      getCustomers();
+      return () => getCustomers();
     },
     [pageNo, pageSize, gender, searchText]
   );

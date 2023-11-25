@@ -9,6 +9,10 @@ public class Const {
     public static final String STATUS_UPCOMING = "UPCOMING";
     public static final String STATUS_CANCEL = "CANCEL";
     public static final String STATUS_USED = "USED";
+    // role
+    public static final String ROLE_EMPLOYEE = "ROLE_EMPLOYEE";
+    public static final String ROLE_CUSTOMER = "ROLE_CUSTOMER";
+    public static final String ROLE_ADMIN = "ROLE_ADMIN";
 
     //error code
     public static final String CODE_NOT_FOUND = "CODE_NOT_FOUND";
@@ -39,6 +43,8 @@ public class Const {
     public static final String VOUCHER_ACCOUNT_NOT_FOUND = "VOUCHER_ACCOUNT_NOT_FOUND";
     public static final String IS_SEND_EMAIL_MEMBER_REQUIRED = "IS_SEND_EMAIL_MEMBER_REQUIRED";
     public static final String ARRAYS_CUSTOMER_NOT_NULL = "ARRAYS_CUSTOMER_NOT_NULL";
+    public static final String PASSWORD_NOT_CORRECT = "PASSWORD_NOT_CORRECT";
+    public static final String ADDRESS_NOT_FOUND = "ADDRESS_NOT_FOUND";
 
 
     //ErrorCode
@@ -49,6 +55,13 @@ public class Const {
     public static final String KAFKA_GROUP_ID = "group-id";
     public static final String TOPIC_VOUCHER = "voucher-cronjob";
     public static final String TOPIC_PROMOTION = "promotion-cronjob";
+    public static final String JWT_EXCEPTION = "JWT_EXCEPTION";
+    public static final String JWT_AUTHENTICATION = "JWT_AUTHENTICATION";
+    public static final String JWT_DECODE_EXCEPTION = "JWT_DECODE_EXCEPTION";
+    public static final String JWT_USER_ALREADY_EXIST = "JWT_USER_ALREADY_EXIST";
+    public static final String JWT_EMAIL_ALREADY_EXIST = "JWT_EMAIL_ALREADY_EXIST";
+    public static final String JWT_PHONE_NUMBER_ALREADY_EXIST = "JWT_PHONE_NUMBER_ALREADY_EXIST";
+    public static final String JWT_LOGIN_ERROR = "JWT_LOGIN_ERROR";
 
     //SORTING
     public static final String SORT_BY_CREATE_AT = "SORT_BY_CREATE_AT";

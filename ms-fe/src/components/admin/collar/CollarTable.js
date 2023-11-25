@@ -1,10 +1,20 @@
 import React from "react";
 import { FormOutlined, DeleteFilled } from "@ant-design/icons";
 
-import { Table, Space, Button, Modal, Input, message, Switch } from "antd";
+import {
+  Table,
+  Space,
+  Button,
+  Modal,
+  Input,
+  message,
+  Switch,
+  notification,
+} from "antd";
 import { useEffect, useState } from "react";
 import styles from "./CollarStyle.module.css";
 import axios from "axios";
+import { getToken } from "../../../service/Token";
 
 const CollarTable = function (props) {
   const [data, setData] = useState([]);
@@ -35,15 +45,32 @@ const CollarTable = function (props) {
   const handleUpdate = () => {
     let collarType = {};
     axios
-      .put(`http://localhost:8080/api/admin/collar/edit/${id}`, {
-        collarTypeName,
-      })
+      .put(
+        `http://localhost:8080/api/admin/collar/edit/${id}`,
+        {
+          collarTypeName,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${getToken(true)}`,
+          },
+        }
+      )
       .then((response) => {
         setShowDetailsModal(false);
         setRender(Math.random);
         message.success("Cập nhật thành công");
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        const status = err.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
+        console.log(err);
+      });
   };
 
   const handleUpdateStatus = (id, statusUpdate) => {
@@ -52,16 +79,31 @@ const CollarTable = function (props) {
     const updatedStatusValue = statusUpdate ? "ACTIVE" : "INACTIVE"; // Cập nhật trạng thái dựa trên giá trị của statusUpdate
 
     axios
-      .put(`http://localhost:8080/api/admin/collar/update/${id}`, {
-        status: updatedStatusValue,
-      })
+      .put(
+        `http://localhost:8080/api/admin/collar/update/${id}`,
+        {
+          status: updatedStatusValue,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${getToken(true)}`,
+          },
+        }
+      )
       .then((response) => {
         setRender(Math.random);
         setTimeout(() => {
           messageApi.success(mess, 2);
         }, 500);
       })
-      .catch((error) => {
+      .catch((err) => {
+        const status = err.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
         setTimeout(() => {
           messageApi.error(`Cập nhật trạng thái thất bại`, 2);
         }, 500);
@@ -69,7 +111,11 @@ const CollarTable = function (props) {
   };
   const handleConfirmDelete = () => {
     axios
-      .delete(`http://localhost:8080/api/admin/collar/delete/${selectedData}`)
+      .delete(`http://localhost:8080/api/admin/collar/delete/${selectedData}`, {
+        headers: {
+          Authorization: `Bearer ${getToken(true)}`,
+        },
+      })
       .then((response) => {
         // Xoá dữ liệu thành công
         // Cập nhật lại danh sách dữ liệu sau khi xoá
@@ -78,17 +124,37 @@ const CollarTable = function (props) {
         // Đóng modal
         setShowModal(false);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        const status = err.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
+      });
   };
 
   useEffect(() => {
     axios
-      .get(`http://localhost:8080/api/admin/collar`)
+      .get(`http://localhost:8080/api/admin/collar`, {
+        headers: {
+          Authorization: `Bearer ${getToken(true)}`,
+        },
+      })
       .then((response) => {
         setData(response.data);
         console.log(response.data);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        const status = err.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
+      });
   }, [props.renderTable, render]);
 
   return (

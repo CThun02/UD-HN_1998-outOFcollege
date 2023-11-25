@@ -3,7 +3,6 @@ import {
   Button,
   Carousel,
   Col,
-  message,
   notification,
   Row,
   Select,
@@ -15,10 +14,10 @@ import Modal from "antd/es/modal/Modal";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import styles from "./ProductDetails.module.css";
+import { getToken } from "../../../service/Token";
 
 const ProductDetails = (props) => {
   const api = "http://localhost:8080/api/admin/";
-  const [messageApi, contextHolder] = message.useMessage();
   const [products, setProducts] = useState([]);
   const [product, setProduct] = useState("");
   const [button, setButton] = useState("");
@@ -80,6 +79,7 @@ const ProductDetails = (props) => {
       key: "productName",
       dataIndex: "productName",
       title: "Sản phẩm",
+      width: "50%",
       render: (text, record, index) => {
         return (
           <Row>
@@ -87,17 +87,25 @@ const ProductDetails = (props) => {
               <div
                 style={{
                   marginTop: "10px",
+                  marginRight: "10px",
                 }}
               >
-                {record.promotionValue !== null ? (
+                {record.promotion.length !== 0 ? (
                   <Badge.Ribbon
-                    text={`Giảm ${record.promotionValue.toLocaleString(
-                      "vi-VN",
-                      {
-                        style: "currency",
-                        currency: "VND",
-                      }
-                    )}`}
+                    text={`Giảm ${record.promotion[0].promotionValue
+                      ? record.promotion[0].promotionMethod === "%"
+                        ? record.promotion[0].promotionValue +
+                        " " +
+                        record.promotion[0].promotionMethod
+                        : record.promotion[0].promotionValue.toLocaleString(
+                          "vi-VN",
+                          {
+                            style: "currency",
+                            currency: "VND",
+                          }
+                        )
+                      : null
+                      }`}
                     color="red"
                   >
                     <Carousel autoplay>
@@ -142,6 +150,10 @@ const ProductDetails = (props) => {
               >
                 <span style={{ fontWeight: "500" }}>
                   {record.product.productName +
+                    "-" +
+                    record.brand.brandName +
+                    "-" +
+                    record.category.categoryName +
                     "-" +
                     record.button.buttonName +
                     "-" +
@@ -195,9 +207,48 @@ const ProductDetails = (props) => {
       key: "price",
       dataIndex: "price",
       title: "Giá",
-      width: 110,
       render: (text, record, index) => {
-        return record.price;
+        return (
+          <div style={{ textAlign: "center" }}>
+            {record.promotion.length !== 0 ? (
+              <span style={{ color: "#ccc" }}>
+                <strike>
+                  {record.price.toLocaleString("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  })}
+                </strike>
+              </span>
+            ) : (
+              <span>
+                {record.price.toLocaleString("vi-VN", {
+                  style: "currency",
+                  currency: "VND",
+                })}
+              </span>
+            )}
+            <br />
+            <span>
+              {record.promotion.length !== 0
+                ? record.promotion[0].promotionMethod === "%"
+                  ? (
+                    (record.price *
+                      (100 - Number(record.promotion[0].promotionValue))) /
+                    100
+                  ).toLocaleString("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  })
+                  : (
+                    record.price - Number(record.promotion[0].promotionValue)
+                  ).toLocaleString("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  })
+                : null}
+            </span>
+          </div>
+        );
       },
     },
     {
@@ -268,6 +319,7 @@ const ProductDetails = (props) => {
     var productDetailCreate = {
       productDetail: {},
       quantity: quantity,
+      priceReduce: 0,
     };
     for (let i = 0; i < props.productDetailsCreate.length; i++) {
       if (props.productDetailsCreate[i].productDetail.id === record.id) {
@@ -287,14 +339,21 @@ const ProductDetails = (props) => {
     ) {
       notification.error({
         message: "Thông báo",
-        description: `Số lượng sản phẩm ${
-          productDetailCreate.quantity > 100
-            ? "thêm tối đa 100"
-            : "tồn không đủ"
-        }`,
+        description: `Số lượng sản phẩm ${productDetailCreate.quantity > 100
+          ? "thêm tối đa 100"
+          : "tồn không đủ"
+          }`,
       });
     } else {
       productDetailCreate.productDetail = record;
+      productDetailCreate.priceReduce =
+        record.promotion.length !== 0
+          ? record.promotion[0].promotionMethod === "%"
+            ? (record.price *
+              (100 - Number(record.promotion[0].promotionValue))) /
+            100
+            : record.price - Number(record.promotion[0].promotionValue)
+          : record.price;
       props.productDetailsCreate?.push(productDetailCreate);
       notification.success({
         message: "Thông báo",
@@ -310,34 +369,39 @@ const ProductDetails = (props) => {
     axios
       .get(
         api +
-          "product/filterProductDetailByIdCom?productId=" +
-          product +
-          "&brandId=" +
-          brand +
-          "&categoryId=" +
-          category +
-          "&buttonId=" +
-          button +
-          "&materialId=" +
-          material +
-          "&shirtTailId=" +
-          shirtTail +
-          "&sleeveId=" +
-          sleeve +
-          "&collarId=" +
-          collar +
-          "&colorId=" +
-          color +
-          "&sizeId=" +
-          size +
-          "&patternId=" +
-          pattern +
-          "&formId=" +
-          form +
-          "&minPrice=" +
-          price[0] +
-          "&maxPrice=" +
-          price[1]
+        "bill/filterProductDetailSellByIdCom?productId=" +
+        product +
+        "&brandId=" +
+        brand +
+        "&categoryId=" +
+        category +
+        "&buttonId=" +
+        button +
+        "&materialId=" +
+        material +
+        "&shirtTailId=" +
+        shirtTail +
+        "&sleeveId=" +
+        sleeve +
+        "&collarId=" +
+        collar +
+        "&colorId=" +
+        color +
+        "&sizeId=" +
+        size +
+        "&patternId=" +
+        pattern +
+        "&formId=" +
+        form +
+        "&minPrice=" +
+        price[0] +
+        "&maxPrice=" +
+        price[1],
+        {
+          headers: {
+            Authorization: `Bearer ${getToken(true)}`,
+          },
+        }
       )
       .then((response) => {
         setProductDetails(response.data);
@@ -345,7 +409,13 @@ const ProductDetails = (props) => {
         console.log(response.data);
       })
       .catch((error) => {
-        console.log(error);
+        const status = error.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
       });
     setTimeout(() => {
       setLoading(false);
@@ -354,101 +424,221 @@ const ProductDetails = (props) => {
   useEffect(() => {
     filter();
     axios
-      .get(api + "brand")
+      .get(api + "brand", {
+        headers: {
+          Authorization: `Bearer ${getToken(true)}`,
+        },
+      })
       .then((res) => {
         setBrands(res.data);
       })
       .catch((error) => {
-        console.log(error);
+        const status = error.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
       });
     axios
-      .get(api + "category")
+      .get(api + "category", {
+        headers: {
+          Authorization: `Bearer ${getToken(true)}`,
+        },
+      })
       .then((res) => {
         setCategories(res.data);
       })
       .catch((error) => {
-        console.log(error);
+        const status = error.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
       });
     axios
-      .get(api + "product/getproductfilterByCom")
+      .get(api + "product/getproductfilterByCom", {
+        headers: {
+          Authorization: `Bearer ${getToken(true)}`,
+        },
+      })
       .then((response) => {
         setProducts(response.data);
         setLoading(false);
       })
       .catch((error) => {
-        console.log(error);
+        const status = error.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
       });
     axios
-      .get(api + "size")
+      .get(api + "size", {
+        headers: {
+          Authorization: `Bearer ${getToken(true)}`,
+        },
+      })
       .then((response) => {
         setSizes(response.data);
       })
       .catch((error) => {
-        console.log(error);
+        const status = error.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
       });
     axios
-      .get(api + "color")
+      .get(api + "color", {
+        headers: {
+          Authorization: `Bearer ${getToken(true)}`,
+        },
+      })
       .then((response) => {
         setColors(response.data);
       })
       .catch((error) => {
-        console.log(error);
+        const status = error.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
       });
     axios
-      .get(api + "button")
+      .get(api + "button", {
+        headers: {
+          Authorization: `Bearer ${getToken(true)}`,
+        },
+      })
       .then((response) => {
         setButtons(response.data);
       })
       .catch((error) => {
-        console.log(error);
+        const status = error.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
       });
     axios
-      .get(api + "material")
+      .get(api + "material", {
+        headers: {
+          Authorization: `Bearer ${getToken(true)}`,
+        },
+      })
       .then((response) => {
         setMaterials(response.data);
       })
       .catch((error) => {
-        console.log(error);
+        const status = error.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
       });
     axios
-      .get(api + "collar")
+      .get(api + "collar", {
+        headers: {
+          Authorization: `Bearer ${getToken(true)}`,
+        },
+      })
       .then((response) => {
         setCollars(response.data);
       })
       .catch((error) => {
-        console.log(error);
+        const status = error.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
       });
     axios
-      .get(api + "pattern")
+      .get(api + "pattern", {
+        headers: {
+          Authorization: `Bearer ${getToken(true)}`,
+        },
+      })
       .then((response) => {
         setPatterns(response.data);
       })
       .catch((error) => {
-        console.log(error);
+        const status = error.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
       });
     axios
-      .get(api + "form")
+      .get(api + "form", {
+        headers: {
+          Authorization: `Bearer ${getToken(true)}`,
+        },
+      })
       .then((response) => {
         setForms(response.data);
       })
       .catch((error) => {
-        console.log(error);
+        const status = error.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
       });
     axios
-      .get(api + "shirt-tail")
+      .get(api + "shirt-tail", {
+        headers: {
+          Authorization: `Bearer ${getToken(true)}`,
+        },
+      })
       .then((response) => {
         setshirtTails(response.data);
       })
       .catch((error) => {
-        console.log(error);
+        const status = error.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
       });
     axios
-      .get(api + "sleeve")
+      .get(api + "sleeve", {
+        headers: {
+          Authorization: `Bearer ${getToken(true)}`,
+        },
+      })
       .then((response) => {
         setSleeves(response.data);
       })
       .catch((error) => {
-        console.log(error);
+        const status = error.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -471,7 +661,6 @@ const ProductDetails = (props) => {
 
   return (
     <>
-      {contextHolder}
       <div className={styles.productDetails}>
         <Row className={styles.productDetails__filter}>
           <Col span={4}>

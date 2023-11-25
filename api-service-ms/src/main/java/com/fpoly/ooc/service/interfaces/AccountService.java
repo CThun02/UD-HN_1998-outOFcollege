@@ -1,6 +1,7 @@
 package com.fpoly.ooc.service.interfaces;
 
 import com.fpoly.ooc.dto.CustomerConditionDTO;
+import com.fpoly.ooc.dto.UserDTO;
 import com.fpoly.ooc.entity.Account;
 import com.fpoly.ooc.entity.AddressDetail;
 import com.fpoly.ooc.request.account.AccountRequest;
@@ -17,6 +18,7 @@ public interface AccountService {
     List<AccountResponce> getAllByRoleid(Long roleId, String keyword);
 
     Account save(AccountRequest request);
+    Account save(Account request);
 
     Account update(AccountRequest request, String username);
 
@@ -36,5 +38,9 @@ public interface AccountService {
 
     List<AccountDetailResponce> getAllCustomer(String keyword);
 
+    Account findLoginByUsername(String username);
+    Account findLoginByEmail(String email);
+    Account findLoginByPhone(String phone);
 
+    Account findAccountByLogin(String login, String role);
 }

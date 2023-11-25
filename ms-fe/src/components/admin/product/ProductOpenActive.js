@@ -1,9 +1,10 @@
-import { Button, message, Switch } from "antd";
+import { Button, message, notification, Switch } from "antd";
 import Checkbox from "antd/es/checkbox/Checkbox";
 import Modal from "antd/es/modal/Modal";
 import axios from "axios";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { getToken } from "../../../service/Token";
 
 const ProductOpenActive = ({ product, onCancel, open, render }) => {
   const navigate = useNavigate();
@@ -16,12 +17,17 @@ const ProductOpenActive = ({ product, onCancel, open, render }) => {
     axios
       .put(
         api +
-          "product/updateProductStatus?productId=" +
-          product.id +
-          "&status=" +
-          (activeProduct === true ? "ACTIVE" : "INACTIVE") +
-          "&openAll=" +
-          openAll
+        "product/updateProductStatus?productId=" +
+        product.id +
+        "&status=" +
+        (activeProduct === true ? "ACTIVE" : "INACTIVE") +
+        "&openAll=" +
+        openAll,
+        {
+          headers: {
+            Authorization: `Bearer ${getToken(true)}`,
+          },
+        }
       )
       .then((response) => {
         messageApi.success(
@@ -32,20 +38,25 @@ const ProductOpenActive = ({ product, onCancel, open, render }) => {
         render();
       })
       .catch((error) => {
+        const status = error.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
         messageApi.error(`Cập nhật trạng thái thất bại`, 2);
       });
   }
   return (
     <Modal
       footer={null}
-      onCancel={() => {
-        navigate("/api/admin/product");
-      }}
+      onCancel={onCancel}
       centered
       open={open}
     >
       {contextHolder}
-      <h6>Sản phẩm đang tạm ngưng kinh doanh</h6>
+      <h6> Sản phẩm đang tạm ngưng kinh doanh</h6 >
       <p>Vui lòng mở kinh doanh ở bên dưới!</p>
       <div
         style={{
@@ -84,7 +95,7 @@ const ProductOpenActive = ({ product, onCancel, open, render }) => {
           Xác nhận
         </Button>
       </div>
-    </Modal>
+    </Modal >
   );
 };
 

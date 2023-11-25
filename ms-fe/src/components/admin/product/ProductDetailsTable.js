@@ -24,6 +24,7 @@ import {
 import { saveImage } from "../../../config/FireBase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
+import { getToken } from "../../../service/Token";
 
 var imgList = [];
 const ProductDetailsTable = (props) => {
@@ -66,42 +67,42 @@ const ProductDetailsTable = (props) => {
       while (j < allProductDetailsCopy.length) {
         if (
           allProductDetailsCopy[i].brand.id ===
-            allProductDetailsCopy[j].brand.id &&
+          allProductDetailsCopy[j].brand.id &&
           allProductDetailsCopy[i].category.id ===
-            allProductDetailsCopy[j].category.id &&
+          allProductDetailsCopy[j].category.id &&
           allProductDetailsCopy[i].button.id ===
-            allProductDetailsCopy[j].button.id &&
+          allProductDetailsCopy[j].button.id &&
           allProductDetailsCopy[i].material.id ===
-            allProductDetailsCopy[j].material.id &&
+          allProductDetailsCopy[j].material.id &&
           allProductDetailsCopy[i].sleeve.id ===
-            allProductDetailsCopy[j].sleeve.id &&
+          allProductDetailsCopy[j].sleeve.id &&
           allProductDetailsCopy[i].collar.id ===
-            allProductDetailsCopy[j].collar.id &&
+          allProductDetailsCopy[j].collar.id &&
           allProductDetailsCopy[i].shirtTail.id ===
-            allProductDetailsCopy[j].shirtTail.id &&
+          allProductDetailsCopy[j].shirtTail.id &&
           allProductDetailsCopy[i].color.id ===
-            allProductDetailsCopy[j].color.id &&
+          allProductDetailsCopy[j].color.id &&
           allProductDetailsCopy[i].size.id === allProductDetailsCopy[j].size.id
         ) {
           // Nếu các thuộc tính giống nhau, bỏ qua
           j++;
         } else if (
           allProductDetailsCopy[i].brand.id ===
-            allProductDetailsCopy[j].brand.id &&
+          allProductDetailsCopy[j].brand.id &&
           allProductDetailsCopy[i].category.id ===
-            allProductDetailsCopy[j].category.id &&
+          allProductDetailsCopy[j].category.id &&
           allProductDetailsCopy[i].button.id ===
-            allProductDetailsCopy[j].button.id &&
+          allProductDetailsCopy[j].button.id &&
           allProductDetailsCopy[i].material.id ===
-            allProductDetailsCopy[j].material.id &&
+          allProductDetailsCopy[j].material.id &&
           allProductDetailsCopy[i].sleeve.id ===
-            allProductDetailsCopy[j].sleeve.id &&
+          allProductDetailsCopy[j].sleeve.id &&
           allProductDetailsCopy[i].collar.id ===
-            allProductDetailsCopy[j].collar.id &&
+          allProductDetailsCopy[j].collar.id &&
           allProductDetailsCopy[i].shirtTail.id ===
-            allProductDetailsCopy[j].shirtTail.id &&
+          allProductDetailsCopy[j].shirtTail.id &&
           allProductDetailsCopy[i].color.id ===
-            allProductDetailsCopy[j].color.id
+          allProductDetailsCopy[j].color.id
         ) {
           // Nếu các thuộc tính trừ size giống nhau, thêm vào productDetails và loại bỏ khỏi mảng
           productDetails.push(allProductDetailsCopy.splice(j, 1)[0]);
@@ -136,14 +137,30 @@ const ProductDetailsTable = (props) => {
               productImageCreate.productDetailId = productDetail.id;
               productImageCreate.path = url;
               axios
-                .post(api + "product/createProductImg", productImageCreate)
-                .then((res) => {})
+                .post(api + "product/createProductImg", productImageCreate, {
+                  headers: {
+                    Authorization: `Bearer ${getToken(true)}`,
+                  },
+                })
+                .then((res) => { })
                 .catch((err) => {
-                  console.log(err);
+                  const status = err.response.status;
+                  if (status === 403) {
+                    notification.error({
+                      message: "Thông báo",
+                      description: "Bạn không có quyền truy cập!",
+                    });
+                  }
                 });
             })
             .catch((err) => {
-              console.log(err);
+              const status = err.response.status;
+              if (status === 403) {
+                notification.error({
+                  message: "Thông báo",
+                  description: "Bạn không có quyền truy cập!",
+                });
+              }
             });
         }
       }
@@ -219,6 +236,7 @@ const ProductDetailsTable = (props) => {
   }
 
   function createProductDetails() {
+    var check = false;
     confirm({
       centered: true,
       title: `Thêm mới các sản phẩm`,
@@ -244,9 +262,14 @@ const ProductDetailsTable = (props) => {
           productDetailCreate.quantity = detail.quantity;
           productDetailCreate.weight = detail.weight;
           productDetailCreate.status = detail.status;
+          productDetailCreate.descriptionDetail = "Description detail";
           if (!productDetailCreate.status.includes("DELETED")) {
             axios
-              .post(api + "product/createDetail", productDetailCreate)
+              .post(api + "product/createDetail", productDetailCreate, {
+                headers: {
+                  Authorization: `Bearer ${getToken(true)}`,
+                },
+              })
               .then((response) => {
                 if (
                   response.data !== "" &&
@@ -258,10 +281,14 @@ const ProductDetailsTable = (props) => {
               })
               .catch((error) => {
                 console.log(error);
+                notification.error({
+                  message: "Thông báo",
+                  description: "Thêm mới các chi tiết sản phẩm Thất bại",
+                });
+                return;
               });
           }
         }
-
         setRender(props.productDetails);
         setTimeout(() => {
           notification.open({
@@ -358,15 +385,15 @@ const ProductDetailsTable = (props) => {
                           onChange={(event) => {
                             uploadImage(
                               product.productName.replaceAll(" ", "_") +
-                                productDetails[0].button.id +
-                                productDetails[0].brand.id +
-                                productDetails[0].category.id +
-                                productDetails[0].material.id +
-                                productDetails[0].collar.id +
-                                productDetails[0].sleeve.id +
-                                productDetails[0].shirtTail.id +
-                                productDetails[0].pattern.id +
-                                productDetails[0].form.id,
+                              productDetails[0].button.id +
+                              productDetails[0].brand.id +
+                              productDetails[0].category.id +
+                              productDetails[0].material.id +
+                              productDetails[0].collar.id +
+                              productDetails[0].sleeve.id +
+                              productDetails[0].shirtTail.id +
+                              productDetails[0].pattern.id +
+                              productDetails[0].form.id,
                               productDetails[0].color,
                               event.target.files
                             );
@@ -511,9 +538,9 @@ const ProductDetailsTable = (props) => {
                                             isDeleted
                                               ? {}
                                               : deleteImageDetail(
-                                                  productDetails[0].color.name,
-                                                  index
-                                                )
+                                                productDetails[0].color.name,
+                                                index
+                                              )
                                           }
                                           key="delete"
                                         />,

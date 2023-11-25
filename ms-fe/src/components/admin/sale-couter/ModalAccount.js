@@ -1,11 +1,12 @@
 import { SearchOutlined } from "@ant-design/icons";
-import { Button, Col, Modal, Row, Table } from "antd";
+import { Button, Col, Modal, Row, Table, notification } from "antd";
 import Input from "antd/es/input/Input";
 import axios from "axios";
 import React from "react";
 import { useState } from "react";
 import { useEffect } from "react";
 import styles from "./search.module.css";
+import { getToken } from "../../../service/Token";
 
 const ModalAccount = ({
   visible,
@@ -83,14 +84,25 @@ const ModalAccount = ({
   function filter(keyword) {
     axios
       .get(
-        `http://localhost:8080/api/admin/account/getAllCustomer?keyword=${keyword}`
+        `http://localhost:8080/api/admin/account/getAllCustomer?keyword=${keyword}`,
+        {
+          headers: {
+            Authorization: `Bearer ${getToken(true)}`,
+          },
+        }
       )
       .then((response) => {
         setData(response.data);
         setLoadding(false);
       })
       .catch((error) => {
-        console.log(error);
+        const status = error.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
       });
   }
   useEffect(() => {

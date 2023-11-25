@@ -45,18 +45,18 @@ public class ProductController {
 
     @GetMapping("/getproductfilterByCom")
     public ResponseEntity<?> filterByCom(@RequestParam(defaultValue = "null") String status,
-                                         @RequestParam(defaultValue = "null") String keywords){
-            return ResponseEntity.ok(service.getProductFilterByCom(status.equals("null")?null:status,
-                    keywords.equals("null")?null:"%"+keywords+"%"));
+                                         @RequestParam(defaultValue = "null") String keywords) {
+        return ResponseEntity.ok(service.getProductFilterByCom(status.equals("null") ? null : status,
+                keywords.equals("null") ? null : "%" + keywords + "%"));
     }
 
     @GetMapping("/getproductdetailbyidpd")
-    public ResponseEntity<?> filterByCom(@RequestParam() Long productDetailId){
+    public ResponseEntity<?> filterByCom(@RequestParam() Long productDetailId) {
         return ResponseEntity.ok(productDetailService.getOnePDDisplayById(productDetailId));
     }
 
     @GetMapping("/getMaxPrice")
-    public ResponseEntity<?> getMaxPrice(@RequestParam Long productId){
+    public ResponseEntity<?> getMaxPrice(@RequestParam Long productId) {
         return ResponseEntity.ok(productDetailService.getMaxPricePDByProductId(productId));
     }
 
@@ -84,12 +84,20 @@ public class ProductController {
                 (request, minPrice.orElse(null), maxPrice.orElse(null)));
     }
 
+
+
     @GetMapping("/searchProductDetail")
     public ResponseEntity<?> searchProductDetail(@RequestParam String keyWords) {
         return ResponseEntity.ok(productDetailService.searchProductDetail(keyWords));
     }
+
+    @GetMapping("/promotion")
+    public ResponseEntity<?> findProductPromotion() {
+        return ResponseEntity.ok(service.findProductPromotion());
+    }
+
     @GetMapping("/getAllProductImages")
-    public List<?> getAllProductImages(){
+    public List<?> getAllProductImages() {
         return productImageService.getAll();
     }
 
@@ -119,7 +127,7 @@ public class ProductController {
     }
 
     @PostMapping("/createProductImg")
-    public ResponseEntity<?> createProductImg(@RequestBody ProductImageRequest request){
+    public ResponseEntity<?> createProductImg(@RequestBody ProductImageRequest request) {
         ProductImage productImage = request.dto();
         return ResponseEntity.ok(productImageService.create(productImage));
     }
@@ -131,13 +139,12 @@ public class ProductController {
         return ResponseEntity.ok(service.update(product));
     }
 
-
     @PutMapping("/updateProductStatus")
     public ResponseEntity<?> updateProductStatus(@RequestParam Long productId,
                                                  @RequestParam String status,
                                                  @RequestParam(defaultValue = "false") Boolean openAll) {
         Product product = service.getOne(productId);
-        if((openAll && status.equals("ACTIVE")) || status.equals("INACTIVE")){
+        if ((openAll && status.equals("ACTIVE")) || status.equals("INACTIVE")) {
             productDetailService.updateProductDetailsByProductId(productId, status);
         }
         product.setStatus(status);
@@ -147,14 +154,14 @@ public class ProductController {
 
     @PutMapping("/updateProductDetail")
     public ResponseEntity<?> updateProductDetail(@RequestBody ProductDetail productDetail,
-                                                 @RequestParam(name = "method", defaultValue = "Update") String method){
-        if(method.equals("Deleted")){
-            if(productDetail.getStatus().equals("DELETED")){
+                                                 @RequestParam(name = "method", defaultValue = "Update") String method) {
+        if (method.equals("Deleted")) {
+            if (productDetail.getStatus().equals("DELETED")) {
                 productDetail.setDeletedAt(LocalDateTime.now());
-            }else{
+            } else {
                 productDetail.setDeletedAt(null);
             }
-        }else{
+        } else {
             productDetail.setDeletedAt(null);
         }
         ProductDetailRequest request = ProductDetailRequest.builder().productId(productDetail.getProduct().getId())
@@ -168,9 +175,8 @@ public class ProductController {
         Optional<ProductDetailDisplayResponse> result = check.stream()
                 .filter(productDetailGet -> !productDetailGet.getId().equals(productDetail.getId()))
                 .findFirst();
-        if(!result.isEmpty()){
-            if(!(result.get().getId() == productDetail.getId())){
-                System.out.println(result.get().getId()+"check"+ request.getId());
+        if (!result.isEmpty()) {
+            if (!(result.get().getId() == productDetail.getId())) {
                 return ResponseEntity.ok(result.get());
             }
         }
@@ -178,68 +184,16 @@ public class ProductController {
     }
 
     @PutMapping("/updateProductImg")
-    public ResponseEntity<?> updateProductImg(@RequestBody ProductImage request){
+    public ResponseEntity<?> updateProductImg(@RequestBody ProductImage request) {
         ProductImage productImage = productImageService.update(request);
         return ResponseEntity.ok(productImage);
     }
 
 
     @DeleteMapping("/deleteProductImage")
-    public ResponseEntity<?> deleteProductImage(@RequestParam Long id){
+    public ResponseEntity<?> deleteProductImage(@RequestParam Long id) {
         ProductImage productImage = productImageService.getOne(id);
         productImageService.delete(productImage);
         return ResponseEntity.ok("ok");
     }
-
-    @GetMapping("/promotion")
-    public ResponseEntity<?> findProductPromotion() {
-        return ResponseEntity.ok(service.findProductPromotion());
-    }
-
-    @PostMapping("/by-product-details-dto")
-    public ResponseEntity<?> findProuctDetailsByListIdProduct(
-            @RequestBody ProductDetailsDTO dto
-    ) {
-        return ResponseEntity.ok(productDetailService.findListProductdetailsByListProductId(dto));
-    }
-
-    @GetMapping("/best-selling")
-    public ResponseEntity<?> getBestSellingProduct() {
-        System.out.println("best");
-        return ResponseEntity.ok(productDetailService.getProductDetailBestSelling());
-    }
-
-    @GetMapping("/new-product")
-    public ResponseEntity<?> getNewProduct() {
-        return ResponseEntity.ok(productDetailService.getNewProductDetail());
-    }
-
-    @PostMapping("/product-shop")
-    public ResponseEntity<?> findAllProductDetailShop(
-            @RequestParam(value = "pageNo", defaultValue = "0") int pageNo,
-            @RequestParam(value = "pageSize", defaultValue = "12") int pageSize,
-            @RequestBody ProductDetailCondition req
-            ) {
-
-        return ResponseEntity.ok(
-                productDetailService.getAllProductDetailShop(
-                        req, PageRequest.of(pageNo, pageSize))
-        );
-    }
-
-    @GetMapping("/get-price-max")
-    public ResponseEntity<?> getPriceMax() {
-        return ResponseEntity.ok(productDetailService.getPriceMax());
-    }
-
-    @PostMapping("/details-product")
-    public ResponseEntity<?> getProductDetail(@RequestBody GetSizeAndColorRequest req) {
-        return ResponseEntity.ok(productDetailService.getProductDetailsShop(req));
-    }
-
-    @PostMapping("/colors-and-sizes")
-    public ResponseEntity<?> getSizesAndColors(@RequestBody GetSizeAndColorRequest req) {
-        return ResponseEntity.ok(productDetailService.getColorAndSize(req));
-    }
-
 }

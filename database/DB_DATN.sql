@@ -461,3 +461,15 @@ CREATE TABLE favorites_list_detail(
     updated_by          NVARCHAR(50),
     deleted_at          DATETIME    
 )
+
+CREATE TABLE product_return(
+	id					BIGINT IDENTITY PRIMARY KEY,
+    product_detail_id   BIGINT FOREIGN KEY(product_detail_id) REFERENCES product_detail(id),
+	reason				VARCHAR(50),
+	status              VARCHAR(50),
+    created_at          DATETIME,
+    updated_at          DATETIME,
+    created_by          NVARCHAR(50),
+    updated_by          NVARCHAR(50),
+    deleted_at          DATETIME 
+)

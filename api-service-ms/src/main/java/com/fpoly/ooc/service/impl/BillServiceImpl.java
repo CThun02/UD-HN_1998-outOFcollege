@@ -161,6 +161,11 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
+    public Bill getAllBillByCode(String billCode) {
+        return null;
+    }
+
+    @Override
     public List<GetListCustomer> getListCustomer() {
         return billRepo.getListCustomer();
     }

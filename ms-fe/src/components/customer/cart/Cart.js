@@ -143,7 +143,6 @@ const Cart = (props) => {
             .then((response) => {
                 setRender(response.data);
                 props.setRenderHeader(Math.random())
-
             }).catch((error) => {
                 console.log(error);
             })
@@ -173,7 +172,7 @@ const Cart = (props) => {
                             <Col span={4}>
                                 <div style={{}} className="m-5">
                                     <Badge.Ribbon
-                                        text={`Giảm ${record?.promotion[0].promotionValue
+                                        text={`Giảm ${record?.promotion[0]?.promotionValue
                                             ? record?.promotion[0].promotionMethod ===
                                                 "%"
                                                 ? record.promotion[0].promotionValue +

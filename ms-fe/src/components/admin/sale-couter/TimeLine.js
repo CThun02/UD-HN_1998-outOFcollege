@@ -19,6 +19,8 @@ import moment from "moment";
 import numeral from "numeral";
 import { CheckCircleOutlined } from "@ant-design/icons";
 import { getAuthToken, getToken } from "../../../service/Token";
+import ModalBillInfoDisplay from "../../element/bill-info/ModalBillInfoDisplay";
+import ModalProduct from "./ModalProduct";
 
 const BillTimeLine = (addId) => {
     const [isModalConfirm, setIsModalConfirm] = useState(false);
@@ -27,6 +29,7 @@ const BillTimeLine = (addId) => {
     const [action, setAction] = useState(null);
     const [timelinePoduct, setTimelinesPoduct] = useState([]);
     const [billInfo, setBillInfo] = useState({});
+    const [isOpenModalProduct, setIsOpenModalProduct] = useState(false);
     const { billId } = useParams();
     const [render, setRender] = useState(null);
     const token = getAuthToken(true);
@@ -122,7 +125,7 @@ const BillTimeLine = (addId) => {
     const handleCancelConfirm = () => {
         setIsModalConfirm(false);
     };
-
+    console.log(billInfo)
     const handleOkConFirm = (note) => {
         handleCreateTimeline(note, action === "cancel" ? "0" : null);
         // if (
@@ -130,7 +133,6 @@ const BillTimeLine = (addId) => {
         // timelines.length === 3 &&
         // billInfo.status !== "Paid"
         // ) {
-        console.log(billInfo.symbol, timelines.length);
         handleUpdateBillStatus(
             action === "cancel"
                 ? "Cancel"
@@ -138,11 +140,21 @@ const BillTimeLine = (addId) => {
                     timelines[timelines.length - 1] === "2" &&
                     action !== "cancel") ||
                     (billInfo.symbol === "Shipping" &&
-                        timelines[timelines.length - 1].status === "3" &&
-                        action !== "cancel")
+                        timelines[timelines.length - 1].status === "3"
+                        && action !== "cancel")
                     ? "Complete"
-                    : "1",
-            billInfo.totalPrice + billInfo?.shipPrice - billInfo.priceReduce
+                    : billInfo.symbol === "Shipping" && billInfo.status === "Paid"
+                        ? "Paid" : 'Unpaid',
+            action === "cancel" ? 0 : (billInfo.symbol === "Received" &&
+                timelines[timelines.length - 1] === "2" &&
+                action !== "cancel") ||
+                (billInfo.symbol === "Shipping" &&
+                    timelines[timelines.length - 1].status === "3"
+                    && action !== "cancel")
+                ? billInfo.totalPrice + billInfo?.shipPrice - billInfo.priceReduce
+                : billInfo.symbol === "Shipping" && billInfo.status === "Paid"
+                    ? billInfo.totalPrice + billInfo?.shipPrice - billInfo.priceReduce
+                    : 0
         );
         // }
         setIsModalConfirm(false);
@@ -154,6 +166,14 @@ const BillTimeLine = (addId) => {
     const handleOkDetail = () => {
         setIsModalDetail(false);
     };
+
+    // const handleOpenModalProduct = () => {
+    //     setIsOpenModalProduct(true)
+    // }
+
+    // const handleCancelModaleProduct = () => {
+    //     setIsOpenModalProduct(false)
+    // }
 
     useEffect(() => {
         axios
@@ -200,6 +220,7 @@ const BillTimeLine = (addId) => {
                 },
             })
             .then((response) => {
+                console.log(response)
                 setBillInfo(response.data);
             })
             .catch((error) => {
@@ -211,7 +232,6 @@ const BillTimeLine = (addId) => {
                     });
                 }
             });
-        console.log(billInfo)
     }, [billId, render]);
 
     const columnProduct = [
@@ -308,15 +328,27 @@ const BillTimeLine = (addId) => {
             dataIndex: "productPrice",
             key: "productPrice",
             render: (price) => {
-                return price.toLocaleString("vi-VN", {
+                return price?.toLocaleString("vi-VN", {
                     style: "currency",
                     currency: "VND",
                 });
             },
         },
     ];
+
+    const [open, setOpen] = useState(false)
+    const handleOpen = () => {
+        console.log(true)
+        setOpen(true)
+    }
+
+    const handleCan = () => {
+        setOpen(false)
+    }
+
     return (
         <>
+            <ModalBillInfoDisplay open={open} cancel={handleCan} billCode={billInfo.billCode} />
             <section className={styles.background}>
                 <div style={{ overflowX: "scroll" }}>
                     <div style={{ width: "fit-content" }}>
@@ -462,6 +494,11 @@ const BillTimeLine = (addId) => {
                         handleOk={handleOkConFirm}
                     />
 
+                    {timelines.length === 2 && <Button onClick={handleOpen}
+                        className={styles.btnPdf}
+                        type="primary">
+                        Xuất hóa đơn
+                    </Button>}
                     <Button
                         className={styles.btnWarning}
                         onClick={() => showModalDetail()}
@@ -502,7 +539,6 @@ const BillTimeLine = (addId) => {
                         </Row>
                         <Row>
                             <Col span={12}>
-                                {console.log(billInfo)}
                                 <span>Hình thức mua hàng</span>
                             </Col>
                             <Col span={12}>
@@ -654,8 +690,20 @@ const BillTimeLine = (addId) => {
 
             <section className={styles.background} style={{ marginTop: "20px" }}>
                 <Row>
-                    <Col span={12}>
+                    <Col span={21}>
                         <h2>Sản phẩm đã mua</h2>
+                    </Col>
+                    <Col span={3}>
+                        <Button type="primary" onClick={() => setIsOpenModalProduct(true)}>
+                            Thêm sản phẩm
+                        </Button>
+                        <ModalProduct
+                            visible={isOpenModalProduct}
+                            onCancel={() => setIsOpenModalProduct(false)}
+                            render={setRender}
+                            cartId={null}
+                            billId={billId}
+                        />
                     </Col>
                 </Row>
                 <Divider

@@ -117,8 +117,10 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
             "WHERE (bd.bill.id = ?1 or ?1 is null)")
     List<ProductDetailResponse> getProductDetailByBillId(Long id);
 
+
     @Query("Select b.id as id, b.billCode as billCode, a.fullName as customerName, a.username as userName, " +
-            "b.completionDate as completionDate, b.price as price, b.billType as billType, b.symbol as symbol" +
+            "b.completionDate as completionDate, b.price as price, b.amountPaid as amountPaid," +
+            " d.shipPrice as shippingPrice, b.billType as billType, b.symbol as symbol" +
             ", b.createdAt as createdAt, b.createdBy as createdBy, b.status as status, b.note as note from Bill b " +
             "left join Account a on b.account.username = a.username " +
             "left join DeliveryNote d on d.bill.id = b.id where  b.billCode = ?1")

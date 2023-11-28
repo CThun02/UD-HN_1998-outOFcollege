@@ -3,20 +3,17 @@ package com.fpoly.ooc.service.interfaces;
 
 import com.fpoly.ooc.entity.BillDetail;
 import com.fpoly.ooc.request.bill.BillDetailRequest;
-import com.fpoly.ooc.responce.bill.BillManagementResponse;
-import com.fpoly.ooc.responce.bill.BillResponse;
-import org.springframework.data.domain.Page;
-
-import java.util.List;
+import com.fpoly.ooc.responce.pdf.PdfResponse;
 
 public interface BillDetailService {
 
-    List<BillResponse> getAll();
 
-    BillDetail createBill(BillDetailRequest request);
+    BillDetail createBillDetail(BillDetailRequest request);
 
     BillDetail updateBill(Long id, String status);
 
     void deleteBill(Long id);
+
+    PdfResponse pdfResponse(String billCode);
 
 }

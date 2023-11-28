@@ -31,6 +31,8 @@ public interface BillService {
 
     void deleteBill(Long id);
 
+    Bill getAllBillByCode(String billCode);
+
     List<GetListCustomer> getListCustomer();
 
     Integer updateBillStatus(BillStatusDTO dto, Long id);

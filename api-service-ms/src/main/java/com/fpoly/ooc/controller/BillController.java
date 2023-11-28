@@ -1,6 +1,7 @@
 package com.fpoly.ooc.controller;
 
 import com.fpoly.ooc.dto.BillStatusDTO;
+import com.fpoly.ooc.request.bill.BillDetailRequest;
 import com.fpoly.ooc.request.bill.BillRequest;
 import com.fpoly.ooc.request.product.ProductDetailRequest;
 import com.fpoly.ooc.responce.bill.BillResponse;
@@ -160,6 +161,7 @@ public class BillController {
     public ResponseEntity<?> getBillByBillCode(@RequestParam String billCode) {
         return ResponseEntity.ok(billService.getBillByBillCode(billCode));
     }
+
     @GetMapping("/getBillReturnByBillCode")
     public ResponseEntity<?> getBillReturnByBillCode(@RequestParam String billCode) {
         return ResponseEntity.ok(billService.getBillReturnByBillCode(billCode));
@@ -193,6 +195,11 @@ public class BillController {
             billDetailService.updateBill(request.get(i), status);
         }
         return null;
+    }
+
+    @PostMapping("/create-bill-detail")
+    public ResponseEntity<?> createdBillDetail(@RequestBody BillDetailRequest request) {
+        return ResponseEntity.ok(billDetailService.createBillDetail(request));
     }
 
 }

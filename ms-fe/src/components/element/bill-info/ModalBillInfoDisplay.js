@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Modal, Button, Col, Row } from 'antd';
+import { Modal, Col, Row } from 'antd';
 import { PDFDownloadLink, Image, Document, Page, Text, View, Font } from '@react-pdf/renderer';
-import QRCode, { QRCodeSVG } from 'qrcode.react';
+import { QRCodeSVG } from 'qrcode.react';
 import style from './ModalBillInfoe.module.css'
 
 const ModalBillInfoDisplay = ({ open, cancel, billCode }) => {

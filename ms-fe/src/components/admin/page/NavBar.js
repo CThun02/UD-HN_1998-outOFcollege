@@ -9,11 +9,19 @@ import {
 } from "@ant-design/icons";
 import { useState } from "react";
 import { useEffect } from "react";
-import { clearAuthToken, getAuthToken } from "../../../service/Token";
-import { Link } from "react-router-dom";
+import { clearAuthToken, getAuthToken, getToken } from "../../../service/Token";
+import { Link, useNavigate } from "react-router-dom";
 
 const NavBar = () => {
   const [user, setUser] = useState("");
+  const token = getToken(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!token) {
+      navigate("/authen/admin/sign-in");
+    }
+  }, [navigate, token])
   const content = (
     <div style={{ width: "100px" }}>
       <p>

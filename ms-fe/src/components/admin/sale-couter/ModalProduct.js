@@ -10,7 +10,7 @@ const ModalProduct = ({ visible, onCancel, cartId, render, billId }) => {
 
   function action() {
     var totalPrice = 0;
-    for (let i = 0; i < productDetailsCreate.length; i++) {
+    for (let i = 0; i < productDetailsCreate?.length; i++) {
       totalPrice += productDetailsCreate[i].priceReduce * productDetailsCreate[i].quantity;
     }
     if (totalPrice > 20000000) {
@@ -19,7 +19,7 @@ const ModalProduct = ({ visible, onCancel, cartId, render, billId }) => {
       cart = {
         productDetails: productDetailsCreate,
         timeStart: now(),
-        account: cart.account,
+        account: cart?.account,
       };
       localStorage.setItem(cartId, JSON.stringify(cart));
       notification.success({
@@ -63,8 +63,9 @@ const ModalProduct = ({ visible, onCancel, cartId, render, billId }) => {
         width={2000}
       >
         <ProductDetails
-          action={billId ? addProductBillDetail : action}
+          action={action}
           productDetailsCreate={productDetailsCreate}
+          billId={billId}
         />
       </Modal>
     </>

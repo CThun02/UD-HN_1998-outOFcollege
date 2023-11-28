@@ -1,17 +1,18 @@
-package com.fpoly.ooc.responce.timeline;
+package com.fpoly.ooc.responce.pdf;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TimelineProductResponse {
-
-    private Long billId;
+@Getter
+@Setter
+public class PdfProduct {
 
     private Long productDetailId;
 
@@ -48,5 +49,9 @@ public class TimelineProductResponse {
     private String productCateGoryName;
 
     private String billDetailStatus;
-    
+
+    private String billCreatedBy;
+
+    private BigDecimal shippingFee;
+
 }

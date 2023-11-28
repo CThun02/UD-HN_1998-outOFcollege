@@ -28,7 +28,7 @@ import ProductCreateDetails from "./product/ProductCreateDetails";
 import BillTimeLine from "./sale-couter/TimeLine";
 import SaveVoucher from "./voucher/SaveVoucher";
 import StatisticalIndex from "./statistical/StatisticalIndex";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NotificationProvider } from "../element/notification/Notification";
 import ReturnIndex from "./return/ReturnIndex";
 import { getToken } from "../../service/Token";
@@ -39,9 +39,11 @@ function AdminPage() {
   const token = getToken(true);
   const navigate = useNavigate();
 
-  if (!token) {
-    navigate("/authen/admin/sign-in");
-  }
+  useEffect(() => {
+    if (!token) {
+      navigate("/authen/admin/sign-in");
+    }
+  }, [navigate, token])
   return (
     <NotificationProvider>
       {token && (

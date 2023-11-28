@@ -171,7 +171,7 @@ const Cart = (props) => {
                         <Row>
                             <Col span={4}>
                                 <div style={{}} className="m-5">
-                                    <Badge.Ribbon
+                                    {record?.promotion[0] ? <Badge.Ribbon
                                         text={`Giảm ${record?.promotion[0]?.promotionValue
                                             ? record?.promotion[0].promotionMethod ===
                                                 "%"
@@ -204,7 +204,22 @@ const Cart = (props) => {
                                                     }
                                                 )}
                                         </Carousel>
-                                    </Badge.Ribbon>
+                                    </Badge.Ribbon> : <Carousel style={{ maxWidth: "300px" }} autoplay>
+                                        {record.productImageResponse &&
+                                            record?.productImageResponse.map(
+                                                (item) => {
+                                                    return (
+                                                        <img
+                                                            key={item.id}
+                                                            style={{ width: "100%", marginTop: "10px" }}
+                                                            alt=""
+                                                            src={item.path}
+                                                        />
+                                                    );
+                                                }
+                                            )}
+                                    </Carousel>}
+
                                 </div>
                             </Col>
                             <Col span={20}>
@@ -398,12 +413,13 @@ const Cart = (props) => {
             if (data) {
                 for (let i = 0; i < carts.length; i++) {
                     if (selectedKeys.includes(carts[i].cartDetailResponse.productDetailId)) {
-                        let priceReduced = (carts[i].promotion[0].promotionMethod === 'vnd' ?
-                            carts[i].promotion[0].promotionValue : ((100 - carts[i].promotion[0].value) / 100) * carts[i].cartDetailResponse.priceProductDetail) * carts[i].cartDetailResponse.quantity;
+                        let priceReduced = (carts[i].promotion[0]?.promotionMethod === 'vnd' ?
+                            carts[i].promotion[0]?.promotionValue : ((100 - carts[i].promotion[0]?.value) / 100) * carts[i].cartDetailResponse.priceProductDetail) * carts[i].cartDetailResponse.quantity;
                         console.log(priceReduced)
-                        totalPrice += carts[i].cartDetailResponse.priceProductDetail * carts[i].cartDetailResponse.quantity - priceReduced;
+                        totalPrice += carts[i].cartDetailResponse.priceProductDetail * carts[i].cartDetailResponse.quantity - (priceReduced ? priceReduced : 0);
                     }
                 }
+                console.log(totalPrice)
                 setTotalPrice(totalPrice);
             } else {
                 for (let i = 0; i < productDetails.length; i++) {

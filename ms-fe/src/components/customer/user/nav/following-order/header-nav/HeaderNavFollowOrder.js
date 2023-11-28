@@ -4,15 +4,14 @@ import { SearchOutlined } from "@ant-design/icons";
 
 function HeaderNavFollowOrder({ setStatus, setCreatedBy, setSymbol, setCount }) {
   const onChangeBill = (e) => {
-    console.log(e)
     if (e === '') {
       setStatus('')
       setCreatedBy('')
       setSymbol('')
       setCount('')
-    } else if (e === 'Client') {
+    } else if (e === 'CLIENT') {
       setCreatedBy('CLIENT');
-      setStatus("")
+      setStatus('')
       setSymbol('')
       setCount('')
     } else if (e === 'Shipping') {
@@ -25,7 +24,18 @@ function HeaderNavFollowOrder({ setStatus, setCreatedBy, setSymbol, setCount }) 
       setCreatedBy('')
       setSymbol('Shipping')
       setCount(2)
-    } else {
+    } else if (e === 'Complete') {
+      setStatus(e)
+      setSymbol('Shipping')
+      setCount(4)
+      setCreatedBy("")
+    } else if (e === 'Cancel') {
+      setStatus(e);
+      setCreatedBy("")
+      setSymbol('')
+      setCount(1)
+    }
+    else {
       setStatus(e);
       setCreatedBy("")
       setSymbol('')
@@ -46,7 +56,7 @@ function HeaderNavFollowOrder({ setStatus, setCreatedBy, setSymbol, setCount }) 
               </span> */}
               <span
                 className={`${styles.textSize} ${styles.textColor} ${styles.span} ${styles.active}`}
-                onClick={() => onChangeBill('Client')}
+                onClick={() => onChangeBill('CLIENT')}
               >
                 Chờ xác nhận
               </span>
@@ -58,7 +68,7 @@ function HeaderNavFollowOrder({ setStatus, setCreatedBy, setSymbol, setCount }) 
               </span>
               <span
                 className={`${styles.textSize} ${styles.textColor} ${styles.span} ${styles.active}`}
-                onClick={() => setStatus('Shipping')}
+                onClick={() => onChangeBill('Shipping')}
               >
                 Đang giao hàng
               </span>
@@ -70,7 +80,7 @@ function HeaderNavFollowOrder({ setStatus, setCreatedBy, setSymbol, setCount }) 
               </span>
               <span
                 className={`${styles.textSize} ${styles.textColor} ${styles.span} ${styles.active}`}
-                onClick={() => setStatus(0)}
+                onClick={() => onChangeBill('Cancel')}
               >
                 Đã hủy
               </span>

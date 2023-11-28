@@ -56,6 +56,7 @@ const Bill = () => {
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
       if (key.startsWith("HD")) {
+        console.log(`key`, JSON.parse(localStorage.getItem(key)).productDetails.length);
         var tab = {
           label: "Hóa đơn: " + localStorage.key(i),
           key: key,
@@ -143,19 +144,19 @@ const Bill = () => {
                 {record.productDetail.promotion?.length > 0 ? (
                   <Badge.Ribbon
                     text={`Giảm ${record.productDetail.promotion[0].promotionValue
-                        ? record.productDetail.promotion[0].promotionMethod ===
-                          "%"
-                          ? record.productDetail.promotion[0].promotionValue +
-                          " " +
-                          record.productDetail.promotion[0].promotionMethod
-                          : record.productDetail.promotion[0].promotionValue.toLocaleString(
-                            "vi-VN",
-                            {
-                              style: "currency",
-                              currency: "VND",
-                            }
-                          )
-                        : null
+                      ? record.productDetail.promotion[0].promotionMethod ===
+                        "%"
+                        ? record.productDetail.promotion[0].promotionValue +
+                        " " +
+                        record.productDetail.promotion[0].promotionMethod
+                        : record.productDetail.promotion[0].promotionValue.toLocaleString(
+                          "vi-VN",
+                          {
+                            style: "currency",
+                            currency: "VND",
+                          }
+                        )
+                      : null
                       }`}
                     color="red"
                   >
@@ -942,7 +943,7 @@ const Bill = () => {
     const bill = {
       billCode: activeKey,
       accountId: account?.username,
-      price: voucherPrice(),
+      price: totalPrice,
       priceReduce: totalPrice - voucherPrice(),
       amountPaid: typeShipping[index]
         ? 0
@@ -951,7 +952,7 @@ const Bill = () => {
           : amountPaid,
       billType: "In-Store",
       symbol: typeShipping[index] ? "Shipping" : symbol,
-      status: typeShipping[index] ? "Unpaid" : "Complete",
+      status: typeShipping[index] ? "Unpaid" : "Paid",
       note: note,
       paymentDetailId: selectedOption[index],
       lstBillDetailRequest: [],
@@ -1127,7 +1128,12 @@ const Bill = () => {
         {items &&
           items.map((item, index) => {
             return (
-              <Tabs.TabPane key={item.key} tab={item.label} items={item}>
+              <Tabs.TabPane
+                key={item.key}
+                tab={item.label}
+                items={item}
+
+              >
                 <div className={styles.tabContent}>
                   <Row>
                     <Col span={12}>

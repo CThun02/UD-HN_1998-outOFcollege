@@ -46,4 +46,6 @@ public class BillInfoResponse {
 
     private String address;
 
+    private String status;
+
 }

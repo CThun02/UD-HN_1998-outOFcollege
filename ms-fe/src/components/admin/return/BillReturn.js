@@ -40,7 +40,7 @@ const BillReturn = () => {
   const token = getAuthToken(true);
 
   const [billInfo, setBillInfor] = useState(null);
-  const [modalQuantityReturn, setModalQuantityReturn] = useState(false);
+  const [modalQuantityReturn, setModalQuantityReturn] = useState([false]);
   const [quantity, setQuantity] = useState(1);
   const [render, setRender] = useState(null);
   const [totalPrice, seTotalPrice] = useState(0);
@@ -48,6 +48,12 @@ const BillReturn = () => {
   const [note, setNote] = useState("");
   const [isConfirm, setIsconfirm] = useState(true);
   const [modalNoteReturn, setModalNoteReturn] = useState(false);
+
+  const handleShowModalProduct = (index, value) => {
+    const newModalVisible = [...modalQuantityReturn];
+    newModalVisible[index] = value;
+    setModalQuantityReturn(newModalVisible);
+  };
 
   const columns = [
     {
@@ -141,18 +147,21 @@ const BillReturn = () => {
       key: "total",
       title: "Tổng tiền",
       render: (_, record) => {
-        return record.productPrice;
+        return record.productPrice?.toLocaleString("vi-VN", {
+          style: "currency",
+          currency: "VND",
+        });
       },
     },
     {
       key: "action",
       title: "Thao tác",
-      render: (_, record) => {
+      render: (_, record, index) => {
         return (
           <>
             <Modal
-              open={modalQuantityReturn}
-              onCancel={() => setModalQuantityReturn(false)}
+              open={modalQuantityReturn[index]}
+              onCancel={() => handleShowModalProduct(index, false)}
               centered
               footer={null}
               title={"Nhập số lượng"}
@@ -163,7 +172,7 @@ const BillReturn = () => {
                 onChange={(e) => {
                   if (
                     Math.abs(Number(e.target.value)) >
-                      Number(record.quantity) ||
+                    Number(record.quantity) ||
                     Number(e.target.value) === 0
                   ) {
                     setQuantity(1);
@@ -176,7 +185,13 @@ const BillReturn = () => {
                 {!returned && (
                   <Button
                     onClick={() => {
-                      reloadProduct(record);
+                      Modal.confirm({
+                        title: "Xác nhận trả hàng",
+                        content: "Chắc chắn trả hàng?",
+                        onOk() {
+                          reloadProduct(index, record);
+                        }
+                      })
                     }}
                     type="primary"
                     size="large"
@@ -188,7 +203,7 @@ const BillReturn = () => {
             </Modal>
             <Button
               onClick={() => {
-                setModalQuantityReturn(true);
+                handleShowModalProduct(index, true);
               }}
               type="primary"
               size="large"
@@ -222,35 +237,7 @@ const BillReturn = () => {
       .then((response) => {
         setRender(response.data);
         var id = productsReturns.map((item) => item.billDetailId);
-        axios
-          .put(
-            `http://localhost:8080/api/admin/bill/billDetail/change-status?status=${
-              status === "5" || status === "3"
-                ? "ReturnW"
-                : status === "-1"
-                ? "ReturnC"
-                : "ReturnS"
-            }`,
-            id,
-            {
-              headers: {
-                Authorization: `Bearer ${getToken(true)}`,
-              },
-            }
-          )
-          .then((response) => {
-            setRender(response.data);
-          })
-          .catch((error) => {
-            const status = error.response.status;
-            if (status === 403) {
-              notification.error({
-                message: "Thông báo",
-                description: "Bạn không có quyền truy cập!",
-              });
-            }
-            return;
-          });
+        changeStatusBillDetail(id, status)
       })
       .catch((error) => {
         const status = error.response.status;
@@ -264,7 +251,38 @@ const BillReturn = () => {
     setModalNoteReturn(false);
   }
 
-  function reloadProduct(record) {
+  function changeStatusBillDetail(id, status) {
+    axios
+      .put(
+        `http://localhost:8080/api/admin/bill/billDetail/change-status?status=${status === "5" || status === "3"
+          ? "ReturnW"
+          : status === "-1"
+            ? "ReturnC"
+            : status === "ACTIVE" ? "ACTIVE" : "ReturnS"
+        }`,
+        id,
+        {
+          headers: {
+            Authorization: `Bearer ${getToken(true)}`,
+          },
+        }
+      )
+      .then((response) => {
+        setRender(response.data);
+      })
+      .catch((error) => {
+        const status = error.response.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
+        return;
+      });
+  }
+
+  function reloadProduct(index, record) {
     let check = -1;
     for (let index = 0; index < productsReturns.length; index++) {
       if (
@@ -285,14 +303,24 @@ const BillReturn = () => {
       message: "Thông báo",
       description: "Chọn sản phẩm thành công",
     });
-    setModalQuantityReturn(false);
+    handleShowModalProduct(index, false);
+    setRender(Math.random())
+  }
+
+  function deleteIfNoneReturned(index) {
+    productsReturns.splice(index, 1);
+    setRender(Math.random());
+    notification.success({
+      message: "Thông báo",
+      description: "Xóa thành công",
+    });
   }
 
   async function searchBill() {
     await axios
       .get(
         `http://localhost:8080/api/admin/bill/getBillByBillCode?billCode=` +
-          billCode,
+        billCode,
         {
           headers: {
             Authorization: `Bearer ${getToken(true)}`,
@@ -345,7 +373,7 @@ const BillReturn = () => {
       axios
         .get(
           `http://localhost:8080/api/admin/bill/getBillReturnByBillCode?billCode=` +
-            billCode,
+          billCode,
           {
             headers: {
               Authorization: `Bearer ${getToken(true)}`,
@@ -354,17 +382,29 @@ const BillReturn = () => {
         )
         .then((response) => {
           setBillInfor(response.data);
-          for (let index = 0; index < response.data.timeLines.length; index++) {
-            if (response.data.timeLines[index].status === "5") {
+          for (let index = 0; index < response.data.billDetails.length; index++) {
+            if (response.data.billDetails[index].billDetailStatus === "ReturnW") {
               setReturned("request");
             }
-            if (response.data.timeLines[index].status === "6") {
+            if (response.data.billDetails[index].billDetailStatus === "ReturnS") {
               setReturned("returned");
             }
-            if (response.data.timeLines[index].status === "-1") {
+            if (response.data.billDetails[index].billDetailStatus === "ReturnC") {
               setReturned("cancel");
             }
           }
+          for (let index = 0; index < response.data.billDetails.length; index++) {
+            if (((response.data.billDetails[index].billDetailStatus === "ReturnW" || response.data.billDetails[index].billDetailStatus === "ReturnS"))) {
+              if (!productsReturns.some(item => item.productDetailId === response.data.billDetails[index].productDetailId))
+                productsReturns.push(response.data.billDetails[index]);
+            }
+          }
+          let total = 0;
+          for (let index = 0; index < productsReturns.length; index++) {
+            total +=
+              productsReturns[index].productPrice * productsReturns[index].quantity;
+          }
+          seTotalPrice(total);
         })
         .catch((error) => {
           const status = error.response.status;
@@ -375,12 +415,7 @@ const BillReturn = () => {
             });
           }
         });
-      let total = 0;
-      for (let index = 0; index < productsReturns.length; index++) {
-        total +=
-          productsReturns[index].productPrice * productsReturns[index].quantity;
-      }
-      seTotalPrice(total);
+
     }
   }, [billCode, modalQuantityReturn, render]);
   return (
@@ -397,19 +432,19 @@ const BillReturn = () => {
                       data.status === "0" || data.status === "-1"
                         ? "#FF0000"
                         : data.status === "5"
-                        ? "#f0ad4e"
-                        : "#00cc00"
+                          ? "#f0ad4e"
+                          : "#00cc00"
                     }
                     icon={
                       data.status === "1"
                         ? FaRegFileAlt
                         : data.status === "0"
-                        ? FaTimes
-                        : data.status === "2"
-                        ? FaRegFileAlt
-                        : data.status === "3"
-                        ? FaTruck
-                        : CheckCircleOutlined
+                          ? FaTimes
+                          : data.status === "2"
+                            ? FaRegFileAlt
+                            : data.status === "3"
+                              ? FaTruck
+                              : CheckCircleOutlined
                     }
                     title={
                       data.status === "0" ? (
@@ -445,21 +480,21 @@ const BillReturn = () => {
                       data.status === "0" || data.status === "-1"
                         ? "#FF0000"
                         : data.status === "3"
-                        ? "#f0ad4e"
-                        : "#00cc00"
+                          ? "#f0ad4e"
+                          : "#00cc00"
                     }
                     icon={
                       data.status === "1"
                         ? FaRegFileAlt
                         : data.status === "0"
-                        ? FaTimes
-                        : data.status === "2"
-                        ? FaRegCheckCircle
-                        : data.status === "3"
-                        ? FaClock
-                        : data.status === "4"
-                        ? FaRocket
-                        : null
+                          ? FaTimes
+                          : data.status === "2"
+                            ? FaRegCheckCircle
+                            : data.status === "3"
+                              ? FaClock
+                              : data.status === "4"
+                                ? FaRocket
+                                : null
                     }
                     title={
                       data.status === "1" ? (
@@ -505,8 +540,8 @@ const BillReturn = () => {
                           !isConfirm
                             ? "-1"
                             : billInfo?.symbol === "Shipping"
-                            ? "6"
-                            : "4"
+                              ? "6"
+                              : "4"
                         );
                       }}
                       type="primary"
@@ -766,15 +801,9 @@ const BillReturn = () => {
                                 color: "rgb(255, 77, 79)",
                                 fontSize: "20px",
                               }}
-                              onClick={() => {
-                                productsReturns.splice(index, 1);
-                                setRender(Math.random());
-                                notification.success({
-                                  message: "Thông báo",
-                                  description: "Xóa thành công",
-                                });
-                              }}
+                              onClick={() => returned === false ? deleteIfNoneReturned(index) : changeStatusBillDetail([record.billDetailId], "ACTIVE")}
                             />
+
                           </div>
                         </Col>
                       </Row>

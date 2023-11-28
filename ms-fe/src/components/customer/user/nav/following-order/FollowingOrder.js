@@ -10,6 +10,7 @@ function FollowingOrder({ tab }) {
   const [count, setCount] = useState(null)
   const [symbol, setSymbol] = useState('')
   const [createdBy, setCreatedBy] = useState('')
+
   return (
     <div>
       <div>

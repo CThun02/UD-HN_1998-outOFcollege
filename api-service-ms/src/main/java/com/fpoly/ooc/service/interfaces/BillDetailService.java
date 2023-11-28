@@ -8,7 +8,7 @@ import com.fpoly.ooc.responce.pdf.PdfResponse;
 public interface BillDetailService {
 
 
-    BillDetail createBill(BillDetailRequest request);
+    BillDetail createBillDetail(BillDetailRequest request);
 
     BillDetail updateBill(Long id, String status);
 

@@ -1,11 +1,15 @@
 package com.fpoly.ooc.controller.client;
 
+import com.fpoly.ooc.dto.BillStatusDTO;
 import com.fpoly.ooc.entity.Account;
 import com.fpoly.ooc.entity.Address;
 import com.fpoly.ooc.entity.AddressDetail;
+import com.fpoly.ooc.entity.Bill;
+import com.fpoly.ooc.repository.BillRepo;
 import com.fpoly.ooc.request.DeliveryNoteRequest;
 import com.fpoly.ooc.request.bill.BillRequest;
 import com.fpoly.ooc.request.product.ProductDetailRequest;
+import com.fpoly.ooc.request.timeline.TimeLinerequest;
 import com.fpoly.ooc.request.voucher.DisplayVoucherRequest;
 import com.fpoly.ooc.service.interfaces.AddressDetailService;
 import com.fpoly.ooc.service.interfaces.AddressServiceI;
@@ -58,6 +62,9 @@ public class ClientController {
 
     @Autowired
     private BillDetailService billDetailService;
+
+    @Autowired
+    private BillRepo billRepo;
 
     @GetMapping("/address")
     public ResponseEntity<?> getAll(@RequestParam("username") String username) {
@@ -145,4 +152,28 @@ public class ClientController {
         return ResponseEntity.status(200).body(billDetailService.pdfResponse(billCode));
     }
 
+    @GetMapping("/timeline/{billId}")
+    public ResponseEntity<?> pdfResponse(@PathVariable("billId") Long billId) {
+        return ResponseEntity.ok(timeLineService.getAllTimeLineByBillId(billId));
+    }
+
+    @PostMapping("/create-timeline/{id}")
+    public ResponseEntity<?> createTimelineByBillId(
+            @PathVariable("id") Long id,
+            @RequestBody(required = false) TimeLinerequest request) {
+        Bill bill;
+        bill = billRepo.findById(id).orElse(null);
+        if (bill != null) {
+            bill.setCreatedBy(request.getCreatedBy());
+            billRepo.saveAndFlush(bill);
+        }
+
+        return ResponseEntity.ok(timeLineService.createTimeLine(id, request));
+    }
+
+    @PutMapping("/change-status-bill/{id}")
+    public ResponseEntity<?> updateBillStatus(@PathVariable("id") Long id,
+                                              @RequestBody BillStatusDTO dto) {
+        return ResponseEntity.ok(billService.updateBillStatus(dto, id));
+    }
 }

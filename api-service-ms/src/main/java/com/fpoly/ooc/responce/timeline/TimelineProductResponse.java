@@ -11,6 +11,8 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class TimelineProductResponse {
 
+    private Long billId;
+
     private Long productDetailId;
 
     private Long billDetailId;

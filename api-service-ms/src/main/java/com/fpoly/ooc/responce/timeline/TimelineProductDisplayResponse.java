@@ -15,6 +15,8 @@ import java.util.List;
 @Setter
 public class TimelineProductDisplayResponse {
 
+    private Long billId;
+
     private Long productDetailId;
 
     private Long billDetailId;
@@ -58,6 +60,7 @@ public class TimelineProductDisplayResponse {
     private List<ProductImageResponse> productImageResponses;
 
     public TimelineProductDisplayResponse(TimelineProductResponse timelineProductResponse) {
+        this.billId= timelineProductResponse.getBillId();
         this.productDetailId = timelineProductResponse.getProductDetailId();
         this.billDetailId = timelineProductResponse.getBillDetailId();
         this.productName = timelineProductResponse.getProductName();

@@ -3,18 +3,78 @@ import styles from "./FollowingOrderContent.module.css";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { getAuthToken } from "../../../../../../service/Token";
+import TimelineCustom from "../../../../../element/bill-info/TimelineCustom";
+import ModalConfirm from "../../../../../admin/sale-couter/ModalConfirm";
 
 function FollowingOrderContent({ billCode, status, symbol, count, createdBy }) {
   const [timelines, setTimelines] = useState([])
   const [totalPrice, setTotalPrice] = useState(0)
   const [loading, setLoading] = useState(false)
+  const [billId, setBillId] = useState(null)
+  const [timelineV1, setTimelineV1] = useState([])
+  const [open, setOpen] = useState(false)
+  const [render, setRender] = useState(false)
+  const [openNote, setOpenNote] = useState([])
+
+  const handleOpen = (e) => {
+    console.log(e)
+    setBillId(e)
+    setOpen(true)
+  }
+
+  const handleCreateTimeline = async (note) => {
+    const data = await token;
+    const values = {
+      note: note,
+      status: '0',
+      createdBy: data ? (data?.username + "_" + data?.fullName) : null,
+    };
+
+    await axios
+      .post(`http://localhost:8080/api/client/create-timeline/${billId}`, values)
+      .then((response) => {
+        setTimelines([...timelines, response.data]);
+        setRender(response.data);
+      })
+      .catch((error) => {
+        console.log(error)
+      });
+  };
+
+  const handleUpdateBillStatus = async () => {
+    await axios
+      .put(
+        `http://localhost:8080/api/client/change-status-bill/${billId}`,
+        {
+          status: 'Cancel',
+          amountPaid: 0,
+        },
+      )
+      .then((response) => {
+        setRender(response.data.amountPaid);
+      })
+      .catch((error) => {
+        console.log(error)
+      });
+  }
+
+  const handleCancel = () => {
+    setOpen(false);
+  }
+
+  const handleCancelBill = (note) => {
+    handleCreateTimeline(note)
+    handleUpdateBillStatus()
+    setOpenNote([])
+  }
 
   const token = getAuthToken()
   useEffect(() => {
     const getAll = async () => {
       setLoading(false)
       const data = await token
-      await axios.get(`http://localhost:8080/api/client/timelineByUser?username=${data?.username}&billCode=${billCode}&status=${status}&symbol=${symbol}&count=${count}&createdBy=${createdBy}`)
+      console.log(`status`, data)
+      await axios.get(`http://localhost:8080/api/client/timelineByUser?username=${data?.username}&billCode=${billCode}&status=${status}&symbol=${symbol}&count=${Number(count)}&createdBy=${createdBy}`)
         .then((response) => {
           setTimelines(response.data)
           setLoading(true)
@@ -29,10 +89,22 @@ function FollowingOrderContent({ billCode, status, symbol, count, createdBy }) {
           console.error(error)
         })
     }
-    getAll()
-    console.log(timelines)
 
-  }, [status])
+    const getTimeline = async () => {
+      axios
+        .get(`http://localhost:8080/api/client/timeline/${billId}`)
+        .then((response) => {
+          setTimelineV1(response.data);
+          console.log(response.data);
+        })
+        .catch((error) => {
+          console.log(error)
+        });
+    }
+    getAll()
+    getTimeline()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status, billId, render]);
 
   return (
     <div className={styles.content}>
@@ -49,7 +121,7 @@ function FollowingOrderContent({ billCode, status, symbol, count, createdBy }) {
               >
                 {status === '' ? ' Chờ giao hàng'
                   : status === 'Complete' ? 'Hoàn thành'
-                    : status === '0' ? 'Đã hủy' : status}
+                    : status === 'Cancel' ? 'Đã hủy' : status}
               </span>
             </div>
             {timelines?.length > 0 && timelines.map((timeline) =>
@@ -72,7 +144,7 @@ function FollowingOrderContent({ billCode, status, symbol, count, createdBy }) {
                   </Carousel>
                 </Col>
                 <Col span={18}>
-                  <Space Space style={{ width: "100%", marginLeft: "16px" }} size={8} direction="vertical">
+                  <Space Space style={{ width: "100%", marginLeft: "16px" }} size={8} direction="vertical" onClick={() => handleOpen(timeline.billId)}>
                     <Row>
                       <Col span={24}>
                         <div
@@ -158,15 +230,21 @@ function FollowingOrderContent({ billCode, status, symbol, count, createdBy }) {
                       padding: "10px 0",
                     }}
                   >
-                    {console.log(status)}
-                    {status === 'Complete' && <Button type="primary" style={{ marginRight: "20px" }}>
-                      Mua lại
-                    </Button>}
-                    {status === '' && <Button type="primary" danger style={{
+                    {(status === 'Complete' && count === 4) &&
+                      <Button type="primary" style={{ marginRight: "20px" }}>
+                        Mua lại
+                      </Button>}
+                    {(createdBy === 'CLIENT') && <Button type="primary" danger style={{
                       marginRight: "20px",
-                    }}>
+                    }}
+                      onClick={() => {
+                        setBillId(timeline.billId);
+                        setOpenNote(true)
+                      }}
+                    >
                       Hủy
                     </Button>}
+                    <ModalConfirm isModalOpen={openNote} handleCancel={() => setOpenNote(false)} handleOk={handleCancelBill} />
                     <span>Thành tiền: {(timeline.quantity * timeline.productPrice).toLocaleString("vi-VN", {
                       style: "currency",
                       currency: "VND",
@@ -181,6 +259,11 @@ function FollowingOrderContent({ billCode, status, symbol, count, createdBy }) {
       </div> : <>
         Đang tải...
       </>}
+      <TimelineCustom
+        open={open}
+        timelines={timelineV1}
+        handleCancel={handleCancel}
+      />
     </div >
   );
 }

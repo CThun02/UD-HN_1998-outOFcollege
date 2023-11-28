@@ -39,11 +39,11 @@ public interface BillService {
 
     Bill findBillByBillId(Long id);
 
-    BillRevenueDisplay getBillRevenue(Integer day, Integer month, Integer year);
+    BillRevenueDisplay getBillRevenue(LocalDateTime dayFrom, LocalDateTime dayTo);
 
-    BillRevenueCompare getRevenueInStoreOnlineCompare(Integer day, Integer month, Integer year);
+    BillRevenueCompare getRevenueInStoreOnlineCompare(LocalDateTime day, LocalDateTime dayTo);
 
-    List<ProductDetailSellResponse> getProductInBillByStatusAndId(Long id, Integer day, Integer month, Integer year);
+    List<ProductDetailSellResponse> getProductInBillByStatusAndId(Long id, LocalDateTime dayFrom, LocalDateTime dayTo);
 
     public BillRevenueCompareDate compareRevenueDate(Integer dayFrom, Integer monthFrom, Integer yearFrom,
                                                      Integer dayTo, Integer monthTo, Integer yearTo);

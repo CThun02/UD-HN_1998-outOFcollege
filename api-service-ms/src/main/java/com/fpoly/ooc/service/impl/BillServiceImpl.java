@@ -184,30 +184,29 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
-    public BillRevenueDisplay getBillRevenue(Integer day, Integer month, Integer year) {
-        ;
-        BillRevenue revenue = billRepo.getBillRevenue(day, month, year);
+    public BillRevenueDisplay getBillRevenue(LocalDateTime dayFrom, LocalDateTime dayTo) {
+        BillRevenue revenue = billRepo.getBillRevenue(dayFrom, dayTo);
         BillRevenueDisplay billRevenueDisplay = new BillRevenueDisplay(revenue);
-        List<ProductDetailSellResponse> productDetailDisplayResponses = this.getProductInBillByStatusAndId(null, day, month, year);
+        List<ProductDetailSellResponse> productDetailDisplayResponses = this.getProductInBillByStatusAndId(null, dayFrom, dayTo);
         billRevenueDisplay.setProductDetailDisplay(productDetailDisplayResponses);
         return billRevenueDisplay;
     }
 
     @Override
-    public BillRevenueCompare getRevenueInStoreOnlineCompare(Integer day, Integer month, Integer year) {
+    public BillRevenueCompare getRevenueInStoreOnlineCompare(LocalDateTime day, LocalDateTime dayTo) {
         BillRevenueCompare billRevenueCompare = new BillRevenueCompare();
-        billRevenueCompare.setOnlineRevenue(billRepo.getRevenueInStoreOnlineCompare("Online", day, month, year) == null ? 0 :
-                billRepo.getRevenueInStoreOnlineCompare("Online", day, month, year));
-        billRevenueCompare.setInStoreRevenue(billRepo.getRevenueInStoreOnlineCompare("In-Store", day, month, year) == null ? 0 :
-                billRepo.getRevenueInStoreOnlineCompare("In-Store", day, month, year));
+        billRevenueCompare.setOnlineRevenue(billRepo.getRevenueInStoreOnlineCompare("Online", day, dayTo) == null ? 0 :
+                billRepo.getRevenueInStoreOnlineCompare("Online", day, dayTo));
+        billRevenueCompare.setInStoreRevenue(billRepo.getRevenueInStoreOnlineCompare("In-Store", day, dayTo) == null ? 0 :
+                billRepo.getRevenueInStoreOnlineCompare("In-Store", day, dayTo));
         billRevenueCompare.setTotalRevenue(billRevenueCompare.getOnlineRevenue() + billRevenueCompare.getInStoreRevenue());
         return billRevenueCompare;
     }
 
     @Override
-    public List<ProductDetailSellResponse> getProductInBillByStatusAndId(Long id, Integer day, Integer month, Integer year) {
+    public List<ProductDetailSellResponse> getProductInBillByStatusAndId(Long id, LocalDateTime dayFrom, LocalDateTime dayTo) {
         List<ProductDetailResponse> productSellTheMost = billRepo.getProductInBillByStatusAndIdAndDate(id,
-                day, month, year);
+                dayFrom, dayTo);
         List<ProductDetailSellResponse> billProductSellTheMosts = new ArrayList<>();
         for (int i = 0; i < productSellTheMost.size(); i++) {
             ProductDetailDisplayResponse response = new ProductDetailDisplayResponse(productSellTheMost.get(i),
@@ -222,8 +221,8 @@ public class BillServiceImpl implements BillService {
     @Override
     public BillRevenueCompareDate compareRevenueDate(Integer dayFrom, Integer monthFrom, Integer yearFrom,
                                                      Integer dayTo, Integer monthTo, Integer yearTo) {
-        Double revenueFrom = billRepo.getRevenueByTime(dayFrom, monthFrom, yearFrom, null);
-        Double revenueTo = billRepo.getRevenueByTime(dayTo, monthTo, yearTo, null);
+        Double revenueFrom = billRepo.getRevenueByTime(dayFrom, monthFrom, yearFrom, dayFrom, monthFrom, yearFrom, null);
+        Double revenueTo = billRepo.getRevenueByTime(dayTo, monthTo, yearTo, dayTo, monthTo, yearTo, null);
         BillRevenueCompareDate billRevenueCompareDate = new BillRevenueCompareDate(revenueFrom, revenueTo);
         return billRevenueCompareDate;
     }
@@ -264,13 +263,13 @@ public class BillServiceImpl implements BillService {
 
     private void addDataLineChart(Integer year, Integer month, Integer day, String time, List<BillLineChartResponse> data) {
         String type = "Tại quầy";
-        Double revenue = billRepo.getRevenueByTime(day, month, year, "In-Store") == null ? 0 :
-                billRepo.getRevenueByTime(day, month, year, "In-Store");
+        Double revenue = billRepo.getRevenueByTime(day, month, year, day, month, year, "In-Store") == null ? 0 :
+                billRepo.getRevenueByTime(day, month, year, day, month, year, "In-Store");
         BillLineChartResponse billRevenue = new BillLineChartResponse(type, time, revenue);
         data.add(billRevenue);
         String typeOnline = "Trực tuyến";
-        Double revenueOnline = billRepo.getRevenueByTime(day, month, year, "Online") == null ? 0 :
-                billRepo.getRevenueByTime(day, month, year, "Online");
+        Double revenueOnline = billRepo.getRevenueByTime(day, month, year, day, month, year, "Online") == null ? 0 :
+                billRepo.getRevenueByTime(day, month, year, day, month, year, "Online");
         BillLineChartResponse billRevenueOnline = new BillLineChartResponse(typeOnline, time, revenueOnline);
         data.add(billRevenueOnline);
     }
@@ -300,16 +299,22 @@ public class BillServiceImpl implements BillService {
         LocalDate now = LocalDate.now();
         if (time.equals("date")) {
             LocalDate before = now.minusDays(1);
-            revenue = billRepo.getRevenueByTime(now.getDayOfMonth(), now.getMonthValue(), now.getYear(), null);
-            revenueBefore = billRepo.getRevenueByTime(before.getDayOfMonth(), before.getMonthValue(), before.getYear(), null);
+            revenue = billRepo.getRevenueByTime(now.getDayOfMonth(), now.getMonthValue(), now.getYear(),
+                    now.getDayOfMonth(), now.getMonthValue(), now.getYear(), null);
+            revenueBefore = billRepo.getRevenueByTime(before.getDayOfMonth(), before.getMonthValue(), before.getYear(),
+                    before.getDayOfMonth(), before.getMonthValue(), before.getYear(), null);
         } else if (time.equals("month")) {
             LocalDate before = now.minusMonths(1);
-            revenue = billRepo.getRevenueByTime(null, now.getMonthValue(), now.getYear(), null);
-            revenueBefore = billRepo.getRevenueByTime(null, before.getMonthValue(), before.getYear(), null);
+            revenue = billRepo.getRevenueByTime(null, now.getMonthValue(), now.getYear(),
+                    null, now.getMonthValue(), now.getYear(),null);
+            revenueBefore = billRepo.getRevenueByTime(null, before.getMonthValue(), before.getYear(),
+                    null, before.getMonthValue(), before.getYear(), null);
         } else if (time.equals("year")) {
             LocalDate before = now.minusYears(1);
-            revenue = billRepo.getRevenueByTime(null, null, now.getYear(), null);
-            revenueBefore = billRepo.getRevenueByTime(null, null, before.getYear(), null);
+            revenue = billRepo.getRevenueByTime(null, null, now.getYear(),
+                    null, null, now.getYear(), null);
+            revenueBefore = billRepo.getRevenueByTime(null, null, before.getYear(),
+                    null, null, before.getYear(), null);
         }
         revenue = revenue == null ? 0.0 : revenue;
         revenueBefore = revenueBefore == null ? 0.0 : revenueBefore;

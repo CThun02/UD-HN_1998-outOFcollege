@@ -54,7 +54,7 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
             "       pd.descriptionDetail AS descriptionDetail, pd.pattern as pattern, pd.form as form, pd.status as status " +
             "FROM BillDetail bd " +
             "JOIN ProductDetail pd ON pd.id = bd.productDetail.id " +
-            "WHERE bd.bill.status <> 'CANCEL' and (bd.bill.id = ?1 or ?1 is null) " +
+            "WHERE bd.bill.status <> 'CANCEL' and bd.status not like 'ReturnS' and (bd.bill.id = ?1 or ?1 is null) " +
             "AND  (?2 IS NULL OR bd.createdAt >= ?2) AND (?3 IS NULL OR bd.createdAt <= ?3)" +
             "GROUP BY pd.id, pd.product, pd.brand, pd.category, pd.button, pd.material, pd.collar, pd.sleeve, pd.size, " +
             "pd.color, pd.shirtTail, bd.price, pd.weight, pd.descriptionDetail, " +

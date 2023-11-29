@@ -10,7 +10,7 @@ import {
   Divider,
   notification,
   Row,
-  Space,
+  Radio,
   Table,
 } from "antd";
 import TextArea from "antd/es/input/TextArea";
@@ -31,6 +31,7 @@ import {
   FaTruck,
 } from "react-icons/fa";
 import { Timeline, TimelineEvent } from "@mailtop/horizontal-timeline";
+import ModalDetail from "../sale-couter/ModalDetail";
 
 var productsReturns = [];
 
@@ -46,8 +47,7 @@ const BillReturn = () => {
   const [totalPrice, seTotalPrice] = useState(0);
   const [returned, setReturned] = useState(false);
   const [note, setNote] = useState("");
-  const [isConfirm, setIsconfirm] = useState(true);
-  const [modalNoteReturn, setModalNoteReturn] = useState(false);
+  const [modalDetail, setModalDetail] = useState(false);
 
   const handleShowModalProduct = (index, value) => {
     const newModalVisible = [...modalQuantityReturn];
@@ -172,7 +172,7 @@ const BillReturn = () => {
                 onChange={(e) => {
                   if (
                     Math.abs(Number(e.target.value)) >
-                    Number(record.quantity) ||
+                      Number(record.quantity) ||
                     Number(e.target.value) === 0
                   ) {
                     setQuantity(1);
@@ -185,13 +185,7 @@ const BillReturn = () => {
                 {!returned && (
                   <Button
                     onClick={() => {
-                      Modal.confirm({
-                        title: "Xác nhận trả hàng",
-                        content: "Chắc chắn trả hàng?",
-                        onOk() {
-                          reloadProduct(index, record);
-                        }
-                      })
+                      reloadProduct(index, record);
                     }}
                     type="primary"
                     size="large"
@@ -219,46 +213,72 @@ const BillReturn = () => {
 
   async function confirmReload(status) {
     const data = await token;
-    const values = {
-      note: note,
-      status: status,
-      createdBy: data?.username + "_" + data?.fullName,
-    };
-    await axios
-      .post(
-        `http://localhost:8080/api/admin/timeline/${billInfo?.id}`,
-        values,
-        {
+    for (let index = Number(status); index <= Number(status) + 1; index++) {
+      await axios
+        .post(
+          `http://localhost:8080/api/admin/timeline/${billInfo?.id}`,
+          {
+            note: note,
+            status: index,
+            createdBy: data?.username + "_" + data?.fullName,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${getToken(true)}`,
+            },
+          }
+        )
+        .then((response) => {})
+        .catch((error) => {
+          const status = error.response.status;
+          if (status === 403) {
+            notification.error({
+              message: "Thông báo",
+              description: "Bạn không có quyền truy cập!",
+            });
+          }
+        });
+    }
+    for (let index = 0; index < productsReturns.length; index++) {
+      const request = {
+        productDetailId: productsReturns[index].productDetailId,
+        billId: billInfo.id,
+        reason: productsReturns[index].reson,
+        quantity: productsReturns[index].quantity,
+      };
+      await axios
+        .post(`http://localhost:8080/api/admin/product-return`, request, {
           headers: {
             Authorization: `Bearer ${getToken(true)}`,
           },
-        }
-      )
-      .then((response) => {
-        setRender(response.data);
-        var id = productsReturns.map((item) => item.billDetailId);
-        changeStatusBillDetail(id, status)
-      })
-      .catch((error) => {
-        const status = error.response.status;
-        if (status === 403) {
-          notification.error({
-            message: "Thông báo",
-            description: "Bạn không có quyền truy cập!",
-          });
-        }
-      });
-    setModalNoteReturn(false);
+        })
+        .then((response) => {})
+        .catch((error) => {
+          const status = error.response.status;
+          if (status === 403) {
+            notification.error({
+              message: "Thông báo",
+              description: "Bạn không có quyền truy cập!",
+            });
+          }
+        });
+    }
+    var id = productsReturns.map((item) => item.billDetailId);
+    changeStatusBillDetail(id, "ReturnS");
+    setRender(Math.random());
   }
 
   function changeStatusBillDetail(id, status) {
     axios
       .put(
-        `http://localhost:8080/api/admin/bill/billDetail/change-status?status=${status === "5" || status === "3"
-          ? "ReturnW"
-          : status === "-1"
+        `http://localhost:8080/api/admin/bill/billDetail/change-status?status=${
+          status === "5" || status === "3"
+            ? "ReturnW"
+            : status === "-1"
             ? "ReturnC"
-            : status === "ACTIVE" ? "ACTIVE" : "ReturnS"
+            : status === "ACTIVE"
+            ? "ACTIVE"
+            : "ReturnS"
         }`,
         id,
         {
@@ -304,7 +324,8 @@ const BillReturn = () => {
       description: "Chọn sản phẩm thành công",
     });
     handleShowModalProduct(index, false);
-    setRender(Math.random())
+    setQuantity(1);
+    setRender(Math.random());
   }
 
   function deleteIfNoneReturned(index) {
@@ -320,7 +341,7 @@ const BillReturn = () => {
     await axios
       .get(
         `http://localhost:8080/api/admin/bill/getBillByBillCode?billCode=` +
-        billCode,
+          billCode,
         {
           headers: {
             Authorization: `Bearer ${getToken(true)}`,
@@ -373,7 +394,7 @@ const BillReturn = () => {
       axios
         .get(
           `http://localhost:8080/api/admin/bill/getBillReturnByBillCode?billCode=` +
-          billCode,
+            billCode,
           {
             headers: {
               Authorization: `Bearer ${getToken(true)}`,
@@ -382,27 +403,51 @@ const BillReturn = () => {
         )
         .then((response) => {
           setBillInfor(response.data);
-          for (let index = 0; index < response.data.billDetails.length; index++) {
-            if (response.data.billDetails[index].billDetailStatus === "ReturnW") {
+          for (
+            let index = 0;
+            index < response.data.billDetails.length;
+            index++
+          ) {
+            if (
+              response.data.billDetails[index].billDetailStatus === "ReturnW"
+            ) {
               setReturned("request");
             }
-            if (response.data.billDetails[index].billDetailStatus === "ReturnS") {
+            if (
+              response.data.billDetails[index].billDetailStatus === "ReturnS"
+            ) {
               setReturned("returned");
             }
-            if (response.data.billDetails[index].billDetailStatus === "ReturnC") {
+            if (
+              response.data.billDetails[index].billDetailStatus === "ReturnC"
+            ) {
               setReturned("cancel");
             }
           }
-          for (let index = 0; index < response.data.billDetails.length; index++) {
-            if (((response.data.billDetails[index].billDetailStatus === "ReturnW" || response.data.billDetails[index].billDetailStatus === "ReturnS"))) {
-              if (!productsReturns.some(item => item.productDetailId === response.data.billDetails[index].productDetailId))
+          for (
+            let index = 0;
+            index < response.data.billDetails.length;
+            index++
+          ) {
+            if (
+              response.data.billDetails[index].billDetailStatus === "ReturnW" ||
+              response.data.billDetails[index].billDetailStatus === "ReturnS"
+            ) {
+              if (
+                !productsReturns.some(
+                  (item) =>
+                    item.productDetailId ===
+                    response.data.billDetails[index].productDetailId
+                )
+              )
                 productsReturns.push(response.data.billDetails[index]);
             }
           }
           let total = 0;
           for (let index = 0; index < productsReturns.length; index++) {
             total +=
-              productsReturns[index].productPrice * productsReturns[index].quantity;
+              productsReturns[index].productPrice *
+              productsReturns[index].quantity;
           }
           seTotalPrice(total);
         })
@@ -415,11 +460,16 @@ const BillReturn = () => {
             });
           }
         });
-
     }
   }, [billCode, modalQuantityReturn, render]);
   return (
     <>
+      <ModalDetail
+        isModalOpen={modalDetail}
+        handleCancel={() => setModalDetail(false)}
+        timelineDetail={billInfo?.timeLines}
+        symbol={billInfo?.symbol}
+      />
       <div className={styles.billReturn}>
         <h3 style={{ marginBottom: "25px" }}>Thông tin hóa đơn</h3>
         <Timeline minEvents={2} placeholder className={styles.timeLine}>
@@ -432,19 +482,19 @@ const BillReturn = () => {
                       data.status === "0" || data.status === "-1"
                         ? "#FF0000"
                         : data.status === "5"
-                          ? "#f0ad4e"
-                          : "#00cc00"
+                        ? "#f0ad4e"
+                        : "#00cc00"
                     }
                     icon={
                       data.status === "1"
                         ? FaRegFileAlt
                         : data.status === "0"
-                          ? FaTimes
-                          : data.status === "2"
-                            ? FaRegFileAlt
-                            : data.status === "3"
-                              ? FaTruck
-                              : CheckCircleOutlined
+                        ? FaTimes
+                        : data.status === "2"
+                        ? FaRegFileAlt
+                        : data.status === "3"
+                        ? FaTruck
+                        : CheckCircleOutlined
                     }
                     title={
                       data.status === "0" ? (
@@ -480,21 +530,21 @@ const BillReturn = () => {
                       data.status === "0" || data.status === "-1"
                         ? "#FF0000"
                         : data.status === "3"
-                          ? "#f0ad4e"
-                          : "#00cc00"
+                        ? "#f0ad4e"
+                        : "#00cc00"
                     }
                     icon={
                       data.status === "1"
                         ? FaRegFileAlt
                         : data.status === "0"
-                          ? FaTimes
-                          : data.status === "2"
-                            ? FaRegCheckCircle
-                            : data.status === "3"
-                              ? FaClock
-                              : data.status === "4"
-                                ? FaRocket
-                                : null
+                        ? FaTimes
+                        : data.status === "2"
+                        ? FaRegCheckCircle
+                        : data.status === "3"
+                        ? FaClock
+                        : data.status === "4"
+                        ? FaRocket
+                        : null
                     }
                     title={
                       data.status === "1" ? (
@@ -518,64 +568,11 @@ const BillReturn = () => {
           )}
         </Timeline>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
-          {returned === "request" && (
-            <>
-              <Space>
-                <Modal
-                  open={modalNoteReturn}
-                  onCancel={() => setModalNoteReturn(false)}
-                  centered
-                  footer={null}
-                  title={"Ghi chú"}
-                >
-                  <TextArea
-                    onChange={(e) => {
-                      setNote(e.target.value);
-                    }}
-                  />
-                  <div style={{ marginTop: "8px", textAlign: "center" }}>
-                    <Button
-                      onClick={() => {
-                        confirmReload(
-                          !isConfirm
-                            ? "-1"
-                            : billInfo?.symbol === "Shipping"
-                              ? "6"
-                              : "4"
-                        );
-                      }}
-                      type="primary"
-                      size="large"
-                    >
-                      Xác nhận
-                    </Button>
-                  </div>
-                </Modal>
-                <Button
-                  onClick={() => {
-                    setIsconfirm(true);
-                    setModalNoteReturn(true);
-                  }}
-                  type="primary"
-                  size="large"
-                >
-                  Xác nhận
-                </Button>
-                <Button
-                  onClick={() => {
-                    setIsconfirm(false);
-                    setModalNoteReturn(true);
-                  }}
-                  danger
-                  type="primary"
-                  size="large"
-                >
-                  Hủy
-                </Button>
-              </Space>
-            </>
-          )}
-          <Button type="primary" size="large">
+          <Button
+            type="primary"
+            size="large"
+            onClick={() => setModalDetail(true)}
+          >
             Chi tiết
           </Button>
         </div>
@@ -678,7 +675,25 @@ const BillReturn = () => {
         <h3 style={{ marginBottom: "25px" }}>Thông tin đơn hàng</h3>
         <div style={{ textAlign: "end", marginBottom: "10px" }}>
           {returned === false && (
-            <Button size="large" type="primary">
+            <Button
+              size="large"
+              type="primary"
+              onClick={() => {
+                Modal.confirm({
+                  centered: true,
+                  title: "Xác nhận trả hàng tất cả",
+                  content: "Chắc chắn trả hàng?",
+                  onOk() {
+                    productsReturns = billInfo?.billDetails;
+                    setRender(Math.random());
+                    notification.success({
+                      message: "Thông báo",
+                      description: "Thêm thông tin trả hàng thành công!",
+                    });
+                  },
+                });
+              }}
+            >
               <ReloadOutlined />
               Trả hàng tất cả
             </Button>
@@ -706,7 +721,7 @@ const BillReturn = () => {
               {productsReturns &&
                 productsReturns.map((record, index) => {
                   return (
-                    <Col span={24}>
+                    <Col span={24} key={index}>
                       <Row>
                         <Col span={4}>
                           <div className="m-5">
@@ -771,6 +786,15 @@ const BillReturn = () => {
                               {record.productSize}
                             </span>
                             <br />
+                            <b>Số lượng: </b>
+                            <span
+                              style={{
+                                marginLeft: "8px",
+                              }}
+                            >
+                              {record.quantity}
+                            </span>
+                            <br />
                             <b>Tổng giá hoàn trả: </b>
                             <span
                               style={{
@@ -778,7 +802,7 @@ const BillReturn = () => {
                               }}
                             >
                               {(
-                                record.productPrice + record.quantity
+                                record.productPrice * record.quantity
                               ).toLocaleString("vi-VN", {
                                 style: "currency",
                                 currency: "VND",
@@ -795,16 +819,33 @@ const BillReturn = () => {
                               justifyContent: "center",
                             }}
                           >
-                            <CloseCircleOutlined
-                              style={{
-                                cursor: "pointer",
-                                color: "rgb(255, 77, 79)",
-                                fontSize: "20px",
-                              }}
-                              onClick={() => returned === false ? deleteIfNoneReturned(index) : changeStatusBillDetail([record.billDetailId], "ACTIVE")}
-                            />
-
+                            {returned === false && (
+                              <CloseCircleOutlined
+                                style={{
+                                  cursor: "pointer",
+                                  color: "rgb(255, 77, 79)",
+                                  fontSize: "20px",
+                                }}
+                                onClick={() => deleteIfNoneReturned(index)}
+                              />
+                            )}
                           </div>
+                        </Col>
+                        <Col span={24}>
+                          <Radio.Group
+                            name="radiogroup"
+                            defaultValue={
+                              productsReturns[index].reason
+                                ? productsReturns[index].reason
+                                : "PRODUCE"
+                            }
+                            onChange={(e) => {
+                              productsReturns[index].reason = e.target.value;
+                            }}
+                          >
+                            <Radio value={"PRODUCE"}>Lỗi do nhà sản xuất</Radio>
+                            <Radio value={"OTHER"}>Lý do khác</Radio>
+                          </Radio.Group>
                         </Col>
                       </Row>
                       <Divider />
@@ -840,6 +881,7 @@ const BillReturn = () => {
                   })}
                 </span>
               </Col>
+
               <Divider />
               <Col span={12} style={{ marginBottom: "10px" }}>
                 <span style={{ fontWeight: 600 }}>Tiền thừa trả khách:</span>
@@ -850,26 +892,46 @@ const BillReturn = () => {
                   currency: "VND",
                 })}
               </Col>
-
-              {returned === false && (
-                <Col span={24}>
-                  <span style={{ fontWeight: 600 }}>
-                    Mô tả <span style={{ color: "rgb(255, 77, 79)" }}>*</span>
+              <Col span={24}>
+                <span style={{ fontWeight: 600 }}>
+                  Mô tả <span style={{ color: "rgb(255, 77, 79)" }}>*</span>
+                </span>
+                <br />
+                {returned === false ? (
+                  <div>
+                    <TextArea
+                      onChange={(e) => {
+                        setNote(e.target.value);
+                      }}
+                      allowClear
+                    />
+                    <Button
+                      type="primary"
+                      size="large"
+                      style={{ width: "100%", margin: "20px 0 " }}
+                      disabled={productsReturns.length === 0}
+                      onClick={() =>
+                        Modal.confirm({
+                          centered: true,
+                          title: "Xác nhận trả hàng",
+                          content: "Chắc chắn trả hàng?",
+                          onOk() {
+                            confirmReload(
+                              billInfo?.symbol === "Shipping" ? "5" : "3"
+                            );
+                          },
+                        })
+                      }
+                    >
+                      <span style={{ fontWeight: 600 }}>Xác nhận trả hàng</span>
+                    </Button>
+                  </div>
+                ) : (
+                  <span>
+                    {billInfo?.timeLines[billInfo?.timeLines.length - 1]?.note}
                   </span>
-                  <TextArea allowClear />
-                  <Button
-                    type="primary"
-                    size="large"
-                    style={{ width: "100%", margin: "20px 0 " }}
-                    disabled={productsReturns.length === 0}
-                    onClick={() =>
-                      confirmReload(billInfo?.symbol === "Shipping" ? "5" : "3")
-                    }
-                  >
-                    <span style={{ fontWeight: 600 }}>Xác nhận trả hàng</span>
-                  </Button>
-                </Col>
-              )}
+                )}
+              </Col>
             </Row>
           </div>
         </Col>

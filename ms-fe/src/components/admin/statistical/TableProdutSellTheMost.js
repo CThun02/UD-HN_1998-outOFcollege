@@ -4,7 +4,7 @@ import axios from "axios";
 import styles from "./StatisticalIndex.module.css";
 import { getToken } from "../../../service/Token";
 
-const TableProdutSellTheMost = ({ date, type }) => {
+const TableProdutSellTheMost = ({ date, dateToP, type }) => {
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
@@ -165,49 +165,62 @@ const TableProdutSellTheMost = ({ date, type }) => {
     },
   ];
   useEffect(() => {
-    var day = "";
-    var month = "";
-    var year = date.substring(0, 4);
-    if (type === "date") {
-      month = date.substring(date.indexOf("-") + 1, date.lastIndexOf("-"));
-      day = date.substring(date.lastIndexOf("-") + 1);
-    } else if (type === "month") {
-      month = date.substring(
-        date.indexOf("-") + 1,
-        date.lastIndexOf("-") === date.indexOf("-")
-          ? date.length
-          : date.lastIndexOf("-")
+    var dateFrom = new Date(date);
+    var dateTo = new Date(type === "other" ? dateToP : date);
+    function getLastDayOfMonth(month) {
+      const firstDayOfNextMonth = new Date(
+        Date.UTC(dateFrom.getFullYear(), month, 1)
       );
+      const lastDayOfMonth = new Date(
+        firstDayOfNextMonth.getTime() - 24 * 60 * 60 * 1000
+      );
+      return lastDayOfMonth.getDate();
     }
-    axios
-      .get(
-        "http://localhost:8080/api/admin/bill/getBillProductSellTheMost?day=" +
-          day +
-          "&month=" +
-          month +
-          "&year=" +
-          year,
-        {
-          headers: {
-            Authorization: `Bearer ${getToken(true)}`,
-          },
-        }
-      )
-      .then((res) => {
-        setLoading(false);
-        setData(res.data);
-      })
-      .catch((err) => {
-        const status = err.response.status;
-        if (status === 403) {
-          notification.error({
-            message: "Thông báo",
-            description: "Bạn không có quyền truy cập!",
-          });
-        }
-        console.log(err);
+    if (type === "month") {
+      dateFrom.setDate(1);
+      dateTo.setDate(getLastDayOfMonth(dateFrom.getMonth() + 1));
+    } else if (type === "year") {
+      dateFrom.setDate(1);
+      dateTo.setDate(getLastDayOfMonth(12));
+      dateFrom.setMonth(0);
+      dateTo.setMonth(11);
+    }
+    if (dateFrom.getTime() > dateTo.getTime()) {
+      notification.error({
+        message: "Thông báo",
+        description:
+          "Thời gian bắt đầu phải bé hơn hoặc bằng thời gian kết thúc",
       });
-  }, [pageSize, date, type]);
+      setLoading(false);
+    } else {
+      axios
+        .get(
+          "http://localhost:8080/api/admin/bill/getBillProductSellTheMost?day=" +
+            encodeURIComponent(dateFrom.toISOString()) +
+            "&dayTo=" +
+            encodeURIComponent(dateTo.toISOString()),
+          {
+            headers: {
+              Authorization: `Bearer ${getToken(true)}`,
+            },
+          }
+        )
+        .then((res) => {
+          setLoading(false);
+          setData(res.data);
+        })
+        .catch((err) => {
+          const status = err.response.status;
+          if (status === 403) {
+            notification.error({
+              message: "Thông báo",
+              description: "Bạn không có quyền truy cập!",
+            });
+          }
+          console.log(err);
+        });
+    }
+  }, [pageSize, date, dateToP, type]);
   return (
     <>
       <Table

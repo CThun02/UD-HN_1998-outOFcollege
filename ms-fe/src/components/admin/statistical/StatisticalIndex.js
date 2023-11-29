@@ -61,8 +61,11 @@ const StatisticalIndex = () => {
   const [pageSize, setPageSize] = useState(5);
   const [loading, setLoading] = useState(true);
   const [dateRevenue, setDateRevenue] = useState(formattedDateNow);
+  const [dateRevenueTo, setDateRevenueTo] = useState(formattedDateNow);
   const [selectTypeDateProduct, setSelectTypeDateproduct] = useState("year");
   const [dateProductSellTheMost, setDateProductSellTheMost] =
+    useState(formattedDateNow);
+  const [dateProductSellTheMostTo, setDateProductSellTheMostTo] =
     useState(formattedDateNow);
   const [typeDateBillRevenue, setTypeDateBillRevenue] = useState("date");
   const [typeDateLineChart, setTypeDateLineChart] = useState("date");
@@ -430,51 +433,63 @@ const StatisticalIndex = () => {
     }
   }
   function getDataRevenue() {
-    var day = "";
-    var month = "";
-    var year = dateRevenue.substring(0, 4);
-    if (typeDateBillRevenue === "date") {
-      month = dateRevenue.substring(
-        dateRevenue.indexOf("-") + 1,
-        dateRevenue.lastIndexOf("-")
+    var dateFrom = new Date(dateRevenue);
+    var dateTo = new Date(
+      typeDateBillRevenue === "other" ? dateRevenueTo : dateRevenue
+    );
+    function getLastDayOfMonth(month) {
+      const firstDayOfNextMonth = new Date(
+        Date.UTC(dateFrom.getFullYear(), month, 1)
       );
-      day = dateRevenue.substring(dateRevenue.lastIndexOf("-") + 1);
-    } else if (typeDateBillRevenue === "month") {
-      month = dateRevenue.substring(
-        dateRevenue.indexOf("-") + 1,
-        dateRevenue.lastIndexOf("-") === dateRevenue.indexOf("-")
-          ? dateRevenue.length
-          : dateRevenue.lastIndexOf("-")
+      const lastDayOfMonth = new Date(
+        firstDayOfNextMonth.getTime() - 24 * 60 * 60 * 1000
       );
+      return lastDayOfMonth.getDate();
     }
-    axios
-      .get(
-        "http://localhost:8080/api/admin/bill/getGrossRevenue?day=" +
-          day +
-          "&month=" +
-          month +
-          "&year=" +
-          year,
-        {
-          headers: {
-            Authorization: `Bearer ${getToken(true)}`,
-          },
-        }
-      )
-      .then((res) => {
-        setLoading(false);
-        setBillRevenue(res.data);
-      })
-      .catch((err) => {
-        const status = err.response.status;
-        if (status === 403) {
-          notification.error({
-            message: "Thông báo",
-            description: "Bạn không có quyền truy cập!",
-          });
-        }
-        console.log(err);
+    if (typeDateBillRevenue === "month") {
+      dateFrom.setDate(1);
+      dateTo.setDate(getLastDayOfMonth(dateFrom.getMonth() + 1));
+    } else if (typeDateBillRevenue === "year") {
+      dateFrom.setDate(1);
+      dateTo.setDate(getLastDayOfMonth(12));
+      dateFrom.setMonth(0);
+      dateTo.setMonth(11);
+    }
+    if (dateFrom.getTime() > dateTo.getTime()) {
+      notification.error({
+        message: "Thông báo",
+        description:
+          "Thời gian bắt đầu phải bé hơn hoặc bằng thời gian kết thúc",
       });
+      setIsLoading(false);
+    } else {
+      axios
+        .get(
+          "http://localhost:8080/api/admin/bill/getGrossRevenue?day=" +
+            encodeURIComponent(dateFrom.toISOString()) +
+            "&dayTo=" +
+            encodeURIComponent(dateTo.toISOString()),
+          {
+            headers: {
+              Authorization: `Bearer ${getToken(true)}`,
+            },
+          }
+        )
+        .then((res) => {
+          setLoading(false);
+          setBillRevenue(res.data);
+        })
+        .catch((err) => {
+          const status = err.response.status;
+          if (status === 403) {
+            notification.error({
+              message: "Thông báo",
+              description: "Bạn không có quyền truy cập!",
+            });
+          }
+          console.log(err);
+        });
+    }
   }
 
   useEffect(() => {
@@ -489,6 +504,7 @@ const StatisticalIndex = () => {
     dateCompare,
     render,
     dateRevenue,
+    dateRevenueTo,
     typeDateBillRevenue,
     dateLineChartValueFrom,
     dateLineChartValueTo,
@@ -511,22 +527,47 @@ const StatisticalIndex = () => {
                   value={typeDateBillRevenue}
                   onChange={(event) => {
                     setDateRevenue(formattedDateNow);
+                    setDateRevenueTo(formattedDateNow);
                     setTypeDateBillRevenue(event);
                   }}
-                  style={{ width: "10%" }}
+                  style={{ width: "15%" }}
                   bordered={false}
                 >
                   <Option value="date">Ngày</Option>
                   <Option value="month">Tháng</Option>
                   <Option value="year">Năm</Option>
+                  <Option value="other">Tùy chọn</Option>
                 </Select>
-                <DatePicker
-                  className={styles.input_noneBorder}
-                  style={{ width: "50%" }}
-                  picker={typeDateBillRevenue}
-                  value={dayjs(dateRevenue)}
-                  onChange={(date, dateString) => setDateRevenue(dateString)}
-                />
+                {typeDateBillRevenue === "other" ? (
+                  <div style={{ width: "60%", display: "inline-block" }}>
+                    <DatePicker
+                      className={styles.input_noneBorder}
+                      style={{ width: "50%" }}
+                      picker={typeDateBillRevenue}
+                      value={dayjs(dateRevenue)}
+                      onChange={(date, dateString) =>
+                        setDateRevenue(dateString)
+                      }
+                    />
+                    <DatePicker
+                      className={styles.input_noneBorder}
+                      style={{ width: "50%" }}
+                      picker={typeDateBillRevenue}
+                      value={dayjs(dateRevenueTo)}
+                      onChange={(date, dateString) =>
+                        setDateRevenueTo(dateString)
+                      }
+                    />
+                  </div>
+                ) : (
+                  <DatePicker
+                    className={styles.input_noneBorder}
+                    style={{ width: "50%" }}
+                    picker={typeDateBillRevenue}
+                    value={dayjs(dateRevenue)}
+                    onChange={(date, dateString) => setDateRevenue(dateString)}
+                  />
+                )}
               </Col>
               <Col span={8}>
                 <Statistic
@@ -897,6 +938,7 @@ const StatisticalIndex = () => {
               value={selectTypeDateProduct}
               onChange={(event) => {
                 setDateProductSellTheMost(formattedDateNow);
+                setDateProductSellTheMostTo(formattedDateNow);
                 setSelectTypeDateproduct(event);
               }}
               style={{ width: "20%" }}
@@ -922,9 +964,9 @@ const StatisticalIndex = () => {
                   className={styles.input_noneBorder}
                   style={{ width: "50%" }}
                   picker={"date"}
-                  value={dayjs(dateProductSellTheMost)}
+                  value={dayjs(dateProductSellTheMostTo)}
                   onChange={(date, dateString) => {
-                    setDateProductSellTheMost(dateString);
+                    setDateProductSellTheMostTo(dateString);
                   }}
                 />
               </div>
@@ -945,6 +987,7 @@ const StatisticalIndex = () => {
               </p>
               <TableProdutSellTheMost
                 date={dateProductSellTheMost}
+                dateToP={dateProductSellTheMostTo}
                 type={selectTypeDateProduct}
               />
             </div>

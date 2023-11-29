@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styles from "./BillManagement.module.css";
-import { Button, Input, Select, Table, Tabs, Tag, TreeSelect, notification } from "antd";
+import { Badge, Button, Input, Select, Table, Tabs, Tag, TreeSelect, notification } from "antd";
 import {
   CheckCircleOutlined,
   ClockCircleOutlined,
@@ -13,7 +13,6 @@ import {
 import dayjs from "dayjs";
 import { DatePicker, Space } from "antd";
 import axios from "axios";
-import moment from "moment";
 import { Link } from "react-router-dom";
 import { getToken } from "../../../service/Token";
 import numeral from "numeral";
@@ -378,18 +377,19 @@ const BillManagement = () => {
             const id = String(i + 1);
             return {
               label: (
-                <span>
-                  <Icon />
-                  {id === "1" ? "Tất cả"
-                    : id === "2" ? "Chờ xác nhận"
-                      : id === '3' ? "Đã xác nhận"
-                        : id === "4" ? "Đang giao"
-                          : id === "5" ? "Đã hoàn thành"
-                            : id === "6" ? "Đã hủy"
-                              : id === '7' ? "Đã thanh toán"
-                                : id === "8" ? "Chưa thanh toán" : ""}
-
-                </span>
+                <Badge count={123}>
+                  <span style={{ padding: "20px" }}>
+                    <Icon />
+                    {id === "1" ? "Tất cả"
+                      : id === "2" ? "Chờ xác nhận"
+                        : id === '3' ? "Đã xác nhận"
+                          : id === "4" ? "Đang giao"
+                            : id === "5" ? "Đã hoàn thành"
+                              : id === "6" ? "Đã hủy"
+                                : id === '7' ? "Đã thanh toán"
+                                  : id === "8" ? "Chưa thanh toán" : ""}
+                  </span>
+                </Badge>
               ),
               key: id === "1" ? ""
                 : id === "2" ? "Client"
@@ -428,9 +428,8 @@ const BillManagement = () => {
           })}
         />
       </section>
-    </div>
+    </div >
   );
 };
 
 export default BillManagement;
-

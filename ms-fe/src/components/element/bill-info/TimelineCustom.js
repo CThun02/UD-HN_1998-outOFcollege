@@ -2,11 +2,12 @@ import React from 'react'
 import { Timeline, TimelineEvent } from "@mailtop/horizontal-timeline";
 import { Modal } from 'antd';
 import { FaRegFileAlt, FaTimes, FaTruck } from 'react-icons/fa';
-import { CheckCircleOutlined } from '@ant-design/icons';
 
 const TimelineCustom = ({ timelines, open, handleCancel }) => {
     const handleOk = () => {
-        console.log(1)
+        console.log(timelines.map((e) => {
+            console.log(e)
+        }))
     }
 
     return (
@@ -15,7 +16,6 @@ const TimelineCustom = ({ timelines, open, handleCancel }) => {
                 footer={false}
             >
                 <Timeline minEvents={6} placeholder >
-                    {timelines}
                     {timelines &&
                         timelines.map((data) => (
                             <TimelineEvent

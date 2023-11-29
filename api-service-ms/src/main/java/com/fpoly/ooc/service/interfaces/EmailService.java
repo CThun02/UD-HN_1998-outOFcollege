@@ -8,4 +8,6 @@ public interface EmailService {
 
     String sendMailWithAttachment(EmailDetails details, Long idVoucher);
 
+    String sendSimpleMail(EmailDetails details);
+
 }

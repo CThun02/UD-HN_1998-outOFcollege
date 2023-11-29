@@ -6,5 +6,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface DeliveryNoteRepo extends JpaRepository<DeliveryNote, Long> {
+
     DeliveryNote getDeliveryNoteByBill_Id(Long billId);
+
 }

@@ -51,7 +51,7 @@ public interface TimeLineRepo extends JpaRepository<Timeline, Long> {
             "   LEFT JOIN BillDetail bd ON b.id = bd.bill.id " +
             "   LEFT JOIN Timeline tl ON tl.bill.id = b.id " +
             "   LEFT JOIN ProductDetail pd ON pd.id = bd.productDetail.id " +
-            "WHERE b.account.username = :username " +
+            "WHERE  (:username IS NULL OR b.account.username = :username) " +
             "   AND (b.billCode like %:billCode% OR :billCode IS NULL) " +
             "   AND (:status IS NULL OR b.status LIKE :status) " +
             "   AND (:createdBy IS NULL OR b.createdBy LIKE :createdBy AND b.status not like 'Cancel') " +
@@ -72,7 +72,7 @@ public interface TimeLineRepo extends JpaRepository<Timeline, Long> {
 
     @Query("SELECT new com.fpoly.ooc.responce.bill.BillInfoResponse(b.id, b.billCode,b.transactionCode, b.symbol, b.billType, " +
             "    b.price, b.priceReduce, dn.shipPrice, b.amountPaid, dn.shipDate, pd.payment.paymentName, b.createdAt, " +
-            "    add.fullName, add.sdt," +
+            "    add.fullName, add.sdt, add.id, " +
             "    add.descriptionDetail +  ' ' + add.ward + ' ' + add.district + ' ' + add.city, b.status) " +
             "FROM Bill b " +
             "   LEFT JOIN DeliveryNote dn ON b.id = dn.bill.id " +

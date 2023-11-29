@@ -106,8 +106,8 @@ public class TimeLineServiceImpl implements TimeLineService {
                                                                       String symbol,
                                                                       Integer count,
                                                                       String createdBy) {
-        List<TimelineProductResponse> lstRes = timeLineRepo.getAllBillByClient(username, billCode, status, symbol, count, createdBy);
         List<TimelineProductDisplayResponse> list = new ArrayList<>();
+        List<TimelineProductResponse> lstRes = timeLineRepo.getAllBillByClient(username, billCode, status, symbol, count, createdBy);
         for (int i = 0; i < lstRes.size(); i++) {
             TimelineProductDisplayResponse response = new TimelineProductDisplayResponse(lstRes.get(i));
             response.setProductImageResponses(productImageServiceI.getProductImageByProductDetailId(response.getProductDetailId()));

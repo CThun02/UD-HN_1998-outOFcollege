@@ -23,6 +23,7 @@ import com.fpoly.ooc.responce.timeline.TimelineProductDisplayResponse;
 import com.fpoly.ooc.responce.timeline.TimelineProductResponse;
 import com.fpoly.ooc.service.interfaces.BillService;
 import com.fpoly.ooc.service.interfaces.DeliveryNoteService;
+import com.fpoly.ooc.service.interfaces.EmailService;
 import com.fpoly.ooc.service.interfaces.ProductDetailServiceI;
 import com.fpoly.ooc.service.interfaces.ProductImageServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +70,9 @@ public class BillServiceImpl implements BillService {
     @Autowired
     private DeliveryNoteService deliveryNoteService;
 
+    @Autowired
+    private EmailService emailService;
+
     @Transactional
     @Override
     public Bill createBill(BillRequest request) {
@@ -93,6 +97,12 @@ public class BillServiceImpl implements BillService {
 
         bill.setStatus(request.getStatus());
         billRepo.save(bill);
+
+        if (bill.getStatus().equals("Unpaid")) {
+            if (!request.getEmailDetails().getRecipient().isEmpty()) {
+                emailService.sendSimpleMail(request.getEmailDetails());
+            }
+        }
 
         for (BillDetailRequest billDetailRequest : request.getLstBillDetailRequest()) {
             BillDetail billDetail = BillDetail.builder()
@@ -340,12 +350,12 @@ public class BillServiceImpl implements BillService {
             productDisplayResponse.setProductImageResponses(productImageService.getProductImageByProductDetailId(productDisplayResponse.getProductDetailId()));
             lstProduct.add(productDisplayResponse);
         }
-        if(billReturnResponse.getSymbol().equals("Shipping")){
+        if (billReturnResponse.getSymbol().equals("Shipping")) {
             DeliveryNote deliveryNote = deliveryNoteService.getDeliveryNoteByBill_Id(billResponse.getId());
             Address address = deliveryNote.getAddress();
-            billReturnResponse.setAddress(address.getDescriptionDetail()+" "+
-                    address.getWard().substring(0, address.getWard().indexOf("|"))+" "+
-                    address.getDistrict().substring(0, address.getDistrict().indexOf("|")) +" "+
+            billReturnResponse.setAddress(address.getDescriptionDetail() + " " +
+                    address.getWard().substring(0, address.getWard().indexOf("|")) + " " +
+                    address.getDistrict().substring(0, address.getDistrict().indexOf("|")) + " " +
                     address.getCity().substring(0, address.getCity().indexOf("|")));
             billReturnResponse.setPhoneNumber(deliveryNote.getPhoneNumber());
             billReturnResponse.setFullName(deliveryNote.getName());

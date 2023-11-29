@@ -9,7 +9,9 @@ function ProductsList({ data, span }) {
   const [active, setActive] = useState(false);
 
   // const enCodeData = encodeURIComponent(JSON.stringify(data));
-  const enCodeData = btoa(JSON.stringify(data));
+  const jsonString = JSON.stringify(data);
+  const utf8Bytes = encodeURIComponent(jsonString);
+  const enCodeData = btoa(utf8Bytes);
   const convertPath = enCodeData.replace(/\//g, "---");
   function handleMouseIn() {
     setActive(true);

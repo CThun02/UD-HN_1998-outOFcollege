@@ -1,6 +1,7 @@
 package com.fpoly.ooc.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fpoly.ooc.common.Commons;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
@@ -29,11 +30,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -44,6 +47,11 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
     private ColorServiceI colorServiceI;
     private SizeServiceI sizeServiceI;
     private KafkaUtil kafkaUtil;
+    @Autowired
+    private SimpMessagingTemplate template;
+    @Autowired
+    private ObjectMapper objectMapper;
+
 
     @Autowired
     public ProductDetailServiceImpl(ProductDetailDAORepositoryI repo, ProductImageServiceI productImageService,
@@ -57,7 +65,22 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
 
     @Override
     public ProductDetail create(ProductDetail productDetail) throws JsonProcessingException {
-        return kafkaUtil.sendingObjectWithKafka(productDetail, Const.TOPIC_PRODUCT_DETAIL);
+        ProductDetail productDetailDb = repo.save(productDetail);
+        if(Objects.nonNull(productDetailDb)) {
+            String productDetailsJson = objectMapper.writeValueAsString(repo.findAll());
+            String productDetailsShopJson = objectMapper.writeValueAsString(repo.getAllProductDetailShop(
+                    null, null, null, "", "", "", "", null,
+                    null, null, null, "desc"));
+            String bestSellingJson = objectMapper.writeValueAsString(repo.getProductDetailBestSelling());
+            String newProductJson = objectMapper.writeValueAsString(repo.getNewProductDetail());
+            template.convertAndSend("/topic/productDetail-topic", productDetailsJson);
+            template.convertAndSend("/topic/productDetailShop-topic", productDetailsShopJson);
+            template.convertAndSend("/topic/bestSellingProduct-topic", bestSellingJson);
+            template.convertAndSend("/topic/newProduct-topic", newProductJson);
+        }
+        return productDetailDb;
+
+//        return kafkaUtil.sendingObjectWithKafka(productDetail, Const.TOPIC_PRODUCT_DETAIL);
     }
 
     @Override

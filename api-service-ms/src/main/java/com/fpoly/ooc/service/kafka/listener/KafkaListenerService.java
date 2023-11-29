@@ -33,6 +33,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -294,12 +295,10 @@ public class KafkaListenerService {
             productDetail = objectMapper.readValue(productDetailJson, ProductDetail.class);
         }
 
-        ProductDetail productDetailDb = null;
-        if(Objects.nonNull(productDetail)) {
-            productDetailDb = productDetailDAORepositoryI.save(productDetail);
-        }
 
-        if(Objects.nonNull(productDetailDb)) {
+        if(Objects.nonNull(productDetail)) {
+            productDetailDAORepositoryI.save(productDetail);
+
             String productDetailsJson = objectMapper.writeValueAsString(productDetailDAORepositoryI.findAll());
             String productDetailsShopJson = objectMapper.writeValueAsString(productDetailDAORepositoryI.getAllProductDetailShop(
                     null, null, null, "", "", "", "", null,

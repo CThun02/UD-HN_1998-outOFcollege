@@ -107,10 +107,10 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
                 
                 WHERE
                     pd.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
-                    AND pi.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
-                    AND bd.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
-                    AND pp.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
-                    AND pn.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                    AND (pi is null or pi.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE)
+                    AND (bd is null or bd.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE)
+                    AND (pp is null or pp.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE)
+                    AND (pn is null or pn.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE)
                     AND pt.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
                     AND c.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
                     AND br.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
@@ -156,10 +156,10 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
                 
                 WHERE
                     pd.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
-                    AND pi.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
-                    AND bd.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
-                    AND pp.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
-                    AND pn.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                    AND (pi is null or pi.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE)
+                    AND (bd is null or bd.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE)
+                    AND (pp is null or pp.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE)
+                    AND (pn is null or pn.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE)
                     AND pt.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
                     AND c.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
                     AND br.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE

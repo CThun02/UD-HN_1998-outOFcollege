@@ -38,7 +38,7 @@ public class ProductServiceImpl implements ProductServiceI {
                 break;
             }
         };
-        return kafkaUtil.sendingObjectWithKafka(product, Const.TOPIC_PRODUCT);
+        return repo.save(product);
     }
 
     @Override

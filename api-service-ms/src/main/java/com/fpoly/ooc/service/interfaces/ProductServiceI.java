@@ -1,5 +1,6 @@
 package com.fpoly.ooc.service.interfaces;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.entity.Product;
 import com.fpoly.ooc.request.product.ProductDetailRequest;
 import com.fpoly.ooc.responce.product.*;
@@ -10,8 +11,8 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public interface ProductServiceI {
-    public Product create(Product product);
-    public Product update(Product product);
+    public Product create(Product product) throws JsonProcessingException;
+    public Product update(Product product) throws JsonProcessingException;
     public Boolean delete(Long id);
     public List<Product> getAll();
     public Product getOne(Long id);

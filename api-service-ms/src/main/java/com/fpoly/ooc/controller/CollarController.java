@@ -1,5 +1,6 @@
 package com.fpoly.ooc.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.entity.CollarType;
 import com.fpoly.ooc.request.collar.CollarRequest;
 import com.fpoly.ooc.request.form.FormRequest;
@@ -32,7 +33,7 @@ public class CollarController {
     }
 
     @PostMapping("create")
-    public ResponseEntity<?> create(@RequestBody CollarType collarType) {
+    public ResponseEntity<?> create(@RequestBody CollarType collarType) throws JsonProcessingException {
         return ResponseEntity.ok(service.create(collarType));
     }
 

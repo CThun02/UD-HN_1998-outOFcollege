@@ -1,5 +1,6 @@
 package com.fpoly.ooc.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
 import com.fpoly.ooc.entity.Material;
@@ -7,6 +8,7 @@ import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.MaterialDAORepository;
 import com.fpoly.ooc.request.material.MaterialRequest;
 import com.fpoly.ooc.service.interfaces.MaterialServiceI;
+import com.fpoly.ooc.service.kafka.KafkaUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,12 +19,14 @@ import java.util.Optional;
 public class MaterialServiceImpl implements MaterialServiceI {
     @Autowired
     private MaterialDAORepository repo;
+    @Autowired
+    private KafkaUtil kafkaUtil;
 
     @Override
-    public Material create(Material material) {
+    public Material create(Material material) throws JsonProcessingException {
         Material materialCheck = repo.findFirstByMaterialName(material.getMaterialName());
         if(materialCheck==null){
-            return repo.save(material);
+            return kafkaUtil.sendingObjectWithKafka(material, Const.TOPIC_MATERIAL);
         }
         return null;
     }
@@ -34,7 +38,11 @@ public class MaterialServiceImpl implements MaterialServiceI {
         return optionalMaterial.map(o -> {
             o.setMaterialName(material.getMaterialName());
             o.setStatus(material.getStatus());
-            return repo.save(o);
+            try {
+                return kafkaUtil.sendingObjectWithKafka(material, Const.TOPIC_MATERIAL);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
         }).orElse(null);
     }
 

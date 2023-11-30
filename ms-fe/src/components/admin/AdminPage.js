@@ -43,7 +43,8 @@ function AdminPage() {
     if (!token) {
       navigate("/authen/admin/sign-in");
     }
-  }, [navigate, token])
+  }, [navigate, token]);
+
   return (
     <NotificationProvider>
       {token && (

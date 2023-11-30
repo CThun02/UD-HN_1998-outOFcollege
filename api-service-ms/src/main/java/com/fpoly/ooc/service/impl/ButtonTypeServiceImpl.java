@@ -1,5 +1,6 @@
 package com.fpoly.ooc.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
 import com.fpoly.ooc.entity.ButtonType;
@@ -8,6 +9,7 @@ import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.ButtonTypeDAORepository;
 import com.fpoly.ooc.request.buttontype.ButtonTypeRequest;
 import com.fpoly.ooc.service.interfaces.ButtonTypeServiceI;
+import com.fpoly.ooc.service.kafka.KafkaUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,12 +20,14 @@ import java.util.Optional;
 public class ButtonTypeServiceImpl implements ButtonTypeServiceI {
     @Autowired
     private ButtonTypeDAORepository repo;
+    @Autowired
+    private KafkaUtil kafkaUtil;
 
     @Override
-    public ButtonType create(ButtonType buttonType) {
+    public ButtonType create(ButtonType buttonType) throws JsonProcessingException {
         ButtonType buttonCheck = repo.findFirstByButtonName(buttonType.getButtonName());
         if(buttonCheck==null){
-            return repo.save(buttonType);
+            return kafkaUtil.sendingObjectWithKafka(buttonType, Const.TOPIC_BUTTON);
         }
         return null;
     }
@@ -35,7 +39,11 @@ public class ButtonTypeServiceImpl implements ButtonTypeServiceI {
         return optional.map(o->{
             o.setButtonName(buttonType.getButtonName());
             o.setStatus(buttonType.getStatus());
-            return repo.save(o);
+            try {
+                return kafkaUtil.sendingObjectWithKafka(buttonType, Const.TOPIC_BUTTON);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
         }).orElse(null);
     }
 

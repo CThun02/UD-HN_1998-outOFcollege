@@ -1,5 +1,6 @@
 package com.fpoly.ooc.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
 import com.fpoly.ooc.entity.Brand;
@@ -9,6 +10,7 @@ import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.BrandDAORepository;
 import com.fpoly.ooc.request.brand.BrandRequest;
 import com.fpoly.ooc.service.interfaces.BrandServiceI;
+import com.fpoly.ooc.service.kafka.KafkaUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,12 +21,14 @@ import java.util.Optional;
 public class BrandServiceImpl implements BrandServiceI {
     @Autowired
     private BrandDAORepository repo;
+    @Autowired
+    private KafkaUtil kafkaUtil;
 
     @Override
-    public Brand create(Brand brand) {
+    public Brand create(Brand brand) throws JsonProcessingException {
         Brand brandCheck = this.findFirstByBrandName(brand.getBrandName());
         if(brandCheck==null){
-            return repo.save(brand);
+            return kafkaUtil.sendingObjectWithKafka(brand, Const.TOPIC_BRAND);
         }
         return null;
     }
@@ -35,7 +39,11 @@ public class BrandServiceImpl implements BrandServiceI {
         Optional<Brand> material1 = repo.findById(id);
         return material1.map(o -> {
             o.setBrandName(brand.getBrandName());
-            return repo.save(o);
+            try {
+                return kafkaUtil.sendingObjectWithKafka(brand, Const.TOPIC_BRAND);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
         }).orElse(null);
 
     }

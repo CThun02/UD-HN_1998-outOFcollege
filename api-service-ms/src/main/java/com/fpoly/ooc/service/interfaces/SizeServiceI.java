@@ -1,5 +1,6 @@
 package com.fpoly.ooc.service.interfaces;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.entity.Color;
 import com.fpoly.ooc.entity.Size;
 import com.fpoly.ooc.request.color.ColorRequest;
@@ -10,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface SizeServiceI {
-    public Size create(Size size);
+    public Size create(Size size) throws JsonProcessingException;
 
     public Size update(Size size, Long id);
 

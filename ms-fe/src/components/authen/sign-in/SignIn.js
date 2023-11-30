@@ -1,11 +1,4 @@
-import {
-  Button,
-  Divider,
-  Form,
-  Input,
-  Space,
-  notification,
-} from "antd";
+import { Button, Divider, Form, Input, Space, notification } from "antd";
 import styles from "./SignIn.module.css";
 import Password from "antd/es/input/Password";
 import { Link, useNavigate } from "react-router-dom";
@@ -46,6 +39,14 @@ function SignIn({ isAuthenAdmin }) {
         navigate(isAuthenAdmin ? "/api/admin" : "/ms-shop/home");
       }
     } catch (err) {
+      if (err.code === "ERR_NETWORK") {
+        api.error({
+          message: `Đã xảy ra lỗi`,
+          description: `Máy chủ đang bảo trì.`,
+        });
+        return;
+      }
+
       api.error({
         message: `Đã xảy ra lỗi`,
         description: `Tài khoản hoặc mật khẩu không chính xác.`,

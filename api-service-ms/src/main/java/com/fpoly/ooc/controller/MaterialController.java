@@ -1,6 +1,7 @@
 package com.fpoly.ooc.controller;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.entity.Material;
 import com.fpoly.ooc.request.material.MaterialRequest;
 import com.fpoly.ooc.service.interfaces.MaterialServiceI;
@@ -31,7 +32,7 @@ public class MaterialController {
     }
 
     @PostMapping("create")
-    public ResponseEntity<?> create(@RequestBody Material material) {
+    public ResponseEntity<?> create(@RequestBody Material material) throws JsonProcessingException {
         return ResponseEntity.ok(service.create(material));
     }
 

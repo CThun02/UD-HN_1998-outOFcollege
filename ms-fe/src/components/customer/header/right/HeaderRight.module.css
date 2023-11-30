@@ -22,12 +22,12 @@
 .margin {
   margin-bottom: 0px !important;
 }
-/* 
+
 .flex {
   display: flex;
   justify-content: flex-end;
   align-content: center;
-} */
+}
 
 .flexEnd {
   display: flex;

@@ -20,15 +20,15 @@ function TypeCategory() {
               </div>
               <div>
                 <h3 className={`${styles.center} ${styles.textH3}`}>
-                  Name Category
+                  Áo sơ mi tay dài
                 </h3>
                 <p className={`${styles.center} ${styles.textP}`}>
-                  Ut sollicitudin quam vel purus tempus, vel eleifend felis
-                  varius.
+                  Thiết kế thời thượng, phong cách. Chất liệu thoáng mát phù hợp
+                  với mọi tình huống.
                 </p>
                 <Link>
                   <Button size="large" type="primary" className={styles.btn}>
-                    Shop now
+                    Mua ngay
                   </Button>
                 </Link>
               </div>
@@ -44,15 +44,15 @@ function TypeCategory() {
               </div>
               <div>
                 <h3 className={`${styles.center} ${styles.textH3}`}>
-                  Name Category
+                  Áo sơ mi tay ngắn
                 </h3>
                 <p className={`${styles.center} ${styles.textP}`}>
-                  Ut sollicitudin quam vel purus tempus, vel eleifend felis
-                  varius.
+                  Đừng lo lắng về chất lượng sản phẩm hay giá cả, ở đây đó là
+                  sựa lựa chọn tốt nhất của bạn.
                 </p>
                 <Link>
                   <Button size="large" type="primary" className={styles.btn}>
-                    Shop now
+                    Mua ngay
                   </Button>
                 </Link>
               </div>
@@ -68,15 +68,15 @@ function TypeCategory() {
               </div>
               <div>
                 <h3 className={`${styles.center} ${styles.textH3}`}>
-                  Name Category
+                  Áo sơ mi công sở
                 </h3>
                 <p className={`${styles.center} ${styles.textP}`}>
-                  Ut sollicitudin quam vel purus tempus, vel eleifend felis
-                  varius.
+                  Đơn giản thanh lịch, luôn luôn lịch sự và thoải mái mỗi khi
+                  bạn mặc trên người.
                 </p>
                 <Link>
                   <Button size="large" type="primary" className={styles.btn}>
-                    Shop now
+                    Mua ngay
                   </Button>
                 </Link>
               </div>

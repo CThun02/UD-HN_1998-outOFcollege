@@ -16,7 +16,7 @@ function FirstPayBill() {
             icon={faCartShopping}
             style={{ marginRight: "5px" }}
           />
-          Shop now
+          Mua ngay
         </Button>
       </Link>
     </div>

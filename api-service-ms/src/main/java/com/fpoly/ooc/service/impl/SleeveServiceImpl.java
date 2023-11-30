@@ -1,5 +1,6 @@
 package com.fpoly.ooc.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
 import com.fpoly.ooc.entity.Color;
@@ -8,6 +9,7 @@ import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.SleeveDAORepository;
 import com.fpoly.ooc.request.sleevetype.SleeveTypeRequest;
 import com.fpoly.ooc.service.interfaces.SleeveServiceI;
+import com.fpoly.ooc.service.kafka.KafkaUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,12 +20,14 @@ import java.util.Optional;
 public class SleeveServiceImpl implements SleeveServiceI {
     @Autowired
     private SleeveDAORepository repo;
+    @Autowired
+    private KafkaUtil kafkaUtil;
 
     @Override
-    public SleeveType create(SleeveType sleeveType) {
+    public SleeveType create(SleeveType sleeveType) throws JsonProcessingException {
         SleeveType sleeveCheck = repo.findFirstBySleeveName(sleeveType.getSleeveName());
         if(sleeveCheck==null){
-            return repo.save(sleeveType);
+            return kafkaUtil.sendingObjectWithKafka(sleeveType, Const.TOPIC_SLEEVE);
         }
         return null;
     }
@@ -35,7 +39,11 @@ public class SleeveServiceImpl implements SleeveServiceI {
         return optional.map(o -> {
             o.setSleeveName(sleeveType.getSleeveName());
             o.setStatus(sleeveType.getStatus());
-            return repo.save(o);
+            try {
+                return kafkaUtil.sendingObjectWithKafka(sleeveType, Const.TOPIC_SLEEVE);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
         }).orElse(null);
     }
 

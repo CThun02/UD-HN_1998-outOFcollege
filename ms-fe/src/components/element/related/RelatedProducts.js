@@ -1,4 +1,4 @@
-import { Divider, Row, Spin } from "antd";
+import { Divider, List, Row, Spin } from "antd";
 import styles from "./RelatedProducts.module.css";
 import { useEffect } from "react";
 import { useState } from "react";
@@ -26,46 +26,30 @@ function RelatedProducts() {
   //page
   const [pageNo, setPageNo] = useState(1);
   const [pageSize, setPageSize] = useState(4);
-  const [totalElements, setTotalElements] = useState(-1);
 
   //loading
   const [isLoading, setIsLoading] = useState(false);
 
-  function handlePreClick() {
-    if (pageNo > 1) {
-      setPageNo((page) => Number(page) - 1);
-    }
-  }
-
-  function handleNextClick() {
-    if (pageNo < totalElements / pageSize) {
-      setPageNo((page) => Number(page) + 1);
-    }
+  function handlePageSize(current, size) {
+    setPageNo(current);
+    setPageSize(size);
   }
 
   useEffect(() => {
     setIsLoading(true);
     async function getProducts() {
       try {
-        const res = await axios.post(
-          baseUrl +
-            "/product-shop?pageNo=" +
-            (pageNo - 1) +
-            "&pageSize=" +
-            pageSize,
-          filter
-        );
+        const res = await axios.post(baseUrl + "/product-shop", filter);
         const data = await res.data;
 
-        setProducts(data.content);
-        setTotalElements(data.totalElements);
+        setProducts(data);
         setIsLoading(false);
       } catch (err) {
         console.log(err);
       }
     }
 
-    getProducts();
+    return () => getProducts();
   }, [pageNo, pageSize, filter]);
 
   return (
@@ -85,37 +69,25 @@ function RelatedProducts() {
         >
           <div className={styles.relatedProduct}>
             <div className={styles.positionRelative}>
-              <div
-                className={`${styles.positionAbsolute} ${styles.size} ${
-                  styles.color
-                } ${styles.backgroundColor} ${styles.left} ${
-                  pageNo > 1 ? styles.hover : ""
-                }`}
-                onClick={handlePreClick}
-              >
-                <DoubleLeftOutlined />
-              </div>
               <div>
-                <Row>
-                  {products.map((product) => (
-                    <ProductsList
-                      span={6}
-                      key={product.productDetailId}
-                      data={product}
-                    />
-                  ))}
-                </Row>
-
-                <div
-                  className={`${styles.positionAbsolute} ${styles.size} ${
-                    styles.color
-                  } ${styles.backgroundColor} ${styles.right} ${
-                    pageNo <= totalElements / pageSize ? styles.hover : ""
-                  }`}
-                  onClick={handleNextClick}
-                >
-                  <DoubleRightOutlined />
-                </div>
+                <List
+                  grid={{ gutter: 16, column: 4 }}
+                  dataSource={products}
+                  renderItem={(item) => (
+                    <List.Item>
+                      <ProductsList data={item} key={item.productDetailId} />
+                    </List.Item>
+                  )}
+                  pagination={{
+                    showSizeChanger: false,
+                    pageSize: pageSize,
+                    showLessItems: true,
+                    style: { marginRight: "10px" },
+                    onChange: (currentPage, pageSize) => {
+                      handlePageSize(currentPage, pageSize);
+                    },
+                  }}
+                />
               </div>
             </div>
           </div>

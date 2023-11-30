@@ -10,7 +10,6 @@ import logoOOC from "../../../Assets/img/logo/logo_OOC.svg";
 import QRReader from "../../../service/QRReader";
 
 const ReturnIndex = () => {
-  const api = "http://localhost:8080/api/admin/bill";
   const navigate = useNavigate();
 
   const [isModalQR, setIsModalQR] = useState(false);

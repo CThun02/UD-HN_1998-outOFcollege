@@ -20,7 +20,6 @@ public interface BillDetailRepo extends JpaRepository<BillDetail, Long> {
             "FROM Bill b " +
             "   LEFT JOIN BillDetail bd ON b.id = bd.bill.id " +
             "   LEFT JOIN ProductDetail pd ON pd.id = bd.productDetail.id " +
-            "   LEFT JOIN DeliveryNote dn ON dn.bill.id = b.id " +
             "WHERE b.billCode = :billCode ")
     List<TimelineProductResponse> lstProductDT(@Param("billCode") String billCode);
 

@@ -384,6 +384,7 @@ public class BillServiceImpl implements BillService {
         BillReturnResponse billReturnResponse = new BillReturnResponse(billResponse);
         billReturnResponse.setTimeLines(timeLineRepo.getTimeLineByBillId(billResponse.getId()));
         List<TimelineProductResponse> timelineProductResponses = timeLineRepo.getTimelineProductByBillId(billReturnResponse.getId());
+        System.out.println("CHECKKKKKK SL");
         for (int i = 0; i < timelineProductResponses.size(); i++) {
             TimelineProductDisplayResponse productDisplayResponse = new TimelineProductDisplayResponse(timelineProductResponses.get(i));
             productDisplayResponse.setProductImageResponses(productImageService.getProductImageByProductDetailId(productDisplayResponse.getProductDetailId()));
@@ -402,5 +403,10 @@ public class BillServiceImpl implements BillService {
         }
         billReturnResponse.setBillDetails(lstProduct);
         return billReturnResponse;
+    }
+
+    @Override
+    public Bill updateBill(Bill bill) {
+        return billRepo.save(bill);
     }
 }

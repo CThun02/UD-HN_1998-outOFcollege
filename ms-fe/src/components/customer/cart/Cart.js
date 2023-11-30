@@ -151,10 +151,8 @@ const Cart = (props) => {
     const handleDeleteApi = (id) => {
         axios.delete(`${cartAPI}?cartDetailId=${id}`)
             .then((response) => {
-                console.log(response);
                 setRender(Math.random);
                 props.setRenderHeader(Math.random())
-
             }).catch((error) => {
                 console.log(error);
             })
@@ -309,7 +307,6 @@ const Cart = (props) => {
             key: 'price_total',
             title: 'Thành tiền',
             render: (_, record) => {
-                { console.log(record) }
                 return (
                     <div style={{ textAlign: "center" }}>
                         {record.promotion.length !== 0 ? (
@@ -419,7 +416,6 @@ const Cart = (props) => {
                         totalPrice += carts[i].cartDetailResponse.priceProductDetail * carts[i].cartDetailResponse.quantity - (priceReduced ? priceReduced : 0);
                     }
                 }
-                console.log(totalPrice)
                 setTotalPrice(totalPrice);
             } else {
                 for (let i = 0; i < productDetails.length; i++) {
@@ -430,7 +426,7 @@ const Cart = (props) => {
                 }
                 setTotalPrice(totalPrice);
             }
-
+            console.log(selectedKeys)
             setSelectedRowKeys(selectedKeys);
         } catch (error) {
             console.error('lỗi click sản phẩm thanh toán:', error);
@@ -450,7 +446,7 @@ const Cart = (props) => {
                 let selectedRow = carts.find((row) => row?.cartDetailResponse.productDetailId === key);
                 newData.push(selectedRow);
             });
-            console.log(newData)
+            console.log(`dt`, newData)
         }
 
         if (newData.length === 0) {
@@ -496,8 +492,6 @@ const Cart = (props) => {
                                 });
                             } else {
                                 for (let j = 0; j < response.data.length; j++) {
-                                    console.log(productDetails[i].data[0].id)
-                                    console.log(response.data[j].cartDetailResponse)
                                     if (Number(productDetails[i].data[0].id) !== Number(response.data[j].cartDetailResponse.productDetailId)) {
                                         cart.lstCartDetail.push({
                                             productDetailId: productDetails[i].data[0].id,
@@ -513,7 +507,6 @@ const Cart = (props) => {
                     const res = axios.post(`${cartAPI}`, cart);
                 }
 
-
                 localStorage.removeItem('checkout');
             } catch (error) {
                 console.log(error);
@@ -524,9 +517,9 @@ const Cart = (props) => {
     }
 
     useEffect(() => {
+        window.scrollTo(0, 0);
         getAllCart();
         getCartAPI()
-        console.log(carts)
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [render]);
 

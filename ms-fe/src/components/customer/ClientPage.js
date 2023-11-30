@@ -11,6 +11,7 @@ import DetailProduct from "./detail-product/DetailProduct";
 import Cart from "./cart/Cart";
 import { useEffect, useState } from "react";
 import UserDetail from "./user/UserDetail";
+import TimelineByBillCode from "../element/timeline/TimelineByBillCode";
 
 function ClientPage() {
   const [render, setRender] = useState(0);
@@ -19,7 +20,7 @@ function ClientPage() {
     <Row>
       <Col span={24} className="h-100vh">
         <div>
-          <Header render={render} />
+          <Header render={render} setRenderHeader={setRender} />
         </div>
         <div>
           <Routes>
@@ -27,10 +28,11 @@ function ClientPage() {
             <Route path="home" element={<HomeClient />} />
             <Route path="about" element={<About />} />
             <Route path="contact" element={<Contact />} />
-            <Route path="checkout" element={<Checkout />} />
+            <Route path="checkout" element={<Checkout setRenderHeader={setRender} />} />
             <Route path="cart" element={<Cart setRenderHeader={setRender} />} />
             <Route path="anything" element={<Shop />} />
             <Route path="user/:username" element={<UserDetail />} />
+            <Route path="bill/:billCode" element={<TimelineByBillCode />} />
             <Route path="shopping">
               <Route index element={<Shop />} />
               {/* <Route path=":typeCategory">

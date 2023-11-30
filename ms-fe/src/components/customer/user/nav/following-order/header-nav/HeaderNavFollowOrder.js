@@ -6,7 +6,7 @@ function HeaderNavFollowOrder({ setStatus, setCreatedBy, setSymbol, setCount }) 
   const onChangeBill = (e) => {
     if (e === '') {
       setStatus('')
-      setCreatedBy('')
+      setCreatedBy('CLIENT')
       setSymbol('')
       setCount('')
     } else if (e === 'CLIENT') {
@@ -33,7 +33,7 @@ function HeaderNavFollowOrder({ setStatus, setCreatedBy, setSymbol, setCount }) 
       setStatus(e);
       setCreatedBy("")
       setSymbol('')
-      setCount(1)
+      setCount('')
     }
     else {
       setStatus(e);
@@ -62,7 +62,7 @@ function HeaderNavFollowOrder({ setStatus, setCreatedBy, setSymbol, setCount }) 
               </span>
               <span
                 className={`${styles.textSize} ${styles.textColor} ${styles.span} ${styles.active}`}
-                onClick={() => setStatus('Confirmed')}
+                onClick={() => onChangeBill('Confirmed')}
               >
                 Đã xác nhận
               </span>

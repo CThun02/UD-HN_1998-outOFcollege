@@ -56,10 +56,10 @@ const Bill = () => {
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
       if (key.startsWith("HD")) {
-        console.log(`key`, JSON.parse(localStorage.getItem(key)).productDetails.length);
         var tab = {
           label: "Hóa đơn: " + localStorage.key(i),
           key: key,
+          count: JSON.parse(localStorage.getItem(key)).productDetails.length
         };
         initialItems.push(tab);
         checkEmpty++;
@@ -732,6 +732,7 @@ const Bill = () => {
           timeStart: now(),
           productDetails: [],
           account: null,
+          count: 0
         })
       );
       setItems(newPanes);
@@ -1130,9 +1131,12 @@ const Bill = () => {
             return (
               <Tabs.TabPane
                 key={item.key}
-                tab={item.label}
+                tab={
+                  <Badge count={item.count ? item.count : 0} showZero >
+                    <span style={{ padding: 10 }}>{item.label}</span>
+                  </Badge>
+                }
                 items={item}
-
               >
                 <div className={styles.tabContent}>
                   <Row>

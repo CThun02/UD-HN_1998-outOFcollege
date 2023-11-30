@@ -1,6 +1,7 @@
 package com.fpoly.ooc.controller.client;
 
 import com.fpoly.ooc.dto.BillStatusDTO;
+import com.fpoly.ooc.dto.EmailDetails;
 import com.fpoly.ooc.entity.Account;
 import com.fpoly.ooc.entity.Address;
 import com.fpoly.ooc.entity.AddressDetail;
@@ -17,11 +18,13 @@ import com.fpoly.ooc.service.interfaces.BillDetailService;
 import com.fpoly.ooc.service.interfaces.BillService;
 import com.fpoly.ooc.service.interfaces.CartDetailService;
 import com.fpoly.ooc.service.interfaces.DeliveryNoteService;
+import com.fpoly.ooc.service.interfaces.EmailService;
 import com.fpoly.ooc.service.interfaces.TimeLineService;
 import com.fpoly.ooc.service.interfaces.VoucherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -65,6 +68,9 @@ public class ClientController {
 
     @Autowired
     private BillRepo billRepo;
+
+    @Autowired
+    private EmailService emailService;
 
     @GetMapping("/address")
     public ResponseEntity<?> getAll(@RequestParam("username") String username) {
@@ -128,7 +134,6 @@ public class ClientController {
                 (request, minPrice.orElse(null), maxPrice.orElse(null)));
     }
 
-
     @GetMapping("/timelineByUser")
     public ResponseEntity<?> timelineByUser(@RequestParam("username") String username,
                                             @RequestParam("billCode") String billCode,
@@ -176,4 +181,34 @@ public class ClientController {
                                               @RequestBody BillStatusDTO dto) {
         return ResponseEntity.ok(billService.updateBillStatus(dto, id));
     }
+
+    @PostMapping("/email")
+    public ResponseEntity<?> email(@RequestBody EmailDetails emailDetails) {
+        return ResponseEntity.ok(emailService.sendSimpleMail(emailDetails));
+    }
+
+    @PutMapping("/update-address/{id}")
+    public ResponseEntity<?> updateAddress(@RequestBody Address address,
+                                           @PathVariable("id") Long id) {
+        address.setId(id);
+        return ResponseEntity.ok(addressService.update(address));
+    }
+
+    @PutMapping("/update-delivery-note/{billId}")
+    public ResponseEntity<?> updateAddress(@RequestBody DeliveryNoteRequest request,
+                                           @PathVariable("billId") Long billId) {
+        return ResponseEntity.ok(deliveryNoteService.updateShippingPrice(billId,
+                request.getShipPrice(), request.getShipDate()));
+    }
+
+    @GetMapping("/delivery-note/{billCode}")
+    public ResponseEntity<?> getOneDeliveryNote(@PathVariable("billCode") String billCode) {
+        return ResponseEntity.ok(deliveryNoteService.getOne(billCode));
+    }
+
+    @GetMapping("/countBill")
+    public ResponseEntity<?> countBill(){
+        return ResponseEntity.ok(billService.getCountFilterBill());
+    }
+
 }

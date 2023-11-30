@@ -94,7 +94,7 @@ const ModalAddress = ({
         .then((response) => {
           setAddress(response.data)
         }).catch((error) => {
-          const status = error.response.status;
+          const status = error.response?.status;
           if (status === 403) {
             notification.error({
               message: "Thông báo",

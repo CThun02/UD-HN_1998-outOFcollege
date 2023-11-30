@@ -72,6 +72,7 @@ function HeaderRight(props) {
                 message: "Success",
                 description: "Đăng xuất thành công!",
               });
+              props.setRenderHeader(Math.random())
             }}
             to={'/ms-shop'}
             className={styles.link}
@@ -94,7 +95,7 @@ function HeaderRight(props) {
   const handleCreateCartByUsername = () => {
     if (data) {
       try {
-        const response = axios.post(`${cartAPI}/createCart?username=` + data);
+        axios.post(`${cartAPI}/createCart?username=` + data);
       } catch (error) {
         console.log(error);
       }

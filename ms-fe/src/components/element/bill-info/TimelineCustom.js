@@ -1,12 +1,13 @@
 import React from 'react'
 import { Timeline, TimelineEvent } from "@mailtop/horizontal-timeline";
-import { Modal } from 'antd';
+import { Col, Modal, Row } from 'antd';
 import { FaRegFileAlt, FaTimes, FaTruck } from 'react-icons/fa';
-import { CheckCircleOutlined } from '@ant-design/icons';
 
-const TimelineCustom = ({ timelines, open, handleCancel }) => {
+const TimelineCustom = ({ timelines, open, handleCancel, userInfo }) => {
     const handleOk = () => {
-        console.log(1)
+        console.log(timelines.map((e) => {
+            console.log(e)
+        }))
     }
 
     return (
@@ -15,7 +16,6 @@ const TimelineCustom = ({ timelines, open, handleCancel }) => {
                 footer={false}
             >
                 <Timeline minEvents={6} placeholder >
-                    {timelines}
                     {timelines &&
                         timelines.map((data) => (
                             <TimelineEvent
@@ -55,6 +55,20 @@ const TimelineCustom = ({ timelines, open, handleCancel }) => {
                             />
                         ))}
                 </Timeline>
+                <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                    <div style={{ width: "40%" }}>
+                        <Row>
+                            <Col span={12} style={{ fontWeight: 500 }}>Tên khách hàng</Col>
+                            <Col span={12}>{userInfo.fullName}</Col>
+                            <Col span={12} style={{ fontWeight: 500 }}>Số điện thoại</Col>
+                            <Col span={12}>{userInfo.phoneNumber}</Col>
+                            <Col span={12} style={{ fontWeight: 500 }}>Ngày nhận hàng dự kiến</Col>
+                            <Col span={12}>{userInfo.shipDate}</Col>
+                            <Col span={12} style={{ fontWeight: 500 }}>Địa chỉ</Col>
+                            <Col span={12}>{userInfo.addressDescription}</Col>
+                        </Row>
+                    </div>
+                </div>
             </Modal>
         </div>
     )

@@ -172,7 +172,7 @@ const BillReturn = () => {
                 onChange={(e) => {
                   if (
                     Math.abs(Number(e.target.value)) >
-                      Number(record.quantity) ||
+                    Number(record.quantity) ||
                     Number(e.target.value) === 0
                   ) {
                     setQuantity(1);
@@ -228,7 +228,7 @@ const BillReturn = () => {
             },
           }
         )
-        .then((response) => {})
+        .then((response) => { })
         .catch((error) => {
           const status = error.response.status;
           if (status === 403) {
@@ -252,7 +252,7 @@ const BillReturn = () => {
             Authorization: `Bearer ${getToken(true)}`,
           },
         })
-        .then((response) => {})
+        .then((response) => { })
         .catch((error) => {
           const status = error.response.status;
           if (status === 403) {
@@ -271,14 +271,13 @@ const BillReturn = () => {
   function changeStatusBillDetail(id, status) {
     axios
       .put(
-        `http://localhost:8080/api/admin/bill/billDetail/change-status?status=${
-          status === "5" || status === "3"
-            ? "ReturnW"
-            : status === "-1"
+        `http://localhost:8080/api/admin/bill/billDetail/change-status?status=${status === "5" || status === "3"
+          ? "ReturnW"
+          : status === "-1"
             ? "ReturnC"
             : status === "ACTIVE"
-            ? "ACTIVE"
-            : "ReturnS"
+              ? "ACTIVE"
+              : "ReturnS"
         }`,
         id,
         {
@@ -341,7 +340,7 @@ const BillReturn = () => {
     await axios
       .get(
         `http://localhost:8080/api/admin/bill/getBillByBillCode?billCode=` +
-          billCode,
+        billCode,
         {
           headers: {
             Authorization: `Bearer ${getToken(true)}`,
@@ -394,7 +393,7 @@ const BillReturn = () => {
       axios
         .get(
           `http://localhost:8080/api/admin/bill/getBillReturnByBillCode?billCode=` +
-            billCode,
+          billCode,
           {
             headers: {
               Authorization: `Bearer ${getToken(true)}`,
@@ -472,102 +471,106 @@ const BillReturn = () => {
       />
       <div className={styles.billReturn}>
         <h3 style={{ marginBottom: "25px" }}>Thông tin hóa đơn</h3>
-        <Timeline minEvents={2} placeholder className={styles.timeLine}>
-          {billInfo?.symbol !== "Received" ? (
-            <Timeline minEvents={6} placeholder className={styles.timeLine}>
-              {billInfo?.timeLines &&
-                billInfo?.timeLines.map((data) => (
-                  <TimelineEvent
-                    color={
-                      data.status === "0" || data.status === "-1"
-                        ? "#FF0000"
-                        : data.status === "5"
-                        ? "#f0ad4e"
-                        : "#00cc00"
-                    }
-                    icon={
-                      data.status === "1"
-                        ? FaRegFileAlt
-                        : data.status === "0"
-                        ? FaTimes
-                        : data.status === "2"
-                        ? FaRegFileAlt
-                        : data.status === "3"
-                        ? FaTruck
-                        : CheckCircleOutlined
-                    }
-                    title={
-                      data.status === "0" ? (
-                        <h3>Đã hủy</h3>
-                      ) : data.status === "1" ? (
-                        <h3>Chờ xác nhận</h3>
-                      ) : data.status === "2" ? (
-                        <h3>Đã xác nhận</h3>
-                      ) : data.status === "3" ? (
-                        <h3>
-                          Đã đóng gói & <br /> đang được giao
-                        </h3>
-                      ) : data.status === "4" ? (
-                        <h3>Giao hàng thành công</h3>
-                      ) : data.status === "5" ? (
-                        <h3>yêu cầu trả hàng</h3>
-                      ) : data.status === "-1" ? (
-                        <h3>Trả hàng thất bại</h3>
-                      ) : (
-                        <h3>Trả hàng thành công</h3>
-                      )
-                    }
-                    subtitle={data.createdDate}
-                  />
-                ))}
-            </Timeline>
-          ) : (
+        <div style={{ overflowX: "scroll", height: '50%' }}>
+          <div style={{ width: "fit-content" }}>
             <Timeline minEvents={2} placeholder className={styles.timeLine}>
-              {billInfo?.timeLines &&
-                billInfo?.timeLines.map((data) => (
-                  <TimelineEvent
-                    color={
-                      data.status === "0" || data.status === "-1"
-                        ? "#FF0000"
-                        : data.status === "3"
-                        ? "#f0ad4e"
-                        : "#00cc00"
-                    }
-                    icon={
-                      data.status === "1"
-                        ? FaRegFileAlt
-                        : data.status === "0"
-                        ? FaTimes
-                        : data.status === "2"
-                        ? FaRegCheckCircle
-                        : data.status === "3"
-                        ? FaClock
-                        : data.status === "4"
-                        ? FaRocket
-                        : null
-                    }
-                    title={
-                      data.status === "1" ? (
-                        <h3>Chờ xác nhận</h3>
-                      ) : data.status === "2" ? (
-                        <h3>Thanh toán thành công</h3>
-                      ) : data.status === "0" ? (
-                        <h3>Đã hủy</h3>
-                      ) : data.status === "3" ? (
-                        <h3>yêu cầu trả hàng</h3>
-                      ) : data.status === "-1" ? (
-                        <h3>Trả hàng thất bại</h3>
-                      ) : (
-                        <h3>Trả hàng thành công</h3>
-                      )
-                    }
-                    subtitle={data.createdDate}
-                  />
-                ))}
+              {billInfo?.symbol !== "Received" ? (
+                <Timeline minEvents={6} placeholder className={styles.timeLine}>
+                  {billInfo?.timeLines &&
+                    billInfo?.timeLines.map((data) => (
+                      <TimelineEvent
+                        color={
+                          data.status === "0" || data.status === "-1"
+                            ? "#FF0000"
+                            : data.status === "5"
+                              ? "#f0ad4e"
+                              : "#00cc00"
+                        }
+                        icon={
+                          data.status === "1"
+                            ? FaRegFileAlt
+                            : data.status === "0"
+                              ? FaTimes
+                              : data.status === "2"
+                                ? FaRegFileAlt
+                                : data.status === "3"
+                                  ? FaTruck
+                                  : CheckCircleOutlined
+                        }
+                        title={
+                          data.status === "0" ? (
+                            <h3>Đã hủy</h3>
+                          ) : data.status === "1" ? (
+                            <h3>Chờ xác nhận</h3>
+                          ) : data.status === "2" ? (
+                            <h3>Đã xác nhận</h3>
+                          ) : data.status === "3" ? (
+                            <h3>
+                              Đã đóng gói & <br /> đang được giao
+                            </h3>
+                          ) : data.status === "4" ? (
+                            <h3>Giao hàng thành công</h3>
+                          ) : data.status === "5" ? (
+                            <h3>yêu cầu trả hàng</h3>
+                          ) : data.status === "-1" ? (
+                            <h3>Trả hàng thất bại</h3>
+                          ) : (
+                            <h3>Trả hàng thành công</h3>
+                          )
+                        }
+                        subtitle={data.createdDate}
+                      />
+                    ))}
+                </Timeline>
+              ) : (
+                <Timeline minEvents={2} placeholder className={styles.timeLine}>
+                  {billInfo?.timeLines &&
+                    billInfo?.timeLines.map((data) => (
+                      <TimelineEvent
+                        color={
+                          data.status === "0" || data.status === "-1"
+                            ? "#FF0000"
+                            : data.status === "3"
+                              ? "#f0ad4e"
+                              : "#00cc00"
+                        }
+                        icon={
+                          data.status === "1"
+                            ? FaRegFileAlt
+                            : data.status === "0"
+                              ? FaTimes
+                              : data.status === "2"
+                                ? FaRegCheckCircle
+                                : data.status === "3"
+                                  ? FaClock
+                                  : data.status === "4"
+                                    ? FaRocket
+                                    : null
+                        }
+                        title={
+                          data.status === "1" ? (
+                            <h3>Chờ xác nhận</h3>
+                          ) : data.status === "2" ? (
+                            <h3>Thanh toán thành công</h3>
+                          ) : data.status === "0" ? (
+                            <h3>Đã hủy</h3>
+                          ) : data.status === "3" ? (
+                            <h3>yêu cầu trả hàng</h3>
+                          ) : data.status === "-1" ? (
+                            <h3>Trả hàng thất bại</h3>
+                          ) : (
+                            <h3>Trả hàng thành công</h3>
+                          )
+                        }
+                        subtitle={data.createdDate}
+                      />
+                    ))}
+                </Timeline>
+              )}
             </Timeline>
-          )}
-        </Timeline>
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          </div>
+        </div>
+        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 20 }}>
           <Button
             type="primary"
             size="large"

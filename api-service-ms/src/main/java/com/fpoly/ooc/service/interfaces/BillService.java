@@ -3,13 +3,19 @@ package com.fpoly.ooc.service.interfaces;
 import com.fpoly.ooc.dto.BillStatusDTO;
 import com.fpoly.ooc.entity.Address;
 import com.fpoly.ooc.entity.Bill;
-import com.fpoly.ooc.entity.BillDetail;
 import com.fpoly.ooc.request.bill.BillRequest;
 import com.fpoly.ooc.request.product.ProductDetailRequest;
-import com.fpoly.ooc.responce.bill.*;
 import com.fpoly.ooc.responce.account.GetListCustomer;
-import com.fpoly.ooc.responce.product.ProductDetailDisplayResponse;
-import com.fpoly.ooc.responce.product.ProductDetailResponse;
+import com.fpoly.ooc.responce.bill.BillGrowthResponse;
+import com.fpoly.ooc.responce.bill.BillLineChartResponse;
+import com.fpoly.ooc.responce.bill.BillManagementResponse;
+import com.fpoly.ooc.responce.bill.BillResponse;
+import com.fpoly.ooc.responce.bill.BillReturnRequestResponse;
+import com.fpoly.ooc.responce.bill.BillReturnResponse;
+import com.fpoly.ooc.responce.bill.BillRevenueCompare;
+import com.fpoly.ooc.responce.bill.BillRevenueCompareDate;
+import com.fpoly.ooc.responce.bill.BillRevenueDisplay;
+import com.fpoly.ooc.responce.bill.CountQuantityBillResponse;
 import com.fpoly.ooc.responce.product.ProductDetailSellResponse;
 
 import java.math.BigDecimal;
@@ -28,6 +34,8 @@ public interface BillService {
             String symbol,
             Integer count,
             String createdBy);
+
+    CountQuantityBillResponse getCountFilterBill();
 
     void deleteBill(Long id);
 

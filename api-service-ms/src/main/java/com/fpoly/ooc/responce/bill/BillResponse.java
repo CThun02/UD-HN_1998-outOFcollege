@@ -33,4 +33,9 @@ public interface BillResponse {
     public String getStatus();
 
     public String getNote();
+
+    public BigDecimal getAmountPaid();
+
+    public BigDecimal getShippingPrice();
+
 }

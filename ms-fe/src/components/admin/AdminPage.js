@@ -44,6 +44,7 @@ function AdminPage() {
       navigate("/authen/admin/sign-in");
     }
   }, [navigate, token]);
+
   return (
     <NotificationProvider>
       {token && (

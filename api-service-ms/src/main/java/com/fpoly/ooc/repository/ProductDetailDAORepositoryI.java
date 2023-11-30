@@ -111,17 +111,17 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
                     AND (bd is null or bd.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE)
                     AND (pp is null or pp.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE)
                     AND (pn is null or pn.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE)
-                    AND pt.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
-                    AND c.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
-                    AND br.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
-                    AND category.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
-                    AND pattern.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
-                    AND form.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
-                    AND button.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
-                    AND material.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
-                    AND collar.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
-                    AND sleeve.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
-                    AND shirtTail.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                    AND (pt is null or pt.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE)
+                    AND (c is null or c.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE)
+                    AND (br is null or br.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE)
+                    AND (category is null or category.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE)
+                    AND (pattern is null or pattern.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE)
+                    AND (form is null or form.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE)
+                    AND (button is null or button.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE)
+                    AND (material is null or material.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE)
+                    AND (collar is null or collar.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE)
+                    AND (sleeve is null or sleeve.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE)
+                    AND (shirtTail is null or shirtTail.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE)
                 GROUP BY pd.id, pt.id, br.id, category.id, pattern.id, form.id, button.id, material.id,
                 collar.id, sleeve.id, shirtTail.id, c.categoryName, pt.productName, br.brandName,
                  pn.promotionMethod, pn.promotionValue, pd.price, pd.createdAt
@@ -160,17 +160,17 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
                     AND (bd is null or bd.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE)
                     AND (pp is null or pp.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE)
                     AND (pn is null or pn.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE)
-                    AND pt.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
-                    AND c.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
-                    AND br.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
-                    AND category.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
-                    AND pattern.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
-                    AND form.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
-                    AND button.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
-                    AND material.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
-                    AND collar.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
-                    AND sleeve.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
-                    AND shirtTail.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                    AND (pt is null or pt.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE)
+                    AND (c is null or c.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE)
+                    AND (br is null or br.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE)
+                    AND (category is null or category.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE)
+                    AND (pattern is null or pattern.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE)
+                    AND (form is null or form.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE)
+                    AND (button is null or button.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE)
+                    AND (material is null or material.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE)
+                    AND (collar is null or collar.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE)
+                    AND (sleeve is null or sleeve.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE)
+                    AND (shirtTail is null or shirtTail.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE)
                 GROUP BY pd.id, pt.id, br.id, category.id, pattern.id, form.id, button.id, material.id,
                 collar.id, sleeve.id, shirtTail.id, c.categoryName, pt.productName, br.brandName,
                 pn.promotionMethod, pn.promotionValue, pd.price, pd.createdAt
@@ -209,18 +209,18 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
             "left join SleeveType sleeve on productDetail.sleeve.id = sleeve.id " +
             "left join ShirtTailType shirt on productDetail.shirtTail.id = shirt.id " +
             "where " +
-            "productDetail.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
-            "and color.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
-            "and s.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
-            "and b.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
-            "and cate.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
-            "and patt.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
-            "and form.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
-            "and button.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
-            "and mate.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
-            "and collar.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
-            "and sleeve.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
-            "and shirt.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "productDetail.status like com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and color.status like com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and s.status like com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and b.status like com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and cate.status like com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and patt.status like com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and form.status like com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and button.status like com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and mate.status like com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and collar.status like com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and sleeve.status like com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and shirt.status like com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
             "and product.id = :productId " +
             "and (:brandId is null or b.id = :brandId) " +
             "and (:categoryId is null or cate.id = :categoryId) " +

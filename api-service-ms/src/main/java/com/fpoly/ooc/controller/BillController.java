@@ -1,6 +1,7 @@
 package com.fpoly.ooc.controller;
 
 import com.fpoly.ooc.dto.BillStatusDTO;
+import com.fpoly.ooc.request.bill.BillDetailRequest;
 import com.fpoly.ooc.request.bill.BillRequest;
 import com.fpoly.ooc.request.product.ProductDetailRequest;
 import com.fpoly.ooc.responce.bill.BillResponse;
@@ -10,6 +11,7 @@ import com.fpoly.ooc.responce.timeline.TimelineProductResponse;
 import com.fpoly.ooc.service.interfaces.BillDetailService;
 import com.fpoly.ooc.service.interfaces.BillService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -27,6 +29,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -110,21 +113,22 @@ public class BillController {
 
     @GetMapping("/getGrossRevenue")
     public ResponseEntity<?> getGrossRevenue(
-            @RequestParam Optional<Integer> day,
-            @RequestParam Optional<Integer> month,
-            @RequestParam Optional<Integer> year) {
-        return ResponseEntity.ok(billService.getBillRevenue(day.orElse(null), month.orElse(null), year.orElse(null)));
+            @RequestParam String day,
+            @RequestParam String dayTo) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        LocalDateTime dateFrom = LocalDateTime.parse(day, formatter);
+        LocalDateTime dateTo = LocalDateTime.parse(dayTo, formatter);
+        return ResponseEntity.ok(billService.getBillRevenue(dateFrom,  dateTo.plusDays(1)));
     }
 
     @GetMapping("/getBillRevenueCompare")
     public ResponseEntity<?> getBillRevenueCompare(
-            @RequestParam Optional<Integer> day,
-            @RequestParam Optional<Integer> month,
-            @RequestParam Optional<Integer> year
-    ) {
-        return ResponseEntity.ok(billService.getRevenueInStoreOnlineCompare(day.orElse(null),
-                month.orElse(null),
-                year.orElse(null)));
+            @RequestParam String day,
+            @RequestParam String dayTo) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        LocalDateTime dateFrom = LocalDateTime.parse(day, formatter);
+        LocalDateTime dateTo = LocalDateTime.parse(dayTo, formatter);
+        return ResponseEntity.ok(billService.getRevenueInStoreOnlineCompare(dateFrom,  dateTo.plusDays(1)));
     }
 
     @GetMapping("/getGrowthStoreByTime")
@@ -134,10 +138,12 @@ public class BillController {
 
     @GetMapping("/getBillProductSellTheMost")
     public ResponseEntity<?> getBillProductSellTheMost(
-            @RequestParam Optional<Integer> day,
-            @RequestParam Optional<Integer> month,
-            @RequestParam Optional<Integer> year) {
-        return ResponseEntity.ok(billService.getProductInBillByStatusAndId(null, day.orElse(null), month.orElse(null), year.orElse(null)));
+            @RequestParam String day,
+            @RequestParam String dayTo) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        LocalDateTime dateFrom = LocalDateTime.parse(day, formatter);
+        LocalDateTime dateTo = LocalDateTime.parse(dayTo, formatter);
+        return ResponseEntity.ok(billService.getProductInBillByStatusAndId(null, dateFrom, dateTo.plusDays(1)));
     }
 
     @GetMapping("/compareRevenueDate")
@@ -155,6 +161,7 @@ public class BillController {
     public ResponseEntity<?> getBillByBillCode(@RequestParam String billCode) {
         return ResponseEntity.ok(billService.getBillByBillCode(billCode));
     }
+
     @GetMapping("/getBillReturnByBillCode")
     public ResponseEntity<?> getBillReturnByBillCode(@RequestParam String billCode) {
         return ResponseEntity.ok(billService.getBillReturnByBillCode(billCode));
@@ -188,6 +195,11 @@ public class BillController {
             billDetailService.updateBill(request.get(i), status);
         }
         return null;
+    }
+
+    @PostMapping("/create-bill-detail")
+    public ResponseEntity<?> createdBillDetail(@RequestBody BillDetailRequest request) {
+        return ResponseEntity.ok(billDetailService.createBillDetail(request));
     }
 
 }

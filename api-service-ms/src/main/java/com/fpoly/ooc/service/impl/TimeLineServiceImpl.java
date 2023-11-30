@@ -3,30 +3,24 @@ package com.fpoly.ooc.service.impl;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
 import com.fpoly.ooc.entity.Bill;
-import com.fpoly.ooc.entity.Promotion;
-import com.fpoly.ooc.entity.PromotionProduct;
+import com.fpoly.ooc.entity.DeliveryNote;
 import com.fpoly.ooc.entity.Timeline;
 import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.BillRepo;
 import com.fpoly.ooc.repository.TimeLineRepo;
 import com.fpoly.ooc.request.timeline.TimeLinerequest;
 import com.fpoly.ooc.responce.bill.BillInfoResponse;
-import com.fpoly.ooc.responce.product.ProductDetailDisplayResponse;
-import com.fpoly.ooc.responce.product.ProductDetailResponse;
-import com.fpoly.ooc.responce.product.ProductDetailSellResponse;
-import com.fpoly.ooc.responce.product.ProductImageResponse;
 import com.fpoly.ooc.responce.timeline.TimeLineResponse;
 import com.fpoly.ooc.responce.timeline.TimelineProductDisplayResponse;
 import com.fpoly.ooc.responce.timeline.TimelineProductResponse;
-import com.fpoly.ooc.service.interfaces.AccountService;
+import com.fpoly.ooc.service.interfaces.DeliveryNoteService;
 import com.fpoly.ooc.service.interfaces.ProductImageServiceI;
-import com.fpoly.ooc.service.interfaces.PromotionProductDetailService;
-import com.fpoly.ooc.service.interfaces.PromotionService;
 import com.fpoly.ooc.service.interfaces.TimeLineService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,10 +37,7 @@ public class TimeLineServiceImpl implements TimeLineService {
     private ProductImageServiceI productImageServiceI;
 
     @Autowired
-    private AccountService accountService;
-
-    @Autowired
-    private PromotionService promotionService;
+    private DeliveryNoteService deliveryNoteService;
 
     @Override
     public List<TimeLineResponse> getAllTimeLineByBillId(Long id) {
@@ -66,11 +57,10 @@ public class TimeLineServiceImpl implements TimeLineService {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND));
         }
 
+
         Timeline timeLine = new Timeline();
         timeLine.setBill(bill);
         timeLine.setNote(request.getNote());
-        System.out.println("CHECKMATES"+request.getStatus());
-
 
         if (request.getStatus() == null) {
             List<TimeLineResponse> lst = timeLineRepo.getTimeLineByBillId(billId);
@@ -80,10 +70,13 @@ public class TimeLineServiceImpl implements TimeLineService {
             } else {
                 statusIncrease = Integer.valueOf(lst.get(lst.size() - 1).getStatus());
                 statusIncrease++;
-
             }
 
             timeLine.setStatus(String.valueOf(statusIncrease));
+            if (lst.size() == 3) {
+                DeliveryNote deliveryNote = deliveryNoteService.getDeliveryNoteByBill_Id(billId);
+                deliveryNote.setDateOfReceipt(LocalDateTime.now());
+            }
         } else {
             timeLine.setStatus(request.getStatus());
         }
@@ -109,23 +102,20 @@ public class TimeLineServiceImpl implements TimeLineService {
     }
 
     @Override
-    public List<ProductDetailSellResponse> getListTimelineByUser(String username, String phoneNumber, String email, String status) {
-        List<ProductDetailSellResponse> productDetailDisplayResponses = new ArrayList<>();
-        List<Long> billIdLongs = timeLineRepo.getBillIdByUserNameOrPhoneNumberOrEmail(username, phoneNumber, email, status);
-        for (int i = 0; i < billIdLongs.size(); i++) {
-            List<ProductDetailResponse> productDetailResponses = billRepo.getProductDetailByBillId(billIdLongs.get(i));
-            for (int j = 0; j < productDetailResponses.size(); j++) {
-                List<ProductImageResponse> productImageResponses = productImageServiceI.getProductImageByProductDetailId(productDetailResponses.get(j).getId());
-                ProductDetailDisplayResponse productDetailDisplayResponse = new
-                        ProductDetailDisplayResponse(productDetailResponses.get(j),
-                        productImageResponses == null ? new ArrayList<>() : productImageResponses);
-                ProductDetailSellResponse productDetailSellResponse = new ProductDetailSellResponse(productDetailDisplayResponse);
-                productDetailSellResponse.setPromotion(promotionService.getPromotionByProductDetailId(productDetailDisplayResponse.getId(), "ACTIVE"));
-                productDetailDisplayResponses.add(productDetailSellResponse);
-            }
+    public List<TimelineProductDisplayResponse> getListTimelineByUser(String username,
+                                                                      String billCode,
+                                                                      String status,
+                                                                      String symbol,
+                                                                      Integer count,
+                                                                      String createdBy) {
+        List<TimelineProductDisplayResponse> list = new ArrayList<>();
+        List<TimelineProductResponse> lstRes = timeLineRepo.getAllBillByClient(username, billCode, status, symbol, count, createdBy);
+        for (int i = 0; i < lstRes.size(); i++) {
+            TimelineProductDisplayResponse response = new TimelineProductDisplayResponse(lstRes.get(i));
+            response.setProductImageResponses(productImageServiceI.getProductImageByProductDetailId(response.getProductDetailId()));
+            list.add(response);
         }
-        return productDetailDisplayResponses;
+        return list;
     }
-
 
 }

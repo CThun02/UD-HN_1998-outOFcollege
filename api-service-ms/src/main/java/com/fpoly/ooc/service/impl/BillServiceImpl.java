@@ -23,6 +23,7 @@ import com.fpoly.ooc.responce.timeline.TimelineProductDisplayResponse;
 import com.fpoly.ooc.responce.timeline.TimelineProductResponse;
 import com.fpoly.ooc.service.interfaces.BillService;
 import com.fpoly.ooc.service.interfaces.DeliveryNoteService;
+import com.fpoly.ooc.service.interfaces.EmailService;
 import com.fpoly.ooc.service.interfaces.ProductDetailServiceI;
 import com.fpoly.ooc.service.interfaces.ProductImageServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +70,9 @@ public class BillServiceImpl implements BillService {
     @Autowired
     private DeliveryNoteService deliveryNoteService;
 
+    @Autowired
+    private EmailService emailService;
+
     @Transactional
     @Override
     public Bill createBill(BillRequest request) {
@@ -93,6 +97,12 @@ public class BillServiceImpl implements BillService {
 
         bill.setStatus(request.getStatus());
         billRepo.save(bill);
+
+        if (bill.getStatus().equals("Unpaid")) {
+            if (!request.getEmailDetails().getRecipient().isEmpty()) {
+                emailService.sendSimpleMail(request.getEmailDetails());
+            }
+        }
 
         for (BillDetailRequest billDetailRequest : request.getLstBillDetailRequest()) {
             BillDetail billDetail = BillDetail.builder()
@@ -149,6 +159,32 @@ public class BillServiceImpl implements BillService {
                 startDate, endDate, status, symbol, count, createdBy);
     }
 
+    @Override
+    public CountQuantityBillResponse getCountFilterBill() {
+        CountQuantityBillResponse countQuantityBillResponse = new CountQuantityBillResponse();
+        countQuantityBillResponse
+                .setCountAll(billRepo.getAllBillManagement(null, null, null,
+                        null, null, null, null).size());
+        countQuantityBillResponse
+                .setCountConfirmS(billRepo.getAllBillManagement(null, null, null,
+                        null, "Shipping", 2, null).size());
+        countQuantityBillResponse
+                .setCountConfirmW(billRepo.getAllBillManagement(null, null, null,
+                        null, null, null, "CLIENT").size());
+        countQuantityBillResponse
+                .setShipping(billRepo.getAllBillManagement(null, null, null,
+                        null, "Shipping", 3, null).size());
+        countQuantityBillResponse.setCancel(billRepo.getAllBillManagement(null, null, null,
+                "Cancel", null, null, null).size());
+        countQuantityBillResponse.setComplete(billRepo.getAllBillManagement(null, null, null,
+                "Complete", null, null, null).size());
+        countQuantityBillResponse.setPaid(billRepo.getAllBillManagement(null, null, null,
+                "Paid", null, null, null).size());
+        countQuantityBillResponse.setUnpaid(billRepo.getAllBillManagement(null, null, null,
+                "UnPaid", null, null, null).size());
+        return countQuantityBillResponse;
+    }
+
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void deleteBill(Long id) {
@@ -158,6 +194,11 @@ public class BillServiceImpl implements BillService {
         }
 
         billRepo.deleteById(id);
+    }
+
+    @Override
+    public Bill getAllBillByCode(String billCode) {
+        return null;
     }
 
     @Override
@@ -184,30 +225,30 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
-    public BillRevenueDisplay getBillRevenue(Integer day, Integer month, Integer year) {
-        ;
-        BillRevenue revenue = billRepo.getBillRevenue(day, month, year);
+    public BillRevenueDisplay getBillRevenue(LocalDateTime dayFrom, LocalDateTime dayTo) {
+        BillRevenue revenue = billRepo.getBillRevenue(dayFrom, dayTo);
         BillRevenueDisplay billRevenueDisplay = new BillRevenueDisplay(revenue);
-        List<ProductDetailSellResponse> productDetailDisplayResponses = this.getProductInBillByStatusAndId(null, day, month, year);
+        List<ProductDetailSellResponse> productDetailDisplayResponses = this.getProductInBillByStatusAndId(null, dayFrom, dayTo);
         billRevenueDisplay.setProductDetailDisplay(productDetailDisplayResponses);
         return billRevenueDisplay;
     }
 
     @Override
-    public BillRevenueCompare getRevenueInStoreOnlineCompare(Integer day, Integer month, Integer year) {
+    public BillRevenueCompare getRevenueInStoreOnlineCompare(LocalDateTime day, LocalDateTime dayTo) {
         BillRevenueCompare billRevenueCompare = new BillRevenueCompare();
-        billRevenueCompare.setOnlineRevenue(billRepo.getRevenueInStoreOnlineCompare("Online", day, month, year) == null ? 0 :
-                billRepo.getRevenueInStoreOnlineCompare("Online", day, month, year));
-        billRevenueCompare.setInStoreRevenue(billRepo.getRevenueInStoreOnlineCompare("In-Store", day, month, year) == null ? 0 :
-                billRepo.getRevenueInStoreOnlineCompare("In-Store", day, month, year));
+        billRevenueCompare.setOnlineRevenue(billRepo.getRevenueInStoreOnlineCompare("Online", day, dayTo) == null ? 0 :
+                billRepo.getRevenueInStoreOnlineCompare("Online", day, dayTo));
+        billRevenueCompare.setInStoreRevenue(billRepo.getRevenueInStoreOnlineCompare("In-Store", day, dayTo) == null ? 0 :
+                billRepo.getRevenueInStoreOnlineCompare("In-Store", day, dayTo));
         billRevenueCompare.setTotalRevenue(billRevenueCompare.getOnlineRevenue() + billRevenueCompare.getInStoreRevenue());
         return billRevenueCompare;
     }
 
     @Override
-    public List<ProductDetailSellResponse> getProductInBillByStatusAndId(Long id, Integer day, Integer month, Integer year) {
+    public List<ProductDetailSellResponse> getProductInBillByStatusAndId(Long id, LocalDateTime dayFrom, LocalDateTime dayTo) {
         List<ProductDetailResponse> productSellTheMost = billRepo.getProductInBillByStatusAndIdAndDate(id,
-                day, month, year);
+                dayFrom, dayTo);
+        System.out.println("CHECK");
         List<ProductDetailSellResponse> billProductSellTheMosts = new ArrayList<>();
         for (int i = 0; i < productSellTheMost.size(); i++) {
             ProductDetailDisplayResponse response = new ProductDetailDisplayResponse(productSellTheMost.get(i),
@@ -222,8 +263,8 @@ public class BillServiceImpl implements BillService {
     @Override
     public BillRevenueCompareDate compareRevenueDate(Integer dayFrom, Integer monthFrom, Integer yearFrom,
                                                      Integer dayTo, Integer monthTo, Integer yearTo) {
-        Double revenueFrom = billRepo.getRevenueByTime(dayFrom, monthFrom, yearFrom, null);
-        Double revenueTo = billRepo.getRevenueByTime(dayTo, monthTo, yearTo, null);
+        Double revenueFrom = billRepo.getRevenueByTime(dayFrom, monthFrom, yearFrom, dayFrom, monthFrom, yearFrom, null);
+        Double revenueTo = billRepo.getRevenueByTime(dayTo, monthTo, yearTo, dayTo, monthTo, yearTo, null);
         BillRevenueCompareDate billRevenueCompareDate = new BillRevenueCompareDate(revenueFrom, revenueTo);
         return billRevenueCompareDate;
     }
@@ -264,13 +305,13 @@ public class BillServiceImpl implements BillService {
 
     private void addDataLineChart(Integer year, Integer month, Integer day, String time, List<BillLineChartResponse> data) {
         String type = "Tại quầy";
-        Double revenue = billRepo.getRevenueByTime(day, month, year, "In-Store") == null ? 0 :
-                billRepo.getRevenueByTime(day, month, year, "In-Store");
+        Double revenue = billRepo.getRevenueByTime(day, month, year, day, month, year, "In-Store") == null ? 0 :
+                billRepo.getRevenueByTime(day, month, year, day, month, year, "In-Store");
         BillLineChartResponse billRevenue = new BillLineChartResponse(type, time, revenue);
         data.add(billRevenue);
         String typeOnline = "Trực tuyến";
-        Double revenueOnline = billRepo.getRevenueByTime(day, month, year, "Online") == null ? 0 :
-                billRepo.getRevenueByTime(day, month, year, "Online");
+        Double revenueOnline = billRepo.getRevenueByTime(day, month, year, day, month, year, "Online") == null ? 0 :
+                billRepo.getRevenueByTime(day, month, year, day, month, year, "Online");
         BillLineChartResponse billRevenueOnline = new BillLineChartResponse(typeOnline, time, revenueOnline);
         data.add(billRevenueOnline);
     }
@@ -300,16 +341,22 @@ public class BillServiceImpl implements BillService {
         LocalDate now = LocalDate.now();
         if (time.equals("date")) {
             LocalDate before = now.minusDays(1);
-            revenue = billRepo.getRevenueByTime(now.getDayOfMonth(), now.getMonthValue(), now.getYear(), null);
-            revenueBefore = billRepo.getRevenueByTime(before.getDayOfMonth(), before.getMonthValue(), before.getYear(), null);
+            revenue = billRepo.getRevenueByTime(now.getDayOfMonth(), now.getMonthValue(), now.getYear(),
+                    now.getDayOfMonth(), now.getMonthValue(), now.getYear(), null);
+            revenueBefore = billRepo.getRevenueByTime(before.getDayOfMonth(), before.getMonthValue(), before.getYear(),
+                    before.getDayOfMonth(), before.getMonthValue(), before.getYear(), null);
         } else if (time.equals("month")) {
             LocalDate before = now.minusMonths(1);
-            revenue = billRepo.getRevenueByTime(null, now.getMonthValue(), now.getYear(), null);
-            revenueBefore = billRepo.getRevenueByTime(null, before.getMonthValue(), before.getYear(), null);
+            revenue = billRepo.getRevenueByTime(null, now.getMonthValue(), now.getYear(),
+                    null, now.getMonthValue(), now.getYear(), null);
+            revenueBefore = billRepo.getRevenueByTime(null, before.getMonthValue(), before.getYear(),
+                    null, before.getMonthValue(), before.getYear(), null);
         } else if (time.equals("year")) {
             LocalDate before = now.minusYears(1);
-            revenue = billRepo.getRevenueByTime(null, null, now.getYear(), null);
-            revenueBefore = billRepo.getRevenueByTime(null, null, before.getYear(), null);
+            revenue = billRepo.getRevenueByTime(null, null, now.getYear(),
+                    null, null, now.getYear(), null);
+            revenueBefore = billRepo.getRevenueByTime(null, null, before.getYear(),
+                    null, null, before.getYear(), null);
         }
         revenue = revenue == null ? 0.0 : revenue;
         revenueBefore = revenueBefore == null ? 0.0 : revenueBefore;
@@ -330,17 +377,18 @@ public class BillServiceImpl implements BillService {
         BillReturnResponse billReturnResponse = new BillReturnResponse(billResponse);
         billReturnResponse.setTimeLines(timeLineRepo.getTimeLineByBillId(billResponse.getId()));
         List<TimelineProductResponse> timelineProductResponses = timeLineRepo.getTimelineProductByBillId(billReturnResponse.getId());
+        System.out.println("CHECKKKKKK SL");
         for (int i = 0; i < timelineProductResponses.size(); i++) {
             TimelineProductDisplayResponse productDisplayResponse = new TimelineProductDisplayResponse(timelineProductResponses.get(i));
             productDisplayResponse.setProductImageResponses(productImageService.getProductImageByProductDetailId(productDisplayResponse.getProductDetailId()));
             lstProduct.add(productDisplayResponse);
         }
-        if(billReturnResponse.getSymbol().equals("Shipping")){
+        if (billReturnResponse.getSymbol().equals("Shipping")) {
             DeliveryNote deliveryNote = deliveryNoteService.getDeliveryNoteByBill_Id(billResponse.getId());
             Address address = deliveryNote.getAddress();
-            billReturnResponse.setAddress(address.getDescriptionDetail()+" "+
-                    address.getWard().substring(0, address.getWard().indexOf("|"))+" "+
-                    address.getDistrict().substring(0, address.getDistrict().indexOf("|")) +" "+
+            billReturnResponse.setAddress(address.getDescriptionDetail() + " " +
+                    address.getWard().substring(0, address.getWard().indexOf("|")) + " " +
+                    address.getDistrict().substring(0, address.getDistrict().indexOf("|")) + " " +
                     address.getCity().substring(0, address.getCity().indexOf("|")));
             billReturnResponse.setPhoneNumber(deliveryNote.getPhoneNumber());
             billReturnResponse.setFullName(deliveryNote.getName());
@@ -348,5 +396,10 @@ public class BillServiceImpl implements BillService {
         }
         billReturnResponse.setBillDetails(lstProduct);
         return billReturnResponse;
+    }
+
+    @Override
+    public Bill updateBill(Bill bill) {
+        return billRepo.save(bill);
     }
 }

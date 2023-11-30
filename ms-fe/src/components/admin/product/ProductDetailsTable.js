@@ -236,74 +236,82 @@ const ProductDetailsTable = (props) => {
   }
 
   function createProductDetails() {
-    var check = false;
-    confirm({
-      centered: true,
-      title: `Thêm mới các sản phẩm`,
-      icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
-      content: "Xác nhận thêm mới",
-      onOk() {
-        props.setLoading(true);
-        for (let detail of props.productDetails) {
-          let productDetailCreate = { ...productDetail };
-          productDetailCreate.productId = product.id;
-          productDetailCreate.brandId = detail.brand.id;
-          productDetailCreate.categoryId = detail.category.id;
-          productDetailCreate.buttonId = detail.button.id;
-          productDetailCreate.collarId = detail.collar.id;
-          productDetailCreate.colorId = detail.color.id;
-          productDetailCreate.materialId = detail.material.id;
-          productDetailCreate.shirtTailId = detail.shirtTail.id;
-          productDetailCreate.patternId = detail.pattern.id;
-          productDetailCreate.formId = detail.form.id;
-          productDetailCreate.sleeveId = detail.sleeve.id;
-          productDetailCreate.sizeId = detail.size.id;
-          productDetailCreate.price = detail.price;
-          productDetailCreate.quantity = detail.quantity;
-          productDetailCreate.weight = detail.weight;
-          productDetailCreate.status = detail.status;
-          productDetailCreate.descriptionDetail = "Description detail";
-          if (!productDetailCreate.status.includes("DELETED")) {
-            axios
-              .post(api + "product/createDetail", productDetailCreate, {
-                headers: {
-                  Authorization: `Bearer ${getToken(true)}`,
-                },
-              })
-              .then((response) => {
-                if (
-                  response.data !== "" &&
-                  response.data !== null &&
-                  response.data !== undefined
-                ) {
-                  createImgageDetail(response.data);
-                }
-              })
-              .catch((error) => {
-                console.log(error);
-                notification.error({
-                  message: "Thông báo",
-                  description: "Thêm mới các chi tiết sản phẩm Thất bại",
+    var colorsCreate = props.colorsCreate;
+    if (imgList.length !== colorsCreate.length) {
+      notification.error({
+        message: "Thông báo",
+        description: "Vui lòng chọn đầy đủ ảnh cho từng mã màu!",
+      });
+    } else {
+      confirm({
+        centered: true,
+        title: `Thêm mới các sản phẩm`,
+        icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
+        content: "Xác nhận thêm mới",
+        onOk() {
+          props.setLoading(true);
+          for (let detail of props.productDetails) {
+            let productDetailCreate = { ...productDetail };
+            productDetailCreate.productId = product.id;
+            productDetailCreate.brandId = detail.brand.id;
+            productDetailCreate.categoryId = detail.category.id;
+            productDetailCreate.buttonId = detail.button.id;
+            productDetailCreate.collarId = detail.collar.id;
+            productDetailCreate.colorId = detail.color.id;
+            productDetailCreate.materialId = detail.material.id;
+            productDetailCreate.shirtTailId = detail.shirtTail.id;
+            productDetailCreate.patternId = detail.pattern.id;
+            productDetailCreate.formId = detail.form.id;
+            productDetailCreate.sleeveId = detail.sleeve.id;
+            productDetailCreate.sizeId = detail.size.id;
+            productDetailCreate.price = detail.price;
+            productDetailCreate.quantity = detail.quantity;
+            productDetailCreate.weight = detail.weight;
+            productDetailCreate.status = detail.status;
+            productDetailCreate.descriptionDetail = "Description detail";
+            if (!productDetailCreate.status.includes("DELETED")) {
+              axios
+                .post(api + "product/createDetail", productDetailCreate, {
+                  headers: {
+                    Authorization: `Bearer ${getToken(true)}`,
+                  },
+                })
+                .then((response) => {
+                  if (
+                    response.data !== "" &&
+                    response.data !== null &&
+                    response.data !== undefined
+                  ) {
+                    createImgageDetail(response.data);
+                  }
+                })
+                .catch((error) => {
+                  console.log(error);
+                  notification.error({
+                    message: "Thông báo",
+                    description: "Thêm mới các chi tiết sản phẩm Thất bại",
+                  });
+                  return;
                 });
-                return;
-              });
+            }
           }
-        }
-        setRender(props.productDetails);
-        setTimeout(() => {
-          notification.open({
-            message: "Thông báo",
-            description: "Thêm mới các chi tiết sản phẩm thành công",
-            icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
-          });
+          setRender(props.productDetails);
           setTimeout(() => {
-            imgList = []; //reset
-            navigate("/api/admin/product");
-          }, 500);
-        }, 1000);
-      },
-    });
+            notification.open({
+              message: "Thông báo",
+              description: "Thêm mới các chi tiết sản phẩm thành công",
+              icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
+            });
+            setTimeout(() => {
+              imgList = []; //reset
+              navigate("/api/admin/product");
+            }, 500);
+          }, 1000);
+        },
+      });
+    }
   }
+
   if (props.productDetails.length === 0 || productDetailsDisplay.length === 0) {
     getProductDetailsDisplay();
   }

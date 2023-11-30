@@ -13,6 +13,8 @@ const PieChart = ({ formattedDateNow }) => {
   const [billRevenueCompare, setBillRevenueCompare] = useState({});
   const [datePercentCompare, setDatePercentCompare] =
     useState(formattedDateNow);
+  const [datePercentCompareTo, setDatePercentCompareTo] =
+    useState(formattedDateNow);
   const [selectTypeDate, setSelectTypeDate] = useState("year");
   const data = [
     {
@@ -46,53 +48,62 @@ const PieChart = ({ formattedDateNow }) => {
     ],
   };
   useEffect(() => {
-    var day = "";
-    var month = "";
-    var year = datePercentCompare.substring(0, 4);
-    if (selectTypeDate === "date") {
-      month = datePercentCompare.substring(
-        datePercentCompare.indexOf("-") + 1,
-        datePercentCompare.lastIndexOf("-")
+    var dateFrom = new Date(datePercentCompare);
+    var dateTo = new Date(
+      selectTypeDate === "other" ? datePercentCompareTo : datePercentCompare
+    );
+    function getLastDayOfMonth(month) {
+      const firstDayOfNextMonth = new Date(
+        Date.UTC(dateFrom.getFullYear(), month, 1)
       );
-      day = datePercentCompare.substring(
-        datePercentCompare.lastIndexOf("-") + 1
+      const lastDayOfMonth = new Date(
+        firstDayOfNextMonth.getTime() - 24 * 60 * 60 * 1000
       );
-    } else if (selectTypeDate === "month") {
-      month = datePercentCompare.substring(
-        datePercentCompare.indexOf("-") + 1,
-        datePercentCompare.lastIndexOf("-") === datePercentCompare.indexOf("-")
-          ? datePercentCompare.length
-          : datePercentCompare.lastIndexOf("-")
-      );
+      return lastDayOfMonth.getDate();
     }
-    axios
-      .get(
-        "http://localhost:8080/api/admin/bill/getBillRevenueCompare?day=" +
-          day +
-          "&month=" +
-          month +
-          "&year=" +
-          year,
-        {
-          headers: {
-            Authorization: `Bearer ${getToken(true)}`,
-          },
-        }
-      )
-      .then((res) => {
-        setBillRevenueCompare(res.data);
-      })
-      .catch((err) => {
-        const status = err.response.status;
-        if (status === 403) {
-          notification.error({
-            message: "Thông báo",
-            description: "Bạn không có quyền truy cập!",
-          });
-        }
-        console.log(err);
+    if (selectTypeDate === "month") {
+      dateFrom.setDate(1);
+      dateTo.setDate(getLastDayOfMonth(dateFrom.getMonth() + 1) - 1);
+    } else if (selectTypeDate === "year") {
+      dateFrom.setDate(1);
+      dateTo.setDate(getLastDayOfMonth(12) - 1);
+      dateFrom.setMonth(0);
+      dateTo.setMonth(11);
+    }
+    if (dateFrom.getTime() > dateTo.getTime()) {
+      notification.error({
+        message: "Thông báo",
+        description:
+          "Thời gian bắt đầu phải bé hơn hoặc bằng thời gian kết thúc",
       });
-  }, [datePercentCompare, selectTypeDate]);
+    } else {
+      axios
+        .get(
+          "http://localhost:8080/api/admin/bill/getBillRevenueCompare?day=" +
+          encodeURIComponent(dateFrom.toISOString()) +
+          "&dayTo=" +
+          encodeURIComponent(dateTo.toISOString()),
+          {
+            headers: {
+              Authorization: `Bearer ${getToken(true)}`,
+            },
+          }
+        )
+        .then((res) => {
+          setBillRevenueCompare(res.data);
+        })
+        .catch((err) => {
+          const status = err.response.status;
+          if (status === 403) {
+            notification.error({
+              message: "Thông báo",
+              description: "Bạn không có quyền truy cập!",
+            });
+          }
+          console.log(err);
+        });
+    }
+  }, [datePercentCompare, datePercentCompareTo, selectTypeDate]);
   return (
     <div>
       <p style={{ fontWeight: 500, marginTop: "12px" }}>
@@ -102,22 +113,44 @@ const PieChart = ({ formattedDateNow }) => {
         value={selectTypeDate}
         onChange={(event) => {
           setDatePercentCompare(formattedDateNow);
+          setDatePercentCompareTo(formattedDateNow);
           setSelectTypeDate(event);
         }}
-        style={{ width: "20%" }}
+        style={{ width: "30%" }}
         bordered={false}
       >
         <Option value="date">Ngày</Option>
         <Option value="month">Tháng</Option>
         <Option value="year">Năm</Option>
+        <Option value="other">Tùy chọn</Option>
       </Select>
-      <DatePicker
-        className={styles.input_noneBorder}
-        style={{ width: "80%" }}
-        picker={selectTypeDate}
-        value={dayjs(datePercentCompare)}
-        onChange={(date, dateString) => setDatePercentCompare(dateString)}
-      />
+      {selectTypeDate === "other" ? (
+        <div style={{ display: "inline-block", width: "70%" }}>
+          <DatePicker
+            className={styles.input_noneBorder}
+            style={{ width: "50%" }}
+            picker={"date"}
+            value={dayjs(datePercentCompare)}
+            onChange={(date, dateString) => setDatePercentCompare(dateString)}
+          />
+          <DatePicker
+            className={styles.input_noneBorder}
+            style={{ width: "50%" }}
+            picker={"date"}
+            value={dayjs(datePercentCompareTo)}
+            onChange={(date, dateString) => setDatePercentCompareTo(dateString)}
+          />
+        </div>
+      ) : (
+        <DatePicker
+          className={styles.input_noneBorder}
+          style={{ width: "70%" }}
+          picker={selectTypeDate}
+          value={dayjs(datePercentCompare)}
+          onChange={(date, dateString) => setDatePercentCompare(dateString)}
+        />
+      )}
+
       <Pie {...config} />
       <Row>
         <Col span={12}>

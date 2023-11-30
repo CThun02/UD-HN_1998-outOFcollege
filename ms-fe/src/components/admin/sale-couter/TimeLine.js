@@ -14,11 +14,16 @@ import ModalConfirm from "./ModalConfirm";
 import SpanBorder from "./SpanBorder";
 import ModalDetail from "./ModalDetail";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import moment from "moment";
 import numeral from "numeral";
 import { CheckCircleOutlined } from "@ant-design/icons";
 import { getAuthToken, getToken } from "../../../service/Token";
+import ModalBillInfoDisplay from "../../element/bill-info/ModalBillInfoDisplay";
+import ModalProduct from "./ModalProduct";
+import ModalAddress from "./ModalAddress";
+import { async } from "q";
+import EditAddress from "../../element/edit-address/EditAddress";
 
 const BillTimeLine = (addId) => {
     const [isModalConfirm, setIsModalConfirm] = useState(false);
@@ -27,9 +32,21 @@ const BillTimeLine = (addId) => {
     const [action, setAction] = useState(null);
     const [timelinePoduct, setTimelinesPoduct] = useState([]);
     const [billInfo, setBillInfo] = useState({});
+    const [isOpenModalProduct, setIsOpenModalProduct] = useState(false);
     const { billId } = useParams();
     const [render, setRender] = useState(null);
     const token = getAuthToken(true);
+    const [open, setOpen] = useState(false)
+    const [openModalDN, setOpenModalDN] = useState(false)
+
+    const handleOpen = () => {
+        console.log(true)
+        setOpen(true)
+    }
+
+    const handleCan = () => {
+        setOpen(false)
+    }
 
     // tạo mới timeline
     const handleCreateTimeline = async (note, stauts) => {
@@ -50,7 +67,7 @@ const BillTimeLine = (addId) => {
                 setRender(response.data);
             })
             .catch((error) => {
-                const status = error.response.status;
+                const status = error.response?.status;
                 if (status === 403) {
                     notification.error({
                         message: "Thông báo",
@@ -122,15 +139,8 @@ const BillTimeLine = (addId) => {
     const handleCancelConfirm = () => {
         setIsModalConfirm(false);
     };
-
     const handleOkConFirm = (note) => {
         handleCreateTimeline(note, action === "cancel" ? "0" : null);
-        // if (
-        // billInfo.symbol === "Shipping" &&
-        // timelines.length === 3 &&
-        // billInfo.status !== "Paid"
-        // ) {
-        console.log(billInfo.symbol, timelines.length);
         handleUpdateBillStatus(
             action === "cancel"
                 ? "Cancel"
@@ -138,11 +148,21 @@ const BillTimeLine = (addId) => {
                     timelines[timelines.length - 1] === "2" &&
                     action !== "cancel") ||
                     (billInfo.symbol === "Shipping" &&
-                        timelines[timelines.length - 1].status === "3" &&
-                        action !== "cancel")
+                        timelines[timelines.length - 1].status === "3"
+                        && action !== "cancel")
                     ? "Complete"
-                    : "1",
-            billInfo.totalPrice + billInfo?.shipPrice - billInfo.priceReduce
+                    : billInfo.symbol === "Shipping" && billInfo.status === "Paid"
+                        ? "Paid" : 'Unpaid',
+            action === "cancel" ? 0 : (billInfo.symbol === "Received" &&
+                timelines[timelines.length - 1] === "2" &&
+                action !== "cancel") ||
+                (billInfo.symbol === "Shipping" &&
+                    timelines[timelines.length - 1].status === "3"
+                    && action !== "cancel")
+                ? billInfo.totalPrice + billInfo?.shipPrice - billInfo.priceReduce
+                : billInfo.symbol === "Shipping" && billInfo.status === "Paid"
+                    ? billInfo.totalPrice + billInfo?.shipPrice - billInfo.priceReduce
+                    : 0
         );
         // }
         setIsModalConfirm(false);
@@ -166,7 +186,7 @@ const BillTimeLine = (addId) => {
                 setTimelines(response.data);
             })
             .catch((error) => {
-                const status = error.response.status;
+                const status = error.response?.status;
                 if (status === 403) {
                     notification.error({
                         message: "Thông báo",
@@ -185,7 +205,7 @@ const BillTimeLine = (addId) => {
             })
             .catch((error) => {
                 console.log(error);
-                const status = error.response.status;
+                const status = error.response?.status;
                 if (status === 403) {
                     notification.error({
                         message: "Thông báo",
@@ -200,10 +220,11 @@ const BillTimeLine = (addId) => {
                 },
             })
             .then((response) => {
+                console.log(response)
                 setBillInfo(response.data);
             })
             .catch((error) => {
-                const status = error.response.status;
+                const status = error.response?.status;
                 if (status === 403) {
                     notification.error({
                         message: "Thông báo",
@@ -211,7 +232,7 @@ const BillTimeLine = (addId) => {
                     });
                 }
             });
-        console.log(billInfo)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [billId, render]);
 
     const columnProduct = [
@@ -308,13 +329,14 @@ const BillTimeLine = (addId) => {
             dataIndex: "productPrice",
             key: "productPrice",
             render: (price) => {
-                return price.toLocaleString("vi-VN", {
+                return price?.toLocaleString("vi-VN", {
                     style: "currency",
                     currency: "VND",
                 });
             },
         },
     ];
+
     return (
         <>
             <section className={styles.background}>
@@ -325,32 +347,39 @@ const BillTimeLine = (addId) => {
                                 {timelines &&
                                     timelines.map((data) => (
                                         <TimelineEvent
-                                            color={data.status === "0" ? "#FF0000" : "#00cc00"}
+                                            color={data?.status === "0" ? "#FF0000" : "#00cc00"}
                                             icon={
-                                                data.status === "1"
+                                                data?.status === "1"
                                                     ? FaRegFileAlt
-                                                    : data.status === "0"
+                                                    : data?.status === "0"
                                                         ? FaTimes
-                                                        : data.status === "2"
+                                                        : data?.status === "2"
                                                             ? FaRegFileAlt
-                                                            : data.status === "3"
+                                                            : data?.status === "3"
                                                                 ? FaTruck
-                                                                : CheckCircleOutlined
+                                                                : data?.status === "4"
+                                                                    ? FaTruck : data?.status === "5"
+                                                                        ? FaTruck
+                                                                        : CheckCircleOutlined
                                             }
                                             title={
-                                                data.status === "0" ? (
+                                                data?.status === "0" ? (
                                                     <h3>Đã hủy</h3>
-                                                ) : data.status === "1" ? (
+                                                ) : data?.status === "1" ? (
                                                     <h3>Chờ xác nhận</h3>
-                                                ) : data.status === "2" ? (
+                                                ) : data?.status === "2" ? (
                                                     <h3>Đã xác nhận</h3>
-                                                ) : data.status === "3" ? (
+                                                ) : data?.status === "3" ? (
                                                     <h3>
                                                         Đã đóng gói & <br /> đang được giao
                                                     </h3>
-                                                ) : (
+                                                ) : data?.status === "4" ? (
                                                     <h3>Giao hàng thành công</h3>
-                                                )
+                                                ) : data?.status === "5" ? (
+                                                    <h3>Yêu cầu trả hàng</h3>
+                                                ) : data?.status === "6" ? (
+                                                    <h3>Trả hàng thành công</h3>
+                                                ) : (<h3>.</h3>)
                                             }
                                             subtitle={data.createdDate}
                                         />
@@ -362,31 +391,31 @@ const BillTimeLine = (addId) => {
                                     timelines.map((data) => (
                                         <TimelineEvent
                                             color={
-                                                data.status === "0"
+                                                data?.status === "0"
                                                     ? "#FF0000"
-                                                    : data.status === "3"
+                                                    : data?.status === "3"
                                                         ? "#f0ad4e"
                                                         : "#00cc00"
                                             }
                                             icon={
-                                                data.status === "1"
+                                                data?.status === "1"
                                                     ? FaRegFileAlt
-                                                    : data.status === "0"
+                                                    : data?.status === "0"
                                                         ? FaTimes
-                                                        : data.status === "2"
+                                                        : data?.status === "2"
                                                             ? FaRegCheckCircle
-                                                            : data.status === "3"
+                                                            : data?.status === "3"
                                                                 ? FaClock
-                                                                : data.status === "4"
+                                                                : data?.status === "4"
                                                                     ? FaRocket
                                                                     : null
                                             }
                                             title={
-                                                data.status === "1"
+                                                data?.status === "1"
                                                     ? "Chờ xác nhận"
-                                                    : data.status === "2"
+                                                    : data?.status === "2"
                                                         ? "Thanh toán thành công"
-                                                        : data.status === "0"
+                                                        : data?.status === "0"
                                                             ? "Đã hủy"
                                                             : ""
                                             }
@@ -462,6 +491,12 @@ const BillTimeLine = (addId) => {
                         handleOk={handleOkConFirm}
                     />
 
+                    {timelines.length >= 2 && <Button onClick={handleOpen}
+                        className={styles.btnPdf}
+                        type="primary">
+                        Xuất hóa đơn
+                    </Button>}
+                    <ModalBillInfoDisplay open={open} cancel={handleCan} billCode={billInfo.billCode} />
                     <Button
                         className={styles.btnWarning}
                         onClick={() => showModalDetail()}
@@ -482,9 +517,25 @@ const BillTimeLine = (addId) => {
 
             <section className={styles.background} style={{ marginTop: "20px" }}>
                 <Row>
-                    <Col span={12}>
+                    <Col span={21}>
                         <h2>Thông tin đơn hàng</h2>
                     </Col>
+                    {console.log(billInfo)}
+                    {billInfo?.symbol === 'Shipping'
+                        && timelines[timelines.length - 1]?.status === '1'
+                        && billInfo?.status !== "Paid"
+                        && <Col span={3}>
+                            <Button type="primary"
+                                onClick={() => setOpenModalDN(true)}>Sửa thông tin</Button>
+                            <EditAddress
+                                isModalOpen={openModalDN}
+                                handleAddressCancel={() => setOpenModalDN(false)}
+                                render={setRender}
+                                addressId={billInfo?.addressId}
+                                billId={billInfo?.billId}
+                                totalPrice={billInfo?.totalPrice}
+                            />
+                        </Col>}
                 </Row>
                 <Divider
                     className={styles.blackDivider}
@@ -502,7 +553,6 @@ const BillTimeLine = (addId) => {
                         </Row>
                         <Row>
                             <Col span={12}>
-                                {console.log(billInfo)}
                                 <span>Hình thức mua hàng</span>
                             </Col>
                             <Col span={12}>
@@ -560,7 +610,7 @@ const BillTimeLine = (addId) => {
                                     </Col>
                                     <Col span={12}>
                                         <span>
-                                            {moment(billInfo?.shipDate).format("DD/MM/YYYY") || "__"}
+                                            {billInfo?.shipDate || "__"}
                                         </span>
                                     </Col>
                                 </Row>
@@ -654,9 +704,24 @@ const BillTimeLine = (addId) => {
 
             <section className={styles.background} style={{ marginTop: "20px" }}>
                 <Row>
-                    <Col span={12}>
+                    <Col span={21}>
                         <h2>Sản phẩm đã mua</h2>
                     </Col>
+                    {billInfo?.symbol === 'Shipping'
+                        && timelines[timelines.length - 1]?.status === '1'
+                        && billInfo?.status !== "Paid" && <Col span={3}>
+                            <Button type="primary" onClick={() => setIsOpenModalProduct(true)}>
+                                Thêm sản phẩm
+                            </Button>
+                            <ModalProduct
+                                visible={isOpenModalProduct}
+                                onCancel={() => setIsOpenModalProduct(false)}
+                                render={setRender}
+                                cartId={null}
+                                billId={billId}
+                            />
+                        </Col>}
+
                 </Row>
                 <Divider
                     className={styles.blackDivider}

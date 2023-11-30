@@ -4,20 +4,18 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import styles from "./ReturnIndex.module.css";
 import { getToken } from "../../../service/Token";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { QrcodeOutlined, SearchOutlined } from "@ant-design/icons";
 import logoOOC from "../../../Assets/img/logo/logo_OOC.svg";
 import QRReader from "../../../service/QRReader";
-import dayjs from "dayjs";
 
 const ReturnIndex = () => {
-  const api = "http://localhost:8080/api/admin/bill";
   const navigate = useNavigate();
 
   const [isModalQR, setIsModalQR] = useState(false);
   const [billCode, setBillCode] = useState("");
 
-  function searchBill() {
+  function searchBill(billCode) {
     axios
       .get(
         `http://localhost:8080/api/admin/bill/getBillByBillCode?billCode=` +
@@ -72,7 +70,7 @@ const ReturnIndex = () => {
         visible={isModalQR}
         onCancel={() => setIsModalQR(false)}
         title={"Tìm kiếm hóa đơn"}
-        setData={setBillCode}
+        setData={searchBill}
       />
       <div className={styles.returnIndex}>
         <img alt="" style={{ width: "12%" }} src={logoOOC} />
@@ -87,7 +85,7 @@ const ReturnIndex = () => {
           <Space>
             <Button
               onClick={() => {
-                searchBill();
+                searchBill(billCode);
               }}
               type="primary"
               size="large"

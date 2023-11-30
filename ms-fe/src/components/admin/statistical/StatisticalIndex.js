@@ -14,6 +14,7 @@ import {
   TableOutlined,
   ClockCircleOutlined,
   EuroOutlined,
+  CarOutlined,
 } from "@ant-design/icons";
 import {
   Col,
@@ -27,10 +28,12 @@ import {
   Badge,
   Table,
   Divider,
+  Tabs,
 } from "antd";
 import Statistic from "antd/es/statistic/Statistic";
 import PieChart from "./PieChart";
 import TableProdutSellTheMost from "./TableProdutSellTheMost";
+import ProductReturns from "./ProductReturns";
 import dayjs from "dayjs";
 import { getToken } from "../../../service/Token";
 
@@ -61,14 +64,23 @@ const StatisticalIndex = () => {
   const [pageSize, setPageSize] = useState(5);
   const [loading, setLoading] = useState(true);
   const [dateRevenue, setDateRevenue] = useState(formattedDateNow);
+  const [dateRevenueTo, setDateRevenueTo] = useState(formattedDateNow);
   const [selectTypeDateProduct, setSelectTypeDateproduct] = useState("year");
+  const [selectTypeDateProductReturn, setSelectTypeDateproductReturn] =
+    useState("year");
   const [dateProductSellTheMost, setDateProductSellTheMost] =
+    useState(formattedDateNow);
+  const [dateProductSellTheMostTo, setDateProductSellTheMostTo] =
+    useState(formattedDateNow);
+  const [dateProductReturn, setDateProductReturn] = useState(formattedDateNow);
+  const [dateProductReturnTo, setDateProductReturnTo] =
     useState(formattedDateNow);
   const [typeDateBillRevenue, setTypeDateBillRevenue] = useState("date");
   const [typeDateLineChart, setTypeDateLineChart] = useState("date");
   const [growthStoreDayData, setGrowthStoreDayData] = useState(null);
   const [growthStoreMonthData, setGrowthStoreMonthData] = useState(null);
   const [growthStoreYearData, setGrowthStoreYearData] = useState(null);
+  const [reason, setReason] = useState("PRODUCE");
 
   const totalQuantity = billRevenue?.productDetailDisplay?.reduce(
     (total, item) => total + item.quantity,
@@ -430,51 +442,63 @@ const StatisticalIndex = () => {
     }
   }
   function getDataRevenue() {
-    var day = "";
-    var month = "";
-    var year = dateRevenue.substring(0, 4);
-    if (typeDateBillRevenue === "date") {
-      month = dateRevenue.substring(
-        dateRevenue.indexOf("-") + 1,
-        dateRevenue.lastIndexOf("-")
+    var dateFrom = new Date(dateRevenue);
+    var dateTo = new Date(
+      typeDateBillRevenue === "other" ? dateRevenueTo : dateRevenue
+    );
+    function getLastDayOfMonth(month) {
+      const firstDayOfNextMonth = new Date(
+        Date.UTC(dateFrom.getFullYear(), month, 1)
       );
-      day = dateRevenue.substring(dateRevenue.lastIndexOf("-") + 1);
-    } else if (typeDateBillRevenue === "month") {
-      month = dateRevenue.substring(
-        dateRevenue.indexOf("-") + 1,
-        dateRevenue.lastIndexOf("-") === dateRevenue.indexOf("-")
-          ? dateRevenue.length
-          : dateRevenue.lastIndexOf("-")
+      const lastDayOfMonth = new Date(
+        firstDayOfNextMonth.getTime() - 24 * 60 * 60 * 1000
       );
+      return lastDayOfMonth.getDate();
     }
-    axios
-      .get(
-        "http://localhost:8080/api/admin/bill/getGrossRevenue?day=" +
-          day +
-          "&month=" +
-          month +
-          "&year=" +
-          year,
-        {
-          headers: {
-            Authorization: `Bearer ${getToken(true)}`,
-          },
-        }
-      )
-      .then((res) => {
-        setLoading(false);
-        setBillRevenue(res.data);
-      })
-      .catch((err) => {
-        const status = err.response.status;
-        if (status === 403) {
-          notification.error({
-            message: "Thông báo",
-            description: "Bạn không có quyền truy cập!",
-          });
-        }
-        console.log(err);
+    if (typeDateBillRevenue === "month") {
+      dateFrom.setDate(1);
+      dateTo.setDate(getLastDayOfMonth(dateFrom.getMonth() + 1) - 1);
+    } else if (typeDateBillRevenue === "year") {
+      dateFrom.setDate(1);
+      dateTo.setDate(getLastDayOfMonth(12) - 1);
+      dateFrom.setMonth(0);
+      dateTo.setMonth(11);
+    }
+    if (dateFrom.getTime() > dateTo.getTime()) {
+      notification.error({
+        message: "Thông báo",
+        description:
+          "Thời gian bắt đầu phải bé hơn hoặc bằng thời gian kết thúc",
       });
+      setIsLoading(false);
+    } else {
+      axios
+        .get(
+          "http://localhost:8080/api/admin/bill/getGrossRevenue?day=" +
+            encodeURIComponent(dateFrom.toISOString()) +
+            "&dayTo=" +
+            encodeURIComponent(dateTo.toISOString()),
+          {
+            headers: {
+              Authorization: `Bearer ${getToken(true)}`,
+            },
+          }
+        )
+        .then((res) => {
+          setLoading(false);
+          setBillRevenue(res.data);
+        })
+        .catch((err) => {
+          const status = err.response.status;
+          if (status === 403) {
+            notification.error({
+              message: "Thông báo",
+              description: "Bạn không có quyền truy cập!",
+            });
+          }
+          console.log(err);
+        });
+    }
   }
 
   useEffect(() => {
@@ -489,10 +513,12 @@ const StatisticalIndex = () => {
     dateCompare,
     render,
     dateRevenue,
+    dateRevenueTo,
     typeDateBillRevenue,
     dateLineChartValueFrom,
     dateLineChartValueTo,
     typeDateLineChart,
+    reason,
   ]);
   return (
     <>
@@ -511,22 +537,47 @@ const StatisticalIndex = () => {
                   value={typeDateBillRevenue}
                   onChange={(event) => {
                     setDateRevenue(formattedDateNow);
+                    setDateRevenueTo(formattedDateNow);
                     setTypeDateBillRevenue(event);
                   }}
-                  style={{ width: "10%" }}
+                  style={{ width: "15%" }}
                   bordered={false}
                 >
                   <Option value="date">Ngày</Option>
                   <Option value="month">Tháng</Option>
                   <Option value="year">Năm</Option>
+                  <Option value="other">Tùy chọn</Option>
                 </Select>
-                <DatePicker
-                  className={styles.input_noneBorder}
-                  style={{ width: "50%" }}
-                  picker={typeDateBillRevenue}
-                  value={dayjs(dateRevenue)}
-                  onChange={(date, dateString) => setDateRevenue(dateString)}
-                />
+                {typeDateBillRevenue === "other" ? (
+                  <div style={{ width: "60%", display: "inline-block" }}>
+                    <DatePicker
+                      className={styles.input_noneBorder}
+                      style={{ width: "50%" }}
+                      picker={typeDateBillRevenue}
+                      value={dayjs(dateRevenue)}
+                      onChange={(date, dateString) =>
+                        setDateRevenue(dateString)
+                      }
+                    />
+                    <DatePicker
+                      className={styles.input_noneBorder}
+                      style={{ width: "50%" }}
+                      picker={typeDateBillRevenue}
+                      value={dayjs(dateRevenueTo)}
+                      onChange={(date, dateString) =>
+                        setDateRevenueTo(dateString)
+                      }
+                    />
+                  </div>
+                ) : (
+                  <DatePicker
+                    className={styles.input_noneBorder}
+                    style={{ width: "50%" }}
+                    picker={typeDateBillRevenue}
+                    value={dayjs(dateRevenue)}
+                    onChange={(date, dateString) => setDateRevenue(dateString)}
+                  />
+                )}
               </Col>
               <Col span={8}>
                 <Statistic
@@ -897,6 +948,7 @@ const StatisticalIndex = () => {
               value={selectTypeDateProduct}
               onChange={(event) => {
                 setDateProductSellTheMost(formattedDateNow);
+                setDateProductSellTheMostTo(formattedDateNow);
                 setSelectTypeDateproduct(event);
               }}
               style={{ width: "20%" }}
@@ -922,9 +974,9 @@ const StatisticalIndex = () => {
                   className={styles.input_noneBorder}
                   style={{ width: "50%" }}
                   picker={"date"}
-                  value={dayjs(dateProductSellTheMost)}
+                  value={dayjs(dateProductSellTheMostTo)}
                   onChange={(date, dateString) => {
-                    setDateProductSellTheMost(dateString);
+                    setDateProductSellTheMostTo(dateString);
                   }}
                 />
               </div>
@@ -945,7 +997,103 @@ const StatisticalIndex = () => {
               </p>
               <TableProdutSellTheMost
                 date={dateProductSellTheMost}
+                dateToP={dateProductSellTheMostTo}
                 type={selectTypeDateProduct}
+              />
+            </div>
+          </div>
+        </Col>
+        <Col span={24}>
+          <div
+            className={`${styles.bgWhite}`}
+            style={{ height: "100%", marginTop: "25px" }}
+          >
+            <h2>
+              <CarOutlined /> Sản phẩm hoàn trả
+            </h2>
+            <p style={{ fontWeight: 500, marginTop: "12px" }}>
+              <ClockCircleOutlined /> Thời gian
+            </p>
+            <Select
+              value={selectTypeDateProductReturn}
+              onChange={(event) => {
+                setDateProductReturn(formattedDateNow);
+                setDateProductReturnTo(formattedDateNow);
+                setSelectTypeDateproductReturn(event);
+              }}
+              style={{ width: "20%" }}
+              bordered={false}
+            >
+              <Option value="date">Ngày</Option>
+              <Option value="month">Tháng</Option>
+              <Option value="year">Năm</Option>
+              <Option value="other">Tùy chọn</Option>
+            </Select>
+            {selectTypeDateProductReturn === "other" ? (
+              <div style={{ width: "80%", display: "inline-block" }}>
+                <DatePicker
+                  className={styles.input_noneBorder}
+                  style={{ width: "50%" }}
+                  picker={"date"}
+                  value={dayjs(dateProductReturn)}
+                  onChange={(date, dateString) => {
+                    setDateProductReturn(dateString);
+                  }}
+                />
+                <DatePicker
+                  className={styles.input_noneBorder}
+                  style={{ width: "50%" }}
+                  picker={"date"}
+                  value={dayjs(dateProductReturnTo)}
+                  onChange={(date, dateString) => {
+                    setDateProductReturnTo(dateString);
+                  }}
+                />
+              </div>
+            ) : (
+              <DatePicker
+                className={styles.input_noneBorder}
+                style={{ width: "80%" }}
+                picker={selectTypeDateProductReturn}
+                value={dayjs(dateProductReturn)}
+                onChange={(date, dateString) => {
+                  setDateProductReturn(dateString);
+                }}
+              />
+            )}
+            <div style={{ margin: "20px 0" }}>
+              <Tabs
+                defaultActiveKey={"1"}
+                onChange={(e) => console.log(e)}
+                items={[CheckCircleOutlined, ClockCircleOutlined].map(
+                  (Icon, i) => {
+                    const id = String(i + 1);
+                    return {
+                      label: (
+                        <Badge count={6}>
+                          <span style={{ padding: "20px" }}>
+                            <Icon />
+                            {id === "1" ? "Sản xuất" : "Khác"}
+                          </span>
+                        </Badge>
+                      ),
+                      key: id === "1" ? "PRODUCE" : "OTHER",
+                      children: (
+                        <div style={{ padding: "8px" }}>
+                          <p style={{ fontWeight: 500, marginBottom: "12px" }}>
+                            <TableOutlined /> Danh sách sản phẩm
+                          </p>
+                          <ProductReturns
+                            date={dateProductReturn}
+                            dateToP={dateProductReturnTo}
+                            type={selectTypeDateProductReturn}
+                            reason={reason}
+                          />
+                        </div>
+                      ),
+                    };
+                  }
+                )}
               />
             </div>
           </div>

@@ -4,7 +4,6 @@ import com.fpoly.ooc.common.Commons;
 import com.fpoly.ooc.dto.EmailDetails;
 import com.fpoly.ooc.repository.VoucherRepository;
 import com.fpoly.ooc.service.interfaces.EmailService;
-import com.fpoly.ooc.service.interfaces.VoucherService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,9 +34,9 @@ public class EmailServiceImpl implements EmailService {
         try {
             SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
 
-            for (String recipient: details.getRecipient()) {
+            for (String recipient : details.getRecipient()) {
 
-                if(voucherRepository.isCheckAccountOwnerVoucher(idVoucher, Commons.lower(recipient))) {
+                if (voucherRepository.isCheckAccountOwnerVoucher(idVoucher, Commons.lower(recipient))) {
                     continue;
                 }
 
@@ -49,7 +48,7 @@ public class EmailServiceImpl implements EmailService {
 
                 javaMailSender.send(simpleMailMessage);
             }
-            
+
             return "DONE";
         } catch (Exception e) {
             return "ERROR";
@@ -65,7 +64,7 @@ public class EmailServiceImpl implements EmailService {
         try {
             mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
 
-            for (String recipient: details.getRecipient()) {
+            for (String recipient : details.getRecipient()) {
                 mimeMessageHelper.setFrom(sender);
                 mimeMessageHelper.setTo(recipient);
                 mimeMessageHelper.setText(details.getMessageBody());
@@ -85,4 +84,26 @@ public class EmailServiceImpl implements EmailService {
             return "ERROR";
         }
     }
+
+    @Override
+    public String sendSimpleMail(EmailDetails details){
+
+        try {
+            MimeMessage message = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            for (String recipient : details.getRecipient()) {
+                helper.setFrom(sender);
+                helper.setTo(recipient);
+                helper.setSubject(details.getSubject());
+                helper.setText(details.getMessageBody(), true);
+                javaMailSender.send(message);
+            }
+
+            return "DONE";
+        } catch (Exception e) {
+            return "ERROR";
+        }
+    }
+
 }

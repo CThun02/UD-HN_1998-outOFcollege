@@ -2,10 +2,10 @@ import { Col, Row } from "antd";
 import HeaderLeft from "../header/left/HeaderLeft";
 import HeaderRight from "../header/right/HeaderRight";
 import styles from "./Header.module.css";
-import { useEffect, useCallback, useState } from "react";
+import { useEffect, useState } from "react";
 import HeaderCenter from "./center/HeaderCenter";
 
-function Header({ render }) {
+function Header({ render, setRenderHeader }) {
   const [position, setPosition] = useState(window.pageYOffset);
   const [visible, setVisible] = useState(true);
   const [checkTop, setCheckTop] = useState(0);

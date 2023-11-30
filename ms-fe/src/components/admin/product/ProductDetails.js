@@ -321,7 +321,7 @@ const ProductDetails = (props) => {
       quantity: quantity,
       priceReduce: 0,
     };
-    for (let i = 0; i < props.productDetailsCreate.length; i++) {
+    for (let i = 0; i < props.productDetailsCreate?.length; i++) {
       if (props.productDetailsCreate[i].productDetail.id === record.id) {
         indexExist = i;
         break;
@@ -350,14 +350,34 @@ const ProductDetails = (props) => {
         record.promotion.length !== 0
           ? record.promotion[0].promotionMethod === "%"
             ? (record.price *
-              (100 - Number(record.promotion[0].promotionValue))) /
-            100
+              (100 - Number(record.promotion[0].promotionValue)))
+            / 100
             : record.price - Number(record.promotion[0].promotionValue)
           : record.price;
       props.productDetailsCreate?.push(productDetailCreate);
 
       handleCancelModalQuantity(index);
-      props.action();
+
+      props.billId ? axios.post(`http://localhost:8080/api/admin/bill/create-bill-detail`, {
+        billId: props.billId,
+        productDetailId: productDetailCreate.productDetail.id,
+        quantity: productDetailCreate.quantity,
+        price: productDetailCreate.priceReduce,
+      }, {
+        headers: {
+          Authorization: `Bearer ${getToken(true)}`,
+        },
+      })
+        .then(response => { })
+        .catch(error => {
+          const status = error.response?.status;
+          if (status === 403) {
+            notification.error({
+              message: "Thông báo",
+              description: "Bạn không có quyền truy cập!",
+            });
+          }
+        }) : props.action()
     }
   }
 

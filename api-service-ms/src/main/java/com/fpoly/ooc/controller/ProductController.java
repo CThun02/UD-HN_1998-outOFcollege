@@ -56,6 +56,7 @@ public class ProductController {
         return ResponseEntity.ok(productDetailService.getOnePDDisplayById(productDetailId));
     }
 
+
     @GetMapping("/getMaxPrice")
     public ResponseEntity<?> getMaxPrice(@RequestParam Long productId) {
         return ResponseEntity.ok(productDetailService.getMaxPricePDByProductId(productId));

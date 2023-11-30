@@ -19,6 +19,7 @@ function FollowingOrderContent({ billCode, status, symbol, count, createdBy }) {
   const [open, setOpen] = useState(false)
   const [render, setRender] = useState(false)
   const [openNote, setOpenNote] = useState(false)
+  const [userInfo, setUserInfo] = useState({})
 
   const getTimeline = async (billId) => {
     axios
@@ -135,9 +136,17 @@ function FollowingOrderContent({ billCode, status, symbol, count, createdBy }) {
 
   const token = getAuthToken()
 
+  const userINfo = () => {
+    axios.get(`http://localhost:8080/api/client/delivery-note/${billCode}`)
+      .then((response) => {
+        setUserInfo(response.data)
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+  }
+
   useEffect(() => {
-    console.log(`billCode ${billCode}`,
-      `status ${status}`, ` symbol ${symbol}`, `count ${count}`, `creared ${createdBy}`)
     const getAll = async () => {
       setLoading(false)
       const data = await token
@@ -177,6 +186,7 @@ function FollowingOrderContent({ billCode, status, symbol, count, createdBy }) {
         })
     }
 
+    userINfo()
     getAll()
     // getTimeline()
 
@@ -204,9 +214,6 @@ function FollowingOrderContent({ billCode, status, symbol, count, createdBy }) {
                           : 'Tất cả'}
               </span>
             </div>
-            {
-              console.log("status", status)
-            }
             {
               (bills?.length > 0 && status === '') ? bills.map((timelines) => {
                 return (
@@ -470,6 +477,7 @@ function FollowingOrderContent({ billCode, status, symbol, count, createdBy }) {
         open={open}
         timelines={timelineV1}
         handleCancel={handleCancel}
+        userInfo={userInfo}
       />
     </div >
   );

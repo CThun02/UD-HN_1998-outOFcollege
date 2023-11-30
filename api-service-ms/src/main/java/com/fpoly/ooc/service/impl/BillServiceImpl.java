@@ -159,6 +159,32 @@ public class BillServiceImpl implements BillService {
                 startDate, endDate, status, symbol, count, createdBy);
     }
 
+    @Override
+    public CountQuantityBillResponse getCountFilterBill() {
+        CountQuantityBillResponse countQuantityBillResponse = new CountQuantityBillResponse();
+        countQuantityBillResponse
+                .setCountAll(billRepo.getAllBillManagement(null, null, null,
+                        null, null, null, null).size());
+        countQuantityBillResponse
+                .setCountConfirmS(billRepo.getAllBillManagement(null, null, null,
+                        null, "Shipping", 2, null).size());
+        countQuantityBillResponse
+                .setCountConfirmW(billRepo.getAllBillManagement(null, null, null,
+                        null, null, null, "CLIENT").size());
+        countQuantityBillResponse
+                .setShipping(billRepo.getAllBillManagement(null, null, null,
+                        null, "Shipping", 3, null).size());
+        countQuantityBillResponse.setCancel(billRepo.getAllBillManagement(null, null, null,
+                "Cancel", null, null, null).size());
+        countQuantityBillResponse.setComplete(billRepo.getAllBillManagement(null, null, null,
+                "Complete", null, null, null).size());
+        countQuantityBillResponse.setPaid(billRepo.getAllBillManagement(null, null, null,
+                "Paid", null, null, null).size());
+        countQuantityBillResponse.setUnpaid(billRepo.getAllBillManagement(null, null, null,
+                "UnPaid", null, null, null).size());
+        return countQuantityBillResponse;
+    }
+
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void deleteBill(Long id) {
@@ -222,6 +248,7 @@ public class BillServiceImpl implements BillService {
     public List<ProductDetailSellResponse> getProductInBillByStatusAndId(Long id, LocalDateTime dayFrom, LocalDateTime dayTo) {
         List<ProductDetailResponse> productSellTheMost = billRepo.getProductInBillByStatusAndIdAndDate(id,
                 dayFrom, dayTo);
+        System.out.println("CHECK");
         List<ProductDetailSellResponse> billProductSellTheMosts = new ArrayList<>();
         for (int i = 0; i < productSellTheMost.size(); i++) {
             ProductDetailDisplayResponse response = new ProductDetailDisplayResponse(productSellTheMost.get(i),
@@ -321,7 +348,7 @@ public class BillServiceImpl implements BillService {
         } else if (time.equals("month")) {
             LocalDate before = now.minusMonths(1);
             revenue = billRepo.getRevenueByTime(null, now.getMonthValue(), now.getYear(),
-                    null, now.getMonthValue(), now.getYear(),null);
+                    null, now.getMonthValue(), now.getYear(), null);
             revenueBefore = billRepo.getRevenueByTime(null, before.getMonthValue(), before.getYear(),
                     null, before.getMonthValue(), before.getYear(), null);
         } else if (time.equals("year")) {

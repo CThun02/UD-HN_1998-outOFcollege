@@ -63,10 +63,10 @@ const PieChart = ({ formattedDateNow }) => {
     }
     if (selectTypeDate === "month") {
       dateFrom.setDate(1);
-      dateTo.setDate(getLastDayOfMonth(dateFrom.getMonth() + 1));
+      dateTo.setDate(getLastDayOfMonth(dateFrom.getMonth() + 1) - 1);
     } else if (selectTypeDate === "year") {
       dateFrom.setDate(1);
-      dateTo.setDate(getLastDayOfMonth(12));
+      dateTo.setDate(getLastDayOfMonth(12) - 1);
       dateFrom.setMonth(0);
       dateTo.setMonth(11);
     }
@@ -80,9 +80,9 @@ const PieChart = ({ formattedDateNow }) => {
       axios
         .get(
           "http://localhost:8080/api/admin/bill/getBillRevenueCompare?day=" +
-            encodeURIComponent(dateFrom.toISOString()) +
-            "&dayTo=" +
-            encodeURIComponent(dateTo.toISOString()),
+          encodeURIComponent(dateFrom.toISOString()) +
+          "&dayTo=" +
+          encodeURIComponent(dateTo.toISOString()),
           {
             headers: {
               Authorization: `Bearer ${getToken(true)}`,

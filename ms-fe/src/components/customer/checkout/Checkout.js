@@ -347,13 +347,19 @@ const Checkout = ({ setRenderHeader }) => {
             emailDetails: {
                 recipient: [formData.email],
                 messageBody: `<body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: Arial, sans-serif;">
-                <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 430px; margin: 0 auto;">
+                <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 50%; margin: 0 auto;">
                     <tr>
                         <td align="center" bgcolor="#ffffff" style="padding: 40px 0;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 20px;">
-                                <img src="gs://outofcollge.appspot.com/logo/logo_OOC.svg" alt="Logo" width="30%">
+                        <table style="width: 100%; padding: 0 20px;">
+                        <tr>
+                            <td style="text-align: left; width: 50%">
+                                <img alt="Logo" src="https://firebasestorage.googleapis.com/v0/b/outofcollge.appspot.com/o/logo%2Flogo_OOC.png?alt=media&token=9dec0335-3b77-4c5b-a278-b5b22b9ecbb4" width="70%" />
+                            </td>
+                            <td style="text-align: right; vertical-align: middle; width: 50%">
                                 <span>Đơn hàng ${billCodeGen}</span>
-                            </div>
+                            </td>
+                        </tr>
+                    </table>
                             <div style="padding: 0 20px; margin-top: 24px;">
                                 <span style="font-weight: 500; font-size: 24px;">Cảm ơn bạn đã mua hàng!</span><br><br>
                                 <p style="text-align: justify;">Xin chào ${formData.fullName}, Chúng tôi đã nhận được đặt hàng của bạn và đã sẵn sàng để vận chuyển. Chúng tôi sẽ thông báo cho bạn khi đơn hàng được gửi đi.</p><br>
@@ -361,10 +367,7 @@ const Checkout = ({ setRenderHeader }) => {
                                     <a style="color: white; font-weight: 500; padding: 16px 20px; border-radius: 4px; background-color: #1666a2; margin-right: 20px;" href="http://localhost:3000/ms-shop/bill/${billCodeGen}">
                                         Xem đơn hàng
                                     </a>
-                                    <br/>
-                                    <div>
                                     hoặc <a style="margin-left: 20px;" href="http://localhost:3000/">Đến cửa hàng của chúng tôi</a>
-                                    </div>
                                 </div>
                                 <br>
                                 <hr>
@@ -497,35 +500,41 @@ const Checkout = ({ setRenderHeader }) => {
                                 price: totalPrice + shippingFee,
                                 email: formData.email,
                                 messageBody: `<body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: Arial, sans-serif;">
-                                                <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 430px; margin: 0 auto;">
-                                                    <tr>
-                                                        <td align="center" bgcolor="#ffffff" style="padding: 40px 0;">
-                                                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 20px;">
-                                                                <img src=${logoOOC} alt="Logo" width="30%">
-                                                                <span>Đơn hàng ${billCodeGen}</span>
-                                                            </div>
-                                                            <div style="padding: 0 20px; margin-top: 24px;">
-                                                                <span style="font-weight: 500; font-size: 24px;">Cảm ơn bạn đã mua hàng!</span><br><br>
-                                                                <p style="text-align: justify;">Xin chào ${formData.fullName}, Chúng tôi đã nhận được đặt hàng của bạn và đã sẵn sàng để vận chuyển. Chúng tôi sẽ thông báo cho bạn khi đơn hàng được gửi đi.</p><br>
-                                                                <div>
-                                                                    <a style="color: white; font-weight: 500; padding: 16px 20px; border-radius: 4px; background-color: #1666a2; margin-right: 20px;" href="http://localhost:3000/ms-shop/bill/${billCodeGen}">
-                                                                        Xem đơn hàng
-                                                                    </a>
-                                                                    hoặc <a style="margin-left: 20px;" href="http://localhost:3000/">Đến cửa hàng của chúng tôi</a>
-                                                                </div>
-                                                                <br>
-                                                                <hr>
-                                                                <br>
-                                                                        <span>Thông tin đơn hàng</span>
-                                                                        <div style="margin-top: 8px;">
-                                                                        ${productDetails.map((item, index) => {
+                                <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 50%; margin: 0 auto;">
+                                    <tr>
+                                        <td align="center" bgcolor="#ffffff" style="padding: 40px 0;">
+                                        <table style="width: 100%; padding: 0 20px;">
+                                        <tr>
+                                            <td style="text-align: left; width: 50%">
+                                                <img alt="Logo" src="https://firebasestorage.googleapis.com/v0/b/outofcollge.appspot.com/o/logo%2Flogo_OOC.png?alt=media&token=9dec0335-3b77-4c5b-a278-b5b22b9ecbb4" width="70%" />
+                                            </td>
+                                            <td style="text-align: right; vertical-align: middle; width: 50%">
+                                                <span>Đơn hàng ${billCodeGen}</span>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                            <div style="padding: 0 20px; margin-top: 24px;">
+                                                <span style="font-weight: 500; font-size: 24px;">Cảm ơn bạn đã mua hàng!</span><br><br>
+                                                <p style="text-align: justify;">Xin chào ${formData.fullName}, Chúng tôi đã nhận được đặt hàng của bạn và đã sẵn sàng để vận chuyển. Chúng tôi sẽ thông báo cho bạn khi đơn hàng được gửi đi.</p><br>
+                                                <div style="text-align: center">
+                                                    <a style="color: white; font-weight: 500; padding: 16px 20px; border-radius: 4px; background-color: #1666a2; margin-right: 20px;" href="http://localhost:3000/ms-shop/bill/${billCodeGen}">
+                                                        Xem đơn hàng
+                                                    </a>
+                                                    hoặc <a style="margin-left: 20px;" href="http://localhost:3000/">Đến cửa hàng của chúng tôi</a>
+                                                </div>
+                                                <br>
+                                                <hr>
+                                                <br>
+                                                        <span>Thông tin đơn hàng</span>
+                                                        <div style="margin-top: 8px;">
+                                                        ${productDetails.map((item, index) => {
                                     return (
                                         `<div key={index} style="display: flex; justify-content: space-between; align-items: center; padding: 4px 20px;">
-                                                                                    <div style="width: 20%; padding: 4px;">
-                                                                                        <img alt="product" style="width: 100%; border: 1px solid #ccc; border-radius: 8px;" src=${item.data[0].productImageResponse[0].path}>
-                                                                                    </div>
-                                                                                    <div style="width: 55%; padding: 4px;">
-                                                                                        <p>${item.data[0].product.productName + "-" + item.data[0].button.buttonName +
+                                                                    <div style="width: 20%; padding: 4px;">
+                                                                        <img alt="product" style="width: 100%; border: 1px solid #ccc; border-radius: 8px;" src=${item.data[0].productImageResponse[0].path}>
+                                                                    </div>
+                                                                    <div style="width: 55%; padding: 4px;">
+                                                                        <p>${item.data[0].product.productName + "-" + item.data[0].button.buttonName +
                                         "-" +
                                         item.data[0].brand.brandName +
                                         "-" +
@@ -542,28 +551,28 @@ const Checkout = ({ setRenderHeader }) => {
                                         item.data[0].pattern.patternName +
                                         "-" +
                                         item.data[0].form.formName} <span style="font-weight: 500;">x ${item.quantity}</span></p>
-                                                                                    </div>
-                                                                                    <div style="width: 25%; padding: 4px;">
-                                                                                        <p>${(item.data[0].price * item.quantity).toLocaleString("vi-VN", { style: "currency", currency: "VND" })}</p>
-                                                                                    </div>
-                                                                                </div>`
+                                                                    </div>
+                                                                    <div style="width: 25%; padding: 4px;">
+                                                                        <p>${(item.data[0].price * item.quantity).toLocaleString("vi-VN", { style: "currency", currency: "VND" })}</p>
+                                                                    </div>
+                                                                </div>`
                                     );
                                 })}
-                                                                            <hr>
-                                                                            <div style="width: 70%; float: right; padding: 4px 20px;">
-                                                                                <div style="display: flex; justify-content: space-between; padding: 4px 0;">
-                                                                                    <span>Tổng giá trị sản phẩm:</span>
-                                                                                    <span style="font-weight: 500;">
-                                                                                        ${totalPrice.toLocaleString("vi-VN", { style: "currency", currency: "VND" })}
-                                                                                    </span>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
+                                                            <hr>
+                                                            <div style="width: 70%; float: right; padding: 4px 20px;">
+                                                                <div style="display: flex; justify-content: space-between; padding: 4px 0;">
+                                                                    <span>Tổng giá trị sản phẩm:</span>
+                                                                    <span style="font-weight: 500;">
+                                                                        ${totalPrice.toLocaleString("vi-VN", { style: "currency", currency: "VND" })}
+                                                                    </span>
+                                                                </div>
                                                             </div>
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </body>`,
+                                                        </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </body>`,
                             }
                         }).then((response) => {
                             window.location.href = `${response.data}`

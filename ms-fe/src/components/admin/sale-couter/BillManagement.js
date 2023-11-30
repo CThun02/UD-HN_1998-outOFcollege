@@ -255,6 +255,14 @@ const BillManagement = () => {
     }
   };
 
+  const [countBill, setCountBill] = useState({})
+  useEffect(() => {
+    axios.get(`http://localhost:8080/api/client/countBill`)
+      .then(response => setCountBill(response.data))
+      .catch(error => console.log(error))
+    console.log(countBill)
+  }, [])
+
   useEffect(() => {
     window.scrollTo(0, 0);
     fetchData();
@@ -262,7 +270,6 @@ const BillManagement = () => {
   }, [billCode, startDate, endDate, status, createdBy, symbol, count]);
 
   const onChangeBill = (e) => {
-    console.log(e)
     if (e === '') {
       setStatus('')
       setcreatedBy('')
@@ -377,7 +384,15 @@ const BillManagement = () => {
             const id = String(i + 1);
             return {
               label: (
-                <Badge count={123}>
+                <Badge count={id === '1' ? countBill.countAll
+                  : id === '2' ? countBill.countConfirmW
+                    : id === '3' ? countBill.countConfirmS
+                      : id === '4' ? countBill.shipping
+                        : id === '5' ? countBill.complete
+                          : id === '6' ? countBill.cancel
+                            : id === '7' ? countBill?.paid
+                              : id === '8' ? countBill?.unpaid
+                                : null} >
                   <span style={{ padding: "20px" }}>
                     <Icon />
                     {id === "1" ? "Tất cả"

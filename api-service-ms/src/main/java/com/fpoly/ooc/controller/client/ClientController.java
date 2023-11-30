@@ -201,4 +201,14 @@ public class ClientController {
                 request.getShipPrice(), request.getShipDate()));
     }
 
+    @GetMapping("/delivery-note/{billCode}")
+    public ResponseEntity<?> getOneDeliveryNote(@PathVariable("billCode") String billCode) {
+        return ResponseEntity.ok(deliveryNoteService.getOne(billCode));
+    }
+
+    @GetMapping("/countBill")
+    public ResponseEntity<?> countBill(){
+        return ResponseEntity.ok(billService.getCountFilterBill());
+    }
+
 }

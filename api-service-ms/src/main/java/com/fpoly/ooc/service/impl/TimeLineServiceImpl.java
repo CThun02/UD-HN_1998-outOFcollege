@@ -3,6 +3,7 @@ package com.fpoly.ooc.service.impl;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
 import com.fpoly.ooc.entity.Bill;
+import com.fpoly.ooc.entity.DeliveryNote;
 import com.fpoly.ooc.entity.Timeline;
 import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.BillRepo;
@@ -12,14 +13,14 @@ import com.fpoly.ooc.responce.bill.BillInfoResponse;
 import com.fpoly.ooc.responce.timeline.TimeLineResponse;
 import com.fpoly.ooc.responce.timeline.TimelineProductDisplayResponse;
 import com.fpoly.ooc.responce.timeline.TimelineProductResponse;
-import com.fpoly.ooc.service.interfaces.AccountService;
+import com.fpoly.ooc.service.interfaces.DeliveryNoteService;
 import com.fpoly.ooc.service.interfaces.ProductImageServiceI;
-import com.fpoly.ooc.service.interfaces.PromotionService;
 import com.fpoly.ooc.service.interfaces.TimeLineService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,10 +37,7 @@ public class TimeLineServiceImpl implements TimeLineService {
     private ProductImageServiceI productImageServiceI;
 
     @Autowired
-    private AccountService accountService;
-
-    @Autowired
-    private PromotionService promotionService;
+    private DeliveryNoteService deliveryNoteService;
 
     @Override
     public List<TimeLineResponse> getAllTimeLineByBillId(Long id) {
@@ -59,6 +57,7 @@ public class TimeLineServiceImpl implements TimeLineService {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND));
         }
 
+
         Timeline timeLine = new Timeline();
         timeLine.setBill(bill);
         timeLine.setNote(request.getNote());
@@ -71,10 +70,13 @@ public class TimeLineServiceImpl implements TimeLineService {
             } else {
                 statusIncrease = Integer.valueOf(lst.get(lst.size() - 1).getStatus());
                 statusIncrease++;
-
             }
 
             timeLine.setStatus(String.valueOf(statusIncrease));
+            if (lst.size() == 3) {
+                DeliveryNote deliveryNote = deliveryNoteService.getDeliveryNoteByBill_Id(billId);
+                deliveryNote.setDateOfReceipt(LocalDateTime.now());
+            }
         } else {
             timeLine.setStatus(request.getStatus());
         }

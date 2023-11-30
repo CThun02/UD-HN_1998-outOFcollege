@@ -5,6 +5,7 @@ import com.fpoly.ooc.entity.Bill;
 import com.fpoly.ooc.entity.DeliveryNote;
 import com.fpoly.ooc.repository.DeliveryNoteRepo;
 import com.fpoly.ooc.request.DeliveryNoteRequest;
+import com.fpoly.ooc.responce.deliveryNote.DeliveryNoteResponse;
 import com.fpoly.ooc.service.interfaces.DeliveryNoteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -46,4 +47,11 @@ public class DeliveryNoteServiceImpl implements DeliveryNoteService {
         deliveryNote.setShipDate(shipDate);
         return deliveryNoteRepo.save(deliveryNote);
     }
+
+    @Override
+    public DeliveryNoteResponse getOne(String billCode) {
+        return deliveryNoteRepo.getOne(billCode);
+    }
+
+
 }

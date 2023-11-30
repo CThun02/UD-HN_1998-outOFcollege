@@ -491,7 +491,7 @@ const BillTimeLine = (addId) => {
                         handleOk={handleOkConFirm}
                     />
 
-                    {timelines.length === 2 && <Button onClick={handleOpen}
+                    {timelines.length >= 2 && <Button onClick={handleOpen}
                         className={styles.btnPdf}
                         type="primary">
                         Xuất hóa đơn

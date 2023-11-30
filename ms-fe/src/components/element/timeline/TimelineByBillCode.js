@@ -1,4 +1,4 @@
-import { Space } from 'antd'
+import { Input, Space } from 'antd'
 import React from 'react'
 import FollowingOrderContent from '../../customer/user/nav/following-order/content-following-order/FollowingOrderContent'
 import { useState } from 'react'

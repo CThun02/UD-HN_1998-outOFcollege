@@ -3,6 +3,7 @@ import HeaderLeft from "../header/left/HeaderLeft";
 import HeaderRight from "../header/right/HeaderRight";
 import styles from "./Header.module.css";
 import { useEffect, useCallback, useState } from "react";
+import HeaderCenter from "./center/HeaderCenter";
 
 function Header({ render }) {
   const [position, setPosition] = useState(window.pageYOffset);
@@ -23,16 +24,20 @@ function Header({ render }) {
 
   return (
     <div
-      className={`${checkTop > 0 ? styles.header : ""} ${visible ? styles.visible : styles.hidden
-        } ${styles.background} `}
+      className={`${checkTop > 0 ? styles.header : ""} ${
+        visible ? styles.visible : styles.hidden
+      } ${styles.background} `}
     >
       <div className={styles.paddingTopAndBottom}>
         <div className={styles.paddingLeftAndRight}>
           <Row className={styles.margin}>
-            <Col span={12}>
+            <Col span={6}>
               <HeaderLeft />
             </Col>
             <Col span={12}>
+              <HeaderCenter />
+            </Col>
+            <Col span={6}>
               <HeaderRight render={render} />
             </Col>
           </Row>

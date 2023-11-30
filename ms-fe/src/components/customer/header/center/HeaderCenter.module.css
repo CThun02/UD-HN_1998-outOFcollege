@@ -1,0 +1,32 @@
+.imageSize {
+  height: 70px;
+}
+
+.logo {
+  height: 70px;
+  padding-right: 10px;
+}
+
+.lineHeight {
+  line-height: 70px;
+}
+
+.link {
+  font-size: 1rem;
+  color: var(--ast-global-color-3);
+  font-weight: 500;
+}
+
+.margin {
+  margin-bottom: 0px !important;
+}
+
+.flex {
+  display: flex;
+  justify-content: center;
+}
+
+.active {
+  /* border-bottom: 1px solid #2fc1ff; */
+  color: #2fc1ff;
+}

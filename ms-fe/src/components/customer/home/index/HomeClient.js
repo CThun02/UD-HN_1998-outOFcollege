@@ -91,16 +91,19 @@ function HomeClient() {
       <Banner />
       <BestSellingAndNewProduct
         arrays={bestSellings}
-        title={"Best Selling Products"}
+        title={"Sản phẩm bán chạy nhất"}
       />
       <ImageTree />
       <TypeCategory />
       <FirstPayBill />
-      <BestSellingAndNewProduct arrays={newProducs} title={"New Products"} />
+      <BestSellingAndNewProduct
+        arrays={newProducs}
+        title={"Sản phẩm mới nhất"}
+      />
       <Link to={"/ms-shop/home"}>
         <FloatButton
           onClick={handleScrollTop}
-          tooltip={<div>Back to top</div>}
+          tooltip={<div>Kéo lên</div>}
           icon={<ArrowUpOutlined />}
         />
       </Link>

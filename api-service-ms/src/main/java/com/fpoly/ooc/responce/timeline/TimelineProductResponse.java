@@ -49,5 +49,4 @@ public class TimelineProductResponse {
 
     private String billDetailStatus;
 
-    private String reason;
 }

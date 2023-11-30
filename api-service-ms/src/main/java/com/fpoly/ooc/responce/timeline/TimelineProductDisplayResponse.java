@@ -57,8 +57,6 @@ public class TimelineProductDisplayResponse {
 
     private String address;
 
-    private String reason;
-
     private List<ProductImageResponse> productImageResponses;
 
     public TimelineProductDisplayResponse(TimelineProductResponse timelineProductResponse) {
@@ -81,6 +79,5 @@ public class TimelineProductDisplayResponse {
         this.productBrandName = timelineProductResponse.getProductBrandName();
         this.productCateGoryName = timelineProductResponse.getProductCateGoryName();
         this.billDetailStatus = timelineProductResponse.getBillDetailStatus();
-        this.reason = timelineProductResponse.getReason();
     }
 }

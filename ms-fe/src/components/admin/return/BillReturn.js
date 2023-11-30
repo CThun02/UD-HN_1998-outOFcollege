@@ -445,8 +445,9 @@ const BillReturn = () => {
                     item.productDetailId ===
                     response.data.billDetails[index].productDetailId
                 )
-              )
+              ) {
                 productsReturns.push(response.data.billDetails[index]);
+              }
             }
           }
           let total = 0;
@@ -848,21 +849,40 @@ const BillReturn = () => {
                           </div>
                         </Col>
                         <Col span={24}>
-                          <Radio.Group
-                            name="radiogroup"
-                            key={index}
-                            defaultValue={
-                              productsReturns[index].reason
-                                ? productsReturns[index].reason
-                                : "PRODUCE"
-                            }
-                            onChange={(e) => {
-                              productsReturns[index].reason = e.target.value;
-                            }}
-                          >
-                            <Radio value={"PRODUCE"}>Lỗi do nhà sản xuất</Radio>
-                            <Radio value={"OTHER"}>Lý do khác</Radio>
-                          </Radio.Group>
+                          {returned === false ? (
+                            <Radio.Group
+                              name="radiogroup"
+                              key={index}
+                              defaultValue={
+                                productsReturns[index].reason
+                                  ? productsReturns[index].reason
+                                  : "PRODUCE"
+                              }
+                              onChange={(e) => {
+                                productsReturns[index].reason = e.target.value;
+                              }}
+                            >
+                              <Radio value={"PRODUCE"}>
+                                Lỗi do nhà sản xuất
+                              </Radio>
+                              <Radio value={"OTHER"}>Lý do khác</Radio>
+                            </Radio.Group>
+                          ) : (
+                            <Radio.Group
+                              name="radiogroup"
+                              key={index}
+                              value={
+                                productsReturns[index].reason
+                                  ? productsReturns[index].reason
+                                  : "PRODUCE"
+                              }
+                            >
+                              <Radio value={"PRODUCE"}>
+                                Lỗi do nhà sản xuất
+                              </Radio>
+                              <Radio value={"OTHER"}>Lý do khác</Radio>
+                            </Radio.Group>
+                          )}
                         </Col>
                       </Row>
                       <Divider />

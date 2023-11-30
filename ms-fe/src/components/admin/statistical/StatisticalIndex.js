@@ -14,6 +14,7 @@ import {
   TableOutlined,
   ClockCircleOutlined,
   EuroOutlined,
+  CarOutlined,
 } from "@ant-design/icons";
 import {
   Col,
@@ -27,10 +28,12 @@ import {
   Badge,
   Table,
   Divider,
+  Tabs,
 } from "antd";
 import Statistic from "antd/es/statistic/Statistic";
 import PieChart from "./PieChart";
 import TableProdutSellTheMost from "./TableProdutSellTheMost";
+import ProductReturns from "./ProductReturns";
 import dayjs from "dayjs";
 import { getToken } from "../../../service/Token";
 
@@ -63,15 +66,21 @@ const StatisticalIndex = () => {
   const [dateRevenue, setDateRevenue] = useState(formattedDateNow);
   const [dateRevenueTo, setDateRevenueTo] = useState(formattedDateNow);
   const [selectTypeDateProduct, setSelectTypeDateproduct] = useState("year");
+  const [selectTypeDateProductReturn, setSelectTypeDateproductReturn] =
+    useState("year");
   const [dateProductSellTheMost, setDateProductSellTheMost] =
     useState(formattedDateNow);
   const [dateProductSellTheMostTo, setDateProductSellTheMostTo] =
+    useState(formattedDateNow);
+  const [dateProductReturn, setDateProductReturn] = useState(formattedDateNow);
+  const [dateProductReturnTo, setDateProductReturnTo] =
     useState(formattedDateNow);
   const [typeDateBillRevenue, setTypeDateBillRevenue] = useState("date");
   const [typeDateLineChart, setTypeDateLineChart] = useState("date");
   const [growthStoreDayData, setGrowthStoreDayData] = useState(null);
   const [growthStoreMonthData, setGrowthStoreMonthData] = useState(null);
   const [growthStoreYearData, setGrowthStoreYearData] = useState(null);
+  const [reason, setReason] = useState("PRODUCE");
 
   const totalQuantity = billRevenue?.productDetailDisplay?.reduce(
     (total, item) => total + item.quantity,
@@ -109,20 +118,21 @@ const StatisticalIndex = () => {
               >
                 {record.promotion.length !== 0 ? (
                   <Badge.Ribbon
-                    text={`Giảm ${record.promotion[0].promotionValue
+                    text={`Giảm ${
+                      record.promotion[0].promotionValue
                         ? record.promotion[0].promotionMethod === "%"
                           ? record.promotion[0].promotionValue +
-                          " " +
-                          record.promotion[0].promotionMethod
+                            " " +
+                            record.promotion[0].promotionMethod
                           : record.promotion[0].promotionValue.toLocaleString(
-                            "vi-VN",
-                            {
-                              style: "currency",
-                              currency: "VND",
-                            }
-                          )
+                              "vi-VN",
+                              {
+                                style: "currency",
+                                currency: "VND",
+                              }
+                            )
                         : null
-                      }`}
+                    }`}
                     color="red"
                   >
                     <Carousel autoplay>
@@ -304,17 +314,17 @@ const StatisticalIndex = () => {
       axios
         .get(
           "http://localhost:8080/api/admin/bill/compareRevenueDate?dayFrom=" +
-          dayFrom +
-          "&monthFrom=" +
-          monthFrom +
-          "&yearFrom=" +
-          yearFrom +
-          "&yearTo=" +
-          yearTo +
-          "&monthTo=" +
-          monthTo +
-          "&dayTo=" +
-          dayTo,
+            dayFrom +
+            "&monthFrom=" +
+            monthFrom +
+            "&yearFrom=" +
+            yearFrom +
+            "&yearTo=" +
+            yearTo +
+            "&monthTo=" +
+            monthTo +
+            "&dayTo=" +
+            dayTo,
           {
             headers: {
               Authorization: `Bearer ${getToken(true)}`,
@@ -375,17 +385,17 @@ const StatisticalIndex = () => {
       axios
         .get(
           "http://localhost:8080/api/admin/bill/getDataLineChart?dayFrom=" +
-          dayFrom +
-          "&monthFrom=" +
-          monthFrom +
-          "&yearFrom=" +
-          yearFrom +
-          "&yearTo=" +
-          yearTo +
-          "&monthTo=" +
-          monthTo +
-          "&dayTo=" +
-          dayTo,
+            dayFrom +
+            "&monthFrom=" +
+            monthFrom +
+            "&yearFrom=" +
+            yearFrom +
+            "&yearTo=" +
+            yearTo +
+            "&monthTo=" +
+            monthTo +
+            "&dayTo=" +
+            dayTo,
           {
             headers: {
               Authorization: `Bearer ${getToken(true)}`,
@@ -411,7 +421,7 @@ const StatisticalIndex = () => {
     try {
       const response = await axios.get(
         "http://localhost:8080/api/admin/bill/getGrowthStoreByTime?time=" +
-        time,
+          time,
         {
           headers: {
             Authorization: `Bearer ${getToken(true)}`,
@@ -465,9 +475,9 @@ const StatisticalIndex = () => {
       axios
         .get(
           "http://localhost:8080/api/admin/bill/getGrossRevenue?day=" +
-          encodeURIComponent(dateFrom.toISOString()) +
-          "&dayTo=" +
-          encodeURIComponent(dateTo.toISOString()),
+            encodeURIComponent(dateFrom.toISOString()) +
+            "&dayTo=" +
+            encodeURIComponent(dateTo.toISOString()),
           {
             headers: {
               Authorization: `Bearer ${getToken(true)}`,
@@ -508,6 +518,7 @@ const StatisticalIndex = () => {
     dateLineChartValueFrom,
     dateLineChartValueTo,
     typeDateLineChart,
+    reason,
   ]);
   return (
     <>
@@ -793,31 +804,31 @@ const StatisticalIndex = () => {
                     title={
                       billRevenueCompare.revenueFrom -
                         billRevenueCompare.revenueTo >
-                        0
+                      0
                         ? "INACTIVE"
                         : "ACTIVE"
                     }
                     value={
                       (Math.abs(
                         billRevenueCompare.revenueFrom -
-                        billRevenueCompare.revenueTo
+                          billRevenueCompare.revenueTo
                       ) /
                         (billRevenueCompare.revenueFrom +
                           billRevenueCompare.revenueTo)) *
-                      100 || 0
+                        100 || 0
                     }
                     precision={2}
                     valueStyle={
                       billRevenueCompare.revenueFrom -
                         billRevenueCompare.revenueTo >
-                        0
+                      0
                         ? { color: "#ff4d4f" }
                         : { color: "#3f8600" }
                     }
                     prefix={
                       billRevenueCompare.revenueFrom -
                         billRevenueCompare.revenueTo >
-                        0 ? (
+                      0 ? (
                         <ArrowDownOutlined />
                       ) : (
                         <ArrowUpOutlined />
@@ -988,6 +999,101 @@ const StatisticalIndex = () => {
                 date={dateProductSellTheMost}
                 dateToP={dateProductSellTheMostTo}
                 type={selectTypeDateProduct}
+              />
+            </div>
+          </div>
+        </Col>
+        <Col span={24}>
+          <div
+            className={`${styles.bgWhite}`}
+            style={{ height: "100%", marginTop: "25px" }}
+          >
+            <h2>
+              <CarOutlined /> Sản phẩm hoàn trả
+            </h2>
+            <p style={{ fontWeight: 500, marginTop: "12px" }}>
+              <ClockCircleOutlined /> Thời gian
+            </p>
+            <Select
+              value={selectTypeDateProductReturn}
+              onChange={(event) => {
+                setDateProductReturn(formattedDateNow);
+                setDateProductReturnTo(formattedDateNow);
+                setSelectTypeDateproductReturn(event);
+              }}
+              style={{ width: "20%" }}
+              bordered={false}
+            >
+              <Option value="date">Ngày</Option>
+              <Option value="month">Tháng</Option>
+              <Option value="year">Năm</Option>
+              <Option value="other">Tùy chọn</Option>
+            </Select>
+            {selectTypeDateProductReturn === "other" ? (
+              <div style={{ width: "80%", display: "inline-block" }}>
+                <DatePicker
+                  className={styles.input_noneBorder}
+                  style={{ width: "50%" }}
+                  picker={"date"}
+                  value={dayjs(dateProductReturn)}
+                  onChange={(date, dateString) => {
+                    setDateProductReturn(dateString);
+                  }}
+                />
+                <DatePicker
+                  className={styles.input_noneBorder}
+                  style={{ width: "50%" }}
+                  picker={"date"}
+                  value={dayjs(dateProductReturnTo)}
+                  onChange={(date, dateString) => {
+                    setDateProductReturnTo(dateString);
+                  }}
+                />
+              </div>
+            ) : (
+              <DatePicker
+                className={styles.input_noneBorder}
+                style={{ width: "80%" }}
+                picker={selectTypeDateProductReturn}
+                value={dayjs(dateProductReturn)}
+                onChange={(date, dateString) => {
+                  setDateProductReturn(dateString);
+                }}
+              />
+            )}
+            <div style={{ margin: "20px 0" }}>
+              <Tabs
+                defaultActiveKey={"1"}
+                onChange={(e) => console.log(e)}
+                items={[CheckCircleOutlined, ClockCircleOutlined].map(
+                  (Icon, i) => {
+                    const id = String(i + 1);
+                    return {
+                      label: (
+                        <Badge count={6}>
+                          <span style={{ padding: "20px" }}>
+                            <Icon />
+                            {id === "1" ? "Sản xuất" : "Khác"}
+                          </span>
+                        </Badge>
+                      ),
+                      key: id === "1" ? "PRODUCE" : "OTHER",
+                      children: (
+                        <div style={{ padding: "8px" }}>
+                          <p style={{ fontWeight: 500, marginBottom: "12px" }}>
+                            <TableOutlined /> Danh sách sản phẩm
+                          </p>
+                          <ProductReturns
+                            date={dateProductReturn}
+                            dateToP={dateProductReturnTo}
+                            type={selectTypeDateProductReturn}
+                            reason={reason}
+                          />
+                        </div>
+                      ),
+                    };
+                  }
+                )}
               />
             </div>
           </div>

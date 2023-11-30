@@ -71,4 +71,5 @@ public interface BillService {
 
     BillReturnResponse getBillReturnByBillCode(String billCode);
 
+    Bill updateBill(Bill bill);
 }

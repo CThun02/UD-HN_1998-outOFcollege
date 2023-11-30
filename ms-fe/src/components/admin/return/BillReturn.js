@@ -172,7 +172,7 @@ const BillReturn = () => {
                 onChange={(e) => {
                   if (
                     Math.abs(Number(e.target.value)) >
-                    Number(record.quantity) ||
+                      Number(record.quantity) ||
                     Number(e.target.value) === 0
                   ) {
                     setQuantity(1);
@@ -228,7 +228,7 @@ const BillReturn = () => {
             },
           }
         )
-        .then((response) => { })
+        .then((response) => {})
         .catch((error) => {
           const status = error.response.status;
           if (status === 403) {
@@ -243,8 +243,9 @@ const BillReturn = () => {
       const request = {
         productDetailId: productsReturns[index].productDetailId,
         billId: billInfo.id,
-        reason: productsReturns[index].reson,
+        reason: productsReturns[index].reason,
         quantity: productsReturns[index].quantity,
+        price: productsReturns[index].productPrice,
       };
       await axios
         .post(`http://localhost:8080/api/admin/product-return`, request, {
@@ -252,7 +253,7 @@ const BillReturn = () => {
             Authorization: `Bearer ${getToken(true)}`,
           },
         })
-        .then((response) => { })
+        .then((response) => {})
         .catch((error) => {
           const status = error.response.status;
           if (status === 403) {
@@ -263,21 +264,27 @@ const BillReturn = () => {
           }
         });
     }
+    notification.success({
+      message: "Thông báo",
+      description: "Trả hàng thành công",
+    });
     var id = productsReturns.map((item) => item.billDetailId);
     changeStatusBillDetail(id, "ReturnS");
     setRender(Math.random());
+    productsReturns = [];
   }
 
   function changeStatusBillDetail(id, status) {
     axios
       .put(
-        `http://localhost:8080/api/admin/bill/billDetail/change-status?status=${status === "5" || status === "3"
-          ? "ReturnW"
-          : status === "-1"
+        `http://localhost:8080/api/admin/bill/billDetail/change-status?status=${
+          status === "5" || status === "3"
+            ? "ReturnW"
+            : status === "-1"
             ? "ReturnC"
             : status === "ACTIVE"
-              ? "ACTIVE"
-              : "ReturnS"
+            ? "ACTIVE"
+            : "ReturnS"
         }`,
         id,
         {
@@ -340,7 +347,7 @@ const BillReturn = () => {
     await axios
       .get(
         `http://localhost:8080/api/admin/bill/getBillByBillCode?billCode=` +
-        billCode,
+          billCode,
         {
           headers: {
             Authorization: `Bearer ${getToken(true)}`,
@@ -393,7 +400,7 @@ const BillReturn = () => {
       axios
         .get(
           `http://localhost:8080/api/admin/bill/getBillReturnByBillCode?billCode=` +
-          billCode,
+            billCode,
           {
             headers: {
               Authorization: `Bearer ${getToken(true)}`,
@@ -438,8 +445,9 @@ const BillReturn = () => {
                     item.productDetailId ===
                     response.data.billDetails[index].productDetailId
                 )
-              )
+              ) {
                 productsReturns.push(response.data.billDetails[index]);
+              }
             }
           }
           let total = 0;
@@ -471,7 +479,7 @@ const BillReturn = () => {
       />
       <div className={styles.billReturn}>
         <h3 style={{ marginBottom: "25px" }}>Thông tin hóa đơn</h3>
-        <div style={{ overflowX: "scroll", height: '50%' }}>
+        <div style={{ overflowX: "scroll", height: "50%" }}>
           <div style={{ width: "fit-content" }}>
             <Timeline minEvents={2} placeholder className={styles.timeLine}>
               {billInfo?.symbol !== "Received" ? (
@@ -483,19 +491,19 @@ const BillReturn = () => {
                           data.status === "0" || data.status === "-1"
                             ? "#FF0000"
                             : data.status === "5"
-                              ? "#f0ad4e"
-                              : "#00cc00"
+                            ? "#f0ad4e"
+                            : "#00cc00"
                         }
                         icon={
                           data.status === "1"
                             ? FaRegFileAlt
                             : data.status === "0"
-                              ? FaTimes
-                              : data.status === "2"
-                                ? FaRegFileAlt
-                                : data.status === "3"
-                                  ? FaTruck
-                                  : CheckCircleOutlined
+                            ? FaTimes
+                            : data.status === "2"
+                            ? FaRegFileAlt
+                            : data.status === "3"
+                            ? FaTruck
+                            : CheckCircleOutlined
                         }
                         title={
                           data.status === "0" ? (
@@ -531,21 +539,21 @@ const BillReturn = () => {
                           data.status === "0" || data.status === "-1"
                             ? "#FF0000"
                             : data.status === "3"
-                              ? "#f0ad4e"
-                              : "#00cc00"
+                            ? "#f0ad4e"
+                            : "#00cc00"
                         }
                         icon={
                           data.status === "1"
                             ? FaRegFileAlt
                             : data.status === "0"
-                              ? FaTimes
-                              : data.status === "2"
-                                ? FaRegCheckCircle
-                                : data.status === "3"
-                                  ? FaClock
-                                  : data.status === "4"
-                                    ? FaRocket
-                                    : null
+                            ? FaTimes
+                            : data.status === "2"
+                            ? FaRegCheckCircle
+                            : data.status === "3"
+                            ? FaClock
+                            : data.status === "4"
+                            ? FaRocket
+                            : null
                         }
                         title={
                           data.status === "1" ? (
@@ -570,7 +578,13 @@ const BillReturn = () => {
             </Timeline>
           </div>
         </div>
-        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 20 }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            marginTop: 20,
+          }}
+        >
           <Button
             type="primary"
             size="large"
@@ -835,20 +849,40 @@ const BillReturn = () => {
                           </div>
                         </Col>
                         <Col span={24}>
-                          <Radio.Group
-                            name="radiogroup"
-                            defaultValue={
-                              productsReturns[index].reason
-                                ? productsReturns[index].reason
-                                : "PRODUCE"
-                            }
-                            onChange={(e) => {
-                              productsReturns[index].reason = e.target.value;
-                            }}
-                          >
-                            <Radio value={"PRODUCE"}>Lỗi do nhà sản xuất</Radio>
-                            <Radio value={"OTHER"}>Lý do khác</Radio>
-                          </Radio.Group>
+                          {returned === false ? (
+                            <Radio.Group
+                              name="radiogroup"
+                              key={index}
+                              defaultValue={
+                                productsReturns[index].reason
+                                  ? productsReturns[index].reason
+                                  : "PRODUCE"
+                              }
+                              onChange={(e) => {
+                                productsReturns[index].reason = e.target.value;
+                              }}
+                            >
+                              <Radio value={"PRODUCE"}>
+                                Lỗi do nhà sản xuất
+                              </Radio>
+                              <Radio value={"OTHER"}>Lý do khác</Radio>
+                            </Radio.Group>
+                          ) : (
+                            <Radio.Group
+                              name="radiogroup"
+                              key={index}
+                              value={
+                                productsReturns[index].reason
+                                  ? productsReturns[index].reason
+                                  : "PRODUCE"
+                              }
+                            >
+                              <Radio value={"PRODUCE"}>
+                                Lỗi do nhà sản xuất
+                              </Radio>
+                              <Radio value={"OTHER"}>Lý do khác</Radio>
+                            </Radio.Group>
+                          )}
                         </Col>
                       </Row>
                       <Divider />

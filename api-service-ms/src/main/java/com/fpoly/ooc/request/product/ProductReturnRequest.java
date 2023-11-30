@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -18,10 +20,11 @@ public class ProductReturnRequest {
     private Long billId;
     private Integer quantity;
     private String reason;
+    private BigDecimal price;
 
     public ProductReturn dto(){
         ProductReturn productReturn = ProductReturn.builder().productDetail(ProductDetail.builder().id(productDetailId).build())
-                .bill(Bill.builder().id(billId).build()).quantity(quantity).reason(reason).build();
+                .bill(Bill.builder().id(billId).build()).quantity(quantity).reason(reason).price(price).build();
         return productReturn;
     }
 }

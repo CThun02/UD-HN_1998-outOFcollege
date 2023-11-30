@@ -46,7 +46,7 @@ public interface TimeLineRepo extends JpaRepository<Timeline, Long> {
             "   b.id, pd.id, bd.id, pd.product.productName, bd.quantity, bd.price, pd.size.sizeName, pd.color.colorCode," +
             "   pd.button.buttonName, pd.collar.collarTypeName, pd.material.materialName, pd.sleeve.sleeveName, " +
             "   pd.shirtTail.shirtTailTypeName, pd.color.colorName, pd.form.formName, pd.pattern.patternName," +
-            "   pd.brand.brandName, pd.category.categoryName, bd.status )" +
+            "   pd.brand.brandName, pd.category.categoryName, bd.status)" +
             "FROM Bill b  " +
             "   LEFT JOIN BillDetail bd ON b.id = bd.bill.id " +
             "   LEFT JOIN Timeline tl ON tl.bill.id = b.id " +

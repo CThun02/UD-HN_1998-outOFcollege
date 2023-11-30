@@ -1,5 +1,6 @@
 import React, { useEffect, useState, } from 'react'
 import styles from './Checkout.module.css'
+import logoOOC from "../../../Assets/img/logo/logo_ghn.png";
 import { Button, Col, Input, Modal, Radio, Row, Select, Space, notification } from 'antd'
 import { Link, useNavigate } from 'react-router-dom'
 import { UserOutlined } from '@ant-design/icons'
@@ -12,8 +13,9 @@ import * as yup from 'yup';
 import { getAuthToken } from '../../../service/Token'
 import ModalAddress from '../../admin/sale-couter/ModalAddress.js'
 import FormUsingVoucher from '../../element/voucher/FormUsingVoucher.js';
+import MailDesign from '../../element/mail-design/MailDesign.js'
 
-const Checkout = (props) => {
+const Checkout = ({ setRenderHeader }) => {
     const [provinces, setProvinces] = useState([])
     const [districts, setDistricts] = useState([])
     const [wards, setWards] = useState([])
@@ -37,7 +39,7 @@ const Checkout = (props) => {
         descriptionDetail: ''
     })
     const navigate = useNavigate()
-
+    const cartAPI = 'http://localhost:8080/api/client/cart';
     const [render, setRender] = useState(null)
     const [showAdd, setShowAdd] = useState(false);
     const [voucherAdd, setVoucherAdd] = useState({});
@@ -230,6 +232,7 @@ const Checkout = (props) => {
 
     const [formData, setFormData] = useState({
         bill_code: generateRandomBillCode(),
+        email: '',
         billType: 'Online',
         paymentDetailId: 1,
         price: 0,
@@ -253,6 +256,7 @@ const Checkout = (props) => {
         city: yup.string().required('Thành phố không được để trống'),
         district: yup.string().required('Quận huyện không được để trống'),
         ward: yup.string().required('Phường xã không được để trống'),
+        email: yup.string().email('Email không hợp lệ').required('Email không được để trống'),
     })
 
     const handleChange = (e) => {
@@ -284,11 +288,20 @@ const Checkout = (props) => {
 
             }
 
-            // Cập nhật mảng productDetails trong giỏ hàng
             cart.productDetails = productDetailUpdate;
 
-            // Lưu lại giỏ hàng vào localStorage
             localStorage.setItem('user', JSON.stringify(cart));
+        }
+    }
+
+    const removeCartDetail = () => {
+        for (let i = 0; i < productDetails?.length; i++) {
+            let cartDetailId = productDetails[i].cartDetailResponse.cartDetailId;
+            axios.delete(`${cartAPI}/${cartDetailId}`)
+                .then((response) => { })
+                .catch((error) => {
+                    console.log(error);
+                })
         }
     }
 
@@ -303,7 +316,6 @@ const Checkout = (props) => {
                         setAddress(response.data)
                         if (addd) {
                             setDefaultAddress(addd)
-                            console.log(addd)
                             let district = addd.district?.substring(1 + addd.district.indexOf("|"));
                             let ward = addd.ward?.substring(1 + addd.ward.indexOf("|"));
                             handleShippingOrderLeadtime(Number(district), ward);
@@ -318,22 +330,102 @@ const Checkout = (props) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const billCodeGen = generateRandomBillCode();
         const bill = {
-            billCode: generateRandomBillCode(),
+            billCode: billCodeGen,
             price: voucherPrice(),
             priceReduce: 0,
             paymentDetailId: formData.paymentDetailId,
             billType: "Online",
             symbol: "Shipping",
-            status: "Unpaid",
+            status: formData.paymentDetailId === 2 ? "Paid" : "Unpaid",
             accountId: dataToken ? dataToken.username : null,
             note: formData.note,
             lstBillDetailRequest: formData.lstBillDetailRequest,
             transactionCode: formData.paymentDetailId === 2 ? '' : null,
             voucherCode: null,
+            emailDetails: {
+                recipient: [formData.email],
+                messageBody: `<body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: Arial, sans-serif;">
+                <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 50%; margin: 0 auto;">
+                    <tr>
+                        <td align="center" bgcolor="#ffffff" style="padding: 40px 0;">
+                        <table style="width: 100%; padding: 0 20px;">
+                        <tr>
+                            <td style="text-align: left; width: 50%">
+                                <img alt="Logo" src="https://firebasestorage.googleapis.com/v0/b/outofcollge.appspot.com/o/logo%2Flogo_OOC.png?alt=media&token=9dec0335-3b77-4c5b-a278-b5b22b9ecbb4" width="70%" />
+                            </td>
+                            <td style="text-align: right; vertical-align: middle; width: 50%">
+                                <span>Đơn hàng ${billCodeGen}</span>
+                            </td>
+                        </tr>
+                    </table>
+                            <div style="padding: 0 20px; margin-top: 24px;">
+                                <span style="font-weight: 500; font-size: 24px;">Cảm ơn bạn đã mua hàng!</span><br><br>
+                                <p style="text-align: justify;">Xin chào ${formData.fullName}, Chúng tôi đã nhận được đặt hàng của bạn và đã sẵn sàng để vận chuyển. Chúng tôi sẽ thông báo cho bạn khi đơn hàng được gửi đi.</p><br>
+                                <div style="text-align: center">
+                                    <a style="color: white; font-weight: 500; padding: 16px 20px; border-radius: 4px; background-color: #1666a2; margin-right: 20px;" href="http://localhost:3000/ms-shop/bill/${billCodeGen}">
+                                        Xem đơn hàng
+                                    </a>
+                                    hoặc <a style="margin-left: 20px;" href="http://localhost:3000/">Đến cửa hàng của chúng tôi</a>
+                                </div>
+                                <br>
+                                <hr>
+                                <br>
+                                        <span>Thông tin đơn hàng</span>
+                                        <div style="margin-top: 8px;">
+                                        ${productDetails.map((item, index) => {
+                    return (
+                        `<div key={index} style="display: flex; justify-content: space-between; align-items: center; padding: 4px 20px;">
+                                                    <div style="width: 20%; padding: 4px;">
+                                                        <img alt="product" style="width: 100%; border: 1px solid #ccc; border-radius: 8px;" src=${item.data[0].productImageResponse[0].path}>
+                                                    </div>
+                                                    <div style="width: 55%; padding: 4px;">
+                                                        <p>${item.data[0].product.productName + "-" + item.data[0].button.buttonName +
+                        "-" +
+                        item.data[0].brand.brandName +
+                        "-" +
+                        item.data[0].category.categoryName +
+                        "-" +
+                        item.data[0].material.materialName +
+                        "-" +
+                        item.data[0].collar.collarTypeName +
+                        "-" +
+                        item.data[0].sleeve.sleeveName +
+                        "-" +
+                        item.data[0].shirtTail.shirtTailTypeName +
+                        "-" +
+                        item.data[0].pattern.patternName +
+                        "-" +
+                        item.data[0].form.formName} <span style="font-weight: 500;">x ${item.quantity}</span></p>
+                                                    </div>
+                                                    <div style="width: 25%; padding: 4px;">
+                                                        <p>${(item.data[0].price * item.quantity).toLocaleString("vi-VN", { style: "currency", currency: "VND" })}</p>
+                                                    </div>
+                                                </div>`
+                    );
+                })}
+                                            <hr>
+                                            <div style="width: 70%; float: right; padding: 4px 20px;">
+                                                <div style="display: flex; justify-content: space-between; padding: 4px 0;">
+                                                    <span>Tổng giá trị sản phẩm:</span>
+                                                    <span style="font-weight: 500;">
+                                                        ${totalPrice.toLocaleString("vi-VN", { style: "currency", currency: "VND" })}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </body>`,
+                subject: `THÔNG BÁO XÁC NHẬN ĐƠN HÀNG ${billCodeGen}`
+            }
         }
 
         const billAddress = {
+            email: formData.email,
             fullName: formData.fullName,
             sdt: formData.phoneNumber,
             city: formData.city,
@@ -406,6 +498,81 @@ const Checkout = (props) => {
                             params: {
                                 billId: response.data.id,
                                 price: totalPrice + shippingFee,
+                                email: formData.email,
+                                messageBody: `<body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: Arial, sans-serif;">
+                                <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 50%; margin: 0 auto;">
+                                    <tr>
+                                        <td align="center" bgcolor="#ffffff" style="padding: 40px 0;">
+                                        <table style="width: 100%; padding: 0 20px;">
+                                        <tr>
+                                            <td style="text-align: left; width: 50%">
+                                                <img alt="Logo" src="https://firebasestorage.googleapis.com/v0/b/outofcollge.appspot.com/o/logo%2Flogo_OOC.png?alt=media&token=9dec0335-3b77-4c5b-a278-b5b22b9ecbb4" width="70%" />
+                                            </td>
+                                            <td style="text-align: right; vertical-align: middle; width: 50%">
+                                                <span>Đơn hàng ${billCodeGen}</span>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                            <div style="padding: 0 20px; margin-top: 24px;">
+                                                <span style="font-weight: 500; font-size: 24px;">Cảm ơn bạn đã mua hàng!</span><br><br>
+                                                <p style="text-align: justify;">Xin chào ${formData.fullName}, Chúng tôi đã nhận được đặt hàng của bạn và đã sẵn sàng để vận chuyển. Chúng tôi sẽ thông báo cho bạn khi đơn hàng được gửi đi.</p><br>
+                                                <div style="text-align: center">
+                                                    <a style="color: white; font-weight: 500; padding: 16px 20px; border-radius: 4px; background-color: #1666a2; margin-right: 20px;" href="http://localhost:3000/ms-shop/bill/${billCodeGen}">
+                                                        Xem đơn hàng
+                                                    </a>
+                                                    hoặc <a style="margin-left: 20px;" href="http://localhost:3000/">Đến cửa hàng của chúng tôi</a>
+                                                </div>
+                                                <br>
+                                                <hr>
+                                                <br>
+                                                        <span>Thông tin đơn hàng</span>
+                                                        <div style="margin-top: 8px;">
+                                                        ${productDetails.map((item, index) => {
+                                    return (
+                                        `<div key={index} style="display: flex; justify-content: space-between; align-items: center; padding: 4px 20px;">
+                                                                    <div style="width: 20%; padding: 4px;">
+                                                                        <img alt="product" style="width: 100%; border: 1px solid #ccc; border-radius: 8px;" src=${item.data[0].productImageResponse[0].path}>
+                                                                    </div>
+                                                                    <div style="width: 55%; padding: 4px;">
+                                                                        <p>${item.data[0].product.productName + "-" + item.data[0].button.buttonName +
+                                        "-" +
+                                        item.data[0].brand.brandName +
+                                        "-" +
+                                        item.data[0].category.categoryName +
+                                        "-" +
+                                        item.data[0].material.materialName +
+                                        "-" +
+                                        item.data[0].collar.collarTypeName +
+                                        "-" +
+                                        item.data[0].sleeve.sleeveName +
+                                        "-" +
+                                        item.data[0].shirtTail.shirtTailTypeName +
+                                        "-" +
+                                        item.data[0].pattern.patternName +
+                                        "-" +
+                                        item.data[0].form.formName} <span style="font-weight: 500;">x ${item.quantity}</span></p>
+                                                                    </div>
+                                                                    <div style="width: 25%; padding: 4px;">
+                                                                        <p>${(item.data[0].price * item.quantity).toLocaleString("vi-VN", { style: "currency", currency: "VND" })}</p>
+                                                                    </div>
+                                                                </div>`
+                                    );
+                                })}
+                                                            <hr>
+                                                            <div style="width: 70%; float: right; padding: 4px 20px;">
+                                                                <div style="display: flex; justify-content: space-between; padding: 4px 0;">
+                                                                    <span>Tổng giá trị sản phẩm:</span>
+                                                                    <span style="font-weight: 500;">
+                                                                        ${totalPrice.toLocaleString("vi-VN", { style: "currency", currency: "VND" })}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </body>`,
                             }
                         }).then((response) => {
                             window.location.href = `${response.data}`
@@ -418,24 +585,31 @@ const Checkout = (props) => {
                             description: "Thanh toán thành công",
                             duration: 2,
                         });
+                        navigate(`/ms-shop`)
                     }
+                    removeCartDetail()
                     localStorage.removeItem('checkout');
-                    navigate(`/ms-shop`)
+
+                    setRenderHeader(Math.random())
                 } catch (error) {
                     console.log(error);
+                }
+                if (!dataToken) {
+                    removeProductDetailCart()
+                    setRenderHeader(Math.random())
                 }
             },
         });
 
-        if (!dataToken) {
-            removeProductDetailCart()
-        }
+
+
     };
 
     const getAllCarts = async () => {
         const data = await token;
         setDataToken(data)
         let carts = JSON.parse(localStorage.getItem('checkout'))
+        console.log(carts)
         if (!carts) {
             navigate(`/ms-shop`)
         }
@@ -478,30 +652,24 @@ const Checkout = (props) => {
     };
 
     useEffect(() => {
+        window.scrollTo(0, 0);
         getAddress()
     }, [])
 
     useEffect(() => {
-        window.scrollTo(0, 0);
         fetchProvince();
         fetchDistrict();
         fetchWard();
         getAllCarts()
 
-        console.log(dataToken)
         if (!dataToken) {
             handleShippingOrderLeadtime(selectedDistrict, selectedWard);
             handleShippingFee(100, selectedDistrict, selectedWard);
         } else {
-            console.log(12)
-            console.log(defaultAddress);
             let district = defaultAddress.district?.substring(1 + defaultAddress.district.indexOf("|"));
             let ward = defaultAddress.ward?.substring(1 + defaultAddress.ward.indexOf("|"));
-            console.log(district)
-            console.log(ward)
             handleShippingOrderLeadtime(Number(district), ward);
             handleShippingFee(100, district, ward);
-            console.log(shippingFee)
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedDistrict,
@@ -547,6 +715,24 @@ const Checkout = (props) => {
 
                                 {/* form */}
                                 <Row>
+                                    <Col className={styles.mb} span={24}>
+                                        <FloatingLabels
+                                            label="Email"
+                                            zIndex={true}
+                                            value={dataToken ? defaultAddress?.email
+                                                : formData?.email}
+                                        >
+                                            <Input
+                                                size='large'
+                                                name='email'
+                                                onChange={handleChange}
+                                                value={dataToken ? defaultAddress?.email
+                                                    : formData?.email}
+                                                allowClear
+                                            />
+                                            {error.email && <div className={styles.errorText}>{error.email}</div>}
+                                        </FloatingLabels>
+                                    </Col>
                                     <Col className={styles.mb} span={24}>
                                         <FloatingLabels
                                             label="Họ tên"

@@ -7,7 +7,7 @@ import { useState } from "react";
 function FollowingOrder({ tab }) {
   const [billCode, setBillCode] = useState('')
   const [status, setStatus] = useState('')
-  const [count, setCount] = useState(null)
+  const [count, setCount] = useState('')
   const [symbol, setSymbol] = useState('')
   const [createdBy, setCreatedBy] = useState('')
 
@@ -21,7 +21,12 @@ function FollowingOrder({ tab }) {
             setCreatedBy={setCreatedBy}
             setSymbol={setSymbol}
           />
-          <FollowingOrderContent billCode={billCode} symbol={symbol} status={status} count={count} createdBy={createdBy} />
+          <FollowingOrderContent
+            billCode={billCode}
+            symbol={symbol}
+            status={status}
+            count={count}
+            createdBy={createdBy} />
         </Space>
       </div>
     </div>

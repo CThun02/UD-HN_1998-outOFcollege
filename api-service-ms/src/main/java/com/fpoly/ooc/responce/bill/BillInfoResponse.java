@@ -33,6 +33,7 @@ public class BillInfoResponse {
 
     private BigDecimal amountPaid;
 
+    @JsonFormat(pattern = "dd/MM/yyyy ")
     private LocalDateTime shipDate;
 
     private String paymentName;
@@ -43,6 +44,8 @@ public class BillInfoResponse {
     private String fullName;
 
     private String phoneNumber;
+
+    private Long addressId;
 
     private String address;
 

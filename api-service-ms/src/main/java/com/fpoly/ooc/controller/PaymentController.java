@@ -1,11 +1,15 @@
 package com.fpoly.ooc.controller;
 
 import com.fpoly.ooc.config.PaymentConfig;
+import com.fpoly.ooc.dto.EmailDetails;
 import com.fpoly.ooc.entity.Bill;
+import com.fpoly.ooc.entity.DeliveryNote;
 import com.fpoly.ooc.entity.Timeline;
 import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.BillRepo;
 import com.fpoly.ooc.repository.TimeLineRepo;
+import com.fpoly.ooc.service.interfaces.DeliveryNoteService;
+import com.fpoly.ooc.service.interfaces.EmailService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -41,11 +45,19 @@ public class PaymentController {
     @Autowired
     private TimeLineRepo timeLineRepo;
 
+    @Autowired
+    private EmailService emailService;
+
+    private String body = null;
+
     @GetMapping("/pay")
     public String payment(@RequestParam("price") Long price,
-                          @RequestParam("billId") String billId)
+                          @RequestParam("billId") String billId,
+                          @RequestParam("email") String email,
+                          @RequestParam("messageBody") String messageBody
+    )
             throws UnsupportedEncodingException {
-
+        body = messageBody;
         String vnp_Version = "2.1.0";
         String vnp_Command = "pay";
         String orderType = "other";
@@ -67,7 +79,7 @@ public class PaymentController {
         vnp_Params.put("vnp_OrderInfo", "Thanh toan don hang:" + vnp_TxnRef);
         vnp_Params.put("vnp_OrderType", orderType);
         vnp_Params.put("vnp_Locale", "vn");
-        vnp_Params.put("vnp_ReturnUrl", PaymentConfig.vnp_ReturnUrl + "?billId=" + billId);
+        vnp_Params.put("vnp_ReturnUrl", PaymentConfig.vnp_ReturnUrl + "?billId=" + billId + "&email=" + email);
         vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
 
         Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
@@ -120,12 +132,20 @@ public class PaymentController {
         String amount = queryParams.get("vnp_Amount");
         String transactionNo = queryParams.get("vnp_TransactionNo");
         Long billId = Long.valueOf(queryParams.get("billId"));
+        String email = queryParams.get("email");
         if ("00".equals(responseCode)) {
             Bill bill = billRepo.findById(billId).orElseThrow(() -> new NotFoundException("Bill id không tồn tại"));
             bill.setTransactionCode(transactionNo);
             bill.setAmountPaid(new BigDecimal(amount));
             bill.setStatus("Paid");
             billRepo.save(bill);
+            EmailDetails emailDetails = new EmailDetails();
+            List<String> mails = new ArrayList<>();
+            mails.add(email);
+            emailDetails.setRecipient(mails);
+            emailDetails.setMessageBody(body);
+            emailDetails.setSubject("THÔNG BÁO XÁC NHẬN ĐƠN HÀNG " + bill.getBillCode());
+            emailService.sendSimpleMail(emailDetails);
             response.sendRedirect("http://localhost:3000/ms-shop");
         } else {
             Bill bill = billRepo.findById(billId).orElseThrow(() -> new NotFoundException("Bill id không tồn tại"));

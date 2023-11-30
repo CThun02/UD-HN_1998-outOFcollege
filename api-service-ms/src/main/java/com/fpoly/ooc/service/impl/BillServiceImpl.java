@@ -98,7 +98,7 @@ public class BillServiceImpl implements BillService {
         bill.setStatus(request.getStatus());
         billRepo.save(bill);
 
-        if (bill.getStatus().equals("Unpaid")) {
+        if (bill.getStatus().equals("Unpaid") && !bill.getBillType().equals("In-Store")) {
             if (!request.getEmailDetails().getRecipient().isEmpty()) {
                 emailService.sendSimpleMail(request.getEmailDetails());
             }
@@ -112,7 +112,14 @@ public class BillServiceImpl implements BillService {
                     .quantity(billDetailRequest.getQuantity())
                     .note("null")
                     .build();
-            billDetailRepo.save(billDetail);
+            BillDetail billDetail1 = billDetailRepo.save(billDetail);
+
+            if (billDetail1 != null) {
+                ProductDetail productDetail = productDetailService.getOne(billDetail.getProductDetail().getId());
+                productDetail.setQuantity(productDetail.getQuantity() - billDetail.getQuantity());
+                productDetailService.update(productDetail);
+            }
+
         }
 
         PaymentDetail paymentDetail = PaymentDetail.builder()

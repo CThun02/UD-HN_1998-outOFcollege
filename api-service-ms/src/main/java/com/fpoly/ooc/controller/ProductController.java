@@ -84,6 +84,10 @@ public class ProductController {
                 (request, minPrice.orElse(null), maxPrice.orElse(null)));
     }
 
+    @GetMapping("/getOneProductDetail/{id}")
+    public ResponseEntity<?> getOneProductDetail(@PathVariable Long id) {
+        return ResponseEntity.ok(productDetailService.getOne(id));
+    }
 
 
     @GetMapping("/searchProductDetail")
@@ -162,6 +166,9 @@ public class ProductController {
                 productDetail.setDeletedAt(null);
             }
         } else {
+            if(productDetail.getQuantity() == 0){
+                productDetail.setStatus(Const.STATUS_INACTIVE);
+            }
             productDetail.setDeletedAt(null);
         }
         ProductDetailRequest request = ProductDetailRequest.builder().productId(productDetail.getProduct().getId())
@@ -182,6 +189,7 @@ public class ProductController {
         }
         return ResponseEntity.ok(productDetailService.update(productDetail));
     }
+
 
     @PutMapping("/updateProductImg")
     public ResponseEntity<?> updateProductImg(@RequestBody ProductImage request) {

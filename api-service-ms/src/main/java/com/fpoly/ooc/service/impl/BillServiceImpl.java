@@ -396,4 +396,9 @@ public class BillServiceImpl implements BillService {
         billReturnResponse.setBillDetails(lstProduct);
         return billReturnResponse;
     }
+
+    @Override
+    public Bill updateBill(Bill bill) {
+        return billRepo.save(bill);
+    }
 }

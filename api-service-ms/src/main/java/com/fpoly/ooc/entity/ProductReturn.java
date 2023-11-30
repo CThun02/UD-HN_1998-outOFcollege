@@ -3,6 +3,8 @@ package com.fpoly.ooc.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -29,4 +31,7 @@ public class ProductReturn extends BaseEntity{
 
     @Column(name = "quantity")
     private Integer quantity;
+
+    @Column(name = "price")
+    private BigDecimal price;
 }

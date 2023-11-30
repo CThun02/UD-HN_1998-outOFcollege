@@ -48,5 +48,6 @@ public class TimelineProductResponse {
     private String productCateGoryName;
 
     private String billDetailStatus;
-    
+
+    private String reason;
 }

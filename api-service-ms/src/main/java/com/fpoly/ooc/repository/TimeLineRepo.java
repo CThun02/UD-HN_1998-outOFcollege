@@ -35,9 +35,10 @@ public interface TimeLineRepo extends JpaRepository<Timeline, Long> {
             "   bd.bill.id, pd.id, bd.id, pd.product.productName, bd.quantity, bd.price, pd.size.sizeName, pd.color.colorCode," +
             "   pd.button.buttonName, pd.collar.collarTypeName, pd.material.materialName, pd.sleeve.sleeveName, " +
             "   pd.shirtTail.shirtTailTypeName, pd.color.colorName, pd.form.formName, pd.pattern.patternName," +
-            "   pd.brand.brandName, pd.category.categoryName, bd.status )" +
+            "   pd.brand.brandName, pd.category.categoryName, bd.status, pr.reason )" +
             "FROM ProductDetail pd " +
             "   JOIN BillDetail bd ON bd.productDetail.id = pd.id " +
+            "   LEFT JOIN ProductReturn pr on pr.productDetail.id = pd.id " +
             "WHERE bd.bill.id = :billId")
     List<TimelineProductResponse> getTimelineProductByBillId(@Param("billId") Long id);
 
@@ -46,11 +47,12 @@ public interface TimeLineRepo extends JpaRepository<Timeline, Long> {
             "   b.id, pd.id, bd.id, pd.product.productName, bd.quantity, bd.price, pd.size.sizeName, pd.color.colorCode," +
             "   pd.button.buttonName, pd.collar.collarTypeName, pd.material.materialName, pd.sleeve.sleeveName, " +
             "   pd.shirtTail.shirtTailTypeName, pd.color.colorName, pd.form.formName, pd.pattern.patternName," +
-            "   pd.brand.brandName, pd.category.categoryName, bd.status )" +
+            "   pd.brand.brandName, pd.category.categoryName, bd.status, pr.reason)" +
             "FROM Bill b  " +
             "   LEFT JOIN BillDetail bd ON b.id = bd.bill.id " +
             "   LEFT JOIN Timeline tl ON tl.bill.id = b.id " +
             "   LEFT JOIN ProductDetail pd ON pd.id = bd.productDetail.id " +
+            "   LEFT JOIN ProductReturn pr on pr.productDetail.id = pd.id " +
             "WHERE  (:username IS NULL OR b.account.username = :username) " +
             "   AND (b.billCode like %:billCode% OR :billCode IS NULL) " +
             "   AND (:status IS NULL OR b.status LIKE :status) " +

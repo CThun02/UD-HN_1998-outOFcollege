@@ -264,9 +264,14 @@ const BillReturn = () => {
           }
         });
     }
+    notification.success({
+      message: "Thông báo",
+      description: "Trả hàng thành công",
+    });
     var id = productsReturns.map((item) => item.billDetailId);
     changeStatusBillDetail(id, "ReturnS");
     setRender(Math.random());
+    productsReturns = [];
   }
 
   function changeStatusBillDetail(id, status) {
@@ -845,6 +850,7 @@ const BillReturn = () => {
                         <Col span={24}>
                           <Radio.Group
                             name="radiogroup"
+                            key={index}
                             defaultValue={
                               productsReturns[index].reason
                                 ? productsReturns[index].reason

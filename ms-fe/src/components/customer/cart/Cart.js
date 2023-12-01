@@ -120,10 +120,47 @@ const Cart = (props) => {
             key: 'price_total',
             title: 'Thành tiền',
             render: (_, record) => {
-                return <div>
-                    {numeral(record.quantity * record.data[0]?.price)
-                        .format('0,0') + ' đ'}
-                </div>
+                return (
+                    <div style={{ textAlign: "center" }}>
+                        {record.data[0].promotion.length > 0 ? (
+                            <span style={{ color: "#ccc" }}>
+                                <strike>
+                                    {((record?.data[0].price) * (record.quantity))?.toLocaleString("vi-VN", {
+                                        style: "currency",
+                                        currency: "VND",
+                                    })}
+                                </strike>
+                            </span>
+                        ) : (
+                            <span>
+                                {(record?.data[0].price * record.quantity).toLocaleString("vi-VN", {
+                                    style: "currency",
+                                    currency: "VND",
+                                })}
+                            </span>
+                        )}
+                        <br />
+                        <span>
+                            {record.data[0]?.promotion?.length !== 0
+                                ? record?.data[0]?.promotion[0]?.promotionMethod === "%"
+                                    ? (
+                                        ((record.data[0].price *
+                                            (100 - Number(record?.data[0]?.promotion[0]?.promotionValue))) /
+                                            100) * record.cartDetailResponse.quantity
+                                    )?.toLocaleString("vi-VN", {
+                                        style: "currency",
+                                        currency: "VND",
+                                    })
+                                    : (
+                                        (record?.data[0]?.price - Number(record?.data[0]?.promotion[0]?.promotionValue)) * record?.quantity
+                                    )?.toLocaleString("vi-VN", {
+                                        style: "currency",
+                                        currency: "VND",
+                                    })
+                                : null}
+                        </span>
+                    </div>
+                );
             }
         },
         {
@@ -149,7 +186,7 @@ const Cart = (props) => {
     }
 
     const handleDeleteApi = (id) => {
-        axios.delete(`${cartAPI}?cartDetailId=${id}`)
+        axios.delete(`${cartAPI}/${id}`)
             .then((response) => {
                 setRender(Math.random);
                 props.setRenderHeader(Math.random())
@@ -309,7 +346,7 @@ const Cart = (props) => {
             render: (_, record) => {
                 return (
                     <div style={{ textAlign: "center" }}>
-                        {record.promotion.length !== 0 ? (
+                        {record.promotion.length < 0 ? (
                             <span style={{ color: "#ccc" }}>
                                 <strike>
                                     {((record?.cartDetailResponse.priceProductDetail) * (record.cartDetailResponse.quantity))?.toLocaleString("vi-VN", {
@@ -470,50 +507,52 @@ const Cart = (props) => {
     const getCartAPI = async () => {
         const data = await token;
 
-        await axios.get(`${cartAPI}`, {
-            params: {
-                username: data?.username
-            }
-        }).then((response) => {
-            setCarts(response.data)
-            try {
-                if (data) {
-                    const cart = {
-                        username: data?.username,
-                        lstCartDetail: [],
-                    };
-                    if (productDetails) {
-                        console.log(productDetails)
-                        for (let i = 0; i < productDetails.length; i++) {
-                            if (response.data.length === 0) {
-                                cart.lstCartDetail.push({
-                                    productDetailId: productDetails[i].data[0].id,
-                                    quantity: productDetails[i].quantity,
-                                });
-                            } else {
-                                for (let j = 0; j < response.data.length; j++) {
-                                    if (Number(productDetails[i].data[0].id) !== Number(response.data[j].cartDetailResponse.productDetailId)) {
-                                        cart.lstCartDetail.push({
-                                            productDetailId: productDetails[i].data[0].id,
-                                            quantity: productDetails[i].quantity,
-                                        });
+        if (data) {
+            await axios.get(`${cartAPI}`, {
+                params: {
+                    username: data?.username
+                }
+            }).then((response) => {
+                setCarts(response.data)
+                try {
+                    if (data) {
+                        const cart = {
+                            username: data?.username,
+                            lstCartDetail: [],
+                        };
+                        if (productDetails) {
+                            console.log(productDetails)
+                            for (let i = 0; i < productDetails.length; i++) {
+                                if (response.data.length === 0) {
+                                    cart.lstCartDetail.push({
+                                        productDetailId: productDetails[i].data[0].id,
+                                        quantity: productDetails[i].quantity,
+                                    });
+                                } else {
+                                    for (let j = 0; j < response.data.length; j++) {
+                                        if (Number(productDetails[i].data[0].id) !== Number(response.data[j].cartDetailResponse.productDetailId)) {
+                                            cart.lstCartDetail.push({
+                                                productDetailId: productDetails[i].data[0].id,
+                                                quantity: productDetails[i].quantity,
+                                            });
+                                        }
                                     }
                                 }
                             }
+                            localStorage.removeItem('user')
                         }
-                        localStorage.removeItem('user')
+
+                        const res = axios.post(`${cartAPI}`, cart);
                     }
 
-                    const res = axios.post(`${cartAPI}`, cart);
+                    localStorage.removeItem('checkout');
+                } catch (error) {
+                    console.log(error);
                 }
-
-                localStorage.removeItem('checkout');
-            } catch (error) {
-                console.log(error);
-            }
-        }).catch((error) => {
-            console.log(error)
-        })
+            }).catch((error) => {
+                console.log(error)
+            })
+        }
     }
 
     useEffect(() => {

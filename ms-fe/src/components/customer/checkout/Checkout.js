@@ -334,7 +334,7 @@ const Checkout = ({ setRenderHeader }) => {
         const bill = {
             billCode: billCodeGen,
             price: voucherPrice(),
-            priceReduce: 0,
+            priceReduce: totalPrice - voucherPrice(),
             paymentDetailId: formData.paymentDetailId,
             billType: "Online",
             symbol: "Shipping",
@@ -601,8 +601,6 @@ const Checkout = ({ setRenderHeader }) => {
             },
         });
 
-
-
     };
 
     const getAllCarts = async () => {
@@ -617,7 +615,7 @@ const Checkout = ({ setRenderHeader }) => {
         let totalPrice = 0;
         if (data) {
             for (let i = 0; i < carts?.length; i++) {
-                totalPrice += carts[i].cartDetailResponse.priceProductDetail
+                totalPrice += (carts[i].cartDetailResponse.priceProductDetail - carts[i].promotion[0].promotionValue)
                     * carts[i].cartDetailResponse.quantity;
             }
         } else {
@@ -654,6 +652,8 @@ const Checkout = ({ setRenderHeader }) => {
     useEffect(() => {
         window.scrollTo(0, 0);
         getAddress()
+        console.log(voucherAdd)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     useEffect(() => {
@@ -965,7 +965,7 @@ const Checkout = ({ setRenderHeader }) => {
                                                                             "-" +
                                                                             productDetail.cartDetailResponse.materialName +
                                                                             "-" +
-                                                                            productDetail.cartDetailResponse.collarTypeName +
+                                                                            productDetail.cartDetailResponse.collarName +
                                                                             "-" +
                                                                             productDetail.cartDetailResponse.sleeveName +
                                                                             "-" +
@@ -988,7 +988,7 @@ const Checkout = ({ setRenderHeader }) => {
                                                                     </div>
                                                                 </div>
                                                                 <div>
-                                                                    {numeral(productDetail.cartDetailResponse.priceProductDetail)
+                                                                    {numeral(productDetail.cartDetailResponse.priceProductDetail - productDetail.promotion[0].promotionValue)
                                                                         .format('0,0') + 'đ'}
                                                                 </div>
                                                             </Space>
@@ -1071,7 +1071,7 @@ const Checkout = ({ setRenderHeader }) => {
                                         Tạm tính
                                     </Col>
                                     <Col span={6} >
-                                        {numeral(totalPrice).format('0,0') + 'đ'}
+                                        {numeral((totalPrice)).format('0,0') + 'đ'}
                                     </Col>
                                     <Col span={18} className={styles.textLeft}>
                                         Phí vận chuyển

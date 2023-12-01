@@ -384,7 +384,7 @@ const BillManagement = () => {
             const id = String(i + 1);
             return {
               label: (
-                <Badge count={id === '1' ? countBill.countAll
+                <Badge showZero count={id === '1' ? countBill.countAll
                   : id === '2' ? countBill.countConfirmW
                     : id === '3' ? countBill.countConfirmS
                       : id === '4' ? countBill.shipping

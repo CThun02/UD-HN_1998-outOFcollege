@@ -1,0 +1,21 @@
+.returnIndex {
+  background-color: #fff;
+  border: 1px solid #edf2f9;
+  border-radius: 4px;
+  height: 85%;
+  text-align: center;
+  padding-top: 20vh;
+  padding: 100px;
+}
+
+.filter_inputSearch {
+  width: 50%;
+  border-radius: 0;
+  box-shadow: none !important;
+  border: none;
+  border-bottom: 1px solid #ccc;
+}
+
+.filter_inputSearch span:focus {
+  border: none !important;
+}

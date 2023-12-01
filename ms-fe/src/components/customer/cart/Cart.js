@@ -346,7 +346,7 @@ const Cart = (props) => {
             render: (_, record) => {
                 return (
                     <div style={{ textAlign: "center" }}>
-                        {record.promotion.length < 0 ? (
+                        {record.promotion.length !== 0 ? (
                             <span style={{ color: "#ccc" }}>
                                 <strike>
                                     {((record?.cartDetailResponse.priceProductDetail) * (record.cartDetailResponse.quantity))?.toLocaleString("vi-VN", {
@@ -449,7 +449,6 @@ const Cart = (props) => {
                     if (selectedKeys.includes(carts[i].cartDetailResponse.productDetailId)) {
                         let priceReduced = (carts[i].promotion[0]?.promotionMethod === 'vnd' ?
                             carts[i].promotion[0]?.promotionValue : ((100 - carts[i].promotion[0]?.value) / 100) * carts[i].cartDetailResponse.priceProductDetail) * carts[i].cartDetailResponse.quantity;
-                        console.log(priceReduced)
                         totalPrice += carts[i].cartDetailResponse.priceProductDetail * carts[i].cartDetailResponse.quantity - (priceReduced ? priceReduced : 0);
                     }
                 }
@@ -457,8 +456,13 @@ const Cart = (props) => {
             } else {
                 for (let i = 0; i < productDetails.length; i++) {
                     const row = productDetails[i];
+                    console.log(row)
                     if (selectedKeys.includes(row?.data[0]?.id)) {
-                        totalPrice += row.data[0].price * row.quantity;
+                        let priceReduced = (row.data[0].promotion[0]?.promotionMethod === 'vnd' ?
+                            row.data[0].promotion[0]?.promotionValue : ((100 - row.data[0].promotion[0]?.promotionValue) / 100) * row.data[0].price) * row.quantity;
+                        console.log(priceReduced)
+                        // totalPrice += row.data[0].price * row.quantity;
+                        totalPrice += row.data[0].price * row.quantity - (priceReduced ? priceReduced : 0);
                     }
                 }
                 setTotalPrice(totalPrice);
@@ -557,6 +561,9 @@ const Cart = (props) => {
 
     useEffect(() => {
         window.scrollTo(0, 0);
+    }, [])
+
+    useEffect(() => {
         getAllCart();
         getCartAPI()
         // eslint-disable-next-line react-hooks/exhaustive-deps

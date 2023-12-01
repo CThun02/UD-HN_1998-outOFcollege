@@ -17,6 +17,8 @@ public class TimelineProductDisplayResponse {
 
     private Long billId;
 
+    private String billCode;
+
     private Long productDetailId;
 
     private Long billDetailId;
@@ -61,6 +63,7 @@ public class TimelineProductDisplayResponse {
 
     public TimelineProductDisplayResponse(TimelineProductResponse timelineProductResponse) {
         this.billId= timelineProductResponse.getBillId();
+        this.billCode = timelineProductResponse.getBillCode();
         this.productDetailId = timelineProductResponse.getProductDetailId();
         this.billDetailId = timelineProductResponse.getBillDetailId();
         this.productName = timelineProductResponse.getProductName();

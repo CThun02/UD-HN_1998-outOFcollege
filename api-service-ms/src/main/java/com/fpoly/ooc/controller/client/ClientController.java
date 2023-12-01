@@ -12,6 +12,7 @@ import com.fpoly.ooc.request.bill.BillRequest;
 import com.fpoly.ooc.request.product.ProductDetailRequest;
 import com.fpoly.ooc.request.timeline.TimeLinerequest;
 import com.fpoly.ooc.request.voucher.DisplayVoucherRequest;
+import com.fpoly.ooc.service.interfaces.AccountService;
 import com.fpoly.ooc.service.interfaces.AddressDetailService;
 import com.fpoly.ooc.service.interfaces.AddressServiceI;
 import com.fpoly.ooc.service.interfaces.BillDetailService;
@@ -73,6 +74,9 @@ public class ClientController {
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private AccountService accountService;
 
     @GetMapping("/address")
     public ResponseEntity<?> getAll(@RequestParam("username") String username) {
@@ -218,6 +222,11 @@ public class ClientController {
     @GetMapping("/address/{id}")
     public ResponseEntity<?> findByAddress(@PathVariable("id") Long id) {
         return ResponseEntity.ok(addressService.getOne(id));
+    }
+
+    @GetMapping("account/{username}")
+    public ResponseEntity<?> detail(@PathVariable String username) {
+        return ResponseEntity.ok(accountService.detail(username));
     }
 
 }

@@ -1,5 +1,6 @@
 package com.fpoly.ooc.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
 import com.fpoly.ooc.entity.Form;
@@ -8,6 +9,7 @@ import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.FormDAORepository;
 import com.fpoly.ooc.request.form.FormRequest;
 import com.fpoly.ooc.service.interfaces.FormServiceI;
+import com.fpoly.ooc.service.kafka.KafkaUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,12 +20,14 @@ import java.util.Optional;
 public class FormServiceImpl implements FormServiceI {
     @Autowired
     private FormDAORepository repo;
+    @Autowired
+    private KafkaUtil kafkaUtil;
 
     @Override
-    public Form create(Form form) {
+    public Form create(Form form) throws JsonProcessingException {
         Form formCheck = repo.findFirstByFormName(form.getFormName());
         if(formCheck==null){
-            return repo.save(form);
+            return kafkaUtil.sendingObjectWithKafka(form, Const.TOPIC_FORM);
         }
         return null;
     }
@@ -35,7 +39,11 @@ public class FormServiceImpl implements FormServiceI {
         return material1.map(o -> {
             o.setFormName(form.getFormName());
 
-            return repo.save(o);
+            try {
+                return kafkaUtil.sendingObjectWithKafka(form, Const.TOPIC_FORM);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
         }).orElse(null);
 
     }

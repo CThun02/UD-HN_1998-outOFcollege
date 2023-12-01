@@ -45,6 +45,7 @@ public class Const {
     public static final String ARRAYS_CUSTOMER_NOT_NULL = "ARRAYS_CUSTOMER_NOT_NULL";
     public static final String PASSWORD_NOT_CORRECT = "PASSWORD_NOT_CORRECT";
     public static final String ADDRESS_NOT_FOUND = "ADDRESS_NOT_FOUND";
+    public static final String ADD_ENTITY_FAIL = "ADD_ENTITY_FAIL";
 
 
     //ErrorCode
@@ -69,4 +70,21 @@ public class Const {
     public static final String SORT_BY_PRICE_UP = "SORT_BY_PRICE_UP";
     public static final String SORT_BY_PRICE_DOWN = "SORT_BY_PRICE_DOWN";
 
+    //job
+    public static final String JOB_EVERY_5_SECONDS = "*/5 * * * * *";
+
+    //topic
+    public static final String TOPIC_PRODUCT = "PRODUCT_TOPIC";
+    public static final String TOPIC_CATEGORY = "CATEGORY_TOPIC";
+    public static final String TOPIC_BRAND = "BRAND_TOPIC";
+    public static final String TOPIC_PATTERN = "PATTERN_TOPIC";
+    public static final String TOPIC_FORM = "FORM_TOPIC";
+    public static final String TOPIC_BUTTON = "BUTTON_TOPIC";
+    public static final String TOPIC_COLLAR = "COLLAR_TOPIC";
+    public static final String TOPIC_SLEEVE = "SLEEVE_TOPIC";
+    public static final String TOPIC_SHIRT_TAILS = "SHIRT_TAILS_TOPIC";
+    public static final String TOPIC_MATERIAL = "MATERIAL_TOPIC";
+    public static final String TOPIC_SIZE = "SIZE_TOPIC";
+    public static final String TOPIC_COLOR = "COLOR_TOPIC";
+    public static final String TOPIC_PRODUCT_DETAIL = "PRODUCT_DETAIL_TOPIC";
 }

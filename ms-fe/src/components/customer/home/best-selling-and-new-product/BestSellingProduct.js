@@ -1,6 +1,7 @@
-import { Col, Row, Space } from "antd";
+import { Col, List, Row, Space } from "antd";
 import styles from "./BestSellingProduct.module.css";
 import ProductsList from "../../../element/product-cart/ProductsList";
+import SockJs from "../../../../service/SockJs";
 
 function BestSellingAndNewProduct({ arrays, title }) {
   return (
@@ -21,15 +22,15 @@ function BestSellingAndNewProduct({ arrays, title }) {
 
       <div className={styles.products}>
         <div className={styles.spacing}>
-          <Row>
-            {arrays.map((product) => (
-              <ProductsList
-                span={6}
-                data={product}
-                key={product.productDetailId}
-              />
-            ))}
-          </Row>
+          <List
+            grid={{ gutter: 16, column: 4 }}
+            dataSource={arrays}
+            renderItem={(item) => (
+              <List.Item>
+                <ProductsList data={item} key={item.productDetailId} />
+              </List.Item>
+            )}
+          />
         </div>
       </div>
     </div>

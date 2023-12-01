@@ -52,6 +52,7 @@ public class ErrorCodeConfig {
         errors.put("JWT_LOGIN_ERROR", "Tài khoản hoặc mật khẩu không chính xác");
         errors.put("PASSWORD_NOT_CORRECT", "Mật khẩu không chính xác");
         errors.put("ADDRESS_NOT_FOUND", "Địa chỉ không chính xác");
+        errors.put("ADD_ENTITY_FAIL", "Thêm thất bại.");
     }
 
     public static String getMessage(String code) {

@@ -1,12 +1,13 @@
 package com.fpoly.ooc.service.interfaces;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.entity.Material;
 import com.fpoly.ooc.request.material.MaterialRequest;
 
 import java.util.List;
 
 public interface MaterialServiceI {
-    public Material create(Material material);
+    public Material create(Material material) throws JsonProcessingException;
 
     public Material update( Material material,Long id);
 

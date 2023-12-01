@@ -1,5 +1,6 @@
 package com.fpoly.ooc.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
 import com.fpoly.ooc.entity.Category;
@@ -9,6 +10,7 @@ import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.CategoryDAORepository;
 import com.fpoly.ooc.request.category.CategoryRequest;
 import com.fpoly.ooc.service.interfaces.CategoryServiceI;
+import com.fpoly.ooc.service.kafka.KafkaUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,12 +21,14 @@ import java.util.Optional;
 public class CategoryServiceImpl implements CategoryServiceI {
     @Autowired
     private CategoryDAORepository repo;
+    @Autowired
+    private KafkaUtil kafkaUtil;
 
     @Override
-    public Category create(Category category) {
+    public Category create(Category category) throws JsonProcessingException {
         Category check = repo.findFirstByCategoryName(category.getCategoryName());
         if(check==null){
-            return repo.save(category);
+            return kafkaUtil.sendingObjectWithKafka(category, Const.TOPIC_CATEGORY);
         }
         return null;
     }
@@ -36,7 +40,11 @@ public class CategoryServiceImpl implements CategoryServiceI {
         return material1.map(o -> {
             o.setCategoryName(category.getCategoryName());
 
-            return repo.save(o);
+            try {
+                return kafkaUtil.sendingObjectWithKafka(category, Const.TOPIC_CATEGORY);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
         }).orElse(null);
     }
 

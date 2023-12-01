@@ -1,5 +1,6 @@
 package com.fpoly.ooc.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.entity.Brand;
 import com.fpoly.ooc.entity.Category;
 import com.fpoly.ooc.request.category.CategoryRequest;
@@ -24,13 +25,13 @@ public class CategoryController {
     }
 
     @PostMapping("")
-    public ResponseEntity<?> create(@RequestParam String categoryName) {
+    public ResponseEntity<?> create(@RequestParam String categoryName) throws JsonProcessingException {
         Category category = Category.builder().categoryName(categoryName).build();
         return ResponseEntity.ok(service.create(category));
     }
 
     @PostMapping("create")
-    public ResponseEntity<?> create(@RequestBody Category category) {
+    public ResponseEntity<?> create(@RequestBody Category category) throws JsonProcessingException {
         return ResponseEntity.ok(service.create(category));
     }
 

@@ -1,5 +1,6 @@
 package com.fpoly.ooc.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.dto.ProductDetailsDTO;
 import com.fpoly.ooc.entity.*;
@@ -112,7 +113,7 @@ public class ProductController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> createProduct(@RequestBody ProductRequest request) {
+    public ResponseEntity<?> createProduct(@RequestBody ProductRequest request) throws JsonProcessingException {
         Product product = request.dto();
         product.setId(null);
         product.setStatus(Const.STATUS_ACTIVE);
@@ -120,7 +121,7 @@ public class ProductController {
     }
 
     @PostMapping("/createDetail")
-    public ResponseEntity<?> createProductDetail(@RequestBody ProductDetailRequest request) {
+    public ResponseEntity<?> createProductDetail(@RequestBody ProductDetailRequest request) throws JsonProcessingException {
         List<ProductDetailDisplayResponse> productDetailResponse = productDetailService.filterProductDetailsByIdCom(request,
                 null, null);
         if (productDetailResponse.isEmpty()) {
@@ -138,7 +139,7 @@ public class ProductController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<?> updateProduct(@RequestBody ProductRequest request) {
+    public ResponseEntity<?> updateProduct(@RequestBody ProductRequest request) throws JsonProcessingException {
         Product product = request.dto();
         product.setDeletedAt(null);
         return ResponseEntity.ok(service.update(product));
@@ -147,7 +148,7 @@ public class ProductController {
     @PutMapping("/updateProductStatus")
     public ResponseEntity<?> updateProductStatus(@RequestParam Long productId,
                                                  @RequestParam String status,
-                                                 @RequestParam(defaultValue = "false") Boolean openAll) {
+                                                 @RequestParam(defaultValue = "false") Boolean openAll) throws JsonProcessingException {
         Product product = service.getOne(productId);
         if ((openAll && status.equals("ACTIVE")) || status.equals("INACTIVE")) {
             productDetailService.updateProductDetailsByProductId(productId, status);
@@ -159,7 +160,7 @@ public class ProductController {
 
     @PutMapping("/updateProductDetail")
     public ResponseEntity<?> updateProductDetail(@RequestBody ProductDetail productDetail,
-                                                 @RequestParam(name = "method", defaultValue = "Update") String method) {
+                                                 @RequestParam(name = "method", defaultValue = "Update") String method) throws JsonProcessingException {
         if (method.equals("Deleted")) {
             if (productDetail.getStatus().equals("DELETED")) {
                 productDetail.setDeletedAt(LocalDateTime.now());

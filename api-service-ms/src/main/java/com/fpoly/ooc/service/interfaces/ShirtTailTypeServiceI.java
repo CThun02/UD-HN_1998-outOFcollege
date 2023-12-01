@@ -1,12 +1,13 @@
 package com.fpoly.ooc.service.interfaces;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.entity.ShirtTailType;
 import com.fpoly.ooc.request.shirttailtype.ShirtTailTypeRequest;
 
 import java.util.List;
 
 public interface ShirtTailTypeServiceI {
-    public ShirtTailType create(ShirtTailType shirtTailType);
+    public ShirtTailType create(ShirtTailType shirtTailType) throws JsonProcessingException;
 
     public ShirtTailType update(ShirtTailType shirtTailType, Long id);
 

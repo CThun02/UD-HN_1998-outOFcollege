@@ -1,5 +1,6 @@
 package com.fpoly.ooc.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.entity.ButtonType;
 import com.fpoly.ooc.request.buttontype.ButtonTypeRequest;
 import com.fpoly.ooc.service.interfaces.ButtonTypeServiceI;
@@ -22,7 +23,7 @@ public class ButtonTypeController {
     }
 
     @PostMapping("create")
-    public ResponseEntity<?> create(@RequestBody ButtonType buttonType) {
+    public ResponseEntity<?> create(@RequestBody ButtonType buttonType) throws JsonProcessingException {
         return ResponseEntity.ok(service.create(buttonType));
     }
 

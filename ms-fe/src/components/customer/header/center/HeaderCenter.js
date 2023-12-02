@@ -17,45 +17,40 @@ function HeaderCenter() {
         <Space direction="horizontal" style={{ width: "100%" }} size={32}>
           <Link
             to={"/ms-shop/home"}
-            className={`${styles.link} ${
-              selectedTab === "home" ? styles.active : ""
-            }`}
+            className={`${styles.link} ${selectedTab === "home" ? styles.active : ""
+              }`}
             onClick={() => handleOnChangeTab("home")}
           >
             Trang chủ
           </Link>
           <Link
             to={"/ms-shop/shopping"}
-            className={`${styles.link} ${
-              selectedTab === "shop" ? styles.active : ""
-            }`}
+            className={`${styles.link} ${selectedTab === "shop" ? styles.active : ""
+              }`}
             onClick={() => handleOnChangeTab("shop")}
           >
             Cửa hàng
           </Link>
           <Link
-            to={"/ms-shop/shopping"}
-            className={`${styles.link} ${
-              selectedTab === "floOrder" ? styles.active : ""
-            }`}
+            to={"/ms-shop/follow-order"}
+            className={`${styles.link} ${selectedTab === "flowOder" ? styles.active : ""
+              }`}
             onClick={() => handleOnChangeTab("flowOder")}
           >
             Theo dõi đơn hàng
           </Link>
           <Link
             to={"/ms-shop/about"}
-            className={`${styles.link} ${
-              selectedTab === "inducere" ? styles.active : ""
-            }`}
+            className={`${styles.link} ${selectedTab === "inducere" ? styles.active : ""
+              }`}
             onClick={() => handleOnChangeTab("inducere")}
           >
             Giới thiệu
           </Link>
           <Link
             to={"/ms-shop/contact"}
-            className={`${styles.link} ${
-              selectedTab === "contact" ? styles.active : ""
-            }`}
+            className={`${styles.link} ${selectedTab === "contact" ? styles.active : ""
+              }`}
             onClick={() => handleOnChangeTab("contact")}
           >
             Liên hệ

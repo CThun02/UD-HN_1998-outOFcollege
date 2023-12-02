@@ -12,6 +12,7 @@ import com.fpoly.ooc.request.bill.BillRequest;
 import com.fpoly.ooc.request.product.ProductDetailRequest;
 import com.fpoly.ooc.request.timeline.TimeLinerequest;
 import com.fpoly.ooc.request.voucher.DisplayVoucherRequest;
+import com.fpoly.ooc.service.interfaces.AccountService;
 import com.fpoly.ooc.service.interfaces.AddressDetailService;
 import com.fpoly.ooc.service.interfaces.AddressServiceI;
 import com.fpoly.ooc.service.interfaces.BillDetailService;
@@ -22,6 +23,7 @@ import com.fpoly.ooc.service.interfaces.EmailService;
 import com.fpoly.ooc.service.interfaces.TimeLineService;
 import com.fpoly.ooc.service.interfaces.VoucherService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -35,6 +37,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Optional;
 
 @RestController
@@ -71,6 +74,9 @@ public class ClientController {
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private AccountService accountService;
 
     @GetMapping("/address")
     public ResponseEntity<?> getAll(@RequestParam("username") String username) {
@@ -207,8 +213,20 @@ public class ClientController {
     }
 
     @GetMapping("/countBill")
-    public ResponseEntity<?> countBill(){
+    public ResponseEntity<?> countBill(
+            @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Optional<LocalDate> startDate,
+            @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Optional<LocalDate> endDate) {
         return ResponseEntity.ok(billService.getCountFilterBill());
+    }
+
+    @GetMapping("/address/{id}")
+    public ResponseEntity<?> findByAddress(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(addressService.getOne(id));
+    }
+
+    @GetMapping("account/{username}")
+    public ResponseEntity<?> detail(@PathVariable String username) {
+        return ResponseEntity.ok(accountService.detail(username));
     }
 
 }

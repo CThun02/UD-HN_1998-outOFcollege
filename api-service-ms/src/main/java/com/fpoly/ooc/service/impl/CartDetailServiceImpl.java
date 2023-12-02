@@ -61,7 +61,6 @@ public class CartDetailServiceImpl implements CartDetailService {
 
             List<PromotionProductResponse> lstPromotion = promotionService
                     .getPromotionByProductDetailId(lstCartDetailResponse.get(i).getProductDetailId(), "ACTIVE");
-
             CartDetailDisplayResponse cartDetailDisplayResponse = new CartDetailDisplayResponse();
             cartDetailDisplayResponse.setCartDetailResponse(lstCartDetailResponse.get(i));
             cartDetailDisplayResponse.setProductImageResponse(lstImageResponse);

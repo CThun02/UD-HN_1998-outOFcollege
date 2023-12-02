@@ -1,5 +1,6 @@
 package com.fpoly.ooc.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.entity.Bill;
 import com.fpoly.ooc.entity.ProductDetail;
 import com.fpoly.ooc.entity.ProductReturn;
@@ -44,7 +45,11 @@ public class ProductReturnService implements ProductReturnServiceI {
         if(productReturn.getReason().equals("OTHER")){
             ProductDetail productDetail = productDetailService.getOne(request.getProductDetailId());
             productDetail.setQuantity(productDetail.getQuantity() + request.getQuantity());
-            productDetailService.update(productDetail);
+            try {
+                productDetailService.update(productDetail);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
         }
         return repo.save(productReturn);
     }

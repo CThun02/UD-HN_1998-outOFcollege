@@ -12,6 +12,7 @@ import Cart from "./cart/Cart";
 import { useEffect, useState } from "react";
 import UserDetail from "./user/UserDetail";
 import TimelineByBillCode from "../element/timeline/TimelineByBillCode";
+import FollowOrder from "./follow-order/FollowOrder";
 
 function ClientPage() {
   const [render, setRender] = useState(0);
@@ -31,6 +32,7 @@ function ClientPage() {
             <Route path="checkout" element={<Checkout setRenderHeader={setRender} />} />
             <Route path="cart" element={<Cart setRenderHeader={setRender} />} />
             <Route path="anything" element={<Shop />} />
+            <Route path="follow-order" element={<FollowOrder />} />
             <Route path="user/:username" element={<UserDetail />} />
             <Route path="bill/:billCode" element={<TimelineByBillCode />} />
             <Route path="shopping">

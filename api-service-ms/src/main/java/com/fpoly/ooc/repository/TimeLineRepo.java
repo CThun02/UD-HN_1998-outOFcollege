@@ -2,16 +2,13 @@ package com.fpoly.ooc.repository;
 
 import com.fpoly.ooc.entity.Timeline;
 import com.fpoly.ooc.responce.bill.BillInfoResponse;
-import com.fpoly.ooc.responce.bill.BillManagementResponse;
 import com.fpoly.ooc.responce.timeline.TimeLineResponse;
 import com.fpoly.ooc.responce.timeline.TimelineProductResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -32,7 +29,7 @@ public interface TimeLineRepo extends JpaRepository<Timeline, Long> {
     List<TimeLineResponse> getTimeLineByBillId(@Param("billId") Long id);
 
     @Query("SELECT new com.fpoly.ooc.responce.timeline.TimelineProductResponse(" +
-            "   bd.bill.id, pd.id, bd.id, pd.product.productName, bd.quantity, bd.price, pd.size.sizeName, pd.color.colorCode," +
+            "   bd.bill.id,  bd.bill.billCode, pd.id, bd.id, pd.product.productName, bd.quantity, bd.price, pd.size.sizeName, pd.color.colorCode," +
             "   pd.button.buttonName, pd.collar.collarTypeName, pd.material.materialName, pd.sleeve.sleeveName, " +
             "   pd.shirtTail.shirtTailTypeName, pd.color.colorName, pd.form.formName, pd.pattern.patternName," +
             "   pd.brand.brandName, pd.category.categoryName, bd.status )" +
@@ -43,7 +40,7 @@ public interface TimeLineRepo extends JpaRepository<Timeline, Long> {
 
 
     @Query("SELECT new com.fpoly.ooc.responce.timeline.TimelineProductResponse(" +
-            "   b.id, pd.id, bd.id, pd.product.productName, bd.quantity, bd.price, pd.size.sizeName, pd.color.colorCode," +
+            "   b.id, b.billCode, pd.id, bd.id, pd.product.productName, bd.quantity, bd.price, pd.size.sizeName, pd.color.colorCode," +
             "   pd.button.buttonName, pd.collar.collarTypeName, pd.material.materialName, pd.sleeve.sleeveName, " +
             "   pd.shirtTail.shirtTailTypeName, pd.color.colorName, pd.form.formName, pd.pattern.patternName," +
             "   pd.brand.brandName, pd.category.categoryName, bd.status)" +
@@ -58,7 +55,7 @@ public interface TimeLineRepo extends JpaRepository<Timeline, Long> {
             "   GROUP BY pd.id, bd.id, pd.product.productName, bd.quantity, bd.price, pd.size.sizeName, pd.color.colorCode, " +
             "              pd.button.buttonName, pd.collar.collarTypeName, pd.material.materialName, pd.sleeve.sleeveName, " +
             "              pd.shirtTail.shirtTailTypeName, pd.color.colorName, pd.form.formName, pd.pattern.patternName, " +
-            "               pd.brand.brandName, pd.category.categoryName, bd.status, b.symbol, b.status,b.createdAt, b.id " +
+            "               pd.brand.brandName, pd.category.categoryName, bd.status, b.billCode, b.symbol, b.status,b.createdAt, b.id " +
             "HAVING (:symbol IS NULL OR (b.symbol like :symbol and b.status not like 'Cancel' " +
             "  AND (:count IS NULL OR COUNT(tl.id) = :count))) " +
             "ORDER BY b.createdAt DESC ")

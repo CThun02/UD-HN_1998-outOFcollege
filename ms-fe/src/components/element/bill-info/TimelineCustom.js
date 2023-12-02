@@ -5,9 +5,7 @@ import { FaRegFileAlt, FaTimes, FaTruck } from 'react-icons/fa';
 
 const TimelineCustom = ({ timelines, open, handleCancel, userInfo }) => {
     const handleOk = () => {
-        console.log(timelines.map((e) => {
-            console.log(e)
-        }))
+
     }
 
     return (

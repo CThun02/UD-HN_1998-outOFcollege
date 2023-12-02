@@ -5,14 +5,9 @@ import com.fpoly.ooc.dto.BillStatusDTO;
 import com.fpoly.ooc.request.bill.BillDetailRequest;
 import com.fpoly.ooc.request.bill.BillRequest;
 import com.fpoly.ooc.request.product.ProductDetailRequest;
-import com.fpoly.ooc.responce.bill.BillResponse;
-import com.fpoly.ooc.responce.bill.BillReturnRequestResponse;
-import com.fpoly.ooc.responce.timeline.TimelineProductDisplayResponse;
-import com.fpoly.ooc.responce.timeline.TimelineProductResponse;
 import com.fpoly.ooc.service.interfaces.BillDetailService;
 import com.fpoly.ooc.service.interfaces.BillService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -91,7 +86,7 @@ public class BillController {
     }
 
     @PostMapping()
-    public ResponseEntity<?> createBill(@RequestBody(required = false) BillRequest request) {
+    public ResponseEntity<?> createBill(@RequestBody(required = false) BillRequest request) throws JsonProcessingException {
         return ResponseEntity.ok(billService.createBill(request));
     }
 
@@ -185,7 +180,7 @@ public class BillController {
         return ResponseEntity.ok().body("Xóa thành công");
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("")
     public ResponseEntity<?> updateBillStatus(@RequestBody BillStatusDTO dto) throws JsonProcessingException {
         return ResponseEntity.ok(billService.updateBillStatus(dto));
     }

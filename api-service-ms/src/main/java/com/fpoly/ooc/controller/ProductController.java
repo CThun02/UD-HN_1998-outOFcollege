@@ -121,13 +121,18 @@ public class ProductController {
     }
 
     @PostMapping("/createDetail")
-    public ResponseEntity<?> createProductDetail(@RequestBody ProductDetailRequest request) throws JsonProcessingException {
+    public ResponseEntity<?> createProductDetail(@RequestBody ProductDetailRequest request) {
         List<ProductDetailDisplayResponse> productDetailResponse = productDetailService.filterProductDetailsByIdCom(request,
                 null, null);
         if (productDetailResponse.isEmpty()) {
             ProductDetail productDetail = request.dto();
-            productDetail = productDetailService.create(productDetail);
-            return ResponseEntity.ok(productDetail);
+            try {
+                productDetail = productDetailService.create(productDetail);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+            request.setId(productDetail.getId());
+            return ResponseEntity.ok(request);
         }
         return null;
     }
@@ -168,9 +173,7 @@ public class ProductController {
                 productDetail.setDeletedAt(null);
             }
         } else {
-            if(productDetail.getQuantity() == 0){
-                productDetail.setStatus(Const.STATUS_INACTIVE);
-            }
+
             productDetail.setDeletedAt(null);
         }
         ProductDetailRequest request = ProductDetailRequest.builder().productId(productDetail.getProduct().getId())

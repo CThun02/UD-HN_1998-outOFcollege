@@ -297,6 +297,7 @@ public class ProductDetail extends BaseEntity{
     @Column(name = "description_detail")
     private String descriptionDetail;
 
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @OneToMany(mappedBy = "productDetailId")
     private List<PromotionProduct> promotionProductList;
 

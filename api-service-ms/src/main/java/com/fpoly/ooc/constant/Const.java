@@ -89,4 +89,6 @@ public class Const {
     public static final String TOPIC_PRODUCT_DETAIL = "PRODUCT_DETAIL_TOPIC";
 
     public static final String TOPIC_TIME_LINE = "TIME_LINE_TOPIC";
+    public static final String TOPIC_CREATE_TIME_LINE = "CREATE_TIME_LINE_TOPIC";
+    public static final String TOPIC_CREATE_BILL = "CREATE_BILL_TOPIC";
 }

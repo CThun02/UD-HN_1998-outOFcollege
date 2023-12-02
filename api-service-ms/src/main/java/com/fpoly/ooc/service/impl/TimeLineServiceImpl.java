@@ -1,8 +1,10 @@
 package com.fpoly.ooc.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
+import com.fpoly.ooc.dto.TimelineBillDTO;
 import com.fpoly.ooc.entity.Bill;
 import com.fpoly.ooc.entity.DeliveryNote;
 import com.fpoly.ooc.entity.Timeline;
@@ -18,15 +20,19 @@ import com.fpoly.ooc.service.interfaces.DeliveryNoteService;
 import com.fpoly.ooc.service.interfaces.ProductImageServiceI;
 import com.fpoly.ooc.service.interfaces.TimeLineService;
 import com.fpoly.ooc.service.kafka.KafkaUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
+@Slf4j
 public class TimeLineServiceImpl implements TimeLineService {
 
     @Autowired
@@ -41,6 +47,12 @@ public class TimeLineServiceImpl implements TimeLineService {
     @Autowired
     private DeliveryNoteService deliveryNoteService;
 
+    @Autowired
+    private SimpMessagingTemplate template;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @Override
     public List<TimeLineResponse> getAllTimeLineByBillId(Long id) {
         Bill bill = billRepo.findById(id).orElse(null);
@@ -54,11 +66,11 @@ public class TimeLineServiceImpl implements TimeLineService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Timeline createTimeLine(Long billId, TimeLinerequest request) throws JsonProcessingException {
-        Bill bill = billRepo.findById(billId).orElse(null);
+        Bill bill = billRepo.findById(billId).orElseThrow(
+                () -> new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND)));
         if (bill == null) {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND));
         }
-
 
         Timeline timeLine = new Timeline();
         timeLine.setBill(bill);
@@ -83,7 +95,12 @@ public class TimeLineServiceImpl implements TimeLineService {
             timeLine.setStatus(request.getStatus());
         }
 
-        return timeLineRepo.save(timeLine);
+        Timeline timelineDb = timeLineRepo.save(timeLine);
+        String timelineJson = objectMapper.writeValueAsString(timeLineRepo.getTimeLineByBillId(bill.getId()));
+        template.convertAndSend("/topic/create-timeline-client-topic", timelineJson);
+        log.info("CreateTimeLineJson: " + timelineJson);
+
+        return timeLine;
     }
 
     @Override

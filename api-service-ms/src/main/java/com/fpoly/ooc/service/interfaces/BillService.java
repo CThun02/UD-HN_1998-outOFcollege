@@ -25,7 +25,7 @@ import java.util.List;
 
 public interface BillService {
 
-    Bill createBill(BillRequest request);
+    Bill createBill(BillRequest request) throws JsonProcessingException;
 
     List<BillManagementResponse> getAllBillManagement(
             String billCode,

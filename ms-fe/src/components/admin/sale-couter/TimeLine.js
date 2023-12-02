@@ -14,15 +14,12 @@ import ModalConfirm from "./ModalConfirm";
 import SpanBorder from "./SpanBorder";
 import ModalDetail from "./ModalDetail";
 import axios from "axios";
-import { useNavigate, useParams } from "react-router-dom";
-import moment from "moment";
+import { useParams } from "react-router-dom";
 import numeral from "numeral";
 import { CheckCircleOutlined } from "@ant-design/icons";
 import { getAuthToken, getToken } from "../../../service/Token";
 import ModalBillInfoDisplay from "../../element/bill-info/ModalBillInfoDisplay";
 import ModalProduct from "./ModalProduct";
-import ModalAddress from "./ModalAddress";
-import { async } from "q";
 import EditAddress from "../../element/edit-address/EditAddress";
 
 const BillTimeLine = (addId) => {
@@ -50,6 +47,7 @@ const BillTimeLine = (addId) => {
 
     // tạo mới timeline
     const handleCreateTimeline = async (note, stauts) => {
+        console.log(`object`, billId)
         const data = await token;
         const values = {
             note: note,
@@ -80,8 +78,9 @@ const BillTimeLine = (addId) => {
     const handleUpdateBillStatus = (status, price) => {
         axios
             .put(
-                `http://localhost:8080/api/admin/bill/${billId}`,
+                `http://localhost:8080/api/admin/bill`,
                 {
+                    id: billId,
                     status: status,
                     amountPaid: price,
                 },
@@ -105,32 +104,6 @@ const BillTimeLine = (addId) => {
             });
     };
 
-    const handleUpdateBillDetailStatus = (request, status) => {
-        axios
-            .put(
-                `http://localhost:8080/api/admin/bill/billDetail/change-status?status=` +
-                status,
-                request,
-
-                {
-                    headers: {
-                        Authorization: `Bearer ${getToken(true)}`,
-                    },
-                }
-            )
-            .then((response) => {
-                setRender(response.data.amountPaid);
-            })
-            .catch((error) => {
-                const status = error.response.status;
-                if (status === 403) {
-                    notification.error({
-                        message: "Thông báo",
-                        description: "Bạn không có quyền truy cập!",
-                    });
-                }
-            });
-    };
 
     const showModalConfirm = () => {
         setIsModalConfirm(true);
@@ -162,7 +135,7 @@ const BillTimeLine = (addId) => {
                     ? billInfo.totalPrice + billInfo?.shipPrice - billInfo.priceReduce
                     : 0
         );
-        console.log(timelines[timelines.length - 1].status)
+        console.log(billId)
         setIsModalConfirm(false);
     };
     const showModalDetail = () => {
@@ -586,7 +559,8 @@ const BillTimeLine = (addId) => {
                             </Col>
                             <Col span={12}>
                                 <SpanBorder
-                                    child={billInfo?.paymentName || "__"}
+                                    child={billInfo?.paymentName === "Cash" ? "Tiền mặt"
+                                        : "ATM" || "__"}
                                     color={"#1677ff"}
                                 />
                             </Col>

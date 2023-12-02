@@ -349,6 +349,7 @@ public class KafkaListenerService {
         if (StringUtils.isNotBlank(createTimelineJson)) {
             timeline = objectMapper.readValue(createTimelineJson, Timeline.class);
         }
+        log.error("CreateTimeLineJson: " + createTimelineJson);
 
         Timeline timelineDb = null;
         if(Objects.nonNull(timeline)) {

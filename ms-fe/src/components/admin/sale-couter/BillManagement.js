@@ -1,6 +1,15 @@
 import React, { useEffect, useState } from "react";
 import styles from "./BillManagement.module.css";
-import { Badge, Button, Input, Select, Table, Tabs, Tag, notification } from "antd";
+import {
+  Badge,
+  Button,
+  Input,
+  Select,
+  Table,
+  Tabs,
+  Tag,
+  notification,
+} from "antd";
 import {
   CheckCircleOutlined,
   ClockCircleOutlined,
@@ -16,6 +25,7 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import { getToken } from "../../../service/Token";
 import numeral from "numeral";
+import SockJs from "../../../service/SockJs";
 const { RangePicker } = DatePicker;
 
 const BillManagement = () => {
@@ -23,9 +33,9 @@ const BillManagement = () => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [status, setStatus] = useState("");
-  const [symbol, setSymbol] = useState('')
+  const [symbol, setSymbol] = useState("");
   const [createdBy, setcreatedBy] = useState("");
-  const [count, setCount] = useState('');
+  const [count, setCount] = useState("");
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
 
@@ -83,13 +93,18 @@ const BillManagement = () => {
       // dataIndex: "employee",
       key: "employee",
       render: (_, record) => {
-        return record.employee?.includes('_') ?
+        return record.employee?.includes("_") ? (
           <span>
-            {record.employee?.substring(record.employee.indexOf("_") + 1)} <br />
+            {record.employee?.substring(record.employee.indexOf("_") + 1)}{" "}
+            <br />
             {record.employee?.substring(0, record.employee.indexOf("_"))}
-          </span> :
-          record.status === 'Cancel' ? "Đã hủy" : "Chờ xác nhận";
-      }
+          </span>
+        ) : record.status === "Cancel" ? (
+          "Đã hủy"
+        ) : (
+          "Chờ xác nhận"
+        );
+      },
     },
     {
       title: "Tên khách hàng",
@@ -136,7 +151,7 @@ const BillManagement = () => {
       dataIndex: "createdDate",
       key: "createdDate",
       render: (createdDate) => {
-        return createdDate
+        return createdDate;
       },
     },
     {
@@ -148,10 +163,12 @@ const BillManagement = () => {
           object === "Unpaid"
             ? "geekblue"
             : object === "Paid"
-              ? "green"
-              : object === "Cancel"
-                ? "red"
-                : object === "Complete" ? "green" : null;
+            ? "green"
+            : object === "Cancel"
+            ? "red"
+            : object === "Complete"
+            ? "green"
+            : null;
         return (
           <Space direction="vertical">
             <div style={{ width: "auto", display: "flex" }}>
@@ -159,9 +176,10 @@ const BillManagement = () => {
                 {object === "Unpaid"
                   ? "Chưa thanh toán"
                   : object === "Cancel"
-                    ? "Đã hủy"
-                    : object === "Complete" ? "Đã hoàn thành"
-                      : "Đã thanh toán"}
+                  ? "Đã hủy"
+                  : object === "Complete"
+                  ? "Đã hoàn thành"
+                  : "Đã thanh toán"}
               </Tag>
             </div>
           </Space>
@@ -196,11 +214,14 @@ const BillManagement = () => {
     };
     console.log(params);
     axios
-      .get(`http://localhost:8080/api/admin/bill?billCode=${billCode}&startDate=${startDate}&endDate=${endDate}&status=${status}&createdBy=${createdBy}&symbol=${symbol}&count=${count}`, {
-        headers: {
-          Authorization: `Bearer ${getToken(true)}`,
-        },
-      })
+      .get(
+        `http://localhost:8080/api/admin/bill?billCode=${billCode}&startDate=${startDate}&endDate=${endDate}&status=${status}&createdBy=${createdBy}&symbol=${symbol}&count=${count}`,
+        {
+          headers: {
+            Authorization: `Bearer ${getToken(true)}`,
+          },
+        }
+      )
       .then((response) => {
         setData(response.data);
         setLoading(false);
@@ -217,14 +238,15 @@ const BillManagement = () => {
       });
   };
 
-  const [countBill, setCountBill] = useState({})
+  const [countBill, setCountBill] = useState({});
   useEffect(() => {
-    axios.get(`http://localhost:8080/api/client/countBill`)
-      .then(response => setCountBill(response.data))
-      .catch(error => console.log(error))
-    console.log(countBill)
+    axios
+      .get(`http://localhost:8080/api/client/countBill`)
+      .then((response) => setCountBill(response.data))
+      .catch((error) => console.log(error));
+    console.log(countBill);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, []);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -233,36 +255,37 @@ const BillManagement = () => {
   }, [billCode, startDate, endDate, status, createdBy, symbol, count]);
 
   const onChangeBill = (e) => {
-    if (e === '') {
-      setStatus('')
-      setcreatedBy('')
-      setSymbol('')
-      setCount('')
-    } else if (e === 'Client') {
-      setcreatedBy('CLIENT');
-      setStatus("")
-      setSymbol('')
-      setCount('')
-    } else if (e === 'Shipping') {
-      setStatus('')
-      setcreatedBy('')
-      setSymbol('Shipping')
-      setCount(3)
-    } else if (e === 'Confirmed') {
-      setStatus('')
-      setcreatedBy('')
-      setSymbol('Shipping')
-      setCount(2)
+    if (e === "") {
+      setStatus("");
+      setcreatedBy("");
+      setSymbol("");
+      setCount("");
+    } else if (e === "Client") {
+      setcreatedBy("CLIENT");
+      setStatus("");
+      setSymbol("");
+      setCount("");
+    } else if (e === "Shipping") {
+      setStatus("");
+      setcreatedBy("");
+      setSymbol("Shipping");
+      setCount(3);
+    } else if (e === "Confirmed") {
+      setStatus("");
+      setcreatedBy("");
+      setSymbol("Shipping");
+      setCount(2);
     } else {
       setStatus(e);
-      setcreatedBy("")
-      setSymbol('')
-      setCount('')
+      setcreatedBy("");
+      setSymbol("");
+      setCount("");
     }
-  }
+  };
 
   return (
     <div>
+      <SockJs connectTo={"new-bill-topic"} setValues={setData} />
       <section className={styles.filter}>
         <h2 style={{ marginBottom: "10px" }}>
           <FilterFilled /> Bộ lọc
@@ -332,8 +355,7 @@ const BillManagement = () => {
         </h2>
         <Tabs
           defaultActiveKey={status}
-          onChange={(e) => onChangeBill(e)
-          }
+          onChange={(e) => onChangeBill(e)}
           items={[
             CheckCircleOutlined,
             CloseCircleOutlined,
@@ -347,36 +369,68 @@ const BillManagement = () => {
             const id = String(i + 1);
             return {
               label: (
-                <Badge showZero count={id === '1' ? countBill.countAll
-                  : id === '2' ? countBill.countConfirmW
-                    : id === '3' ? countBill.countConfirmS
-                      : id === '4' ? countBill.shipping
-                        : id === '5' ? countBill.complete
-                          : id === '6' ? countBill.cancel
-                            : id === '7' ? countBill?.paid
-                              : id === '8' ? countBill?.unpaid
-                                : null} >
+                <Badge
+                  showZero
+                  count={
+                    id === "1"
+                      ? countBill.countAll
+                      : id === "2"
+                      ? countBill.countConfirmW
+                      : id === "3"
+                      ? countBill.countConfirmS
+                      : id === "4"
+                      ? countBill.shipping
+                      : id === "5"
+                      ? countBill.complete
+                      : id === "6"
+                      ? countBill.cancel
+                      : id === "7"
+                      ? countBill?.paid
+                      : id === "8"
+                      ? countBill?.unpaid
+                      : null
+                  }
+                >
                   <span style={{ padding: "20px" }}>
                     <Icon />
-                    {id === "1" ? "Tất cả"
-                      : id === "2" ? "Chờ xác nhận"
-                        : id === '3' ? "Đã xác nhận"
-                          : id === "4" ? "Đang giao"
-                            : id === "5" ? "Đã hoàn thành"
-                              : id === "6" ? "Đã hủy"
-                                : id === '7' ? "Đã thanh toán"
-                                  : id === "8" ? "Chưa thanh toán" : ""}
+                    {id === "1"
+                      ? "Tất cả"
+                      : id === "2"
+                      ? "Chờ xác nhận"
+                      : id === "3"
+                      ? "Đã xác nhận"
+                      : id === "4"
+                      ? "Đang giao"
+                      : id === "5"
+                      ? "Đã hoàn thành"
+                      : id === "6"
+                      ? "Đã hủy"
+                      : id === "7"
+                      ? "Đã thanh toán"
+                      : id === "8"
+                      ? "Chưa thanh toán"
+                      : ""}
                   </span>
                 </Badge>
               ),
-              key: id === "1" ? ""
-                : id === "2" ? "Client"
-                  : id === '3' ? "Confirmed"
-                    : id === "4" ? "Shipping"
-                      : id === "5" ? "Complete"
-                        : id === "6" ? "Cancel"
-                          : id === "7" ? "Paid"
-                            : id === "8" ? "Unpaid" : '',
+              key:
+                id === "1"
+                  ? ""
+                  : id === "2"
+                  ? "Client"
+                  : id === "3"
+                  ? "Confirmed"
+                  : id === "4"
+                  ? "Shipping"
+                  : id === "5"
+                  ? "Complete"
+                  : id === "6"
+                  ? "Cancel"
+                  : id === "7"
+                  ? "Paid"
+                  : id === "8"
+                  ? "Unpaid"
+                  : "",
               children: (
                 <div style={{ padding: "8px" }}>
                   <span style={{ fontWeight: 500 }}>
@@ -406,7 +460,7 @@ const BillManagement = () => {
           })}
         />
       </section>
-    </div >
+    </div>
   );
 };
 

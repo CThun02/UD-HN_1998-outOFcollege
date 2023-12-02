@@ -32,6 +32,7 @@ import com.fpoly.ooc.service.interfaces.ProductImageServiceI;
 import com.fpoly.ooc.service.interfaces.VoucherAccountService;
 import com.fpoly.ooc.service.interfaces.VoucherService;
 import com.fpoly.ooc.service.kafka.KafkaUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,6 +47,7 @@ import java.util.Calendar;
 import java.util.List;
 
 @Service
+@Slf4j
 public class BillServiceImpl implements BillService {
 
     @Autowired
@@ -89,7 +91,7 @@ public class BillServiceImpl implements BillService {
 
     @Transactional
     @Override
-    public Bill createBill(BillRequest request) {
+    public Bill createBill(BillRequest request) throws JsonProcessingException {
         Account accountBuilder = null;
 
         if (request.getAccountId() != null) {
@@ -182,7 +184,7 @@ public class BillServiceImpl implements BillService {
             VoucherAccount voucherAccount = new VoucherAccount();
 //            voucherAccount.se
         }
-        return bill;
+        return kafkaUtil.sendingObjectWithKafka(bill, Const.TOPIC_CREATE_BILL);
     }
 
     @Override
@@ -248,6 +250,7 @@ public class BillServiceImpl implements BillService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Integer updateBillStatus(BillStatusDTO dto) throws JsonProcessingException {
+        log.warn("BillStatusDTORequest: " + dto);
         kafkaUtil.sendingObjectWithKafka(dto, Const.TOPIC_TIME_LINE);
         return 1;
     }

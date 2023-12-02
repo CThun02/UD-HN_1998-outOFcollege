@@ -47,6 +47,7 @@ const BillTimeLine = (addId) => {
 
     // tạo mới timeline
     const handleCreateTimeline = async (note, stauts) => {
+        console.log(`object`, billId)
         const data = await token;
         const values = {
             note: note,
@@ -134,7 +135,7 @@ const BillTimeLine = (addId) => {
                     ? billInfo.totalPrice + billInfo?.shipPrice - billInfo.priceReduce
                     : 0
         );
-        console.log(timelines[timelines.length - 1].status)
+        console.log(billId)
         setIsModalConfirm(false);
     };
     const showModalDetail = () => {

@@ -41,6 +41,9 @@ public class TimeLineServiceImpl implements TimeLineService {
     @Autowired
     private DeliveryNoteService deliveryNoteService;
 
+    @Autowired
+    private KafkaUtil kafkaUtil;
+
     @Override
     public List<TimeLineResponse> getAllTimeLineByBillId(Long id) {
         Bill bill = billRepo.findById(id).orElse(null);
@@ -82,7 +85,7 @@ public class TimeLineServiceImpl implements TimeLineService {
             timeLine.setStatus(request.getStatus());
         }
 
-        return timeLineRepo.save(timeLine);
+        return kafkaUtil.sendingObjectWithKafka(timeLine, Const.TOPIC_CREATE_TIME_LINE);
     }
 
     @Override

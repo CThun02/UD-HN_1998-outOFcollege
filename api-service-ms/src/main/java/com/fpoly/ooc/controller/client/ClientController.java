@@ -184,7 +184,7 @@ public class ClientController {
     }
 
 
-    @PutMapping("/change-status-bill/{id}")
+    @PutMapping("/change-status-bill")
     public ResponseEntity<?> updateBillStatus(@RequestBody BillStatusDTO dto) throws JsonProcessingException {
         return ResponseEntity.ok(billService.updateBillStatus(dto));
     }

@@ -67,42 +67,42 @@ const ProductDetailsTable = (props) => {
       while (j < allProductDetailsCopy.length) {
         if (
           allProductDetailsCopy[i].brand.id ===
-            allProductDetailsCopy[j].brand.id &&
+          allProductDetailsCopy[j].brand.id &&
           allProductDetailsCopy[i].category.id ===
-            allProductDetailsCopy[j].category.id &&
+          allProductDetailsCopy[j].category.id &&
           allProductDetailsCopy[i].button.id ===
-            allProductDetailsCopy[j].button.id &&
+          allProductDetailsCopy[j].button.id &&
           allProductDetailsCopy[i].material.id ===
-            allProductDetailsCopy[j].material.id &&
+          allProductDetailsCopy[j].material.id &&
           allProductDetailsCopy[i].sleeve.id ===
-            allProductDetailsCopy[j].sleeve.id &&
+          allProductDetailsCopy[j].sleeve.id &&
           allProductDetailsCopy[i].collar.id ===
-            allProductDetailsCopy[j].collar.id &&
+          allProductDetailsCopy[j].collar.id &&
           allProductDetailsCopy[i].shirtTail.id ===
-            allProductDetailsCopy[j].shirtTail.id &&
+          allProductDetailsCopy[j].shirtTail.id &&
           allProductDetailsCopy[i].color.id ===
-            allProductDetailsCopy[j].color.id &&
+          allProductDetailsCopy[j].color.id &&
           allProductDetailsCopy[i].size.id === allProductDetailsCopy[j].size.id
         ) {
           // Nếu các thuộc tính giống nhau, bỏ qua
           j++;
         } else if (
           allProductDetailsCopy[i].brand.id ===
-            allProductDetailsCopy[j].brand.id &&
+          allProductDetailsCopy[j].brand.id &&
           allProductDetailsCopy[i].category.id ===
-            allProductDetailsCopy[j].category.id &&
+          allProductDetailsCopy[j].category.id &&
           allProductDetailsCopy[i].button.id ===
-            allProductDetailsCopy[j].button.id &&
+          allProductDetailsCopy[j].button.id &&
           allProductDetailsCopy[i].material.id ===
-            allProductDetailsCopy[j].material.id &&
+          allProductDetailsCopy[j].material.id &&
           allProductDetailsCopy[i].sleeve.id ===
-            allProductDetailsCopy[j].sleeve.id &&
+          allProductDetailsCopy[j].sleeve.id &&
           allProductDetailsCopy[i].collar.id ===
-            allProductDetailsCopy[j].collar.id &&
+          allProductDetailsCopy[j].collar.id &&
           allProductDetailsCopy[i].shirtTail.id ===
-            allProductDetailsCopy[j].shirtTail.id &&
+          allProductDetailsCopy[j].shirtTail.id &&
           allProductDetailsCopy[i].color.id ===
-            allProductDetailsCopy[j].color.id
+          allProductDetailsCopy[j].color.id
         ) {
           // Nếu các thuộc tính trừ size giống nhau, thêm vào productDetails và loại bỏ khỏi mảng
           productDetails.push(allProductDetailsCopy.splice(j, 1)[0]);
@@ -119,8 +119,7 @@ const ProductDetailsTable = (props) => {
 
   function createImgageDetail(productDetail) {
     for (let object of imgList) {
-      if (Number(object.color.id) === Number(productDetail.color.id)) {
-        console.log("đã ok");
+      if (Number(object.color.id) === Number(productDetail.colorId)) {
         for (let i = 0; i < object.imgs.length; i++) {
           const currentTimeInMillis = new Date().getTime();
           const filename = currentTimeInMillis + object.productName;
@@ -142,7 +141,7 @@ const ProductDetailsTable = (props) => {
                     Authorization: `Bearer ${getToken(true)}`,
                   },
                 })
-                .then((res) => {})
+                .then((res) => { })
                 .catch((err) => {
                   const status = err.response.status;
                   if (status === 403) {
@@ -277,11 +276,7 @@ const ProductDetailsTable = (props) => {
                   },
                 })
                 .then((response) => {
-                  if (
-                    response.data !== "" &&
-                    response.data !== null &&
-                    response.data !== undefined
-                  ) {
+                  if (response) {
                     createImgageDetail(response.data);
                   }
                 })
@@ -291,7 +286,7 @@ const ProductDetailsTable = (props) => {
                     message: "Thông báo",
                     description: "Thêm mới các chi tiết sản phẩm Thất bại",
                   });
-                  return;
+                  return null;
                 });
             }
           }
@@ -393,15 +388,15 @@ const ProductDetailsTable = (props) => {
                           onChange={(event) => {
                             uploadImage(
                               product.productName.replaceAll(" ", "_") +
-                                productDetails[0].button.id +
-                                productDetails[0].brand.id +
-                                productDetails[0].category.id +
-                                productDetails[0].material.id +
-                                productDetails[0].collar.id +
-                                productDetails[0].sleeve.id +
-                                productDetails[0].shirtTail.id +
-                                productDetails[0].pattern.id +
-                                productDetails[0].form.id,
+                              productDetails[0].button.id +
+                              productDetails[0].brand.id +
+                              productDetails[0].category.id +
+                              productDetails[0].material.id +
+                              productDetails[0].collar.id +
+                              productDetails[0].sleeve.id +
+                              productDetails[0].shirtTail.id +
+                              productDetails[0].pattern.id +
+                              productDetails[0].form.id,
                               productDetails[0].color,
                               event.target.files
                             );
@@ -546,9 +541,9 @@ const ProductDetailsTable = (props) => {
                                             isDeleted
                                               ? {}
                                               : deleteImageDetail(
-                                                  productDetails[0].color.name,
-                                                  index
-                                                )
+                                                productDetails[0].color.name,
+                                                index
+                                              )
                                           }
                                           key="delete"
                                         />,

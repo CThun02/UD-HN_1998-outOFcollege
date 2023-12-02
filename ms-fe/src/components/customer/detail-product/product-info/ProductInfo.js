@@ -97,8 +97,32 @@ function ProductInfo({
     navigate('/ms-shop/cart');
   }
 
+  const handleByNow = async (e) => {
+    e.preventDefault();
+    const data = await token;
+    let lstCartDetail = []
+    if (data) {
+      axios.post(`${cartAPI}`, {
+        username: data.username,
+        lstCartDetail: [{
+          productDetailId: productDetails[0].id,
+          quantity: quantity
+        }]
+      }).then((response) => {
+        console.log(response.data)
+      }).catch((err) => {
+        console.log(err)
+      })
+    } else {
+      lstCartDetail.push(({ data: productDetails, quantity: quantity }))
+    }
+    localStorage.setItem('checkout', JSON.stringify(lstCartDetail));
+    navigate('/ms-shop/checkout');
+  }
+
   useEffect(() => {
     const existingItem = localStorage.getItem('user');
+    localStorage.getItem('checkout');
 
     if (!existingItem) {
       localStorage.setItem(
@@ -257,7 +281,7 @@ function ProductInfo({
           </Col>
           <Col span={12}>
             <div className={styles.btnShoppingNow}>
-              <button className={`${styles.btn} ${styles.shoppingNow}`}>
+              <button className={`${styles.btn} ${styles.shoppingNow}`} onClick={(e) => handleByNow(e)}>
                 <FontAwesomeIcon
                   icon={faCirclePlus}
                   className={styles.iconAddToCart}

@@ -85,7 +85,7 @@ public class ClientController {
     }
 
     @PostMapping("/bill")
-    public ResponseEntity<?> createBill(@RequestBody(required = false) BillRequest request) {
+    public ResponseEntity<?> createBill(@RequestBody(required = false) BillRequest request) throws JsonProcessingException {
         return ResponseEntity.ok(billService.createBill(request));
     }
 

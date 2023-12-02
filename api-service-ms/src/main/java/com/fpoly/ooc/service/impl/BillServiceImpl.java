@@ -3,6 +3,7 @@ package com.fpoly.ooc.service.impl;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
 import com.fpoly.ooc.dto.BillStatusDTO;
+import com.fpoly.ooc.dto.VoucherAccountConditionDTO;
 import com.fpoly.ooc.entity.*;
 import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.BillDetailRepo;
@@ -13,6 +14,7 @@ import com.fpoly.ooc.repository.VoucherHistoryRepository;
 import com.fpoly.ooc.request.bill.BillDetailRequest;
 import com.fpoly.ooc.request.bill.BillRequest;
 import com.fpoly.ooc.request.product.ProductDetailRequest;
+import com.fpoly.ooc.request.voucher.VoucherRequest;
 import com.fpoly.ooc.responce.bill.*;
 import com.fpoly.ooc.responce.account.GetListCustomer;
 import com.fpoly.ooc.responce.product.ProductDetailDisplayResponse;
@@ -26,6 +28,9 @@ import com.fpoly.ooc.service.interfaces.DeliveryNoteService;
 import com.fpoly.ooc.service.interfaces.EmailService;
 import com.fpoly.ooc.service.interfaces.ProductDetailServiceI;
 import com.fpoly.ooc.service.interfaces.ProductImageServiceI;
+import com.fpoly.ooc.service.interfaces.VoucherAccountService;
+import com.fpoly.ooc.service.interfaces.VoucherService;
+import lombok.Builder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -72,6 +77,12 @@ public class BillServiceImpl implements BillService {
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private VoucherService voucherService;
+
+    @Autowired
+    private VoucherAccountService voucherAccountService;
 
     @Transactional
     @Override
@@ -150,12 +161,20 @@ public class BillServiceImpl implements BillService {
             timeLineRepo.save(timeline);
         }
 
-        VoucherHistory voucherHistory = VoucherHistory.builder()
-                .bill(bill)
-                .voucherCode(request.getVoucherCode())
-                .build();
-        voucherHistoryRepository.save(voucherHistory);
 
+        if (request.getVoucherCode() != null) {
+            VoucherRequest voucher = VoucherRequest.builder()
+                    .voucherCode(request.getVoucherCode())
+                    .limitQuantity(voucherService.findVoucherByVoucherCode(request.getVoucherCode()).getLimitQuantity() - 1)
+                    .build();
+            voucherService.saveOrUpdate(voucher);
+
+            VoucherHistory voucherHistory = VoucherHistory.builder()
+                    .bill(bill)
+                    .voucherCode(request.getVoucherCode())
+                    .build();
+            voucherHistoryRepository.save(voucherHistory);
+        }
         return bill;
     }
 

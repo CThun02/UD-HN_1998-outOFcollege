@@ -342,4 +342,23 @@ public class KafkaListenerService {
             log.info("TimeLineJson: " + timeLineJson);
         }
     }
+
+    @KafkaListener(topics = Const.TOPIC_CREATE_TIME_LINE, groupId = Const.KAFKA_GROUP_ID)
+    public void listenerCreateTimeline(String createTimelineJson) throws JsonProcessingException {
+        Timeline timeline = null;
+        if (StringUtils.isNotBlank(createTimelineJson)) {
+            timeline = objectMapper.readValue(createTimelineJson, Timeline.class);
+        }
+
+        Timeline timelineDb = null;
+        if(Objects.nonNull(timeline)) {
+            timelineDb = timeLineRepo.save(timeline);
+        }
+
+        if(Objects.nonNull(timelineDb)) {
+            String timelineJson = objectMapper.writeValueAsString(timeLineRepo.getTimeLineByBillId(timelineDb.getBill().getId()));
+            template.convertAndSend("/topic/create-timeline-client-topic", timelineJson);
+            log.info("CreateTimeLineJson: " + timelineJson);
+        }
+    }
 }

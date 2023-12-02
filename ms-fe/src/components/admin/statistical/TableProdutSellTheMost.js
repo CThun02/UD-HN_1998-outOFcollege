@@ -41,20 +41,21 @@ const TableProdutSellTheMost = ({ date, dateToP, type }) => {
               >
                 {record.promotion.length !== 0 ? (
                   <Badge.Ribbon
-                    text={`Giảm ${record.promotion[0].promotionValue
-                      ? record.promotion[0].promotionMethod === "%"
-                        ? record.promotion[0].promotionValue +
-                        " " +
-                        record.promotion[0].promotionMethod
-                        : record.promotion[0].promotionValue.toLocaleString(
-                          "vi-VN",
-                          {
-                            style: "currency",
-                            currency: "VND",
-                          }
-                        )
-                      : null
-                      }`}
+                    text={`Giảm ${
+                      record.promotion[0].promotionValue
+                        ? record.promotion[0].promotionMethod === "%"
+                          ? record.promotion[0].promotionValue +
+                            " " +
+                            record.promotion[0].promotionMethod
+                          : record.promotion[0].promotionValue.toLocaleString(
+                              "vi-VN",
+                              {
+                                style: "currency",
+                                currency: "VND",
+                              }
+                            )
+                        : null
+                    }`}
                     color="red"
                   >
                     <Carousel autoplay>
@@ -164,8 +165,8 @@ const TableProdutSellTheMost = ({ date, dateToP, type }) => {
     },
   ];
   useEffect(() => {
-    var dateFrom = new Date(date);
-    var dateTo = new Date(type === "other" ? dateToP : date);
+    var dateFrom = new Date(type === "other" ? date : dateToP);
+    var dateTo = new Date(dateToP);
     function getLastDayOfMonth(month) {
       const firstDayOfNextMonth = new Date(
         Date.UTC(dateFrom.getFullYear(), month, 1)
@@ -177,13 +178,15 @@ const TableProdutSellTheMost = ({ date, dateToP, type }) => {
     }
     if (type === "month") {
       dateFrom.setDate(1);
-      dateTo.setDate(getLastDayOfMonth(dateFrom.getMonth() + 1) - 1);
+      dateTo.setDate(getLastDayOfMonth(dateFrom.getMonth()));
     } else if (type === "year") {
       dateFrom.setDate(1);
-      dateTo.setDate(getLastDayOfMonth(12) - 1);
+      dateTo.setDate(getLastDayOfMonth(11));
       dateFrom.setMonth(0);
       dateTo.setMonth(11);
     }
+    dateFrom.setHours(dateFrom.getHours() + 7);
+    dateTo.setHours(dateTo.getHours() + 7);
     if (dateFrom.getTime() > dateTo.getTime()) {
       notification.error({
         message: "Thông báo",
@@ -195,9 +198,9 @@ const TableProdutSellTheMost = ({ date, dateToP, type }) => {
       axios
         .get(
           "http://localhost:8080/api/admin/bill/getBillProductSellTheMost?day=" +
-          encodeURIComponent(dateFrom.toISOString()) +
-          "&dayTo=" +
-          encodeURIComponent(dateTo.toISOString()),
+            encodeURIComponent(dateFrom.toISOString()) +
+            "&dayTo=" +
+            encodeURIComponent(dateTo.toISOString()),
           {
             headers: {
               Authorization: `Bearer ${getToken(true)}`,

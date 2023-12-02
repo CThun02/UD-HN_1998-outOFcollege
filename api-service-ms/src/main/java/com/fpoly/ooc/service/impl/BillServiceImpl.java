@@ -304,8 +304,8 @@ public class BillServiceImpl implements BillService {
                     for (int j = monthStart; j <= monthEnd; j++) {
                         Calendar calendar = Calendar.getInstance();
                         calendar.set(listYear.get(i), j - 1, 1);
-                        int dayEnd = j == monthEnd ? dayTo : i == 0 ? dayTo : calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
-                        int dayStart = listYear.size() == 1 ? dayFrom : i == 0 ? dayFrom : 1;
+                        int dayStart = (j == monthStart && i==0) ? dayFrom : 1;
+                        int dayEnd = (j == monthEnd && i==listYear.size()-1) ? dayTo : calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
                         for (int k = dayStart; k <= dayEnd; k++) {
                             addDataLineChart(listYear.get(i), j, k, "d" + k + "-m" + j + "-y" + listYear.get(i), data);
                         }

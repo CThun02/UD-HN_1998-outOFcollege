@@ -24,8 +24,9 @@ function Header({ render, setRenderHeader }) {
 
   return (
     <div
-      className={`${checkTop > 0 ? styles.header : ""} ${visible ? styles.visible : styles.hidden
-        } ${styles.background} `}
+      className={`${checkTop > 0 ? styles.header : ""} ${
+        visible ? styles.visible : styles.hidden
+      } ${styles.background} `}
     >
       <div className={styles.paddingTopAndBottom}>
         <div className={styles.paddingLeftAndRight}>

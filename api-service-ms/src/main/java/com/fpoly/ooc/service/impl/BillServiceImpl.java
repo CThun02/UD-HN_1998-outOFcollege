@@ -171,9 +171,13 @@ public class BillServiceImpl implements BillService {
 
             VoucherHistory voucherHistory = VoucherHistory.builder()
                     .bill(bill)
+                    .priceReduce(bill.getPriceReduce())
                     .voucherCode(request.getVoucherCode())
                     .build();
             voucherHistoryRepository.save(voucherHistory);
+
+            VoucherAccount voucherAccount = new VoucherAccount();
+//            voucherAccount.se
         }
         return bill;
     }
@@ -240,8 +244,8 @@ public class BillServiceImpl implements BillService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public Integer updateBillStatus(BillStatusDTO dto, Long id) {
-        billRepo.update(dto.getStatus(), dto.getAmountPaid(), id);
+    public Integer updateBillStatus(BillStatusDTO dto) {
+        billRepo.update(dto.getStatus(), dto.getAmountPaid(), dto.getId());
         return 1;
     }
 
@@ -280,7 +284,6 @@ public class BillServiceImpl implements BillService {
     public List<ProductDetailSellResponse> getProductInBillByStatusAndId(Long id, LocalDateTime dayFrom, LocalDateTime dayTo) {
         List<ProductDetailResponse> productSellTheMost = billRepo.getProductInBillByStatusAndIdAndDate(id,
                 dayFrom, dayTo);
-        System.out.println("CHECK");
         List<ProductDetailSellResponse> billProductSellTheMosts = new ArrayList<>();
         for (int i = 0; i < productSellTheMost.size(); i++) {
             ProductDetailDisplayResponse response = new ProductDetailDisplayResponse(productSellTheMost.get(i),

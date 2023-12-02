@@ -185,9 +185,8 @@ public class BillController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateBillStatus(@PathVariable("id") Long id,
-                                              @RequestBody BillStatusDTO dto) {
-        return ResponseEntity.ok(billService.updateBillStatus(dto, id));
+    public ResponseEntity<?> updateBillStatus(@RequestBody BillStatusDTO dto) {
+        return ResponseEntity.ok(billService.updateBillStatus(dto));
     }
 
     @PutMapping("/billDetail/change-status")

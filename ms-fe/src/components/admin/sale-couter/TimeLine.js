@@ -557,7 +557,8 @@ const BillTimeLine = (addId) => {
                             </Col>
                             <Col span={12}>
                                 <SpanBorder
-                                    child={billInfo?.paymentName || "__"}
+                                    child={billInfo?.paymentName === "Cash" ? "Tiền mặt"
+                                        : "ATM" || "__"}
                                     color={"#1677ff"}
                                 />
                             </Col>

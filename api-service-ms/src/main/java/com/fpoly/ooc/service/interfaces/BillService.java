@@ -43,7 +43,7 @@ public interface BillService {
 
     List<GetListCustomer> getListCustomer();
 
-    Integer updateBillStatus(BillStatusDTO dto, Long id);
+    Integer updateBillStatus(BillStatusDTO dto);
 
     List<Address> getListAddressByUserName(String username);
 

@@ -5,7 +5,7 @@ import ChooseSize from "../../../element/choose-size/ChooseSize";
 import Quantity from "../../../element/quantity/Quantity";
 import { faCartPlus, faCirclePlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Col, Rate, Row, Space, Tag } from "antd";
+import { Col, Rate, Row, Space, Tag, notification } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import numeral from "numeral";
 import { useState } from "react";
@@ -45,6 +45,22 @@ function ProductInfo({
     e.preventDefault();
     const dataToken = await token;
     const existingItem = localStorage.getItem('user');
+    if (Object.keys(chooseColor).length === 0 || Object.keys(chooseSize).length === 0) {
+      notification.error({
+        message: "Thông báo",
+        description: "Không tìm thấy hóa đơn",
+      });
+      return;
+    }
+
+    if (quantity > colorsAndSizes?.quantity) {
+      notification.warning({
+        message: "Thông báo",
+        description: "Không đủ số lượng",
+      });
+      return;
+    }
+
     if (!dataToken) {
       if (existingItem) {
         const existingData = JSON.parse(existingItem);

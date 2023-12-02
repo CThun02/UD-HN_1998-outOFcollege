@@ -144,12 +144,10 @@ const BillTimeLine = (addId) => {
         handleUpdateBillStatus(
             action === "cancel"
                 ? "Cancel"
-                : (billInfo.symbol === "Received" &&
-                    timelines[timelines.length - 1] === "2" &&
-                    action !== "cancel") ||
-                    (billInfo.symbol === "Shipping" &&
-                        timelines[timelines.length - 1].status === "3"
-                        && action !== "cancel")
+                :
+                (billInfo.symbol === "Shipping" &&
+                    timelines[timelines.length - 1].status === "3"
+                    && action !== "cancel")
                     ? "Complete"
                     : billInfo.symbol === "Shipping" && billInfo.status === "Paid"
                         ? "Paid" : 'Unpaid',
@@ -164,7 +162,7 @@ const BillTimeLine = (addId) => {
                     ? billInfo.totalPrice + billInfo?.shipPrice - billInfo.priceReduce
                     : 0
         );
-        // }
+        console.log(timelines[timelines.length - 1].status)
         setIsModalConfirm(false);
     };
     const showModalDetail = () => {
@@ -520,7 +518,6 @@ const BillTimeLine = (addId) => {
                     <Col span={21}>
                         <h2>Thông tin đơn hàng</h2>
                     </Col>
-                    {console.log(billInfo)}
                     {billInfo?.symbol === 'Shipping'
                         && timelines[timelines.length - 1]?.status === '1'
                         && billInfo?.status !== "Paid"

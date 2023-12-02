@@ -28,7 +28,7 @@ const TableProdutSellTheMost = ({ date, dateToP, type }) => {
       key: "product",
       datatIndex: "product",
       title: "Sản phẩm",
-      width: "63%",
+      width: "60%",
       render: (text, record, index) => {
         return (
           <Row>

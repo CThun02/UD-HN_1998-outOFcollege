@@ -499,6 +499,11 @@ const Bill = () => {
 
   const handleProvinceChange = async (value, valueDB) => {
     setSelectedProvince(valueDB);
+    setSelectedDictrict(null);
+    setSelectedWard(null)
+    setLeadtime(null)
+    setShippingFee(null)
+    setDistricts([])
     if (value) {
       await axios
         .get(
@@ -520,6 +525,10 @@ const Bill = () => {
 
   const handleDistrictChange = async (value, valueDB) => {
     setSelectedDictrict(valueDB);
+    setSelectedWard(null)
+    setLeadtime(null)
+    setShippingFee(null)
+    setWards([])
     if (value) {
       try {
         const response = await axios.get(
@@ -743,35 +752,25 @@ const Bill = () => {
 
   // xóa tab
   const remove = (targetKey) => {
-    Modal.confirm({
-      title: "Xóa hóa đơn",
-      content: "Bạn có chắc chắn muốn xóa hóa đơn?",
-      async onOk() {
-        let newActiveKey = activeKey;
-        localStorage.removeItem(targetKey);
-        let lastIndex = -1;
-        items.forEach((item, i) => {
-          if (item.key === targetKey) {
-            lastIndex = i - 1;
-          }
-        });
-        const newPanes = items.filter((item) => item.key !== targetKey);
-        if (newPanes.length && newActiveKey === targetKey) {
-          if (lastIndex >= 0) {
-            newActiveKey = newPanes[lastIndex].key;
-          } else {
-            newActiveKey = newPanes[0].key;
-          }
-        }
-        notification.success({
-          message: "Thông báo",
-          description: "Xóa hóa đơn thành công!",
-        });
-        setCartId(newActiveKey);
-        setItems(newPanes);
-        setActiveKey(newActiveKey);
-      },
+    let newActiveKey = activeKey;
+    localStorage.removeItem(targetKey);
+    let lastIndex = -1;
+    items.forEach((item, i) => {
+      if (item.key === targetKey) {
+        lastIndex = i - 1;
+      }
     });
+    const newPanes = items.filter((item) => item.key !== targetKey);
+    if (newPanes.length && newActiveKey === targetKey) {
+      if (lastIndex >= 0) {
+        newActiveKey = newPanes[lastIndex].key;
+      } else {
+        newActiveKey = newPanes[0].key;
+      }
+    }
+    setCartId(newActiveKey);
+    setItems(newPanes);
+    setActiveKey(newActiveKey);
   };
 
   const onEdit = (targetKey, action) => {
@@ -953,7 +952,7 @@ const Bill = () => {
           : amountPaid,
       billType: "In-Store",
       symbol: typeShipping[index] ? "Shipping" : symbol,
-      status: typeShipping[index] ? "Unpaid" : "Paid",
+      status: typeShipping[index] ? "Unpaid" : "Complete",
       note: note,
       paymentDetailId: selectedOption[index],
       lstBillDetailRequest: [],
@@ -1356,7 +1355,7 @@ const Bill = () => {
                                     0,
                                     selectedAddress.district.indexOf("|")
                                   )
-                                  : undefined
+                                  : selectedDictrict
                               }
                             >
                               {districts &&
@@ -1393,7 +1392,7 @@ const Bill = () => {
                                     0,
                                     selectedAddress?.ward.indexOf("|")
                                   )
-                                  : undefined
+                                  : selectedWard
                               }
                             >
                               {wards &&

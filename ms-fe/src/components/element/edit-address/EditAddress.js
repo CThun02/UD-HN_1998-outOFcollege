@@ -1,9 +1,8 @@
-import { Button, Col, Input, Modal, Row, Select, notification } from 'antd'
+import { Col, Input, Modal, Row, Select, notification } from 'antd'
 import React, { useEffect, useState } from 'react'
 import FloatingLabels from '../../element/FloatingLabels/FloatingLabels'
 import * as yup from 'yup';
 import axios from 'axios';
-import { getAuthToken } from '../../../service/Token';
 import moment from 'moment';
 const EditAddress = ({
     isModalOpen,
@@ -249,10 +248,28 @@ const EditAddress = ({
             description: 'Sửa thông tin thành công',
             duration: 2
         })
+
         handleAddressCancel()
         render(Math.random)
         setFormData({})
     }
+
+    useEffect(() => {
+        axios.get(`${CLIENTURL}/address/${addressId}`)
+            .then((response) => {
+                let district =
+                    response.data.district?.substring(0, response.data.district.indexOf("|"));
+                let ward =
+                    response.data.ward?.substring(0, response.data.ward.indexOf("|"));
+                setFormData({
+                    ...response.data,
+                    district: district,
+                    ward: ward
+                })
+            })
+            .catch((error) => console.log(error))
+        console.log(`formData`, formData)
+    }, [])
 
     useEffect(() => {
         fetchProvince();
@@ -262,6 +279,7 @@ const EditAddress = ({
         let ward = formData.ward?.substring(1 + formData.ward.indexOf("|"));
         handleShippingOrderLeadtime(district, ward)
         handleShippingFee(totalPrice, district, ward)
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [addressId, formData?.district, formData?.ward])
 

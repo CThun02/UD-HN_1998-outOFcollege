@@ -137,7 +137,8 @@ function FollowingOrderContent({ billCode, status, symbol, count, createdBy }) {
   const token = getAuthToken()
 
   const userINfo = () => {
-    axios.get(`http://localhost:8080/api/client/delivery-note/${billCode}`)
+    let code = billCode ? billCode : timelines[0]?.billCode
+    axios.get(`http://localhost:8080/api/client/delivery-note/${code}`)
       .then((response) => {
         setUserInfo(response.data)
       })
@@ -153,11 +154,11 @@ function FollowingOrderContent({ billCode, status, symbol, count, createdBy }) {
       await axios.get(`http://localhost:8080/api/client/timelineByUser?username=${data?.username ? data?.username : ''}&billCode=${billCode}&status=${status}&symbol=${symbol}&count=${count}&createdBy=${createdBy}`)
         .then((response) => {
           setTimelines(response.data)
-          console.log(response.data)
           setLoading(true)
           var billSData = response.data;
           bills = [];
           if (bills.length === 0 && status !== "Complete") {
+            console.log("object")
             for (var i = 0; i < billSData.length; i++) {
               var billExists = []
               billExists.push(billSData[i])
@@ -172,9 +173,6 @@ function FollowingOrderContent({ billCode, status, symbol, count, createdBy }) {
               bills.push(billExists);
             }
           }
-          if (status === "Complete") {
-            bills = response.data;
-          }
           let totalPrice = 0;
           for (let i = 0; i < response.data.length; i++) {
             totalPrice += response.data[i].price * response.data[i].quantity
@@ -185,11 +183,8 @@ function FollowingOrderContent({ billCode, status, symbol, count, createdBy }) {
           console.error(error)
         })
     }
-
     userINfo()
     getAll()
-    // getTimeline()
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status, render, createdBy, count, symbol, billCode]);
 
@@ -214,6 +209,7 @@ function FollowingOrderContent({ billCode, status, symbol, count, createdBy }) {
                           : 'Tất cả'}
               </span>
             </div>
+            {console.log(bills)}
             {
               (bills?.length > 0 && status === '') ? bills.map((timelines) => {
                 return (
@@ -450,10 +446,10 @@ function FollowingOrderContent({ billCode, status, symbol, count, createdBy }) {
                         })}
                       </span>
                     </Col>
-                    <Col span={21}>
+                    <Col span={17}>
                     </Col>
-                    <Col span={3}>
-                      <Button style={{ marginRight: 20 }} onClick={() => handleOpen(timelines.billId)} >
+                    <Col span={7}>
+                      <Button style={{ marginRight: 20 }} onClick={() => handleOpen(timeline.billId)} >
                         Chi tiết đơn hàng
                       </Button>
                       <Button type="primary" style={{ marginRight: "20px" }}

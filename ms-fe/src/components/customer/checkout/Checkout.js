@@ -1,6 +1,5 @@
 import React, { useEffect, useState, } from 'react'
 import styles from './Checkout.module.css'
-import logoOOC from "../../../Assets/img/logo/logo_ghn.png";
 import { Button, Col, Input, Modal, Radio, Row, Select, Space, notification } from 'antd'
 import { Link, useNavigate } from 'react-router-dom'
 import { UserOutlined } from '@ant-design/icons'
@@ -13,13 +12,12 @@ import * as yup from 'yup';
 import { getAuthToken } from '../../../service/Token'
 import ModalAddress from '../../admin/sale-couter/ModalAddress.js'
 import FormUsingVoucher from '../../element/voucher/FormUsingVoucher.js';
-import MailDesign from '../../element/mail-design/MailDesign.js'
 
 const Checkout = ({ setRenderHeader }) => {
     const [provinces, setProvinces] = useState([])
     const [districts, setDistricts] = useState([])
     const [wards, setWards] = useState([])
-    // const [selectedProvince, setSelectedProvince] = useState('')
+    const [email, setEmail] = useState(null)
     const [productDetails, setProductDetails] = useState([])
     const [selectedDistrict, setSelectedDistrict] = useState('')
     const [selectedWard, setSelectedWard] = useState('')
@@ -334,7 +332,7 @@ const Checkout = ({ setRenderHeader }) => {
         const bill = {
             billCode: billCodeGen,
             price: voucherPrice(),
-            priceReduce: 0,
+            priceReduce: totalPrice - voucherPrice(),
             paymentDetailId: formData.paymentDetailId,
             billType: "Online",
             symbol: "Shipping",
@@ -345,9 +343,9 @@ const Checkout = ({ setRenderHeader }) => {
             transactionCode: formData.paymentDetailId === 2 ? '' : null,
             voucherCode: null,
             emailDetails: {
-                recipient: [formData.email],
+                recipient: dataToken ? [email] : [formData.email],
                 messageBody: `<body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: Arial, sans-serif;">
-                <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 50%; margin: 0 auto;">
+                <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="width: 100%; max-width:720px; margin: 0 auto;">
                     <tr>
                         <td align="center" bgcolor="#ffffff" style="padding: 40px 0;">
                         <table style="width: 100%; padding: 0 20px;">
@@ -367,7 +365,7 @@ const Checkout = ({ setRenderHeader }) => {
                                     <a style="color: white; font-weight: 500; padding: 16px 20px; border-radius: 4px; background-color: #1666a2; margin-right: 20px;" href="http://localhost:3000/ms-shop/bill/${billCodeGen}">
                                         Xem đơn hàng
                                     </a>
-                                    hoặc <a style="margin-left: 20px;" href="http://localhost:3000/">Đến cửa hàng của chúng tôi</a>
+                                    hoặc <a style="margin-left: 20px;" href="http://localhost:3000/">Đến cửa hàng</a>
                                 </div>
                                 <br>
                                 <hr>
@@ -378,31 +376,48 @@ const Checkout = ({ setRenderHeader }) => {
                     return (
                         `<div key={index} style="display: flex; justify-content: space-between; align-items: center; padding: 4px 20px;">
                                                     <div style="width: 20%; padding: 4px;">
-                                                        <img alt="product" style="width: 100%; border: 1px solid #ccc; border-radius: 8px;" src=${item.data[0].productImageResponse[0].path}>
+                                                        <img alt="product" style="width: 100%; border: 1px solid #ccc; border-radius: 8px;" src=${dataToken ? item.productImageResponse[0].path : item.data[0].productImageResponse[0].path}>
                                                     </div>
                                                     <div style="width: 55%; padding: 4px;">
-                                                        <p>${item.data[0].product.productName + "-" + item.data[0].button.buttonName +
-                        "-" +
-                        item.data[0].brand.brandName +
-                        "-" +
-                        item.data[0].category.categoryName +
-                        "-" +
-                        item.data[0].material.materialName +
-                        "-" +
-                        item.data[0].collar.collarTypeName +
-                        "-" +
-                        item.data[0].sleeve.sleeveName +
-                        "-" +
-                        item.data[0].shirtTail.shirtTailTypeName +
-                        "-" +
-                        item.data[0].pattern.patternName +
-                        "-" +
-                        item.data[0].form.formName} <span style="font-weight: 500;">x ${item.quantity}</span></p>
+                                                        <p>${!dataToken ? (item.data[0].product.productName + "-" + item.data[0].button.buttonName +
+                            "-" +
+                            item.data[0].brand.brandName +
+                            "-" +
+                            item.data[0].category.categoryName +
+                            "-" +
+                            item.data[0].material.materialName +
+                            "-" +
+                            item.data[0].collar.collarTypeName +
+                            "-" +
+                            item.data[0].sleeve.sleeveName +
+                            "-" +
+                            item.data[0].shirtTail.shirtTailTypeName +
+                            "-" +
+                            item.data[0].pattern.patternName +
+                            "-" +
+                            item.data[0].form.formName) : (item.cartDetailResponse.productName + "-" + item.cartDetailResponse.buttonName +
+                                "-" +
+                                item.cartDetailResponse.brandName +
+                                "-" +
+                                item.cartDetailResponse.categoryName +
+                                "-" +
+                                item.cartDetailResponse.materialName +
+                                "-" +
+                                item.cartDetailResponse.collarName +
+                                "-" +
+                                item.cartDetailResponse.sleeveName +
+                                "-" +
+                                item.cartDetailResponse.shirtTailTypeName +
+                                "-" +
+                                item.cartDetailResponse.patternName +
+                                "-" +
+                                item.cartDetailResponse.formName)} <span style="font-weight: 500;">x ${item.quantity}</span></p>
                                                     </div>
                                                     <div style="width: 25%; padding: 4px;">
-                                                        <p>${(item.data[0].price * item.quantity).toLocaleString("vi-VN", { style: "currency", currency: "VND" })}</p>
-                                                    </div>
-                                                </div>`
+                                                        <p>${(dataToken ? (item?.cartDetailResponse?.priceProductDetail - (item?.promotion[0]?.promotionValue ?? 0)).toLocaleString("vi-VN", { style: "currency", currency: "VND" }) : (item?.data[0]?.price - ((item?.data[0].promotion[0]?.promotionValue) ?? 0)).toLocaleString("vi-VN", { style: "currency", currency: "VND" }))
+                        }</p>
+                                                    </div >
+                                                </div > `
                     );
                 })}
                                             <hr>
@@ -500,7 +515,7 @@ const Checkout = ({ setRenderHeader }) => {
                                 price: totalPrice + shippingFee,
                                 email: formData.email,
                                 messageBody: `<body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: Arial, sans-serif;">
-                                <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 50%; margin: 0 auto;">
+                                <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="width: 100%; max-width:720px; margin: 0 auto;">
                                     <tr>
                                         <td align="center" bgcolor="#ffffff" style="padding: 40px 0;">
                                         <table style="width: 100%; padding: 0 20px;">
@@ -520,7 +535,7 @@ const Checkout = ({ setRenderHeader }) => {
                                                     <a style="color: white; font-weight: 500; padding: 16px 20px; border-radius: 4px; background-color: #1666a2; margin-right: 20px;" href="http://localhost:3000/ms-shop/bill/${billCodeGen}">
                                                         Xem đơn hàng
                                                     </a>
-                                                    hoặc <a style="margin-left: 20px;" href="http://localhost:3000/">Đến cửa hàng của chúng tôi</a>
+                                                    hoặc <a style="margin-left: 20px;" href="http://localhost:3000/">Đến cửa hàng</a>
                                                 </div>
                                                 <br>
                                                 <hr>
@@ -601,8 +616,6 @@ const Checkout = ({ setRenderHeader }) => {
             },
         });
 
-
-
     };
 
     const getAllCarts = async () => {
@@ -617,17 +630,17 @@ const Checkout = ({ setRenderHeader }) => {
         let totalPrice = 0;
         if (data) {
             for (let i = 0; i < carts?.length; i++) {
-                totalPrice += carts[i].cartDetailResponse.priceProductDetail
-                    * carts[i].cartDetailResponse.quantity;
+                totalPrice += (carts[i]?.cartDetailResponse?.priceProductDetail - (carts[i]?.promotion[0]?.promotionValue ?? 0))
+                    * carts[i]?.cartDetailResponse?.quantity;
             }
         } else {
             for (let i = 0; i < carts?.length; i++) {
                 totalPrice +=
-                    carts[i].data[0].price *
-                    carts[i].quantity
+                    (carts[i]?.data[0]?.price - (carts[i]?.data[0]?.promotion[0]?.promotionValue ?? 0)) *
+                    carts[i]?.quantity
             }
         }
-        setTotalPrice(totalPrice)
+        setTotalPrice(Number(totalPrice))
     }
 
     const voucherPrice = () => {
@@ -654,6 +667,20 @@ const Checkout = ({ setRenderHeader }) => {
     useEffect(() => {
         window.scrollTo(0, 0);
         getAddress()
+        const getEmail = async () => {
+            const data = await token
+            if (data) {
+                await axios.get(`http://localhost:8080/api/client/account/${data?.username}`)
+                    .then((response) => {
+                        console.log(response.data.email)
+                        setEmail(response.data.email)
+                    }).catch((error) => {
+                        console.log(error)
+                    })
+            }
+        }
+        getEmail();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     useEffect(() => {
@@ -715,7 +742,7 @@ const Checkout = ({ setRenderHeader }) => {
 
                                 {/* form */}
                                 <Row>
-                                    <Col className={styles.mb} span={24}>
+                                    {dataToken ? null : <Col className={styles.mb} span={24}>
                                         <FloatingLabels
                                             label="Email"
                                             zIndex={true}
@@ -732,7 +759,7 @@ const Checkout = ({ setRenderHeader }) => {
                                             />
                                             {error.email && <div className={styles.errorText}>{error.email}</div>}
                                         </FloatingLabels>
-                                    </Col>
+                                    </Col>}
                                     <Col className={styles.mb} span={24}>
                                         <FloatingLabels
                                             label="Họ tên"
@@ -965,7 +992,7 @@ const Checkout = ({ setRenderHeader }) => {
                                                                             "-" +
                                                                             productDetail.cartDetailResponse.materialName +
                                                                             "-" +
-                                                                            productDetail.cartDetailResponse.collarTypeName +
+                                                                            productDetail.cartDetailResponse.collarName +
                                                                             "-" +
                                                                             productDetail.cartDetailResponse.sleeveName +
                                                                             "-" +
@@ -988,7 +1015,7 @@ const Checkout = ({ setRenderHeader }) => {
                                                                     </div>
                                                                 </div>
                                                                 <div>
-                                                                    {numeral(productDetail.cartDetailResponse.priceProductDetail)
+                                                                    {numeral(productDetail?.cartDetailResponse?.priceProductDetail - (productDetail?.promotion[0]?.promotionValue ?? 0))
                                                                         .format('0,0') + 'đ'}
                                                                 </div>
                                                             </Space>
@@ -1043,7 +1070,7 @@ const Checkout = ({ setRenderHeader }) => {
                                                                     </div>
                                                                 </div>
                                                                 <div>
-                                                                    {numeral(productDetail.data[0].price)
+                                                                    {numeral(productDetail?.data[0]?.price - ((productDetail?.data[0].promotion[0]?.promotionValue) ?? 0))
                                                                         .format('0,0') + 'đ'}
                                                                 </div>
                                                             </Space>
@@ -1071,7 +1098,7 @@ const Checkout = ({ setRenderHeader }) => {
                                         Tạm tính
                                     </Col>
                                     <Col span={6} >
-                                        {numeral(totalPrice).format('0,0') + 'đ'}
+                                        {numeral((totalPrice)).format('0,0') + 'đ'}
                                     </Col>
                                     <Col span={18} className={styles.textLeft}>
                                         Phí vận chuyển

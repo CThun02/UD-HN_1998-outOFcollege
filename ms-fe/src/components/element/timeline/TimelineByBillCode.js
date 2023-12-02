@@ -1,8 +1,6 @@
-import { Input, Space } from 'antd'
+import { Space } from 'antd'
 import React from 'react'
 import FollowingOrderContent from '../../customer/user/nav/following-order/content-following-order/FollowingOrderContent'
-import { useState } from 'react'
-import HeaderNavFollowOrder from '../../customer/user/nav/following-order/header-nav/HeaderNavFollowOrder'
 import { useParams } from 'react-router-dom'
 
 const TimelineByBillCode = () => {

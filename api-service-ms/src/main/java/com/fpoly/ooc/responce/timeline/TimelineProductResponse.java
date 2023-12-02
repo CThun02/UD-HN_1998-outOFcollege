@@ -13,6 +13,8 @@ public class TimelineProductResponse {
 
     private Long billId;
 
+    private String billCode;
+
     private Long productDetailId;
 
     private Long billDetailId;

@@ -12,7 +12,6 @@ import Cart from "./cart/Cart";
 import { useEffect, useState } from "react";
 import UserDetail from "./user/UserDetail";
 import TimelineByBillCode from "../element/timeline/TimelineByBillCode";
-import FollowingOrder from "./user/nav/following-order/FollowingOrder";
 import FollowOrder from "./follow-order/FollowOrder";
 
 function ClientPage() {

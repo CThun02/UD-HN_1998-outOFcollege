@@ -742,7 +742,7 @@ const Checkout = ({ setRenderHeader }) => {
 
                                 {/* form */}
                                 <Row>
-                                    <Col className={styles.mb} span={24}>
+                                    {dataToken ? null : <Col className={styles.mb} span={24}>
                                         <FloatingLabels
                                             label="Email"
                                             zIndex={true}
@@ -759,7 +759,7 @@ const Checkout = ({ setRenderHeader }) => {
                                             />
                                             {error.email && <div className={styles.errorText}>{error.email}</div>}
                                         </FloatingLabels>
-                                    </Col>
+                                    </Col>}
                                     <Col className={styles.mb} span={24}>
                                         <FloatingLabels
                                             label="Họ tên"

@@ -37,7 +37,7 @@ function Header({ render, setRenderHeader }) {
               <HeaderCenter />
             </Col>
             <Col span={6}>
-              <HeaderRight render={setRenderHeader} />
+              <HeaderRight render={render} />
             </Col>
           </Row>
         </div>

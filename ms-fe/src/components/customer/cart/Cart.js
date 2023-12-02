@@ -188,7 +188,7 @@ const Cart = (props) => {
     const handleDeleteApi = (id) => {
         axios.delete(`${cartAPI}/${id}`)
             .then((response) => {
-                setRender(Math.random);
+                setRender(Math.random());
                 props.setRenderHeader(Math.random())
             }).catch((error) => {
                 console.log(error);
@@ -487,7 +487,6 @@ const Cart = (props) => {
                 let selectedRow = carts.find((row) => row?.cartDetailResponse.productDetailId === key);
                 newData.push(selectedRow);
             });
-            console.log(`dt`, newData)
         }
 
         if (newData.length === 0) {
@@ -525,7 +524,6 @@ const Cart = (props) => {
                             lstCartDetail: [],
                         };
                         if (productDetails) {
-                            console.log(productDetails)
                             for (let i = 0; i < productDetails.length; i++) {
                                 if (response.data.length === 0) {
                                     cart.lstCartDetail.push({

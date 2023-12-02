@@ -67,7 +67,8 @@ function FollowingOrderContent({ billCode, status, symbol, count, createdBy }) {
 
   const handleUpdateBillStatus = async () => {
     await axios
-      .put(`http://localhost:8080/api/client/change-status-bill/${billId}`, {
+      .put(`http://localhost:8080/api/client/change-status-bill`, {
+        id: billId,
         status: "Cancel",
         amountPaid: 0,
       })

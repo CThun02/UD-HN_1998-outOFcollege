@@ -25,9 +25,8 @@ function Header({ render, setRenderHeader }) {
 
   return (
     <div
-      className={`${checkTop > 0 ? styles.header : ""} ${
-        visible ? styles.visible : styles.hidden
-      } ${styles.background} `}
+      className={`${checkTop > 0 ? styles.header : ""} ${visible ? styles.visible : styles.hidden
+        } ${styles.background} `}
     >
       <div className={styles.paddingTopAndBottom}>
         <div className={styles.paddingLeftAndRight}>
@@ -39,7 +38,7 @@ function Header({ render, setRenderHeader }) {
               <HeaderCenter />
             </Col>
             <Col span={6}>
-              <HeaderRight render={render} />
+              <HeaderRight render={render} setRenderHeader={setRenderHeader} />
             </Col>
           </Row>
         </div>

@@ -44,16 +44,18 @@ const ModalBillInfoDisplay = ({ open, cancel, billCode }) => {
     };
 
     const generateQRCodeDataURL = async (text) => {
-        try {
-            const response = await fetch(`https://api.qrserver.com/v1/create-qr-code/?data=${text}&size=200x200`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch QR Code');
+        if (text) {
+            try {
+                const response = await fetch(`https://api.qrserver.com/v1/create-qr-code/?data=${text}&size=200x200`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch QR Code');
+                }
+                const qrCodeData = await response.blob();
+                return URL.createObjectURL(qrCodeData);
+            } catch (error) {
+                console.error(error);
+                return null;
             }
-            const qrCodeData = await response.blob();
-            return URL.createObjectURL(qrCodeData);
-        } catch (error) {
-            console.error(error);
-            return null;
         }
     };
 
@@ -239,23 +241,23 @@ const ModalBillInfoDisplay = ({ open, cancel, billCode }) => {
                                     </table>
                                     ---------------------------------------------------------
                                     <Row>
-                                        <Col span={18}>THONG GIA TRI HOA DON</Col>
+                                        <Col span={18}>TỔNG GIÁ TRỊ HÓA ĐƠN</Col>
                                         <Col span={6}>{bill?.totalPrice.toLocaleString("vi-VN", {
                                             style: "currency",
                                             currency: "VND",
                                         })}</Col>
-                                        <Col span={18}>TONG TIEN THANH TOAN</Col>
+                                        <Col span={18}>TỔNG TIỀN THANH TOÁN</Col>
                                         <Col span={6}>{(bill?.totalPrice + (bill?.shippingFee ?? 0)).toLocaleString("vi-VN", {
                                             style: "currency",
                                             currency: "VND",
                                         })}</Col>
-                                        <Col span={18}>TONG TIEN KHACH TRA</Col>
+                                        <Col span={18}>TỔNG TIỀN KHÁCH TRẢ</Col>
                                         <Col span={6}>{bill?.amountPaid?.toLocaleString("vi-VN", {
                                             style: "currency",
                                             currency: "VND",
                                         })}</Col>
-                                        <Col span={18}>TONG TIEN TRA LAI</Col>
-                                        <Col span={6}>{(bill?.amountPaid - (bill?.totalPrice + bill?.shippingFee)).toLocaleString("vi-VN", {
+                                        <Col span={18}>TỔNG TIỀN TRẢ LẠI</Col>
+                                        <Col span={6}>{((bill?.amountPaid - (bill?.totalPrice + bill?.shippingFee)) >= 0 ? (bill?.amountPaid - (bill?.totalPrice + bill?.shippingFee)) : 0).toLocaleString("vi-VN", {
                                             style: "currency",
                                             currency: "VND",
                                         })}</Col>

@@ -104,7 +104,7 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
                    @Param("id") Long id);
 
     @Query("SELECT COUNT(b) AS billSell, SUM(b.price) as grossRevenue FROM Bill " +
-            "b WHERE (?1 IS NULL OR b.createdAt >= ?1) AND (?2 IS NULL OR b.createdAt <= ?2)")
+            "b WHERE (?1 IS NULL OR b.createdAt >= ?1) AND (?2 IS NULL OR b.createdAt <= ?2) and b.status not like 'CANCEL' ")
     BillRevenue getBillRevenue(LocalDateTime dayFrom, LocalDateTime dayTo);
 
     @Query("SELECT pd.id AS id, pd.product AS product, pd.brand as brand, pd.category as category, pd.button AS button," +

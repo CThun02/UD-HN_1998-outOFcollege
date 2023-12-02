@@ -38,12 +38,20 @@ import dayjs from "dayjs";
 import { getToken } from "../../../service/Token";
 
 var currentDate = new Date();
+var yesterday = new Date(currentDate.getTime() - 24 * 60 * 60 * 1000);
 
-var day = currentDate.getDate();
-var month = currentDate.getMonth() + 1;
-var year = currentDate.getFullYear();
-var formattedDateNow = year + "-" + month + "-" + day;
-var formattedDateYesterday = year + "-" + month + "-" + (day - 1);
+var formattedDateNow =
+  currentDate.getFullYear() +
+  "-" +
+  (currentDate.getMonth() + 1) +
+  "-" +
+  currentDate.getDate();
+var formattedDateYesterday =
+  yesterday.getFullYear() +
+  "-" +
+  (yesterday.getMonth() + 1) +
+  "-" +
+  yesterday.getDate();
 const { Option } = Select;
 
 const StatisticalIndex = () => {
@@ -63,16 +71,19 @@ const StatisticalIndex = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const [loading, setLoading] = useState(true);
-  const [dateRevenue, setDateRevenue] = useState(formattedDateNow);
+  const [dateRevenue, setDateRevenue] = useState(formattedDateYesterday);
   const [dateRevenueTo, setDateRevenueTo] = useState(formattedDateNow);
   const [selectTypeDateProduct, setSelectTypeDateproduct] = useState("year");
   const [selectTypeDateProductReturn, setSelectTypeDateproductReturn] =
     useState("year");
-  const [dateProductSellTheMost, setDateProductSellTheMost] =
-    useState(formattedDateNow);
+  const [dateProductSellTheMost, setDateProductSellTheMost] = useState(
+    formattedDateYesterday
+  );
   const [dateProductSellTheMostTo, setDateProductSellTheMostTo] =
     useState(formattedDateNow);
-  const [dateProductReturn, setDateProductReturn] = useState(formattedDateNow);
+  const [dateProductReturn, setDateProductReturn] = useState(
+    formattedDateYesterday
+  );
   const [dateProductReturnTo, setDateProductReturnTo] =
     useState(formattedDateNow);
   const [typeDateBillRevenue, setTypeDateBillRevenue] = useState("date");
@@ -263,6 +274,16 @@ const StatisticalIndex = () => {
     },
   };
 
+  function getLastDayOfMonth(date, month) {
+    const firstDayOfNextMonth = new Date(
+      Date.UTC(date.getFullYear(), month, 1)
+    );
+    const lastDayOfMonth = new Date(
+      firstDayOfNextMonth.getTime() - 24 * 60 * 60 * 1000
+    );
+    return lastDayOfMonth.getDate();
+  }
+
   function compareRevenue() {
     if (dateValueFrom === "" || dateValueTo === "") {
       notification.error({
@@ -440,29 +461,23 @@ const StatisticalIndex = () => {
       }
     }
   }
+
   function getDataRevenue() {
-    var dateFrom = new Date(dateRevenue);
-    var dateTo = new Date(
-      typeDateBillRevenue === "other" ? dateRevenueTo : dateRevenue
+    var dateFrom = new Date(
+      typeDateBillRevenue === "other" ? dateRevenue : dateRevenueTo
     );
-    function getLastDayOfMonth(month) {
-      const firstDayOfNextMonth = new Date(
-        Date.UTC(dateFrom.getFullYear(), month, 1)
-      );
-      const lastDayOfMonth = new Date(
-        firstDayOfNextMonth.getTime() - 24 * 60 * 60 * 1000
-      );
-      return lastDayOfMonth.getDate();
-    }
+    var dateTo = new Date(dateRevenueTo);
     if (typeDateBillRevenue === "month") {
       dateFrom.setDate(1);
-      dateTo.setDate(getLastDayOfMonth(dateFrom.getMonth() + 1) - 1);
+      dateTo.setDate(getLastDayOfMonth(dateFrom, dateFrom.getMonth()));
     } else if (typeDateBillRevenue === "year") {
       dateFrom.setDate(1);
-      dateTo.setDate(getLastDayOfMonth(12) - 1);
+      dateTo.setDate(getLastDayOfMonth(dateFrom, 11));
       dateFrom.setMonth(0);
       dateTo.setMonth(11);
     }
+    dateFrom.setHours(dateFrom.getHours() + 7);
+    dateTo.setHours(dateTo.getHours() + 7);
     if (dateFrom.getTime() > dateTo.getTime()) {
       notification.error({
         message: "Thông báo",
@@ -535,7 +550,7 @@ const StatisticalIndex = () => {
                 <Select
                   value={typeDateBillRevenue}
                   onChange={(event) => {
-                    setDateRevenue(formattedDateNow);
+                    setDateRevenue(formattedDateYesterday);
                     setDateRevenueTo(formattedDateNow);
                     setTypeDateBillRevenue(event);
                   }}
@@ -573,8 +588,10 @@ const StatisticalIndex = () => {
                     className={styles.input_noneBorder}
                     style={{ width: "50%" }}
                     picker={typeDateBillRevenue}
-                    value={dayjs(dateRevenue)}
-                    onChange={(date, dateString) => setDateRevenue(dateString)}
+                    value={dayjs(dateRevenueTo)}
+                    onChange={(date, dateString) => {
+                      setDateRevenueTo(dateString);
+                    }}
                   />
                 )}
               </Col>
@@ -771,9 +788,8 @@ const StatisticalIndex = () => {
                     type="primary"
                     size="large"
                     style={{ width: "10%" }}
-                  >
-                    <CheckCircleOutlined />
-                  </Button>
+                    icon={<CheckCircleOutlined />}
+                  />
                 </Col>
 
                 <Col span={12}>
@@ -946,7 +962,7 @@ const StatisticalIndex = () => {
             <Select
               value={selectTypeDateProduct}
               onChange={(event) => {
-                setDateProductSellTheMost(formattedDateNow);
+                setDateProductSellTheMost(formattedDateYesterday);
                 setDateProductSellTheMostTo(formattedDateNow);
                 setSelectTypeDateproduct(event);
               }}
@@ -984,9 +1000,9 @@ const StatisticalIndex = () => {
                 className={styles.input_noneBorder}
                 style={{ width: "80%" }}
                 picker={selectTypeDateProduct}
-                value={dayjs(dateProductSellTheMost)}
+                value={dayjs(dateProductSellTheMostTo)}
                 onChange={(date, dateString) => {
-                  setDateProductSellTheMost(dateString);
+                  setDateProductSellTheMostTo(dateString);
                 }}
               />
             )}
@@ -1016,7 +1032,7 @@ const StatisticalIndex = () => {
             <Select
               value={selectTypeDateProductReturn}
               onChange={(event) => {
-                setDateProductReturn(formattedDateNow);
+                setDateProductReturn(formattedDateYesterday);
                 setDateProductReturnTo(formattedDateNow);
                 setSelectTypeDateproductReturn(event);
               }}
@@ -1054,9 +1070,9 @@ const StatisticalIndex = () => {
                 className={styles.input_noneBorder}
                 style={{ width: "80%" }}
                 picker={selectTypeDateProductReturn}
-                value={dayjs(dateProductReturn)}
+                value={dayjs(dateProductReturnTo)}
                 onChange={(date, dateString) => {
-                  setDateProductReturn(dateString);
+                  setDateProductReturnTo(dateString);
                 }}
               />
             )}

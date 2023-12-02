@@ -66,6 +66,9 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
     @Override
     public ProductDetail create(ProductDetail productDetail) throws JsonProcessingException {
         ProductDetail productDetailDb = repo.save(productDetail);
+        if(productDetail.getQuantity() == 0){
+            productDetail.setStatus(Const.STATUS_INACTIVE);
+        }
         if(Objects.nonNull(productDetailDb)) {
             String productDetailsJson = objectMapper.writeValueAsString(repo.findAll());
             String productDetailsShopJson = objectMapper.writeValueAsString(repo.getAllProductDetailShop(
@@ -86,6 +89,9 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
     @Override
     public ProductDetail update(ProductDetail productDetail) throws JsonProcessingException {
         ProductDetail productDetailtCheck = this.getOne(productDetail.getId());
+        if(productDetail.getQuantity() == 0){
+            productDetail.setStatus(Const.STATUS_INACTIVE);
+        }
         if (productDetailtCheck != null) {
             productDetailtCheck = kafkaUtil.sendingObjectWithKafka(productDetail, Const.TOPIC_PRODUCT_DETAIL);
         }

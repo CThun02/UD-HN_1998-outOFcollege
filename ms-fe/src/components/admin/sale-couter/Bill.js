@@ -143,22 +143,21 @@ const Bill = () => {
               >
                 {record.productDetail.promotion?.length > 0 ? (
                   <Badge.Ribbon
-                    text={`Giảm ${
-                      record.productDetail.promotion[0].promotionValue
-                        ? record.productDetail.promotion[0].promotionMethod ===
-                          "%"
-                          ? record.productDetail.promotion[0].promotionValue +
-                            " " +
-                            record.productDetail.promotion[0].promotionMethod
-                          : record.productDetail.promotion[0].promotionValue.toLocaleString(
-                              "vi-VN",
-                              {
-                                style: "currency",
-                                currency: "VND",
-                              }
-                            )
-                        : null
-                    }`}
+                    text={`Giảm ${record.productDetail.promotion[0].promotionValue
+                      ? record.productDetail.promotion[0].promotionMethod ===
+                        "%"
+                        ? record.productDetail.promotion[0].promotionValue +
+                        " " +
+                        record.productDetail.promotion[0].promotionMethod
+                        : record.productDetail.promotion[0].promotionValue.toLocaleString(
+                          "vi-VN",
+                          {
+                            style: "currency",
+                            currency: "VND",
+                          }
+                        )
+                      : null
+                      }`}
                     color="red"
                   >
                     <Carousel style={{ maxWidth: "300px" }} autoplay>
@@ -297,20 +296,20 @@ const Bill = () => {
               {record.productDetail.promotionValue
                 ? record.productDetail.promotionMethod === "%"
                   ? (
-                      (record.productDetail.price *
-                        (100 - Number(record.productDetail.promotionValue))) /
-                      100
-                    ).toLocaleString("vi-VN", {
-                      style: "currency",
-                      currency: "VND",
-                    })
+                    (record.productDetail.price *
+                      (100 - Number(record.productDetail.promotionValue))) /
+                    100
+                  ).toLocaleString("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  })
                   : (
-                      record.productDetail.price -
-                      Number(record.productDetail.promotionValue)
-                    ).toLocaleString("vi-VN", {
-                      style: "currency",
-                      currency: "VND",
-                    })
+                    record.productDetail.price -
+                    Number(record.productDetail.promotionValue)
+                  ).toLocaleString("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  })
                 : null}
             </span>
           </div>
@@ -386,13 +385,10 @@ const Bill = () => {
     },
   ];
 
-  const [selectedOption, setSelectedOption] = useState([1]);
+  const [selectedOption, setSelectedOption] = useState(1);
 
   const handleOptionChange = (value, index) => {
-    const visible = [...selectedOption];
-    visible[index] = value;
-    console.log(visible[index]);
-    setSelectedOption(visible);
+    setSelectedOption(value);
     if (value === "2") {
       setAmountPaid(0);
     }
@@ -456,7 +452,7 @@ const Bill = () => {
     delete cart.account;
     localStorage.setItem(cartId, JSON.stringify(cart));
     setSelectedAddress({});
-    setShippingFee(0);
+    setShippingFee(null);
     setLeadtime(null);
     setRendered(Math.random);
   };
@@ -706,6 +702,8 @@ const Bill = () => {
   const onChange = (newActiveKey) => {
     setCartId(newActiveKey);
     setActiveKey(newActiveKey);
+    setSelectedOption(1)
+    handleDeleteAccount()
   };
 
   // gen mã hóa đơn
@@ -816,7 +814,7 @@ const Bill = () => {
     axios
       .get(
         "http://localhost:8080/api/admin/product/getproductdetailbyidpd?productDetailId=" +
-          result,
+        result,
         {
           headers: {
             Authorization: `Bearer ${getToken(true)}`,
@@ -855,8 +853,8 @@ const Bill = () => {
             priceReduce: response.data.promotionValue
               ? response.data.promotionMethod === "%"
                 ? (response.data.price *
-                    (100 - Number(response.data.promotionValue))) /
-                  100
+                  (100 - Number(response.data.promotionValue))) /
+                100
                 : response.data.price - Number(response.data.promotionValue)
               : response.data.price,
           });
@@ -928,6 +926,10 @@ const Bill = () => {
     modalQRScanOpen,
   ]);
 
+  useEffect(() => {
+    handleDeleteAccount();
+  }, [])
+
   const [symbol, setSymbol] = useState("Received");
   const [note, setNote] = useState("");
   const [amountPaid, setAmountPaid] = useState(0);
@@ -936,7 +938,7 @@ const Bill = () => {
     const visible = [...showAddress];
     visible[index] = checked;
     setTypeShipping(visible);
-    setSelectedOption([1]);
+    setSelectedOption(1);
   };
 
   const [errors, setErrors] = useState({});
@@ -948,19 +950,19 @@ const Bill = () => {
       priceReduce: totalPrice - voucherPrice(),
       amountPaid: typeShipping[index]
         ? 0
-        : selectedOption[index] === "2"
-        ? voucherPrice() + shippingFee
-        : amountPaid,
+        : selectedOption === 2
+          ? voucherPrice() + shippingFee
+          : amountPaid,
       billType: "In-Store",
       symbol: typeShipping[index] ? "Shipping" : symbol,
       status: typeShipping[index] ? "Unpaid" : "Complete",
       note: note,
-      paymentDetailId: selectedOption[index],
+      paymentDetailId: Number(selectedOption),
       lstBillDetailRequest: [],
       addressId: selectedAddress?.id,
       fullname: selectedAddress?.fullName,
       phoneNumber: selectedAddress.numberPhone,
-      transactionCode: selectedOption[index] === "2" ? transactionCode : null,
+      transactionCode: selectedOption === "2" ? transactionCode : null,
       voucherCode: voucherAdd?.voucherCode,
       createdBy: "user3",
     };
@@ -975,7 +977,9 @@ const Bill = () => {
 
     const schema = Yup.object().shape({
       fullName: Yup.string().required("Họ và tên không được để trống"),
-      sdt: Yup.string().required("Số điện thoại không được để trống"),
+      sdt: Yup.string()
+        .required('Số điện thoại không được để trống')
+        .matches(/^[0-9]{10}$/, 'Số điện thoại phải có đúng 10 chữ số'),
       city: Yup.string().required("Tỉnh/thành phố không được để trống"),
       district: Yup.string().required("Quận/huyện không được để trống"),
       ward: Yup.string().required("Phường/xã không được để trống"),
@@ -987,10 +991,10 @@ const Bill = () => {
         description: "Không có sản phẩm nào trong giỏ hàng.",
         duration: 2,
       });
-    } else if (selectedOption[index] === 2 && transactionCode === "") {
+    } else if (Number(selectedOption) === 2 && transactionCode === "") {
       return setInputError("Mã giao dịch không được để trống");
     } else if (
-      selectedOption[index] !== "2" &&
+      Number(selectedOption) !== 2 &&
       ((remainAmount < 0 && !typeShipping[index]) || isNaN(remainAmount))
     ) {
       return setInputError("Tiền không đủ");
@@ -1010,8 +1014,7 @@ const Bill = () => {
         async onOk() {
           let addressId;
           let hasError = false;
-
-          if (account === null && switchChange[index]) {
+          if (!account && switchChange[index]) {
             try {
               await schema.validate(billAddress, { abortEarly: false });
               setErrors({});
@@ -1024,6 +1027,7 @@ const Bill = () => {
                   },
                 }
               );
+              console.log(response.data, `ứ ứ`);
               addressId = response.data.id;
             } catch (error) {
               const validationErrors = {};
@@ -1314,9 +1318,9 @@ const Bill = () => {
                               value={
                                 selectedAddress.city
                                   ? selectedAddress?.city.substring(
-                                      0,
-                                      selectedAddress?.city.indexOf("|")
-                                    )
+                                    0,
+                                    selectedAddress?.city.indexOf("|")
+                                  )
                                   : undefined
                               }
                             >
@@ -1353,9 +1357,9 @@ const Bill = () => {
                               value={
                                 selectedAddress.district
                                   ? selectedAddress?.district.substring(
-                                      0,
-                                      selectedAddress.district.indexOf("|")
-                                    )
+                                    0,
+                                    selectedAddress.district.indexOf("|")
+                                  )
                                   : selectedDictrict
                               }
                             >
@@ -1390,9 +1394,9 @@ const Bill = () => {
                               value={
                                 selectedAddress.ward
                                   ? selectedAddress?.ward.substring(
-                                      0,
-                                      selectedAddress?.ward.indexOf("|")
-                                    )
+                                    0,
+                                    selectedAddress?.ward.indexOf("|")
+                                  )
                                   : selectedWard
                               }
                             >
@@ -1457,11 +1461,11 @@ const Bill = () => {
                             productDetails.length > 0
                               ? true
                               : notification.error({
-                                  message: "Lỗi",
-                                  description:
-                                    "Chưa có sản phẩm trong giỏ hàng.",
-                                  duration: 2,
-                                })
+                                message: "Lỗi",
+                                description:
+                                  "Chưa có sản phẩm trong giỏ hàng.",
+                                duration: 2,
+                              })
                           )
                         }
                       >
@@ -1535,7 +1539,7 @@ const Bill = () => {
                           ) : null}
                         </Col>
 
-                        {switchChange[index] && (
+                        {switchChange[index] && shippingFee && (
                           <>
                             <Col span={16}>
                               <span
@@ -1600,8 +1604,8 @@ const Bill = () => {
                             </span>
                           )}
                         </Col>
-                        {Number(selectedOption[index]) !== 2 &&
-                        !typeShipping[index] ? (
+                        {Number(selectedOption) !== 2 &&
+                          !typeShipping[index] ? (
                           <>
                             <Col span={8} style={{ marginTop: "8px" }}>
                               <span
@@ -1633,7 +1637,7 @@ const Bill = () => {
                             </Col>
                           </>
                         ) : null}
-                        {Number(selectedOption[index]) === 2 ? (
+                        {Number(selectedOption) === 2 ? (
                           <>
                             <Input
                               placeholder="Nhập mã giao dịch"
@@ -1649,35 +1653,37 @@ const Bill = () => {
                             </span>
                           </>
                         ) : null}
-                        {Number(selectedOption[index]) !== 2 &&
-                        !typeShipping[index] ? (
-                          <Col span={24}>
-                            {remainAmount > 0 && (
-                              <Row style={{ marginTop: "8px" }}>
-                                <Col span={16}>
-                                  <span
-                                    style={{ fontSize: "16px", width: "200%" }}
-                                  >
-                                    Tiền thừa
-                                  </span>
-                                </Col>
-                                <Col span={8}>
-                                  <span
-                                    style={{
-                                      fontSize: "16px",
-                                      color: "red",
-                                    }}
-                                  >
-                                    {remainAmount.toLocaleString("vi-VN", {
-                                      style: "currency",
-                                      currency: "VND",
-                                    })}
-                                  </span>
-                                </Col>
-                              </Row>
-                            )}
-                          </Col>
-                        ) : null}
+                        {
+                          Number(selectedOption) !== 2 &&
+                            !typeShipping[index] ? (
+                            <Col span={24}>
+                              {remainAmount > 0 && (
+                                <Row style={{ marginTop: "8px" }}>
+                                  <Col span={16}>
+                                    <span
+                                      style={{ fontSize: "16px", width: "200%" }}
+                                    >
+                                      Tiền thừa
+                                    </span>
+                                  </Col>
+                                  <Col span={8}>
+                                    <span
+                                      style={{
+                                        fontSize: "16px",
+                                        color: "red",
+                                      }}
+                                    >
+                                      {remainAmount.toLocaleString("vi-VN", {
+                                        style: "currency",
+                                        currency: "VND",
+                                      })}
+                                    </span>
+                                  </Col>
+                                </Row>
+                              )}
+                            </Col>
+                          ) : null
+                        }
                         <TextArea
                           onChange={(e) => setNote(e.target.value)}
                           rows={3}
@@ -1723,14 +1729,14 @@ const Bill = () => {
                             Xác nhận thanh toán
                           </Button>
                         </div>
-                      </Row>
-                    </Col>
-                  </Row>
-                </div>
-              </Tabs.TabPane>
+                      </Row >
+                    </Col >
+                  </Row >
+                </div >
+              </Tabs.TabPane >
             );
           })}
-      </Tabs>
+      </Tabs >
     </>
   );
 };

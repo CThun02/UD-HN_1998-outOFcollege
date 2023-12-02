@@ -546,7 +546,7 @@ const Cart = (props) => {
                             localStorage.removeItem('user')
                         }
 
-                        const res = axios.post(`${cartAPI}`, cart);
+                        axios.post(`${cartAPI}`, cart);
                     }
 
                     localStorage.removeItem('checkout');

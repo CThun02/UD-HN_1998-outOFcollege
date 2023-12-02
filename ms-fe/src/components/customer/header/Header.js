@@ -20,12 +20,14 @@ function Header({ render, setRenderHeader }) {
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [render]);
 
   return (
     <div
-      className={`${checkTop > 0 ? styles.header : ""} ${visible ? styles.visible : styles.hidden
-        } ${styles.background} `}
+      className={`${checkTop > 0 ? styles.header : ""} ${
+        visible ? styles.visible : styles.hidden
+      } ${styles.background} `}
     >
       <div className={styles.paddingTopAndBottom}>
         <div className={styles.paddingLeftAndRight}>

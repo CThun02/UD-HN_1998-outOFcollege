@@ -62,7 +62,6 @@ public class TimeLineServiceImpl implements TimeLineService {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND));
         }
 
-
         Timeline timeLine = new Timeline();
         timeLine.setBill(bill);
         timeLine.setNote(request.getNote());

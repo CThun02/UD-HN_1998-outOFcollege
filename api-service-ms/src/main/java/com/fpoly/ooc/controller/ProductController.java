@@ -168,9 +168,7 @@ public class ProductController {
                 productDetail.setDeletedAt(null);
             }
         } else {
-            if(productDetail.getQuantity() == 0){
-                productDetail.setStatus(Const.STATUS_INACTIVE);
-            }
+
             productDetail.setDeletedAt(null);
         }
         ProductDetailRequest request = ProductDetailRequest.builder().productId(productDetail.getProduct().getId())

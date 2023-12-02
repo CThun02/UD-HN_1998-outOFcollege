@@ -130,8 +130,8 @@ const ProductReturns = ({ date, dateToP, type, reason }) => {
     },
   ];
   useEffect(() => {
-    var dateFrom = new Date(date);
-    var dateTo = new Date(type === "other" ? dateToP : date);
+    var dateFrom = new Date(type === "other" ? date : dateToP);
+    var dateTo = new Date(dateToP);
     function getLastDayOfMonth(month) {
       const firstDayOfNextMonth = new Date(
         Date.UTC(dateFrom.getFullYear(), month, 1)
@@ -143,12 +143,15 @@ const ProductReturns = ({ date, dateToP, type, reason }) => {
     }
     if (type === "month") {
       dateFrom.setDate(1);
-      dateTo.setDate(getLastDayOfMonth(dateFrom.getMonth() + 1) - 1);
+      dateTo.setDate(getLastDayOfMonth(dateFrom.getMonth()));
     } else if (type === "year") {
       dateFrom.setDate(1);
-      dateTo.setDate(getLastDayOfMonth(12) - 1);
+      dateTo.setDate(getLastDayOfMonth(11));
       dateFrom.setMonth(0);
       dateTo.setMonth(11);
+    } else {
+      dateFrom.setHours(dateFrom.getHours() + 7);
+      dateTo.setHours(dateTo.getHours() + 7);
     }
     if (dateFrom.getTime() > dateTo.getTime()) {
       notification.error({

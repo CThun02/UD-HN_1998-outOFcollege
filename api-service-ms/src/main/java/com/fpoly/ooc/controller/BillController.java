@@ -1,5 +1,6 @@
 package com.fpoly.ooc.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.dto.BillStatusDTO;
 import com.fpoly.ooc.request.bill.BillDetailRequest;
 import com.fpoly.ooc.request.bill.BillRequest;
@@ -184,9 +185,8 @@ public class BillController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateBillStatus(@PathVariable("id") Long id,
-                                              @RequestBody BillStatusDTO dto) {
-        return ResponseEntity.ok(billService.updateBillStatus(dto, id));
+    public ResponseEntity<?> updateBillStatus(@RequestBody BillStatusDTO dto) throws JsonProcessingException {
+        return ResponseEntity.ok(billService.updateBillStatus(dto));
     }
 
     @PutMapping("/billDetail/change-status")

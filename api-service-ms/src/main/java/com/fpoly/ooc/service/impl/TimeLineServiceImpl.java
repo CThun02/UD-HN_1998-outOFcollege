@@ -1,5 +1,6 @@
 package com.fpoly.ooc.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
 import com.fpoly.ooc.entity.Bill;
@@ -16,6 +17,7 @@ import com.fpoly.ooc.responce.timeline.TimelineProductResponse;
 import com.fpoly.ooc.service.interfaces.DeliveryNoteService;
 import com.fpoly.ooc.service.interfaces.ProductImageServiceI;
 import com.fpoly.ooc.service.interfaces.TimeLineService;
+import com.fpoly.ooc.service.kafka.KafkaUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,7 +53,7 @@ public class TimeLineServiceImpl implements TimeLineService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public Timeline createTimeLine(Long billId, TimeLinerequest request) {
+    public Timeline createTimeLine(Long billId, TimeLinerequest request) throws JsonProcessingException {
         Bill bill = billRepo.findById(billId).orElse(null);
         if (bill == null) {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND));

@@ -1,5 +1,6 @@
 package com.fpoly.ooc.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.entity.Bill;
 import com.fpoly.ooc.repository.BillRepo;
 import com.fpoly.ooc.request.timeline.TimeLinerequest;
@@ -43,7 +44,7 @@ public class TimelineController {
     @PostMapping("/{id}")
     public ResponseEntity<?> createTimelineByBillId(
             @PathVariable("id") Long id,
-            @RequestBody(required = false) TimeLinerequest request) {
+            @RequestBody(required = false) TimeLinerequest request) throws JsonProcessingException {
         Bill bill;
         bill = billRepo.findById(id).orElse(null);
         if (bill != null) {

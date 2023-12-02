@@ -1,5 +1,6 @@
 package com.fpoly.ooc.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
 import com.fpoly.ooc.dto.BillStatusDTO;
@@ -26,6 +27,7 @@ import com.fpoly.ooc.service.interfaces.DeliveryNoteService;
 import com.fpoly.ooc.service.interfaces.EmailService;
 import com.fpoly.ooc.service.interfaces.ProductDetailServiceI;
 import com.fpoly.ooc.service.interfaces.ProductImageServiceI;
+import com.fpoly.ooc.service.kafka.KafkaUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -72,6 +74,9 @@ public class BillServiceImpl implements BillService {
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private KafkaUtil kafkaUtil;
 
     @Transactional
     @Override
@@ -221,8 +226,8 @@ public class BillServiceImpl implements BillService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public Integer updateBillStatus(BillStatusDTO dto, Long id) {
-        billRepo.update(dto.getStatus(), dto.getAmountPaid(), id);
+    public Integer updateBillStatus(BillStatusDTO dto) throws JsonProcessingException {
+        kafkaUtil.sendingObjectWithKafka(dto, Const.TOPIC_TIME_LINE);
         return 1;
     }
 

@@ -703,6 +703,9 @@ const Bill = () => {
     setCartId(newActiveKey);
     setActiveKey(newActiveKey);
     setSelectedOption(1)
+    setSelectedProvince(null)
+    setSelectedDictrict(null)
+    setSelectedWard(null)
     handleDeleteAccount()
   };
 
@@ -1321,7 +1324,7 @@ const Bill = () => {
                                     0,
                                     selectedAddress?.city.indexOf("|")
                                   )
-                                  : undefined
+                                  : selectedProvince
                               }
                             >
                               {provinces &&

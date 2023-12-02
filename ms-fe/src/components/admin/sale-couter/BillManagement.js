@@ -115,7 +115,7 @@ const BillManagement = () => {
           <Space direction="vertical" style={{ width: "auto" }}>
             <div style={{ display: "block" }}>
               <div>
-                {record.accountName ? record.accountName : record.fullName}
+                {record.fullName ? record.fullName : record.fullName}
               </div>
               <Tag color={colorAccount}>
                 {record.accountName ? "Thành viên" : "khách lẻ"}

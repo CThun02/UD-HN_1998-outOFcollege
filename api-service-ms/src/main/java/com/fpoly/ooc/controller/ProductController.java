@@ -133,7 +133,7 @@ public class ProductController {
     }
 
     @PostMapping("/createProductImg")
-    public ResponseEntity<?> createProductImg(@RequestBody ProductImageRequest request) {
+    public ResponseEntity<?> createProductImg(@RequestBody ProductImageRequest request) throws JsonProcessingException {
         ProductImage productImage = request.dto();
         return ResponseEntity.ok(productImageService.create(productImage));
     }

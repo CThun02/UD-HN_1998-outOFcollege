@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.dto.BillStatusDTO;
+import com.fpoly.ooc.dto.TimelineBillDTO;
 import com.fpoly.ooc.entity.Bill;
 import com.fpoly.ooc.entity.Brand;
 import com.fpoly.ooc.entity.ButtonType;
@@ -328,9 +329,13 @@ public class KafkaListenerService {
             bill = objectMapper.readValue(billJson, BillStatusDTO.class);
         }
 
-        Integer billDb = null;
+        Bill billDb = null;
         if(Objects.nonNull(bill)) {
-            billDb = billRepo.update(bill.getStatus(), bill.getAmountPaid(), bill.getId());
+            Bill billReq = new Bill();
+            billReq.setId(bill.getId());
+            billReq.setAmountPaid(bill.getAmountPaid());
+            billReq.setStatus(bill.getStatus());
+            billDb = billRepo.save(billReq);
         }
 
         if(Objects.nonNull(billDb)) {
@@ -343,23 +348,43 @@ public class KafkaListenerService {
         }
     }
 
-    @KafkaListener(topics = Const.TOPIC_CREATE_TIME_LINE, groupId = Const.KAFKA_GROUP_ID)
-    public void listenerCreateTimeline(String createTimelineJson) throws JsonProcessingException {
-        Timeline timeline = null;
-        if (StringUtils.isNotBlank(createTimelineJson)) {
-            timeline = objectMapper.readValue(createTimelineJson, Timeline.class);
-        }
-        log.error("CreateTimeLineJson: " + createTimelineJson);
-
-        Timeline timelineDb = null;
-        if(Objects.nonNull(timeline)) {
-            timelineDb = timeLineRepo.save(timeline);
+    @KafkaListener(topics = Const.TOPIC_CREATE_BILL, groupId = Const.KAFKA_GROUP_ID)
+    public void listenerCreateBill(String billJson) throws JsonProcessingException {
+        Bill bill = null;
+        if (StringUtils.isNotBlank(billJson)) {
+            bill = objectMapper.readValue(billJson, Bill.class);
         }
 
-        if(Objects.nonNull(timelineDb)) {
-            String timelineJson = objectMapper.writeValueAsString(timeLineRepo.getTimeLineByBillId(timelineDb.getBill().getId()));
-            template.convertAndSend("/topic/create-timeline-client-topic", timelineJson);
-            log.info("CreateTimeLineJson: " + timelineJson);
+        Bill billDb = null;
+        if(Objects.nonNull(bill)) {
+            billDb = billRepo.save(bill);
+        }
+
+        if(Objects.nonNull(billDb)) {
+            String createBill = objectMapper.writeValueAsString(billRepo.getAllBillManagement(null, null,
+                    null, null, null, null, null));
+            template.convertAndSend("/topic/new-bill-topic", createBill);
+            log.info("TimeLineJson: " + createBill);
         }
     }
+
+//    @KafkaListener(topics = Const.TOPIC_CREATE_TIME_LINE, groupId = Const.KAFKA_GROUP_ID)
+//    public void listenerCreateTimeline(String createTimelineJson) throws JsonProcessingException {
+//        TimelineBillDTO timelineBillDTO = null;
+//        if (StringUtils.isNotBlank(createTimelineJson)) {
+//            timelineBillDTO = objectMapper.readValue(createTimelineJson, TimelineBillDTO.class);
+//        }
+//        log.error("CreateTimeLineJson: " + createTimelineJson);
+//
+//        Timeline timelineDb = null;
+//        if(Objects.nonNull(timelineBillDTO)) {
+//            timelineDb = timeLineRepo.save(timeline);
+//        }
+//
+//        if(Objects.nonNull(timelineDb)) {
+//            String timelineJson = objectMapper.writeValueAsString(timeLineRepo.getTimeLineByBillId(timelineDb.getBill().getId()));
+//            template.convertAndSend("/topic/create-timeline-client-topic", timelineJson);
+//            log.info("CreateTimeLineJson: " + timelineJson);
+//        }
+//    }
 }

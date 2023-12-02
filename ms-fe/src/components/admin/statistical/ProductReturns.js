@@ -128,6 +128,16 @@ const ProductReturns = ({ date, dateToP, type, reason }) => {
         });
       },
     },
+    {
+      key: "action",
+      title: "Thao tác",
+      render: (text, record, index) => {
+        return (record.price * record.quantity)?.toLocaleString("vi-VN", {
+          style: "currency",
+          currency: "VND",
+        });
+      },
+    },
   ];
   useEffect(() => {
     var dateFrom = new Date(type === "other" ? date : dateToP);

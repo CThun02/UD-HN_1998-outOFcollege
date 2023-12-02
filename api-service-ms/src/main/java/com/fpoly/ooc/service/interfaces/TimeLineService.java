@@ -1,6 +1,7 @@
 package com.fpoly.ooc.service.interfaces;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.entity.Timeline;
 import com.fpoly.ooc.request.timeline.TimeLinerequest;
 import com.fpoly.ooc.responce.bill.BillInfoResponse;
@@ -15,7 +16,7 @@ public interface TimeLineService {
 
     List<TimeLineResponse> getAllTimeLineByBillId(Long id);
 
-    Timeline createTimeLine(Long billid, TimeLinerequest request);
+    Timeline createTimeLine(Long billid, TimeLinerequest request) throws JsonProcessingException;
 
     List<TimelineProductDisplayResponse> getTimelineProductByBillId(Long id);
 

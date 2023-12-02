@@ -77,8 +77,9 @@ const BillTimeLine = (addId) => {
     const handleUpdateBillStatus = (status, price) => {
         axios
             .put(
-                `http://localhost:8080/api/admin/bill/${billId}`,
+                `http://localhost:8080/api/admin/bill`,
                 {
+                    id: billId,
                     status: status,
                     amountPaid: price,
                 },

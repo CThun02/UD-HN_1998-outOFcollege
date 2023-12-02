@@ -59,7 +59,7 @@ const Bill = () => {
         var tab = {
           label: "Hóa đơn: " + localStorage.key(i),
           key: key,
-          count: JSON.parse(localStorage.getItem(key)).productDetails.length
+          count: JSON.parse(localStorage.getItem(key)).productDetails.length,
         };
         initialItems.push(tab);
         checkEmpty++;
@@ -497,10 +497,10 @@ const Bill = () => {
   const handleProvinceChange = async (value, valueDB) => {
     setSelectedProvince(valueDB);
     setSelectedDictrict(null);
-    setSelectedWard(null)
-    setLeadtime(null)
-    setShippingFee(null)
-    setDistricts([])
+    setSelectedWard(null);
+    setLeadtime(null);
+    setShippingFee(null);
+    setDistricts([]);
     if (value) {
       await axios
         .get(
@@ -522,10 +522,10 @@ const Bill = () => {
 
   const handleDistrictChange = async (value, valueDB) => {
     setSelectedDictrict(valueDB);
-    setSelectedWard(null)
-    setLeadtime(null)
-    setShippingFee(null)
-    setWards([])
+    setSelectedWard(null);
+    setLeadtime(null);
+    setShippingFee(null);
+    setWards([]);
     if (value) {
       try {
         const response = await axios.get(
@@ -740,7 +740,7 @@ const Bill = () => {
           timeStart: now(),
           productDetails: [],
           account: null,
-          count: 0
+          count: 0,
         })
       );
       setItems(newPanes);
@@ -1080,7 +1080,7 @@ const Bill = () => {
             navigate(`/api/admin/order`);
             remove(activeKey);
           } catch (error) {
-            const status = error.response?.status;
+            const status = error?.response?.status;
             if (status === 403) {
               notification.error({
                 message: "Thông báo",
@@ -1136,7 +1136,7 @@ const Bill = () => {
               <Tabs.TabPane
                 key={item.key}
                 tab={
-                  <Badge count={item.count ? item.count : 0} showZero >
+                  <Badge count={item.count ? item.count : 0} showZero>
                     <span style={{ padding: 10 }}>{item.label}</span>
                   </Badge>
                 }
@@ -1653,35 +1653,37 @@ const Bill = () => {
                             </span>
                           </>
                         ) : null}
-                        {Number(selectedOption) !== 2 &&
-                          !typeShipping[index] ? (
-                          <Col span={24}>
-                            {remainAmount > 0 && (
-                              <Row style={{ marginTop: "8px" }}>
-                                <Col span={16}>
-                                  <span
-                                    style={{ fontSize: "16px", width: "200%" }}
-                                  >
-                                    Tiền thừa
-                                  </span>
-                                </Col>
-                                <Col span={8}>
-                                  <span
-                                    style={{
-                                      fontSize: "16px",
-                                      color: "red",
-                                    }}
-                                  >
-                                    {remainAmount.toLocaleString("vi-VN", {
-                                      style: "currency",
-                                      currency: "VND",
-                                    })}
-                                  </span>
-                                </Col>
-                              </Row>
-                            )}
-                          </Col>
-                        ) : null}
+                        {
+                          Number(selectedOption) !== 2 &&
+                            !typeShipping[index] ? (
+                            <Col span={24}>
+                              {remainAmount > 0 && (
+                                <Row style={{ marginTop: "8px" }}>
+                                  <Col span={16}>
+                                    <span
+                                      style={{ fontSize: "16px", width: "200%" }}
+                                    >
+                                      Tiền thừa
+                                    </span>
+                                  </Col>
+                                  <Col span={8}>
+                                    <span
+                                      style={{
+                                        fontSize: "16px",
+                                        color: "red",
+                                      }}
+                                    >
+                                      {remainAmount.toLocaleString("vi-VN", {
+                                        style: "currency",
+                                        currency: "VND",
+                                      })}
+                                    </span>
+                                  </Col>
+                                </Row>
+                              )}
+                            </Col>
+                          ) : null
+                        }
                         <TextArea
                           onChange={(e) => setNote(e.target.value)}
                           rows={3}
@@ -1727,14 +1729,14 @@ const Bill = () => {
                             Xác nhận thanh toán
                           </Button>
                         </div>
-                      </Row>
-                    </Col>
-                  </Row>
-                </div>
-              </Tabs.TabPane>
+                      </Row >
+                    </Col >
+                  </Row >
+                </div >
+              </Tabs.TabPane >
             );
           })}
-      </Tabs>
+      </Tabs >
     </>
   );
 };

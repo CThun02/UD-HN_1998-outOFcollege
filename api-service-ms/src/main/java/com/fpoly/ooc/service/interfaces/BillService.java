@@ -1,5 +1,6 @@
 package com.fpoly.ooc.service.interfaces;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.dto.BillStatusDTO;
 import com.fpoly.ooc.entity.Address;
 import com.fpoly.ooc.entity.Bill;
@@ -43,7 +44,7 @@ public interface BillService {
 
     List<GetListCustomer> getListCustomer();
 
-    Integer updateBillStatus(BillStatusDTO dto);
+    Integer updateBillStatus(BillStatusDTO dto) throws JsonProcessingException;
 
     List<Address> getListAddressByUserName(String username);
 

@@ -1,5 +1,6 @@
 package com.fpoly.ooc.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
 import com.fpoly.ooc.dto.BillStatusDTO;
@@ -30,7 +31,7 @@ import com.fpoly.ooc.service.interfaces.ProductDetailServiceI;
 import com.fpoly.ooc.service.interfaces.ProductImageServiceI;
 import com.fpoly.ooc.service.interfaces.VoucherAccountService;
 import com.fpoly.ooc.service.interfaces.VoucherService;
-import lombok.Builder;
+import com.fpoly.ooc.service.kafka.KafkaUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,8 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeParseException;
-import java.time.temporal.TemporalAdjusters;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -83,6 +83,9 @@ public class BillServiceImpl implements BillService {
 
     @Autowired
     private VoucherAccountService voucherAccountService;
+
+    @Autowired
+    private KafkaUtil kafkaUtil;
 
     @Transactional
     @Override
@@ -244,8 +247,8 @@ public class BillServiceImpl implements BillService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public Integer updateBillStatus(BillStatusDTO dto) {
-        billRepo.update(dto.getStatus(), dto.getAmountPaid(), dto.getId());
+    public Integer updateBillStatus(BillStatusDTO dto) throws JsonProcessingException {
+        kafkaUtil.sendingObjectWithKafka(dto, Const.TOPIC_TIME_LINE);
         return 1;
     }
 

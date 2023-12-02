@@ -3,6 +3,8 @@ package com.fpoly.ooc.service.kafka.listener;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fpoly.ooc.constant.Const;
+import com.fpoly.ooc.dto.BillStatusDTO;
+import com.fpoly.ooc.entity.Bill;
 import com.fpoly.ooc.entity.Brand;
 import com.fpoly.ooc.entity.ButtonType;
 import com.fpoly.ooc.entity.Category;
@@ -16,6 +18,8 @@ import com.fpoly.ooc.entity.ProductDetail;
 import com.fpoly.ooc.entity.ShirtTailType;
 import com.fpoly.ooc.entity.Size;
 import com.fpoly.ooc.entity.SleeveType;
+import com.fpoly.ooc.entity.Timeline;
+import com.fpoly.ooc.repository.BillRepo;
 import com.fpoly.ooc.repository.BrandDAORepository;
 import com.fpoly.ooc.repository.ButtonTypeDAORepository;
 import com.fpoly.ooc.repository.CategoryDAORepository;
@@ -29,6 +33,7 @@ import com.fpoly.ooc.repository.ProductDetailDAORepositoryI;
 import com.fpoly.ooc.repository.ShirtTailTypeDAORepository;
 import com.fpoly.ooc.repository.SizeDAORepository;
 import com.fpoly.ooc.repository.SleeveDAORepository;
+import com.fpoly.ooc.repository.TimeLineRepo;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -37,6 +42,7 @@ import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import java.sql.Time;
 import java.util.Objects;
 
 @Service
@@ -59,6 +65,8 @@ public class KafkaListenerService {
     private SizeDAORepository sizeDAORepository;
     private ColorDAORepository colorDAORepository;
     private ProductDetailDAORepositoryI productDetailDAORepositoryI;
+    private TimeLineRepo timeLineRepo;
+    private BillRepo billRepo;
 
     @KafkaListener(topics = Const.TOPIC_PRODUCT, groupId = Const.KAFKA_GROUP_ID)
     public void listenerAddProduct(String productJson) throws JsonProcessingException {
@@ -310,6 +318,28 @@ public class KafkaListenerService {
             template.convertAndSend("/topic/bestSellingProduct-topic", bestSellingJson);
             template.convertAndSend("/topic/newProduct-topic", newProductJson);
             log.info("ProductDetailJson: " + productDetailsJson);
+        }
+    }
+
+    @KafkaListener(topics = Const.TOPIC_TIME_LINE, groupId = Const.KAFKA_GROUP_ID)
+    public void listenerTimeline(String billJson) throws JsonProcessingException {
+        BillStatusDTO bill = null;
+        if (StringUtils.isNotBlank(billJson)) {
+            bill = objectMapper.readValue(billJson, BillStatusDTO.class);
+        }
+
+        Integer billDb = null;
+        if(Objects.nonNull(bill)) {
+            billDb = billRepo.update(bill.getStatus(), bill.getAmountPaid(), bill.getId());
+        }
+
+        if(Objects.nonNull(billDb)) {
+            String updateStatusBillJson = objectMapper.writeValueAsString(timeLineRepo.findAll());
+            String timeLineJson = objectMapper.writeValueAsString(timeLineRepo.findAll());
+            String billClient = objectMapper.writeValueAsString(timeLineRepo.getTimeLineByBillId(bill.getId()));
+            template.convertAndSend("/topic/bill-topic", updateStatusBillJson);
+            template.convertAndSend("/topic/timeline-client-topic", billClient);
+            log.info("TimeLineJson: " + timeLineJson);
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.fpoly.ooc.controller.client;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.dto.BillStatusDTO;
 import com.fpoly.ooc.dto.EmailDetails;
 import com.fpoly.ooc.entity.Account;
@@ -171,7 +172,7 @@ public class ClientController {
     @PostMapping("/create-timeline/{id}")
     public ResponseEntity<?> createTimelineByBillId(
             @PathVariable("id") Long id,
-            @RequestBody(required = false) TimeLinerequest request) {
+            @RequestBody(required = false) TimeLinerequest request) throws JsonProcessingException {
         Bill bill;
         bill = billRepo.findById(id).orElse(null);
         if (bill != null) {
@@ -182,9 +183,9 @@ public class ClientController {
         return ResponseEntity.ok(timeLineService.createTimeLine(id, request));
     }
 
-    @PutMapping("/change-status-bill")
-    public ResponseEntity<?> updateBillStatus(@PathVariable("id") Long id,
-                                              @RequestBody BillStatusDTO dto) {
+
+    @PutMapping("/change-status-bill/{id}")
+    public ResponseEntity<?> updateBillStatus(@RequestBody BillStatusDTO dto) throws JsonProcessingException {
         return ResponseEntity.ok(billService.updateBillStatus(dto));
     }
 

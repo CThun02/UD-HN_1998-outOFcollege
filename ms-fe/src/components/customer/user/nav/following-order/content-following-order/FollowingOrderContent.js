@@ -6,6 +6,8 @@ import { getAuthToken } from "../../../../../../service/Token";
 import TimelineCustom from "../../../../../element/bill-info/TimelineCustom";
 import ModalConfirm from "../../../../../admin/sale-couter/ModalConfirm";
 import { useNavigate } from "react-router-dom";
+import SockJS from "../../../../../../service/SockJs";
+import SockJs from "../../../../../../service/SockJs";
 
 var bills = [];
 
@@ -190,6 +192,7 @@ function FollowingOrderContent({ billCode, status, symbol, count, createdBy }) {
 
   return (
     <div className={styles.content}>
+      <SockJs connectTo={"timeline-client-topic"} setValues={setTimelineV1} />
       {loading ? <div className={styles.width}>
         <div className={styles.followingContent}>
           <Space direction="vertical" size={16} style={{ width: "100%" }}>

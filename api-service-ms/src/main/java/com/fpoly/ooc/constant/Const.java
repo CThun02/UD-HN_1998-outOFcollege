@@ -87,4 +87,6 @@ public class Const {
     public static final String TOPIC_SIZE = "SIZE_TOPIC";
     public static final String TOPIC_COLOR = "COLOR_TOPIC";
     public static final String TOPIC_PRODUCT_DETAIL = "PRODUCT_DETAIL_TOPIC";
+
+    public static final String TOPIC_TIME_LINE = "TIME_LINE_TOPIC";
 }

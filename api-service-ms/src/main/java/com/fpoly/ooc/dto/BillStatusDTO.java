@@ -7,6 +7,8 @@ import java.math.BigDecimal;
 @Data
 public class BillStatusDTO {
 
+    private Long id;
+
     private String status;
 
     private BigDecimal amountPaid;

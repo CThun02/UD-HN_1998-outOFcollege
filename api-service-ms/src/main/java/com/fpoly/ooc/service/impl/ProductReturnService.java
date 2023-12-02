@@ -49,6 +49,7 @@ public class ProductReturnService implements ProductReturnServiceI {
                 productDetailService.update(productDetail);
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
+                return null;
             }
         }
         return repo.save(productReturn);

@@ -117,8 +117,9 @@ public class BillController {
             @RequestParam String dayTo) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         LocalDateTime dateFrom = LocalDateTime.parse(day, formatter);
-        LocalDateTime dateTo = LocalDateTime.parse(dayTo, formatter);
-        return ResponseEntity.ok(billService.getBillRevenue(dateFrom,  dateTo.plusDays(1)));
+        LocalDateTime dateTo = LocalDateTime.parse(dayTo, formatter).plusDays(1);
+        System.out.println("CHECKDATE"+dateFrom +dateTo);
+        return ResponseEntity.ok(billService.getBillRevenue(dateFrom,  dateTo));
     }
 
     @GetMapping("/getBillRevenueCompare")

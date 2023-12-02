@@ -1,5 +1,6 @@
 package com.fpoly.ooc.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
 import com.fpoly.ooc.entity.Form;
@@ -9,6 +10,7 @@ import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.PatternDAORepository;
 import com.fpoly.ooc.request.pattern.PatternRequest;
 import com.fpoly.ooc.service.interfaces.PatternServiceI;
+import com.fpoly.ooc.service.kafka.KafkaUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,12 +21,14 @@ import java.util.Optional;
 public class PatternServiceImpl implements PatternServiceI {
     @Autowired
     private PatternDAORepository repo;
+    @Autowired
+    private KafkaUtil kafkaUtil;
 
     @Override
-    public Pattern create(Pattern pattern) {
+    public Pattern create(Pattern pattern) throws JsonProcessingException {
         Pattern patternCheck = repo.findFirstByPatternName(pattern.getPatternName());
         if (patternCheck==null){
-            return repo.save(pattern);
+            return kafkaUtil.sendingObjectWithKafka(pattern, Const.TOPIC_PATTERN);
         }
         return null;
     }
@@ -36,7 +40,11 @@ public class PatternServiceImpl implements PatternServiceI {
         return material1.map(o -> {
             o.setPatternName(pattern.getPatternName());
 
-            return repo.save(o);
+            try {
+                return kafkaUtil.sendingObjectWithKafka(pattern, Const.TOPIC_PATTERN);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
         }).orElse(null);
 
     }

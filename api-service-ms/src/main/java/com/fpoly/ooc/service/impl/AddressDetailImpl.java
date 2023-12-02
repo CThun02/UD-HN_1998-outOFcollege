@@ -1,8 +1,10 @@
 package com.fpoly.ooc.service.impl;
 
+import com.fpoly.ooc.entity.Address;
 import com.fpoly.ooc.entity.AddressDetail;
 import com.fpoly.ooc.repository.AddressDetailRepository;
 import com.fpoly.ooc.service.interfaces.AddressDetailService;
+import com.fpoly.ooc.service.interfaces.AddressServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,8 +14,14 @@ import java.util.List;
 public class AddressDetailImpl implements AddressDetailService
 {
 
-    @Autowired
     private AddressDetailRepository repo;
+    private AddressServiceI addressServiceI;
+
+    @Autowired
+    public AddressDetailImpl(AddressDetailRepository repo, AddressServiceI addressServiceI) {
+        this.repo = repo;
+        this.addressServiceI = addressServiceI;
+    }
 
     @Override
     public List<AddressDetail> getAddressDetailsByUsername(String username) {
@@ -22,6 +30,12 @@ public class AddressDetailImpl implements AddressDetailService
 
     @Override
     public AddressDetail create(AddressDetail addressDetail) {
+        List<Address> addressList = addressServiceI.getListAddress(addressDetail.getAccountAddress().getUsername());
+        if(addressList.size()==0){
+            Address address = addressDetail.getAddressDetail();
+            address.setDefaultaddress(true);
+            addressServiceI.update(address);
+        }
         return repo.save(addressDetail);
     }
 

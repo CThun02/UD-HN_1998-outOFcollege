@@ -54,7 +54,7 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
             "       pd.descriptionDetail AS descriptionDetail, pd.pattern as pattern, pd.form as form, pd.status as status " +
             "FROM BillDetail bd " +
             "JOIN ProductDetail pd ON pd.id = bd.productDetail.id " +
-            "WHERE bd.bill.status <> 'CANCEL' and (bd.bill.id = ?1 or ?1 is null) " +
+            "WHERE bd.bill.status not like 'CANCEL' and (bd.status not like 'ReturnS' or bd.status is null) and (bd.bill.id = ?1 or ?1 is null) " +
             "AND  (?2 IS NULL OR bd.createdAt >= ?2) AND (?3 IS NULL OR bd.createdAt <= ?3)" +
             "GROUP BY pd.id, pd.product, pd.brand, pd.category, pd.button, pd.material, pd.collar, pd.sleeve, pd.size, " +
             "pd.color, pd.shirtTail, bd.price, pd.weight, pd.descriptionDetail, " +
@@ -104,7 +104,7 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
                    @Param("id") Long id);
 
     @Query("SELECT COUNT(b) AS billSell, SUM(b.price) as grossRevenue FROM Bill " +
-            "b WHERE (?1 IS NULL OR b.createdAt >= ?1) AND (?2 IS NULL OR b.createdAt <= ?2)")
+            "b WHERE (?1 IS NULL OR b.createdAt >= ?1) AND (?2 IS NULL OR b.createdAt <= ?2) and b.status not like 'CANCEL' ")
     BillRevenue getBillRevenue(LocalDateTime dayFrom, LocalDateTime dayTo);
 
     @Query("SELECT pd.id AS id, pd.product AS product, pd.brand as brand, pd.category as category, pd.button AS button," +
@@ -117,10 +117,33 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
             "WHERE (bd.bill.id = ?1 or ?1 is null)")
     List<ProductDetailResponse> getProductDetailByBillId(Long id);
 
+
     @Query("Select b.id as id, b.billCode as billCode, a.fullName as customerName, a.username as userName, " +
-            "b.completionDate as completionDate, b.price as price, b.billType as billType, b.symbol as symbol" +
+            "b.completionDate as completionDate, b.price as price, b.amountPaid as amountPaid," +
+            " d.shipPrice as shippingPrice, b.billType as billType, b.symbol as symbol" +
             ", b.createdAt as createdAt, b.createdBy as createdBy, b.status as status, b.note as note from Bill b " +
             "left join Account a on b.account.username = a.username " +
             "left join DeliveryNote d on d.bill.id = b.id where  b.billCode = ?1")
     BillResponse getBillByBillCode(String billCode);
+
+    @Query("SELECT count(b.id) " +
+            "FROM Bill b  " +
+            "   LEFT JOIN BillDetail bd ON b.id = bd.bill.id " +
+            "   LEFT JOIN Timeline tl ON tl.bill.id = b.id " +
+            "WHERE (b.billCode like %:billCode% OR :billCode IS NULL) " +
+            "   AND (b.createdAt >= :startDate OR :startDate IS NULL) " +
+            "   AND (b.createdAt <= :endDate OR :endDate IS NULL) " +
+            "   AND (:status IS NULL OR b.status LIKE :status) " +
+            "   AND (:createdBy IS NULL OR b.createdBy LIKE :createdBy AND b.status not like 'Cancel') " +
+            "GROUP BY b.id, b.symbol, b.status, tl.id " +
+            "   having (:symbol IS NULL OR (b.symbol like :symbol and b.status not like 'Cancel' " +
+            "       AND (:count IS NULL OR COUNT(tl.id) = :count))) ")
+    List<Integer> getCountFilterBill(
+            @Param("billCode") String billCode,
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate,
+            @Param("status") String status,
+            @Param("symbol") String symbol,
+            @Param("count") Integer count,
+            @Param("createdBy") String createdBy);
 }

@@ -67,42 +67,42 @@ const ProductDetailsTable = (props) => {
       while (j < allProductDetailsCopy.length) {
         if (
           allProductDetailsCopy[i].brand.id ===
-          allProductDetailsCopy[j].brand.id &&
+            allProductDetailsCopy[j].brand.id &&
           allProductDetailsCopy[i].category.id ===
-          allProductDetailsCopy[j].category.id &&
+            allProductDetailsCopy[j].category.id &&
           allProductDetailsCopy[i].button.id ===
-          allProductDetailsCopy[j].button.id &&
+            allProductDetailsCopy[j].button.id &&
           allProductDetailsCopy[i].material.id ===
-          allProductDetailsCopy[j].material.id &&
+            allProductDetailsCopy[j].material.id &&
           allProductDetailsCopy[i].sleeve.id ===
-          allProductDetailsCopy[j].sleeve.id &&
+            allProductDetailsCopy[j].sleeve.id &&
           allProductDetailsCopy[i].collar.id ===
-          allProductDetailsCopy[j].collar.id &&
+            allProductDetailsCopy[j].collar.id &&
           allProductDetailsCopy[i].shirtTail.id ===
-          allProductDetailsCopy[j].shirtTail.id &&
+            allProductDetailsCopy[j].shirtTail.id &&
           allProductDetailsCopy[i].color.id ===
-          allProductDetailsCopy[j].color.id &&
+            allProductDetailsCopy[j].color.id &&
           allProductDetailsCopy[i].size.id === allProductDetailsCopy[j].size.id
         ) {
           // Nếu các thuộc tính giống nhau, bỏ qua
           j++;
         } else if (
           allProductDetailsCopy[i].brand.id ===
-          allProductDetailsCopy[j].brand.id &&
+            allProductDetailsCopy[j].brand.id &&
           allProductDetailsCopy[i].category.id ===
-          allProductDetailsCopy[j].category.id &&
+            allProductDetailsCopy[j].category.id &&
           allProductDetailsCopy[i].button.id ===
-          allProductDetailsCopy[j].button.id &&
+            allProductDetailsCopy[j].button.id &&
           allProductDetailsCopy[i].material.id ===
-          allProductDetailsCopy[j].material.id &&
+            allProductDetailsCopy[j].material.id &&
           allProductDetailsCopy[i].sleeve.id ===
-          allProductDetailsCopy[j].sleeve.id &&
+            allProductDetailsCopy[j].sleeve.id &&
           allProductDetailsCopy[i].collar.id ===
-          allProductDetailsCopy[j].collar.id &&
+            allProductDetailsCopy[j].collar.id &&
           allProductDetailsCopy[i].shirtTail.id ===
-          allProductDetailsCopy[j].shirtTail.id &&
+            allProductDetailsCopy[j].shirtTail.id &&
           allProductDetailsCopy[i].color.id ===
-          allProductDetailsCopy[j].color.id
+            allProductDetailsCopy[j].color.id
         ) {
           // Nếu các thuộc tính trừ size giống nhau, thêm vào productDetails và loại bỏ khỏi mảng
           productDetails.push(allProductDetailsCopy.splice(j, 1)[0]);
@@ -142,7 +142,7 @@ const ProductDetailsTable = (props) => {
                     Authorization: `Bearer ${getToken(true)}`,
                   },
                 })
-                .then((res) => { })
+                .then((res) => {})
                 .catch((err) => {
                   const status = err.response.status;
                   if (status === 403) {
@@ -236,74 +236,82 @@ const ProductDetailsTable = (props) => {
   }
 
   function createProductDetails() {
-    var check = false;
-    confirm({
-      centered: true,
-      title: `Thêm mới các sản phẩm`,
-      icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
-      content: "Xác nhận thêm mới",
-      onOk() {
-        props.setLoading(true);
-        for (let detail of props.productDetails) {
-          let productDetailCreate = { ...productDetail };
-          productDetailCreate.productId = product.id;
-          productDetailCreate.brandId = detail.brand.id;
-          productDetailCreate.categoryId = detail.category.id;
-          productDetailCreate.buttonId = detail.button.id;
-          productDetailCreate.collarId = detail.collar.id;
-          productDetailCreate.colorId = detail.color.id;
-          productDetailCreate.materialId = detail.material.id;
-          productDetailCreate.shirtTailId = detail.shirtTail.id;
-          productDetailCreate.patternId = detail.pattern.id;
-          productDetailCreate.formId = detail.form.id;
-          productDetailCreate.sleeveId = detail.sleeve.id;
-          productDetailCreate.sizeId = detail.size.id;
-          productDetailCreate.price = detail.price;
-          productDetailCreate.quantity = detail.quantity;
-          productDetailCreate.weight = detail.weight;
-          productDetailCreate.status = detail.status;
-          productDetailCreate.descriptionDetail = "Description detail";
-          if (!productDetailCreate.status.includes("DELETED")) {
-            axios
-              .post(api + "product/createDetail", productDetailCreate, {
-                headers: {
-                  Authorization: `Bearer ${getToken(true)}`,
-                },
-              })
-              .then((response) => {
-                if (
-                  response.data !== "" &&
-                  response.data !== null &&
-                  response.data !== undefined
-                ) {
-                  createImgageDetail(response.data);
-                }
-              })
-              .catch((error) => {
-                console.log(error);
-                notification.error({
-                  message: "Thông báo",
-                  description: "Thêm mới các chi tiết sản phẩm Thất bại",
+    var colorsCreate = props.colorsCreate;
+    if (imgList.length !== colorsCreate.length) {
+      notification.error({
+        message: "Thông báo",
+        description: "Vui lòng chọn đầy đủ ảnh cho từng mã màu!",
+      });
+    } else {
+      confirm({
+        centered: true,
+        title: `Thêm mới các sản phẩm`,
+        icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
+        content: "Xác nhận thêm mới",
+        onOk() {
+          props.setLoading(true);
+          for (let detail of props.productDetails) {
+            let productDetailCreate = { ...productDetail };
+            productDetailCreate.productId = product.id;
+            productDetailCreate.brandId = detail.brand.id;
+            productDetailCreate.categoryId = detail.category.id;
+            productDetailCreate.buttonId = detail.button.id;
+            productDetailCreate.collarId = detail.collar.id;
+            productDetailCreate.colorId = detail.color.id;
+            productDetailCreate.materialId = detail.material.id;
+            productDetailCreate.shirtTailId = detail.shirtTail.id;
+            productDetailCreate.patternId = detail.pattern.id;
+            productDetailCreate.formId = detail.form.id;
+            productDetailCreate.sleeveId = detail.sleeve.id;
+            productDetailCreate.sizeId = detail.size.id;
+            productDetailCreate.price = detail.price;
+            productDetailCreate.quantity = detail.quantity;
+            productDetailCreate.weight = detail.weight;
+            productDetailCreate.status = detail.status;
+            productDetailCreate.descriptionDetail = "Description detail";
+            if (!productDetailCreate.status.includes("DELETED")) {
+              axios
+                .post(api + "product/createDetail", productDetailCreate, {
+                  headers: {
+                    Authorization: `Bearer ${getToken(true)}`,
+                  },
+                })
+                .then((response) => {
+                  if (
+                    response.data !== "" &&
+                    response.data !== null &&
+                    response.data !== undefined
+                  ) {
+                    createImgageDetail(response.data);
+                  }
+                })
+                .catch((error) => {
+                  console.log(error);
+                  notification.error({
+                    message: "Thông báo",
+                    description: "Thêm mới các chi tiết sản phẩm Thất bại",
+                  });
+                  return;
                 });
-                return;
-              });
+            }
           }
-        }
-        setRender(props.productDetails);
-        setTimeout(() => {
-          notification.open({
-            message: "Thông báo",
-            description: "Thêm mới các chi tiết sản phẩm thành công",
-            icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
-          });
+          setRender(props.productDetails);
           setTimeout(() => {
-            imgList = []; //reset
-            navigate("/api/admin/product");
-          }, 500);
-        }, 1000);
-      },
-    });
+            notification.open({
+              message: "Thông báo",
+              description: "Thêm mới các chi tiết sản phẩm thành công",
+              icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
+            });
+            setTimeout(() => {
+              imgList = []; //reset
+              navigate("/api/admin/product");
+            }, 500);
+          }, 1000);
+        },
+      });
+    }
   }
+
   if (props.productDetails.length === 0 || productDetailsDisplay.length === 0) {
     getProductDetailsDisplay();
   }
@@ -385,15 +393,15 @@ const ProductDetailsTable = (props) => {
                           onChange={(event) => {
                             uploadImage(
                               product.productName.replaceAll(" ", "_") +
-                              productDetails[0].button.id +
-                              productDetails[0].brand.id +
-                              productDetails[0].category.id +
-                              productDetails[0].material.id +
-                              productDetails[0].collar.id +
-                              productDetails[0].sleeve.id +
-                              productDetails[0].shirtTail.id +
-                              productDetails[0].pattern.id +
-                              productDetails[0].form.id,
+                                productDetails[0].button.id +
+                                productDetails[0].brand.id +
+                                productDetails[0].category.id +
+                                productDetails[0].material.id +
+                                productDetails[0].collar.id +
+                                productDetails[0].sleeve.id +
+                                productDetails[0].shirtTail.id +
+                                productDetails[0].pattern.id +
+                                productDetails[0].form.id,
                               productDetails[0].color,
                               event.target.files
                             );
@@ -538,9 +546,9 @@ const ProductDetailsTable = (props) => {
                                             isDeleted
                                               ? {}
                                               : deleteImageDetail(
-                                                productDetails[0].color.name,
-                                                index
-                                              )
+                                                  productDetails[0].color.name,
+                                                  index
+                                                )
                                           }
                                           key="delete"
                                         />,

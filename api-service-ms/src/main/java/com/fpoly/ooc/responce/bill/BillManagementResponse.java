@@ -1,5 +1,6 @@
 package com.fpoly.ooc.responce.bill;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -24,6 +25,7 @@ public class BillManagementResponse {
 
     private String phoneNumber;
 
+    @JsonFormat(pattern = "HH:mm:ss dd/MM/yyyy")
     private LocalDateTime createdDate;
 
     private String billType;

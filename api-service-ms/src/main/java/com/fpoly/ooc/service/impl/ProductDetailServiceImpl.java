@@ -1,5 +1,7 @@
 package com.fpoly.ooc.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fpoly.ooc.common.Commons;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
@@ -21,17 +23,20 @@ import com.fpoly.ooc.service.interfaces.ColorServiceI;
 import com.fpoly.ooc.service.interfaces.ProductDetailServiceI;
 import com.fpoly.ooc.service.interfaces.ProductImageServiceI;
 import com.fpoly.ooc.service.interfaces.SizeServiceI;
+import com.fpoly.ooc.service.kafka.KafkaUtil;
 import com.fpoly.ooc.util.PageUltil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -41,26 +46,48 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
     private ProductImageServiceI productImageService;
     private ColorServiceI colorServiceI;
     private SizeServiceI sizeServiceI;
+    private KafkaUtil kafkaUtil;
+    @Autowired
+    private SimpMessagingTemplate template;
+    @Autowired
+    private ObjectMapper objectMapper;
+
 
     @Autowired
     public ProductDetailServiceImpl(ProductDetailDAORepositoryI repo, ProductImageServiceI productImageService,
-                                    ColorServiceI colorServiceI, SizeServiceI sizeServiceI) {
+                                    ColorServiceI colorServiceI, SizeServiceI sizeServiceI, KafkaUtil kafkaUtil) {
         this.repo = repo;
         this.productImageService = productImageService;
         this.colorServiceI = colorServiceI;
         this.sizeServiceI = sizeServiceI;
+        this.kafkaUtil = kafkaUtil;
     }
 
     @Override
-    public ProductDetail create(ProductDetail productDetail) {
-        return repo.save(productDetail);
+    public ProductDetail create(ProductDetail productDetail) throws JsonProcessingException {
+        ProductDetail productDetailDb = repo.save(productDetail);
+        if(Objects.nonNull(productDetailDb)) {
+            String productDetailsJson = objectMapper.writeValueAsString(repo.findAll());
+            String productDetailsShopJson = objectMapper.writeValueAsString(repo.getAllProductDetailShop(
+                    null, null, null, "", "", "", "", null,
+                    null, null, null, "desc"));
+            String bestSellingJson = objectMapper.writeValueAsString(repo.getProductDetailBestSelling());
+            String newProductJson = objectMapper.writeValueAsString(repo.getNewProductDetail());
+            template.convertAndSend("/topic/productDetail-topic", productDetailsJson);
+            template.convertAndSend("/topic/productDetailShop-topic", productDetailsShopJson);
+            template.convertAndSend("/topic/bestSellingProduct-topic", bestSellingJson);
+            template.convertAndSend("/topic/newProduct-topic", newProductJson);
+        }
+        return productDetailDb;
+
+//        return kafkaUtil.sendingObjectWithKafka(productDetail, Const.TOPIC_PRODUCT_DETAIL);
     }
 
     @Override
-    public ProductDetail update(ProductDetail productDetail) {
+    public ProductDetail update(ProductDetail productDetail) throws JsonProcessingException {
         ProductDetail productDetailtCheck = this.getOne(productDetail.getId());
         if (productDetailtCheck != null) {
-            productDetailtCheck = repo.save(productDetail);
+            productDetailtCheck = kafkaUtil.sendingObjectWithKafka(productDetail, Const.TOPIC_PRODUCT_DETAIL);
         }
         return productDetailtCheck;
     }
@@ -142,7 +169,7 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
     }
 
     @Override
-    public Optional<Page<ProductDetailShop>> getAllProductDetailShop(ProductDetailCondition req, Pageable pageable) {
+    public Optional<List<ProductDetailShop>> getAllProductDetailShop(ProductDetailCondition req) {
 
         String cateStr = "";
         String brandStr = "";
@@ -178,9 +205,7 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
                 req.getProductName(), req.getMinPrice(), req.getMaxPrice(), cateStr, brandStr, colorStr, sizeStr,
                 req.getCategories(), req.getBrands(), req.getColors(), req.getSizes(), sort
         ));
-        return Optional.of(
-                (Page<ProductDetailShop>) PageUltil.page(result, pageable)
-        );
+        return Optional.of(result);
     }
 
     @Override

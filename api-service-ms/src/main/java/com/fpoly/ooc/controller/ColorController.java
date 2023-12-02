@@ -1,5 +1,6 @@
 package com.fpoly.ooc.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.entity.ButtonType;
 import com.fpoly.ooc.entity.Color;
 import com.fpoly.ooc.request.color.ColorRequest;
@@ -22,7 +23,7 @@ public class ColorController {
         return service.findAll();
     }
     @PostMapping("create")
-    public ResponseEntity<?> create(@RequestBody Color color) {
+    public ResponseEntity<?> create(@RequestBody Color color) throws JsonProcessingException {
         return ResponseEntity.ok(service.create(color));
     }
 

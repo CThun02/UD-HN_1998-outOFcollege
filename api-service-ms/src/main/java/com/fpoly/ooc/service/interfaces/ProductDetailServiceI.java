@@ -1,5 +1,6 @@
 package com.fpoly.ooc.service.interfaces;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.dto.ProductDetailsDTO;
 import com.fpoly.ooc.entity.ProductDetail;
 import com.fpoly.ooc.request.product.ProductDetailCondition;
@@ -19,8 +20,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ProductDetailServiceI {
-    public ProductDetail create(ProductDetail productDetail);
-    public ProductDetail update(ProductDetail productDetail);
+    public ProductDetail create(ProductDetail productDetail) throws JsonProcessingException;
+    public ProductDetail update(ProductDetail productDetail) throws JsonProcessingException;
     public Boolean delete(Long id);
     public ProductDetail getOne(Long id);
     public List<ProductDetailDisplayResponse> filterProductDetailsByIdCom(ProductDetailRequest request,
@@ -34,7 +35,7 @@ public interface ProductDetailServiceI {
     Optional<List<ProductDetailShop>> getProductDetailBestSelling();
     Optional<List<ProductDetailShop>> getNewProductDetail();
     public void updateProductDetailsByProductId(Long productId, String status);
-    Optional<Page<ProductDetailShop>> getAllProductDetailShop(ProductDetailCondition req, Pageable pageable);
+    Optional<List<ProductDetailShop>> getAllProductDetailShop(ProductDetailCondition req);
     Optional<BigDecimal> getPriceMax();
     Optional<GetColorAndSizeAndQuantity> getColorAndSize(GetSizeAndColorRequest req);
     Optional<ProductDetailShopResponse> getProductDetailsShop(GetSizeAndColorRequest req);

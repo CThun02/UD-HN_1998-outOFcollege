@@ -28,8 +28,9 @@ const baseUrl = "http://localhost:8080/api/client/product";
 function DetailProduct({ setRenderHeader }) {
   const { id } = useParams();
   const convertData = id.replace(/---/g, "/");
-  const decode64 = atob(convertData);
-  const decodeData = JSON.parse(decode64);
+  const decodedBytes = atob(convertData);
+  const decodedString = decodeURIComponent(decodedBytes);
+  const decodeData = JSON.parse(decodedString);
   const [chooseColor, setChooseColor] = useState({});
   const [chooseSize, setChooseSize] = useState({});
   const [productDetail, setProductDetail] = useState({});

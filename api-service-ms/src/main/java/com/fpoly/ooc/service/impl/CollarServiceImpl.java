@@ -1,5 +1,6 @@
 package com.fpoly.ooc.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
 import com.fpoly.ooc.entity.Brand;
@@ -11,6 +12,7 @@ import com.fpoly.ooc.repository.BrandDAORepository;
 import com.fpoly.ooc.repository.CollarDAORepository;
 import com.fpoly.ooc.request.collar.CollarRequest;
 import com.fpoly.ooc.service.interfaces.CollarServiceI;
+import com.fpoly.ooc.service.kafka.KafkaUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,12 +23,14 @@ import java.util.Optional;
 public class CollarServiceImpl implements CollarServiceI {
     @Autowired
     private CollarDAORepository repo;
+    @Autowired
+    private KafkaUtil kafkaUtil;
 
     @Override
-    public CollarType create(CollarType collarType) {
+    public CollarType create(CollarType collarType) throws JsonProcessingException {
         CollarType collarCheck = repo.findFirstByCollarTypeName(collarType.getCollarTypeName());
         if(collarCheck==null){
-            return repo.save(collarType);
+            return kafkaUtil.sendingObjectWithKafka(collarType, Const.TOPIC_COLLAR);
         }
         return null;
     }
@@ -38,7 +42,11 @@ public class CollarServiceImpl implements CollarServiceI {
         return material1.map(o -> {
             o.setCollarTypeName(collarType.getCollarTypeName());
 
-            return repo.save(o);
+            try {
+                return kafkaUtil.sendingObjectWithKafka(collarType, Const.TOPIC_COLLAR);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
         }).orElse(null);
 
     }

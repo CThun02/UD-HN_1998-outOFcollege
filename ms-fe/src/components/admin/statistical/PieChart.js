@@ -63,10 +63,10 @@ const PieChart = ({ formattedDateNow }) => {
     }
     if (selectTypeDate === "month") {
       dateFrom.setDate(1);
-      dateTo.setDate(getLastDayOfMonth(dateFrom.getMonth() + 1));
+      dateTo.setDate(getLastDayOfMonth(dateFrom.getMonth()));
     } else if (selectTypeDate === "year") {
       dateFrom.setDate(1);
-      dateTo.setDate(getLastDayOfMonth(12));
+      dateTo.setDate(getLastDayOfMonth(11));
       dateFrom.setMonth(0);
       dateTo.setMonth(11);
     }

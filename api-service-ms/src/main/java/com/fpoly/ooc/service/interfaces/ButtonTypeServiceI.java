@@ -1,12 +1,13 @@
 package com.fpoly.ooc.service.interfaces;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.entity.ButtonType;
 import com.fpoly.ooc.request.buttontype.ButtonTypeRequest;
 
 import java.util.List;
 
 public interface ButtonTypeServiceI {
-    public ButtonType create(ButtonType buttonType);
+    public ButtonType create(ButtonType buttonType) throws JsonProcessingException;
 
     public ButtonType update(ButtonType buttonType, Long id);
 

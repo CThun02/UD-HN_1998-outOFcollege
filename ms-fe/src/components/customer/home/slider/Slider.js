@@ -16,22 +16,20 @@ function Slider({ reduce }) {
         </div>
 
         <div className={styles.absolute}>
-          <h2 className={`${styles.textH2} ${styles.upperCase}`}>
-            COMING SOON
-          </h2>
+          <h2 className={`${styles.textH2} ${styles.upperCase}`}>Sắp tới</h2>
           <h1 className={`${styles.textH1} ${styles.upperCase}`}>
-            Men fashion
+            Đồ thời trang nam
           </h1>
           <p className={`${styles.textSpan} ${styles.upperCase}`}>
-            Sale up to {reduce ? reduce : sale} oFf for online order
+            Giảm tới {reduce ? reduce : sale} cho đặt hàng trực tuyến
           </p>
-          <Link>
+          <Link to="/ms-shop/shopping">
             <Button
               size="large"
               type="primary"
               className={`${styles.button} ${styles.spacing}`}
             >
-              Shop now
+              MUA NGAY
             </Button>
           </Link>
         </div>

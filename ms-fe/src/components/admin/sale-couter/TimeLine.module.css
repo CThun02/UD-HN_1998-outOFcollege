@@ -37,6 +37,11 @@
   border: none;
 }
 
+.btnPdf {
+  position: absolute;
+  right: 100px;
+}
+
 .btnWarning:hover,
 .btnWarning:focus {
   background-color: #ec971f;

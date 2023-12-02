@@ -1,5 +1,6 @@
 package com.fpoly.ooc.request.bill;
 
+import com.fpoly.ooc.dto.EmailDetails;
 import com.fpoly.ooc.request.payment.PaymentDetailRequest;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -67,5 +68,7 @@ public class BillRequest {
     private String district;
 
     private String ward;
+
+    private EmailDetails emailDetails;
 
 }

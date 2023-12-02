@@ -1,5 +1,6 @@
 package com.fpoly.ooc.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
 import com.fpoly.ooc.entity.Color;
@@ -10,6 +11,7 @@ import com.fpoly.ooc.request.color.ColorRequest;
 import com.fpoly.ooc.request.productDetail.GetSizeAndColorRequest;
 import com.fpoly.ooc.request.size.SizeRequest;
 import com.fpoly.ooc.service.interfaces.SizeServiceI;
+import com.fpoly.ooc.service.kafka.KafkaUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,12 +22,14 @@ import java.util.Optional;
 public class SizeServiceImpl implements SizeServiceI {
     @Autowired
     private SizeDAORepository repo;
+    @Autowired
+    private KafkaUtil kafkaUtil;
 
     @Override
-    public Size create(Size size) {
+    public Size create(Size size) throws JsonProcessingException {
         Size sizeCheck = repo.findFirstBySizeName(size.getSizeName());
         if(sizeCheck==null){
-            return repo.save(size);
+            return kafkaUtil.sendingObjectWithKafka(size, Const.TOPIC_SIZE);
         }
         return null;
     }
@@ -37,7 +41,11 @@ public class SizeServiceImpl implements SizeServiceI {
         return optional.map(o -> {
             o.setSizeName(size.getSizeName());
             o.setStatus(size.getStatus());
-            return repo.save(o);
+            try {
+                return kafkaUtil.sendingObjectWithKafka(size, Const.TOPIC_SIZE);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
         }).orElse(null);
     }
 

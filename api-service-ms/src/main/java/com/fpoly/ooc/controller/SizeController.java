@@ -1,5 +1,6 @@
 package com.fpoly.ooc.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.entity.Size;
 import com.fpoly.ooc.request.size.SizeRequest;
 import com.fpoly.ooc.service.interfaces.SizeServiceI;
@@ -22,7 +23,7 @@ public class SizeController {
     }
 
     @PostMapping("create")
-    public ResponseEntity<?> create(@RequestBody Size size) {
+    public ResponseEntity<?> create(@RequestBody Size size) throws JsonProcessingException {
         return ResponseEntity.ok(service.create(size));
     }
 

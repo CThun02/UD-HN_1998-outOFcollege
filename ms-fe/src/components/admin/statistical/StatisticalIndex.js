@@ -14,6 +14,7 @@ import {
   TableOutlined,
   ClockCircleOutlined,
   EuroOutlined,
+  CarOutlined,
 } from "@ant-design/icons";
 import {
   Col,
@@ -27,20 +28,30 @@ import {
   Badge,
   Table,
   Divider,
+  Tabs,
 } from "antd";
 import Statistic from "antd/es/statistic/Statistic";
 import PieChart from "./PieChart";
 import TableProdutSellTheMost from "./TableProdutSellTheMost";
+import ProductReturns from "./ProductReturns";
 import dayjs from "dayjs";
 import { getToken } from "../../../service/Token";
 
 var currentDate = new Date();
+var yesterday = new Date(currentDate.getTime() - 24 * 60 * 60 * 1000);
 
-var day = currentDate.getDate();
-var month = currentDate.getMonth() + 1;
-var year = currentDate.getFullYear();
-var formattedDateNow = year + "-" + month + "-" + day;
-var formattedDateYesterday = year + "-" + month + "-" + (day - 1);
+var formattedDateNow =
+  currentDate.getFullYear() +
+  "-" +
+  (currentDate.getMonth() + 1) +
+  "-" +
+  currentDate.getDate();
+var formattedDateYesterday =
+  yesterday.getFullYear() +
+  "-" +
+  (yesterday.getMonth() + 1) +
+  "-" +
+  yesterday.getDate();
 const { Option } = Select;
 
 const StatisticalIndex = () => {
@@ -60,18 +71,27 @@ const StatisticalIndex = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const [loading, setLoading] = useState(true);
-  const [dateRevenue, setDateRevenue] = useState(formattedDateNow);
+  const [dateRevenue, setDateRevenue] = useState(formattedDateYesterday);
   const [dateRevenueTo, setDateRevenueTo] = useState(formattedDateNow);
   const [selectTypeDateProduct, setSelectTypeDateproduct] = useState("year");
-  const [dateProductSellTheMost, setDateProductSellTheMost] =
-    useState(formattedDateNow);
+  const [selectTypeDateProductReturn, setSelectTypeDateproductReturn] =
+    useState("year");
+  const [dateProductSellTheMost, setDateProductSellTheMost] = useState(
+    formattedDateYesterday
+  );
   const [dateProductSellTheMostTo, setDateProductSellTheMostTo] =
+    useState(formattedDateNow);
+  const [dateProductReturn, setDateProductReturn] = useState(
+    formattedDateYesterday
+  );
+  const [dateProductReturnTo, setDateProductReturnTo] =
     useState(formattedDateNow);
   const [typeDateBillRevenue, setTypeDateBillRevenue] = useState("date");
   const [typeDateLineChart, setTypeDateLineChart] = useState("date");
   const [growthStoreDayData, setGrowthStoreDayData] = useState(null);
   const [growthStoreMonthData, setGrowthStoreMonthData] = useState(null);
   const [growthStoreYearData, setGrowthStoreYearData] = useState(null);
+  const [reason, setReason] = useState("PRODUCE");
 
   const totalQuantity = billRevenue?.productDetailDisplay?.reduce(
     (total, item) => total + item.quantity,
@@ -255,6 +275,16 @@ const StatisticalIndex = () => {
     },
   };
 
+  function getLastDayOfMonth(date, month) {
+    const firstDayOfNextMonth = new Date(
+      Date.UTC(date.getFullYear(), month, 1)
+    );
+    const lastDayOfMonth = new Date(
+      firstDayOfNextMonth.getTime() - 24 * 60 * 60 * 1000
+    );
+    return lastDayOfMonth.getDate();
+  }
+
   function compareRevenue() {
     if (dateValueFrom === "" || dateValueTo === "") {
       notification.error({
@@ -432,29 +462,23 @@ const StatisticalIndex = () => {
       }
     }
   }
+
   function getDataRevenue() {
-    var dateFrom = new Date(dateRevenue);
-    var dateTo = new Date(
-      typeDateBillRevenue === "other" ? dateRevenueTo : dateRevenue
+    var dateFrom = new Date(
+      typeDateBillRevenue === "other" ? dateRevenue : dateRevenueTo
     );
-    function getLastDayOfMonth(month) {
-      const firstDayOfNextMonth = new Date(
-        Date.UTC(dateFrom.getFullYear(), month, 1)
-      );
-      const lastDayOfMonth = new Date(
-        firstDayOfNextMonth.getTime() - 24 * 60 * 60 * 1000
-      );
-      return lastDayOfMonth.getDate();
-    }
+    var dateTo = new Date(dateRevenueTo);
     if (typeDateBillRevenue === "month") {
       dateFrom.setDate(1);
-      dateTo.setDate(getLastDayOfMonth(dateFrom.getMonth() + 1));
+      dateTo.setDate(getLastDayOfMonth(dateFrom, dateFrom.getMonth()));
     } else if (typeDateBillRevenue === "year") {
       dateFrom.setDate(1);
-      dateTo.setDate(getLastDayOfMonth(12));
+      dateTo.setDate(getLastDayOfMonth(dateFrom, 11));
       dateFrom.setMonth(0);
       dateTo.setMonth(11);
     }
+    dateFrom.setHours(dateFrom.getHours() + 7);
+    dateTo.setHours(dateTo.getHours() + 7);
     if (dateFrom.getTime() > dateTo.getTime()) {
       notification.error({
         message: "Thông báo",
@@ -509,6 +533,7 @@ const StatisticalIndex = () => {
     dateLineChartValueFrom,
     dateLineChartValueTo,
     typeDateLineChart,
+    reason,
   ]);
   return (
     <>
@@ -526,7 +551,7 @@ const StatisticalIndex = () => {
                 <Select
                   value={typeDateBillRevenue}
                   onChange={(event) => {
-                    setDateRevenue(formattedDateNow);
+                    setDateRevenue(formattedDateYesterday);
                     setDateRevenueTo(formattedDateNow);
                     setTypeDateBillRevenue(event);
                   }}
@@ -564,8 +589,10 @@ const StatisticalIndex = () => {
                     className={styles.input_noneBorder}
                     style={{ width: "50%" }}
                     picker={typeDateBillRevenue}
-                    value={dayjs(dateRevenue)}
-                    onChange={(date, dateString) => setDateRevenue(dateString)}
+                    value={dayjs(dateRevenueTo)}
+                    onChange={(date, dateString) => {
+                      setDateRevenueTo(dateString);
+                    }}
                   />
                 )}
               </Col>
@@ -762,9 +789,8 @@ const StatisticalIndex = () => {
                     type="primary"
                     size="large"
                     style={{ width: "10%" }}
-                  >
-                    <CheckCircleOutlined />
-                  </Button>
+                    icon={<CheckCircleOutlined />}
+                  />
                 </Col>
 
                 <Col span={12}>
@@ -937,7 +963,7 @@ const StatisticalIndex = () => {
             <Select
               value={selectTypeDateProduct}
               onChange={(event) => {
-                setDateProductSellTheMost(formattedDateNow);
+                setDateProductSellTheMost(formattedDateYesterday);
                 setDateProductSellTheMostTo(formattedDateNow);
                 setSelectTypeDateproduct(event);
               }}
@@ -975,9 +1001,9 @@ const StatisticalIndex = () => {
                 className={styles.input_noneBorder}
                 style={{ width: "80%" }}
                 picker={selectTypeDateProduct}
-                value={dayjs(dateProductSellTheMost)}
+                value={dayjs(dateProductSellTheMostTo)}
                 onChange={(date, dateString) => {
-                  setDateProductSellTheMost(dateString);
+                  setDateProductSellTheMostTo(dateString);
                 }}
               />
             )}
@@ -989,6 +1015,101 @@ const StatisticalIndex = () => {
                 date={dateProductSellTheMost}
                 dateToP={dateProductSellTheMostTo}
                 type={selectTypeDateProduct}
+              />
+            </div>
+          </div>
+        </Col>
+        <Col span={24}>
+          <div
+            className={`${styles.bgWhite}`}
+            style={{ height: "100%", marginTop: "25px" }}
+          >
+            <h2>
+              <CarOutlined /> Sản phẩm hoàn trả
+            </h2>
+            <p style={{ fontWeight: 500, marginTop: "12px" }}>
+              <ClockCircleOutlined /> Thời gian
+            </p>
+            <Select
+              value={selectTypeDateProductReturn}
+              onChange={(event) => {
+                setDateProductReturn(formattedDateYesterday);
+                setDateProductReturnTo(formattedDateNow);
+                setSelectTypeDateproductReturn(event);
+              }}
+              style={{ width: "20%" }}
+              bordered={false}
+            >
+              <Option value="date">Ngày</Option>
+              <Option value="month">Tháng</Option>
+              <Option value="year">Năm</Option>
+              <Option value="other">Tùy chọn</Option>
+            </Select>
+            {selectTypeDateProductReturn === "other" ? (
+              <div style={{ width: "80%", display: "inline-block" }}>
+                <DatePicker
+                  className={styles.input_noneBorder}
+                  style={{ width: "50%" }}
+                  picker={"date"}
+                  value={dayjs(dateProductReturn)}
+                  onChange={(date, dateString) => {
+                    setDateProductReturn(dateString);
+                  }}
+                />
+                <DatePicker
+                  className={styles.input_noneBorder}
+                  style={{ width: "50%" }}
+                  picker={"date"}
+                  value={dayjs(dateProductReturnTo)}
+                  onChange={(date, dateString) => {
+                    setDateProductReturnTo(dateString);
+                  }}
+                />
+              </div>
+            ) : (
+              <DatePicker
+                className={styles.input_noneBorder}
+                style={{ width: "80%" }}
+                picker={selectTypeDateProductReturn}
+                value={dayjs(dateProductReturnTo)}
+                onChange={(date, dateString) => {
+                  setDateProductReturnTo(dateString);
+                }}
+              />
+            )}
+            <div style={{ margin: "20px 0" }}>
+              <Tabs
+                defaultActiveKey={"1"}
+                onChange={(e) => setReason(e)}
+                items={[CheckCircleOutlined, ClockCircleOutlined].map(
+                  (Icon, i) => {
+                    const id = String(i + 1);
+                    return {
+                      label: (
+                        <Badge count={6}>
+                          <span style={{ padding: "20px" }}>
+                            <Icon />
+                            {id === "1" ? "Sản xuất" : "Khác"}
+                          </span>
+                        </Badge>
+                      ),
+                      key: id === "1" ? "PRODUCE" : "OTHER",
+                      children: (
+                        <div style={{ padding: "8px" }}>
+                          <p style={{ fontWeight: 500, marginBottom: "12px" }}>
+                            <TableOutlined /> Danh sách sản phẩm
+                          </p>
+                          <ProductReturns
+                            date={dateProductReturn}
+                            dateToP={dateProductReturnTo}
+                            type={selectTypeDateProductReturn}
+                            reason={reason}
+                          />
+                        </div>
+                      ),
+                    };
+                  }
+                )}
               />
             </div>
           </div>

@@ -1,4 +1,4 @@
-package com.fpoly.ooc.job;
+package com.fpoly.ooc.service.job;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fpoly.ooc.constant.Const;
@@ -46,9 +46,9 @@ public class MsJobService {
 
     @PostConstruct
     private void construct() {
-        jobScheduler.scheduleRecurrently(Cron.every15seconds(),
+        jobScheduler.scheduleRecurrently(Const.JOB_EVERY_5_SECONDS,
                 this::isCheckTimeStartDateAndEndDateVoucher);
-        jobScheduler.scheduleRecurrently(Cron.every15seconds(),
+        jobScheduler.scheduleRecurrently(Const.JOB_EVERY_5_SECONDS,
                 this::isCheckTimeStartDateAndEndDatePromotion);
     }
 
@@ -109,21 +109,21 @@ public class MsJobService {
         }
     }
 
-    private Boolean isValidArrayDifferent(List<?> list, List<?> listCurrent) {
+    private <T> Boolean isValidArrayDifferent(List<T> list, List<T> listCurrent) {
         if (list.size() != listCurrent.size()) {
             return true;
         }
 
-        for (int i = 0; i < list.size(); i++) {
-            Object object1 = list.get(i);
-            Object object2 = listCurrent.get(i);
+//        for (int i = 0; i < list.size(); i++) {
+//            Object object1 = list.get(i);
+//            Object object2 = listCurrent.get(i);
+//
+//            if (!Objects.equals(object1, object2)) {
+//                return true;
+//            }
+//        }
 
-            if (!Objects.equals(object1, object2)) {
-                return true;
-            }
-        }
-
-        return false;
+        return list.removeAll(listCurrent);
     }
 
     private String isCheckDateTime(LocalDateTime startDate, LocalDateTime endDate) {

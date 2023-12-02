@@ -1,5 +1,6 @@
 package com.fpoly.ooc.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.entity.CollarType;
 import com.fpoly.ooc.entity.Pattern;
 import com.fpoly.ooc.request.form.FormRequest;
@@ -24,12 +25,12 @@ public class PatternController {
     }
 
     @PostMapping("")
-    public ResponseEntity<?> create(@RequestParam String categoryName){
+    public ResponseEntity<?> create(@RequestParam String categoryName) throws JsonProcessingException {
         Pattern pattern = Pattern.builder().patternName(categoryName).build();
         return ResponseEntity.ok(service.create(pattern));
     }
     @PostMapping("create")
-    public ResponseEntity<?> create(@RequestBody Pattern pattern){
+    public ResponseEntity<?> create(@RequestBody Pattern pattern) throws JsonProcessingException {
         return ResponseEntity.ok(service.create(pattern));
     }
 

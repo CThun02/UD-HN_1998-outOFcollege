@@ -19,8 +19,8 @@ function HeaderRight(props) {
   const token = getAuthToken();
   const [cartIndex, setCartIndex] = useState({
     quantity: 0,
-    totalPrice: 0
-  })
+    totalPrice: 0,
+  });
   const [apiNotification, contextHolder] = notification.useNotification();
 
   useEffect(() => {
@@ -30,25 +30,34 @@ function HeaderRight(props) {
           setUser(data?.fullName);
           setData(data?.username);
           if (data?.username) {
-            axios.get(`http://localhost:8080/api/client/getCartIndex?username=${data?.username}`)
+            axios
+              .get(
+                `http://localhost:8080/api/client/getCartIndex?username=${data?.username}`
+              )
               .then((res) => {
-                setCartIndex(res.data)
+                setCartIndex(res.data);
               })
               .catch((er) => {
-                console.log(er)
-              })
+                console.log(er);
+              });
           } else {
-            setCartIndex({})
-            const cartIndexLocal = JSON.parse(localStorage.getItem('user'));
-            console.log(cartIndexLocal.productDetails)
-            let totalPrice = 0
+            setCartIndex({});
+            const cartIndexLocal = JSON.parse(localStorage.getItem("user"));
+            console.log(cartIndexLocal.productDetails);
+            let totalPrice = 0;
             for (let i = 0; i < cartIndexLocal?.productDetails.length; i++) {
-              totalPrice += Number(cartIndexLocal.productDetails[i].data[0].price * cartIndexLocal.productDetails[i].quantity)
+              totalPrice += Number(
+                cartIndexLocal.productDetails[i].data[0].price *
+                  cartIndexLocal.productDetails[i].quantity
+              );
             }
-            setCartIndex({
-              quantity: cartIndexLocal?.productDetails.length,
-              totalPrice: totalPrice
-            }, Math.random())
+            setCartIndex(
+              {
+                quantity: cartIndexLocal?.productDetails.length,
+                totalPrice: totalPrice,
+              },
+              Math.random()
+            );
           }
           const enCodeData = btoa(JSON.stringify(data?.username));
           const convertPath = enCodeData.replace(/\//g, "-----");
@@ -58,7 +67,6 @@ function HeaderRight(props) {
           console.log(error);
         });
   }, [props.render]);
-
 
   const content = (
     <div style={{ width: "100px" }}>
@@ -72,8 +80,9 @@ function HeaderRight(props) {
                 message: "Success",
                 description: "Đăng xuất thành công!",
               });
+              props.setRenderHeader(Math.random())
             }}
-            to={'/ms-shop'}
+            to={"/ms-shop"}
             className={styles.link}
           >
             Đăng xuất
@@ -94,7 +103,7 @@ function HeaderRight(props) {
   const handleCreateCartByUsername = () => {
     if (data) {
       try {
-        const response = axios.post(`${cartAPI}/createCart?username=` + data);
+        axios.post(`${cartAPI}/createCart?username=` + data);
       } catch (error) {
         console.log(error);
       }
@@ -104,64 +113,42 @@ function HeaderRight(props) {
   return (
     <div className={styles.flex}>
       {contextHolder}
-      <Row className={styles.margin}>
-        <Col span={24}>
-          <div className={styles.lineHeight}>
-            <Row className={styles.margin}>
-              <Col span={user ? 4 : 11}></Col>
-              <Col span={4}>
-                <Link to={"/ms-shop/about"} className={styles.link}>
-                  Giới thiệu
+      <div className={styles.lineHeight}>
+        <Space direction="horizontal" style={{ width: "100%" }} size={36}>
+          <p className={styles.cssParagraph}>
+            {cartIndex.totalPrice?.toLocaleString("vi-VN", {
+              style: "currency",
+              currency: "VND",
+            })}
+          </p>
+          <Badge count={cartIndex.quantity}>
+            <Link
+              to={"/ms-shop/cart"}
+              onClick={() => handleCreateCartByUsername()}
+              className={styles.link}
+            >
+              <ShoppingCartOutlined className={styles.iconSize} />
+            </Link>
+          </Badge>
+          <Space>
+            <Popover content={content} placement="bottomLeft" trigger="hover">
+              <UserOutlined className={styles.iconSize} />
+            </Popover>
+            {user ? (
+              <div style={{ marginLeft: "10px" }}>
+                <span>Xin chào, </span>{" "}
+                <Link
+                  to={"/ms-shop/user/" + usernameEncode}
+                  className={styles.link}
+                >
+                  <strong>{user}</strong>
                 </Link>
-              </Col>
-              <Col span={4}>
-                <Link to={"/ms-shop/contact"} className={styles.link}>
-                  Liên hệ
-                </Link>
-              </Col>
-              <Col span={4}>
-                <p className={styles.cssParagraph}>
-                  {cartIndex.totalPrice?.toLocaleString(
-                    "vi-VN",
-                    {
-                      style: "currency",
-                      currency: "VND",
-                    }
-                  )}</p>
-                <Badge count={cartIndex.quantity}>
-                  <Link to={"/ms-shop/cart"} onClick={() => handleCreateCartByUsername()} className={styles.link}>
-                    <ShoppingCartOutlined className={styles.iconSize} />
-                  </Link>
-                </Badge>
-              </Col>
-              <Col span={user ? 8 : 1} className={styles.centerd}>
-                <Space>
-                  {user ? (
-                    <div>
-                      <span>Xin chào, </span>{" "}
-                      <Link
-                        to={"/ms-shop/user/" + usernameEncode}
-                        className={styles.link}
-                      >
-                        <strong>{user}</strong>
-                      </Link>
-                    </div>
-                  ) : null}
-
-                  <Popover
-                    content={content}
-                    placement="bottomLeft"
-                    trigger="hover"
-                  >
-                    <UserOutlined className={styles.iconSize} />
-                  </Popover>
-                </Space>
-              </Col>
-            </Row>
-          </div >
-        </Col >
-      </Row >
-    </div >
+              </div>
+            ) : null}
+          </Space>
+        </Space>
+      </div>
+    </div>
   );
 }
 

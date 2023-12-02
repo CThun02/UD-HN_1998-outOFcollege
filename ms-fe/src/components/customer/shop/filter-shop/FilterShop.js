@@ -1,10 +1,11 @@
-import { Col, Divider, Input, Row, Slider, Space, theme } from "antd";
+import { Divider, Input, Space } from "antd";
 import styles from "./FilterShop.module.css";
 import ComponentsFilter from "../../../element/filter-shop/ComponentsFilter";
 import RangPrice from "./range-price/RangPrice";
 import { useState } from "react";
 import { useEffect } from "react";
 import axios from "axios";
+import SockJs from "../../../../service/SockJs";
 
 const baseUrl = "http://localhost:8080/api/admin";
 
@@ -20,11 +21,7 @@ function FilterShop({ filter, setFilter }) {
         const res = await axios.get(baseUrl + "/category");
         const data = await res.data;
 
-        const options = data.map((e) => ({
-          value: e.id,
-          label: e.categoryName,
-        }));
-        setCategories(options);
+        setCategories(data);
       } catch (err) {
         console.log(err);
       }
@@ -35,11 +32,7 @@ function FilterShop({ filter, setFilter }) {
         const res = await axios.get(baseUrl + "/brand");
         const data = await res.data;
 
-        const options = data.map((e) => ({
-          value: e.id,
-          label: e.brandName,
-        }));
-        setBrands(options);
+        setBrands(data);
       } catch (err) {
         console.log(err);
       }
@@ -50,12 +43,7 @@ function FilterShop({ filter, setFilter }) {
         const res = await axios.get(baseUrl + "/color");
         const data = await res.data;
 
-        const options = data.map((e) => ({
-          value: e.id,
-          label: e.colorName,
-          code: e.colorCode,
-        }));
-        setColors(options);
+        setColors(data);
       } catch (err) {
         console.log(err);
       }
@@ -66,24 +54,26 @@ function FilterShop({ filter, setFilter }) {
         const res = await axios.get(baseUrl + "/size");
         const data = await res.data;
 
-        const options = data.map((e) => ({
-          value: e.id,
-          label: e.sizeName,
-        }));
-        setSizes(options);
+        setSizes(data);
       } catch (err) {
         console.log(err);
       }
     }
 
-    getCategories();
-    getBrands();
-    getColors();
-    getSizes();
+    return () => {
+      getCategories();
+      getBrands();
+      getColors();
+      getSizes();
+    };
   }, []);
 
   return (
     <div className={styles.width}>
+      <SockJs setValues={setCategories} connectTo={"category-topic"} />
+      <SockJs setValues={setBrands} connectTo={"brand-topic"} />
+      <SockJs setValues={setColors} connectTo={"color-topic"} />
+      <SockJs setValues={setSizes} connectTo={"size-topic"} />
       <div className={styles.content}>
         <Space direction="vertical" style={{ width: "100%" }} size={10}>
           <div className={styles.title}>
@@ -122,28 +112,40 @@ function FilterShop({ filter, setFilter }) {
               <div className={styles.radioGroup}>
                 <Space direction="vertical" style={{ width: "100%" }}>
                   <ComponentsFilter
-                    options={categories}
+                    options={categories.map((e) => ({
+                      value: e.id,
+                      label: e.categoryName,
+                    }))}
                     title={"Loại sản phẩm"}
                     name={"categories"}
                     filter={filter}
                     setFilter={setFilter}
                   />
                   <ComponentsFilter
-                    options={brands}
+                    options={brands.map((e) => ({
+                      value: e.id,
+                      label: e.brandName,
+                    }))}
                     title={"Thương hiệu"}
                     name={"brands"}
                     filter={filter}
                     setFilter={setFilter}
                   />
                   <ComponentsFilter
-                    options={colors}
+                    options={colors.map((e) => ({
+                      value: e.id,
+                      label: e.colorName,
+                    }))}
                     title={"Màu sắc"}
                     name={"colors"}
                     filter={filter}
                     setFilter={setFilter}
                   />
                   <ComponentsFilter
-                    options={sizes}
+                    options={sizes.map((e) => ({
+                      value: e.id,
+                      label: e.sizeName,
+                    }))}
                     title={"Kích cỡ"}
                     name={"sizes"}
                     filter={filter}

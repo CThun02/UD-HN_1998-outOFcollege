@@ -5,13 +5,28 @@ import { Space } from "antd";
 import { useState } from "react";
 
 function FollowingOrder({ tab }) {
-  const [status, setStatus] = useState(null)
+  const [billCode, setBillCode] = useState('')
+  const [status, setStatus] = useState('')
+  const [count, setCount] = useState('')
+  const [symbol, setSymbol] = useState('')
+  const [createdBy, setCreatedBy] = useState('')
+
   return (
     <div>
       <div>
         <Space direction="vertical" size={24} style={{ width: "100%" }}>
-          <HeaderNavFollowOrder setStatus={setStatus} />
-          <FollowingOrderContent status={status} />
+          <HeaderNavFollowOrder setBillCode={setBillCode}
+            setStatus={setStatus}
+            setCount={setCount}
+            setCreatedBy={setCreatedBy}
+            setSymbol={setSymbol}
+          />
+          <FollowingOrderContent
+            billCode={billCode}
+            symbol={symbol}
+            status={status}
+            count={count}
+            createdBy={createdBy} />
         </Space>
       </div>
     </div>

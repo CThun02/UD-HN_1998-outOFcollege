@@ -35,7 +35,6 @@ public class PromotionProductResponse {
     public PromotionProductResponse(String promotionCode, String promotionName, Integer productQuantity,
                                     String promotionMethod, BigDecimal promotionValue, BigDecimal promotionCondition,
                                     LocalDateTime startDate, LocalDateTime endDate, String status) {
-        System.out.println("startDate: " + startDate);
         this.promotionCode = promotionCode;
         this.promotionName = promotionName;
         this.productQuantity = productQuantity;

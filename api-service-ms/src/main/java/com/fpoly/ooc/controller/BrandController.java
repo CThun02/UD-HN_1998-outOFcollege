@@ -1,5 +1,6 @@
 package com.fpoly.ooc.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.entity.Brand;
 import com.fpoly.ooc.request.brand.BrandRequest;
 import com.fpoly.ooc.service.interfaces.BrandServiceI;
@@ -22,12 +23,12 @@ public class BrandController {
     }
 
     @PostMapping("")
-    public ResponseEntity<?> create(@RequestParam String brandName){
+    public ResponseEntity<?> create(@RequestParam String brandName) throws JsonProcessingException {
         Brand brand = Brand.builder().brandName(brandName).build();
         return ResponseEntity.ok(service.create(brand));
     }
     @PostMapping("create")
-    public ResponseEntity<?> create(@RequestBody Brand brand){
+    public ResponseEntity<?> create(@RequestBody Brand brand) throws JsonProcessingException {
         return ResponseEntity.ok(service.create(brand));
     }
 

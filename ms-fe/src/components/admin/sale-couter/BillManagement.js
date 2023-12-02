@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styles from "./BillManagement.module.css";
-import { Badge, Button, Input, Select, Table, Tabs, Tag, TreeSelect, notification } from "antd";
+import { Badge, Button, Input, Select, Table, Tabs, Tag, notification } from "antd";
 import {
   CheckCircleOutlined,
   ClockCircleOutlined,
@@ -24,7 +24,6 @@ const BillManagement = () => {
   const [endDate, setEndDate] = useState("");
   const [status, setStatus] = useState("");
   const [symbol, setSymbol] = useState('')
-  const [billType, setBillType] = useState("");
   const [createdBy, setcreatedBy] = useState("");
   const [count, setCount] = useState('');
   const [loading, setLoading] = useState(false);
@@ -218,49 +217,13 @@ const BillManagement = () => {
       });
   };
 
-  const treeData = [
-    {
-      value: "",
-      title: "Tất cả",
-    },
-    {
-      value: "In-store",
-      title: "Tại quầy",
-      children: [
-        {
-          value: "Shipping",
-          title: "Giao hàng",
-        },
-        {
-          value: "Received",
-          title: "Đã nhận",
-        },
-      ],
-    },
-    {
-      value: "Online",
-      title: "Online",
-    },
-  ];
-
-  const [value, setValue] = useState();
-  const onChange = (newValue) => {
-    setValue(newValue);
-    if (newValue === "Shipping" || newValue === "Received") {
-      setBillType("In-store");
-      setcreatedBy(newValue);
-    } else {
-      setcreatedBy("");
-      setBillType(newValue);
-    }
-  };
-
   const [countBill, setCountBill] = useState({})
   useEffect(() => {
     axios.get(`http://localhost:8080/api/client/countBill`)
       .then(response => setCountBill(response.data))
       .catch(error => console.log(error))
     console.log(countBill)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
@@ -328,7 +291,7 @@ const BillManagement = () => {
               <Select.Option value={"Cancel"}>Đã huỷ</Select.Option>
             </Select>
           </span>
-          <span style={{ fontWeight: 500 }}>
+          {/* <span style={{ fontWeight: 500 }}>
             Loại hóa đơn
             <TreeSelect
               showSearch
@@ -348,7 +311,7 @@ const BillManagement = () => {
               onChange={onChange}
               treeData={treeData}
             />
-          </span>
+          </span> */}
         </div>
         <div style={{ width: "400px", marginTop: "20px" }}>
           <Input

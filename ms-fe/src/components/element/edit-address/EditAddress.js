@@ -16,8 +16,6 @@ const EditAddress = ({
     const [provinces, setProvinces] = useState([])
     const [districts, setDistricts] = useState([])
     const [wards, setWards] = useState([])
-    const [selectedDistrict, setSelectedDistrict] = useState('')
-    const [selectedWard, setSelectedWard] = useState('')
     const [error, setError] = useState({})
     const [leadtime, setLeadtime] = useState(null)
     const [shippingFee, setShippingFee] = useState(0)
@@ -58,22 +56,17 @@ const EditAddress = ({
         setDistricts([])
         setWards([])
         fetchDistrict(e?.substring(e.indexOf("|") + 1))
-        setSelectedDistrict(null)
-        setSelectedWard(null)
     }
 
     const handleDistrictChange = (e) => {
         formData.district = e
         formData.ward = ''
         setWards([])
-        setSelectedDistrict(e?.substring(e.indexOf("|") + 1))
         fetchWard(e?.substring(e.indexOf("|") + 1))
-        setSelectedWard(null)
     }
 
     const handleWardChange = (e) => {
         formData.ward = e
-        setSelectedWard(e?.substring(e.indexOf("|") + 1))
     }
 
     const fetchProvince = async () => {

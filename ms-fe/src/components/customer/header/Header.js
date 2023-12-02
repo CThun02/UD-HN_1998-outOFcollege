@@ -20,6 +20,7 @@ function Header({ render, setRenderHeader }) {
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [render]);
 
   return (

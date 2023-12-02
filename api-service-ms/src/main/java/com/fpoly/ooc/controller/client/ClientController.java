@@ -165,7 +165,7 @@ public class ClientController {
     }
 
     @GetMapping("/timeline/{billId}")
-    public ResponseEntity<?> pdfResponse(@PathVariable("billId") Long billId) {
+    public ResponseEntity<?> timelineResponse(@PathVariable("billId") Long billId) {
         return ResponseEntity.ok(timeLineService.getAllTimeLineByBillId(billId));
     }
 
@@ -183,7 +183,8 @@ public class ClientController {
         return ResponseEntity.ok(timeLineService.createTimeLine(id, request));
     }
 
-    @PutMapping("/change-status-bill/{id}")
+
+    @PutMapping("/change-status-bill")
     public ResponseEntity<?> updateBillStatus(@RequestBody BillStatusDTO dto) throws JsonProcessingException {
         return ResponseEntity.ok(billService.updateBillStatus(dto));
     }

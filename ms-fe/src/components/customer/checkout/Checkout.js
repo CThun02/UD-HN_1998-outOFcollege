@@ -411,7 +411,7 @@ const Checkout = ({ setRenderHeader }) => {
                                 "-" +
                                 item.cartDetailResponse.patternName +
                                 "-" +
-                                item.cartDetailResponse.formName)} <span style="font-weight: 500;">x ${item.quantity}</span></p>
+                                item.cartDetailResponse.formName)} <span style="display: inline-block">(x ${item.quantity})</span></p>
                                                     </div>
                                                     <div style="width: 25%; padding: 4px;">
                                                         <p>${(dataToken ? (item?.cartDetailResponse?.priceProductDetail - (item?.promotion[0]?.promotionValue ?? 0)).toLocaleString("vi-VN", { style: "currency", currency: "VND" }) : (item?.data[0]?.price - ((item?.data[0].promotion[0]?.promotionValue) ?? 0)).toLocaleString("vi-VN", { style: "currency", currency: "VND" }))
@@ -565,7 +565,7 @@ const Checkout = ({ setRenderHeader }) => {
                                         "-" +
                                         item.data[0].pattern.patternName +
                                         "-" +
-                                        item.data[0].form.formName} <span style="font-weight: 500;">x ${item.quantity}</span></p>
+                                        item.data[0].form.formName} <span style="display: inline-block">(x ${item.quantity})</span></p>
                                                                     </div>
                                                                     <div style="width: 25%; padding: 4px;">
                                                                         <p>${(item.data[0].price * item.quantity).toLocaleString("vi-VN", { style: "currency", currency: "VND" })}</p>

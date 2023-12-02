@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
 import com.fpoly.ooc.dto.BillStatusDTO;
+import com.fpoly.ooc.dto.VoucherAccountConditionDTO;
 import com.fpoly.ooc.entity.*;
 import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.BillDetailRepo;
@@ -14,6 +15,7 @@ import com.fpoly.ooc.repository.VoucherHistoryRepository;
 import com.fpoly.ooc.request.bill.BillDetailRequest;
 import com.fpoly.ooc.request.bill.BillRequest;
 import com.fpoly.ooc.request.product.ProductDetailRequest;
+import com.fpoly.ooc.request.voucher.VoucherRequest;
 import com.fpoly.ooc.responce.bill.*;
 import com.fpoly.ooc.responce.account.GetListCustomer;
 import com.fpoly.ooc.responce.product.ProductDetailDisplayResponse;
@@ -27,6 +29,8 @@ import com.fpoly.ooc.service.interfaces.DeliveryNoteService;
 import com.fpoly.ooc.service.interfaces.EmailService;
 import com.fpoly.ooc.service.interfaces.ProductDetailServiceI;
 import com.fpoly.ooc.service.interfaces.ProductImageServiceI;
+import com.fpoly.ooc.service.interfaces.VoucherAccountService;
+import com.fpoly.ooc.service.interfaces.VoucherService;
 import com.fpoly.ooc.service.kafka.KafkaUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,8 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeParseException;
-import java.time.temporal.TemporalAdjusters;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -74,6 +77,12 @@ public class BillServiceImpl implements BillService {
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private VoucherService voucherService;
+
+    @Autowired
+    private VoucherAccountService voucherAccountService;
 
     @Autowired
     private KafkaUtil kafkaUtil;
@@ -155,12 +164,24 @@ public class BillServiceImpl implements BillService {
             timeLineRepo.save(timeline);
         }
 
-        VoucherHistory voucherHistory = VoucherHistory.builder()
-                .bill(bill)
-                .voucherCode(request.getVoucherCode())
-                .build();
-        voucherHistoryRepository.save(voucherHistory);
 
+        if (request.getVoucherCode() != null) {
+            VoucherRequest voucher = VoucherRequest.builder()
+                    .voucherCode(request.getVoucherCode())
+                    .limitQuantity(voucherService.findVoucherByVoucherCode(request.getVoucherCode()).getLimitQuantity() - 1)
+                    .build();
+            voucherService.saveOrUpdate(voucher);
+
+            VoucherHistory voucherHistory = VoucherHistory.builder()
+                    .bill(bill)
+                    .priceReduce(bill.getPriceReduce())
+                    .voucherCode(request.getVoucherCode())
+                    .build();
+            voucherHistoryRepository.save(voucherHistory);
+
+            VoucherAccount voucherAccount = new VoucherAccount();
+//            voucherAccount.se
+        }
         return bill;
     }
 
@@ -266,7 +287,6 @@ public class BillServiceImpl implements BillService {
     public List<ProductDetailSellResponse> getProductInBillByStatusAndId(Long id, LocalDateTime dayFrom, LocalDateTime dayTo) {
         List<ProductDetailResponse> productSellTheMost = billRepo.getProductInBillByStatusAndIdAndDate(id,
                 dayFrom, dayTo);
-        System.out.println("CHECK");
         List<ProductDetailSellResponse> billProductSellTheMosts = new ArrayList<>();
         for (int i = 0; i < productSellTheMost.size(); i++) {
             ProductDetailDisplayResponse response = new ProductDetailDisplayResponse(productSellTheMost.get(i),

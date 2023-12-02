@@ -160,8 +160,7 @@ function FollowingOrderContent({ billCode, status, symbol, count, createdBy }) {
       const data = await token;
       await axios
         .get(
-          `http://localhost:8080/api/client/timelineByUser?username=${
-            data?.username ? data?.username : ""
+          `http://localhost:8080/api/client/timelineByUser?username=${data?.username ? data?.username : ""
           }&billCode=${billCode}&status=${status}&symbol=${symbol}&count=${count}&createdBy=${createdBy}`
         )
         .then((response) => {
@@ -221,321 +220,322 @@ function FollowingOrderContent({ billCode, status, symbol, count, createdBy }) {
                   {status === "" && createdBy === "CLIENT"
                     ? " Chờ giao hàng"
                     : status === "Complete"
-                    ? "Hoàn thành"
-                    : status === "Cancel"
-                    ? "Đã hủy"
-                    : status === "" && symbol === "Shipping" && count === 2
-                    ? "Đã xác nhận"
-                    : status === "" && count === 3
-                    ? "Đang giao hàng"
-                    : "Tất cả"}
+                      ? "Hoàn thành"
+                      : status === "Cancel"
+                        ? "Đã hủy"
+                        : status === "" && symbol === "Shipping" && count === 2
+                          ? "Đã xác nhận"
+                          : status === "" && count === 3
+                            ? "Đang giao hàng"
+                            : "Tất cả"}
                 </span>
               </div>
               {console.log(bills)}
               {bills?.length > 0 && status === ""
                 ? bills.map((timelines) => {
-                    return (
-                      <>
-                        {timelines?.map((timeline) => {
-                          return (
-                            <Row style={{ margin: 0 }}>
-                              <Col span={3}>
-                                <Carousel
-                                  style={{ maxWidth: "300px" }}
-                                  autoplay
-                                >
-                                  {timeline.productImageResponses &&
-                                    timeline.productImageResponses.map(
-                                      (item) => {
-                                        return (
-                                          <img
-                                            key={item.id}
-                                            style={{
-                                              width: "100%",
-                                              marginTop: "10px",
-                                            }}
-                                            alt="ahihi"
-                                            src={item.path}
-                                          />
-                                        );
-                                      }
-                                    )}
-                                </Carousel>
-                              </Col>
-                              <Col span={18}>
-                                <Space
-                                  Space
-                                  style={{ width: "100%", marginLeft: "16px" }}
-                                  size={8}
-                                  direction="vertical"
-                                >
-                                  <Row>
-                                    <Col span={24}>
-                                      <div
-                                        className="m-5"
+                  return (
+                    <>
+                      {timelines?.map((timeline) => {
+                        return (
+                          <Row style={{ margin: 0 }}>
+                            <Col span={3}>
+                              <Carousel
+                                style={{ maxWidth: "300px" }}
+                                autoplay
+                              >
+                                {timeline.productImageResponses &&
+                                  timeline.productImageResponses.map(
+                                    (item) => {
+                                      return (
+                                        <img
+                                          key={item.id}
+                                          style={{
+                                            width: "100%",
+                                            marginTop: "10px",
+                                          }}
+                                          alt="ahihi"
+                                          src={item.path}
+                                        />
+                                      );
+                                    }
+                                  )}
+                              </Carousel>
+                            </Col>
+                            <Col span={18}>
+                              <Space
+                                Space
+                                style={{ width: "100%", marginLeft: "16px" }}
+                                size={8}
+                                direction="vertical"
+                              >
+                                <Row>
+                                  <Col span={24}>
+                                    <div
+                                      className="m-5"
+                                      style={{
+                                        textAlign: "start",
+                                        height: "100%",
+                                        justifyContent: "center",
+                                      }}
+                                    >
+                                      <span style={{ fontWeight: "500" }}>
+                                        {timeline.productName +
+                                          "-" +
+                                          timeline.productBrandName +
+                                          "-" +
+                                          timeline.productCateGoryName +
+                                          "-" +
+                                          timeline.productButton +
+                                          "-" +
+                                          timeline.productMaterial +
+                                          "-" +
+                                          timeline.productCollar +
+                                          "-" +
+                                          timeline.productSleeve +
+                                          "-" +
+                                          timeline.productShirtTail +
+                                          "-" +
+                                          timeline.productPatternName +
+                                          "-" +
+                                          timeline.productFormName}
+                                      </span>
+                                      <br />
+                                      <div className={styles.optionColor}>
+                                        <b>Màu sắc: </b>
+                                        <span
+                                          style={{
+                                            backgroundColor:
+                                              timeline.productColor,
+                                            marginLeft: "8px",
+                                          }}
+                                        ></span>
+                                        {timeline.productColorName}
+                                      </div>
+                                      <b>Kích cỡ: </b>
+                                      <span
                                         style={{
-                                          textAlign: "start",
-                                          height: "100%",
-                                          justifyContent: "center",
+                                          marginLeft: "8px",
                                         }}
                                       >
-                                        <span style={{ fontWeight: "500" }}>
-                                          {timeline.productName +
-                                            "-" +
-                                            timeline.productBrandName +
-                                            "-" +
-                                            timeline.productCateGoryName +
-                                            "-" +
-                                            timeline.productButton +
-                                            "-" +
-                                            timeline.productMaterial +
-                                            "-" +
-                                            timeline.productCollar +
-                                            "-" +
-                                            timeline.productSleeve +
-                                            "-" +
-                                            timeline.productShirtTail +
-                                            "-" +
-                                            timeline.productPatternName +
-                                            "-" +
-                                            timeline.productFormName}
-                                        </span>
-                                        <br />
-                                        <div className={styles.optionColor}>
-                                          <b>Màu sắc: </b>
-                                          <span
-                                            style={{
-                                              backgroundColor:
-                                                timeline.productColor,
-                                              marginLeft: "8px",
-                                            }}
-                                          ></span>
-                                          {timeline.productColorName}
-                                        </div>
-                                        <b>Kích cỡ: </b>
-                                        <span
-                                          style={{
-                                            marginLeft: "8px",
-                                          }}
-                                        >
-                                          {timeline.productSize}
-                                        </span>
-                                        <br />
-                                        <b>Số lượng: </b>
-                                        <span
-                                          style={{
-                                            marginLeft: "8px",
-                                          }}
-                                        >
-                                          {timeline.quantity}
-                                        </span>
-                                      </div>
-                                    </Col>
-                                  </Row>
-                                </Space>
-                              </Col>
-                              <Col
-                                span={3}
-                                style={{
-                                  display: "flex",
-                                  justifyContent: "flex-end",
-                                }}
-                              >
-                                <span
-                                  style={{
-                                    fontSize: "1.25rem",
-                                    color: "#ee4d2d",
-                                  }}
-                                >
-                                  {(
-                                    timeline.productPrice * timeline.quantity
-                                  ).toLocaleString("vi-VN", {
-                                    style: "currency",
-                                    currency: "VND",
-                                  })}
-                                </span>
-                              </Col>
-                            </Row>
-                          );
-                        })}
-                        <Col span={24} style={{}}>
-                          <div
-                            style={{
-                              display: "flex",
-                              justifyContent: "flex-end",
-                              alignItems: "center",
-                              borderTop: "1px solid #ccc",
-                              padding: "10px 0",
-                            }}
-                          >
-                            <Button
-                              style={{ marginRight: 20 }}
-                              onClick={() => handleOpen(timelines[0].billId)}
+                                        {timeline.productSize}
+                                      </span>
+                                      <br />
+                                      <b>Số lượng: </b>
+                                      <span
+                                        style={{
+                                          marginLeft: "8px",
+                                        }}
+                                      >
+                                        {timeline.quantity}
+                                      </span>
+                                    </div>
+                                  </Col>
+                                </Row>
+                              </Space>
+                            </Col>
+                            <Col
+                              span={3}
+                              style={{
+                                display: "flex",
+                                justifyContent: "flex-end",
+                              }}
                             >
-                              Chi tiết đơn hàng
-                            </Button>
-
-                            {createdBy === "CLIENT" && (
-                              <Button
-                                type="primary"
-                                danger
+                              <span
                                 style={{
-                                  marginRight: "20px",
-                                }}
-                                onClick={() => {
-                                  setBillId(timelines[0].billId);
-                                  setOpenNote(true);
+                                  fontSize: "1.25rem",
+                                  color: "#ee4d2d",
                                 }}
                               >
-                                Hủy
-                              </Button>
-                            )}
-                            {/* <span>Thành tiền: {(timeline.quantity * timeline.productPrice).toLocaleString("vi-VN", {
-                          style: "currency",
-                          currency: "VND",
-                        })}</span> */}
-                          </div>
-                          <hr />
-                        </Col>
-                      </>
-                    );
-                  })
-                : timelines?.map((timeline) => {
-                    return (
-                      <Row
-                        style={{ padding: 10, borderBottom: "1px solid gray" }}
-                      >
-                        <Col span={3}>
-                          <Carousel style={{ maxWidth: "300px" }} autoplay>
-                            {timeline.productImageResponses &&
-                              timeline.productImageResponses.map((item) => {
-                                return (
-                                  <img
-                                    key={item.id}
-                                    style={{ width: "100%", marginTop: "10px" }}
-                                    alt="ahihi"
-                                    src={item.path}
-                                  />
-                                );
-                              })}
-                          </Carousel>
-                        </Col>
-                        <Col span={18}>
-                          <Space
-                            Space
-                            style={{ width: "100%", marginLeft: "16px" }}
-                            size={8}
-                            direction="vertical"
-                          >
-                            <Row>
-                              <Col span={24}>
-                                <div
-                                  className="m-5"
-                                  style={{
-                                    textAlign: "start",
-                                    height: "100%",
-                                    justifyContent: "center",
-                                  }}
-                                >
-                                  <span style={{ fontWeight: "500" }}>
-                                    {timeline.productName +
-                                      "-" +
-                                      timeline.productBrandName +
-                                      "-" +
-                                      timeline.productCateGoryName +
-                                      "-" +
-                                      timeline.productButton +
-                                      "-" +
-                                      timeline.productMaterial +
-                                      "-" +
-                                      timeline.productCollar +
-                                      "-" +
-                                      timeline.productSleeve +
-                                      "-" +
-                                      timeline.productShirtTail +
-                                      "-" +
-                                      timeline.productPatternName +
-                                      "-" +
-                                      timeline.productFormName}
-                                  </span>
-                                  <br />
-                                  <div className={styles.optionColor}>
-                                    <b>Màu sắc: </b>
-                                    <span
-                                      style={{
-                                        backgroundColor: timeline.productColor,
-                                        marginLeft: "8px",
-                                      }}
-                                    ></span>
-                                    {timeline.productColorName}
-                                  </div>
-                                  <b>Kích cỡ: </b>
-                                  <span
-                                    style={{
-                                      marginLeft: "8px",
-                                    }}
-                                  >
-                                    {timeline.productSize}
-                                  </span>
-                                  <br />
-                                  <b>Số lượng: </b>
-                                  <span
-                                    style={{
-                                      marginLeft: "8px",
-                                    }}
-                                  >
-                                    {timeline.quantity}
-                                  </span>
-                                </div>
-                              </Col>
-                            </Row>
-                          </Space>
-                        </Col>
-                        <Col
-                          span={3}
+                                {(
+                                  timeline.productPrice * timeline.quantity
+                                ).toLocaleString("vi-VN", {
+                                  style: "currency",
+                                  currency: "VND",
+                                })}
+                              </span>
+                            </Col>
+                          </Row>
+                        );
+                      })}
+                      <Col span={24} style={{}}>
+                        <div
                           style={{
                             display: "flex",
                             justifyContent: "flex-end",
+                            alignItems: "center",
+                            borderTop: "1px solid #ccc",
+                            padding: "10px 0",
                           }}
                         >
-                          <span
-                            style={{ fontSize: "1.25rem", color: "#ee4d2d" }}
-                          >
-                            {(
-                              timeline.productPrice * timeline.quantity
-                            ).toLocaleString("vi-VN", {
-                              style: "currency",
-                              currency: "VND",
-                            })}
-                          </span>
-                        </Col>
-                        <Col span={17}></Col>
-                        <Col span={7}>
                           <Button
                             style={{ marginRight: 20 }}
-                            onClick={() => handleOpen(timeline.billId)}
+                            onClick={() => handleOpen(timelines[0].billId)}
                           >
                             Chi tiết đơn hàng
                           </Button>
-                          <Button
-                            type="primary"
-                            style={{ marginRight: "20px" }}
-                            onClick={() =>
-                              handleRePurchase(timeline.productDetailId)
-                            }
-                          >
-                            Mua lại
-                          </Button>
-                        </Col>
-                      </Row>
-                    );
-                  })}
+
+                          {createdBy === "CLIENT" && (
+                            <Button
+                              type="primary"
+                              danger
+                              style={{
+                                marginRight: "20px",
+                              }}
+                              onClick={() => {
+                                setBillId(timelines[0].billId);
+                                setOpenNote(true);
+                              }}
+                            >
+                              Hủy
+                            </Button>
+                          )}
+                          {/* <span>Thành tiền: {(timeline.quantity * timeline.productPrice).toLocaleString("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                        })}</span> */}
+                        </div>
+                        <hr />
+                      </Col>
+                    </>
+                  );
+                })
+                : timelines?.map((timeline) => {
+                  return (
+                    <Row
+                      style={{ padding: 10, borderBottom: "1px solid gray" }}
+                    >
+                      <Col span={3}>
+                        <Carousel style={{ maxWidth: "300px" }} autoplay>
+                          {timeline.productImageResponses &&
+                            timeline.productImageResponses.map((item) => {
+                              return (
+                                <img
+                                  key={item.id}
+                                  style={{ width: "100%", marginTop: "10px" }}
+                                  alt="ahihi"
+                                  src={item.path}
+                                />
+                              );
+                            })}
+                        </Carousel>
+                      </Col>
+                      <Col span={18}>
+                        <Space
+                          Space
+                          style={{ width: "100%", marginLeft: "16px" }}
+                          size={8}
+                          direction="vertical"
+                        >
+                          <Row>
+                            <Col span={24}>
+                              <div
+                                className="m-5"
+                                style={{
+                                  textAlign: "start",
+                                  height: "100%",
+                                  justifyContent: "center",
+                                }}
+                              >
+                                <span style={{ fontWeight: "500" }}>
+                                  {timeline.productName +
+                                    "-" +
+                                    timeline.productBrandName +
+                                    "-" +
+                                    timeline.productCateGoryName +
+                                    "-" +
+                                    timeline.productButton +
+                                    "-" +
+                                    timeline.productMaterial +
+                                    "-" +
+                                    timeline.productCollar +
+                                    "-" +
+                                    timeline.productSleeve +
+                                    "-" +
+                                    timeline.productShirtTail +
+                                    "-" +
+                                    timeline.productPatternName +
+                                    "-" +
+                                    timeline.productFormName}
+                                </span>
+                                <br />
+                                <div className={styles.optionColor}>
+                                  <b>Màu sắc: </b>
+                                  <span
+                                    style={{
+                                      backgroundColor: timeline.productColor,
+                                      marginLeft: "8px",
+                                    }}
+                                  ></span>
+                                  {timeline.productColorName}
+                                </div>
+                                <b>Kích cỡ: </b>
+                                <span
+                                  style={{
+                                    marginLeft: "8px",
+                                  }}
+                                >
+                                  {timeline.productSize}
+                                </span>
+                                <br />
+                                <b>Số lượng: </b>
+                                <span
+                                  style={{
+                                    marginLeft: "8px",
+                                  }}
+                                >
+                                  {timeline.quantity}
+                                </span>
+                              </div>
+                            </Col>
+                          </Row>
+                        </Space>
+                      </Col>
+                      <Col
+                        span={3}
+                        style={{
+                          display: "flex",
+                          justifyContent: "flex-end",
+                        }}
+                      >
+                        <span
+                          style={{ fontSize: "1.25rem", color: "#ee4d2d" }}
+                        >
+                          {(
+                            timeline.productPrice * timeline.quantity
+                          ).toLocaleString("vi-VN", {
+                            style: "currency",
+                            currency: "VND",
+                          })}
+                        </span>
+                      </Col>
+                      <Col span={17}></Col>
+                      <Col span={7}>
+                        <Button
+                          style={{ marginRight: 20 }}
+                          onClick={() => handleOpen(timeline.billId)}
+                        >
+                          Chi tiết đơn hàng
+                        </Button>
+                        <Button
+                          type="primary"
+                          style={{ marginRight: "20px" }}
+                          onClick={() =>
+                            handleRePurchase(timeline.productDetailId)
+                          }
+                        >
+                          Mua lại
+                        </Button>
+                      </Col>
+                    </Row>
+                  );
+                })}
             </Space>
           </div>
         </div>
       ) : (
         <>Đang tải...</>
-      )}
+      )
+      }
       <ModalConfirm
         isModalOpen={openNote}
         handleCancel={() => setOpenNote(false)}
@@ -547,7 +547,7 @@ function FollowingOrderContent({ billCode, status, symbol, count, createdBy }) {
         handleCancel={handleCancel}
         userInfo={userInfo}
       />
-    </div>
+    </div >
   );
 }
 

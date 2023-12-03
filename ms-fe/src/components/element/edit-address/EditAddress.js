@@ -30,11 +30,10 @@ const EditAddress = ({
 
     const CLIENTURL = `http://localhost:8080/api/client`
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
+    const handleChange = (name, e) => {
         setFormData({
             ...formData,
-            [name]: value,
+            [name]: e,
         });
     };
 
@@ -59,16 +58,15 @@ const EditAddress = ({
     }
 
     const handleDistrictChange = (e) => {
-        formData.district = e
-        formData.ward = ''
+        handleChange("district", e)
         setWards([])
         fetchWard(e?.substring(e.indexOf("|") + 1))
     }
 
     const handleWardChange = (e) => {
-        formData.ward = e
-        console.log(formData.ward)
+        handleChange("ward", e)
     }
+    console.log(formData)
 
     const fetchProvince = async () => {
         await axios
@@ -212,40 +210,41 @@ const EditAddress = ({
                 });
         }
     };
+
     const handleSubmit = async () => {
-        // try {
-        //     await validate.validate(formData, { abortEarly: false });
-        //     setError({})
-        // } catch (errors) {
-        //     const validationErrors = {};
-        //     errors.inner.forEach((err) => {
-        //         validationErrors[err.path] = err.message;
-        //     });
-        //     setError(validationErrors);
-        //     return;
-        // }
+        try {
+            await validate.validate(formData, { abortEarly: false });
+            setError({})
+        } catch (errors) {
+            const validationErrors = {};
+            errors.inner.forEach((err) => {
+                validationErrors[err.path] = err.message;
+            });
+            setError(validationErrors);
+            return;
+        }
 
-        // await axios.put(`${CLIENTURL}/update-address/${addressId}`, formData).then((response) => {
-        //     console.log(response.data)
-        // }).catch((error) => {
-        //     console.log(error);
-        // })
+        await axios.put(`${CLIENTURL}/update-address/${addressId}`, formData).then((response) => {
+            console.log(response.data)
+        }).catch((error) => {
+            console.log(error);
+        })
 
-        // await axios.put(`${CLIENTURL}/update-delivery-note/${billId}`, {
-        //     shipDate: leadtime,
-        //     shipPrice: shippingFee
-        // }).catch((error) => {
-        //     console.log(error);
-        // })
-        // notification.success({
-        //     message: 'Thông báo',
-        //     description: 'Sửa thông tin thành công',
-        //     duration: 2
-        // })
+        await axios.put(`${CLIENTURL}/update-delivery-note/${billId}`, {
+            shipDate: leadtime,
+            shipPrice: shippingFee
+        }).catch((error) => {
+            console.log(error);
+        })
+        notification.success({
+            message: 'Thông báo',
+            description: 'Sửa thông tin thành công',
+            duration: 2
+        })
 
-        // handleAddressCancel()
-        // render(Math.random)
-        // setFormData({})
+        handleAddressCancel()
+        render(Math.random)
+        setFormData({})
         console.log(formData)
     }
 
@@ -263,7 +262,7 @@ const EditAddress = ({
                 })
             })
             .catch((error) => console.log(error))
-        console.log(`formData`, formData)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     useEffect(() => {
@@ -290,7 +289,7 @@ const EditAddress = ({
                         >
                             <Input
                                 name='fullName'
-                                onChange={handleChange}
+                                onChange={(e) => handleChange(e.target.name, e.target.value)}
                                 value={formData.fullName}
                                 allowClear
                             />
@@ -308,7 +307,7 @@ const EditAddress = ({
                         >
                             <Input
                                 name={`sdt`}
-                                onChange={handleChange}
+                                onChange={(e) => handleChange(e.target.name, e.target.value)}
                                 value={formData.sdt}
                                 allowClear
                             />
@@ -423,7 +422,7 @@ const EditAddress = ({
                             <Input
                                 name='descriptionDetail'
                                 value={formData.descriptionDetail}
-                                onChange={handleChange}
+                                onChange={(e) => handleChange(e.target.name, e.target.value)}
                                 allowClear
                             />
                         </FloatingLabels>

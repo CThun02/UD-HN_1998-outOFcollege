@@ -29,7 +29,7 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
             "AND (pd.size.id = ?8 OR ?8 IS NULL) AND (pd.pattern.id = ?9 OR ?9 IS NULL)" +
             "AND (pd.form.id = ?10 OR ?10 IS NULL) AND (pd.brand.id = ?11 OR ?11 IS NULL)" +
             "AND (pd.category.id = ?12 OR ?12 IS NULL) AND ((pd.price >=?13 or ?13 IS NULL) " +
-            "AND (pd.price<=?14 or ?14 IS NULL))")
+            "AND (pd.price<=?14 or ?14 IS NULL)) and pd.status like 'ACTIVE'")
     public List<ProductDetailResponse> filterProductDetailsByIdCom(Long productId, Long idButton, Long idMaterial,
                                                                    Long idShirtTail, Long idSleeve, Long idCollar,
                                                                    Long idColor, Long idSize, Long patternId, Long formId,

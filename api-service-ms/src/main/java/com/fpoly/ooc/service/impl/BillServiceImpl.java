@@ -114,8 +114,8 @@ public class BillServiceImpl implements BillService {
         bill.setStatus(request.getStatus());
         billRepo.save(bill);
 
-        if (bill.getStatus().equals("Unpaid")
-                && !bill.getBillType().equals("In-Store")
+        if (!request.getEmailDetails().getRecipient().isEmpty()
+
         ) {
             if (!request.getEmailDetails().getRecipient().isEmpty()) {
                 emailService.sendSimpleMail(request.getEmailDetails());

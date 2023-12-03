@@ -19,7 +19,6 @@ import com.fpoly.ooc.responce.promotion.PromotionProductResponse;
 import com.fpoly.ooc.service.interfaces.AccountService;
 import com.fpoly.ooc.service.interfaces.CartDetailService;
 import com.fpoly.ooc.service.interfaces.PromotionService;
-import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -72,6 +71,27 @@ public class CartDetailServiceImpl implements CartDetailService {
         return lst;
     }
 
+    @Override
+    public CartDetailDisplayResponse getProductDetailId(Long productDetailId) {
+        CartDetailDisplayResponse cartDetailDisplayResponse = null;
+        List<CartDetailResponse> lstCartDetailResponse = cartDetailRepo.getProductDetailId(productDetailId);
+
+        for (int i = 0; i < lstCartDetailResponse.size(); i++) {
+            List<ProductImageResponse> lstImageResponse = productImageService
+                    .getProductImageByProductDetailId(lstCartDetailResponse.get(i).getProductDetailId());
+
+            List<PromotionProductResponse> lstPromotion = promotionService
+                    .getPromotionByProductDetailId(lstCartDetailResponse.get(i).getProductDetailId(), "ACTIVE");
+            cartDetailDisplayResponse = new CartDetailDisplayResponse();
+            cartDetailDisplayResponse.setCartDetailResponse(lstCartDetailResponse.get(i));
+            cartDetailDisplayResponse.setProductImageResponse(lstImageResponse);
+            cartDetailDisplayResponse.setPromotion(lstPromotion);
+
+        }
+
+        return cartDetailDisplayResponse;
+    }
+
     @Transactional
     @Override
     public Cart createCartDetail(CartRequest request) {
@@ -82,7 +102,7 @@ public class CartDetailServiceImpl implements CartDetailService {
 
         Cart existingCart = cartRepo.findCartByAccount(account);
 
-        if(existingCart==null){
+        if (existingCart == null) {
             existingCart = this.createCart(account.getUsername());
         }
 

@@ -48,7 +48,7 @@ function ProductInfo({
     if (Object.keys(chooseColor).length === 0 || Object.keys(chooseSize).length === 0) {
       notification.error({
         message: "Thông báo",
-        description: "Không tìm thấy hóa đơn",
+        description: "Bạn chưa chọn kích cỡ hoặc màu sắc",
       });
       return;
     }
@@ -100,23 +100,37 @@ function ProductInfo({
   const handleByNow = async (e) => {
     e.preventDefault();
     const data = await token;
-    let lstCartDetail = []
-    if (data) {
-      axios.post(`${cartAPI}`, {
-        username: data.username,
-        lstCartDetail: [{
-          productDetailId: productDetails[0].id,
-          quantity: quantity
-        }]
-      }).then((response) => {
-        console.log(response.data)
-      }).catch((err) => {
-        console.log(err)
-      })
-    } else {
-      lstCartDetail.push(({ data: productDetails, quantity: quantity }))
+    let lstProductDetail = []
+    if (Object.keys(chooseColor).length === 0 || Object.keys(chooseSize).length === 0) {
+      notification.error({
+        message: "Thông báo",
+        description: "Bạn chưa chọn kích cỡ hoặc màu sắc",
+      });
+      return;
     }
-    localStorage.setItem('checkout', JSON.stringify(lstCartDetail));
+    if (data) {
+      try {
+        if (data) {
+          const res = await axios.get(`http://localhost:8080/api/client/cart/productDetail`, {
+            params: {
+              productDetailId: productDetails[0].id
+            }
+          });
+          res.data.cartDetailResponse.quantity = quantity
+          lstProductDetail.push(res.data[0]);
+        } else {
+          lstProductDetail.push({ data: productDetails, quantity: quantity });
+        }
+
+        localStorage.setItem('checkout', JSON.stringify(lstProductDetail));
+        navigate('/ms-shop/checkout');
+      } catch (error) {
+        console.error(error);
+      }
+    } else {
+      lstProductDetail.push(({ data: productDetails, quantity: quantity }))
+    }
+    localStorage.setItem('checkout', JSON.stringify(lstProductDetail));
     navigate('/ms-shop/checkout');
   }
 

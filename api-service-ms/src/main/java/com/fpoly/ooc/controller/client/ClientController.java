@@ -161,7 +161,7 @@ public class ClientController {
 
     @GetMapping("/pdf/{billCode}")
     public ResponseEntity<?> pdfResponse(@PathVariable("billCode") String billCode) {
-        return ResponseEntity.status(200).body(billDetailService.pdfResponse(billCode));
+        return ResponseEntity.ok(billDetailService.pdfResponse(billCode));
     }
 
     @GetMapping("/timeline/{billId}")

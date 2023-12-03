@@ -2,7 +2,6 @@ import {
   Button,
   Col,
   Modal,
-  Pagination,
   Row,
   Space,
   Spin,
@@ -42,7 +41,6 @@ function Promotion() {
   const [isAdmin, setIsAdmin] = useState(false);
 
   //paging
-  const [totalElements, setTotalElements] = useState(1);
   const [pageNo, setPageNo] = useState(1);
   const [pageSize, setPageSize] = useState(5);
 
@@ -231,28 +229,14 @@ function Promotion() {
             status: status,
           };
 
-          const res = await axios.post(
-            `${
-              pageNo !== 1 || pageSize !== 5
-                ? baseUrl +
-                  "?pageNo=" +
-                  (pageNo - 1) +
-                  "&" +
-                  "pageSize=" +
-                  pageSize
-                : baseUrl
-            }`,
-            filter,
-            {
-              headers: {
-                Authorization: `Bearer ${getToken(true)}`,
-              },
-            }
-          );
+          const res = await axios.post(baseUrl, filter, {
+            headers: {
+              Authorization: `Bearer ${getToken(true)}`,
+            },
+          });
 
-          const data = res.data;
-          setPromotions(data.content);
-          setTotalElements(data.totalElements);
+          const data = await res.data;
+          setPromotions(data);
           setIsAdmin(true);
           setIsLoading(false);
         } catch (err) {
@@ -272,7 +256,16 @@ function Promotion() {
 
       return () => getPromotions();
     },
-    [codeOrName, startDate, endDate, status, pageNo, pageSize, isRender]
+    [
+      codeOrName,
+      startDate,
+      endDate,
+      status,
+      pageNo,
+      pageSize,
+      isRender,
+      apiNotification,
+    ]
   );
 
   const calculateStt = (index) => {
@@ -292,7 +285,7 @@ function Promotion() {
         status={status}
         setStatus={setStatus}
       />
-      <SockJs setValues={setPromotions} connectTo="promotion" />
+      {/* <SockJs setValues={setPromotions} connectTo="promotion" /> */}
       <div className={styles.content}>
         <Space style={{ width: "100%" }} direction="vertical" size={16}>
           <Row>
@@ -350,18 +343,18 @@ function Promotion() {
                 action: [promotion.promotionCode, promotion.status],
               }))}
               className={styles.table}
-              pagination={false}
+              pagination={{
+                showSizeChanger: true,
+                pageSizeOptions: [5, 10, 15, 20],
+                defaultPageSize: 5,
+                showLessItems: true,
+                style: { marginRight: "10px" },
+                onChange: (currentPage, pageSize) => {
+                  handlePageSize(currentPage, pageSize);
+                },
+              }}
             />
           </Spin>
-          <Pagination
-            defaultCurrent={pageNo}
-            total={totalElements}
-            showSizeChanger={true}
-            pageSize={pageSize}
-            pageSizeOptions={["5", "10", "20", "50", "100"]}
-            onShowSizeChange={handlePageSize}
-            onChange={(page) => setPageNo(page)}
-          />
         </Space>
       </div>
     </div>

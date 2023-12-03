@@ -12,9 +12,11 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class EmailServiceImpl implements EmailService {
@@ -29,7 +31,8 @@ public class EmailServiceImpl implements EmailService {
     private String sender;
 
     @Override
-    public String sendSimpleMail(EmailDetails details, Long idVoucher) {
+    @Async
+    public CompletableFuture<String> sendSimpleMail(EmailDetails details, Long idVoucher) {
 
         try {
             SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
@@ -49,9 +52,9 @@ public class EmailServiceImpl implements EmailService {
                 javaMailSender.send(simpleMailMessage);
             }
 
-            return "DONE";
+            return CompletableFuture.completedFuture("DONE");
         } catch (Exception e) {
-            return "ERROR";
+            return CompletableFuture.completedFuture("ERROR");
         }
     }
 

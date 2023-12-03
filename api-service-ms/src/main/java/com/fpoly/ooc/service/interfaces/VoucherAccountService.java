@@ -2,15 +2,14 @@ package com.fpoly.ooc.service.interfaces;
 
 import com.fpoly.ooc.dto.VoucherAccountConditionDTO;
 import com.fpoly.ooc.dto.VoucherAccountUsedDTO;
-import com.fpoly.ooc.dto.VoucherHistoryConditionDTO;
-import com.fpoly.ooc.entity.Voucher;
 import com.fpoly.ooc.entity.VoucherAccount;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public interface VoucherAccountService {
 
-    VoucherAccount saveOrUpdate(VoucherAccountConditionDTO voucherAccountConditionDTO);
+    CompletableFuture<VoucherAccount> saveOrUpdate(VoucherAccountConditionDTO voucherAccountConditionDTO);
 
     VoucherAccount updateAccountUsed(VoucherAccountUsedDTO dto);
 

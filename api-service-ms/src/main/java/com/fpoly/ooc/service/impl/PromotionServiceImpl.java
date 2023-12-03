@@ -47,23 +47,21 @@ public class PromotionServiceImpl implements PromotionService {
     private PromotionProductDetailService promotionProductDetailService;
 
     @Override
-    public Page<PromotionProductResponse> pageAll(VoucherAndPromotionConditionDTO voucherAndPromotionConditionDTO,
-                                                  Pageable pageable) {
+    public List<PromotionProductResponse> pageAll(VoucherAndPromotionConditionDTO voucherAndPromotionConditionDTO) {
 
         String status = Objects.isNull(voucherAndPromotionConditionDTO.getStatus()) ?
                 null : voucherAndPromotionConditionDTO.getStatus().equalsIgnoreCase("ALL") ?
                 null : voucherAndPromotionConditionDTO.getStatus();
 
-        return (Page<PromotionProductResponse>) PageUltil.page(
-                promotionRepository.findAllPromotionProduct(
-                        Objects.isNull(voucherAndPromotionConditionDTO.getCodeOrName())
-                                ? null : "%" + voucherAndPromotionConditionDTO.getCodeOrName() + "%",
-                        Objects.isNull(voucherAndPromotionConditionDTO.getStartDate())
-                                ? null : voucherAndPromotionConditionDTO.getStartDate(),
-                        Objects.isNull(voucherAndPromotionConditionDTO.getEndDate())
-                                ? null : voucherAndPromotionConditionDTO.getEndDate(),
-                        status
-                ), pageable);
+        return promotionRepository.findAllPromotionProduct(
+                Objects.isNull(voucherAndPromotionConditionDTO.getCodeOrName())
+                        ? null : "%" + voucherAndPromotionConditionDTO.getCodeOrName() + "%",
+                Objects.isNull(voucherAndPromotionConditionDTO.getStartDate())
+                        ? null : voucherAndPromotionConditionDTO.getStartDate(),
+                Objects.isNull(voucherAndPromotionConditionDTO.getEndDate())
+                        ? null : voucherAndPromotionConditionDTO.getEndDate(),
+                status
+        );
     }
 
     @Transactional
@@ -98,7 +96,6 @@ public class PromotionServiceImpl implements PromotionService {
         log.info("promotionRequest: " + promotionRequest);
 
         promotionRequest.setPromotionId(promotion.getId());
-//        promotionRequest.setPromotionProductId();
         promotionRequest.setPromotionCode(promotion.getPromotionCode());
         promotionRequest.setPromotionName(promotion.getPromotionName());
         promotionRequest.setPromotionMethod(promotion.getPromotionMethod());

@@ -3,7 +3,6 @@ package com.fpoly.ooc.service.impl;
 import com.fpoly.ooc.common.Commons;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
-import com.fpoly.ooc.dto.EmailDetails;
 import com.fpoly.ooc.dto.VoucherAccountConditionDTO;
 import com.fpoly.ooc.dto.VoucherAndPromotionConditionDTO;
 import com.fpoly.ooc.entity.Account;
@@ -19,26 +18,21 @@ import com.fpoly.ooc.service.interfaces.AccountService;
 import com.fpoly.ooc.service.interfaces.EmailService;
 import com.fpoly.ooc.service.interfaces.VoucherAccountService;
 import com.fpoly.ooc.service.interfaces.VoucherService;
-import com.fpoly.ooc.util.PageUltil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @Slf4j
@@ -57,24 +51,24 @@ public class VoucherServiceImpl implements VoucherService {
     private VoucherAccountService voucherAccountService;
 
     @Override
-    public Page<VoucherResponse> findAllVoucher(Pageable pageable, VoucherAndPromotionConditionDTO voucherConditionDTO) {
+    public List<VoucherResponse> findAllVoucher(VoucherAndPromotionConditionDTO voucherConditionDTO) {
 
         String status = Objects.isNull(voucherConditionDTO.getStatus()) ?
                 null : voucherConditionDTO.getStatus().equalsIgnoreCase("ALL") ?
                 null : voucherConditionDTO.getStatus();
 
-        return (Page<VoucherResponse>) PageUltil.page(
-                voucherRepository.findAllVoucher(
+        return voucherRepository.findAllVoucher(
                         StringUtils.isEmpty(voucherConditionDTO.getCodeOrName()) ? null : "%" + Commons.lower(voucherConditionDTO.getCodeOrName()) + "%",
                         Objects.isNull(voucherConditionDTO.getStartDate()) ? null : voucherConditionDTO.getStartDate(),
                         Objects.isNull(voucherConditionDTO.getEndDate()) ? null : voucherConditionDTO.getEndDate(),
                         Commons.lower(status)
-                ), pageable);
+                );
     }
 
     @Transactional
     @Override
-    public Voucher saveOrUpdate(VoucherRequest voucherRequest) {
+    @Async
+    public CompletableFuture<Voucher> saveOrUpdate(VoucherRequest voucherRequest) {
         Voucher voucherDb = null;
         if(voucherRequest.getVoucherId() != null) {
             voucherDb = voucherRepository.findById(voucherRequest.getVoucherId()).orElse(null);
@@ -98,7 +92,7 @@ public class VoucherServiceImpl implements VoucherService {
                 List<String> recipient = accounts.stream().map(Account::getEmail).toList();
                 voucherRequest.getEmailDetails().setRecipient(recipient);
             }
-            result = emailService.sendSimpleMail(voucherRequest.getEmailDetails(), voucher.getId());
+            result = String.valueOf(emailService.sendSimpleMail(voucherRequest.getEmailDetails(), voucher.getId()));
         }
 
         if (result != null && result.equals("ERROR")) {
@@ -112,7 +106,7 @@ public class VoucherServiceImpl implements VoucherService {
             }
         }
 
-        return dbVoucher;
+        return CompletableFuture.completedFuture(dbVoucher);
     }
 
     @Override

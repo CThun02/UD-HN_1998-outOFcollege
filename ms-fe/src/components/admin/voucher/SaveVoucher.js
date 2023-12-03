@@ -261,6 +261,14 @@ function SaveVoucher() {
                   return;
                 }
 
+                if (error?.status === 500) {
+                  setErrorsServer(error);
+                  apiNotification.error({
+                    message: `Lỗi`,
+                    description: "Thay đổi thất bại",
+                  });
+                }
+
                 if (error?.status === 400) {
                   setErrorsServer(error);
                   apiNotification.error({

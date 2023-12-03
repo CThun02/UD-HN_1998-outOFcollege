@@ -31,7 +31,8 @@ public class EmailServiceImpl implements EmailService {
     private String sender;
 
     @Override
-    public String sendSimpleMail(EmailDetails details, Long idVoucher) {
+    @Async
+    public CompletableFuture<String> sendSimpleMail(EmailDetails details, Long idVoucher) {
 
         try {
             SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
@@ -51,9 +52,9 @@ public class EmailServiceImpl implements EmailService {
                 javaMailSender.send(simpleMailMessage);
             }
 
-            return "DONE";
+            return CompletableFuture.completedFuture("DONE");
         } catch (Exception e) {
-            return "ERROR";
+            return CompletableFuture.completedFuture("ERROR");
         }
     }
 

@@ -123,7 +123,7 @@ public class MsJobService {
 //            }
 //        }
 
-        return !list.removeAll(listCurrent);
+        return list.removeAll(listCurrent);
     }
 
     private String isCheckDateTime(LocalDateTime startDate, LocalDateTime endDate) {

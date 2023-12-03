@@ -3,7 +3,6 @@ import styles from "./Voucher.module.css";
 import {
   Button,
   Col,
-  Pagination,
   Row,
   Space,
   Table,
@@ -29,6 +28,7 @@ import moment from "moment";
 import { NotificationContext } from "../../element/notification/Notification";
 import SockJs from "../../../service/SockJs";
 import { getToken, request } from "../../../service/Token";
+import { log } from "sockjs-client/dist/sockjs";
 
 const baseUrl = "http://localhost:8080/api/admin/vouchers/";
 
@@ -136,6 +136,8 @@ function Voucher() {
             status: searchStatus,
           };
 
+          console.log("StatusValue: ", searchStatus);
+
           const res = await axios.post(baseUrl, filter, {
             headers: {
               Authorization: `Bearer ${getToken(true)}`,
@@ -162,15 +164,13 @@ function Voucher() {
         }
       }
 
-      return () => fetchData();
+      fetchData();
     },
     [
       searchNameOrCode,
       searchStartDate,
       searchEndDate,
       searchStatus,
-      pageNo,
-      pageSize,
       successMessage,
       clearNotification,
       reload,
@@ -285,7 +285,7 @@ function Voucher() {
   return (
     <div className={styles.voucher}>
       {contextHolder}
-      {/* <SockJs setValues={setVouchers} connectTo={"voucher"} /> */}
+      <SockJs setValues={setVouchers} connectTo={"voucher"} />
       <FilterVoucherAndPromotion
         searchNameOrCode={searchNameOrCode}
         setSearchNameOrCode={setSearchNameOrCode}

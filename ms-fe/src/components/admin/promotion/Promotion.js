@@ -2,7 +2,6 @@ import {
   Button,
   Col,
   Modal,
-  Pagination,
   Row,
   Space,
   Spin,
@@ -257,7 +256,16 @@ function Promotion() {
 
       return () => getPromotions();
     },
-    [codeOrName, startDate, endDate, status, pageNo, pageSize, isRender]
+    [
+      codeOrName,
+      startDate,
+      endDate,
+      status,
+      pageNo,
+      pageSize,
+      isRender,
+      apiNotification,
+    ]
   );
 
   const calculateStt = (index) => {
@@ -277,7 +285,7 @@ function Promotion() {
         status={status}
         setStatus={setStatus}
       />
-      <SockJs setValues={setPromotions} connectTo="promotion" />
+      {/* <SockJs setValues={setPromotions} connectTo="promotion" /> */}
       <div className={styles.content}>
         <Space style={{ width: "100%" }} direction="vertical" size={16}>
           <Row>

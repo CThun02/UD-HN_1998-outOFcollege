@@ -66,9 +66,8 @@ function FilterVoucherAndPromotion({
     else setEndDate(endDate);
   }
 
-  function handleSetStatus(value) {
-    console.log(`selected ${value}`);
-    setStatus(() => value);
+  function handleSetStatus(status) {
+    setStatus(status);
   }
 
   return (
@@ -135,7 +134,7 @@ function FilterVoucherAndPromotion({
           </Col>
           <Col span={5}>
             <Space style={{ width: "100%" }} direction="vertical">
-              <FloatingLabels label="Trạng thái" name="status" value={"status"}>
+              <FloatingLabels label="Trạng thái" name="status" value={status}>
                 <Select
                   className={styles.selectedItem}
                   onChange={handleSetStatus}

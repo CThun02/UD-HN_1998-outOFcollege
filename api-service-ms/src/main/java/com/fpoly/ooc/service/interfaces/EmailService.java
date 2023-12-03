@@ -6,7 +6,7 @@ import java.util.concurrent.CompletableFuture;
 
 public interface EmailService {
 
-    String sendSimpleMail(EmailDetails details, Long idVoucher);
+    CompletableFuture<String> sendSimpleMail(EmailDetails details, Long idVoucher);
 
     String sendMailWithAttachment(EmailDetails details, Long idVoucher);
 

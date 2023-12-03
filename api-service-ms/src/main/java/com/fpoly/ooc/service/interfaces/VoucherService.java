@@ -5,8 +5,6 @@ import com.fpoly.ooc.entity.Voucher;
 import com.fpoly.ooc.request.voucher.DisplayVoucherRequest;
 import com.fpoly.ooc.request.voucher.VoucherRequest;
 import com.fpoly.ooc.responce.voucher.VoucherResponse;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -15,7 +13,7 @@ public interface VoucherService {
 
     List<VoucherResponse> findAllVoucher(VoucherAndPromotionConditionDTO voucherConditionDTO);
 
-    Voucher saveOrUpdate(VoucherRequest voucherRequest);
+    CompletableFuture<Voucher> saveOrUpdate(VoucherRequest voucherRequest);
 
     Voucher updateStatus(String code);
 

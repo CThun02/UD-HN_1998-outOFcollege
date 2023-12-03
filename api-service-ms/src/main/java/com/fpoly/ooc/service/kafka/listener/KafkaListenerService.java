@@ -3,6 +3,7 @@ package com.fpoly.ooc.service.kafka.listener;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fpoly.ooc.constant.Const;
+import com.fpoly.ooc.constant.ErrorCodeConfig;
 import com.fpoly.ooc.dto.BillStatusDTO;
 import com.fpoly.ooc.dto.TimelineBillDTO;
 import com.fpoly.ooc.entity.Bill;
@@ -20,6 +21,7 @@ import com.fpoly.ooc.entity.ShirtTailType;
 import com.fpoly.ooc.entity.Size;
 import com.fpoly.ooc.entity.SleeveType;
 import com.fpoly.ooc.entity.Timeline;
+import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.BillRepo;
 import com.fpoly.ooc.repository.BrandDAORepository;
 import com.fpoly.ooc.repository.ButtonTypeDAORepository;
@@ -35,8 +37,17 @@ import com.fpoly.ooc.repository.ShirtTailTypeDAORepository;
 import com.fpoly.ooc.repository.SizeDAORepository;
 import com.fpoly.ooc.repository.SleeveDAORepository;
 import com.fpoly.ooc.repository.TimeLineRepo;
+import com.fpoly.ooc.request.productDetail.GetSizeAndColorRequest;
+import com.fpoly.ooc.responce.product.ProductImageResponse;
+import com.fpoly.ooc.responce.productdetail.GetColorAndSizeAndQuantity;
+import com.fpoly.ooc.responce.productdetail.ProductDetailShopResponse;
+import com.fpoly.ooc.service.interfaces.ColorServiceI;
+import com.fpoly.ooc.service.interfaces.ProductDetailServiceI;
+import com.fpoly.ooc.service.interfaces.ProductImageServiceI;
+import com.fpoly.ooc.service.interfaces.SizeServiceI;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
@@ -44,7 +55,10 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.sql.Time;
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -68,6 +82,10 @@ public class KafkaListenerService {
     private ProductDetailDAORepositoryI productDetailDAORepositoryI;
     private TimeLineRepo timeLineRepo;
     private BillRepo billRepo;
+    private ProductImageServiceI productImageServiceI;
+    private ProductDetailServiceI productDetailServiceI;
+    private ColorServiceI colorServiceI;
+    private SizeServiceI sizeServiceI;
 
     @KafkaListener(topics = Const.TOPIC_PRODUCT, groupId = Const.KAFKA_GROUP_ID)
     public void listenerAddProduct(String productJson) throws JsonProcessingException {
@@ -306,19 +324,76 @@ public class KafkaListenerService {
 
 
         if(Objects.nonNull(productDetail)) {
-            productDetailDAORepositoryI.save(productDetail);
+            ProductDetail productDetailDb = productDetailDAORepositoryI.save(productDetail);
+            List<ProductDetailShopResponse> response = productDetailDAORepositoryI.findProductDetailShopResponse(productDetailDb.getProduct().getId(), productDetailDb.getBrand().getId(),
+                    productDetailDb.getCategory().getId(),productDetailDb.getPattern().getId(), productDetailDb.getForm().getId(),
+                    productDetailDb.getButton().getId(), productDetailDb.getMaterial().getId(), productDetailDb.getCollar().getId(), productDetailDb.getSleeve().getId(),
+                    productDetailDb.getShirtTail().getId());
+        List<Long> productDetailIds = response.stream().map(ProductDetailShopResponse::getProductDetailId).collect(Collectors.toList());
+        List<ProductImageResponse> images = productImageServiceI.getProductImageByProductDetailIds(productDetailIds);
 
-            String productDetailsJson = objectMapper.writeValueAsString(productDetailDAORepositoryI.findAll());
-            String productDetailsShopJson = objectMapper.writeValueAsString(productDetailDAORepositoryI.getAllProductDetailShop(
-                    null, null, null, "", "", "", "", null,
-                    null, null, null, "desc"));
-            String bestSellingJson = objectMapper.writeValueAsString(productDetailDAORepositoryI.getProductDetailBestSelling());
-            String newProductJson = objectMapper.writeValueAsString(productDetailDAORepositoryI.getNewProductDetail());
-            template.convertAndSend("/topic/productDetail-topic", productDetailsJson);
-            template.convertAndSend("/topic/productDetailShop-topic", productDetailsShopJson);
-            template.convertAndSend("/topic/bestSellingProduct-topic", bestSellingJson);
-            template.convertAndSend("/topic/newProduct-topic", newProductJson);
-            log.info("ProductDetailJson: " + productDetailsJson);
+        if (CollectionUtils.isEmpty(response)) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND));
+        }
+
+        GetSizeAndColorRequest request = new GetSizeAndColorRequest();
+        request.setColorId(productDetailDb.getColor().getId());
+        request.setSizeId(productDetailDb.getSize().getId());
+        request.setProductId(productDetailDb.getProduct().getId());
+        request.setProductDetailId(productDetailDb.getId());
+        request.setBrandId(productDetailDb.getBrand().getId());
+        request.setCategoryId(productDetailDb.getCategory().getId());
+        request.setPatternId(productDetailDb.getPattern().getId());
+        request.setFormId(productDetailDb.getForm().getId());
+        request.setButtonId(productDetailDb.getButton().getId());
+        request.setMaterialId(productDetailDb.getMaterial().getId());
+        request.setCollarId(productDetailDb.getCollar().getId());
+        request.setSleeveId(productDetailDb.getSleeve().getId());
+        request.setShirtTailId(productDetailDb.getShirtTail().getId());
+
+        GetColorAndSizeAndQuantity res = productDetailDAORepositoryI.findColorAndSize(request.getProductId(), request.getBrandId(), request.getCategoryId(),
+                request.getPatternId(), request.getFormId(), request.getButtonId(), request.getMaterialId(), request.getCollarId(), request.getSleeveId(),
+                request.getShirtTailId(), request.getColorId(), request.getSizeId());
+
+        if(res == null) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND));
+        }
+
+        Optional<List<Color>> colors = colorServiceI.findColorsByProductId(request);
+        Optional<List<Size>> sizes = sizeServiceI.findSizesByProductId(request);
+        if(colors.isEmpty() || sizes.isEmpty()) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND));
+        }
+
+        List<Long> productDetailsId =
+                productDetailDAORepositoryI.productDetailsId(request.getProductId(), request.getBrandId(), request.getCategoryId(), request.getPatternId(),
+                        request.getFormId(), request.getButtonId(), request.getMaterialId(), request.getCollarId(), request.getSleeveId(),
+                        request.getShirtTailId(), request.getColorId(), request.getSizeId());
+        if(!CollectionUtils.isEmpty(productDetailsId)) {
+            res.setProductDetailsId(productDetailsId);
+        }
+        res.setColors(colors.get());
+        res.setSizes(sizes.get());
+
+
+        ProductDetailShopResponse productDetailShopResponse = response.get(0);
+        GetColorAndSizeAndQuantity colorAndSize = productDetailServiceI.getColorAndSize(request).orElseThrow();
+        productDetailShopResponse.setColorAndSizeAndQuantity(colorAndSize);
+        productDetailShopResponse.setImages(images);
+
+        String productDetailsJson = objectMapper.writeValueAsString(productDetailShopResponse);
+        String colorsAndSizes = objectMapper.writeValueAsString(res);
+        String productDetailsShopJson = objectMapper.writeValueAsString(productDetailDAORepositoryI.getAllProductDetailShop(
+                null, null, null, "", "", "", "", null,
+                null, null, null, "up"));
+        String bestSellingJson = objectMapper.writeValueAsString(productDetailDAORepositoryI.getProductDetailBestSelling());
+        String newProductJson = objectMapper.writeValueAsString(productDetailDAORepositoryI.getNewProductDetail());
+        template.convertAndSend("/topic/getOneProductDetail-topic", productDetailsJson);
+        template.convertAndSend("/topic/colorsAndSizes-topic", colorsAndSizes);
+        template.convertAndSend("/topic/productDetailShop-topic", productDetailsShopJson);
+        template.convertAndSend("/topic/bestSellingProduct-topic", bestSellingJson);
+        template.convertAndSend("/topic/newProduct-topic", newProductJson);
+        log.info("ProductDetailJson: " + productDetailsJson);
         }
     }
 

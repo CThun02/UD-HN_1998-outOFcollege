@@ -47,7 +47,6 @@ const BillTimeLine = (addId) => {
 
     // tạo mới timeline
     const handleCreateTimeline = async (note, stauts) => {
-        console.log(`object`, billId)
         const data = await token;
         const values = {
             note: note,
@@ -113,12 +112,13 @@ const BillTimeLine = (addId) => {
         setIsModalConfirm(false);
     };
     const handleOkConFirm = (note) => {
+        console.log(`billInfo`, billInfo);
+        console.log(`timelines`, timelines[timelines.length - 1].status);
         handleCreateTimeline(note, action === "cancel" ? "0" : null);
         handleUpdateBillStatus(
             action === "cancel"
                 ? "Cancel"
-                :
-                (billInfo.symbol === "Shipping" &&
+                : (billInfo.symbol === "Shipping" &&
                     timelines[timelines.length - 1].status === "3"
                     && action !== "cancel")
                     ? "Complete"
@@ -129,13 +129,13 @@ const BillTimeLine = (addId) => {
                 action !== "cancel") ||
                 (billInfo.symbol === "Shipping" &&
                     timelines[timelines.length - 1].status === "3"
+                    && billInfo.status !== "Paid"
                     && action !== "cancel")
                 ? billInfo.totalPrice + billInfo?.shipPrice - billInfo.priceReduce
                 : billInfo.symbol === "Shipping" && billInfo.status === "Paid"
-                    ? billInfo.totalPrice + billInfo?.shipPrice - billInfo.priceReduce
+                    ? billInfo.amountPaid
                     : 0
         );
-        console.log(billId)
         setIsModalConfirm(false);
     };
     const showModalDetail = () => {
@@ -728,16 +728,6 @@ const BillTimeLine = (addId) => {
                         </span>
                         <span>{numeral(billInfo.priceReduce)?.format("0,0") + "đ"}</span>
                     </span>
-                    {billInfo.symbol === "Online" && (
-                        <>
-                            <span className={styles.span}>
-                                <span style={{ width: "200px", display: "inline-block" }}>
-                                    Phí vận chuyển:
-                                </span>
-                                <span>{numeral(billInfo.shipPrice)?.format("0,0") + "đ"}</span>
-                            </span>
-                        </>
-                    )}
                     <b className={styles.span}>
                         <span style={{ width: "200px", display: "inline-block" }}>
                             Tổng cộng:{" "}

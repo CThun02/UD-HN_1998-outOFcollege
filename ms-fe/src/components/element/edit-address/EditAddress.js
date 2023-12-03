@@ -67,6 +67,7 @@ const EditAddress = ({
 
     const handleWardChange = (e) => {
         formData.ward = e
+        console.log(formData.ward)
     }
 
     const fetchProvince = async () => {
@@ -212,39 +213,40 @@ const EditAddress = ({
         }
     };
     const handleSubmit = async () => {
-        try {
-            await validate.validate(formData, { abortEarly: false });
-            setError({})
-        } catch (errors) {
-            const validationErrors = {};
-            errors.inner.forEach((err) => {
-                validationErrors[err.path] = err.message;
-            });
-            setError(validationErrors);
-            return;
-        }
+        // try {
+        //     await validate.validate(formData, { abortEarly: false });
+        //     setError({})
+        // } catch (errors) {
+        //     const validationErrors = {};
+        //     errors.inner.forEach((err) => {
+        //         validationErrors[err.path] = err.message;
+        //     });
+        //     setError(validationErrors);
+        //     return;
+        // }
 
-        await axios.put(`${CLIENTURL}/update-address/${addressId}`, formData).then((response) => {
-            console.log(response.data)
-        }).catch((error) => {
-            console.log(error);
-        })
+        // await axios.put(`${CLIENTURL}/update-address/${addressId}`, formData).then((response) => {
+        //     console.log(response.data)
+        // }).catch((error) => {
+        //     console.log(error);
+        // })
 
-        await axios.put(`${CLIENTURL}/update-delivery-note/${billId}`, {
-            shipDate: leadtime,
-            shipPrice: shippingFee
-        }).catch((error) => {
-            console.log(error);
-        })
-        notification.success({
-            message: 'Thông báo',
-            description: 'Sửa thông tin thành công',
-            duration: 2
-        })
+        // await axios.put(`${CLIENTURL}/update-delivery-note/${billId}`, {
+        //     shipDate: leadtime,
+        //     shipPrice: shippingFee
+        // }).catch((error) => {
+        //     console.log(error);
+        // })
+        // notification.success({
+        //     message: 'Thông báo',
+        //     description: 'Sửa thông tin thành công',
+        //     duration: 2
+        // })
 
-        handleAddressCancel()
-        render(Math.random)
-        setFormData({})
+        // handleAddressCancel()
+        // render(Math.random)
+        // setFormData({})
+        console.log(formData)
     }
 
     useEffect(() => {

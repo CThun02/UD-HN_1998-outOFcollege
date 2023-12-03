@@ -117,7 +117,7 @@ function ProductInfo({
             }
           });
           res.data.cartDetailResponse.quantity = quantity
-          lstProductDetail.push(res.data[0]);
+          lstProductDetail.push(res.data);
         } else {
           lstProductDetail.push({ data: productDetails, quantity: quantity });
         }

@@ -2,7 +2,9 @@ import { Col, Popconfirm, Row, Space, Tag, message } from "antd";
 import styles from "./UserAddress.module.css";
 import { DeleteOutlined, EditOutlined, StarOutlined } from "@ant-design/icons";
 import { request } from "../../../../../service/Token";
-import { useEffect, useState } from "react";
+import EditAddress from "../../../../element/edit-address/EditAddress";
+import { useEffect } from "react";
+import { useState } from "react";
 
 const baseUrl = "http://localhost:8080/api/client/user";
 
@@ -16,15 +18,15 @@ function UserAddress({ address, index, setIsRender }) {
   }
 
   const confirm = (value) => {
-    console.log(value);
     request("DELETE", baseUrl + "/delete-address?addressId=" + value, {});
     setIsRender((render) => !render);
   };
 
   const cancel = (e) => {
-    console.log(e);
     message.error("Click on No");
   };
+
+  const [openAdd, setOpenAdd] = useState(false)
 
   return (
     <div className={styles.userAddress}>
@@ -76,6 +78,14 @@ function UserAddress({ address, index, setIsRender }) {
                   <EditOutlined
                     style={{ fontSize: "1.25rem" }}
                     className={styles.addressEdit}
+                    onClick={() => setOpenAdd(true)}
+                  />
+
+                  <EditAddress isModalOpen={openAdd}
+                    handleAddressOk={() => console.log(123)}
+                    handleAddressCancel={() => setOpenAdd(false)}
+                    render={setIsRender}
+                    addressId={address.idAddress}
                   />
 
                   {!address.defaultAddress && (
@@ -92,12 +102,14 @@ function UserAddress({ address, index, setIsRender }) {
           <div className={styles.addressDetail}>
             <RowAddress title={"Họ tên"} data={address.fullName} />
             <RowAddress title={"Số điện thoại"} data={address.phoneNumber} />
-            <RowAddress title={"Thành phố"} data={address.city} />
-            <RowAddress title={"Huyện"} data={address.district} />
-            <RowAddress title={"Phường"} data={address.ward} />
+            <RowAddress title={"Thành phố"} data={address.city.substring(0, address.city.indexOf('|'))} />
+            <RowAddress title={"Huyện"} data={address.district.substring(0, address.district.indexOf('|'))} />
+            <RowAddress title={"Phường"} data={address.ward.substring(0, address.ward.indexOf('|'))} />
             <RowAddressDetail
               title={"Địa chỉ chi tiết"}
-              detailCity={`${address.city} - ${address.district} ${address.ward}`}
+              detailCity={`${address.city.substring(0, address.city.indexOf('|'))} 
+              - ${address.district.substring(0, address.district.indexOf('|'))}
+               -${address.ward.substring(0, address.ward.indexOf('|'))}`}
               detailHouse={`${address.street} - ${address.descriptionDetail}`}
             />
           </div>

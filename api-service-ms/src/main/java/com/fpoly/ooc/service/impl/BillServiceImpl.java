@@ -251,6 +251,7 @@ public class BillServiceImpl implements BillService {
     @Override
     public Integer updateBillStatus(BillStatusDTO dto) throws JsonProcessingException {
         log.warn("BillStatusDTORequest: " + dto);
+        billRepo.update(dto.getStatus(), dto.getAmountPaid(), dto.getId());
         kafkaUtil.sendingObjectWithKafka(dto, Const.TOPIC_TIME_LINE);
         return 1;
     }

@@ -945,6 +945,9 @@ const Bill = () => {
   };
 
   const [errors, setErrors] = useState({});
+  const handleTest = (index) => {
+    console.log()
+  }
   const handleCreateBill = (index) => {
     const bill = {
       billCode: activeKey,
@@ -958,7 +961,9 @@ const Bill = () => {
           : amountPaid,
       billType: "In-Store",
       symbol: typeShipping[index] ? "Shipping" : symbol,
-      status: typeShipping[index] ? "Unpaid" : "Complete",
+      status: typeShipping[index] ? "Unpaid"
+        : !typeShipping[index] && switchChange[index] ? "Paid"
+          : "Complete",
       note: note,
       paymentDetailId: Number(selectedOption),
       lstBillDetailRequest: [],

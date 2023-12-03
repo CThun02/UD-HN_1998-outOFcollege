@@ -7,7 +7,7 @@ import {
   Modal,
   Row,
   Space,
-  message,
+  notification,
 } from "antd";
 import styles from "./UserInfoDetail.module.css";
 import { EditOutlined, UserOutlined } from "@ant-design/icons";
@@ -50,7 +50,7 @@ function UserInfoDetail({ user, setIsRender }) {
             </Row>
           </div>
 
-          <EditUser isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} user={user?.userInfomationDTO} />
+          <EditUser isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} user={user?.userInfomationDTO} setIsRender={setIsRender} />
 
           <div className={styles.body}>
             <Row style={{ margin: 0 }}>
@@ -127,12 +127,12 @@ function RowUserInfo({ title, data }) {
   );
 }
 
-function EditUser({ setIsModalOpen, isModalOpen, user }) {
+function EditUser({ setIsModalOpen, isModalOpen, user, setIsRender }) {
   const [form] = Form.useForm();
   const [userUpdate, setUserUpdate] = useState({
     username: "",
     password: "",
-    passwordNew: "",
+    newPassword: "",
     rePassword: "",
     email: "",
     phoneNumber: "",
@@ -150,34 +150,46 @@ function EditUser({ setIsModalOpen, isModalOpen, user }) {
   }, [isModalOpen, user])
 
   const handleOk = () => {
-    const formData = form.getFieldsValue();
+    form
+      .validateFields()
+      .then(() => {
+        const formData = form.getFieldsValue();
 
-    form.validateFields().then((values) => {
-      const enteredPassword = values.password;
-      const savedPassword = user.password;
+        bcrypt.compare(formData.password, user.password, (err, result) => {
+          if (err) {
+            console.error(err);
+            return;
+          }
 
-      bcrypt.compare(enteredPassword, savedPassword, (err, result) => {
-        if (err) {
-          console.error(err);
-          return;
-        }
-        if (result) {
-          axios.post(`http://localhost:8080/api/client/user/update-user`, formData)
-            .then(response => console.log(response))
-            .catch(err => console.log(err))
-          setIsModalOpen(false);
-          message.info(`User updated`)
-        } else {
-          form.setFields([
-            {
-              name: 'password',
-              errors: ['Mật khẩu không đúng'],
-            },
-          ]);
-        }
+          if (result) {
+            axios
+              .post(`http://localhost:8080/api/client/user/update-user`, formData)
+              .then((response) => {
+                setIsRender(response.data);
+                setIsModalOpen(false);
+                notification.success({
+                  message: "Thông báo",
+                  description: "Thanh toán thành công",
+                  duration: 2,
+                });
+                form.resetFields();
+              })
+              .catch((err) => console.log(err));
+          } else {
+            form.setFields([
+              {
+                name: 'password',
+                errors: ['Mật khẩu không đúng'],
+              },
+            ]);
+          }
+        });
+      })
+      .catch((error) => {
+        console.log('Validation failed:', error);
       });
-    });
   };
+
 
   const handleCancel = () => {
     setIsModalOpen(false);
@@ -251,7 +263,7 @@ function EditUser({ setIsModalOpen, isModalOpen, user }) {
           </Form.Item>
 
           <Form.Item
-            name={"passwordNew"}
+            name={"newPassword"}
             rules={[
               {
                 required: true,
@@ -276,7 +288,7 @@ function EditUser({ setIsModalOpen, isModalOpen, user }) {
             ]}
           >
             <Password
-              name={"passwordNew"}
+              name={"newPassword"}
               placeholder="Nhập mật khẩu mới"
               size="large"
               className={styles.input}
@@ -285,7 +297,7 @@ function EditUser({ setIsModalOpen, isModalOpen, user }) {
 
           <Form.Item
             name={"rePassword"}
-            dependencies={['passwordNew']}
+            dependencies={['newPassword']}
             rules={[
               {
                 required: true,
@@ -293,8 +305,8 @@ function EditUser({ setIsModalOpen, isModalOpen, user }) {
               },
               ({ getFieldValue }) => ({
                 validator(_, value) {
-                  const passwordNew = getFieldValue('passwordNew');
-                  if (!value || passwordNew === value) {
+                  const newPassword = getFieldValue('newPassword');
+                  if (!value || newPassword === value) {
                     return Promise.resolve();
                   }
                   return Promise.reject(
@@ -372,16 +384,6 @@ function EditUser({ setIsModalOpen, isModalOpen, user }) {
               className={styles.input}
             />
           </Form.Item>
-          {/* <div>
-          <Button
-            type="primary"
-            size="large"
-            className={styles.button}
-            htmlType="submit"
-          >
-            Xác nhận
-          </Button>
-        </div> */}
         </Space>
       </Form>
     </Modal>

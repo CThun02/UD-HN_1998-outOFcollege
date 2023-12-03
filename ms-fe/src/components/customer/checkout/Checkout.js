@@ -978,7 +978,7 @@ const Checkout = ({ setRenderHeader }) => {
                                                                 <div className={styles.productThumbnail}>
                                                                     <div className={styles.productThumbnailWrapper}>
                                                                         <img
-                                                                            src={productDetail?.productImageResponse[0].path} alt="" className={styles.productThumbnailImage} />
+                                                                            src={productDetail?.productImageResponse[0]?.path} alt="" className={styles.productThumbnailImage} />
                                                                     </div>
                                                                     <span className={styles.productThumbnailQuantity}>{productDetail?.cartDetailResponse.quantity}</span>
                                                                 </div>
@@ -1033,7 +1033,7 @@ const Checkout = ({ setRenderHeader }) => {
                                                                 <div className={styles.productThumbnail}>
                                                                     <div className={styles.productThumbnailWrapper}>
                                                                         <img
-                                                                            src={productDetail.data[0].productImageResponse[0].path} alt="" className={styles.productThumbnailImage} />
+                                                                            src={productDetail.data[0]?.productImageResponse[0]?.path} alt="" className={styles.productThumbnailImage} />
                                                                     </div>
                                                                     <span className={styles.productThumbnailQuantity}>{productDetail.quantity}</span>
                                                                 </div>

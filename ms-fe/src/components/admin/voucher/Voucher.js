@@ -48,7 +48,6 @@ function Voucher() {
   const [vouchers, setVouchers] = useState([]);
 
   // page and total elements
-  const [totalElements, setTotalElements] = useState(1);
   const [pageNo, setPageNo] = useState(1);
   const [pageSize, setPageSize] = useState(5);
 
@@ -137,30 +136,16 @@ function Voucher() {
             status: searchStatus,
           };
 
-          const res = await axios.post(
-            `${
-              pageNo !== 1 || pageSize !== 5
-                ? baseUrl +
-                  "?pageNo=" +
-                  (pageNo - 1) +
-                  "&" +
-                  "pageSize=" +
-                  pageSize
-                : baseUrl
-            }`,
-            filter,
-            {
-              headers: {
-                Authorization: `Bearer ${getToken(true)}`,
-              },
-            }
-          );
+          const res = await axios.post(baseUrl, filter, {
+            headers: {
+              Authorization: `Bearer ${getToken(true)}`,
+            },
+          });
 
           const data = await res.data;
 
           setIsLoading(false);
-          setTotalElements(data.totalElements);
-          setVouchers(data.content);
+          setVouchers(data);
           setIsAdmin(true);
         } catch (err) {
           setIsLoading(false);
@@ -189,6 +174,7 @@ function Voucher() {
       successMessage,
       clearNotification,
       reload,
+      apiNotification,
     ]
   );
 
@@ -299,7 +285,7 @@ function Voucher() {
   return (
     <div className={styles.voucher}>
       {contextHolder}
-      <SockJs setValues={setVouchers} connectTo={"voucher"} />
+      {/* <SockJs setValues={setVouchers} connectTo={"voucher"} /> */}
       <FilterVoucherAndPromotion
         searchNameOrCode={searchNameOrCode}
         setSearchNameOrCode={setSearchNameOrCode}
@@ -344,7 +330,7 @@ function Voucher() {
                 <Table
                   style={{ width: "100%" }}
                   columns={columns}
-                  dataSource={vouchers.map((voucher, index) => ({
+                  dataSource={vouchers?.map((voucher, index) => ({
                     key: voucher.voucherId,
                     stt: calculateStt(index),
                     voucherCode: voucher.voucherCode,
@@ -374,16 +360,16 @@ function Voucher() {
                     action: [voucher.voucherCode, voucher.status],
                   }))}
                   className={styles.table}
-                  pagination={false}
-                />
-                <Pagination
-                  defaultCurrent={pageNo}
-                  total={totalElements}
-                  showSizeChanger={true}
-                  pageSize={pageSize}
-                  pageSizeOptions={["5", "10", "20", "50", "100"]}
-                  onShowSizeChange={handlePageSize}
-                  onChange={(page) => setPageNo(page)}
+                  pagination={{
+                    showSizeChanger: true,
+                    pageSizeOptions: [5, 10, 15, 20],
+                    defaultPageSize: 5,
+                    showLessItems: true,
+                    style: { marginRight: "10px" },
+                    onChange: (currentPage, pageSize) => {
+                      handlePageSize(currentPage, pageSize);
+                    },
+                  }}
                 />
               </Space>
             </>

@@ -30,13 +30,9 @@ public class VoucherController {
     private VoucherService voucherService;
 
     @PostMapping("/")
-    public ResponseEntity<?> findAllVoucher(
-            @RequestParam(value = "pageNo",defaultValue = "0") int pageNo,
-            @RequestParam(value = "pageSize",defaultValue = "5  ") int pageSize,
-            @RequestBody VoucherAndPromotionConditionDTO voucherConditionDTO
-            ) {
+    public ResponseEntity<?> findAllVoucher(@RequestBody VoucherAndPromotionConditionDTO voucherConditionDTO) {
         return ResponseEntity.ok()
-                .body(voucherService.findAllVoucher(PageRequest.of(pageNo, pageSize), voucherConditionDTO));
+                .body(voucherService.findAllVoucher(voucherConditionDTO));
     }
 
     @PostMapping("/add")

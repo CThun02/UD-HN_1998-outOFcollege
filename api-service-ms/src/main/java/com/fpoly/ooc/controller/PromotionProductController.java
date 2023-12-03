@@ -31,12 +31,10 @@ public class PromotionProductController {
     private PromotionProductDetailService promotionProductDetailService;
 
     @PostMapping("/")
-    public ResponseEntity<?> findAll(@RequestBody VoucherAndPromotionConditionDTO voucherAndPromotionConditionDTO,
-                                     @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
-                                     @RequestParam(value = "pageSize", defaultValue = "5") Integer pageSize) {
+    public ResponseEntity<?> findAll(@RequestBody VoucherAndPromotionConditionDTO voucherAndPromotionConditionDTO) {
 
         return ResponseEntity.ok(promotionService
-                .pageAll(voucherAndPromotionConditionDTO, PageRequest.of(pageNo, pageSize)));
+                .pageAll(voucherAndPromotionConditionDTO));
     }
 
     @PostMapping("/delete")

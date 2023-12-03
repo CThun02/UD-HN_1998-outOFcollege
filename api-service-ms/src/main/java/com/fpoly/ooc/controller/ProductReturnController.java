@@ -33,4 +33,10 @@ public class ProductReturnController {
         LocalDateTime dateTo = LocalDateTime.parse(dayTo, formatter);
         return ResponseEntity.ok(service.getProductReturnByDateAndReason(dateFrom, dateTo.plusDays(1), reason));
     }
+
+
+    @GetMapping("/getProductReturnByBillCode")
+    public ResponseEntity<?> getProductReturnByBillCode(@RequestParam String billCode) {
+        return ResponseEntity.ok(service.getProductReturnByBillCode(billCode));
+    }
 }

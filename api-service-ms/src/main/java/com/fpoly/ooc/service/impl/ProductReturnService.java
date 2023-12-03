@@ -66,4 +66,16 @@ public class ProductReturnService implements ProductReturnServiceI {
         }
         return productDetailDisplayResponses;
     }
+
+    @Override
+    public List<ProductDetailDisplayResponse> getProductReturnByBillCode(String billCode) {
+        List<ProductDetailDisplayResponse> productDetailDisplayResponses = new ArrayList<>();
+        List<ProductDetailResponse> productDetailResponses = repo.getProductReturnByBillCode(billCode);
+        for (int i = 0; i < productDetailResponses.size(); i++) {
+            ProductDetailDisplayResponse productDetailDisplayResponse = new ProductDetailDisplayResponse(productDetailResponses.get(i),
+                    productImageService.getProductImageByProductDetailId(productDetailResponses.get(i).getId()));
+            productDetailDisplayResponses.add(productDetailDisplayResponse);
+        }
+        return productDetailDisplayResponses;
+    }
 }

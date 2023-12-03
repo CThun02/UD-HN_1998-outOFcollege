@@ -2,6 +2,7 @@ package com.fpoly.ooc.repository;
 
 import com.fpoly.ooc.entity.Address;
 import com.fpoly.ooc.entity.Bill;
+import com.fpoly.ooc.entity.BillDetail;
 import com.fpoly.ooc.responce.bill.*;
 import com.fpoly.ooc.responce.account.GetListCustomer;
 import com.fpoly.ooc.responce.product.ProductDetailResponse;
@@ -146,4 +147,9 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
             @Param("symbol") String symbol,
             @Param("count") Integer count,
             @Param("createdBy") String createdBy);
+
+    @Query("select bd from BillDetail bd join ProductDetail pd on bd.productDetail.id = pd.id " +
+            "join PromotionProduct pp on pp.productDetailId.id = pd.id  where pd.id = ?1 and (bd.createdAt>= pp.promotion.startDate " +
+            "AND bd.createdAt <= pp.promotion.endDate and bd.bill.billCode=?2) and pp.promotion.status = 'ACTIVE' ")
+    List<BillDetail> checkProductInPromotionById(Long productDetailId, String billCode);
 }

@@ -3,6 +3,7 @@ package com.fpoly.ooc.service.impl;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
 import com.fpoly.ooc.dto.CredentialsDTO;
+import com.fpoly.ooc.dto.EmailDetails;
 import com.fpoly.ooc.dto.UserDTO;
 import com.fpoly.ooc.entity.Account;
 import com.fpoly.ooc.entity.Role;
@@ -11,6 +12,7 @@ import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.request.account.SignUpRequest;
 import com.fpoly.ooc.service.interfaces.AccountService;
 import com.fpoly.ooc.service.interfaces.AuthService;
+import com.fpoly.ooc.service.interfaces.EmailService;
 import com.fpoly.ooc.service.interfaces.RoleService;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -19,6 +21,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.nio.CharBuffer;
+import java.util.List;
+import java.util.Objects;
 
 @AllArgsConstructor
 @Service
@@ -27,6 +31,7 @@ public class AuthServiceImpl implements AuthService {
     private AccountService accountService;
     private PasswordEncoder passwordEncoder;
     private RoleService roleService;
+    private EmailService emailService;
 
     @Override
     public UserDTO login(CredentialsDTO dto) {
@@ -74,6 +79,14 @@ public class AuthServiceImpl implements AuthService {
         user.setPassword(passwordEncoder.encode(CharBuffer.wrap(signUp.getPassword())));
 
         Account savedUser = accountService.save(user);
+
+        if(Objects.nonNull(savedUser)) {
+            EmailDetails emailDetails = new EmailDetails();
+            emailDetails.setMessageBody(Const.SIGN_UP_SEND_EMAIL);
+            emailDetails.setSubject("Đăng kí tài khoản");
+            emailDetails.setRecipient(List.of(savedUser.getEmail()));
+            emailService.sendSimpleMail(emailDetails);
+        }
 
         return mapperUser(savedUser);
     }

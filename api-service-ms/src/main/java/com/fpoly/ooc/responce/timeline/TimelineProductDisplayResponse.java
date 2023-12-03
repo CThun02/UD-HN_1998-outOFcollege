@@ -61,6 +61,8 @@ public class TimelineProductDisplayResponse {
 
     private List<ProductImageResponse> productImageResponses;
 
+    private Boolean checkInPromotion;
+
     public TimelineProductDisplayResponse(TimelineProductResponse timelineProductResponse) {
         this.billId= timelineProductResponse.getBillId();
         this.billCode = timelineProductResponse.getBillCode();

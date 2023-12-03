@@ -25,8 +25,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -41,9 +44,12 @@ public class AccountServiceImpl implements AccountService {
     private AddressRepository addressRepository;
     private AddressDetailRepository addressDetailRepository;
     private AddressDetailService addressDetailService;
+    private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
 
     @Autowired
-    public AccountServiceImpl(AccountRepository accountRepository, AddressRepository addressRepository, AddressDetailRepository addressDetailRepository, AddressDetailService addressDetailService) {
+    public AccountServiceImpl(AccountRepository accountRepository, AddressRepository addressRepository,
+                              AddressDetailRepository addressDetailRepository, AddressDetailService addressDetailService) {
         this.accountRepository = accountRepository;
         this.addressRepository = addressRepository;
         this.addressDetailRepository = addressDetailRepository;
@@ -78,7 +84,7 @@ public class AccountServiceImpl implements AccountService {
                 .dob(request.getDob())
                 .role(Role.builder().id(request.getIdRole()).build())
                 .build();
-
+        account.setPassword(passwordEncoder.encode(CharBuffer.wrap(account.getPassword())));
         Account createAccount = accountRepository.save(account);
 
         Address address = Address.builder()
@@ -121,6 +127,7 @@ public class AccountServiceImpl implements AccountService {
         account.setIdNo(request.getIdNo());
         account.setNumberPhone(request.getNumberPhone());
         account.setDob(request.getDob());
+        account.setPassword(passwordEncoder.encode(CharBuffer.wrap(account.getPassword())));
         Account createAccount = accountRepository.save(account);
         return createAccount;
     }

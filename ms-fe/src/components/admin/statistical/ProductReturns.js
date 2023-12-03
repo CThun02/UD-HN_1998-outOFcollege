@@ -1,14 +1,18 @@
-import { Badge, Carousel, Col, Row, Table, notification } from "antd";
+import { Badge, Carousel, Col, Row, Table, notification, Button } from "antd";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import styles from "./StatisticalIndex.module.css";
 import { getToken } from "../../../service/Token";
+import { EyeOutlined } from "@ant-design/icons";
+import ModalProductReturnDetail from "./ModalProductReturnDetail";
 
 const ProductReturns = ({ date, dateToP, type, reason }) => {
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const [loading, setLoading] = useState(true);
+  const [openModalProductReturns, setOpenModalProductReturns] = useState(false);
+  const [productDetailId, setProductDetailId] = useState("");
 
   const columns = [
     {
@@ -132,10 +136,17 @@ const ProductReturns = ({ date, dateToP, type, reason }) => {
       key: "action",
       title: "Thao tác",
       render: (text, record, index) => {
-        return (record.price * record.quantity)?.toLocaleString("vi-VN", {
-          style: "currency",
-          currency: "VND",
-        });
+        return (
+          <Button
+            size="large"
+            type="primary"
+            icon={<EyeOutlined />}
+            onClick={() => {
+              setProductDetailId(record.id);
+              setOpenModalProductReturns(true);
+            }}
+          />
+        );
       },
     },
   ];
@@ -200,9 +211,15 @@ const ProductReturns = ({ date, dateToP, type, reason }) => {
           console.log(err);
         });
     }
-  }, [pageSize, date, dateToP, type, reason]);
+  }, [pageSize, date, dateToP, type, reason, openModalProductReturns]);
   return (
     <>
+      <ModalProductReturnDetail
+        onCancel={() => setOpenModalProductReturns(false)}
+        open={openModalProductReturns}
+        title={"Chi tiết sản phẩm hoàn trả"}
+        productDetailId={productDetailId}
+      />
       <Table
         pagination={{
           showSizeChanger: true,

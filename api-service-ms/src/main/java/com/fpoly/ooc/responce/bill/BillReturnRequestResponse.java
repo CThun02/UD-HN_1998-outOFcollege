@@ -11,7 +11,7 @@ public interface BillReturnRequestResponse {
     String getBillCode();
     String getEmployee();
     String getCustomerName();
-    @JsonFormat(pattern = "HH:mm:ss dd/MM/yyyy ")
+    @JsonFormat(pattern = "HH:mm:ss MM/dd/yyyy")
     LocalDateTime getCreatedAt();
     String getStatus();
 

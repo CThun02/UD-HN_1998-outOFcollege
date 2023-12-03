@@ -1,6 +1,7 @@
 import {
   CheckCircleOutlined,
   CloseCircleOutlined,
+  CloseOutlined,
   ReloadOutlined,
 } from "@ant-design/icons";
 import {
@@ -12,6 +13,7 @@ import {
   Row,
   Radio,
   Table,
+  Tooltip,
 } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import SpanBorder from "../sale-couter/SpanBorder";
@@ -34,7 +36,6 @@ import { Timeline, TimelineEvent } from "@mailtop/horizontal-timeline";
 import ModalDetail from "../sale-couter/ModalDetail";
 
 var productsReturns = [];
-
 const BillReturn = () => {
   const { billCode } = useParams();
   const navigate = useNavigate();
@@ -182,7 +183,7 @@ const BillReturn = () => {
                 }}
               />
               <div style={{ marginTop: "8px", textAlign: "center" }}>
-                {!returned && (
+                {!returned && !record.checkInPromotion && (
                   <Button
                     onClick={() => {
                       reloadProduct(index, record);
@@ -195,16 +196,29 @@ const BillReturn = () => {
                 )}
               </div>
             </Modal>
-            <Button
-              onClick={() => {
-                handleShowModalProduct(index, true);
-              }}
-              type="primary"
-              size="large"
-              disabled={returned !== false}
+            <Tooltip
+              title={
+                record.checkInPromotion
+                  ? "Sản phẩm mua trong đợt khuyến mại không thể trả hàng!"
+                  : ""
+              }
             >
-              <ReloadOutlined />
-            </Button>
+              <Button
+                onClick={() => {
+                  handleShowModalProduct(index, true);
+                }}
+                type="primary"
+                size="large"
+                disabled={returned !== false && record.checkInPromotion}
+                icon={
+                  record.checkInPromotion ? (
+                    <CloseOutlined />
+                  ) : (
+                    <ReloadOutlined />
+                  )
+                }
+              ></Button>
+            </Tooltip>
           </>
         );
       },
@@ -358,33 +372,21 @@ const BillReturn = () => {
         var now = new Date();
         var sevenDay = 7 * 24 * 60 * 60 * 1000;
         if (response.data) {
-          if (response.data.status !== "Complete") {
-            notification.error({
-              message: "Thông báo",
-              description: "Hóa đơn chưa hoàn thành để thực hiện hoàn trả!",
-            });
-          } else if (
+          if (
+            response.data.status !== "Complete" ||
             now.getTime() - new Date(response.data.completionDate).getTime() >
-            sevenDay
+              sevenDay
           ) {
-            notification.error({
-              message: "Thông báo",
-              description: "Hóa đơn đã vượt quá 7 ngày để hoàn trả!",
-            });
+            navigate("/api/admin/return");
           } else {
-            return;
+            productsReturns = [];
           }
-          navigate("/api/admin/return");
         } else {
-          notification.error({
-            message: "Thông báo",
-            description: "Không tìm thấy hóa đơn",
-          });
           navigate("/api/admin/return");
         }
       })
       .catch((error) => {
-        const status = error.response.status;
+        const status = error.response?.status;
         if (status === 403) {
           notification.error({
             message: "Thông báo",

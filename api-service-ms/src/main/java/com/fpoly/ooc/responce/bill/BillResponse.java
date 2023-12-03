@@ -16,7 +16,7 @@ public interface BillResponse {
 
     public String getUserName();
 
-    @JsonFormat(pattern = "HH:mm:ss dd/MM/yyyy")
+    @JsonFormat(pattern = "HH:mm:ss MM/dd/yyyy")
     public LocalDateTime getCompletionDate();
 
     public BigDecimal getPrice();
@@ -25,7 +25,7 @@ public interface BillResponse {
 
     public String getSymbol();
 
-    @JsonFormat(pattern = "HH:mm:ss dd/MM/yyyy")
+    @JsonFormat(pattern = "HH:mm:ss MM/dd/yyyy")
     public LocalDateTime getCreatedAt();
 
     public String getCreatedBy();

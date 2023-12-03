@@ -2,7 +2,7 @@ import { Badge, Button, Card, Rate, Row, Space } from "antd";
 import styles from "./ProductsList.module.css";
 import numeral from "numeral";
 import { Link } from "react-router-dom";
-import { EyeOutlined, PlusCircleOutlined } from "@ant-design/icons";
+import { EyeOutlined, PlusCircleOutlined, ShoppingCartOutlined } from "@ant-design/icons";
 import { useState } from "react";
 
 function ProductsList({ data, span }) {
@@ -21,19 +21,19 @@ function ProductsList({ data, span }) {
     setActive(false);
   }
 
-  const isMethod = data.promotionReduce
-    ? data.promotionMethod === "vnd"
+  const isMethod = data?.promotionReduce
+    ? data?.promotionMethod === "vnd"
       ? "vnd"
-      : data.promotionMethod === "%"
+      : data?.promotionMethod === "%"
         ? "%"
         : null
     : null;
 
   const price =
     isMethod === "vnd"
-      ? data.priceProduct - data.promotionReduce
+      ? data?.priceProduct - data?.promotionReduce
       : isMethod === "%"
-        ? data.priceProduct - data.priceProduct * (data.promotionReduce / 100)
+        ? data?.priceProduct - data?.priceProduct * (data?.promotionReduce / 100)
         : null;
   return (
     <div className={`${styles.centerd} ${styles.marginBottom}`}>
@@ -41,9 +41,9 @@ function ProductsList({ data, span }) {
         text={
           isMethod && price
             ? isMethod === "vnd"
-              ? numeral(data.promotionReduce).format("0,0") + "đ"
+              ? numeral(data?.promotionReduce).format("0,0") + "đ"
               : isMethod === "%"
-                ? data.promotionReduce + "%"
+                ? data?.promotionReduce + "%"
                 : null
             : null
         }
@@ -60,7 +60,11 @@ function ProductsList({ data, span }) {
             style={{ width: "270px", border: "none" }}
             cover={
               <div
-                className={`${styles.position} ${data?.productImages[0]?.path ? "" : styles.fixed
+                className={`${styles.position} ${data?.productImages === null
+                  ? styles.fixed
+                  : data?.productImages[0]?.path
+                    ? ""
+                    : styles.fixed
                   }`}
                 onMouseLeave={() => handleMouseOut(false)}
                 onMouseEnter={() => handleMouseIn(true)}
@@ -68,7 +72,11 @@ function ProductsList({ data, span }) {
                 <img
                   onMouseEnter={() => handleMouseIn(true)}
                   alt="product"
-                  src={data?.productImages[0]?.path}
+                  src={
+                    data?.productImages === null
+                      ? null
+                      : data?.productImages[0]?.path
+                  }
                   className={`${styles.cssHover} ${styles.imageSize} `}
                 />
                 <div
@@ -90,8 +98,7 @@ function ProductsList({ data, span }) {
                           type="primary"
                           className={`${styles.cssBtn} ${styles.addToCart}`}
                         >
-                          <PlusCircleOutlined />
-                          Thêm vào giỏ hàng
+                          <ShoppingCartOutlined />
                         </Button>
                         <Button
                           onMouseEnter={() => handleMouseIn(true)}
@@ -100,7 +107,6 @@ function ProductsList({ data, span }) {
                           className={`${styles.cssBtn} ${styles.quickView}`}
                         >
                           <EyeOutlined />
-                          Xem nhanh
                         </Button>
                       </Space>
                     </Row>
@@ -115,10 +121,10 @@ function ProductsList({ data, span }) {
             >
               <Space direction="vertical" size={6} style={{ width: "100%" }}>
                 <p className={`${styles.centerd} ${styles.opacity}`}>
-                  {data.categoryName}
+                  {data?.categoryName}
                 </p>
                 <h2 className={`${styles.centerd} ${styles.textH2}`}>
-                  {data.productName + " " + data.brandName}
+                  {data?.productName + " " + data?.brandName}
                 </h2>
                 <div className={styles.centerd}>
                   <i>
@@ -128,11 +134,11 @@ function ProductsList({ data, span }) {
                 <p className={styles.centerd}>
                   <del className={styles.priceReduce}>
                     {isMethod
-                      ? numeral(data.priceProduct).format("0,0") + "đ"
+                      ? numeral(data?.priceProduct).format("0,0") + "đ"
                       : ""}
                   </del>
                   <bdi className={`${styles.fontWeight} ${styles.bdiSize}`}>
-                    {numeral(price ? price : data.priceProduct).format("0,0") +
+                    {numeral(price ? price : data?.priceProduct).format("0,0") +
                       "đ"}
                   </bdi>
                 </p>

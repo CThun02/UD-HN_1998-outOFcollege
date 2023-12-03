@@ -69,21 +69,7 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
         if(productDetail.getQuantity() == 0){
             productDetail.setStatus(Const.STATUS_INACTIVE);
         }
-        if(Objects.nonNull(productDetailDb)) {
-            String productDetailsJson = objectMapper.writeValueAsString(repo.findAll());
-            String productDetailsShopJson = objectMapper.writeValueAsString(repo.getAllProductDetailShop(
-                    null, null, null, "", "", "", "", null,
-                    null, null, null, "desc"));
-            String bestSellingJson = objectMapper.writeValueAsString(repo.getProductDetailBestSelling());
-            String newProductJson = objectMapper.writeValueAsString(repo.getNewProductDetail());
-            template.convertAndSend("/topic/productDetail-topic", productDetailsJson);
-            template.convertAndSend("/topic/productDetailShop-topic", productDetailsShopJson);
-            template.convertAndSend("/topic/bestSellingProduct-topic", bestSellingJson);
-            template.convertAndSend("/topic/newProduct-topic", newProductJson);
-        }
         return productDetailDb;
-
-//        return kafkaUtil.sendingObjectWithKafka(productDetail, Const.TOPIC_PRODUCT_DETAIL);
     }
 
     @Override

@@ -10,6 +10,7 @@ import ProductInfo from "./product-info/ProductInfo";
 import Description from "./description/Description";
 import RelatedProducts from "../../element/related/RelatedProducts";
 import axios from "axios";
+import SockJs from "../../../service/SockJs";
 
 const items = [
   {
@@ -180,6 +181,14 @@ function DetailProduct({ setRenderHeader }) {
 
   return (
     <div className={styles.background}>
+      <SockJs
+        connectTo={"getOneProductDetail-topic"}
+        setValues={setProductDetail}
+      />
+      <SockJs
+        connectTo={"colorsAndSizes-topic"}
+        setValues={setColorsAndSizes}
+      />
       <div className={styles.title}>
         <BreadCrumb title={"Chi tiết sản phẩm"} items={items} />
       </div>

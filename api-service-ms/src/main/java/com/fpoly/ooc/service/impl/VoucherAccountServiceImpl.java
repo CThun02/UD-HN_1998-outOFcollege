@@ -14,9 +14,11 @@ import com.fpoly.ooc.service.interfaces.AccountService;
 import com.fpoly.ooc.service.interfaces.VoucherAccountService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @Slf4j
@@ -29,18 +31,19 @@ public class VoucherAccountServiceImpl implements VoucherAccountService {
     private AccountService accountService;
 
     @Override
-    public VoucherAccount saveOrUpdate(VoucherAccountConditionDTO voucherAccountConditionDTO) {
+    @Async
+    public CompletableFuture<VoucherAccount> saveOrUpdate(VoucherAccountConditionDTO voucherAccountConditionDTO) {
 
         if (voucherAccountRepository.isCheckUserUsedVoucher(
                 voucherAccountConditionDTO.getVoucher().getId(),
                 Commons.lower(voucherAccountConditionDTO.getUsername()))
         ) {
-            return null;
+            return CompletableFuture.completedFuture(null);
         }
 
         VoucherAccount voucherAccount = getVoucherAccount(voucherAccountConditionDTO);
 
-        return voucherAccountRepository.save(voucherAccount);
+        return CompletableFuture.completedFuture(voucherAccountRepository.save(voucherAccount));
     }
 
     @Override

@@ -66,11 +66,11 @@ public class MsJobService {
             });
 
             VoucherAndPromotionConditionDTO conditionDTO = new VoucherAndPromotionConditionDTO();
-            Page<VoucherResponse> vouchersCurrent = voucherService.findAllVoucher(PageRequest.of(0, 5), conditionDTO);
-            Boolean isCheckDifferent = isValidArrayDifferent(vouchers, vouchersCurrent.getContent());
+            List<VoucherResponse> vouchersCurrent = voucherService.findAllVoucher(conditionDTO);
+            Boolean isCheckDifferent = isValidArrayDifferent(vouchers, vouchersCurrent);
 
             if (isCheckDifferent) {
-                String vouchersJson = objectMapper.writeValueAsString(vouchersCurrent.getContent());
+                String vouchersJson = objectMapper.writeValueAsString(vouchersCurrent);
                 kafkaTemplate.send(Const.TOPIC_VOUCHER, vouchersJson);
             }
 
@@ -95,11 +95,11 @@ public class MsJobService {
             });
 
             VoucherAndPromotionConditionDTO conditionDTO = new VoucherAndPromotionConditionDTO();
-            Page<PromotionProductResponse> promotionsCurrent = promotionService.pageAll(conditionDTO, PageRequest.of(0, 5));
-            Boolean isCheckDifferent = isValidArrayDifferent(promotions, promotionsCurrent.getContent());
+            List<PromotionProductResponse> promotionsCurrent = promotionService.pageAll(conditionDTO);
+            Boolean isCheckDifferent = isValidArrayDifferent(promotions, promotionsCurrent);
 
             if (isCheckDifferent) {
-                String promotionsJson = objectMapper.writeValueAsString(promotionsCurrent.getContent());
+                String promotionsJson = objectMapper.writeValueAsString(promotionsCurrent);
                 kafkaTemplate.send(Const.TOPIC_PROMOTION, promotionsJson);
             }
         } catch (Exception e) {

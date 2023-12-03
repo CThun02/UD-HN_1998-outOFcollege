@@ -30,7 +30,7 @@ public interface AccountRepository extends JpaRepository<Account, String> {
 
     @Query(value = "select email from account " +
             "left join role on account.role_id = role.id " +
-            "where role_name = 'CUSTOMER' ", nativeQuery = true)
+            "where role_name = 'ROLE_CUSTOMER' ", nativeQuery = true)
     List<String> emailAccountList();
 
     @Query(name = "Account.customerAccountList", nativeQuery = true)

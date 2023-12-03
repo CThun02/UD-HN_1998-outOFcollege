@@ -11,8 +11,7 @@ import java.util.List;
 
 public interface PromotionService {
 
-    Page<PromotionProductResponse> pageAll(VoucherAndPromotionConditionDTO voucherAndPromotionConditionDTO,
-                                           Pageable pageable);
+    List<PromotionProductResponse> pageAll(VoucherAndPromotionConditionDTO voucherAndPromotionConditionDTO);
 
     Promotion saveOrUpdate(PromotionRequest promotionRequest);
 

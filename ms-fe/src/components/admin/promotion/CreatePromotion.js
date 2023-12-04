@@ -232,6 +232,14 @@ function CreatePromotion() {
                     description: `${err?.response?.data?.message}`,
                   });
                 }
+
+                if (error?.status === "BAD_REQUEST") {
+                  setErrorsServer(error);
+                  apiNotification.error({
+                    message: `Lỗi`,
+                    description: `${err?.response?.data?.message}`,
+                  });
+                }
               });
           } else {
             console.log("ERROR");

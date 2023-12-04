@@ -100,3 +100,9 @@
   transition: 0.2s linear;
   opacity: 0.6;
 }
+
+.moneyInactive {
+  color: #ccc;
+  text-decoration: line-through;
+  margin-right: 10px;
+}

@@ -284,11 +284,15 @@ public class VoucherServiceImpl implements VoucherService {
                 if (request.getStartDate().isAfter(request.getEndDate())) {
                     throw new NotFoundException(ErrorCodeConfig.getMessage(Const.END_DATE_LESS_START_DATE), "endDate");
                 }
+
+                voucher.setStatus(Const.STATUS_UPCOMING);
                 break;
             case "ACTIVE":
                 if (request.getStartDate().isAfter(request.getEndDate())) {
                     throw new NotFoundException(ErrorCodeConfig.getMessage(Const.END_DATE_LESS_START_DATE), "endDate");
                 }
+
+                voucher.setStatus(Const.STATUS_ACTIVE);
                 break;
             default:
                 throw new NotFoundException(ErrorCodeConfig.getMessage(Const.STATUS_INVALID), "status");
@@ -323,7 +327,6 @@ public class VoucherServiceImpl implements VoucherService {
 
         voucher.setStartDate(request.getStartDate());
         voucher.setEndDate(request.getEndDate());
-        voucher.setStatus(Const.STATUS_UPCOMING);
 
         return voucher;
     }

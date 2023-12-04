@@ -28,7 +28,8 @@ public class ProductDetailShop {
     private String brandName;
     private String promotionMethod;
     private BigDecimal promotionReduce;
-    private BigDecimal priceProduct;
+    private BigDecimal priceProductMin;
+    private BigDecimal priceProductMax;
     private Long quantitySelling;
     private List<ProductImageResponse> productImages;
 
@@ -52,7 +53,30 @@ public class ProductDetailShop {
         this.brandName = brandName;
         this.promotionMethod = promotionMethod;
         this.promotionReduce = promotionReduce;
-        this.priceProduct = priceProduct;
+        this.priceProductMin = priceProduct;
         this.quantitySelling = quantitySelling;
+    }
+
+    public ProductDetailShop(Long productId, Long brandId, Long categoryId, Long patternId, Long formId,
+                             Long buttonId, Long materialId, Long collarId, Long sleeveId, Long shirtTailId, String categoryName,
+                             String productName, String brandName, String promotionMethod, BigDecimal promotionReduce, BigDecimal priceProductMin,
+                             BigDecimal priceProductMax) {
+        this.productId = productId;
+        this.brandId = brandId;
+        this.categoryId = categoryId;
+        this.patternId = patternId;
+        this.formId = formId;
+        this.buttonId = buttonId;
+        this.materialId = materialId;
+        this.collarId = collarId;
+        this.sleeveId = sleeveId;
+        this.shirtTailId = shirtTailId;
+        this.categoryName = categoryName;
+        this.productName = productName;
+        this.brandName = brandName;
+        this.promotionMethod = promotionMethod;
+        this.promotionReduce = promotionReduce;
+        this.priceProductMin = priceProductMin;
+        this.priceProductMax = priceProductMax;
     }
 }

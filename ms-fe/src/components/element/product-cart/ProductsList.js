@@ -31,9 +31,10 @@ function ProductsList({ data, span }) {
 
   const price =
     isMethod === "vnd"
-      ? data?.priceProduct - data?.promotionReduce
+      ? data?.priceProductMin - data?.promotionReduce
       : isMethod === "%"
-      ? data?.priceProduct - data?.priceProduct * (data?.promotionReduce / 100)
+      ? data?.priceProductMin -
+        data?.priceProductMin * (data?.promotionReduce / 100)
       : null;
   return (
     <div className={`${styles.centerd} ${styles.marginBottom}`}>
@@ -138,12 +139,13 @@ function ProductsList({ data, span }) {
                 <p className={styles.centerd}>
                   <del className={styles.priceReduce}>
                     {isMethod
-                      ? numeral(data?.priceProduct).format("0,0") + "đ"
+                      ? numeral(data?.priceProductMin).format("0,0") + "đ"
                       : ""}
                   </del>
                   <bdi className={`${styles.fontWeight} ${styles.bdiSize}`}>
-                    {numeral(price ? price : data?.priceProduct).format("0,0") +
-                      "đ"}
+                    {numeral(
+                      price ? (price <= 0 ? 0 : price) : data?.priceProductMin
+                    ).format("0,0") + "đ"}
                   </bdi>
                 </p>
               </Space>

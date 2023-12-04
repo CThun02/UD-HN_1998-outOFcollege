@@ -154,6 +154,11 @@ public class PromotionServiceImpl implements PromotionService {
     }
 
     private Promotion promotion(PromotionRequest request) {
+        Promotion promotionDb = null;
+        if(request.getPromotionId() != null) {
+            promotionDb = promotionRepository.findById(request.getPromotionId()).orElse(null);
+        }
+
         Promotion promotion = new Promotion();
 
         if (StringUtils.isBlank(request.getPromotionName())) {
@@ -218,11 +223,13 @@ public class PromotionServiceImpl implements PromotionService {
                     throw new NotFoundException(ErrorCodeConfig.getMessage(Const.END_DATE_LESS_START_DATE), "endDate");
                 }
 
+                promotion.setStatus(Const.STATUS_UPCOMING);
                 break;
             case "ACTIVE":
                 if (request.getStartDate().isAfter(request.getEndDate())) {
                     throw new NotFoundException(ErrorCodeConfig.getMessage(Const.END_DATE_LESS_START_DATE), "endDate");
                 }
+                promotion.setStatus(Const.STATUS_ACTIVE);
                 break;
             default:
                 throw new NotFoundException(ErrorCodeConfig.getMessage(Const.STATUS_INVALID), "status");
@@ -237,9 +244,12 @@ public class PromotionServiceImpl implements PromotionService {
         promotion.setPromotionName(request.getPromotionName());
         promotion.setPromotionMethod(request.getPromotionMethod());
         promotion.setPromotionValue(request.getPromotionValue());
-        promotion.setStartDate(request.getStartDate());
         promotion.setEndDate(request.getEndDate());
-        promotion.setStatus(Const.STATUS_UPCOMING);
+        promotion.setStartDate(request.getStartDate());
+
+        if (Objects.nonNull(promotionDb)) {
+            promotion.setStartDate(promotionDb.getStartDate());
+        }
 
         return promotion;
     }

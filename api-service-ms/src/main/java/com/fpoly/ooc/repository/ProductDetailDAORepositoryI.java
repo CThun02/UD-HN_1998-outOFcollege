@@ -190,11 +190,11 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
                                                     List<Long> categories,
                                                     List<Long> brands,
                                                     List<Long> colors,
-                                                    List<Long> sizes,
-                                                    String sort);
+                                                    List<Long> sizes);
 
     @Query("select new com.fpoly.ooc.responce.productdetail.GetColorAndSizeAndQuantity(" +
-            "min(productDetail.price), max(productDetail.price), sum(productDetail.quantity)) " +
+            "min(productDetail.price), max(productDetail.price), sum(productDetail.quantity), promotion.promotionMethod, " +
+            "promotion.promotionValue) " +
             "from ProductDetail productDetail " +
             "left join Product product on productDetail.product.id = product.id " +
             "left join Color color on productDetail.color.id = color.id " +
@@ -208,6 +208,8 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
             "left join CollarType collar on productDetail.collar.id = collar.id " +
             "left join SleeveType sleeve on productDetail.sleeve.id = sleeve.id " +
             "left join ShirtTailType shirt on productDetail.shirtTail.id = shirt.id " +
+            "left join PromotionProduct promotionProduct on productDetail.id = promotionProduct.productDetailId.id " +
+            "left join Promotion promotion on promotion.id = promotionProduct.promotion.id " +
             "where " +
             "productDetail.status like com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
             "and color.status like com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
@@ -221,6 +223,8 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
             "and collar.status like com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
             "and sleeve.status like com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
             "and shirt.status like com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and (promotionProduct is null or promotionProduct.status like com.fpoly.ooc.constant.Const.STATUS_ACTIVE) " +
+            "and (promotion is null or promotion.status like com.fpoly.ooc.constant.Const.STATUS_ACTIVE) " +
             "and product.id = :productId " +
             "and (:brandId is null or b.id = :brandId) " +
             "and (:categoryId is null or cate.id = :categoryId) " +
@@ -232,7 +236,8 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
             "and (:sleeveId is null or sleeve.id = :sleeveId) " +
             "and (:shirtId is null or shirt.id = :shirtId) " +
             "and (:colorId is null or color.id  = :colorId)" +
-            "and (:sizeId is null or s.id = :sizeId) ")
+            "and (:sizeId is null or s.id = :sizeId) " +
+            "group by promotion.promotionValue, promotion.promotionMethod ")
     GetColorAndSizeAndQuantity findColorAndSize(@Param("productId") Long productId,
                                                 @Param("brandId") Long brandId,
                                                 @Param("categoryId") Long categoryId,
@@ -350,4 +355,39 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
                                 @Param("shirtId") Long shirtId,
                                 @Param("colorId") Long colorId,
                                 @Param("sizeId") Long sizeId);
+
+    @Query("""
+            SELECT productDetail.id FROM ProductDetail productDetail
+            WHERE
+                    productDetail.product.id = ?1
+                AND productDetail.brand.id = ?2
+                AND productDetail.category.id = ?3
+                AND productDetail.pattern.id = ?4
+                AND productDetail.form.id = ?5
+                AND productDetail.button.id = ?6
+                AND productDetail.material.id = ?7
+                AND productDetail.collar.id = ?8
+                AND productDetail.sleeve.id = ?9
+                AND productDetail.shirtTail.id = ?10
+                AND productDetail.product.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                AND productDetail.brand.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                AND productDetail.category.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                AND productDetail.pattern.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                AND productDetail.form.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                AND productDetail.button.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                AND productDetail.material.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                AND productDetail.collar.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                AND productDetail.sleeve.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                AND productDetail.shirtTail.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+        """)
+    List<Long> productDetailsId(Long productId,
+                                Long brandId,
+                                Long categoryId,
+                                Long patternId,
+                                Long formId,
+                                Long buttonId,
+                                Long materialId,
+                                Long collarId,
+                                Long sleeveId,
+                                Long shirtId);
 }

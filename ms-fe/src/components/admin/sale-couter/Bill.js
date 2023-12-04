@@ -299,14 +299,14 @@ const Bill = () => {
                     (record.productDetail.price *
                       (100 - Number(record.productDetail.promotionValue))) /
                     100
-                  ).toLocaleString("vi-VN", {
+                  )?.toLocaleString("vi-VN", {
                     style: "currency",
                     currency: "VND",
                   })
                   : (
                     record.productDetail.price -
                     Number(record.productDetail.promotionValue)
-                  ).toLocaleString("vi-VN", {
+                  )?.toLocaleString("vi-VN", {
                     style: "currency",
                     currency: "VND",
                   })
@@ -323,7 +323,7 @@ const Bill = () => {
       render: (text, record, index) => {
         return (
           <span>
-            {(record.priceReduce * record.quantity).toLocaleString("vi-VN", {
+            {(record.priceReduce * record.quantity)?.toLocaleString("vi-VN", {
               style: "currency",
               currency: "VND",
             })}
@@ -445,6 +445,7 @@ const Bill = () => {
   const [isOpenFormVoucher, setIsOpenFormVoucher] = useState(false);
   const [voucherAdd, setVoucherAdd] = useState({});
   const [typeShipping, setTypeShipping] = useState([]);
+  const [email, setEmail] = useState("")
 
   // xóa tài khoản
   const handleDeleteAccount = () => {
@@ -504,7 +505,7 @@ const Bill = () => {
     if (value) {
       await axios
         .get(
-          `https://online-gateway.ghn.vn/shiip/public-api/master-data/district?province_id=${value}`,
+          `https://online-gateway.ghn.vn/shiip/public-api/master-data/district?province_id=${value?.trim()}`,
           {
             headers: {
               token: "0f082cbe-5110-11ee-a59f-a260851ba65c",
@@ -529,7 +530,7 @@ const Bill = () => {
     if (value) {
       try {
         const response = await axios.get(
-          `https://online-gateway.ghn.vn/shiip/public-api/master-data/ward?district_id=${value}`,
+          `https://online-gateway.ghn.vn/shiip/public-api/master-data/ward?district_id=${value?.trim()}`,
           {
             headers: {
               token: `0f082cbe-5110-11ee-a59f-a260851ba65c`,
@@ -554,7 +555,7 @@ const Bill = () => {
       from_district_id: 3440,
       from_ward_code: "13010",
       to_district_id: Number(toDistrictId),
-      to_ward_code: `${toWardCode}`,
+      to_ward_code: `${toWardCode?.trim()}`,
       service_id: 53321,
     };
 
@@ -606,7 +607,7 @@ const Bill = () => {
       result = totalPrice;
     }
 
-    return result;
+    return result >= 0 ? result : 0;
   };
   // phí ship
   const handleShippingFee = (insuranceValue, toDistrictId, toWardCode) => {
@@ -621,7 +622,7 @@ const Bill = () => {
       coupon: null,
       from_district_id: 3440,
       to_district_id: Number(toDistrictId),
-      to_ward_code: toWardCode,
+      to_ward_code: toWardCode?.trim(),
       height: 15,
       length: 15,
       weight: totalWeight,
@@ -641,7 +642,6 @@ const Bill = () => {
           }
         )
         .then((response) => {
-          console.log(`1`);
           setShippingFee(response.data.data.total);
         })
         .catch((error) => {
@@ -945,6 +945,7 @@ const Bill = () => {
   };
 
   const [errors, setErrors] = useState({});
+
   const handleCreateBill = (index) => {
     const bill = {
       billCode: activeKey,
@@ -958,7 +959,9 @@ const Bill = () => {
           : amountPaid,
       billType: "In-Store",
       symbol: typeShipping[index] ? "Shipping" : symbol,
-      status: typeShipping[index] ? "Unpaid" : "Complete",
+      status: typeShipping[index] ? "Unpaid"
+        : !typeShipping[index] && switchChange[index] ? "Paid"
+          : "Complete",
       note: note,
       paymentDetailId: Number(selectedOption),
       lstBillDetailRequest: [],
@@ -968,8 +971,89 @@ const Bill = () => {
       transactionCode: selectedOption === "2" ? transactionCode : null,
       voucherCode: voucherAdd?.voucherCode,
       createdBy: "user3",
+      emailDetails: {
+        recipient: selectedAddress.email ? [selectedAddress.email] : [email],
+        messageBody: `<body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: Arial, sans-serif;">
+        <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="width: 100%; max-width:720px; margin: 0 auto;">
+            <tr>
+                <td align="center" bgcolor="#ffffff" style="padding: 40px 0;">
+                <table style="width: 100%; padding: 0 20px;">
+                <tr>
+                    <td style="text-align: left; width: 50%">
+                        <img alt="Logo" src="https://firebasestorage.googleapis.com/v0/b/outofcollge.appspot.com/o/logo%2Flogo_OOC.png?alt=media&token=9dec0335-3b77-4c5b-a278-b5b22b9ecbb4" width="70%" />
+                    </td>
+                    <td style="text-align: right; vertical-align: middle; width: 50%">
+                        <span>Đơn hàng ${activeKey}</span>
+                    </td>
+                </tr>
+            </table>
+                    <div style="padding: 0 20px; margin-top: 24px;">
+                        <span style="font-weight: 500; font-size: 24px;">Cảm ơn bạn đã mua hàng!</span><br><br>
+                        <p style="text-align: justify;">Xin chào ${fullname}, Chúng tôi đã nhận được đặt hàng của bạn và đã sẵn sàng để vận chuyển. Chúng tôi sẽ thông báo cho bạn khi đơn hàng được gửi đi.</p><br>
+                        <div style="text-align: center">
+                            <a style="color: white; font-weight: 500; padding: 16px 20px; border-radius: 4px; background-color: #1666a2; margin-right: 20px;" href="http://localhost:3000/ms-shop/bill/${activeKey}">
+                                Xem đơn hàng
+                            </a>
+                            hoặc <a style="margin-left: 20px;" href="http://localhost:3000/">Đến cửa hàng</a>
+                        </div>
+                        <br>
+                        <hr>
+                        <br>
+                                <span>Thông tin đơn hàng</span>
+                                <div style="margin-top: 8px;">
+                                ${productDetails.map((item, index) => {
+          return (
+            `<div key={index} style="display: flex; justify-content: space-between; align-items: center; padding: 4px 20px;">
+                                            <div style="width: 20%; padding: 4px;">
+                                                <img alt="product" style="width: 100%; border: 1px solid #ccc; border-radius: 8px;" src=${item.productDetail.productImageResponse[0].path}>
+                                            </div>
+                                            <div style="width: 55%; padding: 4px;">
+                                                <p>${(item.productDetail.product.productName + "-" + item.productDetail.button.buttonName +
+              "-" +
+              item.productDetail.brand.brandName +
+              "-" +
+              item.productDetail.category.categoryName +
+              "-" +
+              item.productDetail.collar.materialName +
+              "-" +
+              item.productDetail.color.collarName +
+              "-" +
+              item.productDetail.sleeve.sleeveName +
+              "-" +
+              item.productDetail.shirtTail.shirtTailTypeName +
+              "-" +
+              item.productDetail.patternName +
+              "-" +
+              item.productDetail.formName)
+            } <span style="display: inline-block">(x ${item.quantity})</span></p >
+                                            </div >
+  <div style="width: 25%; padding: 4px;">
+    <p>${(item.priceReduce)?.toLocaleString("vi-VN", { style: "currency", currency: "VND" })}</p>
+  </div >
+                                        </div > `
+          );
+        })}
+<hr>
+  <div style="width: 70%; float: right; padding: 4px 20px;">
+    <div style="display: flex; justify-content: space-between; padding: 4px 0;">
+      <span>Tổng giá trị sản phẩm:</span>
+      <span style="font-weight: 500;">
+        ${(voucherPrice() + (shippingFee ?? 0))?.toLocaleString("vi-VN", { style: "currency", currency: "VND" })}
+      </span>
+    </div>
+  </div>
+</div>
+                    </div >
+                </td >
+            </tr >
+        </table >
+    </body > `,
+        subject: `THÔNG BÁO XÁC NHẬN ĐƠN HÀNG ${activeKey} `
+      }
     };
+
     const billAddress = {
+      email: email,
       fullName: fullname,
       sdt: phoneNumber,
       city: selectedProvince,
@@ -986,6 +1070,7 @@ const Bill = () => {
       city: Yup.string().required("Tỉnh/thành phố không được để trống"),
       district: Yup.string().required("Quận/huyện không được để trống"),
       ward: Yup.string().required("Phường/xã không được để trống"),
+      email: Yup.string().email('Địa chỉ email không hợp lệ')
     });
 
     if (productDetails.length <= 0) {
@@ -1026,11 +1111,10 @@ const Bill = () => {
                 billAddress,
                 {
                   headers: {
-                    Authorization: `Bearer ${getToken(true)}`,
+                    Authorization: `Bearer ${getToken(true)} `,
                   },
                 }
               );
-              console.log(response.data, `ứ ứ`);
               addressId = response.data.id;
             } catch (error) {
               const validationErrors = {};
@@ -1053,7 +1137,7 @@ const Bill = () => {
               bill,
               {
                 headers: {
-                  Authorization: `Bearer ${getToken(true)}`,
+                  Authorization: `Bearer ${getToken(true)} `,
                 },
               }
             );
@@ -1070,7 +1154,7 @@ const Bill = () => {
                 },
                 {
                   headers: {
-                    Authorization: `Bearer ${getToken(true)}`,
+                    Authorization: `Bearer ${getToken(true)} `,
                   },
                 }
               );
@@ -1139,7 +1223,7 @@ const Bill = () => {
               <Tabs.TabPane
                 key={item.key}
                 tab={
-                  <Badge count={item.count ? item.count : 0} showZero>
+                  <Badge count={productDetails.length ? productDetails.length : 0} showZero>
                     <span style={{ padding: 10 }}>{item.label}</span>
                   </Badge>
                 }
@@ -1270,6 +1354,22 @@ const Bill = () => {
                       <Row style={{ marginBottom: "30px" }}>
                         <Col span={24}>
                           <Row>
+                            <Col span={24}>
+                              <div className="m-5">
+                                <b style={{ color: "red" }}></b> Email
+                                {console.log(selectedAddress)}
+                                <Input
+                                  placeholder="nhập email"
+                                  value={selectedAddress?.email}
+                                  onChange={(e) => setEmail(e.target.value)}
+                                />
+                                {errors.email && (
+                                  <div style={{ color: "red" }}>
+                                    {errors.email}
+                                  </div>
+                                )}
+                              </div>
+                            </Col>
                             <Col span={12}>
                               <div className="m-5">
                                 <b style={{ color: "red" }}>*</b> Họ và tên
@@ -1319,7 +1419,7 @@ const Bill = () => {
                                 )
                               }
                               value={
-                                selectedAddress.city
+                                selectedAddress?.city
                                   ? selectedAddress?.city.substring(
                                     0,
                                     selectedAddress?.city.indexOf("|")
@@ -1332,7 +1432,7 @@ const Bill = () => {
                                   <Select.Option
                                     label={province?.ProvinceName}
                                     key={province?.ProvinceID}
-                                    value={`${province?.ProvinceName}|${province?.ProvinceID}`}
+                                    value={`${province?.ProvinceName}| ${province?.ProvinceID} `}
                                   >
                                     {province?.ProvinceName}
                                   </Select.Option>
@@ -1358,7 +1458,7 @@ const Bill = () => {
                                 )
                               }
                               value={
-                                selectedAddress.district
+                                selectedAddress?.district
                                   ? selectedAddress?.district.substring(
                                     0,
                                     selectedAddress.district.indexOf("|")
@@ -1371,7 +1471,7 @@ const Bill = () => {
                                   return (
                                     <Select.Option
                                       key={district?.DistrictID}
-                                      value={`${district?.DistrictName}|${district?.DistrictID}`}
+                                      value={`${district?.DistrictName}| ${district?.DistrictID} `}
                                     >
                                       {district?.DistrictName}
                                     </Select.Option>
@@ -1395,7 +1495,7 @@ const Bill = () => {
                               style={{ width: "100%" }}
                               onChange={handleWardChange}
                               value={
-                                selectedAddress.ward
+                                selectedAddress?.ward
                                   ? selectedAddress?.ward.substring(
                                     0,
                                     selectedAddress?.ward.indexOf("|")
@@ -1407,7 +1507,7 @@ const Bill = () => {
                                 wards?.map((ward) => (
                                   <Select.Option
                                     key={ward?.WardCode}
-                                    value={`${ward.WardName}|${ward.WardCode}`}
+                                    value={`${ward.WardName}| ${ward.WardCode} `}
                                   >
                                     {ward.WardName}
                                   </Select.Option>
@@ -1474,13 +1574,7 @@ const Bill = () => {
                       >
                         Chọn mã giảm giá
                       </Button>
-                      <FormUsingVoucher
-                        priceBill={totalPrice}
-                        voucher={voucherAdd}
-                        setVoucher={setVoucherAdd}
-                        isOpen={isOpenFormVoucher}
-                        setIsOpen={setIsOpenFormVoucher}
-                      />
+
                       <Row style={{ marginTop: "10px" }}>
                         <Col span={16}>
                           {" "}
@@ -1499,7 +1593,7 @@ const Bill = () => {
                               fontSize: "16px",
                             }}
                           >
-                            {totalPrice.toLocaleString("vi-VN", {
+                            {totalPrice?.toLocaleString("vi-VN", {
                               style: "currency",
                               currency: "VND",
                             })}
@@ -1585,7 +1679,7 @@ const Bill = () => {
                                 fontSize: "16px",
                               }}
                             >
-                              {(voucherPrice() + shippingFee).toLocaleString(
+                              {(voucherPrice() + shippingFee)?.toLocaleString(
                                 "vi-VN",
                                 {
                                   style: "currency",
@@ -1600,7 +1694,7 @@ const Bill = () => {
                                 fontSize: " 16px",
                               }}
                             >
-                              {voucherPrice().toLocaleString("vi-VN", {
+                              {(voucherPrice())?.toLocaleString("vi-VN", {
                                 style: "currency",
                                 currency: "VND",
                               })}
@@ -1676,7 +1770,7 @@ const Bill = () => {
                                         color: "red",
                                       }}
                                     >
-                                      {remainAmount.toLocaleString("vi-VN", {
+                                      {remainAmount?.toLocaleString("vi-VN", {
                                         style: "currency",
                                         currency: "VND",
                                       })}
@@ -1740,6 +1834,13 @@ const Bill = () => {
             );
           })}
       </Tabs >
+      <FormUsingVoucher
+        priceBill={totalPrice}
+        voucher={voucherAdd}
+        setVoucher={setVoucherAdd}
+        isOpen={isOpenFormVoucher}
+        setIsOpen={setIsOpenFormVoucher}
+      />
     </>
   );
 };

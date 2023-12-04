@@ -17,4 +17,8 @@ public interface VoucherAccountService {
 
     List<String> findAccountByVoucherId(Long voucherId);
 
+    VoucherAccount findVoucherAccountByUsernameAndVoucherCode(String username, String voucherCode);
+
+    VoucherAccount updateStatus(VoucherAccount voucherAccount);
+
 }

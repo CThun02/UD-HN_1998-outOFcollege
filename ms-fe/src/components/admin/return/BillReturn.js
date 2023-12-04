@@ -173,7 +173,7 @@ const BillReturn = () => {
                 onChange={(e) => {
                   if (
                     Math.abs(Number(e.target.value)) >
-                      Number(record.quantity) ||
+                    Number(record.quantity) ||
                     Number(e.target.value) === 0
                   ) {
                     setQuantity(1);
@@ -209,7 +209,7 @@ const BillReturn = () => {
                 }}
                 type="primary"
                 size="large"
-                disabled={returned !== false && record.checkInPromotion}
+                disabled={returned !== false || record.checkInPromotion}
                 icon={
                   record.checkInPromotion ? (
                     <CloseOutlined />
@@ -242,7 +242,7 @@ const BillReturn = () => {
             },
           }
         )
-        .then((response) => {})
+        .then((response) => { })
         .catch((error) => {
           const status = error.response.status;
           if (status === 403) {
@@ -267,7 +267,7 @@ const BillReturn = () => {
             Authorization: `Bearer ${getToken(true)}`,
           },
         })
-        .then((response) => {})
+        .then((response) => { })
         .catch((error) => {
           const status = error.response.status;
           if (status === 403) {
@@ -291,14 +291,13 @@ const BillReturn = () => {
   function changeStatusBillDetail(id, status) {
     axios
       .put(
-        `http://localhost:8080/api/admin/bill/billDetail/change-status?status=${
-          status === "5" || status === "3"
-            ? "ReturnW"
-            : status === "-1"
+        `http://localhost:8080/api/admin/bill/billDetail/change-status?status=${status === "5" || status === "3"
+          ? "ReturnW"
+          : status === "-1"
             ? "ReturnC"
             : status === "ACTIVE"
-            ? "ACTIVE"
-            : "ReturnS"
+              ? "ACTIVE"
+              : "ReturnS"
         }`,
         id,
         {
@@ -361,7 +360,7 @@ const BillReturn = () => {
     await axios
       .get(
         `http://localhost:8080/api/admin/bill/getBillByBillCode?billCode=` +
-          billCode,
+        billCode,
         {
           headers: {
             Authorization: `Bearer ${getToken(true)}`,
@@ -375,11 +374,9 @@ const BillReturn = () => {
           if (
             response.data.status !== "Complete" ||
             now.getTime() - new Date(response.data.completionDate).getTime() >
-              sevenDay
+            sevenDay
           ) {
             navigate("/api/admin/return");
-          } else {
-            productsReturns = [];
           }
         } else {
           navigate("/api/admin/return");
@@ -402,7 +399,7 @@ const BillReturn = () => {
       axios
         .get(
           `http://localhost:8080/api/admin/bill/getBillReturnByBillCode?billCode=` +
-            billCode,
+          billCode,
           {
             headers: {
               Authorization: `Bearer ${getToken(true)}`,
@@ -493,19 +490,19 @@ const BillReturn = () => {
                           data.status === "0" || data.status === "-1"
                             ? "#FF0000"
                             : data.status === "5"
-                            ? "#f0ad4e"
-                            : "#00cc00"
+                              ? "#f0ad4e"
+                              : "#00cc00"
                         }
                         icon={
                           data.status === "1"
                             ? FaRegFileAlt
                             : data.status === "0"
-                            ? FaTimes
-                            : data.status === "2"
-                            ? FaRegFileAlt
-                            : data.status === "3"
-                            ? FaTruck
-                            : CheckCircleOutlined
+                              ? FaTimes
+                              : data.status === "2"
+                                ? FaRegFileAlt
+                                : data.status === "3"
+                                  ? FaTruck
+                                  : CheckCircleOutlined
                         }
                         title={
                           data.status === "0" ? (
@@ -541,21 +538,21 @@ const BillReturn = () => {
                           data.status === "0" || data.status === "-1"
                             ? "#FF0000"
                             : data.status === "3"
-                            ? "#f0ad4e"
-                            : "#00cc00"
+                              ? "#f0ad4e"
+                              : "#00cc00"
                         }
                         icon={
                           data.status === "1"
                             ? FaRegFileAlt
                             : data.status === "0"
-                            ? FaTimes
-                            : data.status === "2"
-                            ? FaRegCheckCircle
-                            : data.status === "3"
-                            ? FaClock
-                            : data.status === "4"
-                            ? FaRocket
-                            : null
+                              ? FaTimes
+                              : data.status === "2"
+                                ? FaRegCheckCircle
+                                : data.status === "3"
+                                  ? FaClock
+                                  : data.status === "4"
+                                    ? FaRocket
+                                    : null
                         }
                         title={
                           data.status === "1" ? (
@@ -692,32 +689,6 @@ const BillReturn = () => {
       </div>
       <div style={{ marginBottom: "25px" }} className={styles.billReturn}>
         <h3 style={{ marginBottom: "25px" }}>Thông tin đơn hàng</h3>
-        <div style={{ textAlign: "end", marginBottom: "10px" }}>
-          {returned === false && (
-            <Button
-              size="large"
-              type="primary"
-              onClick={() => {
-                Modal.confirm({
-                  centered: true,
-                  title: "Xác nhận trả hàng tất cả",
-                  content: "Chắc chắn trả hàng?",
-                  onOk() {
-                    productsReturns = billInfo?.billDetails;
-                    setRender(Math.random());
-                    notification.success({
-                      message: "Thông báo",
-                      description: "Thêm thông tin trả hàng thành công!",
-                    });
-                  },
-                });
-              }}
-            >
-              <ReloadOutlined />
-              Trả hàng tất cả
-            </Button>
-          )}
-        </div>
         <Table
           dataSource={
             billInfo?.billDetails &&
@@ -942,6 +913,7 @@ const BillReturn = () => {
                       onChange={(e) => {
                         setNote(e.target.value);
                       }}
+                      disabled={productsReturns.length === 0}
                       allowClear
                     />
                     <Button

@@ -1,22 +1,19 @@
-import { Badge, Col, Popover, Row, Space, notification } from "antd";
+import { Badge, Popover, Space, notification } from "antd";
 import styles from "./HeaderRight.module.css";
 import { Link } from "react-router-dom";
 import { UserOutlined, ShoppingCartOutlined } from "@ant-design/icons";
 import { getAuthToken, clearAuthToken } from "../../../../service/Token";
-import { NotificationContext } from "../../../element/notification/NotificationAuthen";
-import { useContext, useEffect } from "react";
+import { useEffect } from "react";
 import { useState } from "react";
 import axios from "axios";
 const cartAPI = "http://localhost:8080/api/client/cart";
 
 function HeaderRight(props) {
-  const { showSuccessNotification } = useContext(NotificationContext);
 
   // const { showSuccessNotification } = useContext(NotificationContext);
   const [user, setUser] = useState("");
   const [usernameEncode, setUsernameEncode] = useState("");
   const [data, setData] = useState(null);
-  const token = getAuthToken();
   const [cartIndex, setCartIndex] = useState({
     quantity: 0,
     totalPrice: 0,
@@ -48,7 +45,7 @@ function HeaderRight(props) {
             for (let i = 0; i < cartIndexLocal?.productDetails.length; i++) {
               totalPrice += Number(
                 cartIndexLocal.productDetails[i].data[0].price *
-                  cartIndexLocal.productDetails[i].quantity
+                cartIndexLocal.productDetails[i].quantity
               );
             }
             setCartIndex(

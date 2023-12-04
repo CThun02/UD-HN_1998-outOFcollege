@@ -5,6 +5,7 @@ import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
 import com.fpoly.ooc.dto.BillStatusDTO;
 import com.fpoly.ooc.dto.VoucherAccountConditionDTO;
+import com.fpoly.ooc.dto.VoucherAccountUsedDTO;
 import com.fpoly.ooc.entity.*;
 import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.BillDetailRepo;
@@ -114,12 +115,8 @@ public class BillServiceImpl implements BillService {
         bill.setStatus(request.getStatus());
         billRepo.save(bill);
 
-        if (bill.getStatus().equals("Unpaid")
-                && !bill.getBillType().equals("In-Store")
-        ) {
-            if (!request.getEmailDetails().getRecipient().isEmpty()) {
-                emailService.sendSimpleMail(request.getEmailDetails());
-            }
+        if (!request.getEmailDetails().getRecipient().isEmpty()) {
+            emailService.sendSimpleMail(request.getEmailDetails());
         }
 
         for (BillDetailRequest billDetailRequest : request.getLstBillDetailRequest()) {
@@ -128,7 +125,7 @@ public class BillServiceImpl implements BillService {
                     .productDetail(ProductDetail.builder().id(billDetailRequest.getProductDetailId()).build())
                     .price(billDetailRequest.getPrice())
                     .quantity(billDetailRequest.getQuantity())
-                    .note("null")
+                    .status(Const.STATUS_INACTIVE)
                     .build();
             BillDetail billDetail1 = billDetailRepo.save(billDetail);
 
@@ -141,7 +138,6 @@ public class BillServiceImpl implements BillService {
                     e.printStackTrace();
                 }
             }
-
         }
 
         PaymentDetail paymentDetail = PaymentDetail.builder()
@@ -166,7 +162,6 @@ public class BillServiceImpl implements BillService {
             timeLineRepo.save(timeline);
         }
 
-
         if (request.getVoucherCode() != null) {
             VoucherRequest voucher = VoucherRequest.builder()
                     .voucherCode(request.getVoucherCode())
@@ -181,9 +176,14 @@ public class BillServiceImpl implements BillService {
                     .build();
             voucherHistoryRepository.save(voucherHistory);
 
-            VoucherAccount voucherAccount = new VoucherAccount();
-//            voucherAccount.se
+            if (!request.getAccountId().isBlank() && !request.getVoucherCode().isBlank()) {
+                VoucherAccount voucherAccount =
+                        voucherAccountService.findVoucherAccountByUsernameAndVoucherCode(request.getAccountId(), request.getVoucherCode());
+                voucherAccount.setStatus(Const.STATUS_USED);
+                voucherAccountService.updateStatus(voucherAccount);
+            }
         }
+
         return kafkaUtil.sendingObjectWithKafka(bill, Const.TOPIC_CREATE_BILL);
     }
 
@@ -251,6 +251,7 @@ public class BillServiceImpl implements BillService {
     @Override
     public Integer updateBillStatus(BillStatusDTO dto) throws JsonProcessingException {
         log.warn("BillStatusDTORequest: " + dto);
+        billRepo.update(dto.getStatus(), dto.getAmountPaid(), dto.getId());
         kafkaUtil.sendingObjectWithKafka(dto, Const.TOPIC_TIME_LINE);
         return 1;
     }
@@ -332,8 +333,8 @@ public class BillServiceImpl implements BillService {
                     for (int j = monthStart; j <= monthEnd; j++) {
                         Calendar calendar = Calendar.getInstance();
                         calendar.set(listYear.get(i), j - 1, 1);
-                        int dayStart = (j == monthStart && i==0) ? dayFrom : 1;
-                        int dayEnd = (j == monthEnd && i==listYear.size()-1) ? dayTo : calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+                        int dayStart = (j == monthStart && i == 0) ? dayFrom : 1;
+                        int dayEnd = (j == monthEnd && i == listYear.size() - 1) ? dayTo : calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
                         for (int k = dayStart; k <= dayEnd; k++) {
                             addDataLineChart(listYear.get(i), j, k, "d" + k + "-m" + j + "-y" + listYear.get(i), data);
                         }
@@ -422,9 +423,9 @@ public class BillServiceImpl implements BillService {
             TimelineProductDisplayResponse productDisplayResponse = new TimelineProductDisplayResponse(timelineProductResponses.get(i));
             productDisplayResponse.setProductImageResponses(productImageService.getProductImageByProductDetailId(productDisplayResponse.getProductDetailId()));
             List<BillDetail> bd = billRepo.checkProductInPromotionById(productDisplayResponse.getProductDetailId(), billCode);
-            if(!bd.isEmpty()){
+            if (!bd.isEmpty()) {
                 productDisplayResponse.setCheckInPromotion(true);
-            }else {
+            } else {
                 productDisplayResponse.setCheckInPromotion(false);
             }
             lstProduct.add(productDisplayResponse);

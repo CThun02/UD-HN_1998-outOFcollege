@@ -88,7 +88,7 @@ public class ClientAccountServiceImpl implements ClientAccountService {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.PASSWORD_NOT_CORRECT));
         }
 
-        account.setPassword(request.getNewPassword());
+        account.setPassword(passwordEncoder.encode(request.getNewPassword()));
         account.setFullName(request.getFullName());
         account.setEmail(request.getEmail());
         account.setNumberPhone(request.getPhoneNumber());

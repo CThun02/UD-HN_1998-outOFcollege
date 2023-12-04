@@ -25,7 +25,7 @@ public class BillManagementResponse {
 
     private String phoneNumber;
 
-    @JsonFormat(pattern = "HH:mm:ss dd/MM/yyyy")
+    @JsonFormat(pattern = "HH:mm:ss MM/dd/yyyy")
     private LocalDateTime createdDate;
 
     private String billType;

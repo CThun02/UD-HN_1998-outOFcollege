@@ -65,6 +65,17 @@ public class VoucherAccountServiceImpl implements VoucherAccountService {
         return voucherAccountRepository.findAccountByVoucherId(voucherId);
     }
 
+    @Override
+    public VoucherAccount findVoucherAccountByUsernameAndVoucherCode(String username, String voucherCode) {
+        return voucherAccountRepository
+                .findVoucherAccountsByAccountVoucher_UsernameAndVoucherAccount_VoucherCode(username, voucherCode);
+    }
+
+    @Override
+    public VoucherAccount updateStatus(VoucherAccount voucherAccount) {
+        return voucherAccountRepository.save(voucherAccount);
+    }
+
     private VoucherAccount getVoucherAccount(VoucherAccountConditionDTO voucherAccountConditionDTO) {
         Account account = accountService.findByUsername(voucherAccountConditionDTO.getUsername());
         Voucher voucher = voucherAccountConditionDTO.getVoucher();

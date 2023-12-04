@@ -22,13 +22,12 @@ function ProductInfo({
   chooseColor,
   chooseSize,
   productDetails,
-  setRenderHeader
+  setRenderHeader,
 }) {
   const [quantity, setQuantity] = useState(1);
   const navigate = useNavigate();
   const token = getAuthToken();
-  const cartAPI = 'http://localhost:8080/api/client/cart';
-
+  const cartAPI = "http://localhost:8080/api/client/cart";
 
   function handleChangePrice(value) {
     if (!isNaN(value)) {
@@ -44,8 +43,11 @@ function ProductInfo({
   const handleAddToCart = async (e) => {
     e.preventDefault();
     const dataToken = await token;
-    const existingItem = localStorage.getItem('user');
-    if (Object.keys(chooseColor).length === 0 || Object.keys(chooseSize).length === 0) {
+    const existingItem = localStorage.getItem("user");
+    if (
+      Object.keys(chooseColor).length === 0 ||
+      Object.keys(chooseSize).length === 0
+    ) {
       notification.error({
         message: "Thông báo",
         description: "Bạn chưa chọn kích cỡ hoặc màu sắc",
@@ -67,45 +69,60 @@ function ProductInfo({
         existingData.timeStart = now();
         let productExists = false;
         for (let i = 0; i < existingData.productDetails?.length; i++) {
-          if (existingData?.productDetails[i].data[0].id === productDetails[0]?.id) {
-            existingData.productDetails[i].quantity += quantity
+          if (
+            existingData?.productDetails[i].data[0].id === productDetails[0]?.id
+          ) {
+            existingData.productDetails[i].quantity += quantity;
             productExists = true;
             break;
           }
         }
 
         if (!productExists) {
-          existingData.productDetails.push({ data: productDetails, quantity: quantity })
+          existingData.productDetails.push({
+            data: productDetails,
+            quantity: quantity,
+          });
         }
 
-        localStorage.setItem('user', JSON.stringify(existingData));
+        localStorage.setItem("user", JSON.stringify(existingData));
       }
     } else {
-      axios.post(`${cartAPI}`, {
-        username: dataToken.username,
-        lstCartDetail: [{
-          productDetailId: productDetails[0].id,
-          quantity: quantity
-        }]
-      }).then((response) => {
-        console.log(response.data)
-      }).catch((err) => {
-        console.log(err)
-      })
+      axios
+        .post(`${cartAPI}`, {
+          username: dataToken.username,
+          lstCartDetail: [
+            {
+              productDetailId: productDetails[0].id,
+              quantity: quantity,
+            },
+          ],
+        })
+        .then((response) => {
+          console.log(response.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     }
-    setRenderHeader(Math.random())
+
+    setRenderHeader(Math.random());
     notification.success({
       message: "Thông báo",
       description: "Thêm thành công!",
-      duration: 2
+      duration: 2,
     });
-  }
+  };
 
   const handleByNow = async (e) => {
     e.preventDefault();
     const data = await token;
-    let lstProductDetail = []
-    if (Object.keys(chooseColor).length === 0 || Object.keys(chooseSize).length === 0) {
+
+    let lstProductDetail = [];
+    if (
+      Object.keys(chooseColor).length === 0 ||
+      Object.keys(chooseSize).length === 0
+    ) {
       notification.error({
         message: "Thông báo",
         description: "Bạn chưa chọn kích cỡ hoặc màu sắc",
@@ -115,43 +132,46 @@ function ProductInfo({
     if (data) {
       try {
         if (data) {
-          const res = await axios.get(`http://localhost:8080/api/client/cart/productDetail`, {
-            params: {
-              productDetailId: productDetails[0].id
+          const res = await axios.get(
+            `http://localhost:8080/api/client/cart/productDetail`,
+            {
+              params: {
+                productDetailId: productDetails[0].id,
+              },
             }
-          });
-          res.data.cartDetailResponse.quantity = quantity
+          );
+          res.data.cartDetailResponse.quantity = quantity;
           lstProductDetail.push(res.data[0]);
         } else {
           lstProductDetail.push({ data: productDetails, quantity: quantity });
         }
 
-        localStorage.setItem('checkout', JSON.stringify(lstProductDetail));
-        navigate('/ms-shop/checkout');
+        localStorage.setItem("checkout", JSON.stringify(lstProductDetail));
+        navigate("/ms-shop/checkout");
       } catch (error) {
         console.error(error);
       }
     } else {
-      lstProductDetail.push(({ data: productDetails, quantity: quantity }))
+      lstProductDetail.push({ data: productDetails, quantity: quantity });
     }
-    localStorage.setItem('checkout', JSON.stringify(lstProductDetail));
-    navigate('/ms-shop/checkout');
-  }
+    localStorage.setItem("checkout", JSON.stringify(lstProductDetail));
+    navigate("/ms-shop/checkout");
+  };
 
   useEffect(() => {
-    const existingItem = localStorage.getItem('user');
-    localStorage.getItem('checkout');
+    const existingItem = localStorage.getItem("user");
+    localStorage.getItem("checkout");
 
     if (!existingItem) {
       localStorage.setItem(
-        'user',
+        "user",
         JSON.stringify({
           timeStart: now(),
           productDetails: [],
         })
       );
     }
-  }, [])
+  }, []);
 
   return (
     <>
@@ -163,33 +183,84 @@ function ProductInfo({
           >
             {data.productName}
           </h2>
-          {data.promotionMethod && data.promotionValue && (
-            <Tag
-              color="#D80032"
-              style={{ fontSize: "16px", padding: "6px 12px" }}
-            >
-              Giảm {`${data.promotionValue}${data.promotionMethod}`}
-            </Tag>
-          )}
+          {colorsAndSizes?.promotionType && colorsAndSizes?.promotionValue
+            ? data.promotionMethod &&
+              data.promotionValue && (
+                <Tag
+                  color="#D80032"
+                  style={{ fontSize: "16px", padding: "6px 12px" }}
+                >
+                  Giảm{" "}
+                  {`${numeral(data.promotionValue).format("0,0")}${
+                    data.promotionMethod === "vnd" ? "đ" : "%"
+                  }`}
+                </Tag>
+              )
+            : ""}
         </Space>
       </div>
       <div className={styles.items}>
         <div className={styles.spaceItems}>
           <Space style={{ width: "100%" }} direction="horizontal" size={28}>
-            <div className={styles.money}>
-              <span style={{ fontWeight: "600" }}>
-                {`${comparePrice(
-                  colorsAndSizes.priceProductMin,
-                  colorsAndSizes.priceProductMax
-                )
-                  ? handleChangePrice(colorsAndSizes.priceProductMin) + "đ"
-                  : handleChangePrice(colorsAndSizes.priceProductMin) +
-                  " - " +
-                  handleChangePrice(colorsAndSizes.priceProductMax) +
-                  "đ"
-                  }`}
+            <div className={`${styles.money}`}>
+              <span
+                style={{ fontWeight: "600" }}
+                className={`${
+                  colorsAndSizes.promotionType && colorsAndSizes.promotionValue
+                    ? styles.moneyInactive
+                    : ""
+                }`}
+              >
+                {`${
+                  comparePrice(
+                    colorsAndSizes.priceProductMin,
+                    colorsAndSizes.priceProductMax
+                  )
+                    ? handleChangePrice(colorsAndSizes.priceProductMin) + "đ"
+                    : handleChangePrice(colorsAndSizes.priceProductMin) +
+                      " - " +
+                      handleChangePrice(colorsAndSizes.priceProductMax) +
+                      "đ"
+                }`}
               </span>
+              {colorsAndSizes?.promotionType &&
+              colorsAndSizes?.promotionValue ? (
+                <span style={{ fontWeight: "600" }}>
+                  {`${
+                    comparePrice(
+                      colorsAndSizes.priceProductMin,
+                      colorsAndSizes.priceProductMax
+                    )
+                      ? colorsAndSizes?.promotionType === "vnd"
+                        ? handleChangePrice(
+                            colorsAndSizes.priceProductMin -
+                              colorsAndSizes.promotionValue <=
+                              0
+                              ? 0
+                              : colorsAndSizes.priceProductMin -
+                                  colorsAndSizes.promotionValue
+                          ) + "đ"
+                        : handleChangePrice(
+                            colorsAndSizes.priceProductMin -
+                              colorsAndSizes.priceProductMin *
+                                (colorsAndSizes.promotionValue / 100) <=
+                              0
+                              ? 0
+                              : colorsAndSizes.priceProductMin -
+                                  colorsAndSizes.priceProductMin *
+                                    (colorsAndSizes.promotionValue / 100)
+                          ) + "đ"
+                      : handleChangePrice(colorsAndSizes.priceProductMin) +
+                        " - " +
+                        handleChangePrice(colorsAndSizes.priceProductMax) +
+                        "đ"
+                  }`}
+                </span>
+              ) : (
+                ""
+              )}
             </div>
+
             <div
               style={{
                 width: "2px",
@@ -286,7 +357,8 @@ function ProductInfo({
         <Row>
           <Col span={12}>
             <div className={styles.btnAddToCart}>
-              <button className={`${styles.btn}`}
+              <button
+                className={`${styles.btn}`}
                 onClick={(e) => handleAddToCart(e)}
               >
                 <FontAwesomeIcon
@@ -299,7 +371,10 @@ function ProductInfo({
           </Col>
           <Col span={12}>
             <div className={styles.btnShoppingNow}>
-              <button className={`${styles.btn} ${styles.shoppingNow}`} onClick={(e) => handleByNow(e)}>
+              <button
+                className={`${styles.btn} ${styles.shoppingNow}`}
+                onClick={(e) => handleByNow(e)}
+              >
                 <FontAwesomeIcon
                   icon={faCirclePlus}
                   className={styles.iconAddToCart}

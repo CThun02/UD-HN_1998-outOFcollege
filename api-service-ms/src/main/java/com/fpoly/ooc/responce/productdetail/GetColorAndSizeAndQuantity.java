@@ -19,10 +19,15 @@ public class GetColorAndSizeAndQuantity {
     private BigDecimal priceProductMax;
     private Long quantity;
     private List<Long> productDetailsId;
+    private String promotionType;
+    private BigDecimal promotionValue;
 
-    public GetColorAndSizeAndQuantity(BigDecimal priceProductMin, BigDecimal priceProductMax, Long quantity) {
+    public GetColorAndSizeAndQuantity(BigDecimal priceProductMin, BigDecimal priceProductMax, Long quantity, String promotionType,
+                                      BigDecimal promotionValue) {
         this.priceProductMin = priceProductMin;
         this.priceProductMax = priceProductMax;
         this.quantity = quantity;
+        this.promotionType = promotionType;
+        this.promotionValue = promotionValue;
     }
 }

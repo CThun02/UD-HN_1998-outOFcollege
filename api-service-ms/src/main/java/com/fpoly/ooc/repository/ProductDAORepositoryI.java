@@ -28,13 +28,7 @@ public interface ProductDAORepositoryI extends JpaRepository<Product, Long> {
     public ProductResponse getProductResponseById(Long id);
     public Product findFirstByProductCode(String productCode);
 
-    @Query("select new com.fpoly.ooc.responce.product.ProductPromotionResponse(" +
-            "p.id, p.productName, sum(bd.quantity), min(pd.price), max(pd.price), " +
-            "sum(case when pd.quantity > 0 then pd.quantity else 0 end)) from Product p " +
-            "left join ProductDetail pd on p.id = pd.product.id " +
-            "left join BillDetail bd on pd.id = bd.productDetail.id " +
-            "group by p.id, p.productName " +
-            "having sum(pd.quantity) > 0 ")
+    @Query(name = "Product.findProductPromotion", nativeQuery = true)
     List<ProductPromotionResponse> findProductPromotion();
 
     @Query("SELECT new java.lang.Long(product.id) " +

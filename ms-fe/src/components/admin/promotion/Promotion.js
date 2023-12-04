@@ -48,7 +48,7 @@ function Promotion() {
   const [codeOrName, setCodeOrName] = useState(null);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
-  const [status, setStatus] = useState(null);
+  const [status, setStatus] = useState("ALL");
 
   const { successMessage, clearNotification, context } =
     useContext(NotificationContext);
@@ -285,7 +285,7 @@ function Promotion() {
         status={status}
         setStatus={setStatus}
       />
-      {/* <SockJs setValues={setPromotions} connectTo="promotion" /> */}
+      <SockJs setValues={setPromotions} connectTo="promotion" />
       <div className={styles.content}>
         <Space style={{ width: "100%" }} direction="vertical" size={16}>
           <Row>

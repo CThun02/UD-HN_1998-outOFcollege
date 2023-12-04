@@ -377,8 +377,6 @@ const BillReturn = () => {
             sevenDay
           ) {
             navigate("/api/admin/return");
-          } else {
-            productsReturns = [];
           }
         } else {
           navigate("/api/admin/return");

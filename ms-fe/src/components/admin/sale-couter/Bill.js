@@ -607,7 +607,7 @@ const Bill = () => {
       result = totalPrice;
     }
 
-    return result;
+    return result >= 0 ? result : 0;
   };
   // phí ship
   const handleShippingFee = (insuranceValue, toDistrictId, toWardCode) => {
@@ -972,7 +972,7 @@ const Bill = () => {
       voucherCode: voucherAdd?.voucherCode,
       createdBy: "user3",
       emailDetails: {
-        recipient: [email],
+        recipient: selectedAddress.email ? [selectedAddress.email] : [email],
         messageBody: `<body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: Arial, sans-serif;">
         <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="width: 100%; max-width:720px; margin: 0 auto;">
             <tr>
@@ -1053,6 +1053,7 @@ const Bill = () => {
     };
 
     const billAddress = {
+      email: email,
       fullName: fullname,
       sdt: phoneNumber,
       city: selectedProvince,
@@ -1069,6 +1070,7 @@ const Bill = () => {
       city: Yup.string().required("Tỉnh/thành phố không được để trống"),
       district: Yup.string().required("Quận/huyện không được để trống"),
       ward: Yup.string().required("Phường/xã không được để trống"),
+      email: Yup.string().email('Địa chỉ email không hợp lệ')
     });
 
     if (productDetails.length <= 0) {
@@ -1221,7 +1223,7 @@ const Bill = () => {
               <Tabs.TabPane
                 key={item.key}
                 tab={
-                  <Badge count={item.count ? item.count : 0} showZero>
+                  <Badge count={productDetails.length ? productDetails.length : 0} showZero>
                     <span style={{ padding: 10 }}>{item.label}</span>
                   </Badge>
                 }
@@ -1355,14 +1357,15 @@ const Bill = () => {
                             <Col span={24}>
                               <div className="m-5">
                                 <b style={{ color: "red" }}></b> Email
+                                {console.log(selectedAddress)}
                                 <Input
                                   placeholder="nhập email"
+                                  value={selectedAddress?.email}
                                   onChange={(e) => setEmail(e.target.value)}
-                                  value={selectedAddress?.fullName}
                                 />
-                                {errors.fullName && (
+                                {errors.email && (
                                   <div style={{ color: "red" }}>
-                                    {errors.fullName}
+                                    {errors.email}
                                   </div>
                                 )}
                               </div>
@@ -1571,13 +1574,7 @@ const Bill = () => {
                       >
                         Chọn mã giảm giá
                       </Button>
-                      <FormUsingVoucher
-                        priceBill={totalPrice}
-                        voucher={voucherAdd}
-                        setVoucher={setVoucherAdd}
-                        isOpen={isOpenFormVoucher}
-                        setIsOpen={setIsOpenFormVoucher}
-                      />
+
                       <Row style={{ marginTop: "10px" }}>
                         <Col span={16}>
                           {" "}
@@ -1697,7 +1694,7 @@ const Bill = () => {
                                 fontSize: " 16px",
                               }}
                             >
-                              {voucherPrice()?.toLocaleString("vi-VN", {
+                              {(voucherPrice())?.toLocaleString("vi-VN", {
                                 style: "currency",
                                 currency: "VND",
                               })}
@@ -1837,6 +1834,13 @@ const Bill = () => {
             );
           })}
       </Tabs >
+      <FormUsingVoucher
+        priceBill={totalPrice}
+        voucher={voucherAdd}
+        setVoucher={setVoucherAdd}
+        isOpen={isOpenFormVoucher}
+        setIsOpen={setIsOpenFormVoucher}
+      />
     </>
   );
 };

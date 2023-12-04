@@ -94,7 +94,11 @@ function ProductInfo({
       })
     }
     setRenderHeader(Math.random())
-    navigate('/ms-shop/cart');
+    notification.success({
+      message: "Thông báo",
+      description: "Thêm thành công!",
+      duration: 2
+    });
   }
 
   const handleByNow = async (e) => {
@@ -117,7 +121,7 @@ function ProductInfo({
             }
           });
           res.data.cartDetailResponse.quantity = quantity
-          lstProductDetail.push(res.data);
+          lstProductDetail.push(res.data[0]);
         } else {
           lstProductDetail.push({ data: productDetails, quantity: quantity });
         }

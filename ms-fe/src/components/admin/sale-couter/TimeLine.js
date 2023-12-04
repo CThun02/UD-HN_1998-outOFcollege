@@ -1,4 +1,4 @@
-import { Button, Carousel, Col, Divider, Row, Table, notification } from "antd";
+import { Button, Carousel, Col, Divider, InputNumber, Row, Space, Table, notification } from "antd";
 import { useEffect, useState } from "react";
 import { Timeline, TimelineEvent } from "@mailtop/horizontal-timeline";
 import {
@@ -16,7 +16,7 @@ import ModalDetail from "./ModalDetail";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import numeral from "numeral";
-import { CheckCircleOutlined } from "@ant-design/icons";
+import { CheckCircleOutlined, DeleteOutlined } from "@ant-design/icons";
 import { getAuthToken, getToken } from "../../../service/Token";
 import ModalBillInfoDisplay from "../../element/bill-info/ModalBillInfoDisplay";
 import ModalProduct from "./ModalProduct";
@@ -294,6 +294,18 @@ const BillTimeLine = (addId) => {
             title: "Số lượng",
             dataIndex: "quantity",
             key: "quantity",
+            render: (text, record, index) => {
+                return (
+                    <InputNumber
+                        min={1}
+                        // max={record.quantity >= record.productDetail.quantity}
+                        value={record.quantity}
+                        onClick={(event) =>
+                            console.log(record)
+                        }
+                    />
+                );
+            },
         },
         {
             title: "Giá",
@@ -304,6 +316,25 @@ const BillTimeLine = (addId) => {
                     style: "currency",
                     currency: "VND",
                 });
+            },
+        },
+        {
+            title: "Thao tác",
+            key: "productPrice",
+            render: (_, record) => {
+                return (
+                    <>
+                        <Space size="middle">
+                            <Button
+                                icon={<DeleteOutlined />}
+                                danger
+                                href="#1"
+                                key={record.key}
+                                onClick={() => console.log(record)}
+                            ></Button>
+                        </Space >
+                    </>
+                )
             },
         },
     ];
@@ -339,7 +370,7 @@ const BillTimeLine = (addId) => {
                                                 ) : data?.status === "1" ? (
                                                     <h3>Chờ xác nhận</h3>
                                                 ) : data?.status === "2" ? (
-                                                    <h3>Đã xác nhận</h3>
+                                                    <h3>Chờ giao hàng</h3>
                                                 ) : data?.status === "3" ? (
                                                     <h3>
                                                         Đã đóng gói & <br /> đang được giao
@@ -692,7 +723,6 @@ const BillTimeLine = (addId) => {
                                 billId={billId}
                             />
                         </Col>}
-
                 </Row>
                 <Divider
                     className={styles.blackDivider}

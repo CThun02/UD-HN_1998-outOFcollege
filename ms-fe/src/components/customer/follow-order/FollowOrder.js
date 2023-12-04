@@ -5,7 +5,6 @@ import QRReader from '../../../service/QRReader';
 import { useState } from 'react';
 import styles from './FollowOrder.module.css'
 import logoOOC from "../../../Assets/img/logo/logo_OOC.svg";
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const FollowOrder = () => {
@@ -14,20 +13,14 @@ const FollowOrder = () => {
     const navigate = useNavigate()
 
     const searchBill = (billCode) => {
-        axios.get(`http://localhost:8080/api/client/pdf/${billCode}`)
-            .then((response) => {
-                if (response.data) {
-                    navigate("/ms-shop/bill/" + response.data.billCode);
-                } else {
-                    notification.error({
-                        message: "Thông báo",
-                        description: "Không tìm thấy hóa đơn",
-                    });
-                }
-            })
-            .catch((error) => {
-                console.log(error)
-            })
+        if (billCode) {
+            navigate("/ms-shop/bill/" + billCode);
+        } else {
+            notification.error({
+                message: "Thông báo",
+                description: "Không tìm thấy hóa đơn",
+            });
+        }
     }
 
     return (

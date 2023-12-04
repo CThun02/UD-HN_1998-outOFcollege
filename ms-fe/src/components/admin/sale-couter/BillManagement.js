@@ -142,7 +142,7 @@ const BillManagement = () => {
       render: (text, record) => {
         return (
           numeral(
-            record.totalPrice + record.shipPrice - record?.priceReduce
+            record.totalPrice + record.shipPrice - record?.priceReduce < 0 ? 0 : record.totalPrice + record.shipPrice - record?.priceReduce
           ).format("0,0") + "đ"
         );
       },
@@ -399,7 +399,7 @@ const BillManagement = () => {
                       : id === "2"
                         ? "Chờ xác nhận"
                         : id === "3"
-                          ? "Đã xác nhận"
+                          ? "Chờ giao hàng"
                           : id === "4"
                             ? "Đang giao"
                             : id === "5"

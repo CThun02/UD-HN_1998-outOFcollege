@@ -143,15 +143,15 @@ const Cart = (props) => {
                         <span>
                             {record.data[0]?.promotion?.length !== 0
                                 ? record?.data[0]?.promotion[0]?.promotionMethod === "%"
-                                    ? (
+                                    ? Number(
                                         ((record.data[0].price *
                                             (100 - Number(record?.data[0]?.promotion[0]?.promotionValue))) /
-                                            100) * record.cartDetailResponse?.quantity
+                                            100) * record.quantity
                                     )?.toLocaleString("vi-VN", {
                                         style: "currency",
                                         currency: "VND",
                                     })
-                                    : (
+                                    : Number(
                                         (record?.data[0]?.price - Number(record?.data[0]?.promotion[0]?.promotionValue)) * record?.quantity
                                     )?.toLocaleString("vi-VN", {
                                         style: "currency",
@@ -448,26 +448,24 @@ const Cart = (props) => {
                 for (let i = 0; i < carts.length; i++) {
                     if (selectedKeys.includes(carts[i]?.cartDetailResponse?.productDetailId)) {
                         let priceReduced = (carts[i]?.promotion[0]?.promotionMethod === 'vnd' ?
-                            carts[i]?.promotion[0]?.promotionValue : ((100 - carts[i]?.promotion[0]?.value) / 100) * carts[i]?.cartDetailResponse?.priceProductDetail) * carts[i].cartDetailResponse?.quantity;
-                        totalPrice += carts[i].cartDetailResponse?.priceProductDetail * carts[i].cartDetailResponse?.quantity - (priceReduced ? priceReduced : 0);
+                            carts[i]?.promotion[0]?.promotionValue :
+                            ((100 - carts[i]?.promotion[0]?.promotionValue) / 100) * carts[i]?.cartDetailResponse?.priceProductDetail) * carts[i].cartDetailResponse?.quantity;
+                        totalPrice += priceReduced
                     }
                 }
                 setTotalPrice(totalPrice);
             } else {
                 for (let i = 0; i < productDetails.length; i++) {
                     const row = productDetails[i];
-                    console.log(row)
                     if (selectedKeys.includes(row?.data[0]?.id)) {
                         let priceReduced = (row.data[0].promotion[0]?.promotionMethod === 'vnd' ?
-                            row.data[0].promotion[0]?.promotionValue : ((100 - row.data[0].promotion[0]?.promotionValue) / 100) * row.data[0].price) * row?.quantity;
-                        console.log(priceReduced)
-                        // totalPrice += row.data[0].price * row.quantity;
-                        totalPrice += row.data[0]?.price * row?.quantity - (priceReduced ? priceReduced : 0);
+                            row.data[0].promotion[0]?.promotionValue
+                            : ((100 - row.data[0].promotion[0]?.promotionValue) / 100) * row.data[0].price) * row?.quantity;
+                        totalPrice += priceReduced;
                     }
                 }
                 setTotalPrice(totalPrice);
             }
-            console.log(selectedKeys)
             setSelectedRowKeys(selectedKeys);
         } catch (error) {
             console.error('lỗi click sản phẩm thanh toán:', error);

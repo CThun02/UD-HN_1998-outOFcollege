@@ -20,6 +20,7 @@ const ModalProduct = ({ visible, onCancel, cartId, render, billId }) => {
         productDetails: productDetailsCreate,
         timeStart: now(),
         account: cart?.account,
+        count: productDetailsCreate.length,
       };
       localStorage.setItem(cartId, JSON.stringify(cart));
       notification.success({
@@ -28,10 +29,6 @@ const ModalProduct = ({ visible, onCancel, cartId, render, billId }) => {
       });
     }
 
-  }
-
-  const addProductBillDetail = () => {
-    console.log(123)
   }
 
   let notifi = () => {

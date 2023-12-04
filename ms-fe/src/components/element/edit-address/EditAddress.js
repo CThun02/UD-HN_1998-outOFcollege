@@ -66,7 +66,6 @@ const EditAddress = ({
     const handleWardChange = (e) => {
         handleChange("ward", e)
     }
-    console.log(formData)
 
     const fetchProvince = async () => {
         await axios

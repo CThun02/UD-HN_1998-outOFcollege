@@ -1,5 +1,7 @@
 package com.fpoly.ooc.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.entity.Bill;
 import com.fpoly.ooc.entity.BillDetail;
 import com.fpoly.ooc.entity.ProductDetail;
@@ -10,6 +12,7 @@ import com.fpoly.ooc.responce.bill.BillResponse;
 import com.fpoly.ooc.responce.pdf.PdfResponse;
 import com.fpoly.ooc.responce.timeline.TimelineProductResponse;
 import com.fpoly.ooc.service.interfaces.BillDetailService;
+import com.fpoly.ooc.service.interfaces.ProductDetailServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +30,9 @@ public class BillDetailServiceImpl implements BillDetailService {
     @Autowired
     private BillDetailRepo billDetailRepo;
 
+    @Autowired
+    private ProductDetailServiceI productDetailService;
+
     @Transactional(rollbackFor = Exception.class)
     @Override
     public BillDetail createBillDetail(BillDetailRequest request) {
@@ -38,6 +44,7 @@ public class BillDetailServiceImpl implements BillDetailService {
             if (request.getProductDetailId() == billDetail.getProductDetail().getId()) {
                 billDetail.setQuantity(billDetail.getQuantity() + request.getQuantity());
                 billDetail.setPrice(request.getPrice());
+                billDetail.setStatus(Const.STATUS_INACTIVE);
                 BillDetail updateBillDetail = billDetailRepo.save(billDetail);
 
                 billTotal = billTotal.add(request.getPrice().multiply(new BigDecimal(request.getQuantity())));
@@ -54,7 +61,6 @@ public class BillDetailServiceImpl implements BillDetailService {
                 .quantity(request.getQuantity())
                 .build();
 
-        // billDetal nếu sai thay bằng request.getQuantity
         billTotal = billTotal.add(request.getPrice().multiply(new BigDecimal(billDetail.getQuantity())));
 
         BillDetail savedBillDetail = billDetailRepo.save(billDetail);
@@ -73,6 +79,25 @@ public class BillDetailServiceImpl implements BillDetailService {
 
         billDetail.setStatus(status);
         return billDetailRepo.save(billDetail);
+    }
+
+    @Override
+    public BillDetail updateBillDetail(BillDetailRequest request) throws JsonProcessingException {
+        ProductDetail productDetail = productDetailService.getOne(request.getProductDetailId());
+        productDetail.setQuantity(productDetail.getQuantity() - request.getQuantity());
+        productDetailService.update(productDetail);
+
+        BillDetail billDetail = BillDetail.builder()
+                .id(request.getBillDetailId())
+                .bill(Bill.builder().id(request.getBillId()).build())
+                .productDetail(productDetail)
+                .price(request.getPrice())
+                .quantity(request.getQuantity())
+                .status(Const.STATUS_ACTIVE)
+                .build();
+        billDetailRepo.save(billDetail);
+
+        return billDetail;
     }
 
     @Override

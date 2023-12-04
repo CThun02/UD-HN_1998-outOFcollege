@@ -2,7 +2,6 @@ package com.fpoly.ooc.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.dto.BillStatusDTO;
-import com.fpoly.ooc.request.bill.BillDetailRequest;
 import com.fpoly.ooc.request.bill.BillRequest;
 import com.fpoly.ooc.request.product.ProductDetailRequest;
 import com.fpoly.ooc.service.interfaces.BillDetailService;
@@ -114,8 +113,8 @@ public class BillController {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         LocalDateTime dateFrom = LocalDateTime.parse(day, formatter);
         LocalDateTime dateTo = LocalDateTime.parse(dayTo, formatter).plusDays(1);
-        System.out.println("CHECKDATE"+dateFrom +dateTo);
-        return ResponseEntity.ok(billService.getBillRevenue(dateFrom,  dateTo));
+        System.out.println("CHECKDATE" + dateFrom + dateTo);
+        return ResponseEntity.ok(billService.getBillRevenue(dateFrom, dateTo));
     }
 
     @GetMapping("/getBillRevenueCompare")
@@ -125,7 +124,7 @@ public class BillController {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         LocalDateTime dateFrom = LocalDateTime.parse(day, formatter);
         LocalDateTime dateTo = LocalDateTime.parse(dayTo, formatter);
-        return ResponseEntity.ok(billService.getRevenueInStoreOnlineCompare(dateFrom,  dateTo.plusDays(1)));
+        return ResponseEntity.ok(billService.getRevenueInStoreOnlineCompare(dateFrom, dateTo.plusDays(1)));
     }
 
     @GetMapping("/getGrowthStoreByTime")
@@ -193,9 +192,5 @@ public class BillController {
         return null;
     }
 
-    @PostMapping("/create-bill-detail")
-    public ResponseEntity<?> createdBillDetail(@RequestBody BillDetailRequest request) {
-        return ResponseEntity.ok(billDetailService.createBillDetail(request));
-    }
 
 }

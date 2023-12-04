@@ -198,8 +198,7 @@ const MyForm = (props) => {
             const currentTimeInMillis = new Date().getTime();
             const imgRef = ref(
               saveImage,
-              `accounts/${Number(roleId) === 1 ? "employees" : "customers"}/${
-                currentTimeInMillis + "_" + accountScan.numberPhone
+              `accounts/${Number(roleId) === 1 ? "employees" : "customers"}/${currentTimeInMillis + "_" + accountScan.numberPhone
               }`
             );
             uploadBytes(imgRef, imageFile)
@@ -224,15 +223,13 @@ const MyForm = (props) => {
                   .then((res) => {
                     notification.open({
                       message: "Thông báo",
-                      description: `Thêm mới ${
-                        Number(roleId) === 1 ? "nhân viên" : "khách hàng"
-                      } thành công`,
+                      description: `Thêm mới ${Number(roleId) === 1 ? "nhân viên" : "khách hàng"
+                        } thành công`,
                       icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
                     });
                     setLoading(false);
                     navigate(
-                      `/api/admin/${
-                        Number(roleId) === 1 ? "employee" : "customer"
+                      `/api/admin/${Number(roleId) === 1 ? "employee" : "customer"
                       }`
                     );
                   })
@@ -371,6 +368,7 @@ const MyForm = (props) => {
                       )}
                     </h6>
                     <Input
+                      value={accountScan.idNo}
                       onChange={(event) => {
                         handleSetAccountScan(
                           "idNo",
@@ -427,8 +425,8 @@ const MyForm = (props) => {
                     <DatePicker
                       value={
                         accountScan.dob === " " ||
-                        accountScan.dob === "" ||
-                        accountScan.dob === null
+                          accountScan.dob === "" ||
+                          accountScan.dob === null
                           ? null
                           : dayjs(accountScan.dob)
                       }
@@ -439,11 +437,10 @@ const MyForm = (props) => {
                           if (currenYear - event?.toDate().getFullYear() < 16) {
                             notification.error({
                               message: "Thông báo",
-                              description: `${
-                                roleId === 1
-                                  ? "Nhân viên phải trên 16 tuổi"
-                                  : "Khách hàng phải trên 16 tuổi"
-                              }`,
+                              description: `${roleId === 1
+                                ? "Nhân viên phải trên 16 tuổi"
+                                : "Khách hàng phải trên 16 tuổi"
+                                }`,
                             });
                             return;
                           }

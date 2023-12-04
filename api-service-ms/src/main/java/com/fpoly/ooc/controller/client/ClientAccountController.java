@@ -39,7 +39,7 @@ public class ClientAccountController {
 
     @GetMapping("{username}")
     public ResponseEntity<?> userDetail(@PathVariable("username") String username) {
-        if(StringUtils.isBlank(username) || StringUtils.isEmpty(username)) {
+        if (StringUtils.isBlank(username) || StringUtils.isEmpty(username)) {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.USER_NOT_FOUND));
         }
 
@@ -75,10 +75,10 @@ public class ClientAccountController {
 
     private String validToken(String header) {
         String token = null;
-        if(header != null) {
+        if (header != null) {
             String[] authenElements = header.split(" ");
 
-            if(authenElements.length == 2 && "Bearer".equals(authenElements[0])) {
+            if (authenElements.length == 2 && "Bearer".equals(authenElements[0])) {
                 token = authenElements[1];
             }
         }

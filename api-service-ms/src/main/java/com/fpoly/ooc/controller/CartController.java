@@ -29,6 +29,11 @@ public class CartController {
         return ResponseEntity.ok(cartDetailService.getAllCart(username));
     }
 
+    @GetMapping("/productDetail")
+    public ResponseEntity<?> getALl( @RequestParam("productDetailId") Long productDetailId) {
+        return ResponseEntity.ok(cartDetailService.getProductDetailId(productDetailId));
+    }
+
     @PostMapping("")
     public ResponseEntity<?> createCartDetail(@RequestBody CartRequest request) {
         Cart cart = cartDetailService.createCartDetail(request);

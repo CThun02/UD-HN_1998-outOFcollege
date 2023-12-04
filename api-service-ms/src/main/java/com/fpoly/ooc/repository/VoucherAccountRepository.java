@@ -31,4 +31,6 @@ public interface VoucherAccountRepository extends JpaRepository<VoucherAccount, 
             "and voucherAccount.voucherAccount.id = :voucherId ")
     List<String> findAccountByVoucherId(@Param("voucherId") Long voucherId);
 
+    VoucherAccount findVoucherAccountsByAccountVoucher_UsernameAndVoucherAccount_VoucherCode(String username, String voucherCode);
+
 }

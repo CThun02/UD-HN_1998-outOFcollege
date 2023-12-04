@@ -5,15 +5,18 @@ import {
   Form,
   Input,
   Modal,
-  Radio,
   Row,
   Space,
+  notification,
 } from "antd";
 import styles from "./UserInfoDetail.module.css";
 import { EditOutlined, UserOutlined } from "@ant-design/icons";
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import Password from "antd/es/input/Password";
+import { useEffect } from "react";
+import axios from "axios";
+import bcrypt from 'bcryptjs';
+
 
 function UserInfoDetail({ user, setIsRender }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -47,7 +50,7 @@ function UserInfoDetail({ user, setIsRender }) {
             </Row>
           </div>
 
-          <EditUser isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
+          <EditUser isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} user={user?.userInfomationDTO} setIsRender={setIsRender} />
 
           <div className={styles.body}>
             <Row style={{ margin: 0 }}>
@@ -124,12 +127,12 @@ function RowUserInfo({ title, data }) {
   );
 }
 
-function EditUser({ setIsModalOpen, isModalOpen }) {
+function EditUser({ setIsModalOpen, isModalOpen, user, setIsRender }) {
   const [form] = Form.useForm();
   const [userUpdate, setUserUpdate] = useState({
     username: "",
     password: "",
-    passwordNew: "",
+    newPassword: "",
     rePassword: "",
     email: "",
     phoneNumber: "",
@@ -137,9 +140,56 @@ function EditUser({ setIsModalOpen, isModalOpen }) {
     role: "customer",
   });
 
+  useEffect(() => {
+    if (user && 'password' in user) {
+      const { password, ...userWithoutPassword } = user;
+      setUserUpdate(userWithoutPassword);
+    } else {
+      setUserUpdate(user);
+    }
+  }, [isModalOpen, user])
+
   const handleOk = () => {
-    setIsModalOpen(false);
+    form
+      .validateFields()
+      .then(() => {
+        const formData = form.getFieldsValue();
+
+        bcrypt.compare(formData.password, user.password, (err, result) => {
+          if (err) {
+            console.error(err);
+            return;
+          }
+
+          if (result) {
+            axios
+              .post(`http://localhost:8080/api/client/user/update-user`, formData)
+              .then((response) => {
+                setIsRender(response.data);
+                setIsModalOpen(false);
+                notification.success({
+                  message: "Thông báo",
+                  description: "Thanh toán thành công",
+                  duration: 2,
+                });
+                form.resetFields();
+              })
+              .catch((err) => console.log(err));
+          } else {
+            form.setFields([
+              {
+                name: 'password',
+                errors: ['Mật khẩu không đúng'],
+              },
+            ]);
+          }
+        });
+      })
+      .catch((error) => {
+        console.log('Validation failed:', error);
+      });
   };
+
 
   const handleCancel = () => {
     setIsModalOpen(false);
@@ -153,7 +203,7 @@ function EditUser({ setIsModalOpen, isModalOpen }) {
       onOk={handleOk}
       onCancel={handleCancel}
     >
-      <Form form={form}>
+      <Form form={form} initialValues={userUpdate}>
         <Space direction="vertical" style={{ width: "100%" }}>
           <Form.Item
             name={"username"}
@@ -213,7 +263,7 @@ function EditUser({ setIsModalOpen, isModalOpen }) {
           </Form.Item>
 
           <Form.Item
-            name={"passwordNew"}
+            name={"newPassword"}
             rules={[
               {
                 required: true,
@@ -238,23 +288,25 @@ function EditUser({ setIsModalOpen, isModalOpen }) {
             ]}
           >
             <Password
-              name={"passwordNew"}
+              name={"newPassword"}
               placeholder="Nhập mật khẩu mới"
               size="large"
               className={styles.input}
             />
           </Form.Item>
+
           <Form.Item
             name={"rePassword"}
+            dependencies={['newPassword']}
             rules={[
               {
                 required: true,
                 message: "* Không được bỏ trống",
               },
-
               ({ getFieldValue }) => ({
                 validator(_, value) {
-                  if (!value || getFieldValue("password") === value) {
+                  const newPassword = getFieldValue('newPassword');
+                  if (!value || newPassword === value) {
                     return Promise.resolve();
                   }
                   return Promise.reject(
@@ -273,6 +325,7 @@ function EditUser({ setIsModalOpen, isModalOpen }) {
               className={styles.input}
             />
           </Form.Item>
+
           <Form.Item
             name={"fullName"}
             rules={[
@@ -331,16 +384,6 @@ function EditUser({ setIsModalOpen, isModalOpen }) {
               className={styles.input}
             />
           </Form.Item>
-          {/* <div>
-          <Button
-            type="primary"
-            size="large"
-            className={styles.button}
-            htmlType="submit"
-          >
-            Xác nhận
-          </Button>
-        </div> */}
         </Space>
       </Form>
     </Modal>

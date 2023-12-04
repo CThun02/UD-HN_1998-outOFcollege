@@ -2,7 +2,11 @@ import { Badge, Button, Card, Rate, Row, Space } from "antd";
 import styles from "./ProductsList.module.css";
 import numeral from "numeral";
 import { Link } from "react-router-dom";
-import { EyeOutlined, PlusCircleOutlined } from "@ant-design/icons";
+import {
+  EyeOutlined,
+  PlusCircleOutlined,
+  ShoppingCartOutlined,
+} from "@ant-design/icons";
 import { useState } from "react";
 
 function ProductsList({ data, span }) {
@@ -101,8 +105,7 @@ function ProductsList({ data, span }) {
                           type="primary"
                           className={`${styles.cssBtn} ${styles.addToCart}`}
                         >
-                          <PlusCircleOutlined />
-                          Add to cart
+                          <ShoppingCartOutlined />
                         </Button>
                         <Button
                           onMouseEnter={() => handleMouseIn(true)}
@@ -111,7 +114,6 @@ function ProductsList({ data, span }) {
                           className={`${styles.cssBtn} ${styles.quickView}`}
                         >
                           <EyeOutlined />
-                          Quick view
                         </Button>
                       </Space>
                     </Row>

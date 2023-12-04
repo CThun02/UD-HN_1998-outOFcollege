@@ -23,12 +23,12 @@ public class BillReturnResponse {
     private String billCode;
     private String customerName;
     private String userName;
-    @JsonFormat(pattern = "HH:mm:ss dd/MM/yyyy ")
+    @JsonFormat(pattern = "HH:mm:ss MM/dd/yyyy")
     private LocalDateTime conpletionDate;
     private BigDecimal price;
     private String billType;
     private String symbol;
-    @JsonFormat(pattern = "HH:mm:ss dd/MM/yyyy ")
+    @JsonFormat(pattern = "HH:mm:ss MM/dd/yyyy")
     private LocalDateTime createdAt;
     private String createdBy;
     private List<TimelineProductDisplayResponse> billDetails;
@@ -36,7 +36,7 @@ public class BillReturnResponse {
     private String fullName;
     private String phoneNumber;
     private String address;
-    @JsonFormat(pattern = "HH:mm:ss dd/MM/yyyy ")
+    @JsonFormat(pattern = "HH:mm:ss MM/dd/yyyy")
     private LocalDateTime shippingDate;
     private String note;
     private String status;

@@ -109,8 +109,8 @@ const Cart = (props) => {
                 return (
                     <InputNumber
                         min={1}
-                        value={record.quantity}
-                        max={record.data.quantity}
+                        value={record?.quantity}
+                        max={record?.data?.quantity}
                         onChange={(e) => updateQuantity(e, index)}
                     />
                 );
@@ -125,7 +125,7 @@ const Cart = (props) => {
                         {record.data[0].promotion.length > 0 ? (
                             <span style={{ color: "#ccc" }}>
                                 <strike>
-                                    {((record?.data[0].price) * (record.quantity))?.toLocaleString("vi-VN", {
+                                    {((record?.data[0]?.price) * (record?.quantity))?.toLocaleString("vi-VN", {
                                         style: "currency",
                                         currency: "VND",
                                     })}
@@ -133,7 +133,7 @@ const Cart = (props) => {
                             </span>
                         ) : (
                             <span>
-                                {(record?.data[0].price * record.quantity).toLocaleString("vi-VN", {
+                                {(record?.data[0]?.price * record?.quantity).toLocaleString("vi-VN", {
                                     style: "currency",
                                     currency: "VND",
                                 })}
@@ -143,15 +143,15 @@ const Cart = (props) => {
                         <span>
                             {record.data[0]?.promotion?.length !== 0
                                 ? record?.data[0]?.promotion[0]?.promotionMethod === "%"
-                                    ? (
+                                    ? Number(
                                         ((record.data[0].price *
                                             (100 - Number(record?.data[0]?.promotion[0]?.promotionValue))) /
-                                            100) * record.cartDetailResponse.quantity
+                                            100) * record.quantity
                                     )?.toLocaleString("vi-VN", {
                                         style: "currency",
                                         currency: "VND",
                                     })
-                                    : (
+                                    : Number(
                                         (record?.data[0]?.price - Number(record?.data[0]?.promotion[0]?.promotionValue)) * record?.quantity
                                     )?.toLocaleString("vi-VN", {
                                         style: "currency",
@@ -332,10 +332,10 @@ const Cart = (props) => {
                 return (
                     <InputNumber
                         min={1}
-                        value={record?.cartDetailResponse.quantity}
-                        max={record?.cartDetailResponse.quantityProductDetail}
+                        value={record?.cartDetailResponse?.quantity}
+                        max={record?.cartDetailResponse?.quantityProductDetail}
                         onChange={(e) =>
-                            handleUpdateQuantityApi(record.cartDetailResponse.cartDetailId, e)}
+                            handleUpdateQuantityApi(record?.cartDetailResponse?.cartDetailId, e)}
                     />
                 );
             },
@@ -349,7 +349,7 @@ const Cart = (props) => {
                         {record.promotion.length !== 0 ? (
                             <span style={{ color: "#ccc" }}>
                                 <strike>
-                                    {((record?.cartDetailResponse.priceProductDetail) * (record.cartDetailResponse.quantity))?.toLocaleString("vi-VN", {
+                                    {((record?.cartDetailResponse?.priceProductDetail) * (record?.cartDetailResponse?.quantity))?.toLocaleString("vi-VN", {
                                         style: "currency",
                                         currency: "VND",
                                     })}
@@ -357,7 +357,7 @@ const Cart = (props) => {
                             </span>
                         ) : (
                             <span>
-                                {(record?.cartDetailResponse.priceProductDetail * record.cartDetailResponse.quantity).toLocaleString("vi-VN", {
+                                {(record?.cartDetailResponse?.priceProductDetail * record?.cartDetailResponse?.quantity).toLocaleString("vi-VN", {
                                     style: "currency",
                                     currency: "VND",
                                 })}
@@ -370,13 +370,13 @@ const Cart = (props) => {
                                     ? (
                                         ((record.cartDetailResponse.priceProductDetail *
                                             (100 - Number(record?.promotion[0].promotionValue))) /
-                                            100) * record.cartDetailResponse.quantity
+                                            100) * record?.cartDetailResponse?.quantity
                                     )?.toLocaleString("vi-VN", {
                                         style: "currency",
                                         currency: "VND",
                                     })
                                     : (
-                                        (record.cartDetailResponse.priceProductDetail - Number(record?.promotion[0].promotionValue)) * record.cartDetailResponse.quantity
+                                        (record?.cartDetailResponse?.priceProductDetail - Number(record?.promotion[0]?.promotionValue)) * record?.cartDetailResponse?.quantity
                                     )?.toLocaleString("vi-VN", {
                                         style: "currency",
                                         currency: "VND",
@@ -402,7 +402,7 @@ const Cart = (props) => {
     const updateQuantity = (e, index) => {
         let cart = JSON.parse(localStorage.getItem('user'));
         let productDetail = cart.productDetails;
-        if (e > productDetail[index].data[0].quantity) {
+        if (e > productDetail[index]?.data[0]?.quantity) {
             notification.warning({
                 message: "Thông báo",
                 description: "Vượt quá số lượng tồn",
@@ -446,28 +446,26 @@ const Cart = (props) => {
             let totalPrice = 0;
             if (data) {
                 for (let i = 0; i < carts.length; i++) {
-                    if (selectedKeys.includes(carts[i].cartDetailResponse.productDetailId)) {
-                        let priceReduced = (carts[i].promotion[0]?.promotionMethod === 'vnd' ?
-                            carts[i].promotion[0]?.promotionValue : ((100 - carts[i].promotion[0]?.value) / 100) * carts[i].cartDetailResponse.priceProductDetail) * carts[i].cartDetailResponse.quantity;
-                        totalPrice += carts[i].cartDetailResponse.priceProductDetail * carts[i].cartDetailResponse.quantity - (priceReduced ? priceReduced : 0);
+                    if (selectedKeys.includes(carts[i]?.cartDetailResponse?.productDetailId)) {
+                        let priceReduced = (carts[i]?.promotion[0]?.promotionMethod === 'vnd' ?
+                            carts[i]?.promotion[0]?.promotionValue :
+                            ((100 - carts[i]?.promotion[0]?.promotionValue) / 100) * carts[i]?.cartDetailResponse?.priceProductDetail) * carts[i].cartDetailResponse?.quantity;
+                        totalPrice += priceReduced
                     }
                 }
                 setTotalPrice(totalPrice);
             } else {
                 for (let i = 0; i < productDetails.length; i++) {
                     const row = productDetails[i];
-                    console.log(row)
                     if (selectedKeys.includes(row?.data[0]?.id)) {
                         let priceReduced = (row.data[0].promotion[0]?.promotionMethod === 'vnd' ?
-                            row.data[0].promotion[0]?.promotionValue : ((100 - row.data[0].promotion[0]?.promotionValue) / 100) * row.data[0].price) * row.quantity;
-                        console.log(priceReduced)
-                        // totalPrice += row.data[0].price * row.quantity;
-                        totalPrice += row.data[0].price * row.quantity - (priceReduced ? priceReduced : 0);
+                            row.data[0].promotion[0]?.promotionValue
+                            : ((100 - row.data[0].promotion[0]?.promotionValue) / 100) * row.data[0].price) * row?.quantity;
+                        totalPrice += priceReduced;
                     }
                 }
                 setTotalPrice(totalPrice);
             }
-            console.log(selectedKeys)
             setSelectedRowKeys(selectedKeys);
         } catch (error) {
             console.error('lỗi click sản phẩm thanh toán:', error);
@@ -528,14 +526,14 @@ const Cart = (props) => {
                                 if (response.data.length === 0) {
                                     cart.lstCartDetail.push({
                                         productDetailId: productDetails[i].data[0].id,
-                                        quantity: productDetails[i].quantity,
+                                        quantity: productDetails[i]?.quantity,
                                     });
                                 } else {
                                     for (let j = 0; j < response.data.length; j++) {
                                         if (Number(productDetails[i].data[0].id) !== Number(response.data[j].cartDetailResponse.productDetailId)) {
                                             cart.lstCartDetail.push({
                                                 productDetailId: productDetails[i].data[0].id,
-                                                quantity: productDetails[i].quantity,
+                                                quantity: productDetails[i]?.quantity,
                                             });
                                         }
                                     }

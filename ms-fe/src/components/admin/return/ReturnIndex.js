@@ -19,7 +19,7 @@ const ReturnIndex = () => {
     axios
       .get(
         `http://localhost:8080/api/admin/bill/getBillByBillCode?billCode=` +
-          billCode,
+        billCode,
         {
           headers: {
             Authorization: `Bearer ${getToken(true)}`,

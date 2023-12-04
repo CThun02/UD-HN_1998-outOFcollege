@@ -358,7 +358,7 @@ const ProductDetails = (props) => {
 
       handleCancelModalQuantity(index);
 
-      props.billId ? axios.post(`http://localhost:8080/api/admin/bill/create-bill-detail`, {
+      props.billId ? axios.post(`http://localhost:8080/api/admin/bill-detail/create-bill-detail`, {
         billId: props.billId,
         productDetailId: productDetailCreate.productDetail.id,
         quantity: productDetailCreate.quantity,

@@ -182,34 +182,36 @@ const ProductReturns = ({ date, dateToP, type, reason }) => {
       });
       setLoading(false);
     } else {
-      axios
-        .get(
-          "http://localhost:8080/api/admin/product-return/getProductReturnByDateAndReason?day=" +
+      return () => {
+
+        axios
+          .get(
+            "http://localhost:8080/api/admin/product-return/getProductReturnByDateAndReason?day=" +
             encodeURIComponent(dateFrom.toISOString()) +
             "&dayTo=" +
             encodeURIComponent(dateTo.toISOString()) +
             "&reason=" +
             reason,
-          {
-            headers: {
-              Authorization: `Bearer ${getToken(true)}`,
-            },
-          }
-        )
-        .then((res) => {
-          setLoading(false);
-          setData(res.data);
-        })
-        .catch((err) => {
-          const status = err.response.status;
-          if (status === 403) {
-            notification.error({
-              message: "Thông báo",
-              description: "Bạn không có quyền truy cập!",
-            });
-          }
-          console.log(err);
-        });
+            {
+              headers: {
+                Authorization: `Bearer ${getToken(true)}`,
+              },
+            }
+          )
+          .then((res) => {
+            setLoading(false);
+            setData(res.data);
+          })
+          .catch((err) => {
+            const status = err.response.status;
+            if (status === 403) {
+              notification.error({
+                message: "Thông báo",
+                description: "Bạn không có quyền truy cập!",
+              });
+            }
+          });
+      }
     }
   }, [pageSize, date, dateToP, type, reason, openModalProductReturns]);
   return (

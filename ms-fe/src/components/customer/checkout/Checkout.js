@@ -630,14 +630,17 @@ const Checkout = ({ setRenderHeader }) => {
         let totalPrice = 0;
         if (data) {
             for (let i = 0; i < carts?.length; i++) {
-                totalPrice += (carts[i]?.cartDetailResponse?.priceProductDetail - (carts[i]?.promotion[0]?.promotionValue ?? 0))
-                    * carts[i]?.cartDetailResponse?.quantity;
+                let priceReduced = (carts[i]?.promotion[0]?.promotionMethod === 'vnd' ?
+                    carts[i]?.promotion[0]?.promotionValue :
+                    ((100 - carts[i]?.promotion[0]?.promotionValue) / 100) * carts[i]?.cartDetailResponse?.priceProductDetail) * carts[i].cartDetailResponse?.quantity;
+                totalPrice += priceReduced
             }
         } else {
             for (let i = 0; i < carts?.length; i++) {
-                totalPrice +=
-                    (carts[i]?.data[0]?.price - (carts[i]?.data[0]?.promotion[0]?.promotionValue ?? 0)) *
-                    carts[i]?.quantity
+                let priceReduced = (carts[i].data[0].promotion[0]?.promotionMethod === 'vnd' ?
+                    carts[i].data[0].promotion[0]?.promotionValue
+                    : ((100 - carts[i].data[0].promotion[0]?.promotionValue) / 100) * carts[i].data[0].price) * carts[i]?.quantity;
+                totalPrice += priceReduced;
             }
         }
         setTotalPrice(Number(totalPrice))
@@ -661,7 +664,7 @@ const Checkout = ({ setRenderHeader }) => {
             result = totalPrice;
         }
 
-        return result;
+        return result >= 0 ? result : 0;
     };
 
     useEffect(() => {
@@ -978,7 +981,7 @@ const Checkout = ({ setRenderHeader }) => {
                                                                 <div className={styles.productThumbnail}>
                                                                     <div className={styles.productThumbnailWrapper}>
                                                                         <img
-                                                                            src={productDetail?.productImageResponse[0].path} alt="" className={styles.productThumbnailImage} />
+                                                                            src={productDetail?.productImageResponse[0]?.path} alt="" className={styles.productThumbnailImage} />
                                                                     </div>
                                                                     <span className={styles.productThumbnailQuantity}>{productDetail?.cartDetailResponse.quantity}</span>
                                                                 </div>
@@ -1015,7 +1018,11 @@ const Checkout = ({ setRenderHeader }) => {
                                                                     </div>
                                                                 </div>
                                                                 <div>
-                                                                    {numeral(productDetail?.cartDetailResponse?.priceProductDetail - (productDetail?.promotion[0]?.promotionValue ?? 0))
+                                                                    {numeral((
+                                                                        (productDetail?.promotion[0]?.promotionMethod === 'vnd' ?
+                                                                            productDetail?.promotion[0]?.promotionValue :
+                                                                            ((100 - productDetail?.promotion[0]?.promotionValue) / 100) * productDetail?.cartDetailResponse?.priceProductDetail) * productDetail.cartDetailResponse?.quantity
+                                                                    ))
                                                                         .format('0,0') + 'đ'}
                                                                 </div>
                                                             </Space>
@@ -1033,7 +1040,7 @@ const Checkout = ({ setRenderHeader }) => {
                                                                 <div className={styles.productThumbnail}>
                                                                     <div className={styles.productThumbnailWrapper}>
                                                                         <img
-                                                                            src={productDetail.data[0].productImageResponse[0].path} alt="" className={styles.productThumbnailImage} />
+                                                                            src={productDetail.data[0]?.productImageResponse[0]?.path} alt="" className={styles.productThumbnailImage} />
                                                                     </div>
                                                                     <span className={styles.productThumbnailQuantity}>{productDetail.quantity}</span>
                                                                 </div>
@@ -1070,7 +1077,11 @@ const Checkout = ({ setRenderHeader }) => {
                                                                     </div>
                                                                 </div>
                                                                 <div>
-                                                                    {numeral(productDetail?.data[0]?.price - ((productDetail?.data[0].promotion[0]?.promotionValue) ?? 0))
+                                                                    {numeral(
+                                                                        (productDetail.data[0].promotion[0]?.promotionMethod === 'vnd' ?
+                                                                            productDetail.data[0].promotion[0]?.promotionValue
+                                                                            : ((100 - productDetail.data[0].promotion[0]?.promotionValue) / 100) * productDetail.data[0].price) * productDetail?.quantity
+                                                                    )
                                                                         .format('0,0') + 'đ'}
                                                                 </div>
                                                             </Space>

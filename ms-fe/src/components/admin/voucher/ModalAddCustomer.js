@@ -148,7 +148,7 @@ function ModalAddCustomer({
           });
       }
 
-      return () => getCustomers();
+      getCustomers();
     },
     [pageNo, pageSize, gender, searchText]
   );
@@ -171,10 +171,25 @@ function ModalAddCustomer({
     [values, customers]
   );
 
-  function handleOnSelected(record, isSelected, selectedRows, nativeEvent) {
-    setSelectedRows((prevData) => [...prevData, record]);
-    const { username } = record;
-    setSelectedRowKeys((prevData) => [...prevData, username]);
+  function handleOnSelected(record) {
+    const isExist = selectedRows.some(
+      (item) => item.username === record.username
+    );
+
+    if (isExist) {
+      const dataRows = selectedRows.filter(
+        (el) => el.username !== record.username
+      );
+      const dataRowsUser = selectedRowKeys.filter(
+        (el) => el !== record.username
+      );
+      setSelectedRows(dataRows);
+      setSelectedRowKeys(dataRowsUser);
+    } else {
+      setSelectedRows((prevData) => [...prevData, record]);
+      const { username } = record;
+      setSelectedRowKeys((prevData) => [...prevData, username]);
+    }
   }
 
   function handleOnOk() {
@@ -193,12 +208,17 @@ function ModalAddCustomer({
   }
 
   function handleDeleted(value) {
+    const dataRows = selectedRows.filter(
+      (el) => el.username !== value.username
+    );
     setSelectedRows((selectedRows) =>
       selectedRows.filter((row) => row !== value)
     );
     setSelectedRowKeys((selectedRowKeys) =>
       selectedRowKeys.filter((row) => row !== value.key)
     );
+    setCustomers(dataRows);
+    setFieldValue("usernames", dataRows);
     if (!values?.voucherId) {
       setCustomers((selectedRows) =>
         selectedRows.filter((row) => row !== value)
@@ -211,7 +231,7 @@ function ModalAddCustomer({
     onChange: handleOnChange,
     getCheckboxProps: (record) => ({
       disabled: values?.usernames?.some(
-        (item) => item.username === record.username
+        (item) => item?.username === record?.username
       ),
     }),
   };

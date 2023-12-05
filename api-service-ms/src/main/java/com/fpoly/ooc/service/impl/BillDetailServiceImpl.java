@@ -82,6 +82,11 @@ public class BillDetailServiceImpl implements BillDetailService {
     }
 
     @Override
+    public BillDetail deleteBillDetail(Long billDetailId) {
+        return null;
+    }
+
+    @Override
     public BillDetail updateBillDetail(BillDetailRequest request) throws JsonProcessingException {
         ProductDetail productDetail = productDetailService.getOne(request.getProductDetailId());
         productDetail.setQuantity(productDetail.getQuantity() - request.getQuantity());

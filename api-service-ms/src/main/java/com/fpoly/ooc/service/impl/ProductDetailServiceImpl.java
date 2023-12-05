@@ -25,6 +25,7 @@ import com.fpoly.ooc.service.interfaces.ProductImageServiceI;
 import com.fpoly.ooc.service.interfaces.SizeServiceI;
 import com.fpoly.ooc.service.kafka.KafkaUtil;
 import com.fpoly.ooc.util.PageUltil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class ProductDetailServiceImpl implements ProductDetailServiceI {
     private ProductDetailDAORepositoryI repo;
     private ProductImageServiceI productImageService;
@@ -184,20 +186,40 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
             sizeStr = "HasSize";
         }
 
-        String sort = null;
-        if(req.getSort() != null) {
-            if(req.getSort().equals("up")) {
-                sort = "asc";
-            } else {
-                sort = "desc";
-            }
-        }
+//        String sort = null;
+//        if(req.getSort() != null) {
+//            if(req.getSort().equals("up")) {
+//                sort = "asc";
+//            } else {
+//                sort = "desc";
+//            }
+//        }
 
-        List<ProductDetailShop> result = getImageByProductDetailId(repo.getAllProductDetailShop(
+        List<ProductDetailShop> result = repo.getAllProductDetailShop(
                 req.getProductName(), req.getMinPrice(), req.getMaxPrice(), cateStr, brandStr, colorStr, sizeStr,
-                req.getCategories(), req.getBrands(), req.getColors(), req.getSizes(), sort
-        ));
-        return Optional.of(result);
+                req.getCategories(), req.getBrands(), req.getColors(), req.getSizes()
+        );
+
+        result.stream().map(productDetail -> {
+            List<Long> productDetailIdsByComponent =
+                    repo.productDetailsId(productDetail.getProductId(), productDetail.getBrandId(), productDetail.getCategoryId(),
+                            productDetail.getPatternId(), productDetail.getFormId(), productDetail.getButtonId(), productDetail.getMaterialId(),
+                            productDetail.getCollarId(), productDetail.getSleeveId(), productDetail.getShirtTailId());
+
+            if (CollectionUtils.isEmpty(productDetailIdsByComponent)) {
+                log.warn("product detail id is empty");
+            }
+
+            if (productDetailIdsByComponent.size() > 1) {
+                log.warn("product detail id has size than: " + productDetailIdsByComponent.size());
+            }
+
+            productDetail.setProductDetailId(productDetailIdsByComponent.get(0));
+
+            return productDetail;
+        }).collect(Collectors.toList());
+
+        return Optional.of(getImageByProductDetailId(result));
     }
 
     @Override

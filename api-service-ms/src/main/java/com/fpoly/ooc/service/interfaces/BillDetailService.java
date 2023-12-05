@@ -13,7 +13,7 @@ public interface BillDetailService {
 
     BillDetail updateBill(Long id, String status);
 
-    BillDetail deleteBillDetail(Long billDetailId);
+    BillDetail deleteBillDetail(Long BillId,Long billDetailId);
 
     BillDetail updateBillDetail(BillDetailRequest request) throws JsonProcessingException;
 

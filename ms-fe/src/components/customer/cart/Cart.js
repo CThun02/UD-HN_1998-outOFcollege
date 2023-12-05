@@ -447,9 +447,9 @@ const Cart = (props) => {
             if (data) {
                 for (let i = 0; i < carts.length; i++) {
                     if (selectedKeys.includes(carts[i]?.cartDetailResponse?.productDetailId)) {
-                        let priceReduced = (carts[i]?.promotion[0]?.promotionMethod === 'vnd' ?
+                        let priceReduced = carts[i]?.promotion[0] ? ((carts[i]?.promotion[0]?.promotionMethod === 'vnd' ?
                             carts[i]?.promotion[0]?.promotionValue :
-                            ((100 - carts[i]?.promotion[0]?.promotionValue) / 100) * carts[i]?.cartDetailResponse?.priceProductDetail) * carts[i].cartDetailResponse?.quantity;
+                            ((100 - carts[i]?.promotion[0]?.promotionValue) / 100) * carts[i]?.cartDetailResponse?.priceProductDetail) * carts[i].cartDetailResponse?.quantity) : (carts[i]?.cartDetailResponse?.priceProductDetail) * carts[i].cartDetailResponse?.quantity;
                         totalPrice += priceReduced
                     }
                 }
@@ -457,10 +457,11 @@ const Cart = (props) => {
             } else {
                 for (let i = 0; i < productDetails.length; i++) {
                     const row = productDetails[i];
+                    console.log(row.data[0])
                     if (selectedKeys.includes(row?.data[0]?.id)) {
-                        let priceReduced = (row.data[0].promotion[0]?.promotionMethod === 'vnd' ?
+                        let priceReduced = row.data[0].promotion[0] ? ((row.data[0].promotion[0]?.promotionMethod === 'vnd' ?
                             row.data[0].promotion[0]?.promotionValue
-                            : ((100 - row.data[0].promotion[0]?.promotionValue) / 100) * row.data[0].price) * row?.quantity;
+                            : ((100 - row.data[0].promotion[0]?.promotionValue) / 100) * row.data[0].price) * row?.quantity) : row.data[0].price * row.data[0].quantity;
                         totalPrice += priceReduced;
                     }
                 }

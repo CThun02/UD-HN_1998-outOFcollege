@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
-import com.fpoly.ooc.dto.TimelineBillDTO;
 import com.fpoly.ooc.entity.Bill;
 import com.fpoly.ooc.entity.DeliveryNote;
 import com.fpoly.ooc.entity.Timeline;
@@ -19,7 +18,6 @@ import com.fpoly.ooc.responce.timeline.TimelineProductResponse;
 import com.fpoly.ooc.service.interfaces.DeliveryNoteService;
 import com.fpoly.ooc.service.interfaces.ProductImageServiceI;
 import com.fpoly.ooc.service.interfaces.TimeLineService;
-import com.fpoly.ooc.service.kafka.KafkaUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -29,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @Slf4j
@@ -95,7 +92,7 @@ public class TimeLineServiceImpl implements TimeLineService {
             timeLine.setStatus(request.getStatus());
         }
 
-        Timeline timelineDb = timeLineRepo.save(timeLine);
+        timeLineRepo.save(timeLine);
         String timelineJson = objectMapper.writeValueAsString(timeLineRepo.getTimeLineByBillId(bill.getId()));
         template.convertAndSend("/topic/create-timeline-client-topic", timelineJson);
         log.info("CreateTimeLineJson: " + timelineJson);

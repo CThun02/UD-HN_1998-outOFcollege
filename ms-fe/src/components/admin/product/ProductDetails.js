@@ -14,7 +14,7 @@ import Modal from "antd/es/modal/Modal";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import styles from "./ProductDetails.module.css";
-import { getToken } from "../../../service/Token";
+import { getAuthToken, getToken } from "../../../service/Token";
 
 const ProductDetails = (props) => {
   const api = "http://localhost:8080/api/admin/";
@@ -51,6 +51,7 @@ const ProductDetails = (props) => {
   const [quantity, setQuantiy] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
+  const token = getAuthToken(true);
 
   const columns = [
     {
@@ -358,6 +359,8 @@ const ProductDetails = (props) => {
 
       handleCancelModalQuantity(index);
 
+      const data = token;
+
       props.billId ? axios.post(`http://localhost:8080/api/admin/bill-detail/create-bill-detail`, {
         billId: props.billId,
         productDetailId: productDetailCreate.productDetail.id,
@@ -368,8 +371,43 @@ const ProductDetails = (props) => {
           Authorization: `Bearer ${getToken(true)}`,
         },
       })
-        .then(response => { })
+        .then(response => {
+          const values = {
+            note: `
+              ${productDetailCreate.productDetail.product.productName} - ${productDetailCreate.productDetail.brand.brandName} - ${productDetailCreate.productDetail.button.buttonName} - ${productDetailCreate.productDetail.category.categoryName} - ${productDetailCreate.productDetail.collar.collarTypeName} - ${productDetailCreate.productDetail.form.formName} - ${productDetailCreate.productDetail.material.materialName} - ${productDetailCreate.productDetail.pattern.patternName} - ${productDetailCreate.productDetail.shirtTail.shirtTailTypeName} - ${productDetailCreate.productDetail.sleeve.sleeveName} - ${productDetailCreate.productDetail.color.colorName} - ${productDetailCreate.productDetail.size.sizeName}`,
+            status: "Update",
+            createdBy: data?.username + "_" + data?.fullName,
+          };
+          axios
+            .post(`http://localhost:8080/api/admin/timeline/${props.billId}`, values, {
+              headers: {
+                Authorization: `Bearer ${getToken(true)}`,
+              },
+            })
+            .then((response) => {
+            })
+            .catch((error) => {
+
+            })
+        })
         .catch(error => {
+          const values = {
+            note: `
+              ${productDetailCreate.productDetail.product.productName} - ${productDetailCreate.productDetail.brand.brandName} - ${productDetailCreate.productDetail.button.buttonName} - ${productDetailCreate.productDetail.category.categoryName} - ${productDetailCreate.productDetail.collar.collarTypeName} - ${productDetailCreate.productDetail.form.formName} - ${productDetailCreate.productDetail.material.materialName} - ${productDetailCreate.productDetail.pattern.patternName} - ${productDetailCreate.productDetail.shirtTail.shirtTailTypeName} - ${productDetailCreate.productDetail.sleeve.sleeveName} - ${productDetailCreate.productDetail.color.colorName} - ${productDetailCreate.productDetail.size.sizeName}`,
+            status: "Update",
+            createdBy: data?.username + "_" + data?.fullName,
+          };
+          axios
+            .post(`http://localhost:8080/api/admin/timeline/${props.billId}`, values, {
+              headers: {
+                Authorization: `Bearer ${getToken(true)}`,
+              },
+            })
+            .then((response) => {
+            })
+            .catch((error) => {
+
+            })
           const status = error.response?.status;
           if (status === 403) {
             notification.error({

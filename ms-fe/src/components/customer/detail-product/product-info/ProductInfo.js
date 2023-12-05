@@ -121,13 +121,10 @@ function ProductInfo({
             }
           });
           res.data.cartDetailResponse.quantity = quantity
-          lstProductDetail.push(res.data[0]);
-        } else {
-          lstProductDetail.push({ data: productDetails, quantity: quantity });
+          lstProductDetail.push(res.data);
         }
-
-        localStorage.setItem('checkout', JSON.stringify(lstProductDetail));
-        navigate('/ms-shop/checkout');
+        // localStorage.setItem('checkout', JSON.stringify(lstProductDetail));
+        // navigate('/ms-shop/checkout');
       } catch (error) {
         console.error(error);
       }

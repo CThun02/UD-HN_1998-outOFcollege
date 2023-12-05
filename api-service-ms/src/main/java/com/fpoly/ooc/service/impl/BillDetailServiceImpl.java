@@ -6,7 +6,6 @@ import com.fpoly.ooc.entity.Bill;
 import com.fpoly.ooc.entity.BillDetail;
 import com.fpoly.ooc.entity.ProductDetail;
 import com.fpoly.ooc.repository.BillDetailRepo;
-import com.fpoly.ooc.repository.BillRepo;
 import com.fpoly.ooc.request.bill.BillDetailRequest;
 import com.fpoly.ooc.responce.bill.BillResponse;
 import com.fpoly.ooc.responce.pdf.PdfResponse;
@@ -25,7 +24,7 @@ import java.util.List;
 public class BillDetailServiceImpl implements BillDetailService {
 
     @Autowired
-    private BillRepo billRepo;
+    private BillServiceImpl billService;
 
     @Autowired
     private BillDetailRepo billDetailRepo;
@@ -33,39 +32,45 @@ public class BillDetailServiceImpl implements BillDetailService {
     @Autowired
     private ProductDetailServiceI productDetailService;
 
-    @Transactional(rollbackFor = Exception.class)
     @Override
     public BillDetail createBillDetail(BillDetailRequest request) {
-        List<BillDetail> existingBillDetail = billDetailRepo.findBillDetailByBill_Id(request.getBillId());
-        Bill bill = billRepo.findById(request.getBillId()).orElse(null);
-        BigDecimal billTotal = bill.getPrice();
-
-        for (BillDetail billDetail : existingBillDetail) {
-            if (request.getProductDetailId() == billDetail.getProductDetail().getId()) {
-                billDetail.setQuantity(billDetail.getQuantity() + request.getQuantity());
-                billDetail.setPrice(request.getPrice());
-                billDetail.setStatus(Const.STATUS_INACTIVE);
-                BillDetail updateBillDetail = billDetailRepo.save(billDetail);
-
-                billTotal = billTotal.add(request.getPrice().multiply(new BigDecimal(request.getQuantity())));
-                bill.setPrice(billTotal);
-                billRepo.save(bill);
-                return updateBillDetail;
-            }
-        }
-
-        BillDetail billDetail = BillDetail.builder()
+        BillDetail billDetail = BillDetail.builder().id(request.getBillDetailId())
                 .bill(Bill.builder().id(request.getBillId()).build())
                 .productDetail(ProductDetail.builder().id(request.getProductDetailId()).build())
                 .price(request.getPrice())
                 .quantity(request.getQuantity())
                 .build();
+        Bill bill = billService.findBillByBillId(request.getBillId());
+        BillDetail savedBillDetail = null;
 
-        billTotal = billTotal.add(request.getPrice().multiply(new BigDecimal(billDetail.getQuantity())));
-
-        BillDetail savedBillDetail = billDetailRepo.save(billDetail);
-        bill.setPrice(billTotal);
-        billRepo.save(bill);
+        if (request.getBillDetailId() != null) {
+            billDetail = billDetailRepo.findById(request.getBillDetailId()).orElse(null);
+            billDetail.setQuantity(request.getQuantity());
+            savedBillDetail = billDetailRepo.save(billDetail);
+        } else {
+            List<BillDetail> existingBillDetail = billDetailRepo.findBillDetailByBill_Id(request.getBillId());
+            if (existingBillDetail.isEmpty()) {
+                savedBillDetail = billDetailRepo.save(billDetail);
+            } else {
+                Boolean check = true;
+                for (BillDetail billDetailUpdate : existingBillDetail) {
+                    if (request.getProductDetailId() == billDetailUpdate.getProductDetail().getId()) {
+                        billDetailUpdate.setQuantity(billDetailUpdate.getQuantity() + request.getQuantity());
+                        billDetailUpdate.setPrice(request.getPrice());
+                        billDetailUpdate.setStatus(Const.STATUS_INACTIVE);
+                        savedBillDetail = billDetailRepo.save(billDetailUpdate);
+                        check = false;
+                        break;
+                    }
+                }
+                if (check) {
+                    savedBillDetail = billDetailRepo.save(billDetail);
+                }
+            }
+        }
+        BigDecimal priceBill = billDetailRepo.getTotalPriceByBillCode(bill.getBillCode());
+        bill.setPrice(priceBill);
+        billService.updateBill(bill);
         return savedBillDetail;
     }
 
@@ -79,6 +84,18 @@ public class BillDetailServiceImpl implements BillDetailService {
 
         billDetail.setStatus(status);
         return billDetailRepo.save(billDetail);
+    }
+
+    @Override
+    public BillDetail deleteBillDetail(Long billId, Long billDetailId) {
+        Bill bill = billService.findBillByBillId(billId);
+        BillDetail billDetail = billDetailRepo.findById(billDetailId).orElse(null);
+        billDetailRepo.deleteById(billDetailId);
+
+        BigDecimal priceBill = billDetailRepo.getTotalPriceByBillCode(bill.getBillCode());
+        bill.setPrice(priceBill);
+        billService.updateBill(bill);
+        return billDetail;
     }
 
     @Override
@@ -107,7 +124,7 @@ public class BillDetailServiceImpl implements BillDetailService {
 
     @Override
     public PdfResponse pdfResponse(String billCode) {
-        BillResponse bill = billRepo.getBillByBillCode(billCode);
+        BillResponse bill = billService.getBillByBillCode(billCode);
         List<TimelineProductResponse> lstProductDT = billDetailRepo.lstProductDT(billCode);
 
         PdfResponse pdfResponse = PdfResponse.builder()
@@ -122,6 +139,5 @@ public class BillDetailServiceImpl implements BillDetailService {
 
         return pdfResponse;
     }
-
 
 }

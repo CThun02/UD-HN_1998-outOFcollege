@@ -21,6 +21,8 @@ public class TimelineProductResponse {
 
     private String productName;
 
+    private Integer productQuantity;
+
     private Integer quantity;
 
     private BigDecimal productPrice;

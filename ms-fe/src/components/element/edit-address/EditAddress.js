@@ -129,7 +129,7 @@ const EditAddress = ({
             service_id: 53321,
         };
 
-        if (toDistrictId && toWardCode) {
+        if (toDistrictId && toWardCode && isModalOpen) {
             axios
                 .post(
                     "https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/leadtime",
@@ -169,7 +169,7 @@ const EditAddress = ({
             width: 15,
         };
 
-        if (insuranceValue && toDistrictId && toWardCode) {
+        if (insuranceValue && toDistrictId && toWardCode && isModalOpen) {
             axios
                 .post(
                     "https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee",

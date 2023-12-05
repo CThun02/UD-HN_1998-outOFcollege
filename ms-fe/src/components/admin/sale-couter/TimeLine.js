@@ -16,7 +16,7 @@ import ModalDetail from "./ModalDetail";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import numeral from "numeral";
-import { CheckCircleOutlined, DeleteOutlined } from "@ant-design/icons";
+import { CheckCircleOutlined, DeleteOutlined, DeleteRowOutlined } from "@ant-design/icons";
 import { getAuthToken, getToken } from "../../../service/Token";
 import ModalBillInfoDisplay from "../../element/bill-info/ModalBillInfoDisplay";
 import ModalProduct from "./ModalProduct";
@@ -35,6 +35,7 @@ const BillTimeLine = (addId) => {
     const token = getAuthToken(true);
     const [open, setOpen] = useState(false)
     const [openModalDN, setOpenModalDN] = useState(false)
+    const [timlinesDisplay, setTimlneDisplay] = useState([]);
 
     const handleOpen = () => {
         console.log(true)
@@ -60,6 +61,7 @@ const BillTimeLine = (addId) => {
                 },
             })
             .then((response) => {
+
                 setTimelines([...timelines, response.data]);
                 setRender(response.data);
             })
@@ -111,10 +113,11 @@ const BillTimeLine = (addId) => {
     const handleCancelConfirm = () => {
         setIsModalConfirm(false);
     };
+
     const handleOkConFirm = (note) => {
         console.log(`billInfo`, billInfo);
-        console.log(`timelines`, timelines[timelines.length - 1].status);
-        handleCreateTimeline(note, action === "cancel" ? "0" : null);
+        console.log(`timelines`, Number(timlinesDisplay[timlinesDisplay.length - 1].status));
+        handleCreateTimeline(note, action === "cancel" ? "0" : Number(++timlinesDisplay[timlinesDisplay.length - 1].status));
         handleUpdateBillStatus(
             action === "cancel"
                 ? "Cancel"
@@ -125,7 +128,7 @@ const BillTimeLine = (addId) => {
                     : billInfo.symbol === "Shipping" && billInfo.status === "Paid"
                         ? "Paid" : 'Unpaid',
             action === "cancel" ? 0 : (billInfo.symbol === "Received" &&
-                timelines[timelines.length - 1] === "2" &&
+                timelines[timelines.length - 1].status === "2" &&
                 action !== "cancel") ||
                 (billInfo.symbol === "Shipping" &&
                     timelines[timelines.length - 1].status === "3"
@@ -154,6 +157,13 @@ const BillTimeLine = (addId) => {
                 },
             })
             .then((response) => {
+                var timelinesPush = [];
+                for (let index = 0; index < response.data.length; index++) {
+                    if (!isNaN(response.data[index].status)) {
+                        timelinesPush.push(response.data[index]);
+                    }
+                }
+                setTimlneDisplay(timelinesPush);
                 setTimelines(response.data);
             })
             .catch((error) => {
@@ -205,6 +215,45 @@ const BillTimeLine = (addId) => {
             });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [billId, render]);
+
+    const updateQUantityBillDetail = (record, value) => {
+        axios
+            .post(`http://localhost:8080/api/admin/bill-detail/create-bill-detail`, {
+                billId: record.billId,
+                billDetailId: record.billDetailId,
+                productDetailId: record.productDetailId,
+                quantity: value,
+                price: record.productPrice,
+            }, {
+                headers: {
+                    Authorization: `Bearer ${getToken(true)}`,
+                },
+            })
+            .then((response) => {
+                setRender(Math.random())
+                console.log(response);
+            })
+            .catch((err) => {
+                setRender(Math.random())
+                console.log(err)
+            })
+
+    }
+
+    const handleDeleteBillDetail = (record) => {
+        handleCreateTimeline("thích thì xóa", "Delete")
+        axios.delete(`http://localhost:8080/api/admin/bill-detail?billId=${record.billId}&billDetailId=${record.billDetailId}`, {
+            headers: {
+                Authorization: `Bearer ${getToken(true)}`,
+            },
+        }).then((response) => {
+            setRender(Math.random())
+        }).catch((err) => {
+            setRender(Math.random())
+            console.log(err)
+        }
+        )
+    }
 
     const columnProduct = [
         {
@@ -298,10 +347,10 @@ const BillTimeLine = (addId) => {
                 return (
                     <InputNumber
                         min={1}
-                        // max={record.quantity >= record.productDetail.quantity}
+                        max={record.quantity >= record.productQuantity}
                         value={record.quantity}
-                        onClick={(event) =>
-                            console.log(record)
+                        onChange={(e) =>
+                            updateQUantityBillDetail(record, e)
                         }
                     />
                 );
@@ -330,7 +379,7 @@ const BillTimeLine = (addId) => {
                                 danger
                                 href="#1"
                                 key={record.key}
-                                onClick={() => console.log(record)}
+                                onClick={() => handleDeleteBillDetail(record)}
                             ></Button>
                         </Space >
                     </>
@@ -346,8 +395,8 @@ const BillTimeLine = (addId) => {
                     <div style={{ width: "fit-content" }}>
                         {billInfo?.symbol !== "Received" ? (
                             <Timeline minEvents={6} placeholder className={styles.timeLine}>
-                                {timelines &&
-                                    timelines.map((data) => (
+                                {timlinesDisplay &&
+                                    timlinesDisplay.map((data) => (
                                         <TimelineEvent
                                             color={data?.status === "0" ? "#FF0000" : "#00cc00"}
                                             icon={
@@ -362,7 +411,8 @@ const BillTimeLine = (addId) => {
                                                                 : data?.status === "4"
                                                                     ? FaTruck : data?.status === "5"
                                                                         ? FaTruck
-                                                                        : CheckCircleOutlined
+                                                                        : data.status === 'Update' ? CheckCircleOutlined : data.status === 'Delete' ? DeleteRowOutlined
+                                                                            : null
                                             }
                                             title={
                                                 data?.status === "0" ? (
@@ -381,7 +431,9 @@ const BillTimeLine = (addId) => {
                                                     <h3>Yêu cầu trả hàng</h3>
                                                 ) : data?.status === "6" ? (
                                                     <h3>Trả hàng thành công</h3>
-                                                ) : (<h3>.</h3>)
+                                                ) : data?.status === 'Update' ? (<h3>
+                                                    Cập nhật sản phẩm
+                                                </h3>) : data?.status === 'Delete' ? (<h3>Xóa sản phẩm</h3>) : (<h3>.</h3>)
                                             }
                                             subtitle={data.createdDate}
                                         />
@@ -389,8 +441,8 @@ const BillTimeLine = (addId) => {
                             </Timeline>
                         ) : (
                             <Timeline minEvents={2} placeholder className={styles.timeLine}>
-                                {timelines &&
-                                    timelines.map((data) => (
+                                {timlinesDisplay &&
+                                    timlinesDisplay.map((data) => (
                                         <TimelineEvent
                                             color={
                                                 data?.status === "0"
@@ -429,7 +481,7 @@ const BillTimeLine = (addId) => {
                     </div>
                 </div>
                 <div className={styles.btnHeader} style={{ marginTop: 24 }}>
-                    {billInfo?.symbol === "Received" &&
+                    {/* {billInfo?.symbol === "Received" &&
                         timelines.length !== 2 &&
                         timelines.length !== 4 && (
                             <>
@@ -454,10 +506,10 @@ const BillTimeLine = (addId) => {
                                     Hủy
                                 </Button>
                             </>
-                        )}
+                        )} */}
                     {billInfo?.symbol !== "Received" &&
-                        timelines.length !== 4 &&
-                        timelines.length !== 5 &&
+                        timelines[timelines.length - 1]?.status !== '4' &&
+                        timelines[timelines.length - 1]?.status !== '5' &&
                         timelines[timelines.length - 1]?.status !== "0" && (
                             <>
                                 <Button
@@ -469,11 +521,21 @@ const BillTimeLine = (addId) => {
                                 >
                                     Xác nhận
                                 </Button>
+                                <Button
+                                    style={{ marginLeft: '10px' }}
+                                    type="primary"
+                                    onClick={() => {
+                                        setAction("confirm");
+                                        showModalConfirm();
+                                    }}
+                                >
+                                    Quảy trở lại
+                                </Button>
                             </>
                         )}
                     {billInfo?.symbol !== "Received" &&
-                        timelines.length !== 3 &&
-                        timelines.length !== 4 &&
+                        timelines[timelines.length - 1]?.status !== "3" &&
+                        timelines[timelines.length - 1]?.status !== 4 &&
                         timelines[timelines.length - 1]?.status !== "0" && (
                             <Button
                                 type="primary"
@@ -691,26 +753,13 @@ const BillTimeLine = (addId) => {
                 </Row>
             </section>
 
-            {/* <section className={styles.background} style={{ marginTop: '20px' }}>
-                <Row>
-                    <Col span={12}>
-                        <h2>Lịch sử thanh toán</h2>
-                    </Col>
-                    <Col span={12} style={{ textAlign: 'right' }}>
-                        <Button type='primary'>Thanh toán</Button>
-                    </Col>
-                </Row>
-                <Divider className={styles.blackDivider} style={{ marginTop: '10px' }} />
-                <Table columns={columns} dataSource={[timelines[0]]} pagination={false} />
-            </section> */}
-
             <section className={styles.background} style={{ marginTop: "20px" }}>
                 <Row>
                     <Col span={21}>
                         <h2>Sản phẩm đã mua</h2>
                     </Col>
                     {billInfo?.symbol === 'Shipping'
-                        && timelines[timelines.length - 1]?.status === '1'
+                        && (timelines[timelines.length - 1]?.status === '1' || timelines[timelines.length - 1]?.status === 'Update' || timelines[timelines.length - 1]?.status === 'Delete')
                         && billInfo?.status !== "Paid" && <Col span={3}>
                             <Button type="primary" onClick={() => setIsOpenModalProduct(true)}>
                                 Thêm sản phẩm

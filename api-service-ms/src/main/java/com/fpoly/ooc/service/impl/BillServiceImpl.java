@@ -43,7 +43,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
@@ -176,11 +175,13 @@ public class BillServiceImpl implements BillService {
                     .build();
             voucherHistoryRepository.save(voucherHistory);
 
-            if (!request.getAccountId().isBlank() && !request.getVoucherCode().isBlank()) {
+            if (request.getAccountId() != null && request.getVoucherCode() != null) {
                 VoucherAccount voucherAccount =
                         voucherAccountService.findVoucherAccountByUsernameAndVoucherCode(request.getAccountId(), request.getVoucherCode());
-                voucherAccount.setStatus(Const.STATUS_USED);
-                voucherAccountService.updateStatus(voucherAccount);
+                if (voucherAccount != null) {
+                    voucherAccount.setStatus(Const.STATUS_USED);
+                    voucherAccountService.updateStatus(voucherAccount);
+                }
             }
         }
 
@@ -447,6 +448,23 @@ public class BillServiceImpl implements BillService {
 
     @Override
     public Bill updateBill(Bill bill) {
+        VoucherHistory voucherHistory = voucherHistoryRepository.findVoucherHistoryByBill_BillCode(bill.getBillCode());
+        Voucher voucher = voucherService.findVoucherByVoucherCode(voucherHistory.getVoucherCode());
+        BigDecimal price = bill.getPrice();
+        BigDecimal priceReduce = BigDecimal.valueOf(0);
+        BigDecimal condition = voucher.getVoucherCondition();
+        if (price.compareTo(condition) > 0) {
+            if (voucher.getVoucherMethod().equals("%")) {
+                priceReduce = (price.multiply(voucher.getVoucherValue())).divide(BigDecimal.valueOf(100));
+                if (priceReduce.compareTo(voucher.getVoucherValueMax()) > 0) {
+                    priceReduce = voucher.getVoucherValueMax();
+                }
+            } else {
+                priceReduce = voucher.getVoucherValue();
+            }
+        }
+        price = (bill.getPrice()).subtract(priceReduce);
+        bill.setPrice(price);
         return billRepo.save(bill);
     }
 }

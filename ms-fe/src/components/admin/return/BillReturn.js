@@ -173,7 +173,7 @@ const BillReturn = () => {
                 onChange={(e) => {
                   if (
                     Math.abs(Number(e.target.value)) >
-                    Number(record.quantity) ||
+                      Number(record.quantity) ||
                     Number(e.target.value) === 0
                   ) {
                     setQuantity(1);
@@ -242,7 +242,7 @@ const BillReturn = () => {
             },
           }
         )
-        .then((response) => { })
+        .then((response) => {})
         .catch((error) => {
           const status = error.response.status;
           if (status === 403) {
@@ -267,7 +267,7 @@ const BillReturn = () => {
             Authorization: `Bearer ${getToken(true)}`,
           },
         })
-        .then((response) => { })
+        .then((response) => {})
         .catch((error) => {
           const status = error.response.status;
           if (status === 403) {
@@ -291,13 +291,14 @@ const BillReturn = () => {
   function changeStatusBillDetail(id, status) {
     axios
       .put(
-        `http://localhost:8080/api/admin/bill/billDetail/change-status?status=${status === "5" || status === "3"
-          ? "ReturnW"
-          : status === "-1"
+        `http://localhost:8080/api/admin/bill/billDetail/change-status?status=${
+          status === "5" || status === "3"
+            ? "ReturnW"
+            : status === "-1"
             ? "ReturnC"
             : status === "ACTIVE"
-              ? "ACTIVE"
-              : "ReturnS"
+            ? "ACTIVE"
+            : "ReturnS"
         }`,
         id,
         {
@@ -360,7 +361,7 @@ const BillReturn = () => {
     await axios
       .get(
         `http://localhost:8080/api/admin/bill/getBillByBillCode?billCode=` +
-        billCode,
+          billCode,
         {
           headers: {
             Authorization: `Bearer ${getToken(true)}`,
@@ -374,7 +375,7 @@ const BillReturn = () => {
           if (
             response.data.status !== "Complete" ||
             now.getTime() - new Date(response.data.completionDate).getTime() >
-            sevenDay
+              sevenDay
           ) {
             navigate("/api/admin/return");
           }
@@ -399,7 +400,7 @@ const BillReturn = () => {
       axios
         .get(
           `http://localhost:8080/api/admin/bill/getBillReturnByBillCode?billCode=` +
-          billCode,
+            billCode,
           {
             headers: {
               Authorization: `Bearer ${getToken(true)}`,
@@ -490,19 +491,19 @@ const BillReturn = () => {
                           data.status === "0" || data.status === "-1"
                             ? "#FF0000"
                             : data.status === "5"
-                              ? "#f0ad4e"
-                              : "#00cc00"
+                            ? "#f0ad4e"
+                            : "#00cc00"
                         }
                         icon={
                           data.status === "1"
                             ? FaRegFileAlt
                             : data.status === "0"
-                              ? FaTimes
-                              : data.status === "2"
-                                ? FaRegFileAlt
-                                : data.status === "3"
-                                  ? FaTruck
-                                  : CheckCircleOutlined
+                            ? FaTimes
+                            : data.status === "2"
+                            ? FaRegFileAlt
+                            : data.status === "3"
+                            ? FaTruck
+                            : CheckCircleOutlined
                         }
                         title={
                           data.status === "0" ? (
@@ -510,7 +511,7 @@ const BillReturn = () => {
                           ) : data.status === "1" ? (
                             <h3>Chờ xác nhận</h3>
                           ) : data.status === "2" ? (
-                            <h3>Đã xác nhận</h3>
+                            <h3>Chờ giao hàng</h3>
                           ) : data.status === "3" ? (
                             <h3>
                               Đã đóng gói & <br /> đang được giao
@@ -538,21 +539,21 @@ const BillReturn = () => {
                           data.status === "0" || data.status === "-1"
                             ? "#FF0000"
                             : data.status === "3"
-                              ? "#f0ad4e"
-                              : "#00cc00"
+                            ? "#f0ad4e"
+                            : "#00cc00"
                         }
                         icon={
                           data.status === "1"
                             ? FaRegFileAlt
                             : data.status === "0"
-                              ? FaTimes
-                              : data.status === "2"
-                                ? FaRegCheckCircle
-                                : data.status === "3"
-                                  ? FaClock
-                                  : data.status === "4"
-                                    ? FaRocket
-                                    : null
+                            ? FaTimes
+                            : data.status === "2"
+                            ? FaRegCheckCircle
+                            : data.status === "3"
+                            ? FaClock
+                            : data.status === "4"
+                            ? FaRocket
+                            : null
                         }
                         title={
                           data.status === "1" ? (
@@ -616,7 +617,11 @@ const BillReturn = () => {
                 <span style={{ fontWeight: 500 }}>Ngày giao hàng</span>
               </Col>
               <Col span={16}>
-                <span>{billInfo?.shippingDate}</span>
+                <span>
+                  {billInfo?.shippingDate === null
+                    ? billInfo?.conpletionDate
+                    : billInfo?.shippingDate}
+                </span>
               </Col>
             </Row>
           </Col>
@@ -626,7 +631,11 @@ const BillReturn = () => {
                 <span style={{ fontWeight: 500 }}>Số điện thoại</span>
               </Col>
               <Col span={16}>
-                <span>{billInfo?.phoneNumber}</span>
+                <span>
+                  {billInfo?.phoneNumberReceived === null
+                    ? billInfo?.phoneNumber
+                    : billInfo?.phoneNumberReceived}
+                </span>
               </Col>
             </Row>
           </Col>

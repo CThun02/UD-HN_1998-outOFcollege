@@ -21,6 +21,8 @@ public interface BillResponse {
 
     public BigDecimal getPrice();
 
+    public BigDecimal getPriceReduce();
+
     public String getBillType();
 
     public String getSymbol();
@@ -38,4 +40,7 @@ public interface BillResponse {
 
     public BigDecimal getShippingPrice();
 
+    public String getNumberPhone();
+
+    public String getNumberPhoneReceived();
 }

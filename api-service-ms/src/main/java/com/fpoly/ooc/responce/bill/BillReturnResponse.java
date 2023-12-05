@@ -26,6 +26,7 @@ public class BillReturnResponse {
     @JsonFormat(pattern = "HH:mm:ss MM/dd/yyyy")
     private LocalDateTime conpletionDate;
     private BigDecimal price;
+    private BigDecimal priceReduce;
     private String billType;
     private String symbol;
     @JsonFormat(pattern = "HH:mm:ss MM/dd/yyyy")
@@ -35,6 +36,7 @@ public class BillReturnResponse {
     private List<TimeLineResponse> timeLines;
     private String fullName;
     private String phoneNumber;
+    private String phoneNumberReceived;
     private String address;
     @JsonFormat(pattern = "HH:mm:ss MM/dd/yyyy")
     private LocalDateTime shippingDate;
@@ -54,5 +56,8 @@ public class BillReturnResponse {
         this.createdBy = response.getCreatedBy();
         this.note = response.getNote();
         this.status = response.getStatus();
+        this.phoneNumber = response.getNumberPhone();
+        this.phoneNumberReceived = response.getNumberPhoneReceived();
+        this.priceReduce = response.getPriceReduce();
     }
 }

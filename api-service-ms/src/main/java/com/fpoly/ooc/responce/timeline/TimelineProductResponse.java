@@ -19,6 +19,8 @@ public class TimelineProductResponse {
 
     private Long billDetailId;
 
+    private String productCode;
+
     private String productName;
 
     private Integer quantity;

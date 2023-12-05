@@ -49,6 +49,7 @@ const BillReturn = () => {
   const [returned, setReturned] = useState(false);
   const [note, setNote] = useState("");
   const [modalDetail, setModalDetail] = useState(false);
+  const [isLoad, setIsLoad] = useState(0);
 
   const handleShowModalProduct = (index, value) => {
     const newModalVisible = [...modalQuantityReturn];
@@ -227,12 +228,17 @@ const BillReturn = () => {
 
   async function confirmReload(status) {
     const data = await token;
+    var productReturnString = "";
+    for (let index = 0; index < productsReturns.length; index++) {
+      productReturnString +=
+        " | Hoàn trả sản phẩm: " + productsReturns[index].productCode;
+    }
     for (let index = Number(status); index <= Number(status) + 1; index++) {
       await axios
         .post(
           `http://localhost:8080/api/admin/timeline/${billInfo?.id}`,
           {
-            note: note,
+            note: "Lý do: " + note + productReturnString,
             status: index,
             createdBy: data?.username + "_" + data?.fullName,
           },
@@ -393,6 +399,14 @@ const BillReturn = () => {
         }
       });
   }
+  function getProductReturns() {
+    axios
+      .get(
+        "http://localhost:8080/api/admin/product-return/getProductReturnByBillCode?billCode=" +
+          billCode
+      )
+      .then();
+  }
 
   useEffect(() => {
     if (billCode) {
@@ -457,6 +471,7 @@ const BillReturn = () => {
               productsReturns[index].quantity;
           }
           seTotalPrice(total);
+          setIsLoad(1);
         })
         .catch((error) => {
           const status = error.response.status;
@@ -467,6 +482,9 @@ const BillReturn = () => {
             });
           }
         });
+    }
+    if (isLoad === 0 && !returned) {
+      productsReturns = [];
     }
   }, [billCode, modalQuantityReturn, render]);
   return (

@@ -8,10 +8,7 @@ import com.fpoly.ooc.repository.ProductReturnRepository;
 import com.fpoly.ooc.request.product.ProductReturnRequest;
 import com.fpoly.ooc.responce.product.ProductDetailDisplayResponse;
 import com.fpoly.ooc.responce.product.ProductDetailResponse;
-import com.fpoly.ooc.service.interfaces.BillService;
-import com.fpoly.ooc.service.interfaces.ProductDetailServiceI;
-import com.fpoly.ooc.service.interfaces.ProductImageServiceI;
-import com.fpoly.ooc.service.interfaces.ProductReturnServiceI;
+import com.fpoly.ooc.service.interfaces.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,13 +23,14 @@ public class ProductReturnService implements ProductReturnServiceI {
     BillService billService;
     ProductDetailServiceI productDetailService;
     ProductImageServiceI productImageService;
+    VoucherHistoryService voucherHistoryService;
 
-    @Autowired
-    public ProductReturnService(ProductReturnRepository repo, BillService billService, ProductDetailServiceI productDetailService,ProductImageServiceI productImageService ) {
+    public ProductReturnService(ProductReturnRepository repo, BillService billService, ProductDetailServiceI productDetailService, ProductImageServiceI productImageService, VoucherHistoryService voucherHistoryService) {
         this.repo = repo;
         this.billService = billService;
         this.productDetailService = productDetailService;
         this.productImageService = productImageService;
+        this.voucherHistoryService = voucherHistoryService;
     }
 
     @Override

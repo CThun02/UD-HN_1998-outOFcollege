@@ -12,7 +12,7 @@ import java.util.List;
 @Repository
 public interface BillDetailRepo extends JpaRepository<BillDetail, Long> {
 
-    @Query("SELECT DISTINCT new com.fpoly.ooc.responce.timeline.TimelineProductResponse(b.id, b.billCode, pd.id, bd.id, pd.product.productName, " +
+    @Query("SELECT DISTINCT new com.fpoly.ooc.responce.timeline.TimelineProductResponse(b.id, b.billCode, pd.id, bd.id, pd.product.productCode, pd.product.productName, " +
             "   bd.quantity, bd.price, pd.size.sizeName, pd.color.colorCode, pd.button.buttonName, pd.collar.collarTypeName, " +
             "   pd.material.materialName, pd.sleeve.sleeveName, pd.shirtTail.shirtTailTypeName, pd.color.colorName," +
             "   pd.form.formName, pd.pattern.patternName, pd.brand.brandName, pd.category.categoryName, bd.status) " +

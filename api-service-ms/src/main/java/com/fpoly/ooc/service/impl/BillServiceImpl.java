@@ -449,18 +449,20 @@ public class BillServiceImpl implements BillService {
     @Override
     public Bill updateBill(Bill bill) {
         VoucherHistory voucherHistory = voucherHistoryRepository.findVoucherHistoryByBill_BillCode(bill.getBillCode());
-        Voucher voucher = voucherService.findVoucherByVoucherCode(voucherHistory.getVoucherCode());
         BigDecimal price = bill.getPrice();
         BigDecimal priceReduce = BigDecimal.valueOf(0);
-        BigDecimal condition = voucher.getVoucherCondition();
-        if (price.compareTo(condition) > 0) {
-            if (voucher.getVoucherMethod().equals("%")) {
-                priceReduce = (price.multiply(voucher.getVoucherValue())).divide(BigDecimal.valueOf(100));
-                if (priceReduce.compareTo(voucher.getVoucherValueMax()) > 0) {
-                    priceReduce = voucher.getVoucherValueMax();
+        if(voucherHistory != null){
+            Voucher voucher = voucherService.findVoucherByVoucherCode(voucherHistory.getVoucherCode());
+            BigDecimal condition = voucher==null?BigDecimal.valueOf(0):voucher.getVoucherCondition();
+            if (price.compareTo(condition) > 0 && voucher != null) {
+                if (voucher.getVoucherMethod().equals("%")) {
+                    priceReduce = (price.multiply(voucher.getVoucherValue())).divide(BigDecimal.valueOf(100));
+                    if (priceReduce.compareTo(voucher.getVoucherValueMax()) > 0) {
+                        priceReduce = voucher.getVoucherValueMax();
+                    }
+                } else if(voucher.getVoucherMethod().equals("VND")){
+                    priceReduce = voucher.getVoucherValue();
                 }
-            } else {
-                priceReduce = voucher.getVoucherValue();
             }
         }
         price = (bill.getPrice()).subtract(priceReduce);

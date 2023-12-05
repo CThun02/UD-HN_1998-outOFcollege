@@ -334,99 +334,13 @@ const Checkout = ({ setRenderHeader }) => {
             "https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-light-webfont.ttf"
     });
 
-
-    const stylesPDF = {
-        page: {
-            flexDirection: 'row',
-            backgroundColor: '#E4E4E4'
-
-        },
-        section: {
-            margin: 10,
-            padding: 10,
-            flexGrow: 1
-        },
-        VIETNAM: {
-            fontFamily: "Roboto"
-        },
-        container: {
-            display: 'flex',
-            flexDirection: 'row',
-            width: '100%',
-        },
-        halfPage: {
-            width: '60%',
-            border: '1px solid black',
-            padding: 5,
-            marginBottom: 10,
-        },
-        rightPage: {
-            width: '40%',
-            border: '1px solid black',
-            padding: 5,
-            marginBottom: 10,
-        },
-
-    }
-
-    const generateQRCodeDataURL = async (text) => {
-        if (text) {
-            try {
-                const response = await fetch(`https://api.qrserver.com/v1/create-qr-code/?data=${text}&size=200x200`);
-                if (!response.ok) {
-                    throw new Error('Failed to fetch QR Code');
-                }
-                const qrCodeData = await response.blob();
-                return URL.createObjectURL(qrCodeData);
-            } catch (error) {
-                console.error(error);
-                return null;
-            }
-        }
-    };
-    const generatePDF = () => {
-        const qrCodeDataUrl = generateQRCodeDataURL(1);
-        return (
-            <Document style={stylesPDF.VIETNAM}>
-                <Page>
-                    <View style={stylesPDF.container}>
-                        <View style={stylesPDF.halfPage}>
-                            <View>
-                                <Text>Từ: </Text>
-                                <Text>Admin xịn xò con bò</Text>
-                                <Text>Phường phương canh, Nam Từ Liêm, Hà Nội </Text>
-                                <Text>SDT: 09371538192</Text>
-                            </View>
-                            <View>
-                                <Text>Đến: </Text>
-                                <Text>Trần Thị Hoa</Text>
-                                <Text>Phường phương canh, Nam Từ Liêm, Hà Nội </Text>
-                                <Text>SDT: 09371538192</Text>
-                            </View>
-                        </View>
-                        <View style={stylesPDF.rightPage}>
-                            <View style={{ flex: 1 }}>
-                                <Text>QR CODE</Text>
-                                <Text>
-                                    <Image src={qrCodeDataUrl} style={{ width: 100, height: 100 }} />
-                                </Text>
-                            </View>
-                        </View>
-                    </View>
-                    <View></View>
-                </Page>
-            </Document>
-        );
-    };
-
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         const billCodeGen = generateRandomBillCode();
         const bill = {
             billCode: billCodeGen,
             price: totalPrice,
-            priceReduce: voucherPrice(),
+            priceReduce: totalPrice - voucherPrice(),
             paymentDetailId: formData.paymentDetailId,
             billType: "Online",
             symbol: "Shipping",
@@ -819,34 +733,9 @@ const Checkout = ({ setRenderHeader }) => {
         render
     ])
 
-    const handleTest = () => {
-        return (
-            <PDFDownloadLink
-                document={generatePDF()}
-                fileName={`myPDF.pdf`}
-            >
-                {({ loading }) => (loading ? 'Generating PDF...' : 'Download PDF')}
-            </PDFDownloadLink>
-        );
-    };
-
-    // return (
-    //     <div>
-    //         {handleTest()} {/* Gọi handleTest để tạo và tải xuống PDF */}
-    //         <button>VIP</button> {/* Nút không cần gọi handleTest */}
-    //     </div>
-    // );
     return (
         <div className={styles.wrapper}>
             <div className={styles.container}>
-                <PDFDownloadLink
-                    key="pdf-download"
-                    document={generatePDF()}
-                    fileName={`deooo.pdf`}
-                >
-                    {({ loading }) => loading ? 'Đang tạo PDF...' : 'Tải xuống PDF'}
-                </PDFDownloadLink >
-                <button onClick={handleTest}>VIP</button>
                 <Row style={{ paddingTop: '50px' }}>
                     <Col span={14}>
                         <h1 style={{ textAlign: 'center', marginBottom: '20px' }}>

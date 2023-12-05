@@ -61,7 +61,6 @@ const BillTimeLine = (addId) => {
                 },
             })
             .then((response) => {
-
                 setTimelines([...timelines, response.data]);
                 setRender(response.data);
             })
@@ -105,7 +104,6 @@ const BillTimeLine = (addId) => {
             });
     };
 
-
     const showModalConfirm = () => {
         setIsModalConfirm(true);
     };
@@ -115,23 +113,22 @@ const BillTimeLine = (addId) => {
     };
 
     const handleOkConFirm = (note) => {
-        console.log(`billInfo`, billInfo);
-        console.log(`timelines`, Number(timlinesDisplay[timlinesDisplay.length - 1].status));
-        handleCreateTimeline(note, action === "cancel" ? "0" : Number(++timlinesDisplay[timlinesDisplay.length - 1].status));
+        handleCreateTimeline(note, action === "cancel" ? "0"
+            : Number(++timlinesDisplay[timlinesDisplay.length - 1].status));
         handleUpdateBillStatus(
             action === "cancel"
                 ? "Cancel"
-                : (billInfo.symbol === "Shipping" &&
-                    timelines[timelines.length - 1].status === "3"
-                    && action !== "cancel")
+                : (billInfo.symbol === "Shipping"
+                    && Number(timelines[timelines.length - 1].status) === 4
+                )
                     ? "Complete"
                     : billInfo.symbol === "Shipping" && billInfo.status === "Paid"
                         ? "Paid" : 'Unpaid',
             action === "cancel" ? 0 : (billInfo.symbol === "Received" &&
-                timelines[timelines.length - 1].status === "2" &&
+                Number(timelines[timelines.length - 1].status) === 2 &&
                 action !== "cancel") ||
                 (billInfo.symbol === "Shipping" &&
-                    timelines[timelines.length - 1].status === "3"
+                    Number(timelines[timelines.length - 1].status) === 4
                     && billInfo.status !== "Paid"
                     && action !== "cancel")
                 ? billInfo.totalPrice + billInfo?.shipPrice - billInfo.priceReduce
@@ -139,7 +136,7 @@ const BillTimeLine = (addId) => {
                     ? billInfo.amountPaid
                     : 0
         );
-        setIsModalConfirm(false);
+        // setIsModalConfirm(false);
     };
     const showModalDetail = () => {
         setIsModalDetail(true);
@@ -201,7 +198,6 @@ const BillTimeLine = (addId) => {
                 },
             })
             .then((response) => {
-                console.log(response)
                 setBillInfo(response.data);
             })
             .catch((error) => {
@@ -231,7 +227,11 @@ const BillTimeLine = (addId) => {
             })
             .then((response) => {
                 setRender(Math.random())
-                console.log(response);
+                notification.success({
+                    message: "Thông báo",
+                    description: "Cập nhật thành công",
+                    duration: 2
+                });
             })
             .catch((err) => {
                 setRender(Math.random())
@@ -240,9 +240,9 @@ const BillTimeLine = (addId) => {
 
     }
 
-    const handleDeleteBillDetail = (record) => {
-        handleCreateTimeline("thích thì xóa", "Delete")
-        axios.delete(`http://localhost:8080/api/admin/bill-detail?billId=${record.billId}&billDetailId=${record.billDetailId}`, {
+    const handleDeleteBillDetail = (pdCode, bdID, note) => {
+        handleCreateTimeline(note + ' | ' + pdCode, "Delete")
+        axios.delete(`http://localhost:8080/api/admin/bill-detail?billId=${billId}&billDetailId=${bdID}`, {
             headers: {
                 Authorization: `Bearer ${getToken(true)}`,
             },
@@ -253,8 +253,11 @@ const BillTimeLine = (addId) => {
             console.log(err)
         }
         )
+        setIsModalConfirm(false)
     }
 
+    let pdID = null;
+    let bdID = null
     const columnProduct = [
         {
             title: "#",
@@ -379,7 +382,7 @@ const BillTimeLine = (addId) => {
                                 danger
                                 href="#1"
                                 key={record.key}
-                                onClick={() => handleDeleteBillDetail(record)}
+                                onClick={() => setIsModalConfirm(true)}
                             ></Button>
                         </Space >
                     </>
@@ -535,7 +538,7 @@ const BillTimeLine = (addId) => {
                         )}
                     {billInfo?.symbol !== "Received" &&
                         timelines[timelines.length - 1]?.status !== "3" &&
-                        timelines[timelines.length - 1]?.status !== 4 &&
+                        timelines[timelines.length - 1]?.status !== '4' &&
                         timelines[timelines.length - 1]?.status !== "0" && (
                             <Button
                                 type="primary"
@@ -552,7 +555,7 @@ const BillTimeLine = (addId) => {
                     <ModalConfirm
                         isModalOpen={isModalConfirm}
                         handleCancel={handleCancelConfirm}
-                        handleOk={handleOkConFirm}
+                        handleOk={(note) => handleOkConFirm(note)}
                     />
 
                     {timelines.length >= 2 && <Button onClick={handleOpen}

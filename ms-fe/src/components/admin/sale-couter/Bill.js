@@ -969,7 +969,7 @@ const Bill = () => {
       fullname: selectedAddress?.fullName,
       phoneNumber: selectedAddress.numberPhone,
       transactionCode: selectedOption === "2" ? transactionCode : null,
-      voucherCode: voucherAdd?.voucherCode,
+      voucherCode: voucherAdd?.voucherCode ?? null,
       createdBy: "user3",
       emailDetails: {
         recipient: selectedAddress.email ? [selectedAddress.email] : [email],

@@ -374,7 +374,7 @@ const ProductDetails = (props) => {
         .then(response => {
           const values = {
             note: `
-              ${productDetailCreate.productDetail.product.productName} - ${productDetailCreate.productDetail.brand.brandName} - ${productDetailCreate.productDetail.button.buttonName} - ${productDetailCreate.productDetail.category.categoryName} - ${productDetailCreate.productDetail.collar.collarTypeName} - ${productDetailCreate.productDetail.form.formName} - ${productDetailCreate.productDetail.material.materialName} - ${productDetailCreate.productDetail.pattern.patternName} - ${productDetailCreate.productDetail.shirtTail.shirtTailTypeName} - ${productDetailCreate.productDetail.sleeve.sleeveName} - ${productDetailCreate.productDetail.color.colorName} - ${productDetailCreate.productDetail.size.sizeName}`,
+              ${productDetailCreate.productDetail.id} `,
             status: "Update",
             createdBy: data?.username + "_" + data?.fullName,
           };
@@ -387,13 +387,17 @@ const ProductDetails = (props) => {
             .then((response) => {
             })
             .catch((error) => {
-
             })
+          notification.success({
+            message: "Thông báo",
+            description: "Cập nhật thành công!",
+            duration: 2
+          });
         })
         .catch(error => {
           const values = {
             note: `
-              ${productDetailCreate.productDetail.product.productName} - ${productDetailCreate.productDetail.brand.brandName} - ${productDetailCreate.productDetail.button.buttonName} - ${productDetailCreate.productDetail.category.categoryName} - ${productDetailCreate.productDetail.collar.collarTypeName} - ${productDetailCreate.productDetail.form.formName} - ${productDetailCreate.productDetail.material.materialName} - ${productDetailCreate.productDetail.pattern.patternName} - ${productDetailCreate.productDetail.shirtTail.shirtTailTypeName} - ${productDetailCreate.productDetail.sleeve.sleeveName} - ${productDetailCreate.productDetail.color.colorName} - ${productDetailCreate.productDetail.size.sizeName}`,
+              ${productDetailCreate.productDetail.id} `,
             status: "Update",
             createdBy: data?.username + "_" + data?.fullName,
           };
@@ -406,7 +410,6 @@ const ProductDetails = (props) => {
             .then((response) => {
             })
             .catch((error) => {
-
             })
           const status = error.response?.status;
           if (status === 403) {

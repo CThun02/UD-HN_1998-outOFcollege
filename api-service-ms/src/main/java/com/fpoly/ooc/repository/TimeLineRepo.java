@@ -29,7 +29,8 @@ public interface TimeLineRepo extends JpaRepository<Timeline, Long> {
     List<TimeLineResponse> getTimeLineByBillId(@Param("billId") Long id);
 
     @Query("SELECT new com.fpoly.ooc.responce.timeline.TimelineProductResponse(" +
-            "   bd.bill.id,  bd.bill.billCode, pd.id, bd.id, pd.product.productName, bd.quantity, bd.price, pd.size.sizeName, pd.color.colorCode," +
+            "   bd.bill.id,  bd.bill.billCode, pd.id, bd.id, pd.product.productCode," +
+            "   pd.product.productName, bd.quantity, bd.price, pd.size.sizeName, pd.color.colorCode," +
             "   pd.button.buttonName, pd.collar.collarTypeName, pd.material.materialName, pd.sleeve.sleeveName, " +
             "   pd.shirtTail.shirtTailTypeName, pd.color.colorName, pd.form.formName, pd.pattern.patternName," +
             "   pd.brand.brandName, pd.category.categoryName, bd.status )" +
@@ -40,7 +41,8 @@ public interface TimeLineRepo extends JpaRepository<Timeline, Long> {
 
 
     @Query("SELECT new com.fpoly.ooc.responce.timeline.TimelineProductResponse(" +
-            "   b.id, b.billCode, pd.id, bd.id, pd.product.productName, bd.quantity, bd.price, pd.size.sizeName, pd.color.colorCode," +
+            "   b.id, b.billCode, pd.id, bd.id, pd.product.productCode, pd.product.productName," +
+            "   bd.quantity, bd.price, pd.size.sizeName, pd.color.colorCode," +
             "   pd.button.buttonName, pd.collar.collarTypeName, pd.material.materialName, pd.sleeve.sleeveName, " +
             "   pd.shirtTail.shirtTailTypeName, pd.color.colorName, pd.form.formName, pd.pattern.patternName," +
             "   pd.brand.brandName, pd.category.categoryName, bd.status)" +
@@ -52,10 +54,10 @@ public interface TimeLineRepo extends JpaRepository<Timeline, Long> {
             "   AND (b.billCode like %:billCode% OR :billCode IS NULL) " +
             "   AND (:status IS NULL OR b.status LIKE :status) " +
             "   AND (:createdBy IS NULL OR b.createdBy LIKE :createdBy AND b.status not like 'Cancel') " +
-            "   GROUP BY pd.id, bd.id, pd.product.productName, bd.quantity, bd.price, pd.size.sizeName, pd.color.colorCode, " +
+            "   GROUP BY pd.id, bd.id, pd.product.productCode, pd.product.productName, bd.quantity, bd.price, pd.size.sizeName, pd.color.colorCode, " +
             "              pd.button.buttonName, pd.collar.collarTypeName, pd.material.materialName, pd.sleeve.sleeveName, " +
             "              pd.shirtTail.shirtTailTypeName, pd.color.colorName, pd.form.formName, pd.pattern.patternName, " +
-            "               pd.brand.brandName, pd.category.categoryName, bd.status, b.billCode, b.symbol, b.status,b.createdAt, b.id " +
+            "              pd.brand.brandName, pd.category.categoryName, bd.status, b.billCode, b.symbol, b.status,b.createdAt, b.id " +
             "HAVING (:symbol IS NULL OR (b.symbol like :symbol and b.status not like 'Cancel' " +
             "  AND (:count IS NULL OR COUNT(tl.id) = :count))) " +
             "ORDER BY b.createdAt DESC ")

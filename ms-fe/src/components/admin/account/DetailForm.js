@@ -25,6 +25,14 @@ import { FormOutlined, CheckCircleTwoTone } from "@ant-design/icons";
 import { useParams } from "react-router-dom";
 import TextArea from "antd/es/input/TextArea";
 import { getToken } from "../../../service/Token";
+import {
+  ref,
+  uploadBytes,
+  getDownloadURL,
+  deleteObject,
+} from "firebase/storage";
+import { saveImage } from "../../../config/FireBase";
+import Password from "antd/es/input/Password";
 const DetailForm = (props) => {
   var roleId = props.roleId;
   const [data, setData] = useState({
@@ -96,10 +104,7 @@ const DetailForm = (props) => {
     }));
   };
   const handleUpload = (file) => {
-    // Xử lý file ảnh tải lên và set state imageUrl
-    // Thực hiện mã xử lý tải lên của bạn ở đây
     setImageFile(file);
-    // Giả sử server trả về URL của ảnh đã tải lên
     const imageUrl = URL.createObjectURL(file);
     handleSetAccount("image", imageUrl);
   };
@@ -270,28 +275,54 @@ const DetailForm = (props) => {
       onOk: async () => {
         setLoadingUdpate(true);
         try {
-          await axios
-            .put(
-              `http://localhost:8080/api/admin/account/update/${data.username}`,
-              data,
-              {
-                headers: {
-                  Authorization: `Bearer ${getToken(true)}`,
-                },
-              }
-            )
+          const currentTimeInMillis = new Date().getTime();
+          const imgRef = ref(
+            saveImage,
+            `accounts/${Number(roleId) === 1 ? "employees" : "customers"}/${
+              currentTimeInMillis + "_" + data.numberPhone
+            }`
+          );
+          if (!data.image) {
+            deleteObject(data.image).catch((err) => {});
+          }
+          uploadBytes(imgRef, imageFile)
             .then(() => {
-              setLoadingUdpate(false);
-              notification.open({
-                message: "Thông báo",
-                description: `Cập nhật ${
-                  Number(roleId) === 1 ? "nhân viên" : "khách hàng"
-                } thành công`,
-                icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
-              });
+              return getDownloadURL(imgRef);
+            })
+            .then((url) => {
+              data.image = url;
+            })
+            .then(() => {
+              axios
+                .put(
+                  `http://localhost:8080/api/admin/account/update/${data.username}`,
+                  data,
+                  {
+                    headers: {
+                      Authorization: `Bearer ${getToken(true)}`,
+                    },
+                  }
+                )
+                .then(() => {
+                  setLoadingUdpate(false);
+                  notification.open({
+                    message: "Thông báo",
+                    description: `Cập nhật ${
+                      Number(roleId) === 1 ? "nhân viên" : "khách hàng"
+                    } thành công`,
+                    icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
+                  });
+                });
             });
         } catch (error) {
-          console.error(error);
+          console.log("Lỗi khi đặt địa chỉ mặc định");
+          const status = error?.response?.data?.status;
+          if (status === 403) {
+            messageApi.error({
+              message: "Lỗi",
+              description: "Bạn không có quyền xem nội dung này",
+            });
+          }
         }
       },
       onCancel: () => {
@@ -338,8 +369,8 @@ const DetailForm = (props) => {
   const handleCreateAddress = () => {
     Modal.confirm({
       title: "Xác nhận cập nhật",
-      content: "Bạn có chắc chắn muốn cập nhật không?",
-      okText: "Cập nhật",
+      content: "Bạn có chắc chắn muốn Thêm mới không?",
+      okText: "Thêm mới",
       cancelText: "Hủy bỏ",
       onOk: async () => {
         setLoadingUdpateADD(true);
@@ -424,6 +455,7 @@ const DetailForm = (props) => {
                 name="avatar"
                 showUploadList={false}
                 beforeUpload={handleUpload}
+                onChange={(e) => console.log(e.file)}
               >
                 <Tooltip placement="left" title={"click to upload avatar"}>
                   <Avatar
@@ -456,7 +488,14 @@ const DetailForm = (props) => {
                   Mã định danh{" "}
                   {roleId === 1 ? <span style={{ color: "red" }}>*</span> : ""}
                 </span>
-                <Input type="text" name="idNo" value={data.idNo} />
+                <Input
+                  onChange={(event) => {
+                    handleSetAddressUpdate("idNo", event.target.value);
+                  }}
+                  type="text"
+                  name="idNo"
+                  value={data.idNo}
+                />
               </div>
             </Col>
             <Col span={24}>
@@ -592,6 +631,7 @@ const DetailForm = (props) => {
                             />
                           </div>
                         </Col>
+
                         <Col span={8}>
                           <div className="m-5">
                             <h6>Email</h6>

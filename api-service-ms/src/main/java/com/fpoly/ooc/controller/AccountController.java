@@ -83,7 +83,7 @@ public class AccountController {
     public ResponseEntity<?> createAddress(@RequestBody Address address, @RequestParam String userName) {
         Address addressCreate = addressService.create(address);
         AddressDetail addressDetailCreate = AddressDetail.builder().accountAddress(Account.builder().username(userName).build())
-                .addressDetail(Address.builder().id(addressCreate.getId()).build()).build();
+                .addressDetail(addressCreate).build();
         return ResponseEntity.ok(addressDetailService.create(addressDetailCreate));
     }
 

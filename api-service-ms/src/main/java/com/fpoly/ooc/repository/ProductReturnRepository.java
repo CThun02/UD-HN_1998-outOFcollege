@@ -28,7 +28,7 @@ public interface ProductReturnRepository extends JpaRepository<ProductReturn, Lo
             ", pr.productDetail.size AS size, pr.productDetail.color AS color, pr.productDetail.shirtTail AS shirtTail" +
             ", pr.price AS price, pr.productDetail.weight as weight, sum(pr.quantity) AS quantity, " +
             "  pr.reason AS descriptionDetail" +
-            " FROM ProductReturn pr join Bill b on pr.bill.id = b.id where b.id=?1 " +
+            " FROM ProductReturn pr join Bill b on pr.bill.id = b.id where b.billCode=?1 " +
             "group by  id, product, brand, category, button, pattern, form, material, collar, sleeve, size, color, shirtTail, price, weight," +
             "descriptionDetail")
     public List<ProductDetailResponse> getProductReturnByBillCode(String billCode);

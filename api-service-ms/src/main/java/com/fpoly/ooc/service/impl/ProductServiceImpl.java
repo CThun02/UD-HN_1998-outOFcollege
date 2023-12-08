@@ -30,7 +30,7 @@ public class ProductServiceImpl implements ProductServiceI {
     @Override
     public Product create(Product product) throws JsonProcessingException {
         while(true){
-            String productCode= "PRO_"+ UniqueRandomHex.generateUniqueRandomHex();
+            String productCode= "PRO_"+ UniqueRandomHex.generateUniqueRandomHex().toUpperCase();
             productCode = productCode.replace("#", "");
             Optional<Product> check = Optional.ofNullable(repo.findFirstByProductCode(productCode));
             if(check.isEmpty()){
@@ -38,7 +38,11 @@ public class ProductServiceImpl implements ProductServiceI {
                 break;
             }
         };
-        return repo.save(product);
+        Product productExist = repo.getProductByProductName(product.getProductName());
+        if(productExist == null){
+            return repo.save(product);
+        }
+        return null;
     }
 
     @Override

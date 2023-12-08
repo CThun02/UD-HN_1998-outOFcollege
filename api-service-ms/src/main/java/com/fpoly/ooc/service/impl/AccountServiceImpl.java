@@ -78,7 +78,6 @@ public class AccountServiceImpl implements AccountService {
                 .fullName(request.getFullName())
                 .email(request.getEmail())
                 .gender(request.getGender())
-                .password(request.getPassword())
                 .idNo(request.getIdNo())
                 .numberPhone(request.getNumberPhone())
                 .dob(request.getDob())
@@ -123,11 +122,9 @@ public class AccountServiceImpl implements AccountService {
         account.setFullName(request.getFullName());
         account.setEmail(request.getEmail());
         account.setGender(request.getGender());
-        account.setPassword(request.getPassword());
         account.setIdNo(request.getIdNo());
         account.setNumberPhone(request.getNumberPhone());
         account.setDob(request.getDob());
-        account.setPassword(passwordEncoder.encode(CharBuffer.wrap(account.getPassword())));
         Account createAccount = accountRepository.save(account);
         return createAccount;
     }
@@ -207,9 +204,8 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public List<AccountDetailResponce> getAllCustomer(String keyword) {
-        List<AddressDetail> accountAddressDetails = addressDetailService.getAllCustomer();
-        List<Account> accounts = accountRepository.getAllAccountByRoleId(Long.valueOf(2), "%"+keyword+"%");
+    public List<AccountDetailResponce> getAllCustomer(Long roleId, String keyword, String status) {
+        List<Account> accounts = accountRepository.getAllAccountByRoleId(roleId, keyword.equals(null)?null:"%"+keyword+"%", status);
         List<AccountDetailResponce> lstAccountDetailResponces = new ArrayList<>();
         for (Account accountGet : accounts) {
             Account account = accountGet;
@@ -223,17 +219,8 @@ public class AccountServiceImpl implements AccountService {
                     .email(account.getEmail())
                     .numberPhone(account.getNumberPhone())
                     .build();
-            for (AddressDetail addressDetail : accountAddressDetails) {
-                List<Address> accountAddressList = accountAddressDetails.stream()
-                        .filter(ad -> ad.getAccountAddress().equals(account))
-                        .map(ad -> ad.getAddressDetail())
-                        .collect(Collectors.toList());
-                accountDetailResponce.setAccountAddress(accountAddressList);
-            }
             lstAccountDetailResponces.add(accountDetailResponce);
-
         }
-
         return lstAccountDetailResponces;
     }
 

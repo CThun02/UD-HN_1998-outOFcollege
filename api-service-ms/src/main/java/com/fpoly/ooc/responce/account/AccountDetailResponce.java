@@ -28,6 +28,4 @@ public class AccountDetailResponce {
     private String email;
     private String numberPhone;
     private List<Address> accountAddress;
-
-
 }

@@ -67,42 +67,42 @@ const ProductDetailsTable = (props) => {
       while (j < allProductDetailsCopy.length) {
         if (
           allProductDetailsCopy[i].brand.id ===
-          allProductDetailsCopy[j].brand.id &&
+            allProductDetailsCopy[j].brand.id &&
           allProductDetailsCopy[i].category.id ===
-          allProductDetailsCopy[j].category.id &&
+            allProductDetailsCopy[j].category.id &&
           allProductDetailsCopy[i].button.id ===
-          allProductDetailsCopy[j].button.id &&
+            allProductDetailsCopy[j].button.id &&
           allProductDetailsCopy[i].material.id ===
-          allProductDetailsCopy[j].material.id &&
+            allProductDetailsCopy[j].material.id &&
           allProductDetailsCopy[i].sleeve.id ===
-          allProductDetailsCopy[j].sleeve.id &&
+            allProductDetailsCopy[j].sleeve.id &&
           allProductDetailsCopy[i].collar.id ===
-          allProductDetailsCopy[j].collar.id &&
+            allProductDetailsCopy[j].collar.id &&
           allProductDetailsCopy[i].shirtTail.id ===
-          allProductDetailsCopy[j].shirtTail.id &&
+            allProductDetailsCopy[j].shirtTail.id &&
           allProductDetailsCopy[i].color.id ===
-          allProductDetailsCopy[j].color.id &&
+            allProductDetailsCopy[j].color.id &&
           allProductDetailsCopy[i].size.id === allProductDetailsCopy[j].size.id
         ) {
           // Nếu các thuộc tính giống nhau, bỏ qua
           j++;
         } else if (
           allProductDetailsCopy[i].brand.id ===
-          allProductDetailsCopy[j].brand.id &&
+            allProductDetailsCopy[j].brand.id &&
           allProductDetailsCopy[i].category.id ===
-          allProductDetailsCopy[j].category.id &&
+            allProductDetailsCopy[j].category.id &&
           allProductDetailsCopy[i].button.id ===
-          allProductDetailsCopy[j].button.id &&
+            allProductDetailsCopy[j].button.id &&
           allProductDetailsCopy[i].material.id ===
-          allProductDetailsCopy[j].material.id &&
+            allProductDetailsCopy[j].material.id &&
           allProductDetailsCopy[i].sleeve.id ===
-          allProductDetailsCopy[j].sleeve.id &&
+            allProductDetailsCopy[j].sleeve.id &&
           allProductDetailsCopy[i].collar.id ===
-          allProductDetailsCopy[j].collar.id &&
+            allProductDetailsCopy[j].collar.id &&
           allProductDetailsCopy[i].shirtTail.id ===
-          allProductDetailsCopy[j].shirtTail.id &&
+            allProductDetailsCopy[j].shirtTail.id &&
           allProductDetailsCopy[i].color.id ===
-          allProductDetailsCopy[j].color.id
+            allProductDetailsCopy[j].color.id
         ) {
           // Nếu các thuộc tính trừ size giống nhau, thêm vào productDetails và loại bỏ khỏi mảng
           productDetails.push(allProductDetailsCopy.splice(j, 1)[0]);
@@ -141,7 +141,7 @@ const ProductDetailsTable = (props) => {
                     Authorization: `Bearer ${getToken(true)}`,
                   },
                 })
-                .then((res) => { })
+                .then((res) => {})
                 .catch((err) => {
                   const status = err.response.status;
                   if (status === 403) {
@@ -236,10 +236,37 @@ const ProductDetailsTable = (props) => {
 
   function createProductDetails() {
     var colorsCreate = props.colorsCreate;
+    var validateNumber = props.productDetails.some(
+      (item) =>
+        item.quantity <= 0 ||
+        item.quantity > 1000 ||
+        item.price < 100000 ||
+        item.price > 5000000 ||
+        item.weight < 200 ||
+        item.weight > 1000 ||
+        item.price === "" ||
+        item.quantity === "" ||
+        item.weight === ""
+    );
     if (imgList.length !== colorsCreate.length) {
       notification.error({
         message: "Thông báo",
         description: "Vui lòng chọn đầy đủ ảnh cho từng mã màu!",
+      });
+    } else if (validateNumber) {
+      notification.error({
+        message: "Thông báo",
+        description: (
+          <span>
+            Vui lòng nhập hợp lệ!
+            <br />
+            Số lượng (1 - 1.000)
+            <br />
+            Trọng lượng (200g - 1000g)
+            <br />
+            Giá (100.000đ - 5.000.000đ)
+          </span>
+        ),
       });
     } else {
       confirm({
@@ -388,15 +415,15 @@ const ProductDetailsTable = (props) => {
                           onChange={(event) => {
                             uploadImage(
                               product.productName.replaceAll(" ", "_") +
-                              productDetails[0].button.id +
-                              productDetails[0].brand.id +
-                              productDetails[0].category.id +
-                              productDetails[0].material.id +
-                              productDetails[0].collar.id +
-                              productDetails[0].sleeve.id +
-                              productDetails[0].shirtTail.id +
-                              productDetails[0].pattern.id +
-                              productDetails[0].form.id,
+                                productDetails[0].button.id +
+                                productDetails[0].brand.id +
+                                productDetails[0].category.id +
+                                productDetails[0].material.id +
+                                productDetails[0].collar.id +
+                                productDetails[0].sleeve.id +
+                                productDetails[0].shirtTail.id +
+                                productDetails[0].pattern.id +
+                                productDetails[0].form.id,
                               productDetails[0].color,
                               event.target.files
                             );
@@ -541,9 +568,9 @@ const ProductDetailsTable = (props) => {
                                             isDeleted
                                               ? {}
                                               : deleteImageDetail(
-                                                productDetails[0].color.name,
-                                                index
-                                              )
+                                                  productDetails[0].color.name,
+                                                  index
+                                                )
                                           }
                                           key="delete"
                                         />,

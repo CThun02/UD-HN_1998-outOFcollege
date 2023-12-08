@@ -1,6 +1,7 @@
 package com.fpoly.ooc.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fpoly.ooc.entity.Brand;
 import com.fpoly.ooc.entity.ShirtTailType;
 import com.fpoly.ooc.request.shirttailtype.ShirtTailTypeRequest;
 import com.fpoly.ooc.service.interfaces.ShirtTailTypeServiceI;
@@ -23,7 +24,8 @@ public class ShirtTailTypeController {
     }
 
     @PostMapping("create")
-    public ResponseEntity<?> create(@RequestBody ShirtTailType shirtTailType) throws JsonProcessingException {
+    public ResponseEntity<?> create(@RequestParam String name) throws JsonProcessingException {
+        ShirtTailType shirtTailType = ShirtTailType.builder().shirtTailTypeName(name).build();
         return ResponseEntity.ok(service.create(shirtTailType));
     }
 

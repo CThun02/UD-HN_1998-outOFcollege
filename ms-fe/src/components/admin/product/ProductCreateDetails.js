@@ -146,16 +146,23 @@ const ProductCreateDetails = () => {
             })
             .then((res) => {
               setLoadingProduct(false);
-              handleSetProduct("description", " ");
-              setmodalProductCreate(false);
-              setProduct(res.data);
-              setRender(Math.random());
-              handleSetProductDetail("productId", res.data.id);
-              notification.open({
-                message: "Thông báo",
-                description: "Thêm mới sản phẩm thành công",
-                icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
-              });
+              if (res.data) {
+                notification.open({
+                  message: "Thông báo",
+                  description: "Thêm mới sản phẩm thành công",
+                  icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
+                });
+                handleSetProduct("description", " ");
+                setmodalProductCreate(false);
+                handleSetProduct("id", res.data.id);
+                setRender(Math.random());
+                handleSetProductDetail("productId", res.data.id);
+              } else {
+                notification.warning({
+                  message: "Thông báo",
+                  description: "Sản phẩm đã tồn tại",
+                });
+              }
             })
             .catch((err) => {
               const status = err.response.status;
@@ -204,26 +211,26 @@ const ProductCreateDetails = () => {
       axios
         .get(
           api +
-          "product/filterProductDetailByIdCom?productId=" +
-          productDetailRequest.productId +
-          "&buttonId=" +
-          productDetailRequest.buttonId +
-          "&materialId=" +
-          productDetailRequest.materialId +
-          "&shirtTailId=" +
-          productDetailRequest.shirtTailId +
-          "&sleeveId=" +
-          productDetailRequest.sleeveId +
-          "&collarId=" +
-          productDetailRequest.collarId +
-          "&brandId=" +
-          productDetailRequest.brandId +
-          "&categoryId=" +
-          productDetailRequest.categoryId +
-          "&patternId=" +
-          productDetailRequest.patternId +
-          "&formId=" +
-          productDetailRequest.formId,
+            "product/filterProductDetailByIdCom?productId=" +
+            productDetailRequest.productId +
+            "&buttonId=" +
+            productDetailRequest.buttonId +
+            "&materialId=" +
+            productDetailRequest.materialId +
+            "&shirtTailId=" +
+            productDetailRequest.shirtTailId +
+            "&sleeveId=" +
+            productDetailRequest.sleeveId +
+            "&collarId=" +
+            productDetailRequest.collarId +
+            "&brandId=" +
+            productDetailRequest.brandId +
+            "&categoryId=" +
+            productDetailRequest.categoryId +
+            "&patternId=" +
+            productDetailRequest.patternId +
+            "&formId=" +
+            productDetailRequest.formId,
           {
             headers: {
               Authorization: `Bearer ${getToken(true)}`,
@@ -372,7 +379,7 @@ const ProductCreateDetails = () => {
     if (patternCreate.trim() !== "") {
       confirm({
         centered: true,
-        title: `Thêm mới sản phẩm ${product.productName}`,
+        title: `Thêm mới họa tiết ${patternCreate}`,
         icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
         content: "Xác nhận thêm mới",
         onOk() {
@@ -385,7 +392,7 @@ const ProductCreateDetails = () => {
             })
             .then((res) => {
               setPatternCreate(" ");
-              if (res.data === "") {
+              if (!res.data) {
                 messageApi.error("Họa tiết đã tồn tại!", 1);
               } else {
                 messageApi.success("Thêm hoạ tiết thành công!", 1);
@@ -403,7 +410,7 @@ const ProductCreateDetails = () => {
               }
             });
         },
-        onCancel() { },
+        onCancel() {},
       });
     } else {
       messageApi.error("Vui lòng nhập hoạt tiết!", 1);
@@ -411,17 +418,17 @@ const ProductCreateDetails = () => {
   }
 
   function createShirtTail(event) {
-    if (formCreate.trim() !== "") {
+    if (shirtTailCreate.trim() !== "") {
       confirm({
         centered: true,
-        title: `Thêm mới sản phẩm ${product.productName}`,
+        title: `Thêm mới đuôi áo ${shirtTailCreate}`,
         icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
         content: "Xác nhận thêm mới",
         onOk() {
           setisLoading(true);
           axios
             .post(
-              api + "shirt-tail?shirtTailTypeName=" + shirtTailCreate.trim(),
+              api + "shirt-tail/create?name=" + shirtTailCreate.trim(),
               null,
               {
                 headers: {
@@ -449,7 +456,7 @@ const ProductCreateDetails = () => {
               }
             });
         },
-        onCancel() { },
+        onCancel() {},
       });
     } else {
       messageApi.error("Vui lòng nhập dáng áo!", 1);
@@ -460,7 +467,7 @@ const ProductCreateDetails = () => {
     if (brandCreate.trim() !== "") {
       confirm({
         centered: true,
-        title: `Thêm mới sản phẩm ${product.productName}`,
+        title: `Thêm mới thương hiệu ${brandCreate}`,
         icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
         content: "Xác nhận thêm mới",
         onOk() {
@@ -491,7 +498,7 @@ const ProductCreateDetails = () => {
               }
             });
         },
-        onCancel() { },
+        onCancel() {},
       });
     } else {
       messageApi.error("Vui lòng nhập thương hiệu!", 1);
@@ -502,7 +509,7 @@ const ProductCreateDetails = () => {
     if (categoryCreate.trim() !== "") {
       confirm({
         centered: true,
-        title: `Thêm mới sản phẩm ${product.productName}`,
+        title: `Thêm mới loại sản phẩm ${categoryCreate}`,
         icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
         content: "Xác nhận thêm mới",
         onOk() {
@@ -533,7 +540,7 @@ const ProductCreateDetails = () => {
               }
             });
         },
-        onCancel() { },
+        onCancel() {},
       });
     } else {
       messageApi.error("Vui lòng nhập loại sản phẩm!", 1);
@@ -544,7 +551,7 @@ const ProductCreateDetails = () => {
     if (formCreate.trim() !== "") {
       confirm({
         centered: true,
-        title: `Thêm mới sản phẩm ${product.productName}`,
+        title: `Thêm mới dáng áo ${formCreate}`,
         icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
         content: "Xác nhận thêm mới",
         onOk() {
@@ -575,7 +582,7 @@ const ProductCreateDetails = () => {
               }
             });
         },
-        onCancel() { },
+        onCancel() {},
       });
     } else {
       messageApi.error("Vui lòng nhập dáng áo!", 1);
@@ -586,23 +593,27 @@ const ProductCreateDetails = () => {
     if (buttonCreate.trim() !== "") {
       confirm({
         centered: true,
-        title: `Thêm mới sản phẩm ${product.productName}`,
+        title: `Thêm mới nút áo ${buttonCreate}`,
         icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
         content: "Xác nhận thêm mới",
         onOk() {
           setisLoading(true);
           axios
-            .post(api + "form?categoryName=" + formCreate.trim(), null, {
-              headers: {
-                Authorization: `Bearer ${getToken(true)}`,
-              },
-            })
+            .post(
+              api + "button/create?buttonTypeName=" + buttonCreate.trim(),
+              null,
+              {
+                headers: {
+                  Authorization: `Bearer ${getToken(true)}`,
+                },
+              }
+            )
             .then((res) => {
               setRender(Math.random);
               if (res.data === "") {
-                messageApi.error("Dáng áo đã tồn tại!", 1);
+                messageApi.error("Nút áo đã tồn tại!", 1);
               } else {
-                messageApi.success("Thêm dáng áo thành công!", 1);
+                messageApi.success("Thêm nút áo thành công!", 1);
               }
               setFormCreate(" ");
               setisLoading(false);
@@ -617,7 +628,7 @@ const ProductCreateDetails = () => {
               }
             });
         },
-        onCancel() { },
+        onCancel() {},
       });
     } else {
       messageApi.error("Vui lòng nhập nút áo!", 1);
@@ -628,7 +639,7 @@ const ProductCreateDetails = () => {
     if (materialCreate.trim() !== "") {
       confirm({
         centered: true,
-        title: `Thêm mới sản phẩm ${product.productName}`,
+        title: `Thêm mới chất liệu ${materialCreate}`,
         icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
         content: "Xác nhận thêm mới",
         onOk() {
@@ -665,7 +676,7 @@ const ProductCreateDetails = () => {
               }
             });
         },
-        onCancel() { },
+        onCancel() {},
       });
     } else {
       messageApi.error("Vui lòng nhập chất liệu!", 1);
@@ -676,7 +687,7 @@ const ProductCreateDetails = () => {
     if (collarCreate.trim() !== "") {
       confirm({
         centered: true,
-        title: `Thêm mới sản phẩm ${product.productName}`,
+        title: `Thêm mới cổ áo ${collarCreate}`,
         icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
         content: "Xác nhận thêm mới",
         onOk() {
@@ -713,7 +724,7 @@ const ProductCreateDetails = () => {
               }
             });
         },
-        onCancel() { },
+        onCancel() {},
       });
     } else {
       messageApi.error("Vui lòng nhập cổ áo!", 1);
@@ -724,7 +735,7 @@ const ProductCreateDetails = () => {
     if (sleeveCreate.trim() !== "") {
       confirm({
         centered: true,
-        title: `Thêm mới sản phẩm ${product.productName}`,
+        title: `Thêm mới tay áo ${sleeveCreate}`,
         icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
         content: "Xác nhận thêm mới",
         onOk() {
@@ -759,7 +770,7 @@ const ProductCreateDetails = () => {
               }
             });
         },
-        onCancel() { },
+        onCancel() {},
       });
     } else {
       messageApi.error("Vui lòng nhập tay áo!", 1);
@@ -770,7 +781,7 @@ const ProductCreateDetails = () => {
     if (sizeCreate.trim() !== "") {
       confirm({
         centered: true,
-        title: `Thêm mới sản phẩm ${product.productName}`,
+        title: `Thêm mới kích cỡ ${sizeCreate}`,
         icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
         content: "Xác nhận thêm mới",
         onOk() {
@@ -805,7 +816,7 @@ const ProductCreateDetails = () => {
               }
             });
         },
-        onCancel() { },
+        onCancel() {},
       });
     } else {
       messageApi.error("Vui lòng nhập kích cỡ!", 1);
@@ -819,7 +830,7 @@ const ProductCreateDetails = () => {
     ) {
       confirm({
         centered: true,
-        title: `Thêm mới sản phẩm ${product.productName}`,
+        title: `Thêm mới màu sắc ${colorCreate.colorName}`,
         icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
         content: "Xác nhận thêm mới",
         onOk() {
@@ -850,7 +861,7 @@ const ProductCreateDetails = () => {
               }
             });
         },
-        onCancel() { },
+        onCancel() {},
       });
     } else {
       messageApi.error("Vui lòng nhập màu sắc!", 1);
@@ -1220,6 +1231,7 @@ const ProductCreateDetails = () => {
                                 "productName",
                                 input === "" ? product.productName : input
                               );
+                              console.log(input, option);
                               return (option?.label ?? "").includes(input);
                             }}
                             size="large"
@@ -1229,6 +1241,11 @@ const ProductCreateDetails = () => {
                                 .localeCompare(
                                   (optionB?.label ?? "").toLowerCase()
                                 )
+                            }
+                            filterOption={(input, option) =>
+                              (option?.label ?? "")
+                                .toLowerCase()
+                                .includes(input.toLowerCase())
                             }
                             onChange={(index) => {
                               setProduct(
@@ -1315,6 +1332,16 @@ const ProductCreateDetails = () => {
                               <Select
                                 showSearch
                                 style={{ width: "100%" }}
+                                notFoundContent={
+                                  <div
+                                    style={{ textAlign: "center" }}
+                                    onClick={() => {
+                                      createBrand();
+                                    }}
+                                  >
+                                    <PlusOutlined />
+                                  </div>
+                                }
                                 onChange={(event, record) => {
                                   handleSetProductDetailCom("brand", record);
                                 }}
@@ -1325,22 +1352,17 @@ const ProductCreateDetails = () => {
                                   );
                                   return (option?.label ?? "").includes(input);
                                 }}
+                                filterOption={(input, option) =>
+                                  (option?.label ?? "")
+                                    .toLowerCase()
+                                    .includes(input.toLowerCase())
+                                }
                                 filterSort={(optionA, optionB) =>
                                   (optionA?.label ?? "")
                                     .toLowerCase()
                                     .localeCompare(
                                       (optionB?.label ?? "").toLowerCase()
                                     )
-                                }
-                                notFoundContent={
-                                  <div
-                                    style={{ textAlign: "center" }}
-                                    onClick={() => {
-                                      createBrand();
-                                    }}
-                                  >
-                                    <PlusOutlined />
-                                  </div>
                                 }
                               >
                                 {brands &&
@@ -1380,6 +1402,11 @@ const ProductCreateDetails = () => {
                                     .localeCompare(
                                       (optionB?.label ?? "").toLowerCase()
                                     )
+                                }
+                                filterOption={(input, option) =>
+                                  (option?.label ?? "")
+                                    .toLowerCase()
+                                    .includes(input.toLowerCase())
                                 }
                                 notFoundContent={
                                   <div
@@ -1424,6 +1451,11 @@ const ProductCreateDetails = () => {
                                   );
                                   return (option?.label ?? "").includes(input);
                                 }}
+                                filterOption={(input, option) =>
+                                  (option?.label ?? "")
+                                    .toLowerCase()
+                                    .includes(input.toLowerCase())
+                                }
                                 filterSort={(optionA, optionB) =>
                                   (optionA?.label ?? "")
                                     .toLowerCase()
@@ -1474,6 +1506,11 @@ const ProductCreateDetails = () => {
                                   );
                                   return (option?.label ?? "").includes(input);
                                 }}
+                                filterOption={(input, option) =>
+                                  (option?.label ?? "")
+                                    .toLowerCase()
+                                    .includes(input.toLowerCase())
+                                }
                                 filterSort={(optionA, optionB) =>
                                   (optionA?.label ?? "")
                                     .toLowerCase()
@@ -1531,6 +1568,11 @@ const ProductCreateDetails = () => {
                                       (optionB?.label ?? "").toLowerCase()
                                     )
                                 }
+                                filterOption={(input, option) =>
+                                  (option?.label ?? "")
+                                    .toLowerCase()
+                                    .includes(input.toLowerCase())
+                                }
                                 notFoundContent={
                                   <div
                                     style={{ textAlign: "center" }}
@@ -1568,6 +1610,11 @@ const ProductCreateDetails = () => {
                                 onChange={(event, record) => {
                                   handleSetProductDetailCom("sleeve", record);
                                 }}
+                                filterOption={(input, option) =>
+                                  (option?.label ?? "")
+                                    .toLowerCase()
+                                    .includes(input.toLowerCase())
+                                }
                                 onSearch={(input, option) => {
                                   setSleeveCreate(
                                     input === "" ? sleeveCreate : input
@@ -1621,6 +1668,11 @@ const ProductCreateDetails = () => {
                                     record
                                   );
                                 }}
+                                filterOption={(input, option) =>
+                                  (option?.label ?? "")
+                                    .toLowerCase()
+                                    .includes(input.toLowerCase())
+                                }
                                 onSearch={(input, option) => {
                                   setshirtTailCreate(
                                     input === "" ? shirtTailCreate : input
@@ -1670,6 +1722,11 @@ const ProductCreateDetails = () => {
                                 onChange={(event, record) => {
                                   handleSetProductDetailCom("pattern", record);
                                 }}
+                                filterOption={(input, option) =>
+                                  (option?.label ?? "")
+                                    .toLowerCase()
+                                    .includes(input.toLowerCase())
+                                }
                                 placeholder="Pattern"
                                 className={styles.product__createDetailsSelect}
                                 onSearch={(input, option) => {
@@ -1721,6 +1778,11 @@ const ProductCreateDetails = () => {
                                 onChange={(event, record) => {
                                   handleSetProductDetailCom("form", record);
                                 }}
+                                filterOption={(input, option) =>
+                                  (option?.label ?? "")
+                                    .toLowerCase()
+                                    .includes(input.toLowerCase())
+                                }
                                 placeholder="form"
                                 onSearch={(input, option) => {
                                   setFormCreate(
@@ -1842,6 +1904,11 @@ const ProductCreateDetails = () => {
                                 onChange={(event, record) => {
                                   setSizesCreate(record);
                                 }}
+                                filterOption={(input, option) =>
+                                  (option?.label ?? "")
+                                    .toLowerCase()
+                                    .includes(input.toLowerCase())
+                                }
                                 onSearch={(input, option) => {
                                   setSizeCreate(
                                     input === "" ? sizeCreate : input
@@ -1894,10 +1961,15 @@ const ProductCreateDetails = () => {
                                 onChange={(event, record) => {
                                   setColorsCreate(record);
                                 }}
+                                filterOption={(input, option) =>
+                                  (option?.label ?? "")
+                                    .toLowerCase()
+                                    .includes(input.toLowerCase())
+                                }
                                 onSearch={(input, option) => {
                                   handleSetColorCreate(
                                     "colorName",
-                                    input === "" ? materialCreate : input
+                                    input === "" ? colorCreate.colorName : input
                                   );
                                   return (option?.label ?? "").includes(input);
                                 }}
@@ -1951,8 +2023,8 @@ const ProductCreateDetails = () => {
           </Row>
         </div>
         {product.productId !== null &&
-          colorsCreate.length > 0 &&
-          productDetailsCreate.length > 0 ? (
+        colorsCreate.length > 0 &&
+        productDetailsCreate.length > 0 ? (
           <ProductDetailsTable
             setLoading={setisLoading}
             product={product}

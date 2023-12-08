@@ -23,7 +23,8 @@ public class ButtonTypeController {
     }
 
     @PostMapping("create")
-    public ResponseEntity<?> create(@RequestBody ButtonType buttonType) throws JsonProcessingException {
+    public ResponseEntity<?> create(@RequestParam String buttonTypeName) throws JsonProcessingException {
+        ButtonType buttonType = ButtonType.builder().buttonName(buttonTypeName).build();
         return ResponseEntity.ok(service.create(buttonType));
     }
 

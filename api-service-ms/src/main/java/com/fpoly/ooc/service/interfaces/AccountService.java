@@ -36,7 +36,7 @@ public interface AccountService {
 
     Account findByUsername(String username);
 
-    List<AccountDetailResponce> getAllCustomer(String keyword);
+    List<AccountDetailResponce> getAllCustomer(Long roleId, String keyword, String status);
 
     Account findLoginByUsername(String username);
     Account findLoginByEmail(String email);

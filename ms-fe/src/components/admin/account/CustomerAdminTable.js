@@ -78,12 +78,12 @@ function CustomerTable(props) {
             title: "Giới Tính",
             dataIndex: "gender",
             key: "gender",
-            render: (_, record) => (record.gender === true ? "nam" : "nữ"),
+            render: (_, record) => (record.gender === true ? "Nam" : "Nữ"),
           },
           {
             title: "Số điện thoại",
-            dataIndex: "phoneNumber",
-            key: "phoneNumber",
+            dataIndex: "numberPhone",
+            key: "numberPhone",
           },
 
           {

@@ -111,9 +111,9 @@ public class AccountController {
     }
 
     @GetMapping("/getAllCustomer")
-    public ResponseEntity<?> getAllCustomer(@RequestParam() String keyword) {
-        return ResponseEntity.ok(service.getAllCustomer(keyword.equals("All")
-                ? null : keyword));
+    public ResponseEntity<?> getAllCustomer(@RequestParam() Long roleId, @RequestParam() String keyword, @RequestParam() String status) {
+        return ResponseEntity.ok(service.getAllCustomer(roleId, keyword.equals("All")
+                ? null : keyword, status.equals("ALL")? null :status));
     }
 
 }

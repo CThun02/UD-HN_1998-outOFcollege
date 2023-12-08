@@ -996,11 +996,40 @@ const ProductDetails = (props) => {
                           icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
                           content: "Xác nhận chỉnh sửa",
                           onOk() {
-                            updateProductDetail(
-                              productDetailUpdate,
-                              true,
-                              index
-                            );
+                            if (
+                              productDetailUpdate.quantity <= 0 ||
+                              productDetailUpdate.quantity > 1000 ||
+                              productDetailUpdate.price < 100000 ||
+                              productDetailUpdate.price > 5000000 ||
+                              productDetailUpdate.weight < 200 ||
+                              productDetailUpdate.weight > 1000 ||
+                              productDetailUpdate.price === "" ||
+                              productDetailUpdate.quantity === "" ||
+                              productDetailUpdate.weight === ""
+                            ) {
+                              setLoading(false);
+                              notification.error({
+                                message: "Thông báo",
+                                description: (
+                                  <span>
+                                    Vui lòng nhập hợp lệ!
+                                    <br />
+                                    Số lượng (1 - 1.000)
+                                    <br />
+                                    Trọng lượng (200g - 1000g)
+                                    <br />
+                                    Giá (100.000đ - 5.000.000đ)
+                                  </span>
+                                ),
+                              });
+                              return null;
+                            } else {
+                              updateProductDetail(
+                                productDetailUpdate,
+                                true,
+                                index
+                              );
+                            }
                           },
                         });
                       }}
@@ -1030,7 +1059,13 @@ const ProductDetails = (props) => {
                                 <Popconfirm
                                   title="Bạn có chắc muốn xóa ảnh này?"
                                   onConfirm={() =>
-                                    deleteProductImage(productImage)
+                                    record.productImageResponse?.length === 1
+                                      ? notification.warning({
+                                          message: "Thông báo",
+                                          description:
+                                            "Mỗi sản phẩm phải có ít nhất một ảnh!",
+                                        })
+                                      : deleteProductImage(productImage)
                                   }
                                   okText="Xóa"
                                   cancelText="Hủy"
@@ -1699,7 +1734,36 @@ const ProductDetails = (props) => {
         for (let keyUpdates of selectedRowKeys) {
           for (let productDetail of productDetailsUpdate) {
             if (keyUpdates === productDetail.id) {
-              updateProductDetail(productDetail);
+              if (
+                productDetail.quantity <= 0 ||
+                productDetail.quantity > 1000 ||
+                productDetail.price < 100000 ||
+                productDetail.price > 5000000 ||
+                productDetail.weight < 200 ||
+                productDetail.weight > 1000 ||
+                productDetail.price === "" ||
+                productDetail.quantity === "" ||
+                productDetail.weight === ""
+              ) {
+                setLoading(false);
+                notification.error({
+                  message: "Thông báo",
+                  description: (
+                    <span>
+                      Vui lòng nhập hợp lệ!
+                      <br />
+                      Số lượng (1 - 1.000)
+                      <br />
+                      Trọng lượng (200g - 1000g)
+                      <br />
+                      Giá (100.000đ - 5.000.000đ)
+                    </span>
+                  ),
+                });
+                return null;
+              } else {
+                updateProductDetail(productDetail);
+              }
             }
           }
         }

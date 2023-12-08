@@ -204,9 +204,8 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public List<AccountDetailResponce> getAllCustomer(String keyword) {
-        List<AddressDetail> accountAddressDetails = addressDetailService.getAllCustomer();
-        List<Account> accounts = accountRepository.getAllAccountByRoleId(Long.valueOf(2), "%"+keyword+"%");
+    public List<AccountDetailResponce> getAllCustomer(Long roleId, String keyword, String status) {
+        List<Account> accounts = accountRepository.getAllAccountByRoleId(roleId, keyword.equals(null)?null:"%"+keyword+"%", status);
         List<AccountDetailResponce> lstAccountDetailResponces = new ArrayList<>();
         for (Account accountGet : accounts) {
             Account account = accountGet;
@@ -221,9 +220,7 @@ public class AccountServiceImpl implements AccountService {
                     .numberPhone(account.getNumberPhone())
                     .build();
             lstAccountDetailResponces.add(accountDetailResponce);
-
         }
-
         return lstAccountDetailResponces;
     }
 

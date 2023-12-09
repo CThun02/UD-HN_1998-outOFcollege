@@ -57,7 +57,9 @@ const ModalDetail = ({
                         : status === 'Update' ?
                           `Cập nhật sản phẩm`
                           : status === 'Delete' ? `Xóa sản phẩm`
-                            : "Trả hàng thành công";
+                            : status === '2Cancel' ? `Đã xác nhận`
+                              : status === "Rollback" ? "Quay trở lại xác nhận"
+                                : "Trả hàng thành công"
         }
       },
     },

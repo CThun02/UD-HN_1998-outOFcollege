@@ -23,6 +23,8 @@ public interface ProductDAORepositoryI extends JpaRepository<Product, Long> {
             "order by o.createdAt desc ")
     public List<ProductTableResponse> getProductFilterByCom(String status, String keywords);
 
+    public Product getProductByProductName(String name);
+
     @Query("Select o.id as id, o.productCode as productCode, o.productName as productName" +
             ", o.status as status, o.description as description from Product o where o.id=?1")
     public ProductResponse getProductResponseById(Long id);

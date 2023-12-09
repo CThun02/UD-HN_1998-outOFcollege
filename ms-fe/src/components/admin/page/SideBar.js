@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import styles from "./SideBar.module.css";
 import logoOOC from "../../../Assets/img/logo/logo_OOC.svg";
 import { Menu } from "antd";
@@ -34,9 +34,11 @@ const SideBar = () => {
   const token = getToken(true);
   const navigate = useNavigate();
   const href = "/api/admin/";
-  if (!token) {
-    navigate("/authen/admin/sign-in");
-  }
+  useEffect(() => {
+    if (!token) {
+      navigate("/authen/admin/sign-in");
+    }
+  }, [token, navigate]);
   const handelClick = (key) => {
     switch (key) {
       case "thongKe":

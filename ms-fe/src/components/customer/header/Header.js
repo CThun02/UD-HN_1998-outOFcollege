@@ -6,6 +6,9 @@ import { useEffect, useState } from "react";
 import HeaderCenter from "./center/HeaderCenter";
 
 function Header({ render, setRenderHeader }) {
+  const [selectedTab, setSelectedTab] = useState("");
+  const href = window.location.href;
+
   const [position, setPosition] = useState(window.pageYOffset);
   const [visible, setVisible] = useState(true);
   const [checkTop, setCheckTop] = useState(0);
@@ -23,22 +26,57 @@ function Header({ render, setRenderHeader }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [render]);
 
+  useEffect(() => {
+    if (href.includes("home") || selectedTab === "") {
+      setSelectedTab("home");
+    }
+
+    if (href.includes("shopping")) {
+      setSelectedTab("shop");
+    }
+
+    if (href.includes("follow-order")) {
+      setSelectedTab("flowOder");
+    }
+
+    if (href.includes("about")) {
+      setSelectedTab("inducere");
+    }
+
+    if (href.includes("contact")) {
+      setSelectedTab("contact");
+    }
+
+    if (href.includes("cart")) {
+      setSelectedTab("cart");
+    }
+  }, []);
+
   return (
     <div
-      className={`${checkTop > 0 ? styles.header : ""} ${visible ? styles.visible : styles.hidden
-        } ${styles.background} `}
+      className={`${checkTop > 0 ? styles.header : ""} ${
+        visible ? styles.visible : styles.hidden
+      } ${styles.background} `}
     >
       <div className={styles.paddingTopAndBottom}>
         <div className={styles.paddingLeftAndRight}>
           <Row className={styles.margin}>
             <Col span={6}>
-              <HeaderLeft />
+              <HeaderLeft setSelectedTab={setSelectedTab} />
             </Col>
             <Col span={12}>
-              <HeaderCenter />
+              <HeaderCenter
+                selectedTab={selectedTab}
+                setSelectedTab={setSelectedTab}
+              />
             </Col>
             <Col span={6}>
-              <HeaderRight render={render} setRenderHeader={setRenderHeader} />
+              <HeaderRight
+                selectedTab={selectedTab}
+                setSelectedTab={setSelectedTab}
+                render={render}
+                setRenderHeader={setRenderHeader}
+              />
             </Col>
           </Row>
         </div>

@@ -227,11 +227,15 @@ const BillReturn = () => {
   ];
 
   async function confirmReload(status) {
+    console.log(productsReturns);
     const data = await token;
     var productReturnString = "";
     for (let index = 0; index < productsReturns.length; index++) {
       productReturnString +=
-        " | Hoàn trả sản phẩm: " + productsReturns[index].productCode;
+        " | Hoàn trả sản phẩm: " +
+        productsReturns[index]?.productCode +
+        "Id sản phẩm: " +
+        productsReturns[index]?.productImageResponses[0]?.productDetailId;
     }
     for (let index = Number(status); index <= Number(status) + 1; index++) {
       await axios
@@ -399,21 +403,13 @@ const BillReturn = () => {
         }
       });
   }
-  function getProductReturns() {
-    axios
-      .get(
-        "http://localhost:8080/api/admin/product-return/getProductReturnByBillCode?billCode=" +
-          billCode
-      )
-      .then();
-  }
 
   useEffect(() => {
     if (billCode) {
       searchBill();
       axios
         .get(
-          `http://localhost:8080/api/admin/bill/getBillReturnByBillCode?billCode=` +
+          "http://localhost:8080/api/admin/product-return/getProductReturnByBillCode?billCode=" +
             billCode,
           {
             headers: {
@@ -421,60 +417,102 @@ const BillReturn = () => {
             },
           }
         )
-        .then((response) => {
-          setBillInfor(response.data);
-          for (
-            let index = 0;
-            index < response.data.billDetails.length;
-            index++
-          ) {
-            if (
-              response.data.billDetails[index].billDetailStatus === "ReturnW"
-            ) {
-              setReturned("request");
-            }
-            if (
-              response.data.billDetails[index].billDetailStatus === "ReturnS"
-            ) {
-              setReturned("returned");
-            }
-            if (
-              response.data.billDetails[index].billDetailStatus === "ReturnC"
-            ) {
-              setReturned("cancel");
-            }
-          }
-          for (
-            let index = 0;
-            index < response.data.billDetails.length;
-            index++
-          ) {
-            if (
-              response.data.billDetails[index].billDetailStatus === "ReturnW" ||
-              response.data.billDetails[index].billDetailStatus === "ReturnS"
-            ) {
-              if (
-                !productsReturns.some(
-                  (item) =>
-                    item.productDetailId ===
-                    response.data.billDetails[index].productDetailId
-                )
-              ) {
-                productsReturns.push(response.data.billDetails[index]);
+        .then((res) => {
+          axios
+            .get(
+              `http://localhost:8080/api/admin/bill/getBillReturnByBillCode?billCode=` +
+                billCode,
+              {
+                headers: {
+                  Authorization: `Bearer ${getToken(true)}`,
+                },
               }
-            }
-          }
-          let total = 0;
-          for (let index = 0; index < productsReturns.length; index++) {
-            total +=
-              productsReturns[index].productPrice *
-              productsReturns[index].quantity;
-          }
-          seTotalPrice(total);
-          setIsLoad(1);
+            )
+            .then((response) => {
+              for (
+                let index = 0;
+                index < response.data.billDetails.length;
+                index++
+              ) {
+                if (
+                  response.data.billDetails[index].billDetailStatus ===
+                  "ReturnW"
+                ) {
+                  setReturned("request");
+                }
+                if (
+                  response.data.billDetails[index].billDetailStatus ===
+                  "ReturnS"
+                ) {
+                  setReturned("returned");
+                }
+                if (
+                  response.data.billDetails[index].billDetailStatus ===
+                  "ReturnC"
+                ) {
+                  setReturned("cancel");
+                }
+              }
+              for (
+                let index = 0;
+                index < response.data.billDetails.length;
+                index++
+              ) {
+                if (
+                  response.data.billDetails[index].billDetailStatus ===
+                    "ReturnW" ||
+                  response.data.billDetails[index].billDetailStatus ===
+                    "ReturnS"
+                ) {
+                  if (
+                    !productsReturns.some(
+                      (item) =>
+                        item.productDetailId ===
+                        response.data.billDetails[index].productDetailId
+                    )
+                  ) {
+                    productsReturns.push(response.data.billDetails[index]);
+                  }
+                }
+              }
+              let total = 0;
+              for (let index = 0; index < productsReturns.length; index++) {
+                total +=
+                  productsReturns[index].productPrice *
+                  productsReturns[index].quantity;
+              }
+              for (
+                let index = 0;
+                index < response.data.billDetails.length;
+                index++
+              ) {
+                for (let i = 0; i < res.data.length; i++) {
+                  if (
+                    response.data.billDetails[index].productDetailId ===
+                    res.data[i].id
+                  ) {
+                    productsReturns[index].reason =
+                      res.data[i].descriptionDetail;
+                    break;
+                  }
+                }
+              }
+              seTotalPrice(total);
+              setIsLoad(1);
+              setBillInfor(response.data);
+            })
+            .catch((error) => {
+              const status = error?.response?.status;
+              if (status === 403) {
+                notification.error({
+                  message: "Thông báo",
+                  description: "Bạn không có quyền truy cập!",
+                });
+              }
+            });
         })
         .catch((error) => {
-          const status = error.response.status;
+          const status = error?.response?.status;
           if (status === 403) {
             notification.error({
               message: "Thông báo",
@@ -716,6 +754,34 @@ const BillReturn = () => {
       </div>
       <div style={{ marginBottom: "25px" }} className={styles.billReturn}>
         <h3 style={{ marginBottom: "25px" }}>Thông tin đơn hàng</h3>
+        <div style={{ textAlign: "end", marginBottom: "10px" }}>
+          {returned === false && (
+            <Button
+              size="large"
+              type="primary"
+              onClick={() => {
+                Modal.confirm({
+                  centered: true,
+                  title: "Xác nhận trả hàng tất cả",
+                  content: "Chắc chắn trả hàng?",
+                  onOk() {
+                    productsReturns = billInfo?.billDetails.filter(
+                      (item) => !item.checkInPromotion
+                    );
+                    setRender(Math.random());
+                    notification.success({
+                      message: "Thông báo",
+                      description: "Thêm thông tin trả hàng thành công!",
+                    });
+                  },
+                });
+              }}
+            >
+              <ReloadOutlined />
+              Trả hàng tất cả
+            </Button>
+          )}
+        </div>
         <Table
           dataSource={
             billInfo?.billDetails &&
@@ -734,6 +800,7 @@ const BillReturn = () => {
             style={{ height: "100%" }}
           >
             <h3 style={{ marginBottom: "25px" }}>Thông tin trả hàng</h3>
+
             <Row>
               {productsReturns &&
                 productsReturns.map((record, index) => {

@@ -40,4 +40,16 @@ public class CommonUtils {
         return account;
     }
 
+    public static <T> T getOneElementsInArrays(List<T> list) {
+        if(CollectionUtils.isEmpty(list)) {
+            return null;
+        }
+
+        if(list.size() > 1) {
+            log.warn("this is list than 1 size: " + list.size());
+        }
+
+        return list.get(0);
+    }
+
 }

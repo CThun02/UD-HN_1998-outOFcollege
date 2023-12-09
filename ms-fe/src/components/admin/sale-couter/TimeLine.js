@@ -114,7 +114,7 @@ const BillTimeLine = (addId) => {
     };
 
     const handleRollback = (note) => {
-        handleCreateTimeline(noteTimeline, `Confirm`, timelineId);
+        handleCreateTimeline(noteTimeline, `2Cancel`, timelineId);
         setTimeout(() => {
             handleCreateTimeline(note, `Rollback`, null);
         }, 1000);
@@ -381,6 +381,7 @@ const BillTimeLine = (addId) => {
             dataIndex: "quantity",
             key: "quantity",
             render: (text, record, index) => {
+                console.log(Number(timlinesDisplay[timlinesDisplay.length - 1]?.status))
                 return (
                     <InputNumber
                         min={1}
@@ -389,6 +390,7 @@ const BillTimeLine = (addId) => {
                         onChange={(e) =>
                             updateQUantityBillDetail(record, e, index)
                         }
+                        disabled={Number(timlinesDisplay[timlinesDisplay.length - 1]?.status) !== 1}
                     />
                 );
             },
@@ -421,7 +423,7 @@ const BillTimeLine = (addId) => {
                                     setBdId(record.billDetailId)
                                     setIsModalConfirm(true)
                                 }}
-                                disabled={timelinePoduct.length === 1}
+                                disabled={Number(timlinesDisplay[timlinesDisplay.length - 1]?.status) !== 1}
                             ></Button>
                         </Space >
                     </>
@@ -615,7 +617,7 @@ const BillTimeLine = (addId) => {
                         <h2>Thông tin đơn hàng</h2>
                     </Col>
                     {billInfo?.symbol === 'Shipping'
-                        && timelines[timelines.length - 1]?.status === '1'
+                        && Number(timlinesDisplay[timlinesDisplay.length - 1]?.status) === 1
                         && billInfo?.status !== "Paid"
                         && <Col span={3}>
                             <Button type="primary"
@@ -789,7 +791,11 @@ const BillTimeLine = (addId) => {
                         <h2>Sản phẩm đã mua</h2>
                     </Col>
                     {billInfo?.symbol === 'Shipping'
-                        && (timelines[timelines.length - 1]?.status === '1' || timelines[timelines.length - 1]?.status === 'Update' || timelines[timelines.length - 1]?.status === 'Delete')
+                        && (timelines[timelines.length - 1]?.status === '1'
+                            || timelines[timelines.length - 1]?.status === 'Update'
+                            || timelines[timelines.length - 1]?.status === 'Delete'
+                            || timelines[timelines.length - 1]?.status === 'Confirm'
+                            || timelines[timelines.length - 1]?.status === 'Rollback')
                         && billInfo?.status !== "Paid" && <Col span={3}>
                             <Button type="primary" onClick={() => setIsOpenModalProduct(true)}>
                                 Thêm sản phẩm

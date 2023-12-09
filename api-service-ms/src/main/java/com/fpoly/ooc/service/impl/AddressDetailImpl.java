@@ -32,7 +32,7 @@ public class AddressDetailImpl implements AddressDetailService
     public AddressDetail create(AddressDetail addressDetail) {
         List<Address> addressList = addressServiceI.getListAddress(addressDetail.getAccountAddress().getUsername());
         if(addressList.size()==0){
-            Address address = addressDetail.getAddressDetail();
+            Address address = addressServiceI.getOne(addressDetail.getAddressDetail().getId());
             address.setDefaultaddress(true);
             addressServiceI.update(address);
         }

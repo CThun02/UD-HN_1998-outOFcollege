@@ -121,3 +121,8 @@
   margin: 0;
   padding: 0;
 }
+
+.fixedPx {
+  width: 270px !important;
+  height: 270px !important;
+}

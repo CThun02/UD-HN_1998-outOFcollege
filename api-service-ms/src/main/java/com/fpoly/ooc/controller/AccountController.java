@@ -83,7 +83,7 @@ public class AccountController {
     public ResponseEntity<?> createAddress(@RequestBody Address address, @RequestParam String userName) {
         Address addressCreate = addressService.create(address);
         AddressDetail addressDetailCreate = AddressDetail.builder().accountAddress(Account.builder().username(userName).build())
-                .addressDetail(Address.builder().id(addressCreate.getId()).build()).build();
+                .addressDetail(addressCreate).build();
         return ResponseEntity.ok(addressDetailService.create(addressDetailCreate));
     }
 
@@ -111,9 +111,9 @@ public class AccountController {
     }
 
     @GetMapping("/getAllCustomer")
-    public ResponseEntity<?> getAllCustomer(@RequestParam() String keyword) {
-        return ResponseEntity.ok(service.getAllCustomer(keyword.equals("All")
-                ? null : keyword));
+    public ResponseEntity<?> getAllCustomer(@RequestParam() Long roleId, @RequestParam() String keyword, @RequestParam() String status) {
+        return ResponseEntity.ok(service.getAllCustomer(roleId, keyword.equals("All")
+                ? null : keyword, status.equals("ALL")? null :status));
     }
 
 }

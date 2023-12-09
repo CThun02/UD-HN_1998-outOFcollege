@@ -13,7 +13,8 @@ import axios from "axios";
 import { getToken } from "../../../service/Token";
 
 const CustomerAddminIndex = function (props) {
-  const [value, setValue] = useState(1);
+  const [value, setValue] = useState("ALL");
+  const [keyword, setKeyword] = useState("");
   const [data, setData] = useState([]);
   const [api, contextHolder] = notification.useNotification();
 
@@ -24,17 +25,18 @@ const CustomerAddminIndex = function (props) {
 
   let roleId = props.roleId;
   const onChange = (e) => {
-    console.log("radio checked", e.target.value);
     setValue(e.target.value);
   };
 
-  function filter(keyword) {
+  function filter() {
     axios
       .get(
-        "http://localhost:8080/api/admin/account/viewAll?roleId=" +
+        "http://localhost:8080/api/admin/account/getAllCustomer?roleId=" +
           roleId +
           "&keyword=" +
-          keyword,
+          keyword +
+          "&status=" +
+          value,
         {
           headers: {
             Authorization: `Bearer ${getToken(true)}`,
@@ -59,8 +61,8 @@ const CustomerAddminIndex = function (props) {
   }
 
   useEffect(() => {
-    filter("");
-  }, [roleId]);
+    filter();
+  }, [roleId, value, keyword]);
 
   return (
     <>
@@ -76,7 +78,7 @@ const CustomerAddminIndex = function (props) {
             </span>
             {"  "}
             <Radio.Group onChange={onChange} value={value}>
-              <Radio value={1}>Tất cả</Radio>
+              <Radio value={"ALL"}>Tất cả</Radio>
               <Radio value={"ACTIVE"}>Hoạt động</Radio>
               <Radio value={"INACTIVE"}>Ngưng hoạt động</Radio>
             </Radio.Group>
@@ -84,10 +86,10 @@ const CustomerAddminIndex = function (props) {
           <Col span={12} style={{ marginTop: "20px" }}>
             <Input
               className={styles.filter_inputSearch}
-              placeholder="Nhập mã tên để tìm kiếm"
+              placeholder="Nhập tên, số điện thoại, email để tìm kiếm"
               prefix={<SearchOutlined />}
               onChange={(event) => {
-                filter(event.target.value);
+                setKeyword(event.target.value);
               }}
             />
           </Col>

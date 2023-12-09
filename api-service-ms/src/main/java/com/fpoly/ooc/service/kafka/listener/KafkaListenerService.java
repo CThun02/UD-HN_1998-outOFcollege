@@ -45,6 +45,7 @@ import com.fpoly.ooc.service.interfaces.ColorServiceI;
 import com.fpoly.ooc.service.interfaces.ProductDetailServiceI;
 import com.fpoly.ooc.service.interfaces.ProductImageServiceI;
 import com.fpoly.ooc.service.interfaces.SizeServiceI;
+import com.fpoly.ooc.util.CommonUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -351,11 +352,12 @@ public class KafkaListenerService {
         request.setSleeveId(productDetailDb.getSleeve().getId());
         request.setShirtTailId(productDetailDb.getShirtTail().getId());
 
-        GetColorAndSizeAndQuantity res = productDetailDAORepositoryI.findColorAndSize(request.getProductId(), request.getBrandId(), request.getCategoryId(),
+        List<GetColorAndSizeAndQuantity> colorAndSizeListByReq = productDetailDAORepositoryI.findColorAndSize(request.getProductId(), request.getBrandId(), request.getCategoryId(),
                 request.getPatternId(), request.getFormId(), request.getButtonId(), request.getMaterialId(), request.getCollarId(), request.getSleeveId(),
                 request.getShirtTailId(), request.getColorId(), request.getSizeId());
 
-        if(res == null) {
+        GetColorAndSizeAndQuantity res = CommonUtils.getOneElementsInArrays(colorAndSizeListByReq);
+        if(Objects.isNull(res)) {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND));
         }
 

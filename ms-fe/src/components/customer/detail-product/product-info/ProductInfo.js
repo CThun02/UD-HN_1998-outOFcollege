@@ -180,19 +180,18 @@ function ProductInfo({
           >
             {data.productName}
           </h2>
-          {colorsAndSizes?.promotionType && colorsAndSizes?.promotionValue
-            ? data.promotionMethod &&
-            data.promotionValue && (
-              <Tag
-                color="#D80032"
-                style={{ fontSize: "16px", padding: "6px 12px" }}
-              >
-                Giảm{" "}
-                {`${numeral(data.promotionValue).format("0,0")}${data.promotionMethod === "vnd" ? "đ" : "%"
-                  }`}
-              </Tag>
-            )
-            : ""}
+          {colorsAndSizes?.promotionType && colorsAndSizes?.promotionValue ? (
+            <Tag
+              color="#D80032"
+              style={{ fontSize: "16px", padding: "6px 12px" }}
+            >
+              Giảm{" "}
+              {`${numeral(data.promotionValue).format("0,0")}${data.promotionMethod === "vnd" ? "đ" : "%"
+                }`}
+            </Tag>
+          ) : (
+            ""
+          )}
         </Space>
       </div>
       <div className={styles.items}>
@@ -202,19 +201,19 @@ function ProductInfo({
               <span
                 style={{ fontWeight: "600" }}
                 className={`${colorsAndSizes.promotionType && colorsAndSizes.promotionValue
-                    ? styles.moneyInactive
-                    : ""
+                  ? styles.moneyInactive
+                  : ""
                   }`}
               >
                 {`${comparePrice(
                   colorsAndSizes.priceProductMin,
                   colorsAndSizes.priceProductMax
                 )
-                    ? handleChangePrice(colorsAndSizes.priceProductMin) + "đ"
-                    : handleChangePrice(colorsAndSizes.priceProductMin) +
-                    " - " +
-                    handleChangePrice(colorsAndSizes.priceProductMax) +
-                    "đ"
+                  ? handleChangePrice(colorsAndSizes.priceProductMin) + "đ"
+                  : handleChangePrice(colorsAndSizes.priceProductMin) +
+                  " - " +
+                  handleChangePrice(colorsAndSizes.priceProductMax) +
+                  "đ"
                   }`}
               </span>
               {colorsAndSizes?.promotionType &&
@@ -224,29 +223,29 @@ function ProductInfo({
                     colorsAndSizes.priceProductMin,
                     colorsAndSizes.priceProductMax
                   )
-                      ? colorsAndSizes?.promotionType === "vnd"
-                        ? handleChangePrice(
-                          colorsAndSizes.priceProductMin -
-                            colorsAndSizes.promotionValue <=
-                            0
-                            ? 0
-                            : colorsAndSizes.priceProductMin -
-                            colorsAndSizes.promotionValue
-                        ) + "đ"
-                        : handleChangePrice(
-                          colorsAndSizes.priceProductMin -
-                            colorsAndSizes.priceProductMin *
-                            (colorsAndSizes.promotionValue / 100) <=
-                            0
-                            ? 0
-                            : colorsAndSizes.priceProductMin -
-                            colorsAndSizes.priceProductMin *
-                            (colorsAndSizes.promotionValue / 100)
-                        ) + "đ"
-                      : handleChangePrice(colorsAndSizes.priceProductMin) +
-                      " - " +
-                      handleChangePrice(colorsAndSizes.priceProductMax) +
-                      "đ"
+                    ? colorsAndSizes?.promotionType === "vnd"
+                      ? handleChangePrice(
+                        colorsAndSizes.priceProductMin -
+                          colorsAndSizes.promotionValue <=
+                          0
+                          ? 0
+                          : colorsAndSizes.priceProductMin -
+                          colorsAndSizes.promotionValue
+                      ) + "đ"
+                      : handleChangePrice(
+                        colorsAndSizes.priceProductMin -
+                          colorsAndSizes.priceProductMin *
+                          (colorsAndSizes.promotionValue / 100) <=
+                          0
+                          ? 0
+                          : colorsAndSizes.priceProductMin -
+                          colorsAndSizes.priceProductMin *
+                          (colorsAndSizes.promotionValue / 100)
+                      ) + "đ"
+                    : handleChangePrice(colorsAndSizes.priceProductMin) +
+                    " - " +
+                    handleChangePrice(colorsAndSizes.priceProductMax) +
+                    "đ"
                     }`}
                 </span>
               ) : (

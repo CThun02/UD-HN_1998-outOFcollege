@@ -90,74 +90,121 @@ import java.util.List;
 
 @NamedNativeQuery(name = "ProductDetail.getAllProductDetailShop",
         query = """
-            SELECT
-                    pt.id               AS 'ProductId',
-                    br.id               AS 'BrandId',
-                    cy.id               AS 'CategoryId',
-                    patt.id             AS 'PatternId',
-                    f.id                AS 'FormId',
-                    button.id           AS 'ButtonId',
-                    mate.id             AS 'MaterialId',
-                    collar.id           AS 'CollarId',
-                    sleeve.id           AS 'SleeveId',
-                    shirtTail.id        AS 'ShirtTailId',
-                    c.category_name     AS 'CategoryName',
-                    pt.product_name     AS 'ProductName',
-                    br.brand_name       AS 'BrandName',
-                    pn.promotion_method AS 'PromotionMethod',
-                    pn.promotion_value  AS 'PromotionValue',
-                    MIN(pd.price)       AS 'MinPrice',
-                    MAX(pd.price)       AS 'MaxPrice'
+                    SELECT
+                            pt.id               AS 'ProductId',
+                            br.id               AS 'BrandId',
+                            cy.id               AS 'CategoryId',
+                            patt.id             AS 'PatternId',
+                            f.id                AS 'FormId',
+                            button.id           AS 'ButtonId',
+                            mate.id             AS 'MaterialId',
+                            collar.id           AS 'CollarId',
+                            sleeve.id           AS 'SleeveId',
+                            shirtTail.id        AS 'ShirtTailId',
+                            c.category_name     AS 'CategoryName',
+                            pt.product_name     AS 'ProductName',
+                            br.brand_name       AS 'BrandName',
+                            (SELECT TOP 1
+                                 pSub.promotion_method
+                             FROM
+                                 promotion_product_detail ppdSub
+                                 INNER JOIN promotion pSub ON ppdSub.promotion_id = pSub.id
+                                 INNER JOIN dbo.product_detail pdSub ON pdSub.id = ppdSub.product_detail_id
+                             WHERE
+                                 ppdSub.product_detail_id IN (
+                                 SELECT pdSecondSub.id
+                                 FROM product_detail pdSecondSub
+                                 WHERE pdSecondSub.product_id = pt.id
+                                 and pdSecondSub.brand_id = br.id
+                                 and pdSecondSub.category_id = cy.id
+                                 and pdSecondSub.pattern_id = patt.id
+                                 and pdSecondSub.form_id = f.id
+                                 and pdSecondSub.button_id = button.id
+                                 and pdSecondSub.material_id = mate.id
+                                 and pdSecondSub.collar_id = collar.id
+                                 and pdSecondSub.sleeve_id = sleeve.id
+                                 and pdSecondSub.shirt_tail_id = shirtTail.id)
+                             ORDER BY
+                                 CASE
+                                     WHEN pSub.promotion_method = 'vnd' THEN pSub.promotion_value
+                                     WHEN pSub.promotion_method = '%' THEN ((pSub.promotion_value / 100) * MAX(pd.price))
+                                 END DESC
+                             ) AS 'PromotionMethod',
+                            (select top 1 pSub.promotion_value
+                                              from promotion_product_detail ppdSub inner join promotion pSub on ppdSub.promotion_id = pSub.id
+                                              inner join dbo.product_detail pdSub on pdSub.id = ppdSub.product_detail_id
+                                              where ppdSub.product_detail_id in (
+                                              SELECT pdSecondSub.id
+                                                 FROM product_detail pdSecondSub
+                                                 WHERE pdSecondSub.product_id = pt.id
+                                                 and pdSecondSub.brand_id = br.id
+                                                 and pdSecondSub.category_id = cy.id
+                                                 and pdSecondSub.pattern_id = patt.id
+                                                 and pdSecondSub.form_id = f.id
+                                                 and pdSecondSub.button_id = button.id
+                                                 and pdSecondSub.material_id = mate.id
+                                                 and pdSecondSub.collar_id = collar.id
+                                                 and pdSecondSub.sleeve_id = sleeve.id
+                                                 and pdSecondSub.shirt_tail_id = shirtTail.id
+                                                 )
+                                              ORDER BY
+                                             CASE
+                                                 WHEN pSub.promotion_method = 'vnd' THEN pSub.promotion_value
+                                                 WHEN pSub.promotion_method = '%' THEN ((pSub.promotion_value / 100) * MAX(pd.price))
+                                             END DESC
+                                             )  AS 'PromotionValue',
+                            MIN(pd.price)       AS 'MinPrice',
+                            MAX(pd.price)       AS 'MaxPrice'
 
-                    FROM product_detail pd
-                    LEFT JOIN product_image pie ON pd.id = pie.product_detail_id
-                    LEFT JOIN category c ON c.id = pd.category_id
-                    LEFT JOIN product pt ON pt.id = pd.product_id
-                    LEFT JOIN brand b ON b.id = pd.brand_id
-                    LEFT JOIN color cor ON cor.id = pd.color_id
-                    LEFT JOIN size se ON se.id = pd.size_id
-                    LEFT JOIN promotion_product_detail pp ON pd.id = pp.product_detail_id
-                    LEFT JOIN promotion pn ON pn.id = pp.promotion_id
-                    LEFT JOIN brand br ON br.id = pd.brand_id
-                    LEFT JOIN category cy ON cy.id = pd.category_id
-                    LEFT JOIN pattern patt ON patt.id = pd.pattern_id
-                    LEFT JOIN form f ON f.id = pd.form_id
-                    LEFT JOIN button_type button ON button.id = pd.button_id
-                    LEFT JOIN material mate ON mate.id = pd.material_id
-                    LEFT JOIN collar_type collar ON collar.id = pd.collar_id
-                    LEFT JOIN sleeve_type sleeve ON sleeve.id = pd.sleeve_id
-                    LEFT JOIN shirt_tail_type shirtTail ON shirtTail.id = pd.shirt_tail_id
+                            FROM product_detail pd
+                            LEFT JOIN product_image pie ON pd.id = pie.product_detail_id
+                            LEFT JOIN category c ON c.id = pd.category_id
+                            LEFT JOIN product pt ON pt.id = pd.product_id
+                            LEFT JOIN brand b ON b.id = pd.brand_id
+                            LEFT JOIN color cor ON cor.id = pd.color_id
+                            LEFT JOIN size se ON se.id = pd.size_id
+                            LEFT JOIN promotion_product_detail pp ON pd.id = pp.product_detail_id
+                            LEFT JOIN promotion pn ON pn.id = pp.promotion_id
+                            LEFT JOIN brand br ON br.id = pd.brand_id
+                            LEFT JOIN category cy ON cy.id = pd.category_id
+                            LEFT JOIN pattern patt ON patt.id = pd.pattern_id
+                            LEFT JOIN form f ON f.id = pd.form_id
+                            LEFT JOIN button_type button ON button.id = pd.button_id
+                            LEFT JOIN material mate ON mate.id = pd.material_id
+                            LEFT JOIN collar_type collar ON collar.id = pd.collar_id
+                            LEFT JOIN sleeve_type sleeve ON sleeve.id = pd.sleeve_id
+                            LEFT JOIN shirt_tail_type shirtTail ON shirtTail.id = pd.shirt_tail_id
 
-                    WHERE
-                        pd.status = 'ACTIVE'
-                        AND (pie.product_detail_id is null or pie.status = 'ACTIVE')
-                        AND (pp.product_detail_id is null or pp.status = 'ACTIVE')
-                        AND pt.status = 'ACTIVE'
-                        AND c.status = 'ACTIVE'
-                        AND br.status = 'ACTIVE'
-                        AND cy.status = 'ACTIVE'
-                        AND patt.status = 'ACTIVE'
-                        AND f.status = 'ACTIVE'
-                        AND button.status = 'ACTIVE'
-                        AND mate.status = 'ACTIVE'
-                        AND collar.status = 'ACTIVE'
-                        AND sleeve.status = 'ACTIVE'
-                        AND shirtTail.status = 'ACTIVE'
-                        AND (pp.promotion_id is null or pn.status = 'ACTIVE')
-                        AND (?1 IS NULL OR lower(pt.product_name) LIKE ?1 OR lower(c.category_name) LIKE ?1 OR lower(br.brand_name) like ?1
-                            OR lower(cy.category_name) LIKE ?1 OR lower(patt.pattern_name) LIKE ?1 OR lower(f.form_name) LIKE ?1
-                            OR lower(mate.material_name) LIKE ?1 OR lower(collar.collar_type_name) LIKE ?1 OR sleeve.seleeve_name LIKE ?1
-                            OR lower(shirtTail.shirt_tail_name) LIKE ?1
-                        )
-                        AND (?2 IS NULL OR pp.money_after >= ?2 OR pd.price >= ?2)
-                        AND (?3 IS NULL OR pp.money_after <= ?3 OR pd.price <= ?3)
-                        AND (?4 = '' OR c.id IN (?8))
-                        AND (?5 = '' OR b.id IN (?9))
-                        AND (?6 = '' OR cor.id IN (?10))
-                        AND (?7 = '' OR se.id IN (?11))
-                    GROUP BY pt.id, br.id, cy.id, patt.id, f.id, button.id, mate.id, collar.id, sleeve.id, shirtTail.id,
-                     c.category_name, pt.product_name, br.brand_name, pn.promotion_method, pn.promotion_value
-        """, resultSetMapping = "Mapping.ProductDetailShop")
+                            WHERE
+                                pd.status = 'ACTIVE'
+                                AND (pie.product_detail_id is null or pie.status = 'ACTIVE')
+                                AND (pp.product_detail_id is null or pp.status = 'ACTIVE')
+                                AND pt.status = 'ACTIVE'
+                                AND c.status = 'ACTIVE'
+                                AND br.status = 'ACTIVE'
+                                AND cy.status = 'ACTIVE'
+                                AND patt.status = 'ACTIVE'
+                                AND f.status = 'ACTIVE'
+                                AND button.status = 'ACTIVE'
+                                AND mate.status = 'ACTIVE'
+                                AND collar.status = 'ACTIVE'
+                                AND sleeve.status = 'ACTIVE'
+                                AND shirtTail.status = 'ACTIVE'
+                                AND (pp.promotion_id is null or pn.status = 'ACTIVE')
+                                AND (?1 IS NULL OR lower(pt.product_name) LIKE ?1 OR lower(c.category_name) LIKE ?1 OR lower(br.brand_name) like ?1
+                                    OR lower(cy.category_name) LIKE ?1 OR lower(patt.pattern_name) LIKE ?1 OR lower(f.form_name) LIKE ?1
+                                    OR lower(mate.material_name) LIKE ?1 OR lower(collar.collar_type_name) LIKE ?1 OR sleeve.seleeve_name LIKE ?1
+                                    OR lower(shirtTail.shirt_tail_name) LIKE ?1
+                                )
+                                AND (?2 IS NULL OR pp.money_after >= ?2 OR pd.price >= ?2)
+                                AND (?3 IS NULL OR pp.money_after <= ?3 OR pd.price <= ?3)
+                                AND (?4 = '' OR c.id IN (?8))
+                                AND (?5 = '' OR b.id IN (?9))
+                                AND (?6 = '' OR cor.id IN (?10))
+                                AND (?7 = '' OR se.id IN (?11))
+                            GROUP BY pt.id, br.id, cy.id, patt.id, f.id, button.id, mate.id, collar.id, sleeve.id, shirtTail.id,
+                             c.category_name, pt.product_name, br.brand_name
+                """, resultSetMapping = "Mapping.ProductDetailShop")
 
 @SqlResultSetMapping(
         name = "Mapping.ProductsDetailsResponse",
@@ -216,7 +263,7 @@ import java.util.List;
 @Table(name = "product_detail")
 @Entity
 @Builder
-public class ProductDetail extends BaseEntity{
+public class ProductDetail extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -235,7 +282,7 @@ public class ProductDetail extends BaseEntity{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "brand_id")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    private  Brand brand;
+    private Brand brand;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pattern_id")

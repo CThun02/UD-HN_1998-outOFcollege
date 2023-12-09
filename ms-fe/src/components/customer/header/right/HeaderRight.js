@@ -9,7 +9,6 @@ import axios from "axios";
 const cartAPI = "http://localhost:8080/api/client/cart";
 
 function HeaderRight(props) {
-
   // const { showSuccessNotification } = useContext(NotificationContext);
   const [user, setUser] = useState("");
   const [usernameEncode, setUsernameEncode] = useState("");
@@ -45,7 +44,7 @@ function HeaderRight(props) {
             for (let i = 0; i < cartIndexLocal?.productDetails.length; i++) {
               totalPrice += Number(
                 cartIndexLocal.productDetails[i].data[0].price *
-                cartIndexLocal.productDetails[i].quantity
+                  cartIndexLocal.productDetails[i].quantity
               );
             }
             setCartIndex(
@@ -77,7 +76,7 @@ function HeaderRight(props) {
                 message: "Success",
                 description: "Đăng xuất thành công!",
               });
-              props.setRenderHeader(Math.random())
+              props.setRenderHeader(Math.random());
             }}
             to={"/ms-shop"}
             className={styles.link}
@@ -121,10 +120,17 @@ function HeaderRight(props) {
           <Badge count={cartIndex.quantity}>
             <Link
               to={"/ms-shop/cart"}
-              onClick={() => handleCreateCartByUsername()}
+              onClick={() => {
+                handleCreateCartByUsername();
+                props.setSelectedTab("cart");
+              }}
               className={styles.link}
             >
-              <ShoppingCartOutlined className={styles.iconSize} />
+              <ShoppingCartOutlined
+                className={`${
+                  props.selectedTab === "cart" ? styles.active : ""
+                } ${styles.iconSize}`}
+              />
             </Link>
           </Badge>
           <Space>

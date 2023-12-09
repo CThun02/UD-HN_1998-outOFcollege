@@ -4,7 +4,6 @@ import numeral from "numeral";
 import { Link } from "react-router-dom";
 import {
   EyeOutlined,
-  PlusCircleOutlined,
   ShoppingCartOutlined,
 } from "@ant-design/icons";
 import { useState } from "react";
@@ -83,7 +82,9 @@ function ProductsList({ data, span }) {
                       ? null
                       : data?.productImages[0]?.path
                   }
-                  className={`${styles.cssHover} ${styles.imageSize} `}
+                  className={`${styles.cssHover} ${styles.imageSize} ${
+                    data?.productImages === null ? styles.fixedPx : ""
+                  }`}
                 />
                 <div
                   className={`${styles.transition} ${

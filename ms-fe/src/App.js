@@ -8,7 +8,6 @@ import { NotificationProvider } from "./components/element/notification/Notifica
 import { getToken } from "./service/Token";
 
 function App() {
-  const tokenAdmin = getToken(true);
   const tokenClient = getToken(false);
 
   return (
@@ -25,12 +24,10 @@ function App() {
                 element={<Authen isAuthenAdmin={false} />}
               />
             )}
-            {tokenAdmin ? null : (
-              <Route
-                path="authen/admin/*"
-                element={<Authen isAuthenAdmin={true} />}
-              />
-            )}
+            <Route
+              path="authen/admin/*"
+              element={<Authen isAuthenAdmin={true} />}
+            />
             <Route
               path="*"
               element={

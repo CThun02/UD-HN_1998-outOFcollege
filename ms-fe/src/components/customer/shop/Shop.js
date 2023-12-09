@@ -93,27 +93,25 @@ function Shop() {
                   setFilter={setFilter}
                   products={products}
                 />
-                <Row>
-                  <List
-                    grid={{ gutter: 16, column: 3 }}
-                    dataSource={products}
-                    renderItem={(item) => (
-                      <List.Item>
-                        <ProductsList data={item} key={item.productDetailId} />
-                      </List.Item>
-                    )}
-                    pagination={{
-                      showSizeChanger: true,
-                      pageSizeOptions: [9, 12, 15, 18],
-                      pageSize: pageSize,
-                      showLessItems: true,
-                      style: { marginRight: "10px" },
-                      onChange: (currentPage, pageSize) => {
-                        handlePageSize(currentPage, pageSize);
-                      },
-                    }}
-                  />
-                </Row>
+                <List
+                  grid={{ gutter: 16, column: 3 }}
+                  dataSource={products}
+                  renderItem={(item) => (
+                    <List.Item>
+                      <ProductsList data={item} key={item.productDetailId} />
+                    </List.Item>
+                  )}
+                  pagination={{
+                    showSizeChanger: true,
+                    pageSizeOptions: [9, 12, 15, 18],
+                    pageSize: pageSize,
+                    showLessItems: true,
+                    style: { marginRight: "10px" },
+                    onChange: (currentPage, pageSize) => {
+                      handlePageSize(currentPage, pageSize);
+                    },
+                  }}
+                />
               </Col>
             </Row>
           </div>

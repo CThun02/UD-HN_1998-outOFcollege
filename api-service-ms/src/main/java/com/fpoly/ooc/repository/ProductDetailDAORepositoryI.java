@@ -238,7 +238,7 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
             "and (:colorId is null or color.id  = :colorId)" +
             "and (:sizeId is null or s.id = :sizeId) " +
             "group by promotion.promotionValue, promotion.promotionMethod ")
-    GetColorAndSizeAndQuantity findColorAndSize(@Param("productId") Long productId,
+    List<GetColorAndSizeAndQuantity> findColorAndSize(@Param("productId") Long productId,
                                                 @Param("brandId") Long brandId,
                                                 @Param("categoryId") Long categoryId,
                                                 @Param("patternId") Long patternId,

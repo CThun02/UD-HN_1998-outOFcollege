@@ -7,6 +7,7 @@ import { useState } from "react";
 import { NotificationContext } from "../../element/notification/NotificationAuthen";
 import { useContext } from "react";
 import { getToken, setAuthHeader } from "../../../service/Token";
+import { useEffect } from "react";
 
 const facebookLogo = "/logo/facebook.png";
 const googleLogo = "/logo/google.png";
@@ -14,6 +15,7 @@ const googleLogo = "/logo/google.png";
 const baseUrl = "http://localhost:8080/api/v1/auth/login";
 
 function SignIn({ isAuthenAdmin }) {
+  const [isLoadingPage, setIsLoadingPage] = useState(true);
   const [form] = Form.useForm();
   const [login, setLogin] = useState({
     login: "",
@@ -54,104 +56,119 @@ function SignIn({ isAuthenAdmin }) {
     }
   }
 
+  useEffect(() => {
+    if (getToken(true)) {
+      setIsLoadingPage(false);
+      navigate("/api/admin");
+    }
+  }, [navigate, isAuthenAdmin]);
+
   return (
     <div className={styles.background}>
-      {contextHolder}
-      <div className={styles.content}>
-        <div className={styles.parrentDiv}>
-          <div className={styles.image}></div>
-          <div className={styles.childDiv}>
-            <Form form={form} onFinish={handleOnSubmit}>
-              <Space direction="vertical" style={{ width: "100%" }}>
-                <h1 className={styles.h1}>Đăng nhập</h1>
-                <Form.Item
-                  name={"username"}
-                  rules={[
-                    {
-                      required: true,
-                      message: "* Tên đăng nhập không được bỏ trống",
-                      whitespace: true,
-                    },
-                  ]}
-                >
-                  <Input
-                    name={"username"}
-                    placeholder="Tên đăng nhập"
-                    size="large"
-                    className={styles.input}
-                    value={login.login}
-                    onChange={(e) =>
-                      setLogin({ ...login, login: e.target.value })
-                    }
-                  />
-                </Form.Item>
-                <Form.Item
-                  name={"password"}
-                  rules={[
-                    {
-                      required: true,
-                      message: "* Tên đăng nhập không được bỏ trống",
-                      whitespace: true,
-                    },
-                  ]}
-                >
-                  <Password
-                    name={"password"}
-                    placeholder="Nhập mật khẩu"
-                    size="large"
-                    className={styles.input}
-                    value={login.password}
-                    onChange={(e) =>
-                      setLogin({ ...login, password: e.target.value })
-                    }
-                  />
-                </Form.Item>
-                <div>
-                  <Button
-                    type="primary"
-                    size="large"
-                    className={styles.button}
-                    htmlType="submit"
-                  >
-                    Xác nhận
-                  </Button>
-                </div>
-                {isAuthenAdmin === false && (
-                  <div className={styles.center}>
-                    <Link to={"/authen/re-password"}>Quên mật khẩu?</Link>
-                    <Link to={"/authen/sign-up"}>Đăng kí tài khoản</Link>
-                  </div>
-                )}
-                <div>
-                  <Divider
-                    style={{ margin: "0", color: "#B0A695", fontWeight: 400 }}
-                  >
-                    Hoặc
-                  </Divider>
-                </div>
-                <div className={styles.flex}>
-                  <Button size="large" className={styles.logoIcon}>
-                    <img
-                      src={facebookLogo}
-                      alt="facebook"
-                      style={{ width: "20px", marginRight: "10px" }}
-                    />
-                    <span>Facebook</span>
-                  </Button>
-                  <Button size="large" className={styles.logoIcon}>
-                    <img
-                      src={googleLogo}
-                      alt="google"
-                      style={{ width: "20px", marginRight: "10px" }}
-                    />
-                    <span>Google</span>
-                  </Button>
-                </div>
-              </Space>
-            </Form>
+      {isLoadingPage && (
+        <>
+          {contextHolder}
+          <div className={styles.content}>
+            <div className={styles.parrentDiv}>
+              <div className={styles.image}></div>
+              <div className={styles.childDiv}>
+                <Form form={form} onFinish={handleOnSubmit}>
+                  <Space direction="vertical" style={{ width: "100%" }}>
+                    <h1 className={styles.h1}>Đăng nhập</h1>
+                    <Form.Item
+                      name={"username"}
+                      rules={[
+                        {
+                          required: true,
+                          message: "* Tên đăng nhập không được bỏ trống",
+                          whitespace: true,
+                        },
+                      ]}
+                    >
+                      <Input
+                        name={"username"}
+                        placeholder="Tên đăng nhập"
+                        size="large"
+                        className={styles.input}
+                        value={login.login}
+                        onChange={(e) =>
+                          setLogin({ ...login, login: e.target.value })
+                        }
+                      />
+                    </Form.Item>
+                    <Form.Item
+                      name={"password"}
+                      rules={[
+                        {
+                          required: true,
+                          message: "* Tên đăng nhập không được bỏ trống",
+                          whitespace: true,
+                        },
+                      ]}
+                    >
+                      <Password
+                        name={"password"}
+                        placeholder="Nhập mật khẩu"
+                        size="large"
+                        className={styles.input}
+                        value={login.password}
+                        onChange={(e) =>
+                          setLogin({ ...login, password: e.target.value })
+                        }
+                      />
+                    </Form.Item>
+                    <div>
+                      <Button
+                        type="primary"
+                        size="large"
+                        className={styles.button}
+                        htmlType="submit"
+                      >
+                        Xác nhận
+                      </Button>
+                    </div>
+                    {isAuthenAdmin === false && (
+                      <div className={styles.center}>
+                        <Link to={"/authen/re-password"}>Quên mật khẩu?</Link>
+                        <Link to={"/authen/sign-up"}>Đăng kí tài khoản</Link>
+                      </div>
+                    )}
+                    <div>
+                      <Divider
+                        style={{
+                          margin: "0",
+                          color: "#B0A695",
+                          fontWeight: 400,
+                        }}
+                      >
+                        Hoặc
+                      </Divider>
+                    </div>
+                    <div className={styles.flex}>
+                      <Button size="large" className={styles.logoIcon}>
+                        <img
+                          src={facebookLogo}
+                          alt="facebook"
+                          style={{ width: "20px", marginRight: "10px" }}
+                        />
+                        <span>Facebook</span>
+                      </Button>
+                      <Button size="large" className={styles.logoIcon}>
+                        <img
+                          src={googleLogo}
+                          alt="google"
+                          style={{ width: "20px", marginRight: "10px" }}
+                        />
+                        <span>Google</span>
+                      </Button>
+                    </div>
+                  </Space>
+                </Form>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        </>
+      )}
     </div>
   );
 }

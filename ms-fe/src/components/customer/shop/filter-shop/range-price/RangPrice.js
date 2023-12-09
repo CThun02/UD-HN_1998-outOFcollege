@@ -2,6 +2,7 @@ import { Col, Input, Row, Slider, Space } from "antd";
 import styles from "./RangPrice.module.css";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import numeral from "numeral";
 
 const baseUrl = "http://localhost:8080/api/client/product/get-price-max";
 
@@ -38,7 +39,6 @@ function RangPrice({ filter, setFilter }) {
           ]}
           onChange={(value) => {
             setFilter({ ...filter, minPrice: value[0], maxPrice: value[1] });
-            console.log("filter: ", filter);
           }}
         />
         <Space style={{ width: "100%" }} direction="vertical">

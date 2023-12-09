@@ -5,35 +5,14 @@ import styles from "./HeaderCenter.module.css";
 import { useState } from "react";
 import { useEffect } from "react";
 
-function HeaderCenter() {
-  const [selectedTab, setSelectedTab] = useState("");
-  const href = window.location.href;
+function HeaderCenter({selectedTab, setSelectedTab}) {
+ 
 
   function handleOnChangeTab(tabName) {
     setSelectedTab(tabName);
   }
 
-  useEffect(() => {
-    if (href.includes("home")) {
-      setSelectedTab("home");
-    }
-
-    if (href.includes("shopping")) {
-      setSelectedTab("shop");
-    }
-
-    if (href.includes("follow-order")) {
-      setSelectedTab("flowOder");
-    }
-
-    if (href.includes("about")) {
-      setSelectedTab("inducere");
-    }
-
-    if (href.includes("contact")) {
-      setSelectedTab("contact");
-    }
-  }, []);
+  
 
   return (
     <div className={`${styles.lineHeight} ${styles.flex}`}>

@@ -22,15 +22,14 @@ import com.fpoly.ooc.responce.productdetail.ProductsDetailsResponse;
 import com.fpoly.ooc.service.interfaces.ColorServiceI;
 import com.fpoly.ooc.service.interfaces.ProductDetailServiceI;
 import com.fpoly.ooc.service.interfaces.ProductImageServiceI;
+import com.fpoly.ooc.service.interfaces.PromotionProductDetailService;
 import com.fpoly.ooc.service.interfaces.SizeServiceI;
 import com.fpoly.ooc.service.kafka.KafkaUtil;
-import com.fpoly.ooc.util.PageUltil;
+import com.fpoly.ooc.util.CommonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -206,15 +205,10 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
                             productDetail.getPatternId(), productDetail.getFormId(), productDetail.getButtonId(), productDetail.getMaterialId(),
                             productDetail.getCollarId(), productDetail.getSleeveId(), productDetail.getShirtTailId());
 
-            if (CollectionUtils.isEmpty(productDetailIdsByComponent)) {
-                log.warn("product detail id is empty");
+            Long productDetailId = CommonUtils.getOneElementsInArrays(productDetailIdsByComponent);
+            if(Objects.nonNull(productDetailId)) {
+                productDetail.setProductDetailId(productDetailIdsByComponent.get(0));
             }
-
-            if (productDetailIdsByComponent.size() > 1) {
-                log.warn("product detail id has size than: " + productDetailIdsByComponent.size());
-            }
-
-            productDetail.setProductDetailId(productDetailIdsByComponent.get(0));
 
             return productDetail;
         }).collect(Collectors.toList());
@@ -231,11 +225,11 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
 
     @Override
     public Optional<GetColorAndSizeAndQuantity> getColorAndSize(GetSizeAndColorRequest req) {
-        GetColorAndSizeAndQuantity res = repo.findColorAndSize(req.getProductId(), req.getBrandId(), req.getCategoryId(),
+        List<GetColorAndSizeAndQuantity> colorAndSizeListByReq = repo.findColorAndSize(req.getProductId(), req.getBrandId(), req.getCategoryId(),
                 req.getPatternId(), req.getFormId(), req.getButtonId(), req.getMaterialId(), req.getCollarId(), req.getSleeveId(),
                 req.getShirtTailId(), req.getColorId(), req.getSizeId());
-
-        if(res == null) {
+        GetColorAndSizeAndQuantity res = CommonUtils.getOneElementsInArrays(colorAndSizeListByReq);
+        if(Objects.isNull(res)) {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND));
         }
 

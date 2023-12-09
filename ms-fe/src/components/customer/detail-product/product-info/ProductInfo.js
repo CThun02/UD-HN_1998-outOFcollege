@@ -183,20 +183,19 @@ function ProductInfo({
           >
             {data.productName}
           </h2>
-          {colorsAndSizes?.promotionType && colorsAndSizes?.promotionValue
-            ? data.promotionMethod &&
-              data.promotionValue && (
-                <Tag
-                  color="#D80032"
-                  style={{ fontSize: "16px", padding: "6px 12px" }}
-                >
-                  Giảm{" "}
-                  {`${numeral(data.promotionValue).format("0,0")}${
-                    data.promotionMethod === "vnd" ? "đ" : "%"
-                  }`}
-                </Tag>
-              )
-            : ""}
+          {colorsAndSizes?.promotionType && colorsAndSizes?.promotionValue ? (
+            <Tag
+              color="#D80032"
+              style={{ fontSize: "16px", padding: "6px 12px" }}
+            >
+              Giảm{" "}
+              {`${numeral(data.promotionValue).format("0,0")}${
+                data.promotionMethod === "vnd" ? "đ" : "%"
+              }`}
+            </Tag>
+          ) : (
+            ""
+          )}
         </Space>
       </div>
       <div className={styles.items}>

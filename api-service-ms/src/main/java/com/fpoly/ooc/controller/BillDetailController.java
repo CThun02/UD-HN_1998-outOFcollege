@@ -28,7 +28,7 @@ public class BillDetailController {
     public ResponseEntity<?> createdBillDetail(@RequestBody BillDetailRequest request) {
         BillDetail billDetail = billDetailService.createBillDetail(request);
         request.setBillDetailId(billDetail.getId());
-        return ResponseEntity.ok(billDetail);
+        return ResponseEntity.ok("ok");
     }
 
     @PutMapping()

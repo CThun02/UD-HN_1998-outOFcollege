@@ -90,7 +90,7 @@ import java.util.List;
 
 @NamedNativeQuery(name = "ProductDetail.getAllProductDetailShop",
         query = """
-            SELECT  pd.id               AS 'ProductDetailId',
+            SELECT
                     pt.id               AS 'ProductId',
                     br.id               AS 'BrandId',
                     cy.id               AS 'CategoryId',
@@ -106,12 +106,11 @@ import java.util.List;
                     br.brand_name       AS 'BrandName',
                     pn.promotion_method AS 'PromotionMethod',
                     pn.promotion_value  AS 'PromotionValue',
-                    pd.price            AS 'Price',
-                    COUNT(bd.id)        AS 'QuantitySelling'
+                    MIN(pd.price)       AS 'MinPrice',
+                    MAX(pd.price)       AS 'MaxPrice'
 
                     FROM product_detail pd
                     LEFT JOIN product_image pie ON pd.id = pie.product_detail_id
-                    LEFT JOIN bill_detail bd ON pd.id = bd.product_detail_id
                     LEFT JOIN category c ON c.id = pd.category_id
                     LEFT JOIN product pt ON pt.id = pd.product_id
                     LEFT JOIN brand b ON b.id = pd.brand_id
@@ -132,7 +131,6 @@ import java.util.List;
                     WHERE
                         pd.status = 'ACTIVE'
                         AND (pie.product_detail_id is null or pie.status = 'ACTIVE')
-                        AND (bd.product_detail_id is null or bd.status = 'ACTIVE')
                         AND (pp.product_detail_id is null or pp.status = 'ACTIVE')
                         AND pt.status = 'ACTIVE'
                         AND c.status = 'ACTIVE'
@@ -143,22 +141,22 @@ import java.util.List;
                         AND button.status = 'ACTIVE'
                         AND mate.status = 'ACTIVE'
                         AND collar.status = 'ACTIVE'
-                        AND collar.status = 'ACTIVE'
                         AND sleeve.status = 'ACTIVE'
                         AND shirtTail.status = 'ACTIVE'
                         AND (pp.promotion_id is null or pn.status = 'ACTIVE')
-                        AND (?1 IS NULL OR lower(pt.product_name) LIKE ?1)
+                        AND (?1 IS NULL OR lower(pt.product_name) LIKE ?1 OR lower(c.category_name) LIKE ?1 OR lower(br.brand_name) like ?1
+                            OR lower(cy.category_name) LIKE ?1 OR lower(patt.pattern_name) LIKE ?1 OR lower(f.form_name) LIKE ?1
+                            OR lower(mate.material_name) LIKE ?1 OR lower(collar.collar_type_name) LIKE ?1 OR sleeve.seleeve_name LIKE ?1
+                            OR lower(shirtTail.shirt_tail_name) LIKE ?1
+                        )
                         AND (?2 IS NULL OR pp.money_after >= ?2 OR pd.price >= ?2)
                         AND (?3 IS NULL OR pp.money_after <= ?3 OR pd.price <= ?3)
                         AND (?4 = '' OR c.id IN (?8))
                         AND (?5 = '' OR b.id IN (?9))
                         AND (?6 = '' OR cor.id IN (?10))
                         AND (?7 = '' OR se.id IN (?11))
-                    GROUP BY pd.id, pt.id, br.id, cy.id, patt.id, f.id, button.id, mate.id, collar.id, sleeve.id, shirtTail.id,
-                     c.category_name, pt.product_name, br.brand_name, pn.promotion_method, pn.promotion_value, pd.price
-                    ORDER BY
-                        CASE WHEN ?12 = 'desc' THEN pd.price END DESC,
-                        CASE WHEN ?12 = 'asc' THEN pd.price END ASC;
+                    GROUP BY pt.id, br.id, cy.id, patt.id, f.id, button.id, mate.id, collar.id, sleeve.id, shirtTail.id,
+                     c.category_name, pt.product_name, br.brand_name, pn.promotion_method, pn.promotion_value
         """, resultSetMapping = "Mapping.ProductDetailShop")
 
 @SqlResultSetMapping(
@@ -189,7 +187,6 @@ import java.util.List;
         classes = @ConstructorResult(
                 targetClass = ProductDetailShop.class,
                 columns = {
-                        @ColumnResult(name = "ProductDetailId", type = Long.class),
                         @ColumnResult(name = "ProductId", type = Long.class),
                         @ColumnResult(name = "BrandId", type = Long.class),
                         @ColumnResult(name = "CategoryId", type = Long.class),
@@ -205,12 +202,11 @@ import java.util.List;
                         @ColumnResult(name = "BrandName", type = String.class),
                         @ColumnResult(name = "PromotionMethod", type = String.class),
                         @ColumnResult(name = "PromotionValue", type = BigDecimal.class),
-                        @ColumnResult(name = "Price", type = BigDecimal.class),
-                        @ColumnResult(name = "QuantitySelling", type = Long.class),
+                        @ColumnResult(name = "MinPrice", type = BigDecimal.class),
+                        @ColumnResult(name = "MaxPrice", type = BigDecimal.class),
                 }
         )
 )
-
 
 @Getter
 @Setter

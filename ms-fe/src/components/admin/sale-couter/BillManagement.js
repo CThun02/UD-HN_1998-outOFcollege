@@ -37,6 +37,7 @@ const BillManagement = () => {
   const [status, setStatus] = useState("");
   const [symbol, setSymbol] = useState("");
   const [createdBy, setcreatedBy] = useState("");
+  const [billType, setBillType] = useState("");
   const [count, setCount] = useState("");
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
@@ -201,22 +202,13 @@ const BillManagement = () => {
       },
     },
   ];
+  const [countBill, setCountBill] = useState({});
 
   const fetchData = () => {
     setLoading(true);
-    const params = {
-      billCode: billCode,
-      startDate: startDate,
-      endDate: endDate,
-      status: status,
-      symbol: symbol,
-      count: count,
-      createdBy: createdBy,
-    };
-    console.log(params);
     axios
       .get(
-        `http://localhost:8080/api/admin/bill?billCode=${billCode}&startDate=${startDate}&endDate=${endDate}&status=${status}&createdBy=${createdBy}&symbol=${symbol}&count=${count}`,
+        `http://localhost:8080/api/admin/bill?billCode=${billCode}&startDate=${startDate}&endDate=${endDate}&status=${status}&createdBy=${createdBy}&symbol=${symbol}&count=${count}&billType=${billType}`,
         {
           headers: {
             Authorization: `Bearer ${getToken(true)}`,
@@ -237,23 +229,18 @@ const BillManagement = () => {
         }
         setLoading(false);
       });
-  };
 
-  const [countBill, setCountBill] = useState({});
-  useEffect(() => {
     axios
-      .get(`http://localhost:8080/api/client/countBill`)
+      .get(`http://localhost:8080/api/client/countBill?billType=${billType}&startDate=${startDate}&endDate=${endDate}`)
       .then((response) => setCountBill(response.data))
       .catch((error) => console.log(error));
-    console.log(countBill);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [billCode, startDate, endDate, status, createdBy, symbol, count]);
+  }, [billCode, startDate, endDate, status, createdBy, symbol, count, billType]);
 
   const onChangeBill = (e) => {
     if (e === "") {
@@ -291,7 +278,6 @@ const BillManagement = () => {
         <h2 style={{ marginBottom: "10px" }}>
           <FilterFilled /> Bộ lọc
         </h2>
-
         <div>
           <span style={{ fontWeight: 500 }}>Ngày tạo</span>
           <RangePicker
@@ -300,42 +286,20 @@ const BillManagement = () => {
             onChange={onRangeChange}
           />
           <span style={{ margin: "0 20px", fontWeight: 500 }}>
-            Trạng thái
+            Loại hóa đơn
             <Select
               bordered={false}
               style={{ width: "12%", borderBottom: "1px solid #ccc" }}
               onChange={(e) => {
-                setStatus(e);
+                setBillType(e)
               }}
               defaultValue={""}
             >
               <Select.Option value={""}>Tất cả</Select.Option>
-              <Select.Option value={"Unpaid"}>Chưa thanh toán</Select.Option>
-              <Select.Option value={"Paid"}>Đã thanh toán</Select.Option>
-              <Select.Option value={"Cancel"}>Đã huỷ</Select.Option>
+              <Select.Option value={"In-Store"}>Tại quầy</Select.Option>
+              <Select.Option value={"Online"}>Online</Select.Option>
             </Select>
           </span>
-          {/* <span style={{ fontWeight: 500 }}>
-            Loại hóa đơn
-            <TreeSelect
-              showSearch
-              style={{
-                width: "16%",
-                borderBottom: "1px solid #ccc",
-              }}
-              bordered={false}
-              value={value}
-              dropdownStyle={{
-                maxHeight: 500,
-                overflow: "auto",
-              }}
-              defaultValue={""}
-              placeholder=""
-              treeDefaultExpandAll
-              onChange={onChange}
-              treeData={treeData}
-            />
-          </span> */}
         </div>
         <div style={{ width: "400px", marginTop: "20px" }}>
           <Input

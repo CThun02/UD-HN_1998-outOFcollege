@@ -385,6 +385,7 @@ const ProductDetails = (props) => {
               },
             })
             .then((response) => {
+
             })
             .catch((error) => {
             })
@@ -395,22 +396,7 @@ const ProductDetails = (props) => {
           });
         })
         .catch(error => {
-          const values = {
-            note: `
-              ${productDetailCreate.productDetail.id} `,
-            status: "Update",
-            createdBy: data?.username + "_" + data?.fullName,
-          };
-          axios
-            .post(`http://localhost:8080/api/admin/timeline/${props.billId}`, values, {
-              headers: {
-                Authorization: `Bearer ${getToken(true)}`,
-              },
-            })
-            .then((response) => {
-            })
-            .catch((error) => {
-            })
+
           const status = error.response?.status;
           if (status === 403) {
             notification.error({

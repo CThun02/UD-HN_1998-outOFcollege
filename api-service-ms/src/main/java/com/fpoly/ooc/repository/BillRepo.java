@@ -30,11 +30,13 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
             "WHERE ad.accountAddress.username = ?1 ")
     List<Address> getListAddressByUsername(String username);
 
-    @Query("SELECT sum(b.price) from Bill b where (b.billType like ?1 or ?1 is null) AND b.status <> 'CANCEL' AND " +
+    Bill findBillByBillCode(String billCode);
+
+    @Query("SELECT sum(b.priceReduce) from Bill b where (b.billType like ?1 or ?1 is null) AND b.status <> 'CANCEL' AND " +
             "(?2 IS NULL OR b.createdAt >= ?2) AND (?3 IS NULL OR b.createdAt <= ?3)")
     Double getRevenueInStoreOnlineCompare(String type, LocalDateTime day, LocalDateTime dayTo);
 
-    @Query("SELECT sum(b.price) FROM Bill b WHERE " +
+    @Query("SELECT sum(b.priceReduce) FROM Bill b WHERE " +
             "((:dayParam IS NULL OR DAY(b.createdAt) >= :dayParam) and (:dayTo is null or DAY(b.createdAt) <= :dayTo)) AND " +
             "((:monthParam IS NULL OR MONTH(b.createdAt) >= :monthParam) and (:monthTo is null or MONTH(b.createdAt) <= :monthTo)) AND " +
             "((:yearParam IS NULL OR YEAR(b.createdAt) >= :yearParam) and (:yearTo is null or YEAR(b.createdAt) <= :yearTo)) " +
@@ -81,6 +83,7 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
             "   AND (b.createdAt >= :startDate OR :startDate IS NULL) " +
             "   AND (b.createdAt <= :endDate OR :endDate IS NULL) " +
             "   AND (:status IS NULL OR b.status LIKE :status) " +
+            "   AND (:billType IS NULL OR b.billType LIKE :billType)" +
             "   AND (:createdBy IS NULL OR b.createdBy LIKE :createdBy AND b.status not like 'Cancel') " +
             "GROUP BY b.id, b.billCode, b.price, b.createdAt, b.billType, b.status, " +
             "    b.symbol, dn.shipPrice, b.priceReduce, dn.name, dn.phoneNumber, b.createdBy, " +
@@ -95,7 +98,9 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
             @Param("status") String status,
             @Param("symbol") String symbol,
             @Param("count") Integer count,
-            @Param("createdBy") String createdBy);
+            @Param("createdBy") String createdBy,
+            @Param("billType") String billType
+    );
 
 
     @Modifying
@@ -104,7 +109,7 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
                    @Param("amountPaid") BigDecimal amountPaid,
                    @Param("id") Long id);
 
-    @Query("SELECT COUNT(b) AS billSell, SUM(b.price) as grossRevenue FROM Bill " +
+    @Query("SELECT COUNT(b) AS billSell, SUM(b.priceReduce) as grossRevenue FROM Bill " +
             "b WHERE (?1 IS NULL OR b.createdAt >= ?1) AND (?2 IS NULL OR b.createdAt <= ?2) and b.status not like 'CANCEL' ")
     BillRevenue getBillRevenue(LocalDateTime dayFrom, LocalDateTime dayTo);
 
@@ -120,9 +125,10 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
 
 
     @Query("Select b.id as id, b.billCode as billCode, a.fullName as customerName, a.username as userName, " +
-            "b.completionDate as completionDate, b.price as price, b.amountPaid as amountPaid," +
+            "b.completionDate as completionDate, b.price as price, b.priceReduce as priceReduce, b.amountPaid as amountPaid," +
             " d.shipPrice as shippingPrice, b.billType as billType, b.symbol as symbol" +
-            ", b.createdAt as createdAt, b.createdBy as createdBy, b.status as status, b.note as note from Bill b " +
+            ", b.createdAt as createdAt, b.createdBy as createdBy, b.status as status, a.numberPhone as numberPhone," +
+            "d.phoneNumber as numberPhoneReceived, b.note as note from Bill b " +
             "left join Account a on b.account.username = a.username " +
             "left join DeliveryNote d on d.bill.id = b.id where  b.billCode = ?1")
     BillResponse getBillByBillCode(String billCode);

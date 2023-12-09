@@ -627,7 +627,7 @@ const DetailForm = (props) => {
                                 <h6>Tỉnh/Thành phố</h6>
                                 <Select
                                   defaultValue={
-                                    item.city.includes("|")
+                                    item.city?.includes("|")
                                       ? item.city.substring(
                                           0,
                                           item.city.indexOf("|")
@@ -677,7 +677,7 @@ const DetailForm = (props) => {
                                 <h6>Quận/huyện</h6>
                                 <Select
                                   defaultValue={
-                                    item.district.includes("|")
+                                    item.district?.includes("|")
                                       ? item.district.substring(
                                           0,
                                           item.district.indexOf("|")
@@ -727,7 +727,7 @@ const DetailForm = (props) => {
                                 <h6>Xã/Phường/Thị trấn</h6>
                                 <Select
                                   defaultValue={
-                                    item.ward.includes("|")
+                                    item.ward?.includes("|")
                                       ? item.ward.substring(
                                           0,
                                           item.ward.indexOf("|")

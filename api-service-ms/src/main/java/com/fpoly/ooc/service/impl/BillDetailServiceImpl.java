@@ -5,6 +5,7 @@ import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.entity.Bill;
 import com.fpoly.ooc.entity.BillDetail;
 import com.fpoly.ooc.entity.ProductDetail;
+import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.BillDetailRepo;
 import com.fpoly.ooc.request.bill.BillDetailRequest;
 import com.fpoly.ooc.responce.bill.BillResponse;
@@ -138,6 +139,14 @@ public class BillDetailServiceImpl implements BillDetailService {
                 .build();
 
         return pdfResponse;
+    }
+
+    @Override
+    public List<BillDetail> findBillDetailByBillCode(String billCode) {
+        if (billCode == null){
+            throw new NotFoundException(Const.CODE_NOT_FOUND);
+        }
+        return billDetailRepo.findBillDetailByBill_BillCode(billCode);
     }
 
 }

@@ -170,10 +170,9 @@ const ProductReturns = ({ date, dateToP, type, reason }) => {
       dateTo.setDate(getLastDayOfMonth(11));
       dateFrom.setMonth(0);
       dateTo.setMonth(11);
-    } else {
-      dateFrom.setHours(dateFrom.getHours() + 7);
-      dateTo.setHours(dateTo.getHours() + 7);
     }
+    dateFrom.setHours(dateFrom.getHours() + 7);
+    dateTo.setHours(dateTo.getHours() + 7);
     if (dateFrom.getTime() > dateTo.getTime()) {
       notification.error({
         message: "Thông báo",
@@ -182,36 +181,33 @@ const ProductReturns = ({ date, dateToP, type, reason }) => {
       });
       setLoading(false);
     } else {
-      return () => {
-
-        axios
-          .get(
-            "http://localhost:8080/api/admin/product-return/getProductReturnByDateAndReason?day=" +
+      axios
+        .get(
+          "http://localhost:8080/api/admin/product-return/getProductReturnByDateAndReason?day=" +
             encodeURIComponent(dateFrom.toISOString()) +
             "&dayTo=" +
             encodeURIComponent(dateTo.toISOString()) +
             "&reason=" +
             reason,
-            {
-              headers: {
-                Authorization: `Bearer ${getToken(true)}`,
-              },
-            }
-          )
-          .then((res) => {
-            setLoading(false);
-            setData(res.data);
-          })
-          .catch((err) => {
-            const status = err.response.status;
-            if (status === 403) {
-              notification.error({
-                message: "Thông báo",
-                description: "Bạn không có quyền truy cập!",
-              });
-            }
-          });
-      }
+          {
+            headers: {
+              Authorization: `Bearer ${getToken(true)}`,
+            },
+          }
+        )
+        .then((res) => {
+          setLoading(false);
+          setData(res.data);
+        })
+        .catch((err) => {
+          const status = err.response.status;
+          if (status === 403) {
+            notification.error({
+              message: "Thông báo",
+              description: "Bạn không có quyền truy cập!",
+            });
+          }
+        });
     }
   }, [pageSize, date, dateToP, type, reason, openModalProductReturns]);
   return (

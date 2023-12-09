@@ -36,6 +36,10 @@ const BillTimeLine = (addId) => {
     const [open, setOpen] = useState(false)
     const [openModalDN, setOpenModalDN] = useState(false)
     const [timlinesDisplay, setTimlneDisplay] = useState([]);
+    const [pdCode, setPdCode] = useState(null);
+    const [bdId, setBdId] = useState(null);
+    const [noteTimeline, setNoteTimeline] = useState(null)
+    const [timelineId, setTimelineId] = useState(null)
 
     const handleOpen = () => {
         console.log(true)
@@ -47,9 +51,10 @@ const BillTimeLine = (addId) => {
     }
 
     // tạo mới timeline
-    const handleCreateTimeline = async (note, stauts) => {
+    const handleCreateTimeline = async (note, stauts, id) => {
         const data = await token;
         const values = {
+            timelineId: id,
             note: note,
             status: stauts,
             createdBy: data?.username + "_" + data?.fullName,
@@ -108,27 +113,36 @@ const BillTimeLine = (addId) => {
         setIsModalConfirm(true);
     };
 
+    const handleRollback = (note) => {
+        handleCreateTimeline(noteTimeline, `Confirm`, timelineId);
+        setTimeout(() => {
+            handleCreateTimeline(note, `Rollback`, null);
+        }, 1000);
+        setIsModalConfirm(false)
+    };
+
+
     const handleCancelConfirm = () => {
         setIsModalConfirm(false);
     };
 
     const handleOkConFirm = (note) => {
         handleCreateTimeline(note, action === "cancel" ? "0"
-            : Number(++timlinesDisplay[timlinesDisplay.length - 1].status));
+            : Number(++timlinesDisplay[timlinesDisplay.length - 1].status), null);
         handleUpdateBillStatus(
             action === "cancel"
                 ? "Cancel"
                 : (billInfo.symbol === "Shipping"
-                    && Number(timelines[timelines.length - 1].status) === 4
+                    && Number(timelines[timelines.length - 1]?.status) === 4
                 )
                     ? "Complete"
                     : billInfo.symbol === "Shipping" && billInfo.status === "Paid"
                         ? "Paid" : 'Unpaid',
-            action === "cancel" ? 0 : (billInfo.symbol === "Received" &&
-                Number(timelines[timelines.length - 1].status) === 2 &&
+            action === "cancel" ? 0 : (billInfo?.symbol === "Received" &&
+                Number(timelines[timelines.length - 1]?.status) === 2 &&
                 action !== "cancel") ||
                 (billInfo.symbol === "Shipping" &&
-                    Number(timelines[timelines.length - 1].status) === 4
+                    Number(timelines[timelines.length - 1]?.status) === 4
                     && billInfo.status !== "Paid"
                     && action !== "cancel")
                 ? billInfo.totalPrice + billInfo?.shipPrice - billInfo.priceReduce
@@ -136,8 +150,9 @@ const BillTimeLine = (addId) => {
                     ? billInfo.amountPaid
                     : 0
         );
-        // setIsModalConfirm(false);
+        setIsModalConfirm(false);
     };
+
     const showModalDetail = () => {
         setIsModalDetail(true);
     };
@@ -147,72 +162,82 @@ const BillTimeLine = (addId) => {
     };
 
     useEffect(() => {
-        axios
-            .get(`http://localhost:8080/api/admin/timeline/${billId}`, {
-                headers: {
-                    Authorization: `Bearer ${getToken(true)}`,
-                },
-            })
-            .then((response) => {
-                var timelinesPush = [];
-                for (let index = 0; index < response.data.length; index++) {
-                    if (!isNaN(response.data[index].status)) {
-                        timelinesPush.push(response.data[index]);
+        const gettimeline = async () => {
+            await axios
+                .get(`http://localhost:8080/api/admin/timeline/${billId}`, {
+                    headers: {
+                        Authorization: `Bearer ${getToken(true)}`,
+                    },
+                })
+                .then((response) => {
+                    var timelinesPush = [];
+                    for (let index = 0; index < response.data.length; index++) {
+                        if (!isNaN(response.data[index].status)) {
+                            timelinesPush.push(response.data[index]);
+                        }
                     }
-                }
-                setTimlneDisplay(timelinesPush);
-                setTimelines(response.data);
-            })
-            .catch((error) => {
-                const status = error.response?.status;
-                if (status === 403) {
-                    notification.error({
-                        message: "Thông báo",
-                        description: "Bạn không có quyền truy cập!",
-                    });
-                }
-            });
-        axios
-            .get(`http://localhost:8080/api/admin/timeline/${billId}/product`, {
-                headers: {
-                    Authorization: `Bearer ${getToken(true)}`,
-                },
-            })
-            .then((response) => {
-                setTimelinesPoduct(response.data);
-            })
-            .catch((error) => {
-                console.log(error);
-                const status = error.response?.status;
-                if (status === 403) {
-                    notification.error({
-                        message: "Thông báo",
-                        description: "Bạn không có quyền truy cập!",
-                    });
-                }
-            });
-        axios
-            .get(`http://localhost:8080/api/admin/timeline/${billId}/info`, {
-                headers: {
-                    Authorization: `Bearer ${getToken(true)}`,
-                },
-            })
-            .then((response) => {
-                setBillInfo(response.data);
-            })
-            .catch((error) => {
-                const status = error.response?.status;
-                if (status === 403) {
-                    notification.error({
-                        message: "Thông báo",
-                        description: "Bạn không có quyền truy cập!",
-                    });
-                }
-            });
+                    setTimlneDisplay(timelinesPush);
+                    setTimelines(response.data);
+                })
+                .catch((error) => {
+                    const status = error.response?.status;
+                    if (status === 403) {
+                        notification.error({
+                            message: "Thông báo",
+                            description: "Bạn không có quyền truy cập!",
+                        });
+                    }
+                });
+        }
+        const getProduct = async () => {
+            axios
+                .get(`http://localhost:8080/api/admin/timeline/${billId}/product`, {
+                    headers: {
+                        Authorization: `Bearer ${getToken(true)}`,
+                    },
+                })
+                .then((response) => {
+                    setTimelinesPoduct(response.data);
+                })
+                .catch((error) => {
+                    console.log(error);
+                    const status = error.response?.status;
+                    if (status === 403) {
+                        notification.error({
+                            message: "Thông báo",
+                            description: "Bạn không có quyền truy cập!",
+                        });
+                    }
+                });
+        }
+        const getInfo = async () => {
+            await axios
+                .get(`http://localhost:8080/api/admin/timeline/${billId}/info`, {
+                    headers: {
+                        Authorization: `Bearer ${getToken(true)}`,
+                    },
+                })
+                .then((response) => {
+                    setBillInfo(response.data);
+                })
+                .catch((error) => {
+                    const status = error.response?.status;
+                    if (status === 403) {
+                        notification.error({
+                            message: "Thông báo",
+                            description: "Bạn không có quyền truy cập!",
+                        });
+                    }
+                });
+        }
+        gettimeline()
+        getProduct()
+        getInfo()
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [billId, render]);
 
-    const updateQUantityBillDetail = (record, value) => {
+    const updateQUantityBillDetail = (record, value, index) => {
+        let quantityOld = timelinePoduct[index].quantity
         axios
             .post(`http://localhost:8080/api/admin/bill-detail/create-bill-detail`, {
                 billId: record.billId,
@@ -232,32 +257,41 @@ const BillTimeLine = (addId) => {
                     description: "Cập nhật thành công",
                     duration: 2
                 });
+                handleCreateTimeline(`Cập nhật sản phẩm: ${record.productCode} |  ${(Number(quantityOld) - Number(value)) > 0 ? (Number(quantityOld) - Number(value)) : (Math.abs(Number(quantityOld) - Number(value)))
+                    } `, "Update", null)
             })
             .catch((err) => {
+                notification.success({
+                    message: "Thông báo",
+                    description: "Cập nhật thành công",
+                    duration: 2
+                });
+                handleCreateTimeline(`Cập nhật sản phẩm: ${record.productCode} | ${quantityOld - value > 0 ? quantityOld - value : Math.abs(quantityOld - value)} `, "Update", null)
                 setRender(Math.random())
                 console.log(err)
             })
-
     }
 
     const handleDeleteBillDetail = (pdCode, bdID, note) => {
-        handleCreateTimeline(note + ' | ' + pdCode, "Delete")
+        setAction('Delete')
+        handleCreateTimeline(note + ' | ' + pdCode, "Delete", null)
         axios.delete(`http://localhost:8080/api/admin/bill-detail?billId=${billId}&billDetailId=${bdID}`, {
             headers: {
                 Authorization: `Bearer ${getToken(true)}`,
             },
         }).then((response) => {
+            notification.success({
+                message: "Thông báo",
+                description: "Xóa thành thành công!",
+                duration: 2
+            });
             setRender(Math.random())
         }).catch((err) => {
-            setRender(Math.random())
             console.log(err)
-        }
-        )
+        })
         setIsModalConfirm(false)
     }
 
-    let pdID = null;
-    let bdID = null
     const columnProduct = [
         {
             title: "#",
@@ -353,7 +387,7 @@ const BillTimeLine = (addId) => {
                         max={record.quantity >= record.productQuantity}
                         value={record.quantity}
                         onChange={(e) =>
-                            updateQUantityBillDetail(record, e)
+                            updateQUantityBillDetail(record, e, index)
                         }
                     />
                 );
@@ -382,7 +416,12 @@ const BillTimeLine = (addId) => {
                                 danger
                                 href="#1"
                                 key={record.key}
-                                onClick={() => setIsModalConfirm(true)}
+                                onClick={() => {
+                                    setPdCode(record.productCode)
+                                    setBdId(record.billDetailId)
+                                    setIsModalConfirm(true)
+                                }}
+                                disabled={timelinePoduct.length === 1}
                             ></Button>
                         </Space >
                     </>
@@ -399,8 +438,9 @@ const BillTimeLine = (addId) => {
                         {billInfo?.symbol !== "Received" ? (
                             <Timeline minEvents={6} placeholder className={styles.timeLine}>
                                 {timlinesDisplay &&
-                                    timlinesDisplay.map((data) => (
+                                    timlinesDisplay.map((data, index) => (
                                         <TimelineEvent
+                                            key={index}
                                             color={data?.status === "0" ? "#FF0000" : "#00cc00"}
                                             icon={
                                                 data?.status === "1"
@@ -412,10 +452,14 @@ const BillTimeLine = (addId) => {
                                                             : data?.status === "3"
                                                                 ? FaTruck
                                                                 : data?.status === "4"
-                                                                    ? FaTruck : data?.status === "5"
+                                                                    ? FaTruck
+                                                                    : data?.status === "5"
                                                                         ? FaTruck
-                                                                        : data.status === 'Update' ? CheckCircleOutlined : data.status === 'Delete' ? DeleteRowOutlined
-                                                                            : null
+                                                                        : data?.status === 'Update' ? CheckCircleOutlined
+                                                                            : data?.status === 'Delete' ? DeleteRowOutlined
+                                                                                : data?.status === 'confirm' ? DeleteRowOutlined
+                                                                                    : data?.status === 'rollback' ? DeleteRowOutlined
+                                                                                        : null
                                             }
                                             title={
                                                 data?.status === "0" ? (
@@ -436,7 +480,8 @@ const BillTimeLine = (addId) => {
                                                     <h3>Trả hàng thành công</h3>
                                                 ) : data?.status === 'Update' ? (<h3>
                                                     Cập nhật sản phẩm
-                                                </h3>) : data?.status === 'Delete' ? (<h3>Xóa sản phẩm</h3>) : (<h3>.</h3>)
+                                                </h3>) : data?.status === 'Delete' ? (<h3>Xóa sản phẩm</h3>) : data?.status === 'Confirm' ? (<h3>Chờ giao hàng</h3>) : data?.status === 'Rollback'
+                                                    ? (<h3>Quay lại xác nhận</h3>) : (<h3>.</h3>)
                                             }
                                             subtitle={data.createdDate}
                                         />
@@ -445,8 +490,9 @@ const BillTimeLine = (addId) => {
                         ) : (
                             <Timeline minEvents={2} placeholder className={styles.timeLine}>
                                 {timlinesDisplay &&
-                                    timlinesDisplay.map((data) => (
+                                    timlinesDisplay.map((data, index) => (
                                         <TimelineEvent
+                                            key={index}
                                             color={
                                                 data?.status === "0"
                                                     ? "#FF0000"
@@ -484,32 +530,6 @@ const BillTimeLine = (addId) => {
                     </div>
                 </div>
                 <div className={styles.btnHeader} style={{ marginTop: 24 }}>
-                    {/* {billInfo?.symbol === "Received" &&
-                        timelines.length !== 2 &&
-                        timelines.length !== 4 && (
-                            <>
-                                <Button
-                                    type="primary"
-                                    onClick={() => {
-                                        setAction("confirm");
-                                        showModalConfirm();
-                                    }}
-                                >
-                                    Xác nhận
-                                </Button>
-                                <Button
-                                    type="primary"
-                                    danger
-                                    style={{ margin: "0 10px" }}
-                                    onClick={() => {
-                                        setAction("cancel");
-                                        showModalConfirm();
-                                    }}
-                                >
-                                    Hủy
-                                </Button>
-                            </>
-                        )} */}
                     {billInfo?.symbol !== "Received" &&
                         timelines[timelines.length - 1]?.status !== '4' &&
                         timelines[timelines.length - 1]?.status !== '5' &&
@@ -524,18 +544,22 @@ const BillTimeLine = (addId) => {
                                 >
                                     Xác nhận
                                 </Button>
-                                <Button
-                                    style={{ marginLeft: '10px' }}
-                                    type="primary"
-                                    onClick={() => {
-                                        setAction("confirm");
-                                        showModalConfirm();
-                                    }}
-                                >
-                                    Quảy trở lại
-                                </Button>
                             </>
                         )}
+                    {billInfo?.billType === 'Online'
+                        && Number(timelines[timelines.length - 1]?.status) === 2
+                        && <Button
+                            style={{ marginLeft: '10px' }}
+                            type="primary"
+                            onClick={() => {
+                                setNoteTimeline(timelines[timelines.length - 1]?.note)
+                                setTimelineId(timelines[timelines.length - 1]?.id)
+                                setAction("rollback");
+                                showModalConfirm();
+                            }}
+                        >
+                            Quay trở lại xác nhận
+                        </Button>}
                     {billInfo?.symbol !== "Received" &&
                         timelines[timelines.length - 1]?.status !== "3" &&
                         timelines[timelines.length - 1]?.status !== '4' &&
@@ -555,15 +579,18 @@ const BillTimeLine = (addId) => {
                     <ModalConfirm
                         isModalOpen={isModalConfirm}
                         handleCancel={handleCancelConfirm}
-                        handleOk={(note) => handleOkConFirm(note)}
+                        handleOk={(note) =>
+                            action === 'Delete' ? handleDeleteBillDetail(pdCode, bdId, note) :
+                                action === 'rollback' ? handleRollback(note)
+                                    : handleOkConFirm(note)}
+                        action={action}
                     />
-
                     {timelines.length >= 2 && <Button onClick={handleOpen}
                         className={styles.btnPdf}
                         type="primary">
                         Xuất hóa đơn
                     </Button>}
-                    <ModalBillInfoDisplay open={open} cancel={handleCan} billCode={billInfo.billCode} />
+                    <ModalBillInfoDisplay open={open} cancel={handleCan} billCode={billInfo?.billCode} />
                     <Button
                         className={styles.btnWarning}
                         onClick={() => showModalDetail()}
@@ -593,14 +620,14 @@ const BillTimeLine = (addId) => {
                         && <Col span={3}>
                             <Button type="primary"
                                 onClick={() => setOpenModalDN(true)}>Sửa thông tin</Button>
-                            <EditAddress
+                            {openModalDN && <EditAddress
                                 isModalOpen={openModalDN}
                                 handleAddressCancel={() => setOpenModalDN(false)}
-                                render={setRender}
+                                setRender={setRender}
                                 addressId={billInfo?.addressId}
                                 billId={billInfo?.billId}
                                 totalPrice={billInfo?.totalPrice}
-                            />
+                            />}
                         </Col>}
                 </Row>
                 <Divider
@@ -624,7 +651,7 @@ const BillTimeLine = (addId) => {
                             <Col span={12}>
                                 <SpanBorder
                                     child={
-                                        billInfo.billType === "In-store" ? "Tại quầy" : "Trực tuyến"
+                                        billInfo?.billType === "In-Store" ? "Tại quầy" : "Trực tuyến"
                                     }
                                     color={"#1677ff"}
                                 />

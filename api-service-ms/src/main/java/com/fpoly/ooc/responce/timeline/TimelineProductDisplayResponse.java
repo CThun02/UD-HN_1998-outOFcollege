@@ -23,6 +23,8 @@ public class TimelineProductDisplayResponse {
 
     private Long billDetailId;
 
+    private String productCode;
+
     private String productName;
 
     private Integer quantity;
@@ -84,5 +86,6 @@ public class TimelineProductDisplayResponse {
         this.productBrandName = timelineProductResponse.getProductBrandName();
         this.productCateGoryName = timelineProductResponse.getProductCateGoryName();
         this.billDetailStatus = timelineProductResponse.getBillDetailStatus();
+        this.productCode = timelineProductResponse.getProductCode();
     }
 }

@@ -35,4 +35,6 @@ public interface VoucherService {
 
     Boolean isCheckTimeUse(String voucherCode, String username);
 
+    Voucher updateVoucher(Voucher voucher);
+
 }

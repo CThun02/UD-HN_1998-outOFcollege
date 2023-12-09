@@ -35,6 +35,7 @@ import com.fpoly.ooc.service.interfaces.VoucherService;
 import com.fpoly.ooc.service.kafka.KafkaUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -108,9 +109,11 @@ public class BillServiceImpl implements BillService {
                 .symbol(request.getSymbol())
                 .note(request.getNote())
                 .billCode(request.getBillCode())
-                .completionDate(LocalDateTime.now())
                 .build();
 
+        if (bill.getSymbol().equals("In-Store")) {
+            bill.setCompletionDate(LocalDateTime.now());
+        }
         bill.setStatus(request.getStatus());
         billRepo.save(bill);
 
@@ -162,11 +165,9 @@ public class BillServiceImpl implements BillService {
         }
 
         if (request.getVoucherCode() != null) {
-            VoucherRequest voucher = VoucherRequest.builder()
-                    .voucherCode(request.getVoucherCode())
-                    .limitQuantity(voucherService.findVoucherByVoucherCode(request.getVoucherCode()).getLimitQuantity() - 1)
-                    .build();
-            voucherService.saveOrUpdate(voucher);
+            Voucher voucher = voucherService.findVoucherByVoucherCode(request.getVoucherCode());
+            voucher.setLimitQuantity(voucher.getLimitQuantity() - 1);
+            voucherService.updateVoucher(voucher);
 
             VoucherHistory voucherHistory = VoucherHistory.builder()
                     .bill(bill)
@@ -196,34 +197,40 @@ public class BillServiceImpl implements BillService {
             String status,
             String symbol,
             Integer count,
-            String createdBy) {
-        return billRepo.getAllBillManagement(billCode,
-                startDate, endDate, status, symbol, count, createdBy);
+            String createdBy,
+            String billType) {
+        return billRepo.getAllBillManagement(billCode, startDate, endDate, status, symbol,
+                count, createdBy, billType);
     }
 
     @Override
-    public CountQuantityBillResponse getCountFilterBill() {
+    public Bill findBillByBillCode(String billCode) {
+        return billRepo.findBillByBillCode(billCode);
+    }
+
+    @Override
+    public CountQuantityBillResponse getCountFilterBill(String billType, LocalDateTime startDate, LocalDateTime endDate) {
         CountQuantityBillResponse countQuantityBillResponse = new CountQuantityBillResponse();
         countQuantityBillResponse
-                .setCountAll(billRepo.getAllBillManagement(null, null, null,
-                        null, null, null, null).size());
+                .setCountAll(billRepo.getAllBillManagement(null, startDate, endDate,
+                        null, null, null, null, billType).size());
         countQuantityBillResponse
-                .setCountConfirmS(billRepo.getAllBillManagement(null, null, null,
-                        null, "Shipping", 2, null).size());
+                .setCountConfirmS(billRepo.getAllBillManagement(null, startDate, endDate,
+                        null, "Shipping", 2, null, billType).size());
         countQuantityBillResponse
-                .setCountConfirmW(billRepo.getAllBillManagement(null, null, null,
-                        null, null, null, "CLIENT").size());
+                .setCountConfirmW(billRepo.getAllBillManagement(null, startDate, endDate,
+                        null, null, null, "CLIENT", billType).size());
         countQuantityBillResponse
-                .setShipping(billRepo.getAllBillManagement(null, null, null,
-                        null, "Shipping", 3, null).size());
-        countQuantityBillResponse.setCancel(billRepo.getAllBillManagement(null, null, null,
-                "Cancel", null, null, null).size());
-        countQuantityBillResponse.setComplete(billRepo.getAllBillManagement(null, null, null,
-                "Complete", null, null, null).size());
-        countQuantityBillResponse.setPaid(billRepo.getAllBillManagement(null, null, null,
-                "Paid", null, null, null).size());
-        countQuantityBillResponse.setUnpaid(billRepo.getAllBillManagement(null, null, null,
-                "UnPaid", null, null, null).size());
+                .setShipping(billRepo.getAllBillManagement(null, startDate, endDate,
+                        null, "Shipping", 3, null, billType).size());
+        countQuantityBillResponse.setCancel(billRepo.getAllBillManagement(null, startDate, endDate,
+                "Cancel", null, null, null, billType).size());
+        countQuantityBillResponse.setComplete(billRepo.getAllBillManagement(null, startDate, endDate,
+                "Complete", null, null, null, billType).size());
+        countQuantityBillResponse.setPaid(billRepo.getAllBillManagement(null, startDate, endDate,
+                "Paid", null, null, null, billType).size());
+        countQuantityBillResponse.setUnpaid(billRepo.getAllBillManagement(null, startDate, endDate,
+                "UnPaid", null, null, null, billType).size());
         return countQuantityBillResponse;
     }
 
@@ -252,7 +259,20 @@ public class BillServiceImpl implements BillService {
     @Override
     public Integer updateBillStatus(BillStatusDTO dto) throws JsonProcessingException {
         log.warn("BillStatusDTORequest: " + dto);
-        billRepo.update(dto.getStatus(), dto.getAmountPaid(), dto.getId());
+
+        Bill bill = billRepo.findById(dto.getId()).orElse(null);
+        bill.setStatus(dto.getStatus());
+        bill.setAmountPaid(dto.getAmountPaid());
+        if (dto.getStatus().equals("4")) {
+            bill.setCompletionDate(LocalDateTime.now());
+        }
+
+        billRepo.save(bill);
+        if (dto.getStatus().equals("Cancel")) {
+//            VoucherAccount voucherAccount = voucherAccountService.findVoucherAccountByUsernameAndVoucherCode();
+//             voucherAccount.setStatus(Const.STATUS_ACTIVE);
+//             voucherAccountService.updateStatus(voucherAccount);
+        }
         kafkaUtil.sendingObjectWithKafka(dto, Const.TOPIC_TIME_LINE);
         return 1;
     }
@@ -451,16 +471,16 @@ public class BillServiceImpl implements BillService {
         VoucherHistory voucherHistory = voucherHistoryRepository.findVoucherHistoryByBill_BillCode(bill.getBillCode());
         BigDecimal price = bill.getPrice();
         BigDecimal priceReduce = BigDecimal.valueOf(0);
-        if(voucherHistory != null){
+        if (voucherHistory != null) {
             Voucher voucher = voucherService.findVoucherByVoucherCode(voucherHistory.getVoucherCode());
-            BigDecimal condition = voucher==null?BigDecimal.valueOf(0):voucher.getVoucherCondition();
+            BigDecimal condition = voucher == null ? BigDecimal.valueOf(0) : voucher.getVoucherCondition();
             if (price.compareTo(condition) > 0 && voucher != null) {
                 if (voucher.getVoucherMethod().equals("%")) {
                     priceReduce = (price.multiply(voucher.getVoucherValue())).divide(BigDecimal.valueOf(100));
                     if (priceReduce.compareTo(voucher.getVoucherValueMax()) > 0) {
                         priceReduce = voucher.getVoucherValueMax();
                     }
-                } else if(voucher.getVoucherMethod().equals("VND")){
+                } else if (voucher.getVoucherMethod().equals("VND")) {
                     priceReduce = voucher.getVoucherValue();
                 }
             }

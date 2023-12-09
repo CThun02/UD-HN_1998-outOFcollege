@@ -8,13 +8,16 @@ import com.fpoly.ooc.entity.Bill;
 import com.fpoly.ooc.entity.DeliveryNote;
 import com.fpoly.ooc.entity.Timeline;
 import com.fpoly.ooc.exception.NotFoundException;
-import com.fpoly.ooc.repository.BillRepo;
 import com.fpoly.ooc.repository.TimeLineRepo;
 import com.fpoly.ooc.request.timeline.TimeLinerequest;
 import com.fpoly.ooc.responce.bill.BillInfoResponse;
 import com.fpoly.ooc.responce.timeline.TimeLineResponse;
+import com.fpoly.ooc.responce.timeline.TimelineClientResponse;
+import com.fpoly.ooc.responce.timeline.TimelineCustomInfo;
 import com.fpoly.ooc.responce.timeline.TimelineProductDisplayResponse;
 import com.fpoly.ooc.responce.timeline.TimelineProductResponse;
+import com.fpoly.ooc.service.interfaces.BillDetailService;
+import com.fpoly.ooc.service.interfaces.BillService;
 import com.fpoly.ooc.service.interfaces.DeliveryNoteService;
 import com.fpoly.ooc.service.interfaces.ProductImageServiceI;
 import com.fpoly.ooc.service.interfaces.TimeLineService;
@@ -27,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -36,13 +40,16 @@ public class TimeLineServiceImpl implements TimeLineService {
     private TimeLineRepo timeLineRepo;
 
     @Autowired
-    private BillRepo billRepo;
+    private BillService billService;
 
     @Autowired
     private ProductImageServiceI productImageServiceI;
 
     @Autowired
     private DeliveryNoteService deliveryNoteService;
+
+    @Autowired
+    private BillDetailService billDetailService;
 
     @Autowired
     private SimpMessagingTemplate template;
@@ -52,7 +59,7 @@ public class TimeLineServiceImpl implements TimeLineService {
 
     @Override
     public List<TimeLineResponse> getAllTimeLineByBillId(Long id) {
-        Bill bill = billRepo.findById(id).orElse(null);
+        Bill bill = billService.findBillByBillId(id);
         if (bill == null) {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND));
         }
@@ -60,44 +67,96 @@ public class TimeLineServiceImpl implements TimeLineService {
         return timeLineRepo.getTimeLineByBillId(id);
     }
 
+    @Override
+    public TimelineClientResponse getTimelineByBillCode(String billCode) {
+        if (billCode == null) {
+            throw new NotFoundException(Const.CODE_NOT_FOUND);
+        }
+        Bill bill = billService.findBillByBillCode(billCode);
+
+        TimelineClientResponse timelineClientResponse = new TimelineClientResponse();
+        List<TimelineProductDisplayResponse> lstProduct = new ArrayList<>();
+
+        List<TimelineProductResponse> lstTimelineProductResponses = null;
+        lstTimelineProductResponses = timeLineRepo.getTimelineProductByBillId(bill.getId());
+        timelineClientResponse.setLstTimeline(timeLineRepo.getTimeLineByBillId(bill.getId()));
+
+        for (TimelineProductResponse timelineProductResponse : lstTimelineProductResponses) {
+            TimelineProductDisplayResponse response = new TimelineProductDisplayResponse(timelineProductResponse);
+            response.setProductImageResponses(productImageServiceI.getProductImageByProductDetailId(response.getProductDetailId()));
+            lstProduct.add(response);
+        }
+
+        timelineClientResponse.setLstProduct(lstProduct);
+
+        DeliveryNote deliveryNote = deliveryNoteService.getDeliveryNoteByBill_Id(bill.getId());
+
+        if (deliveryNote != null) {
+            TimelineCustomInfo timelineCustomInfo = TimelineCustomInfo.builder()
+                    .fullName(deliveryNote.getName())
+                    .phoneNumber(deliveryNote.getPhoneNumber())
+                    .orderDate(bill.getCreatedAt())
+                    .dateOfReceipt(bill.getCompletionDate())
+                    .addressDetail(deliveryNote.getAddress().getDescriptionDetail())
+                    .ward(deliveryNote.getAddress().getWard())
+                    .district(deliveryNote.getAddress().getDistrict())
+                    .city(deliveryNote.getAddress().getCity())
+                    .build();
+            timelineClientResponse.setTimelineCustomInfo(timelineCustomInfo);
+        }
+
+        return timelineClientResponse;
+    }
+
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Timeline createTimeLine(Long billId, TimeLinerequest request) throws JsonProcessingException {
-        Bill bill = billRepo.findById(billId).orElseThrow(
-                () -> new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND)));
+        Bill bill = billService.findBillByBillId(billId);
         if (bill == null) {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND));
         }
+        Timeline timeline = new Timeline();
 
-        Timeline timeLine = new Timeline();
-        timeLine.setBill(bill);
-        timeLine.setNote(request.getNote());
-
-        if (request.getStatus() == null) {
-            List<TimeLineResponse> lst = timeLineRepo.getTimeLineByBillId(billId);
-            Integer statusIncrease = 0;
-            if (lst.isEmpty()) {
-                statusIncrease++;
-            } else {
-                statusIncrease = Integer.valueOf(lst.get(lst.size() - 1).getStatus());
-                statusIncrease++;
-            }
-
-            timeLine.setStatus(String.valueOf(statusIncrease));
-            if (lst.size() == 3) {
-                DeliveryNote deliveryNote = deliveryNoteService.getDeliveryNoteByBill_Id(billId);
-                deliveryNote.setDateOfReceipt(LocalDateTime.now());
-            }
-        } else {
-            timeLine.setStatus(request.getStatus());
+        Optional<Timeline> existingTimeline = Optional.empty();
+        if (request.getTimelineId() != null) {
+            existingTimeline = timeLineRepo.findById(request.getTimelineId());
         }
 
-        timeLineRepo.save(timeLine);
+        if (existingTimeline.isPresent()) {
+            Timeline timelineUpdate = existingTimeline.get();
+            timelineUpdate.setStatus(request.getStatus());
+            timelineUpdate.setNote(request.getNote());
+            timeLineRepo.save(timelineUpdate);
+        } else {
+            timeline.setBill(bill);
+            timeline.setNote(request.getNote());
+
+            if (request.getStatus() == null) {
+                List<TimeLineResponse> lst = timeLineRepo.getTimeLineByBillId(billId);
+                Integer statusIncrease = 0;
+                if (lst.isEmpty()) {
+                    statusIncrease++;
+                } else {
+                    statusIncrease = Integer.valueOf(lst.get(lst.size() - 1).getStatus());
+                    statusIncrease++;
+                }
+
+                timeline.setStatus(String.valueOf(statusIncrease));
+                if (lst.size() == 3) {
+                    DeliveryNote deliveryNote = deliveryNoteService.getDeliveryNoteByBill_Id(billId);
+                    deliveryNote.setDateOfReceipt(LocalDateTime.now());
+                }
+            } else {
+                timeline.setStatus(request.getStatus());
+            }
+            timeLineRepo.save(timeline);
+        }
+
         String timelineJson = objectMapper.writeValueAsString(timeLineRepo.getTimeLineByBillId(bill.getId()));
         template.convertAndSend("/topic/create-timeline-client-topic", timelineJson);
         log.info("CreateTimeLineJson: " + timelineJson);
 
-        return timeLine;
+        return timeline;
     }
 
     @Override

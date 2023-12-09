@@ -488,7 +488,10 @@ const Checkout = ({ setRenderHeader }) => {
                     for (let i = 0; i < productDetails?.length; i++) {
                         const billDetail = {
                             productDetailId: productDetails[i].cartDetailResponse.productDetailId,
-                            price: productDetails[i].cartDetailResponse.priceProductDetail,
+                            price: productDetails[i]?.promotion[0] ? ((productDetails[i]?.promotion[0]?.promotionMethod === 'vnd' ?
+                                (productDetails[i].cartDetailResponse?.quantity * productDetails[i]?.cartDetailResponse?.priceProductDetail) - productDetails[i]?.promotion[0]?.promotionValue :
+                                ((100 - productDetails[i]?.promotion[0]?.promotionValue) / 100) * productDetails[i]?.cartDetailResponse?.priceProductDetail) * productDetails[i].cartDetailResponse?.quantity)
+                                : productDetails[i].cartDetailResponse?.quantity * productDetails[i]?.cartDetailResponse?.priceProductDetail,
                             quantity: productDetails[i].cartDetailResponse.quantity,
                         };
                         formData.lstBillDetailRequest.push(billDetail)
@@ -497,7 +500,10 @@ const Checkout = ({ setRenderHeader }) => {
                     for (let i = 0; i < productDetails?.length; i++) {
                         const billDetail = {
                             productDetailId: productDetails[i].data[0].id,
-                            price: productDetails[i].data[0].price,
+                            price: productDetails[i].data[0].promotion[0] ? ((productDetails[i].data[0].promotion[0]?.promotionMethod === 'vnd' ?
+                                (productDetails[i].data[0].price * productDetails[i]?.quantity) - productDetails[i].data[0].promotion[0]?.promotionValue
+                                : ((100 - productDetails[i].data[0].promotion[0]?.promotionValue) / 100) * productDetails[i].data[0].price) * productDetails[i]?.quantity)
+                                : productDetails[i].data[0].price * productDetails[i]?.quantity,
                             quantity: productDetails[i].quantity,
                         };
                         formData.lstBillDetailRequest.push(billDetail)
@@ -647,15 +653,14 @@ const Checkout = ({ setRenderHeader }) => {
         if (data) {
             for (let i = 0; i < carts?.length; i++) {
                 let priceReduced = carts[i]?.promotion[0] ? ((carts[i]?.promotion[0]?.promotionMethod === 'vnd' ?
-                    (carts[i].cartDetailResponse?.quantity * carts[i]?.cartDetailResponse?.priceProductDetail) - carts[i]?.promotion[0]?.promotionValue :
-                    ((100 - carts[i]?.promotion[0]?.promotionValue) / 100) * carts[i]?.cartDetailResponse?.priceProductDetail) * carts[i].cartDetailResponse?.quantity)
-                    : carts[i].cartDetailResponse?.quantity * carts[i]?.cartDetailResponse?.priceProductDetail;
+                    carts[i]?.cartDetailResponse?.priceProductDetail - carts[i]?.promotion[0]?.promotionValue :
+                    ((100 - carts[i]?.promotion[0]?.promotionValue) / 100) * carts[i]?.cartDetailResponse?.priceProductDetail) * carts[i].cartDetailResponse?.quantity) : (carts[i]?.cartDetailResponse?.priceProductDetail) * carts[i].cartDetailResponse?.quantity;
                 totalPrice += priceReduced
             }
         } else {
             for (let i = 0; i < carts?.length; i++) {
                 let priceReduced = carts[i].data[0].promotion[0] ? ((carts[i].data[0].promotion[0]?.promotionMethod === 'vnd' ?
-                    (carts[i].data[0].price * carts[i]?.quantity) - carts[i].data[0].promotion[0]?.promotionValue
+                    (carts[i].data[0].price) - carts[i].data[0].promotion[0]?.promotionValue
                     : ((100 - carts[i].data[0].promotion[0]?.promotionValue) / 100) * carts[i].data[0].price) * carts[i]?.quantity)
                     : carts[i].data[0].price * carts[i]?.quantity;
                 totalPrice += priceReduced;

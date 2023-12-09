@@ -7,6 +7,7 @@ import com.fpoly.ooc.request.product.ProductDetailRequest;
 import com.fpoly.ooc.service.interfaces.BillDetailService;
 import com.fpoly.ooc.service.interfaces.BillService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -47,17 +48,22 @@ public class BillController {
             @RequestParam(value = "status", required = false) String status,
             @RequestParam(value = "symbol", required = false) String symbol,
             @RequestParam(value = "count", required = false) Optional<Integer> count,
-            @RequestParam(value = "createdBy", required = false) String createdBy) {
+            @RequestParam(value = "createdBy", required = false) String createdBy,
+            @RequestParam(value = "billType", required = false) String billType
+    ) {
         LocalDateTime startDateTime = startDate.map(date -> LocalDateTime.of(date, LocalTime.MIN)).orElse(null);
         LocalDateTime endDateTime = endDate.map(date -> LocalDateTime.of(date, LocalTime.MAX)).orElse(null);
 
-        return ResponseEntity.ok(billService.getAllBillManagement(billCode.trim().equals("") ? null : billCode,
+        return ResponseEntity.ok(billService.getAllBillManagement(
+                billCode.trim().equals("") ? null : billCode,
                 startDateTime,
                 endDateTime,
                 status.trim().equals("") ? null : status,
                 symbol.trim().equals("") ? null : symbol,
                 count.orElse(null),
-                createdBy.trim().equals("") ? null : createdBy));
+                createdBy.trim().equals("") ? null : createdBy,
+                billType.trim().equals("") ? null : billType
+        ));
     }
 
     @GetMapping("/filterProductDetailSellByIdCom")
@@ -113,7 +119,6 @@ public class BillController {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         LocalDateTime dateFrom = LocalDateTime.parse(day, formatter);
         LocalDateTime dateTo = LocalDateTime.parse(dayTo, formatter).plusDays(1);
-        System.out.println("CHECKDATE" + dateFrom + dateTo);
         return ResponseEntity.ok(billService.getBillRevenue(dateFrom, dateTo));
     }
 

@@ -12,7 +12,7 @@ public interface CartDetailService {
 
     List<CartDetailDisplayResponse> getAllCart(String username);
 
-     CartDetailDisplayResponse getProductDetailId( Long productDetailId);
+    CartDetailDisplayResponse getProductDetailId(Long productDetailId);
 
     Cart createCartDetail(CartRequest request);
 

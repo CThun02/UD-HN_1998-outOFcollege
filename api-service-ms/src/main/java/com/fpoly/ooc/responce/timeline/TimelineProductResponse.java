@@ -1,6 +1,7 @@
 package com.fpoly.ooc.responce.timeline;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -9,6 +10,7 @@ import java.math.BigDecimal;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class TimelineProductResponse {
 
     private Long billId;
@@ -18,6 +20,8 @@ public class TimelineProductResponse {
     private Long productDetailId;
 
     private Long billDetailId;
+
+    private String productCode;
 
     private String productName;
 

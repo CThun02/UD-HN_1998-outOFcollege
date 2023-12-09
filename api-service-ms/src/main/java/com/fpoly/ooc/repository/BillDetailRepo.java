@@ -13,8 +13,9 @@ import java.util.List;
 @Repository
 public interface BillDetailRepo extends JpaRepository<BillDetail, Long> {
 
-    @Query("SELECT DISTINCT new com.fpoly.ooc.responce.timeline.TimelineProductResponse(b.id, b.billCode, pd.id, bd.id, pd.product.productName, " +
-            "   pd.quantity, bd.quantity, bd.price, pd.size.sizeName, pd.color.colorCode, pd.button.buttonName, pd.collar.collarTypeName, " +
+
+    @Query("SELECT DISTINCT new com.fpoly.ooc.responce.timeline.TimelineProductResponse(b.id, b.billCode, pd.id, bd.id, pd.product.productCode, pd.product.productName, " +
+            "   pd.quantity ,bd.quantity, bd.price, pd.size.sizeName, pd.color.colorCode, pd.button.buttonName, pd.collar.collarTypeName, " +
             "   pd.material.materialName, pd.sleeve.sleeveName, pd.shirtTail.shirtTailTypeName, pd.color.colorName," +
             "   pd.form.formName, pd.pattern.patternName, pd.brand.brandName, pd.category.categoryName, bd.status) " +
             "FROM Bill b " +
@@ -29,5 +30,7 @@ public interface BillDetailRepo extends JpaRepository<BillDetail, Long> {
             "like ?1 and (bd.status is null or (bd.status not like 'CANCEL' " +
             "and bd.status not like 'RETURNS' ))")
     BigDecimal getTotalPriceByBillCode(String billCode);
+
+    List<BillDetail> findBillDetailByBill_BillCode(String billCode);
 
 }

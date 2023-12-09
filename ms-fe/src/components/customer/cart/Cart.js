@@ -349,7 +349,7 @@ const Cart = (props) => {
                         {record.promotion.length !== 0 ? (
                             <span style={{ color: "#ccc" }}>
                                 <strike>
-                                    {((record?.cartDetailResponse?.priceProductDetail) * (record?.cartDetailResponse?.quantity))?.toLocaleString("vi-VN", {
+                                    {((record?.cartDetailResponse?.priceProductDetail) * (record?.cartDetailResponse?.quantity)) ? ((record?.cartDetailResponse?.priceProductDetail) * (record?.cartDetailResponse?.quantity)) : 0?.toLocaleString("vi-VN", {
                                         style: "currency",
                                         currency: "VND",
                                     })}
@@ -357,7 +357,7 @@ const Cart = (props) => {
                             </span>
                         ) : (
                             <span>
-                                {(record?.cartDetailResponse?.priceProductDetail * record?.cartDetailResponse?.quantity).toLocaleString("vi-VN", {
+                                {(record?.cartDetailResponse?.priceProductDetail * record?.cartDetailResponse?.quantity) > 0 ? (record?.cartDetailResponse?.priceProductDetail * record?.cartDetailResponse?.quantity) : 0?.toLocaleString("vi-VN", {
                                     style: "currency",
                                     currency: "VND",
                                 })}
@@ -368,15 +368,18 @@ const Cart = (props) => {
                             {record.promotion.length !== 0
                                 ? record?.promotion[0]?.promotionMethod === "%"
                                     ? (
-                                        ((record.cartDetailResponse.priceProductDetail *
+                                        (((record.cartDetailResponse.priceProductDetail *
                                             (100 - Number(record?.promotion[0].promotionValue))) /
-                                            100) * record?.cartDetailResponse?.quantity
+                                            100) * record?.cartDetailResponse?.quantity) > 0
+                                            ? ((record.cartDetailResponse.priceProductDetail *
+                                                (100 - Number(record?.promotion[0].promotionValue))) /
+                                                100) * record?.cartDetailResponse?.quantity : 0
                                     )?.toLocaleString("vi-VN", {
                                         style: "currency",
                                         currency: "VND",
                                     })
                                     : (
-                                        (record?.cartDetailResponse?.priceProductDetail - Number(record?.promotion[0]?.promotionValue)) * record?.cartDetailResponse?.quantity
+                                        ((record?.cartDetailResponse?.priceProductDetail - Number(record?.promotion[0]?.promotionValue)) * record?.cartDetailResponse?.quantity) > 0 ? ((record?.cartDetailResponse?.priceProductDetail - Number(record?.promotion[0]?.promotionValue)) * record?.cartDetailResponse?.quantity) : 0
                                     )?.toLocaleString("vi-VN", {
                                         style: "currency",
                                         currency: "VND",
@@ -448,25 +451,24 @@ const Cart = (props) => {
                 for (let i = 0; i < carts.length; i++) {
                     if (selectedKeys.includes(carts[i]?.cartDetailResponse?.productDetailId)) {
                         let priceReduced = carts[i]?.promotion[0] ? ((carts[i]?.promotion[0]?.promotionMethod === 'vnd' ?
-                            carts[i]?.promotion[0]?.promotionValue :
+                            carts[i]?.cartDetailResponse?.priceProductDetail - carts[i]?.promotion[0]?.promotionValue :
                             ((100 - carts[i]?.promotion[0]?.promotionValue) / 100) * carts[i]?.cartDetailResponse?.priceProductDetail) * carts[i].cartDetailResponse?.quantity) : (carts[i]?.cartDetailResponse?.priceProductDetail) * carts[i].cartDetailResponse?.quantity;
                         totalPrice += priceReduced
                     }
                 }
-                setTotalPrice(totalPrice);
             } else {
                 for (let i = 0; i < productDetails.length; i++) {
                     const row = productDetails[i];
-                    console.log(row.data[0])
                     if (selectedKeys.includes(row?.data[0]?.id)) {
+                        console.log()
                         let priceReduced = row.data[0].promotion[0] ? ((row.data[0].promotion[0]?.promotionMethod === 'vnd' ?
-                            row.data[0].promotion[0]?.promotionValue
-                            : ((100 - row.data[0].promotion[0]?.promotionValue) / 100) * row.data[0].price) * row?.quantity) : row.data[0].price * row.data[0].quantity;
+                            (row.data[0].price - row.data[0].promotion[0]?.promotionValue)
+                            : (((100 - row.data[0].promotion[0]?.promotionValue) / 100) * row.data[0].price))) * row.quantity : row.data[0].price * row.quantity;
                         totalPrice += priceReduced;
                     }
                 }
-                setTotalPrice(totalPrice);
             }
+            setTotalPrice(totalPrice > 0 ? totalPrice : 0);
             setSelectedRowKeys(selectedKeys);
         } catch (error) {
             console.error('lỗi click sản phẩm thanh toán:', error);

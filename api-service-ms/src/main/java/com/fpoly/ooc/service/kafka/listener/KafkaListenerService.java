@@ -385,7 +385,7 @@ public class KafkaListenerService {
         String colorsAndSizes = objectMapper.writeValueAsString(res);
         String productDetailsShopJson = objectMapper.writeValueAsString(productDetailDAORepositoryI.getAllProductDetailShop(
                 null, null, null, "", "", "", "", null,
-                null, null, null, "up"));
+                null, null, null));
         String bestSellingJson = objectMapper.writeValueAsString(productDetailDAORepositoryI.getProductDetailBestSelling());
         String newProductJson = objectMapper.writeValueAsString(productDetailDAORepositoryI.getNewProductDetail());
         template.convertAndSend("/topic/getOneProductDetail-topic", productDetailsJson);
@@ -437,7 +437,7 @@ public class KafkaListenerService {
 
         if(Objects.nonNull(billDb)) {
             String createBill = objectMapper.writeValueAsString(billRepo.getAllBillManagement(null, null,
-                    null, null, null, null, null));
+                    null, null, null, null, null, null));
             template.convertAndSend("/topic/new-bill-topic", createBill);
             log.info("TimeLineJson: " + createBill);
         }

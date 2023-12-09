@@ -49,11 +49,16 @@ public class JpaConfig {
                 String user = null;
                 UserDTO userDTO = null;
                 if(authentication.getPrincipal().equals("anonymousUser")
-                        && (uri.contains("client") || uri.contains("/api/v1/auth/signup"))) {
+                        && (uri.contains("client") || uri.contains("/api/v1/auth/signup") || uri.contains("rePassword"))) {
                     user = "CLIENT";
                 } else {
-                    userDTO = (UserDTO) authentication.getPrincipal();
-                    user = userDTO.getUsername() + "_" + userDTO.getFullName();
+                    try {
+                        userDTO = (UserDTO) authentication.getPrincipal();
+                        user = userDTO.getUsername() + "_" + userDTO.getFullName();
+                    } catch (Exception e) {
+                        user = "CLIENT";
+                        log.warn("Error convert");
+                    }
                 }
 
                 // return username_fullName

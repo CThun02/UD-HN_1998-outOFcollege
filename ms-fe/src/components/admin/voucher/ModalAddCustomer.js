@@ -259,7 +259,7 @@ function ModalAddCustomer({
           onCancel={handleOnCancel}
         >
           <Spin
-            tip="Loading..."
+            tip="Vui lòng chờ..."
             spinning={isLoading}
             size="large"
             style={{ width: "100%" }}

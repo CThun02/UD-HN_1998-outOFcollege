@@ -1091,7 +1091,7 @@ const ProductCreateDetails = () => {
   return (
     <>
       <Spin
-        tip="Loading..."
+        tip="Vui lòng chờ..."
         spinning={isLoading}
         size="large"
         style={{ width: "100%" }}
@@ -1106,7 +1106,7 @@ const ProductCreateDetails = () => {
             onCancel={() => setModalColorOpen(false)}
           >
             <Spin
-              tip="Loading..."
+              tip="Vui lòng chờ..."
               spinning={loadingColor}
               size="large"
               style={{ width: "100%" }}
@@ -1147,7 +1147,7 @@ const ProductCreateDetails = () => {
           >
             <div>
               <Spin
-                tip="Loading..."
+                tip="Vui lòng chờ..."
                 spinning={loadingProduct}
                 size="large"
                 style={{ width: "100%" }}

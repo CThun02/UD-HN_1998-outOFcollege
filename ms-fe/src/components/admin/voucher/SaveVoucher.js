@@ -380,7 +380,7 @@ function SaveVoucher() {
       <div className={styles.content}>
         {contextProviderNotification}
         <Spin
-          tip="Loading..."
+          tip="Vui lòng chờ..."
           spinning={isLoading}
           size="large"
           style={{ width: "100%" }}

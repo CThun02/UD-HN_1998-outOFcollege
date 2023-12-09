@@ -445,7 +445,7 @@ const DetailForm = (props) => {
       <Row>
         <Col span={8}>
           <Spin
-            tip="Loading..."
+            tip="Vui lòng chờ..."
             spinning={loadingUpdate}
             size="large"
             style={{ width: "100%" }}
@@ -576,7 +576,7 @@ const DetailForm = (props) => {
         </Col>
         <Col span={16}>
           <Spin
-            tip="Loading..."
+            tip="Vui lòng chờ..."
             spinning={loadingUpdateADD}
             size="large"
             style={{ width: "100%" }}
@@ -843,7 +843,7 @@ const DetailForm = (props) => {
               >
                 <Panel header={<h5>Thêm mới địa chỉ</h5>} key={1}>
                   <Spin
-                    tip="Loading..."
+                    tip="Vui lòng chờ..."
                     spinning={loadingUpdateADD}
                     size="large"
                     style={{ width: "100%" }}

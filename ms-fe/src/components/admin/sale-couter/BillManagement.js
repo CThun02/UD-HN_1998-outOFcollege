@@ -142,7 +142,9 @@ const BillManagement = () => {
       render: (text, record) => {
         return (
           numeral(
-            record.totalPrice + record.shipPrice - record?.priceReduce < 0 ? 0 : record.totalPrice + record.shipPrice - record?.priceReduce
+            record.totalPrice + record.shipPrice - record?.priceReduce < 0
+              ? 0
+              : record.totalPrice + record.shipPrice - record?.priceReduce
           ).format("0,0") + "đ"
         );
       },
@@ -164,12 +166,12 @@ const BillManagement = () => {
           object === "Unpaid"
             ? "geekblue"
             : object === "Paid"
-              ? "green"
-              : object === "Cancel"
-                ? "red"
-                : object === "Complete"
-                  ? "green"
-                  : null;
+            ? "green"
+            : object === "Cancel"
+            ? "red"
+            : object === "Complete"
+            ? "green"
+            : null;
         return (
           <Space direction="vertical">
             <div style={{ width: "auto", display: "flex" }}>
@@ -177,10 +179,10 @@ const BillManagement = () => {
                 {object === "Unpaid"
                   ? "Chưa thanh toán"
                   : object === "Cancel"
-                    ? "Đã hủy"
-                    : object === "Complete"
-                      ? "Đã hoàn thành"
-                      : "Đã thanh toán"}
+                  ? "Đã hủy"
+                  : object === "Complete"
+                  ? "Đã hoàn thành"
+                  : "Đã thanh toán"}
               </Tag>
             </div>
           </Space>
@@ -376,20 +378,20 @@ const BillManagement = () => {
                     id === "1"
                       ? countBill.countAll
                       : id === "2"
-                        ? countBill.countConfirmW
-                        : id === "3"
-                          ? countBill.countConfirmS
-                          : id === "4"
-                            ? countBill.shipping
-                            : id === "5"
-                              ? countBill.complete
-                              : id === "6"
-                                ? countBill.cancel
-                                : id === "7"
-                                  ? countBill?.paid
-                                  : id === "8"
-                                    ? countBill?.unpaid
-                                    : null
+                      ? countBill.countConfirmW
+                      : id === "3"
+                      ? countBill.countConfirmS
+                      : id === "4"
+                      ? countBill.shipping
+                      : id === "5"
+                      ? countBill.complete
+                      : id === "6"
+                      ? countBill.cancel
+                      : id === "7"
+                      ? countBill?.paid
+                      : id === "8"
+                      ? countBill?.unpaid
+                      : null
                   }
                 >
                   <span style={{ padding: "20px" }}>
@@ -397,20 +399,20 @@ const BillManagement = () => {
                     {id === "1"
                       ? "Tất cả"
                       : id === "2"
-                        ? "Chờ xác nhận"
-                        : id === "3"
-                          ? "Chờ giao hàng"
-                          : id === "4"
-                            ? "Đang giao"
-                            : id === "5"
-                              ? "Đã hoàn thành"
-                              : id === "6"
-                                ? "Đã hủy"
-                                : id === "7"
-                                  ? "Đã thanh toán"
-                                  : id === "8"
-                                    ? "Chưa thanh toán"
-                                    : ""}
+                      ? "Chờ xác nhận"
+                      : id === "3"
+                      ? "Chờ giao hàng"
+                      : id === "4"
+                      ? "Đang giao"
+                      : id === "5"
+                      ? "Đã hoàn thành"
+                      : id === "6"
+                      ? "Đã hủy"
+                      : id === "7"
+                      ? "Đã thanh toán"
+                      : id === "8"
+                      ? "Chưa thanh toán"
+                      : ""}
                   </span>
                 </Badge>
               ),
@@ -418,20 +420,20 @@ const BillManagement = () => {
                 id === "1"
                   ? ""
                   : id === "2"
-                    ? "Client"
-                    : id === "3"
-                      ? "Confirmed"
-                      : id === "4"
-                        ? "Shipping"
-                        : id === "5"
-                          ? "Complete"
-                          : id === "6"
-                            ? "Cancel"
-                            : id === "7"
-                              ? "Paid"
-                              : id === "8"
-                                ? "Unpaid"
-                                : "",
+                  ? "Client"
+                  : id === "3"
+                  ? "Confirmed"
+                  : id === "4"
+                  ? "Shipping"
+                  : id === "5"
+                  ? "Complete"
+                  : id === "6"
+                  ? "Cancel"
+                  : id === "7"
+                  ? "Paid"
+                  : id === "8"
+                  ? "Unpaid"
+                  : "",
               children: (
                 <div style={{ padding: "8px" }}>
                   <span style={{ fontWeight: 500 }}>
@@ -442,7 +444,7 @@ const BillManagement = () => {
                     dataSource={data}
                     columns={columns}
                     loading={loading}
-                    loadingIndicator={<div>Loading...</div>}
+                    loadingIndicator={<div>Vui lòng chờ...</div>}
                     pagination={{
                       showSizeChanger: true,
                       pageSizeOptions: [5, 10, 15, 20],

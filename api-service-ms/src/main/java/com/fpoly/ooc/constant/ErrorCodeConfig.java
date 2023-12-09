@@ -5,12 +5,15 @@ import io.micrometer.common.util.StringUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
 @Data
+@Slf4j
 public class ErrorCodeConfig {
 
     private static Map<String, String> errors = new HashMap<>();
@@ -53,6 +56,32 @@ public class ErrorCodeConfig {
         errors.put("PASSWORD_NOT_CORRECT", "Mật khẩu không chính xác");
         errors.put("ADDRESS_NOT_FOUND", "Địa chỉ không chính xác");
         errors.put("ADD_ENTITY_FAIL", "Thêm thất bại.");
+        errors.put("USER_NOT_FOUND_BY_EMAIL", "Địa chỉ email không chính xác.");
+        errors.put("OPERATION_ERROR", "Thao tác thất bại.");
+
+
+        // SEND_EMAIL_TEMPLATE
+        errors.put("SEND_EMAIL_TEMPLATE_TITLE", """
+                    <h1 style="font-family: 'Lato', sans-serif;
+                        	color: #000000;
+                        	margin-top: 0;
+                        	font-weight: 400;">%s</h1>
+                """);
+        errors.put("SEND_EMAIL_TEMPLATE_BODY",
+                """
+                    <h2 style="font-family: 'Lato', sans-serif;
+                                    color: #000000;
+                                    margin-top: 0;
+                                    font-weight: 400;">%s</h2>
+                    <h3 style="font-family: 'Lato', sans-serif;
+                            color: #000000;
+                            margin-top: 0;
+                            font-weight: 400;">%s</h3>
+                    <h4 style="font-family: 'Lato', sans-serif;
+                            color: #000000;
+                            margin-top: 0;
+                            font-weight: 400;">%s</h4>
+                        """);
     }
 
     public static String getMessage(String code) {
@@ -64,10 +93,10 @@ public class ErrorCodeConfig {
     }
 
     public static String getFormatMessage(String code, Object... objects) {
-        if(StringUtils.isNotBlank(code)) {
+        if(StringUtils.isNotBlank(code) && errors.containsKey(code)) {
             return String.format(errors.get(code), objects);
         } else {
-            return String.format(errors.get(code));
+            return "Invalid error code or code not found.";
         }
     }
 

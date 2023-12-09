@@ -2,6 +2,7 @@ package com.fpoly.ooc.controller;
 
 import com.fpoly.ooc.config.UserAuthenticationProvider;
 import com.fpoly.ooc.dto.CredentialsDTO;
+import com.fpoly.ooc.dto.RePasswordRequest;
 import com.fpoly.ooc.dto.UserDTO;
 import com.fpoly.ooc.request.account.SignUpRequest;
 import com.fpoly.ooc.service.interfaces.AuthService;
@@ -46,4 +47,8 @@ public class AuthController {
         return ResponseEntity.ok().body(userAuthenticationProvider.getUsernameFromToken(token));
     }
 
+    @PostMapping("/rePassword")
+    public ResponseEntity<?> rePassword(@RequestBody RePasswordRequest rePasswordRequest) {
+        return ResponseEntity.ok(authService.forgotPassword(rePasswordRequest));
+    }
 }

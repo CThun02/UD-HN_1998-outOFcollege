@@ -10,6 +10,8 @@ public interface EmailService {
 
     String sendMailWithAttachment(EmailDetails details, Long idVoucher);
 
-    String sendSimpleMail(EmailDetails details);
+    CompletableFuture<String> sendSimpleMail(EmailDetails details);
+
+    CompletableFuture<String> sendRePassword(EmailDetails details);
 
 }

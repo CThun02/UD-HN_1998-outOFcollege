@@ -266,7 +266,7 @@ const ProductDetails = (props) => {
               style={{ top: "10px" }}
             >
               <Spin
-                tip="Loading..."
+                tip="Vui lòng chờ..."
                 spinning={loadingUpdateProduct}
                 size="large"
                 style={{ width: "100%" }}
@@ -1047,7 +1047,7 @@ const ProductDetails = (props) => {
                   {record.productImageResponse?.length < 3 ? (
                     <Col span={6}>
                       <Spin
-                        tip="Loading..."
+                        tip="Vui lòng chờ..."
                         spinning={loadingProductImage}
                         size="small"
                       >
@@ -2149,7 +2149,7 @@ const ProductDetails = (props) => {
         open={product?.status === "INACTIVE"}
       />
       <Spin
-        tip="Loading..."
+        tip="Vui lòng chờ..."
         spinning={loadingUpdateProducts}
         size="large"
         style={{ width: "100%" }}

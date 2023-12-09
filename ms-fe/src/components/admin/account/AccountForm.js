@@ -297,7 +297,7 @@ const MyForm = (props) => {
 
   return (
     <Spin
-      tip="Loading..."
+      tip="Vui lòng chờ..."
       spinning={loading}
       size="large"
       style={{ width: "100%" }}

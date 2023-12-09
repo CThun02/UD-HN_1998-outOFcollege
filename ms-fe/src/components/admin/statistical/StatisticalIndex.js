@@ -129,20 +129,21 @@ const StatisticalIndex = () => {
               >
                 {record.promotion.length !== 0 ? (
                   <Badge.Ribbon
-                    text={`Giảm ${record.promotion[0].promotionValue
+                    text={`Giảm ${
+                      record.promotion[0].promotionValue
                         ? record.promotion[0].promotionMethod === "%"
                           ? record.promotion[0].promotionValue +
-                          " " +
-                          record.promotion[0].promotionMethod
+                            " " +
+                            record.promotion[0].promotionMethod
                           : record.promotion[0].promotionValue.toLocaleString(
-                            "vi-VN",
-                            {
-                              style: "currency",
-                              currency: "VND",
-                            }
-                          )
+                              "vi-VN",
+                              {
+                                style: "currency",
+                                currency: "VND",
+                              }
+                            )
                         : null
-                      }`}
+                    }`}
                     color="red"
                   >
                     <Carousel autoplay>
@@ -334,17 +335,17 @@ const StatisticalIndex = () => {
       axios
         .get(
           "http://localhost:8080/api/admin/bill/compareRevenueDate?dayFrom=" +
-          dayFrom +
-          "&monthFrom=" +
-          monthFrom +
-          "&yearFrom=" +
-          yearFrom +
-          "&yearTo=" +
-          yearTo +
-          "&monthTo=" +
-          monthTo +
-          "&dayTo=" +
-          dayTo,
+            dayFrom +
+            "&monthFrom=" +
+            monthFrom +
+            "&yearFrom=" +
+            yearFrom +
+            "&yearTo=" +
+            yearTo +
+            "&monthTo=" +
+            monthTo +
+            "&dayTo=" +
+            dayTo,
           {
             headers: {
               Authorization: `Bearer ${getToken(true)}`,
@@ -405,17 +406,17 @@ const StatisticalIndex = () => {
       axios
         .get(
           "http://localhost:8080/api/admin/bill/getDataLineChart?dayFrom=" +
-          dayFrom +
-          "&monthFrom=" +
-          monthFrom +
-          "&yearFrom=" +
-          yearFrom +
-          "&yearTo=" +
-          yearTo +
-          "&monthTo=" +
-          monthTo +
-          "&dayTo=" +
-          dayTo,
+            dayFrom +
+            "&monthFrom=" +
+            monthFrom +
+            "&yearFrom=" +
+            yearFrom +
+            "&yearTo=" +
+            yearTo +
+            "&monthTo=" +
+            monthTo +
+            "&dayTo=" +
+            dayTo,
           {
             headers: {
               Authorization: `Bearer ${getToken(true)}`,
@@ -441,7 +442,7 @@ const StatisticalIndex = () => {
     try {
       const response = await axios.get(
         "http://localhost:8080/api/admin/bill/getGrowthStoreByTime?time=" +
-        time,
+          time,
         {
           headers: {
             Authorization: `Bearer ${getToken(true)}`,
@@ -489,9 +490,9 @@ const StatisticalIndex = () => {
       axios
         .get(
           "http://localhost:8080/api/admin/bill/getGrossRevenue?day=" +
-          encodeURIComponent(dateFrom.toISOString()) +
-          "&dayTo=" +
-          encodeURIComponent(dateTo.toISOString()),
+            encodeURIComponent(dateFrom.toISOString()) +
+            "&dayTo=" +
+            encodeURIComponent(dateTo.toISOString()),
           {
             headers: {
               Authorization: `Bearer ${getToken(true)}`,
@@ -716,7 +717,7 @@ const StatisticalIndex = () => {
         <Col span={8}>
           <div className={`${styles.bgWhite} ${styles.fixHeightDefault}`}>
             <Spin
-              tip="Loading..."
+              tip="Vui lòng chờ..."
               spinning={isLoading}
               size="large"
               style={{ width: "100%", height: "100%" }}
@@ -819,31 +820,31 @@ const StatisticalIndex = () => {
                     title={
                       billRevenueCompare.revenueFrom -
                         billRevenueCompare.revenueTo >
-                        0
+                      0
                         ? "INACTIVE"
                         : "ACTIVE"
                     }
                     value={
                       (Math.abs(
                         billRevenueCompare.revenueFrom -
-                        billRevenueCompare.revenueTo
+                          billRevenueCompare.revenueTo
                       ) /
                         (billRevenueCompare.revenueFrom +
                           billRevenueCompare.revenueTo)) *
-                      100 || 0
+                        100 || 0
                     }
                     precision={2}
                     valueStyle={
                       billRevenueCompare.revenueFrom -
                         billRevenueCompare.revenueTo >
-                        0
+                      0
                         ? { color: "#ff4d4f" }
                         : { color: "#3f8600" }
                     }
                     prefix={
                       billRevenueCompare.revenueFrom -
                         billRevenueCompare.revenueTo >
-                        0 ? (
+                      0 ? (
                         <ArrowDownOutlined />
                       ) : (
                         <ArrowUpOutlined />

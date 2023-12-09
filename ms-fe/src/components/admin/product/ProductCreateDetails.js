@@ -204,26 +204,26 @@ const ProductCreateDetails = () => {
       axios
         .get(
           api +
-          "product/filterProductDetailByIdCom?productId=" +
-          productDetailRequest.productId +
-          "&buttonId=" +
-          productDetailRequest.buttonId +
-          "&materialId=" +
-          productDetailRequest.materialId +
-          "&shirtTailId=" +
-          productDetailRequest.shirtTailId +
-          "&sleeveId=" +
-          productDetailRequest.sleeveId +
-          "&collarId=" +
-          productDetailRequest.collarId +
-          "&brandId=" +
-          productDetailRequest.brandId +
-          "&categoryId=" +
-          productDetailRequest.categoryId +
-          "&patternId=" +
-          productDetailRequest.patternId +
-          "&formId=" +
-          productDetailRequest.formId,
+            "product/filterProductDetailByIdCom?productId=" +
+            productDetailRequest.productId +
+            "&buttonId=" +
+            productDetailRequest.buttonId +
+            "&materialId=" +
+            productDetailRequest.materialId +
+            "&shirtTailId=" +
+            productDetailRequest.shirtTailId +
+            "&sleeveId=" +
+            productDetailRequest.sleeveId +
+            "&collarId=" +
+            productDetailRequest.collarId +
+            "&brandId=" +
+            productDetailRequest.brandId +
+            "&categoryId=" +
+            productDetailRequest.categoryId +
+            "&patternId=" +
+            productDetailRequest.patternId +
+            "&formId=" +
+            productDetailRequest.formId,
           {
             headers: {
               Authorization: `Bearer ${getToken(true)}`,
@@ -403,7 +403,7 @@ const ProductCreateDetails = () => {
               }
             });
         },
-        onCancel() { },
+        onCancel() {},
       });
     } else {
       messageApi.error("Vui lòng nhập hoạt tiết!", 1);
@@ -449,7 +449,7 @@ const ProductCreateDetails = () => {
               }
             });
         },
-        onCancel() { },
+        onCancel() {},
       });
     } else {
       messageApi.error("Vui lòng nhập dáng áo!", 1);
@@ -491,7 +491,7 @@ const ProductCreateDetails = () => {
               }
             });
         },
-        onCancel() { },
+        onCancel() {},
       });
     } else {
       messageApi.error("Vui lòng nhập thương hiệu!", 1);
@@ -533,7 +533,7 @@ const ProductCreateDetails = () => {
               }
             });
         },
-        onCancel() { },
+        onCancel() {},
       });
     } else {
       messageApi.error("Vui lòng nhập loại sản phẩm!", 1);
@@ -575,7 +575,7 @@ const ProductCreateDetails = () => {
               }
             });
         },
-        onCancel() { },
+        onCancel() {},
       });
     } else {
       messageApi.error("Vui lòng nhập dáng áo!", 1);
@@ -617,7 +617,7 @@ const ProductCreateDetails = () => {
               }
             });
         },
-        onCancel() { },
+        onCancel() {},
       });
     } else {
       messageApi.error("Vui lòng nhập nút áo!", 1);
@@ -665,7 +665,7 @@ const ProductCreateDetails = () => {
               }
             });
         },
-        onCancel() { },
+        onCancel() {},
       });
     } else {
       messageApi.error("Vui lòng nhập chất liệu!", 1);
@@ -713,7 +713,7 @@ const ProductCreateDetails = () => {
               }
             });
         },
-        onCancel() { },
+        onCancel() {},
       });
     } else {
       messageApi.error("Vui lòng nhập cổ áo!", 1);
@@ -759,7 +759,7 @@ const ProductCreateDetails = () => {
               }
             });
         },
-        onCancel() { },
+        onCancel() {},
       });
     } else {
       messageApi.error("Vui lòng nhập tay áo!", 1);
@@ -805,7 +805,7 @@ const ProductCreateDetails = () => {
               }
             });
         },
-        onCancel() { },
+        onCancel() {},
       });
     } else {
       messageApi.error("Vui lòng nhập kích cỡ!", 1);
@@ -850,7 +850,7 @@ const ProductCreateDetails = () => {
               }
             });
         },
-        onCancel() { },
+        onCancel() {},
       });
     } else {
       messageApi.error("Vui lòng nhập màu sắc!", 1);
@@ -1080,7 +1080,7 @@ const ProductCreateDetails = () => {
   return (
     <>
       <Spin
-        tip="Loading..."
+        tip="Vui lòng chờ..."
         spinning={isLoading}
         size="large"
         style={{ width: "100%" }}
@@ -1095,7 +1095,7 @@ const ProductCreateDetails = () => {
             onCancel={() => setModalColorOpen(false)}
           >
             <Spin
-              tip="Loading..."
+              tip="Vui lòng chờ..."
               spinning={loadingColor}
               size="large"
               style={{ width: "100%" }}
@@ -1136,7 +1136,7 @@ const ProductCreateDetails = () => {
           >
             <div>
               <Spin
-                tip="Loading..."
+                tip="Vui lòng chờ..."
                 spinning={loadingProduct}
                 size="large"
                 style={{ width: "100%" }}
@@ -1951,8 +1951,8 @@ const ProductCreateDetails = () => {
           </Row>
         </div>
         {product.productId !== null &&
-          colorsCreate.length > 0 &&
-          productDetailsCreate.length > 0 ? (
+        colorsCreate.length > 0 &&
+        productDetailsCreate.length > 0 ? (
           <ProductDetailsTable
             setLoading={setisLoading}
             product={product}

@@ -284,6 +284,14 @@ public class AccountServiceImpl implements AccountService {
         return null;
     }
 
+    @Override
+    public Account findAccountByEmail(String email) {
+        if(StringUtils.isNotBlank(email)) {
+            return accountRepository.findAccountByEmail(email);
+        }
+        return null;
+    }
+
     private Page<AccountVoucher> page(List<AccountVoucher> inputList, Pageable pageable) {
 
         int pageNo = pageable.getPageNumber();

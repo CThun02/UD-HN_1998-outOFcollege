@@ -8,7 +8,7 @@ const EditAddress = ({
     isModalOpen,
     handleAddressOk,
     handleAddressCancel,
-    render,
+    setRender,
     addressId,
     billId,
     totalPrice
@@ -27,6 +27,7 @@ const EditAddress = ({
         ward: '',
         descriptionDetail: '',
     })
+    const [thisRender, setThisRender] = useState(null)
 
     const CLIENTURL = `http://localhost:8080/api/client`
 
@@ -129,7 +130,7 @@ const EditAddress = ({
             service_id: 53321,
         };
 
-        if (toDistrictId && toWardCode) {
+        if (toDistrictId && toWardCode && isModalOpen) {
             axios
                 .post(
                     "https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/leadtime",
@@ -169,7 +170,7 @@ const EditAddress = ({
             width: 15,
         };
 
-        if (insuranceValue && toDistrictId && toWardCode) {
+        if (insuranceValue && toDistrictId && toWardCode && isModalOpen) {
             axios
                 .post(
                     "https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee",
@@ -242,9 +243,9 @@ const EditAddress = ({
         })
 
         handleAddressCancel()
-        render(Math.random)
+        setThisRender(Math.random)
         setFormData({})
-        console.log(formData)
+        setRender(Math.random())
     }
 
     useEffect(() => {
@@ -254,15 +255,14 @@ const EditAddress = ({
                     response.data.district?.substring(0, response.data.district.indexOf("|"));
                 let ward =
                     response.data.ward?.substring(0, response.data.ward.indexOf("|"));
-                setFormData({
-                    ...response.data,
-                    district: district,
-                    ward: ward
-                })
+                console.log(response.data)
+                console.log(ward, district)
+                setFormData(response.data)
+                console.log(formData)
             })
             .catch((error) => console.log(error))
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+    }, [thisRender])
 
     useEffect(() => {
         fetchProvince();
@@ -362,7 +362,7 @@ const EditAddress = ({
                                     height: 45,
                                     width: 465
                                 }}
-                                value={formData.district}
+                                value={formData.district.substring(0, formData.district.indexOf('|'))}
                                 optionFilterProp="children"
                                 filterOption={(input, option) => (option?.label ?? '').includes(input)}
                                 filterSort={(optionA, optionB) =>
@@ -393,7 +393,7 @@ const EditAddress = ({
                                     height: 45,
                                     width: 465
                                 }}
-                                value={formData.ward}
+                                value={formData.ward.substring(0, formData.ward.indexOf('|'))}
                                 optionFilterProp="children"
                                 filterOption={(input, option) => (option?.label ?? '').includes(input)}
                                 filterSort={(optionA, optionB) =>

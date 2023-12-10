@@ -677,6 +677,7 @@ const Bill = () => {
     }
     const visible = [...switchChange];
     visible[index] = checked;
+    setRemainAmount(-1)
     setSwitchChange(visible);
     setSymbol(checked ? "Shipping" : "Received");
     if (!checked) {
@@ -813,6 +814,7 @@ const Bill = () => {
         });
     }
   };
+
   const scanAddProductDetailIntoCart = (result) => {
     axios
       .get(
@@ -969,7 +971,7 @@ const Bill = () => {
       fullname: selectedAddress?.fullName,
       phoneNumber: selectedAddress.numberPhone,
       transactionCode: selectedOption === "2" ? transactionCode : null,
-      voucherCode: voucherAdd?.voucherCode,
+      voucherCode: voucherAdd?.voucherCode ?? null,
       createdBy: "user3",
       emailDetails: {
         recipient: selectedAddress.email ? [selectedAddress.email] : [email],
@@ -1185,6 +1187,7 @@ const Bill = () => {
     const inputValue = e.target.value;
     let calculatedValue = 0;
     if (switchChange[index]) {
+
       calculatedValue = inputValue - voucherPrice() - shippingFee;
     } else {
       calculatedValue = inputValue - voucherPrice();
@@ -1834,12 +1837,14 @@ const Bill = () => {
             );
           })}
       </Tabs >
+      {console.log(account)}
       <FormUsingVoucher
         priceBill={totalPrice}
         voucher={voucherAdd}
         setVoucher={setVoucherAdd}
         isOpen={isOpenFormVoucher}
         setIsOpen={setIsOpenFormVoucher}
+        username={account ? account?.username : null}
       />
     </>
   );

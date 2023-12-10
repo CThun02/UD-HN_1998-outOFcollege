@@ -1,12 +1,21 @@
-import { Modal } from 'antd';
+import { Modal, notification } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import React, { useState } from 'react'
 
-const ModalConfirm = ({ isModalOpen, handleOk, handleCancel }) => {
+const ModalConfirm = ({ isModalOpen, handleOk, handleCancel, action }) => {
 
     const [note, setNote] = useState('')
 
     const handleOkConfirm = () => {
+        if (action === 'rollback') {
+            if (note.length < 50) {
+                notification.error({
+                    message: "Thông báo",
+                    description: "Nhập lý do!",
+                });
+                return
+            }
+        }
         handleOk(note);
         setNote('');
     };

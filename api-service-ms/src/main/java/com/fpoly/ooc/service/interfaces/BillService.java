@@ -34,9 +34,12 @@ public interface BillService {
             String status,
             String symbol,
             Integer count,
-            String createdBy);
+            String createdBy,
+            String billType);
 
-    CountQuantityBillResponse getCountFilterBill();
+    Bill findBillByBillCode(String billCode);
+
+    CountQuantityBillResponse getCountFilterBill(String billType, LocalDateTime startDate, LocalDateTime endDate);
 
     void deleteBill(Long id);
 

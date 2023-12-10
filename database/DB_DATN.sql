@@ -317,7 +317,7 @@ CREATE TABLE delivery_note(
 CREATE TABLE time_line(
     id                  BIGINT IDENTITY PRIMARY KEY,
     bill_id             BIGINT FOREIGN KEY(bill_id) REFERENCES bill(id),
-    note                NVARCHAR(100),
+    note                NVARCHAR(MAX),
     status              VARCHAR(50),
     created_at          DATETIME,
     updated_at          DATETIME,

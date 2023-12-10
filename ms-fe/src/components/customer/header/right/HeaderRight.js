@@ -66,7 +66,17 @@ function HeaderRight(props) {
 
   const content = (
     <div style={{ width: "100px" }}>
-      {user ? (
+      <p>
+        <Link to={"/authen/sign-in"} className={styles.link}>
+          Đăng nhập
+        </Link>
+      </p>
+    </div>
+  );
+
+  const contentLogout = (
+    <div style={{ width: "100px" }}>
+      {user && (
         <p>
           <Link
             onClick={() => {
@@ -84,14 +94,6 @@ function HeaderRight(props) {
             Đăng xuất
           </Link>
         </p>
-      ) : (
-        <>
-          <p>
-            <Link to={"/authen/sign-in"} className={styles.link}>
-              Đăng nhập
-            </Link>
-          </p>
-        </>
       )}
     </div>
   );
@@ -134,18 +136,32 @@ function HeaderRight(props) {
             </Link>
           </Badge>
           <Space>
-            <Popover content={content} placement="bottomLeft" trigger="hover">
-              <UserOutlined className={styles.iconSize} />
-            </Popover>
             {user ? (
-              <div style={{ marginLeft: "10px" }}>
+              <UserOutlined className={styles.iconSize} />
+            ) : (
+              <Popover content={content} placement="bottomLeft" trigger="hover">
+                <UserOutlined className={styles.iconSize} />
+              </Popover>
+            )}
+            {user ? (
+              <div
+                style={{ marginLeft: "10px" }}
+                className={styles.cssText}
+                title={user}
+              >
                 <span>Xin chào, </span>{" "}
-                <Link
-                  to={"/ms-shop/user/" + usernameEncode}
-                  className={styles.link}
+                <Popover
+                  content={contentLogout}
+                  placement="bottomLeft"
+                  trigger="hover"
                 >
-                  <strong>{user}</strong>
-                </Link>
+                  <Link
+                    to={"/ms-shop/user/" + usernameEncode}
+                    className={styles.link}
+                  >
+                    <strong>{user}</strong>
+                  </Link>
+                </Popover>
               </div>
             ) : null}
           </Space>

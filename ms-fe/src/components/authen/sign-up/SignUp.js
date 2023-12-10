@@ -39,6 +39,8 @@ function SignUp() {
       showSuccessNotification("Đăng kí thành công", "login");
       navigate("/ms-shop/home");
     } catch (err) {
+      setIsLoading(false);
+
       if (err?.response?.status === 400) {
         api.error({
           message: `Đã xảy ra lỗi`,
@@ -51,8 +53,6 @@ function SignUp() {
         message: `Đã xảy ra lỗi`,
         description: `${err.response?.data?.message}`,
       });
-
-      setIsLoading(false);
     }
   }
 

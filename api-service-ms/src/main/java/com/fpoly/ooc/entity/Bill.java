@@ -76,6 +76,9 @@ public class Bill extends BaseEntity {
     private List<Timeline> timeLine;
 
     @OneToMany(mappedBy = "bill")
+    private List<BillDetail> billDetails;
+
+    @OneToMany(mappedBy = "bill")
     private List<PaymentDetail> lstPaymentDetail;
 
 }

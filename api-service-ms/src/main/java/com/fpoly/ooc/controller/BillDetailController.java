@@ -1,17 +1,18 @@
 package com.fpoly.ooc.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fpoly.ooc.entity.BillDetail;
 import com.fpoly.ooc.request.bill.BillDetailRequest;
 import com.fpoly.ooc.service.interfaces.BillDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -25,7 +26,9 @@ public class BillDetailController {
 
     @PostMapping("/create-bill-detail")
     public ResponseEntity<?> createdBillDetail(@RequestBody BillDetailRequest request) {
-        return ResponseEntity.ok(billDetailService.createBillDetail(request));
+        BillDetail billDetail = billDetailService.createBillDetail(request);
+        request.setBillDetailId(billDetail.getId());
+        return ResponseEntity.ok("ok");
     }
 
     @PutMapping()
@@ -33,9 +36,10 @@ public class BillDetailController {
         return ResponseEntity.ok(billDetailService.updateBillDetail(request));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteBillDetail(@PathVariable("id") Long id) throws JsonProcessingException {
-        return ResponseEntity.ok(billDetailService.deleteBillDetail(id));
+    @DeleteMapping("")
+    public ResponseEntity<?> deleteBillDetail(@RequestParam("billId") Long billId,
+                                              @RequestParam("billDetailId") Long billDetailId) {
+        return ResponseEntity.ok(billDetailService.deleteBillDetail(billId, billDetailId));
     }
 
 }

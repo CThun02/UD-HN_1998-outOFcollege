@@ -39,6 +39,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Optional;
 
 @RestController
@@ -215,9 +217,13 @@ public class ClientController {
 
     @GetMapping("/countBill")
     public ResponseEntity<?> countBill(
+            @RequestParam(value = "billType", required = false) String billType,
             @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Optional<LocalDate> startDate,
             @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Optional<LocalDate> endDate) {
-        return ResponseEntity.ok(billService.getCountFilterBill());
+        LocalDateTime startDateTime = startDate.map(date -> LocalDateTime.of(date, LocalTime.MIN)).orElse(null);
+        LocalDateTime endDateTime = endDate.map(date -> LocalDateTime.of(date, LocalTime.MAX)).orElse(null);
+        return ResponseEntity.ok(billService.getCountFilterBill(billType.trim().equals("") ? null : billType,
+                startDateTime, endDateTime));
     }
 
     @GetMapping("/address/{id}")
@@ -225,9 +231,14 @@ public class ClientController {
         return ResponseEntity.ok(addressService.getOne(id));
     }
 
-    @GetMapping("account/{username}")
+    @GetMapping("/account/{username}")
     public ResponseEntity<?> detail(@PathVariable String username) {
         return ResponseEntity.ok(accountService.detail(username));
+    }
+
+    @GetMapping("/getTimelineClientByBillCode/{billCode}")
+    public ResponseEntity<?> getTest(@PathVariable("billCode") String billCode) {
+        return ResponseEntity.ok().body(timeLineService.getTimelineByBillCode(billCode));
     }
 
 }

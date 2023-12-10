@@ -98,13 +98,11 @@ public class EmailServiceImpl implements EmailService {
             MimeMessage message = javaMailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-            for (String recipient : details.getRecipient()) {
                 helper.setFrom(sender);
-                helper.setTo(recipient);
+                helper.setTo(details.getRecipient().get(0));
                 helper.setSubject(details.getSubject());
                 helper.setText(details.getMessageBody(), true);
                 javaMailSender.send(message);
-            }
 
             return CompletableFuture.completedFuture("DONE");
         } catch (Exception e) {

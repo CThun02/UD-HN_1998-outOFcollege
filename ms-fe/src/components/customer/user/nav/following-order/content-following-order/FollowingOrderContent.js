@@ -156,10 +156,10 @@ function FollowingOrderContent({ billCode, status, symbol, count, createdBy }) {
   };
 
   useEffect(() => {
-    const getAll = async () => {
+    const getAll = () => {
       setLoading(false);
-      const data = await token;
-      await axios
+      const data = token;
+      axios
         .get(
           `http://localhost:8080/api/client/timelineByUser?username=${data?.username ? data?.username : ""
           }&billCode=${billCode}&status=${status}&symbol=${symbol}&count=${count}&createdBy=${createdBy}`

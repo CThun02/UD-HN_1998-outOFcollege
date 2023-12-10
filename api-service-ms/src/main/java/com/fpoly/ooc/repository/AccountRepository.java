@@ -76,9 +76,6 @@ public interface AccountRepository extends JpaRepository<Account, String> {
             "and (account.numberPhone = ?1 or account.email = ?1 or account.username = ?1) ")
     Account findUserByLogin(String login);
 
-//        @Query("SELECT new com.fpoly.ooc.responce.account.AccountResponce(a.username,a.avatar,a.fullName,a.)" +
-//                "FROM Account a where a.role=?1")
-//    List<Account> seach(String username);
 
     @Query("""
         select new com.fpoly.ooc.dto.UserInfomationDTO(user.username, user.password,

@@ -1086,12 +1086,10 @@ const StatisticalIndex = () => {
                     const id = String(i + 1);
                     return {
                       label: (
-                        <Badge count={6}>
-                          <span style={{ padding: "20px" }}>
-                            <Icon />
-                            {id === "1" ? "Sản xuất" : "Khác"}
-                          </span>
-                        </Badge>
+                        <span style={{ padding: "20px" }}>
+                          <Icon />
+                          {id === "1" ? "Sản xuất" : "Khác"}
+                        </span>
                       ),
                       key: id === "1" ? "PRODUCE" : "OTHER",
                       children: (

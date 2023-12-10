@@ -8,11 +8,14 @@ import { NotificationContext } from "../../element/notification/NotificationAuth
 import { useContext } from "react";
 import { getToken, setAuthHeader } from "../../../service/Token";
 import { useEffect } from "react";
+import { GoogleLogin } from "@react-oauth/google";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+import { jwtDecode } from "jwt-decode";
 
 const facebookLogo = "/logo/facebook.png";
 const googleLogo = "/logo/google.png";
 
-const baseUrl = "http://localhost:8080/api/v1/auth/login";
+const baseUrl = "http://localhost:8080/api/v1/auth";
 
 function SignIn({ isAuthenAdmin }) {
   const [isLoading, setIsLoading] = useState(true);
@@ -35,7 +38,47 @@ function SignIn({ isAuthenAdmin }) {
   async function handleOnSubmit() {
     try {
       if (!getToken(isAuthenAdmin)) {
-        const res = await axios.post(baseUrl, login);
+        const res = await axios.post(baseUrl + "/login", login);
+        const data = await res.data;
+        const status = await res.status;
+
+        if (status === 200) {
+          setAuthHeader(data.token, isAuthenAdmin);
+        }
+
+        showSuccessNotification("Đăng nhập thành công", "login");
+        navigate(isAuthenAdmin ? "/api/admin" : "/ms-shop/home");
+        setIsLoading(false);
+      }
+    } catch (err) {
+      setIsLoading(false);
+      if (err.code === "ERR_NETWORK") {
+        api.error({
+          message: `Đã xảy ra lỗi`,
+          description: `Máy chủ đang bảo trì.`,
+        });
+        return;
+      }
+
+      api.error({
+        message: `Đã xảy ra lỗi`,
+        description: `Tài khoản hoặc mật khẩu không chính xác.`,
+      });
+    }
+  }
+
+  async function handleOnSubmitGoogle(token) {
+    try {
+      if (!getToken(isAuthenAdmin)) {
+        const decode = jwtDecode(token);
+        const objectGoogle = {
+          email: decode.email,
+          name: decode.name,
+          picture: decode.picture,
+          role: isAuthenAdmin ? "ROLE_ADMIN" : "ROLE_CUSTOMER",
+          isAdmin: isAuthenAdmin,
+        };
+        const res = await axios.post(baseUrl + "/google", objectGoogle);
         const data = await res.data;
         const status = await res.status;
 
@@ -92,9 +135,9 @@ function SignIn({ isAuthenAdmin }) {
   );
 
   useEffect(() => {
-    if (getToken(true) && isAuthenAdmin) {
+    if (getToken(isAuthenAdmin)) {
       setIsLoadingPage(false);
-      navigate("/api/admin");
+      navigate(isAuthenAdmin ? "/api/admin" : "/ms-shop");
     }
   }, [navigate, isAuthenAdmin]);
 
@@ -194,14 +237,43 @@ function SignIn({ isAuthenAdmin }) {
                           />
                           <span>Facebook</span>
                         </Button>
-                        <Button size="large" className={styles.logoIcon}>
-                          <img
-                            src={googleLogo}
-                            alt="google"
-                            style={{ width: "20px", marginRight: "10px" }}
-                          />
-                          <span>Google</span>
-                        </Button>
+                        {isAuthenAdmin ? (
+                          <GoogleOAuthProvider clientId="142772119548-58psqiarvspr1356mm7itghqsqbbl38d.apps.googleusercontent.com">
+                            <GoogleLogin
+                              onSuccess={(credentialResponse) =>
+                                handleOnSubmitGoogle(
+                                  credentialResponse.credential
+                                )
+                              }
+                              onError={() => {
+                                api.error({
+                                  message: `Đã xảy ra lỗi`,
+                                  description: `Máy chủ đang bảo trì. Vui lòng đăng nhập phương thức khác.`,
+                                });
+                                return;
+                              }}
+                              key={"login"}
+                            />
+                          </GoogleOAuthProvider>
+                        ) : (
+                          <GoogleOAuthProvider clientId="650795647044-pqeg0r3lphvuire996mi13fh17fn0893.apps.googleusercontent.com">
+                            <GoogleLogin
+                              onSuccess={(credentialResponse) =>
+                                handleOnSubmitGoogle(
+                                  credentialResponse.credential
+                                )
+                              }
+                              onError={() => {
+                                api.error({
+                                  message: `Đã xảy ra lỗi`,
+                                  description: `Máy chủ đang bảo trì. Vui lòng đăng nhập phương thức khác.`,
+                                });
+                                return;
+                              }}
+                              key={"login"}
+                            />
+                          </GoogleOAuthProvider>
+                        )}
                       </div>
                     </Space>
                   </Form>

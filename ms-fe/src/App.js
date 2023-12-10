@@ -5,11 +5,8 @@ import ClientPage from "./components/customer/ClientPage";
 import { Result } from "antd";
 import Authen from "./components/authen/Authen";
 import { NotificationProvider } from "./components/element/notification/NotificationAuthen";
-import { getToken } from "./service/Token";
 
 function App() {
-  const tokenClient = getToken(false);
-
   return (
     <>
       <NotificationProvider>
@@ -18,12 +15,7 @@ function App() {
             <Route index element={<ClientPage />} />
             <Route path="api/*" element={<AdminPage />} />
             <Route path="ms-shop/*" element={<ClientPage />} />
-            {tokenClient ? null : (
-              <Route
-                path="authen/*"
-                element={<Authen isAuthenAdmin={false} />}
-              />
-            )}
+            <Route path="authen/*" element={<Authen isAuthenAdmin={false} />} />
             <Route
               path="authen/admin/*"
               element={<Authen isAuthenAdmin={true} />}

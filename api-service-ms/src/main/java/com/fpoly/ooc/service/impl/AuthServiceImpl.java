@@ -5,6 +5,7 @@ import com.fpoly.ooc.constant.ErrorCodeConfig;
 import com.fpoly.ooc.dto.CredentialsDTO;
 import com.fpoly.ooc.dto.EmailDetails;
 import com.fpoly.ooc.dto.RePasswordRequest;
+import com.fpoly.ooc.dto.SignUpGoogleDTO;
 import com.fpoly.ooc.dto.UserDTO;
 import com.fpoly.ooc.entity.Account;
 import com.fpoly.ooc.entity.Role;
@@ -85,7 +86,8 @@ public class AuthServiceImpl implements AuthService {
         Account savedUser = accountService.save(user);
         String title = ErrorCodeConfig.getFormatMessage(Const.HTML_TITLE, "Đăng kí tài khoản");
         String body = ErrorCodeConfig.getFormatMessage(Const.HTML_BODY,
-                "Chúc mừng bạn đã đăng kí tài khoản thành công.", null,
+                "Chúc mừng bạn đã đăng kí tài khoản thành công.", "<p style=\"font-size: 16px;\">Tên tài khoản: "
+                        + signUp.getUsername() + "</p>" + "<p style=\"font-size: 16px;\">Mật khẩu: " + signUp.getPassword() + "</p>",
                 "Cảm ơn bạn đã tin tưởng và đồng hành cùng chúng tôi. Bạn có thể đăng nhập vào website của chúng tôi tại đây. Chúc một ngày tốt lành!!");
         if(Objects.nonNull(savedUser)) {
             EmailDetails emailDetails = new EmailDetails();
@@ -145,6 +147,45 @@ public class AuthServiceImpl implements AuthService {
                 .username(account.getUsername())
                 .roles(roleService.findRoleNameByUsername(account.getUsername()))
                 .build();
+    }
+
+    @Override
+    public UserDTO loginWithConnectGoogle(SignUpGoogleDTO req) {
+        if (Objects.isNull(req)) {
+            return null;
+        }
+
+        Account findAccount = accountService.findAccountByLogin(req.getEmail(), req.getRole());
+        if (Objects.nonNull(findAccount)) {
+            return mapperUser(findAccount);
+        }
+
+        if (req.getIsAdmin()) {
+            return null;
+        }
+
+        int usernameAtIndex = req.getEmail().indexOf("@");
+        if(usernameAtIndex == -1) {
+            return null;
+        }
+        String username = req.getEmail().substring(0, usernameAtIndex);
+
+        Account isCheckUsername = accountService.findByUsername(username);
+
+        if(Objects.nonNull(isCheckUsername)) {
+            username = username + ((int) (Math.random() * 9999));
+        }
+
+        SignUpRequest signUp = new SignUpRequest();
+        signUp.setUsername(username);
+        signUp.setRole(req.getRole());
+        signUp.setEmail(req.getEmail());
+        signUp.setPassword(generatorCodeNoUpperCase());
+        signUp.setFullName(req.getName());
+
+        UserDTO saveAccount = register(signUp);
+
+        return saveAccount;
     }
 
     private UserDTO mapperUser(Account account) {

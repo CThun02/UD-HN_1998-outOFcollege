@@ -11,7 +11,7 @@ function Slider({ reduce }) {
       <div className={styles.relative}>
         <div>
           <div className={styles.imageSize}>
-            <img src={imageSlider} alt="slider" />
+            <img src={imageSlider} alt="slider" style={{ width: "100%" }} />
           </div>
         </div>
 
@@ -21,7 +21,8 @@ function Slider({ reduce }) {
             Đồ thời trang nam
           </h1>
           <p className={`${styles.textSpan} ${styles.upperCase}`}>
-            Giảm tới {reduce ? reduce : sale} cho đặt hàng trực tuyến
+            Giảm tới {reduce ? reduce : sale}{" "}
+            <span className={styles.hideText}>cho đặt hàng trực tuyến</span>
           </p>
           <Link to="/ms-shop/shopping">
             <Button

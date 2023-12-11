@@ -16,8 +16,8 @@
 
 .absolute {
   position: absolute;
-  top: 200px;
-  left: 180px;
+  top: 22%;
+  left: 10%;
 }
 
 .imageSize {
@@ -57,5 +57,21 @@
 }
 
 .spacing {
-  margin-top: 28px;
+  margin-top: 2%;
+}
+
+@media (max-width: 1000px) {
+  .textSpan {
+    background-color: #845b38;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    text-align: center;
+    letter-spacing: 2px;
+  }
+  .hideText {
+    display: none;
+  }
 }

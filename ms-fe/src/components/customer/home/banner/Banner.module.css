@@ -2,7 +2,7 @@
   background-color: #101218;
   /* padding-top: 35px;
   padding-bottom: 30px; */
-  padding: 35px 150px 30px 150px;
+  padding: 0 5% 0 5%;
 }
 
 .backgroundCard {
@@ -14,7 +14,7 @@
 }
 
 .padding {
-  padding: 35px 25px;
+  padding: 7% 5%;
 }
 
 .sizeText {

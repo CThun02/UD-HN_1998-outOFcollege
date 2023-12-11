@@ -1,9 +1,5 @@
-.width {
-  width: 270px !important;
-}
-
-.image {
-  height: 360px !important;
+.width80 {
+  width: 80%;
 }
 
 .width div:nth-child(2) {

@@ -34,3 +34,14 @@
 .width div:nth-child(2) {
   height: auto;
 }
+.btnFilter {
+  display: none;
+}
+@media (max-width: 1199px) {
+  .filter {
+    display: none;
+  }
+  .btnFilter {
+    display: block;
+  }
+}

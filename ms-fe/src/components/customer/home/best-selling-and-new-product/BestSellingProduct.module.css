@@ -28,6 +28,13 @@
 }
 
 .spacing {
-  padding-left: 150px;
-  padding-right: 150px;
+  padding-left: 10%;
+  padding-right: 10%;
+}
+
+@media (max-width: 870px) {
+  .spacing {
+    padding-left: 2%;
+    padding-right: 2%;
+  }
 }

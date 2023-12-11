@@ -30,3 +30,9 @@
   /* border-bottom: 1px solid #2fc1ff; */
   color: #2fc1ff;
 }
+
+@media (max-width: 1499px) {
+  .flex {
+    display: none;
+  }
+}

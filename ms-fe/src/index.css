@@ -5,7 +5,8 @@
 }
 
 body {
-  font-family: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue",
+  font-family: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue",
     Helvetica, Arial, sans-serif !important;
   font-size: 14px;
   background-color: #f9fbfd !important;
@@ -14,7 +15,8 @@ body {
   overflow-x: hidden;
 }
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
 }
 
 p {
@@ -23,6 +25,34 @@ p {
 
 h6 {
   font-size: 16px;
+}
+
+@media (max-width: 1300px) {
+  h2 {
+    font-size: 24px !important;
+  }
+
+  h1 {
+    font-size: 32px !important;
+  }
+
+  p {
+    font-size: 16px !important;
+  }
+}
+
+@media (max-width: 500px) {
+  h2 {
+    font-size: 16px !important;
+  }
+
+  h1 {
+    font-size: 20px !important;
+  }
+
+  p {
+    font-size: 16px !important;
+  }
 }
 
 /* Tùy chỉnh kiểu dáng chung của thanh cuộn */

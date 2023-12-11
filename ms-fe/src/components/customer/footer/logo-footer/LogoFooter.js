@@ -13,15 +13,11 @@ function LogoFooter() {
             <img src={logo} alt="logo-shop" className={styles.imageSize} />
           </Link>
         </Col>
-      </Row>
-      <Row>
-        <Col>
+        <Col span={24}>
           <p className={styles.fontStyle}>
             Sự đơn giản là định nghĩa của thanh lịch.
           </p>
         </Col>
-      </Row>
-      <Row>
         <Col span={24}>
           <Space direction="vertical" size={10}>
             <Col span={24}>

@@ -27,34 +27,39 @@ const ModalDetail = ({
           return status === "1"
             ? "Chờ xác nhận"
             : status === "2"
-            ? "Thanh toán thành công"
-            : status === "0"
-            ? "Đã hủy"
-            : status === "3"
-            ? "Yêu cầu trả hàng"
-            : status === "4"
-            ? "Trả hàng thành công"
-            : status === "5"
-            ? "Yêu cầu trả hàng"
-            : status === "-1"
-            ? "Đã hủy yêu cầu trả hàng"
-            : "Trả hàng thành công";
+              ? "Thanh toán thành công"
+              : status === "0"
+                ? "Đã hủy"
+                : status === "3"
+                  ? "Yêu cầu trả hàng"
+                  : status === "4"
+                    ? "Trả hàng thành công"
+                    : status === "5"
+                      ? "Yêu cầu trả hàng"
+                      : status === "-1"
+                        ? "Đã hủy yêu cầu trả hàng"
+                        : "Trả hàng thành công";
         } else {
           return status === "1"
             ? "Chờ xác nhận"
             : status === "2"
-            ? "Đã xác nhận"
-            : status === "3"
-            ? "Đã giao đóng gói & đang được giao"
-            : status === "4"
-            ? "Giao hàng thành công"
-            : status === "0"
-            ? "Đã hủy"
-            : status === "5"
-            ? "Yêu cầu trả hàng"
-            : status === "-1"
-            ? "Đã hủy yêu cầu trả hàng"
-            : "Trả hàng thành công";
+              ? "Đã xác nhận"
+              : status === "3"
+                ? "Đã giao đóng gói & đang được giao"
+                : status === "4"
+                  ? "Giao hàng thành công"
+                  : status === "0"
+                    ? "Đã hủy"
+                    : status === "5"
+                      ? "Yêu cầu trả hàng"
+                      : status === "-1"
+                        ? "Đã hủy yêu cầu trả hàng"
+                        : status === 'Update' ?
+                          `Cập nhật sản phẩm`
+                          : status === 'Delete' ? `Xóa sản phẩm`
+                            : status === '2Cancel' ? `Đã xác nhận`
+                              : status === "Rollback" ? "Quay trở lại xác nhận"
+                                : "Trả hàng thành công"
         }
       },
     },

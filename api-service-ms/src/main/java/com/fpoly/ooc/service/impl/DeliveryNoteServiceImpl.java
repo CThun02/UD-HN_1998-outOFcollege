@@ -14,7 +14,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Service
-
 public class DeliveryNoteServiceImpl implements DeliveryNoteService {
 
     @Autowired

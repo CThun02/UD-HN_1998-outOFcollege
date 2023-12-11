@@ -12,6 +12,8 @@ import * as yup from 'yup';
 import { getAuthToken } from '../../../service/Token'
 import ModalAddress from '../../admin/sale-couter/ModalAddress.js'
 import FormUsingVoucher from '../../element/voucher/FormUsingVoucher.js';
+import { PDFDownloadLink, Image, Document, Page, Text, View, Font } from '@react-pdf/renderer';
+
 
 const Checkout = ({ setRenderHeader }) => {
     const [provinces, setProvinces] = useState([])
@@ -43,6 +45,7 @@ const Checkout = ({ setRenderHeader }) => {
     const [voucherAdd, setVoucherAdd] = useState({});
     const [isOpenFormVoucher, setIsOpenFormVoucher] = useState(false);
     const [username, setUsername] = useState(null)
+    const [bill, setBill] = useState(null)
 
     const handleProvincesChange = (e) => {
         formData.city = e
@@ -287,7 +290,6 @@ const Checkout = ({ setRenderHeader }) => {
             }
 
             cart.productDetails = productDetailUpdate;
-
             localStorage.setItem('user', JSON.stringify(cart));
         }
     }
@@ -326,12 +328,18 @@ const Checkout = ({ setRenderHeader }) => {
         }
     }
 
+    Font.register({
+        family: "Roboto",
+        src:
+            "https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-light-webfont.ttf"
+    });
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         const billCodeGen = generateRandomBillCode();
         const bill = {
             billCode: billCodeGen,
-            price: voucherPrice(),
+            price: totalPrice,
             priceReduce: totalPrice - voucherPrice(),
             paymentDetailId: formData.paymentDetailId,
             billType: "Online",
@@ -341,7 +349,7 @@ const Checkout = ({ setRenderHeader }) => {
             note: formData.note,
             lstBillDetailRequest: formData.lstBillDetailRequest,
             transactionCode: formData.paymentDetailId === 2 ? '' : null,
-            voucherCode: null,
+            voucherCode: voucherAdd.voucherCode ? voucherAdd.voucherCode : null,
             emailDetails: {
                 recipient: dataToken ? [email] : [formData.email],
                 messageBody: `<body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: Arial, sans-serif;">
@@ -414,7 +422,15 @@ const Checkout = ({ setRenderHeader }) => {
                                 item.cartDetailResponse.formName)} <span style="display: inline-block">(x ${item.quantity})</span></p>
                                                     </div>
                                                     <div style="width: 25%; padding: 4px;">
-                                                        <p>${(dataToken ? (item?.cartDetailResponse?.priceProductDetail - (item?.promotion[0]?.promotionValue ?? 0)).toLocaleString("vi-VN", { style: "currency", currency: "VND" }) : (item?.data[0]?.price - ((item?.data[0].promotion[0]?.promotionValue) ?? 0)).toLocaleString("vi-VN", { style: "currency", currency: "VND" }))
+                                                        <p>${(dataToken ? ((item?.promotion[0] ? (
+                            (item?.promotion[0]?.promotionMethod === 'vnd' ?
+                                item?.promotion[0]?.promotionValue :
+                                ((100 - item?.promotion[0]?.promotionValue) / 100) * item?.cartDetailResponse?.priceitem) * item.cartDetailResponse?.quantity
+                        ) : item.cartDetailResponse?.quantity * item?.cartDetailResponse?.priceProductDetail)).toLocaleString("vi-VN", { style: "currency", currency: "VND" }) : ((
+                            item.data[0].promotion[0] ? ((item.data[0].promotion[0]?.promotionMethod === 'vnd' ?
+                                item.data[0].promotion[0]?.promotionValue
+                                : ((100 - item.data[0].promotion[0]?.promotionValue) / 100) * item.data[0].price) * item?.quantity) : item?.quantity * item.data[0].price
+                        )).toLocaleString("vi-VN", { style: "currency", currency: "VND" }))
                         }</p>
                                                     </div >
                                                 </div > `
@@ -472,7 +488,10 @@ const Checkout = ({ setRenderHeader }) => {
                     for (let i = 0; i < productDetails?.length; i++) {
                         const billDetail = {
                             productDetailId: productDetails[i].cartDetailResponse.productDetailId,
-                            price: productDetails[i].cartDetailResponse.priceProductDetail,
+                            price: productDetails[i]?.promotion[0] ? ((productDetails[i]?.promotion[0]?.promotionMethod === 'vnd' ?
+                                (productDetails[i].cartDetailResponse?.quantity * productDetails[i]?.cartDetailResponse?.priceProductDetail) - productDetails[i]?.promotion[0]?.promotionValue :
+                                ((100 - productDetails[i]?.promotion[0]?.promotionValue) / 100) * productDetails[i]?.cartDetailResponse?.priceProductDetail) * productDetails[i].cartDetailResponse?.quantity)
+                                : productDetails[i].cartDetailResponse?.quantity * productDetails[i]?.cartDetailResponse?.priceProductDetail,
                             quantity: productDetails[i].cartDetailResponse.quantity,
                         };
                         formData.lstBillDetailRequest.push(billDetail)
@@ -481,7 +500,10 @@ const Checkout = ({ setRenderHeader }) => {
                     for (let i = 0; i < productDetails?.length; i++) {
                         const billDetail = {
                             productDetailId: productDetails[i].data[0].id,
-                            price: productDetails[i].data[0].price,
+                            price: productDetails[i].data[0].promotion[0] ? ((productDetails[i].data[0].promotion[0]?.promotionMethod === 'vnd' ?
+                                (productDetails[i].data[0].price * productDetails[i]?.quantity) - productDetails[i].data[0].promotion[0]?.promotionValue
+                                : ((100 - productDetails[i].data[0].promotion[0]?.promotionValue) / 100) * productDetails[i].data[0].price) * productDetails[i]?.quantity)
+                                : productDetails[i].data[0].price * productDetails[i]?.quantity,
                             quantity: productDetails[i].quantity,
                         };
                         formData.lstBillDetailRequest.push(billDetail)
@@ -630,16 +652,17 @@ const Checkout = ({ setRenderHeader }) => {
         let totalPrice = 0;
         if (data) {
             for (let i = 0; i < carts?.length; i++) {
-                let priceReduced = (carts[i]?.promotion[0]?.promotionMethod === 'vnd' ?
-                    carts[i]?.promotion[0]?.promotionValue :
-                    ((100 - carts[i]?.promotion[0]?.promotionValue) / 100) * carts[i]?.cartDetailResponse?.priceProductDetail) * carts[i].cartDetailResponse?.quantity;
+                let priceReduced = carts[i]?.promotion[0] ? ((carts[i]?.promotion[0]?.promotionMethod === 'vnd' ?
+                    carts[i]?.cartDetailResponse?.priceProductDetail - carts[i]?.promotion[0]?.promotionValue :
+                    ((100 - carts[i]?.promotion[0]?.promotionValue) / 100) * carts[i]?.cartDetailResponse?.priceProductDetail) * carts[i].cartDetailResponse?.quantity) : (carts[i]?.cartDetailResponse?.priceProductDetail) * carts[i].cartDetailResponse?.quantity;
                 totalPrice += priceReduced
             }
         } else {
             for (let i = 0; i < carts?.length; i++) {
-                let priceReduced = (carts[i].data[0].promotion[0]?.promotionMethod === 'vnd' ?
-                    carts[i].data[0].promotion[0]?.promotionValue
-                    : ((100 - carts[i].data[0].promotion[0]?.promotionValue) / 100) * carts[i].data[0].price) * carts[i]?.quantity;
+                let priceReduced = carts[i].data[0].promotion[0] ? ((carts[i].data[0].promotion[0]?.promotionMethod === 'vnd' ?
+                    (carts[i].data[0].price) - carts[i].data[0].promotion[0]?.promotionValue
+                    : ((100 - carts[i].data[0].promotion[0]?.promotionValue) / 100) * carts[i].data[0].price) * carts[i]?.quantity)
+                    : carts[i].data[0].price * carts[i]?.quantity;
                 totalPrice += priceReduced;
             }
         }
@@ -682,6 +705,14 @@ const Checkout = ({ setRenderHeader }) => {
                     })
             }
         }
+
+        // axios.get(`http://localhost:8080/api/client/pdf/${billCode}`)
+        //     .then((response) => {
+        //         setBill(response.data);
+        //     })
+        //     .catch((error) => {
+        //         console.log(error);
+        //     });
         getEmail();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
@@ -987,23 +1018,23 @@ const Checkout = ({ setRenderHeader }) => {
                                                                 </div>
                                                                 <div style={{ width: 256 }}>
                                                                     <span >
-                                                                        {productDetail.cartDetailResponse.productName + "-" + productDetail.cartDetailResponse.buttonName +
+                                                                        {productDetail?.cartDetailResponse.productName + "-" + productDetail?.cartDetailResponse.buttonName +
                                                                             "-" +
-                                                                            productDetail.cartDetailResponse.brandName +
+                                                                            productDetail?.cartDetailResponse.brandName +
                                                                             "-" +
-                                                                            productDetail.cartDetailResponse.categoryName +
+                                                                            productDetail?.cartDetailResponse.categoryName +
                                                                             "-" +
-                                                                            productDetail.cartDetailResponse.materialName +
+                                                                            productDetail?.cartDetailResponse.materialName +
                                                                             "-" +
-                                                                            productDetail.cartDetailResponse.collarName +
+                                                                            productDetail?.cartDetailResponse.collarName +
                                                                             "-" +
-                                                                            productDetail.cartDetailResponse.sleeveName +
+                                                                            productDetail?.cartDetailResponse.sleeveName +
                                                                             "-" +
-                                                                            productDetail.cartDetailResponse.shirtTailTypeName +
+                                                                            productDetail?.cartDetailResponse.shirtTailTypeName +
                                                                             "-" +
-                                                                            productDetail.cartDetailResponse.patternName +
+                                                                            productDetail?.cartDetailResponse.patternName +
                                                                             "-" +
-                                                                            productDetail.cartDetailResponse.formName}
+                                                                            productDetail?.cartDetailResponse.formName}
                                                                     </span>
                                                                     <div style={{ display: 'flex', alignItems: 'center' }}>
                                                                         <div
@@ -1011,18 +1042,18 @@ const Checkout = ({ setRenderHeader }) => {
                                                                                 height: 20,
                                                                                 width: 20,
                                                                                 borderRadius: '50%',
-                                                                                backgroundColor: productDetail.cartDetailResponse.colorCode,
+                                                                                backgroundColor: productDetail?.cartDetailResponse.colorCode,
                                                                             }}
                                                                         ></div>/
-                                                                        <span>{productDetail.cartDetailResponse.sizeName}</span>
+                                                                        <span>{productDetail?.cartDetailResponse.sizeName}</span>
                                                                     </div>
                                                                 </div>
                                                                 <div>
-                                                                    {numeral((
+                                                                    {numeral(productDetail?.promotion[0] ? (
                                                                         (productDetail?.promotion[0]?.promotionMethod === 'vnd' ?
-                                                                            productDetail?.promotion[0]?.promotionValue :
+                                                                            productDetail?.cartDetailResponse?.priceProductDetail - productDetail?.promotion[0]?.promotionValue :
                                                                             ((100 - productDetail?.promotion[0]?.promotionValue) / 100) * productDetail?.cartDetailResponse?.priceProductDetail) * productDetail.cartDetailResponse?.quantity
-                                                                    ))
+                                                                    ) : productDetail.cartDetailResponse?.quantity * productDetail?.cartDetailResponse?.priceProductDetail)
                                                                         .format('0,0') + 'đ'}
                                                                 </div>
                                                             </Space>
@@ -1078,9 +1109,9 @@ const Checkout = ({ setRenderHeader }) => {
                                                                 </div>
                                                                 <div>
                                                                     {numeral(
-                                                                        (productDetail.data[0].promotion[0]?.promotionMethod === 'vnd' ?
-                                                                            productDetail.data[0].promotion[0]?.promotionValue
-                                                                            : ((100 - productDetail.data[0].promotion[0]?.promotionValue) / 100) * productDetail.data[0].price) * productDetail?.quantity
+                                                                        productDetail.data[0].promotion[0] ? ((productDetail.data[0].promotion[0]?.promotionMethod === 'vnd' ?
+                                                                            productDetail.data[0].price - productDetail.data[0].promotion[0]?.promotionValue
+                                                                            : ((100 - productDetail.data[0].promotion[0]?.promotionValue) / 100) * productDetail.data[0].price) * productDetail?.quantity) : productDetail?.quantity * productDetail.data[0].price
                                                                     )
                                                                         .format('0,0') + 'đ'}
                                                                 </div>
@@ -1102,6 +1133,7 @@ const Checkout = ({ setRenderHeader }) => {
                                     setIsOpen={setIsOpenFormVoucher}
                                     username={dataToken?.username}
                                 />
+                                {console.log(voucherAdd)}
                             </div>
                             <div style={{ borderTop: '1px solid rgba(175,175,175,.34)', padding: '10px' }}>
                                 <Row>

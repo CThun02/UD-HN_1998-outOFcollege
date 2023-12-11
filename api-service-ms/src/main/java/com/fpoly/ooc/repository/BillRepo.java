@@ -30,6 +30,8 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
             "WHERE ad.accountAddress.username = ?1 ")
     List<Address> getListAddressByUsername(String username);
 
+    Bill findBillByBillCode(String billCode);
+
     @Query("SELECT sum(b.priceReduce) from Bill b where (b.billType like ?1 or ?1 is null) AND b.status <> 'CANCEL' AND " +
             "(?2 IS NULL OR b.createdAt >= ?2) AND (?3 IS NULL OR b.createdAt <= ?3)")
     Double getRevenueInStoreOnlineCompare(String type, LocalDateTime day, LocalDateTime dayTo);
@@ -81,6 +83,7 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
             "   AND (b.createdAt >= :startDate OR :startDate IS NULL) " +
             "   AND (b.createdAt <= :endDate OR :endDate IS NULL) " +
             "   AND (:status IS NULL OR b.status LIKE :status) " +
+            "   AND (:billType IS NULL OR b.billType LIKE :billType)" +
             "   AND (:createdBy IS NULL OR b.createdBy LIKE :createdBy AND b.status not like 'Cancel') " +
             "GROUP BY b.id, b.billCode, b.price, b.createdAt, b.billType, b.status, " +
             "    b.symbol, dn.shipPrice, b.priceReduce, dn.name, dn.phoneNumber, b.createdBy, " +
@@ -95,7 +98,9 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
             @Param("status") String status,
             @Param("symbol") String symbol,
             @Param("count") Integer count,
-            @Param("createdBy") String createdBy);
+            @Param("createdBy") String createdBy,
+            @Param("billType") String billType
+    );
 
 
     @Modifying

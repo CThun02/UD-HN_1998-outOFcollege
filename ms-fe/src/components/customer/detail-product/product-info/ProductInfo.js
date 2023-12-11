@@ -140,14 +140,11 @@ function ProductInfo({
               },
             }
           );
-          res.data.cartDetailResponse.quantity = quantity;
-          lstProductDetail.push(res.data[0]);
-        } else {
-          lstProductDetail.push({ data: productDetails, quantity: quantity });
+          res.data.cartDetailResponse.quantity = quantity
+          lstProductDetail.push(res.data);
         }
-
-        localStorage.setItem("checkout", JSON.stringify(lstProductDetail));
-        navigate("/ms-shop/checkout");
+        // localStorage.setItem('checkout', JSON.stringify(lstProductDetail));
+        // navigate('/ms-shop/checkout');
       } catch (error) {
         console.error(error);
       }
@@ -189,9 +186,8 @@ function ProductInfo({
               style={{ fontSize: "16px", padding: "6px 12px" }}
             >
               Giảm{" "}
-              {`${numeral(data.promotionValue).format("0,0")}${
-                data.promotionMethod === "vnd" ? "đ" : "%"
-              }`}
+              {`${numeral(data.promotionValue).format("0,0")}${data.promotionMethod === "vnd" ? "đ" : "%"
+                }`}
             </Tag>
           ) : (
             ""
@@ -204,56 +200,53 @@ function ProductInfo({
             <div className={`${styles.money}`}>
               <span
                 style={{ fontWeight: "600" }}
-                className={`${
-                  colorsAndSizes.promotionType && colorsAndSizes.promotionValue
-                    ? styles.moneyInactive
-                    : ""
-                }`}
+                className={`${colorsAndSizes.promotionType && colorsAndSizes.promotionValue
+                  ? styles.moneyInactive
+                  : ""
+                  }`}
               >
-                {`${
-                  comparePrice(
+                {`${comparePrice(
+                  colorsAndSizes.priceProductMin,
+                  colorsAndSizes.priceProductMax
+                )
+                  ? handleChangePrice(colorsAndSizes.priceProductMin) + "đ"
+                  : handleChangePrice(colorsAndSizes.priceProductMin) +
+                  " - " +
+                  handleChangePrice(colorsAndSizes.priceProductMax) +
+                  "đ"
+                  }`}
+              </span>
+              {colorsAndSizes?.promotionType &&
+                colorsAndSizes?.promotionValue ? (
+                <span style={{ fontWeight: "600" }}>
+                  {`${comparePrice(
                     colorsAndSizes.priceProductMin,
                     colorsAndSizes.priceProductMax
                   )
-                    ? handleChangePrice(colorsAndSizes.priceProductMin) + "đ"
+                    ? colorsAndSizes?.promotionType === "vnd"
+                      ? handleChangePrice(
+                        colorsAndSizes.priceProductMin -
+                          colorsAndSizes.promotionValue <=
+                          0
+                          ? 0
+                          : colorsAndSizes.priceProductMin -
+                          colorsAndSizes.promotionValue
+                      ) + "đ"
+                      : handleChangePrice(
+                        colorsAndSizes.priceProductMin -
+                          colorsAndSizes.priceProductMin *
+                          (colorsAndSizes.promotionValue / 100) <=
+                          0
+                          ? 0
+                          : colorsAndSizes.priceProductMin -
+                          colorsAndSizes.priceProductMin *
+                          (colorsAndSizes.promotionValue / 100)
+                      ) + "đ"
                     : handleChangePrice(colorsAndSizes.priceProductMin) +
-                      " - " +
-                      handleChangePrice(colorsAndSizes.priceProductMax) +
-                      "đ"
-                }`}
-              </span>
-              {colorsAndSizes?.promotionType &&
-              colorsAndSizes?.promotionValue ? (
-                <span style={{ fontWeight: "600" }}>
-                  {`${
-                    comparePrice(
-                      colorsAndSizes.priceProductMin,
-                      colorsAndSizes.priceProductMax
-                    )
-                      ? colorsAndSizes?.promotionType === "vnd"
-                        ? handleChangePrice(
-                            colorsAndSizes.priceProductMin -
-                              colorsAndSizes.promotionValue <=
-                              0
-                              ? 0
-                              : colorsAndSizes.priceProductMin -
-                                  colorsAndSizes.promotionValue
-                          ) + "đ"
-                        : handleChangePrice(
-                            colorsAndSizes.priceProductMin -
-                              colorsAndSizes.priceProductMin *
-                                (colorsAndSizes.promotionValue / 100) <=
-                              0
-                              ? 0
-                              : colorsAndSizes.priceProductMin -
-                                  colorsAndSizes.priceProductMin *
-                                    (colorsAndSizes.promotionValue / 100)
-                          ) + "đ"
-                      : handleChangePrice(colorsAndSizes.priceProductMin) +
-                        " - " +
-                        handleChangePrice(colorsAndSizes.priceProductMax) +
-                        "đ"
-                  }`}
+                    " - " +
+                    handleChangePrice(colorsAndSizes.priceProductMax) +
+                    "đ"
+                    }`}
                 </span>
               ) : (
                 ""

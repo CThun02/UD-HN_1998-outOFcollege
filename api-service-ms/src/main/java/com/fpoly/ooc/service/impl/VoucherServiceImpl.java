@@ -194,6 +194,11 @@ public class VoucherServiceImpl implements VoucherService {
         return voucherRepository.isCheckTimeUseAndAccount(Commons.lower(voucherCode), Commons.lower(username));
     }
 
+    @Override
+    public Voucher updateVoucher(Voucher voucher) {
+        return voucherRepository.save(voucher);
+    }
+
     private VoucherRequest convertVoucher(Voucher voucher) {
 
         return VoucherRequest.builder()

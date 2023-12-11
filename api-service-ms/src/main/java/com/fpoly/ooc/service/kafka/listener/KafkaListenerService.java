@@ -440,7 +440,9 @@ public class KafkaListenerService {
         if(Objects.nonNull(billDb)) {
             String createBill = objectMapper.writeValueAsString(billRepo.getAllBillManagement(null, null,
                     null, null, null, null, null, null));
+            String notificationsJson = objectMapper.writeValueAsString(billRepo.findAllNotifications());
             template.convertAndSend("/topic/new-bill-topic", createBill);
+            template.convertAndSend("/topic/notifications-topic", notificationsJson);
             log.info("TimeLineJson: " + createBill);
         }
     }

@@ -29,7 +29,6 @@ function SockJs({ setValues, connectTo }) {
     console.log("New Message Received!!", msg);
     if (msg.body) {
       console.log("New Message Received If!!", msg.body);
-
       setValues(JSON.parse(msg.body));
     }
   };

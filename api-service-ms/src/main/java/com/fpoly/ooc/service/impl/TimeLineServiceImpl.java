@@ -19,6 +19,7 @@ import com.fpoly.ooc.responce.timeline.TimelineProductResponse;
 import com.fpoly.ooc.service.interfaces.BillDetailService;
 import com.fpoly.ooc.service.interfaces.BillService;
 import com.fpoly.ooc.service.interfaces.DeliveryNoteService;
+import com.fpoly.ooc.service.interfaces.NotificationService;
 import com.fpoly.ooc.service.interfaces.ProductImageServiceI;
 import com.fpoly.ooc.service.interfaces.TimeLineService;
 import lombok.extern.slf4j.Slf4j;
@@ -56,6 +57,9 @@ public class TimeLineServiceImpl implements TimeLineService {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @Override
     public List<TimeLineResponse> getAllTimeLineByBillId(Long id) {
@@ -151,6 +155,9 @@ public class TimeLineServiceImpl implements TimeLineService {
             }
             timeLineRepo.save(timeline);
         }
+
+        String notificationsJson = objectMapper.writeValueAsString(notificationService.notificationDTOList());
+        template.convertAndSend("/topic/notifications-topic", notificationsJson);
 
         String timelineJson = objectMapper.writeValueAsString(timeLineRepo.getTimeLineByBillId(bill.getId()));
         template.convertAndSend("/topic/create-timeline-client-topic", timelineJson);

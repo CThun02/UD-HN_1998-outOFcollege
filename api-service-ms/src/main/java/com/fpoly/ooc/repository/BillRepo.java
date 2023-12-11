@@ -1,5 +1,6 @@
 package com.fpoly.ooc.repository;
 
+import com.fpoly.ooc.dto.NotificationDTO;
 import com.fpoly.ooc.entity.Address;
 import com.fpoly.ooc.entity.Bill;
 import com.fpoly.ooc.entity.BillDetail;
@@ -158,4 +159,7 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
             "join PromotionProduct pp on pp.productDetailId.id = pd.id  where pd.id = ?1 and (bd.createdAt>= pp.promotion.startDate " +
             "AND bd.createdAt <= pp.promotion.endDate and bd.bill.billCode=?2) and pp.promotion.status = 'ACTIVE' ")
     List<BillDetail> checkProductInPromotionById(Long productDetailId, String billCode);
+
+    @Query(name = "Bill.findAllNotifications", nativeQuery = true)
+    List<NotificationDTO> findAllNotifications();
 }

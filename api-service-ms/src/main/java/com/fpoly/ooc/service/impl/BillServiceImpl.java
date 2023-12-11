@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
 import com.fpoly.ooc.dto.BillStatusDTO;
+import com.fpoly.ooc.dto.NotificationDTO;
 import com.fpoly.ooc.dto.VoucherAccountConditionDTO;
 import com.fpoly.ooc.dto.VoucherAccountUsedDTO;
 import com.fpoly.ooc.entity.*;
@@ -488,5 +489,10 @@ public class BillServiceImpl implements BillService {
         price = (bill.getPrice()).subtract(priceReduce);
         bill.setPrice(price);
         return billRepo.save(bill);
+    }
+
+    @Override
+    public List<NotificationDTO> findAllNotifications() {
+        return billRepo.findAllNotifications();
     }
 }

@@ -1,7 +1,25 @@
 .flexContent {
   display: flex;
-  justify-content: center;
+  justify-content: space-around;
   padding-bottom: 80px;
+  width: 100%;
+}
+
+.selectResponse {
+  text-align: center;
+  padding-bottom: 80px;
+  display: none;
+}
+
+.selectDescription {
+  width: 70%;
+  border-bottom: 1px solid #a3a3a3 !important;
+}
+
+.contentDescription {
+  display: flex;
+  width: 100%;
+  justify-content: center;
 }
 
 .tabs {
@@ -52,4 +70,16 @@
 .flexCenter {
   display: flex;
   justify-content: center;
+}
+
+@media (max-width: 767px) {
+  .sizeText {
+    font-size: 16px;
+  }
+  .selectResponse {
+    display: block;
+  }
+  .flexContent {
+    display: none;
+  }
 }

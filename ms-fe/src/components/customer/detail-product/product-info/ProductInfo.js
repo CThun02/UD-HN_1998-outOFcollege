@@ -321,7 +321,7 @@ function ProductInfo({
       <div className={styles.sizeDiv}>
         <div className={styles.colorName}>
           <Row>
-            <Col span={16}>
+            <Col span={14}>
               <span className={`${styles.color} ${styles.textSize}`}>
                 Kích cỡ:{" "}
               </span>
@@ -331,7 +331,7 @@ function ProductInfo({
                 {chooseSize.sizeName}
               </span>
             </Col>
-            <Col span={8}>
+            <Col span={10}>
               <Link>Bảng quy đổi kích cỡ</Link>
             </Col>
           </Row>
@@ -354,7 +354,7 @@ function ProductInfo({
 
       <div className={styles.itemsCart}>
         <Row>
-          <Col span={12}>
+          <Col xxl={14} sm={24} xs={24} style={{ marginTop: "12px" }}>
             <div className={styles.btnAddToCart}>
               <button
                 className={`${styles.btn}`}
@@ -368,7 +368,7 @@ function ProductInfo({
               </button>
             </div>
           </Col>
-          <Col span={12}>
+          <Col xxl={10} sm={24} xs={24} style={{ marginTop: "12px" }}>
             <div className={styles.btnShoppingNow}>
               <button
                 className={`${styles.btn} ${styles.shoppingNow}`}

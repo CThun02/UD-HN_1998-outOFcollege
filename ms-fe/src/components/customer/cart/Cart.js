@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import styles from './Cart.module.css'
-import { Badge, Button, Carousel, Col, InputNumber, Row, Table, notification } from 'antd'
+import { Badge, Button, Carousel, Col, InputNumber, Row, Select, Table, notification } from 'antd'
 import { CloseOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
-import numeral from 'numeral'
+import numeral, { validate } from 'numeral'
 import { getAuthToken } from '../../../service/Token'
 import axios from 'axios'
 
@@ -17,7 +17,13 @@ const Cart = (props) => {
     const [carts, setCarts] = useState([])
     const token = getAuthToken();
 
+    const [sizeId, setSizeId] = useState(null)
+    const [colorId, setColorId] = useState(null)
+    const [colorsAndSizes, setColorsAndSizes] = useState({});
+
+
     const cartAPI = 'http://localhost:8080/api/client/cart';
+    const baseUrl = "http://localhost:8080/api/client/product";
 
     const columns = [
         {
@@ -195,6 +201,43 @@ const Cart = (props) => {
             })
     }
 
+    // const getColorsAndSizes = async (productId, brandId, categoryId, patternId, formId,
+    //     buttonId, materialId, collarId, sleeveId, shirtTailId) => {
+    //     if (
+    //         productId &&
+    //         brandId &&
+    //         categoryId &&
+    //         patternId &&
+    //         formId &&
+    //         buttonId &&
+    //         materialId &&
+    //         collarId &&
+    //         sleeveId &&
+    //         shirtTailId
+    //     ) {
+    //         try {
+    //             const res = await axios.post(baseUrl + "/colors-and-sizes", {
+    //                 productId,
+    //                 brandId,
+    //                 categoryId,
+    //                 patternId,
+    //                 formId,
+    //                 buttonId,
+    //                 materialId,
+    //                 collarId,
+    //                 sleeveId,
+    //                 shirtTailId,
+    //                 colorId: sizeId,
+    //                 sizeId: colorId,
+    //             });
+    //             const data = await res.data;
+    //             setColorsAndSizes(data);
+    //         } catch (err) {
+    //             console.log(err);
+    //         }
+    //     }
+    // }
+
     const columnsAPI = [
         {
             key: 'product',
@@ -268,34 +311,35 @@ const Cart = (props) => {
                                     <span style={{ fontWeight: "500" }}>
                                         {record?.cartDetailResponse.productName +
                                             "-" +
-                                            record?.cartDetailResponse.buttonName +
+                                            record?.cartDetailResponse?.brand.brandName +
                                             "-" +
-                                            record?.cartDetailResponse.brandName +
+                                            record?.cartDetailResponse?.category.categoryName +
                                             "-" +
-                                            record?.cartDetailResponse.categoryName +
+                                            record?.cartDetailResponse?.pattern.patternName +
                                             "-" +
-                                            record?.cartDetailResponse.materialName +
+                                            record?.cartDetailResponse?.form.formName +
                                             "-" +
-                                            record?.cartDetailResponse.collarName +
+                                            record?.cartDetailResponse?.button.buttonName +
                                             "-" +
-                                            record?.cartDetailResponse.sleeveName +
+                                            record?.cartDetailResponse?.material.materialName +
                                             "-" +
-                                            record?.cartDetailResponse.shirtTailName +
+                                            record?.cartDetailResponse?.collarType.collarTypeName +
                                             "-" +
-                                            record?.cartDetailResponse.patternName +
+                                            record?.cartDetailResponse?.sleeveType.sleeveName +
                                             "-" +
-                                            record?.cartDetailResponse.formName}
+                                            record?.cartDetailResponse?.shirtTailType.shirtTailTypeName
+                                        }
                                     </span>
                                     <br />
                                     <div className={styles.optionColor}>
                                         <b>Màu sắc: </b>
                                         <span
                                             style={{
-                                                backgroundColor: record?.cartDetailResponse.colorCode,
+                                                backgroundColor: record?.cartDetailResponse?.color.colorCode,
                                                 marginLeft: "8px",
                                             }}
                                         ></span>
-                                        {record?.cartDetailResponse.colorName}
+                                        {record?.cartDetailResponse?.color.colorName}
                                     </div>
                                     <br />
                                     <b>Kích cỡ: </b>
@@ -304,7 +348,7 @@ const Cart = (props) => {
                                             marginLeft: "8px",
                                         }}
                                     >
-                                        {record?.cartDetailResponse.sizeName}
+                                        {record?.cartDetailResponse?.size.sizeName}
                                     </span>
                                 </div>
                             </Col>
@@ -394,6 +438,7 @@ const Cart = (props) => {
             key: 'action',
             title: 'Thao tác',
             render: (_, record, index) => {
+                console.log(record)
                 return <div>
                     <CloseOutlined style={{ cursor: 'pointer', color: 'red' }}
                         onClick={(e) => handleDeleteApi(record.cartDetailResponse.cartDetailId)} />
@@ -508,9 +553,11 @@ const Cart = (props) => {
         onChange: onSelectChange,
     };
 
+    useEffect(() => {
+    }, [])
+
     const getCartAPI = async () => {
         const data = await token;
-
         if (data) {
             await axios.get(`${cartAPI}`, {
                 params: {
@@ -564,7 +611,7 @@ const Cart = (props) => {
 
     useEffect(() => {
         getAllCart();
-        getCartAPI()
+        getCartAPI();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [render]);
 

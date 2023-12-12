@@ -13,6 +13,7 @@ const ModalDetail = ({
     {
       title: "#",
       key: "stt",
+      width: "7%",
       render: (_, record, index) => {
         return index + 1;
       },
@@ -21,7 +22,7 @@ const ModalDetail = ({
       title: "Thao tác",
       dataIndex: "status",
       key: "status",
-      width: "15%",
+      width: "18%",
       render: (status) => {
         if (symbol === "Received") {
           return status === "1"
@@ -88,20 +89,19 @@ const ModalDetail = ({
     },
     {
       title: "Ghi chú",
-      dataIndex: "note",
       key: "note",
       width: "40%",
-      render: (note) => {
+      render: (_, record) => {
         return (
-          <div>
-            {note?.indexOf("|") > 0 ? (
+          <div style={{ maxWidth: "50%" }}>
+            {record?.note?.indexOf("|") > 0 ? (
               <>
-                {note.split("|").map((item) => {
-                  return <div style={{ textAlign: "start" }}>{item}</div>;
+                {record?.note.split("|").map((item) => {
+                  return <div style={{ textAlign: "start" }}><p>{item}</p></div>;
                 })}
               </>
             ) : (
-              <div style={{ textAlign: "start" }}>{note}</div>
+              <div style={{ textAlign: "start" }}><p>{record?.note}</p></div>
             )}
           </div>
         );
@@ -110,24 +110,22 @@ const ModalDetail = ({
   ];
 
   return (
-    <div>
-      <Modal
-        closeIcon={true}
-        open={isModalOpen}
-        onOk={handleOk}
-        onCancel={handleCancel}
-        footer={null}
-        className={styles.w}
-        title={"Ghi chú hóa đơn"}
-      >
-        <Table
-          columns={columns}
-          dataSource={timelineDetail}
-          pagination={false}
-          closeIcon
-        />
-      </Modal>
-    </div>
+    <Modal
+      closeIcon={true}
+      open={isModalOpen}
+      onOk={handleOk}
+      onCancel={handleCancel}
+      footer={null}
+      className={styles.w}
+      title={"Ghi chú hóa đơn"}
+      width={1000}
+    >
+      <Table
+        columns={columns}
+        dataSource={timelineDetail}
+        pagination={false}
+      />
+    </Modal>
   );
 };
 

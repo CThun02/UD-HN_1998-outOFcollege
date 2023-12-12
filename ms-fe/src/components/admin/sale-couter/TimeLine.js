@@ -162,7 +162,7 @@ const BillTimeLine = (addId) => {
     };
 
     useEffect(() => {
-        const gettimeline = async () => {
+        const getTimeline = async () => {
             await axios
                 .get(`http://localhost:8080/api/admin/timeline/${billId}`, {
                     headers: {
@@ -230,7 +230,7 @@ const BillTimeLine = (addId) => {
                     }
                 });
         }
-        gettimeline()
+        getTimeline()
         getProduct()
         getInfo()
         // eslint-disable-next-line react-hooks/exhaustive-deps

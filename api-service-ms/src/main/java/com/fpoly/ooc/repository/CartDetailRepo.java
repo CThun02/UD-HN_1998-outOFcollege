@@ -24,10 +24,9 @@ public interface CartDetailRepo extends JpaRepository<CartDetail, Long> {
 //            "JOIN pd.color color")
 //    List<CartResponse> getAllCart();
 
-    @Query("SELECT NEW com.fpoly.ooc.responce.cart.CartDetailResponse(pd.product.id, pd.id, pd.product.productName, pd.brand.brandName," +
-            "   pd.category.categoryName, pd.pattern.patternName, pd.form.formName, pd.button.buttonName, " +
-            "   pd.material.materialName, pd.collar.collarTypeName, pd.sleeve.sleeveName, pd.shirtTail.shirtTailTypeName," +
-            "   pd.size.sizeName, pd.color.colorName, pd.color.colorCode, pd.price, pd.quantity, pd.weight, cd.quantity," +
+    @Query("SELECT NEW com.fpoly.ooc.responce.cart.CartDetailResponse(pd.product.id, pd.id, pd.product.productName, pd.brand," +
+            "   pd.category, pd.pattern, pd.form, pd.button, pd.material, pd.collar, pd.sleeve, pd.shirtTail, " +
+            "   pd.size, pd.color, pd.price, pd.quantity, pd.weight, cd.quantity, " +
             "   cd.id) " +
             "FROM Cart c JOIN CartDetail cd ON c.id = cd.cart.id " +
             "   JOIN ProductDetail pd ON pd.id = cd.productDetail.id " +
@@ -48,11 +47,9 @@ public interface CartDetailRepo extends JpaRepository<CartDetail, Long> {
             "       AND c.account.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE ")
     List<CartDetailResponse> getAllCart(@Param("username") String username);
 
-    @Query("SELECT NEW com.fpoly.ooc.responce.cart.CartDetailResponse(pd.product.id, pd.id, pd.product.productName, pd.brand.brandName," +
-            "   pd.category.categoryName, pd.pattern.patternName, pd.form.formName, pd.button.buttonName, " +
-            "   pd.material.materialName, pd.collar.collarTypeName, pd.sleeve.sleeveName, pd.shirtTail.shirtTailTypeName," +
-            "   pd.size.sizeName, pd.color.colorName, pd.color.colorCode, pd.price, pd.quantity, pd.weight, pd.quantity," +
-            "   pd.id) " +
+    @Query("SELECT NEW com.fpoly.ooc.responce.cart.CartDetailResponse(pd.product.id, pd.id, pd.product.productName, pd.brand," +
+            "   pd.category, pd.pattern, pd.form, pd.button, pd.material, pd.collar, pd.sleeve, pd.shirtTail, " +
+            "   pd.size, pd.color, pd.price, pd.quantity, pd.weight, pd.quantity, pd.id) " +
             "FROM ProductDetail pd " +
             "   WHERE pd.id = :id " +
             "       AND pd.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +

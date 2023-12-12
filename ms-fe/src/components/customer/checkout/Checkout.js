@@ -403,23 +403,25 @@ const Checkout = ({ setRenderHeader }) => {
                             "-" +
                             item.data[0].pattern.patternName +
                             "-" +
-                            item.data[0].form.formName) : (item.cartDetailResponse.productName + "-" + item.cartDetailResponse.buttonName +
+                            item.data[0].form.formName) : (item?.cartDetailResponse.productName +
                                 "-" +
-                                item.cartDetailResponse.brandName +
+                                item?.cartDetailResponse?.brand.brandName +
                                 "-" +
-                                item.cartDetailResponse.categoryName +
+                                item?.cartDetailResponse?.category.categoryName +
                                 "-" +
-                                item.cartDetailResponse.materialName +
+                                item?.cartDetailResponse?.pattern.patternName +
                                 "-" +
-                                item.cartDetailResponse.collarName +
+                                item?.cartDetailResponse?.form.formName +
                                 "-" +
-                                item.cartDetailResponse.sleeveName +
+                                item?.cartDetailResponse?.button.buttonName +
                                 "-" +
-                                item.cartDetailResponse.shirtTailTypeName +
+                                item?.cartDetailResponse?.material.materialName +
                                 "-" +
-                                item.cartDetailResponse.patternName +
+                                item?.cartDetailResponse?.collarType.collarName +
                                 "-" +
-                                item.cartDetailResponse.formName)} <span style="display: inline-block">(x ${item.quantity})</span></p>
+                                item?.cartDetailResponse?.sleeveType.sleeveName +
+                                "-" +
+                                item?.cartDetailResponse?.shirtTailType.shirtTailName)} <span style="display: inline-block">(x ${item.quantity})</span></p>
                                                     </div>
                                                     <div style="width: 25%; padding: 4px;">
                                                         <p>${(dataToken ? ((item?.promotion[0] ? (
@@ -1018,23 +1020,25 @@ const Checkout = ({ setRenderHeader }) => {
                                                                 </div>
                                                                 <div style={{ width: 256 }}>
                                                                     <span >
-                                                                        {productDetail?.cartDetailResponse.productName + "-" + productDetail?.cartDetailResponse.buttonName +
+                                                                        {productDetail?.cartDetailResponse.productName +
                                                                             "-" +
-                                                                            productDetail?.cartDetailResponse.brandName +
+                                                                            productDetail?.cartDetailResponse?.brand.brandName +
                                                                             "-" +
-                                                                            productDetail?.cartDetailResponse.categoryName +
+                                                                            productDetail?.cartDetailResponse?.category.categoryName +
                                                                             "-" +
-                                                                            productDetail?.cartDetailResponse.materialName +
+                                                                            productDetail?.cartDetailResponse?.pattern.patternName +
                                                                             "-" +
-                                                                            productDetail?.cartDetailResponse.collarName +
+                                                                            productDetail?.cartDetailResponse?.form.formName +
                                                                             "-" +
-                                                                            productDetail?.cartDetailResponse.sleeveName +
+                                                                            productDetail?.cartDetailResponse?.button.buttonName +
                                                                             "-" +
-                                                                            productDetail?.cartDetailResponse.shirtTailTypeName +
+                                                                            productDetail?.cartDetailResponse?.material.materialName +
                                                                             "-" +
-                                                                            productDetail?.cartDetailResponse.patternName +
+                                                                            productDetail?.cartDetailResponse?.collarType.collarName +
                                                                             "-" +
-                                                                            productDetail?.cartDetailResponse.formName}
+                                                                            productDetail?.cartDetailResponse?.sleeveType.sleeveName +
+                                                                            "-" +
+                                                                            productDetail?.cartDetailResponse?.shirtTailType.shirtTailTypeName}
                                                                     </span>
                                                                     <div style={{ display: 'flex', alignItems: 'center' }}>
                                                                         <div
@@ -1042,10 +1046,10 @@ const Checkout = ({ setRenderHeader }) => {
                                                                                 height: 20,
                                                                                 width: 20,
                                                                                 borderRadius: '50%',
-                                                                                backgroundColor: productDetail?.cartDetailResponse.colorCode,
+                                                                                backgroundColor: productDetail?.cartDetailResponse?.color.colorCode,
                                                                             }}
                                                                         ></div>/
-                                                                        <span>{productDetail?.cartDetailResponse.sizeName}</span>
+                                                                        <span>{productDetail?.cartDetailResponse?.size.sizeName}</span>
                                                                     </div>
                                                                 </div>
                                                                 <div>

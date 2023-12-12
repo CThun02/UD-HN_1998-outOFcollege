@@ -4,6 +4,7 @@ import com.fpoly.ooc.dto.VoucherAndPromotionConditionDTO;
 import com.fpoly.ooc.entity.Voucher;
 import com.fpoly.ooc.request.voucher.DisplayVoucherRequest;
 import com.fpoly.ooc.request.voucher.VoucherRequest;
+import com.fpoly.ooc.responce.voucher.VoucherAccountResponse;
 import com.fpoly.ooc.responce.voucher.VoucherResponse;
 
 import java.util.List;
@@ -36,5 +37,7 @@ public interface VoucherService {
     Boolean isCheckTimeUse(String voucherCode, String username);
 
     Voucher updateVoucher(Voucher voucher);
+
+    List<VoucherAccountResponse> getVoucherByUsernameAndVoucherCode(String username, String voucherCode);
 
 }

@@ -13,6 +13,7 @@ import com.fpoly.ooc.repository.VoucherRepository;
 import com.fpoly.ooc.request.voucher.DisplayVoucherRequest;
 import com.fpoly.ooc.request.voucher.VoucherRequest;
 import com.fpoly.ooc.responce.account.AccountVoucher;
+import com.fpoly.ooc.responce.voucher.VoucherAccountResponse;
 import com.fpoly.ooc.responce.voucher.VoucherResponse;
 import com.fpoly.ooc.service.interfaces.AccountService;
 import com.fpoly.ooc.service.interfaces.EmailService;
@@ -365,5 +366,12 @@ public class VoucherServiceImpl implements VoucherService {
 
         return responseList;
     }
+
+
+    @Override
+    public List<VoucherAccountResponse> getVoucherByUsernameAndVoucherCode(String username, String voucherCode) {
+        return voucherRepository.getVoucherByUsernameAndVoucherCode(username,voucherCode);
+    }
+
 
 }

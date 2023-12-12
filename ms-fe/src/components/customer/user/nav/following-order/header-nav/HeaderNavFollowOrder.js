@@ -2,46 +2,50 @@ import { Input, Space } from "antd";
 import styles from "./HeaderNavFollowOrder.module.css";
 import { SearchOutlined } from "@ant-design/icons";
 
-function HeaderNavFollowOrder({ setStatus, setCreatedBy, setSymbol, setCount }) {
+function HeaderNavFollowOrder({
+  setStatus,
+  setCreatedBy,
+  setSymbol,
+  setCount,
+}) {
   const onChangeBill = (e) => {
-    if (e === '') {
-      setStatus('')
-      setCreatedBy('CLIENT')
-      setSymbol('')
-      setCount('')
-    } else if (e === 'CLIENT') {
-      setCreatedBy('CLIENT');
-      setStatus('')
-      setSymbol('')
-      setCount('')
-    } else if (e === 'Shipping') {
-      setStatus('')
-      setCreatedBy('')
-      setSymbol('Shipping')
-      setCount(3)
-    } else if (e === 'Confirmed') {
-      setStatus('')
-      setCreatedBy('')
-      setSymbol('Shipping')
-      setCount(2)
-    } else if (e === 'Complete') {
-      setStatus(e)
-      setSymbol('Shipping')
-      setCount(4)
-      setCreatedBy("")
-    } else if (e === 'Cancel') {
+    if (e === "") {
+      setStatus("");
+      setCreatedBy("CLIENT");
+      setSymbol("");
+      setCount("");
+    } else if (e === "CLIENT") {
+      setCreatedBy("CLIENT");
+      setStatus("");
+      setSymbol("");
+      setCount("");
+    } else if (e === "Shipping") {
+      setStatus("");
+      setCreatedBy("");
+      setSymbol("Shipping");
+      setCount(3);
+    } else if (e === "Confirmed") {
+      setStatus("");
+      setCreatedBy("");
+      setSymbol("Shipping");
+      setCount(2);
+    } else if (e === "Complete") {
       setStatus(e);
-      setCreatedBy("")
-      setSymbol('')
-      setCount('')
-    }
-    else {
+      setSymbol("Shipping");
+      setCount(4);
+      setCreatedBy("");
+    } else if (e === "Cancel") {
       setStatus(e);
-      setCreatedBy("")
-      setSymbol('')
-      setCount('')
+      setCreatedBy("");
+      setSymbol("");
+      setCount("");
+    } else {
+      setStatus(e);
+      setCreatedBy("");
+      setSymbol("");
+      setCount("");
     }
-  }
+  };
   return (
     <div className={styles.headerNavFollowOrder}>
       <div className={styles.content}>
@@ -56,31 +60,31 @@ function HeaderNavFollowOrder({ setStatus, setCreatedBy, setSymbol, setCount }) 
               </span> */}
               <span
                 className={`${styles.textSize} ${styles.textColor} ${styles.span} ${styles.active}`}
-                onClick={() => onChangeBill('CLIENT')}
+                onClick={() => onChangeBill("CLIENT")}
               >
                 Chờ xác nhận
               </span>
               <span
                 className={`${styles.textSize} ${styles.textColor} ${styles.span} ${styles.active}`}
-                onClick={() => onChangeBill('Confirmed')}
+                onClick={() => onChangeBill("Confirmed")}
               >
                 Đã xác nhận
               </span>
               <span
                 className={`${styles.textSize} ${styles.textColor} ${styles.span} ${styles.active}`}
-                onClick={() => onChangeBill('Shipping')}
+                onClick={() => onChangeBill("Shipping")}
               >
                 Đang giao hàng
               </span>
               <span
                 className={`${styles.textSize} ${styles.textColor} ${styles.span} ${styles.active}`}
-                onClick={() => onChangeBill('Complete')}
+                onClick={() => onChangeBill("Complete")}
               >
                 Hoàn thành
               </span>
               <span
                 className={`${styles.textSize} ${styles.textColor} ${styles.span} ${styles.active}`}
-                onClick={() => onChangeBill('Cancel')}
+                onClick={() => onChangeBill("Cancel")}
               >
                 Đã hủy
               </span>
@@ -96,8 +100,8 @@ function HeaderNavFollowOrder({ setStatus, setCreatedBy, setSymbol, setCount }) 
             </div>
           </Space>
         </div>
-      </div >
-    </div >
+      </div>
+    </div>
   );
 }
 

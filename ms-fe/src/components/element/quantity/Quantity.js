@@ -29,12 +29,12 @@ function Quantity({ quantity, setQuantity, quantityProduct }) {
   return (
     <div className={styles.quantityInput}>
       <Row>
-        <Col span={4} style={{ display: "flex" }}>
+        <Col xl={6} xs={12} style={{ display: "flex" }}>
           <div className={styles.felxCenter}>
             <span className={styles.text}>Số lượng: </span>
           </div>
         </Col>
-        <Col span={8}>
+        <Col xl={8} xs={12}>
           <div className={styles.positon}>
             <button
               className={`${styles.buttonCss} ${styles.buttonMinus} ${
@@ -64,8 +64,7 @@ function Quantity({ quantity, setQuantity, quantityProduct }) {
             </button>
           </div>
         </Col>
-        <Col span={1}></Col>
-        <Col span={11} style={{ display: "flex" }}>
+        <Col xl={10} xs={24} style={{ display: "flex" }}>
           <div className={styles.felxCenter}>
             <span>{quantityProduct} sản phẩm có sẵn</span>
           </div>

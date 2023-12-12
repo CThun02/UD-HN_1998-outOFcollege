@@ -5,11 +5,11 @@
   height: 85%;
   text-align: center;
   padding-top: 20vh;
-  padding: 100px;
+  padding: 8%;
 }
 
 .filter_inputSearch {
-  width: 50%;
+  width: 320px;
   border-radius: 0;
   box-shadow: none !important;
   border: none;

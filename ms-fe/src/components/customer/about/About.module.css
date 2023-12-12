@@ -98,3 +98,65 @@ ul {
 ul li {
   margin-bottom: 10px;
 }
+.text {
+  font-size: 18px;
+  margin-top: 40px;
+}
+.image img {
+  width: 600px;
+  height: 600px;
+}
+.image {
+  margin-left: 50px;
+}
+
+@media (max-width: 1199px) {
+  .image {
+    margin-left: 0;
+    margin-top: 24px;
+  }
+  .image img {
+    width: 280px;
+    height: 250px;
+  }
+  .img {
+    width: 250px;
+    height: 250px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin-top: -180px;
+    border-radius: 10px;
+  }
+
+  .infoLeftImg {
+    background-color: #f8f6f3;
+    width: 400px;
+    border-radius: 5px;
+    position: relative;
+  }
+
+  .infoLeftP {
+    position: absolute;
+    top: 75%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 340px;
+    font-size: 16px;
+  }
+  .iconStar {
+    position: absolute;
+    top: 55%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 500px;
+    font-size: 16px;
+  }
+}

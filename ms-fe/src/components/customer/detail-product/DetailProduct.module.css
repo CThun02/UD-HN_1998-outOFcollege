@@ -1,7 +1,7 @@
 .flexCenter {
   padding-bottom: 90px;
   display: flex;
-  justify-content: center;
+  justify-content: space-around;
 }
 
 .background {
@@ -31,5 +31,10 @@
 
 .description {
   padding-bottom: 65px;
-  width: 80%;
+}
+
+@media (max-width: 767px) {
+  .product {
+    padding: 0;
+  }
 }

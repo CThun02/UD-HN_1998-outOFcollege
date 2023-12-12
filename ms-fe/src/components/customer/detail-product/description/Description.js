@@ -1,4 +1,4 @@
-import { Col, Row, Space } from "antd";
+import { Col, Row, Select, Space } from "antd";
 import styles from "./Description.module.css";
 import { useState } from "react";
 import ComponentDetail from "./ComponentDetail";
@@ -9,8 +9,38 @@ function Description({ productDetail }) {
   return (
     <div className={styles.description}>
       <div className={styles.flexContent}>
-        <div className={styles.tabs}>
-          <Space direction="horizontal" style={{ width: "100%" }} size={100}>
+        <span
+          className={`${styles.colorText} ${styles.sizeText} ${
+            styles.cssHover
+          } ${tab === "description" ? styles.active : ""}`}
+          onClick={() => setTab("description")}
+        >
+          Mô tả chi tiết
+        </span>
+        <span
+          className={`${styles.colorText} ${styles.sizeText} ${
+            styles.cssHover
+          } ${tab === "detailProduct" ? styles.active : ""}`}
+          onClick={() => setTab("detailProduct")}
+        >
+          Thông tin sản phẩm
+        </span>
+        <span
+          className={`${styles.colorText} ${styles.sizeText} ${
+            styles.cssHover
+          } ${tab === "exchangeSize" ? styles.active : ""}`}
+          onClick={() => setTab("exchangeSize")}
+        >
+          Quy đổi kích cỡ
+        </span>
+      </div>
+      <div className={styles.selectResponse}>
+        <Select
+          bordered={false}
+          value={tab}
+          className={styles.selectDescription}
+        >
+          <Select.Option key={1} value={"description"}>
             <span
               className={`${styles.colorText} ${styles.sizeText} ${
                 styles.cssHover
@@ -19,6 +49,8 @@ function Description({ productDetail }) {
             >
               Mô tả chi tiết
             </span>
+          </Select.Option>
+          <Select.Option key={2} value={"detailProduct"}>
             <span
               className={`${styles.colorText} ${styles.sizeText} ${
                 styles.cssHover
@@ -27,6 +59,8 @@ function Description({ productDetail }) {
             >
               Thông tin sản phẩm
             </span>
+          </Select.Option>
+          <Select.Option key={3} value={"exchangeSize"}>
             <span
               className={`${styles.colorText} ${styles.sizeText} ${
                 styles.cssHover
@@ -35,12 +69,12 @@ function Description({ productDetail }) {
             >
               Quy đổi kích cỡ
             </span>
-          </Space>
-        </div>
+          </Select.Option>
+        </Select>
       </div>
 
       <div className={styles.contentDescription}>
-        <div>
+        <div style={{ width: "70%" }}>
           {tab === "description" && (
             <p
               className={`${styles.cssParagraph} ${

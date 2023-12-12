@@ -9,12 +9,12 @@ function SortAndResultSearch({ products, filter, setFilter }) {
     <div>
       <div>
         <Row>
-          <Col span={20}>
+          <Col xs={24} md={12} xl={18}>
             <p style={{ fontSize: "16px", color: "#111111" }}>
               Hiển thị <strong>{products.length}</strong> kết quả
             </p>
           </Col>
-          <Col span={4}>
+          <Col xs={24} md={12} xl={6}>
             <Select
               style={{ width: "100%" }}
               defaultValue={"up"}

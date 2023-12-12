@@ -1,5 +1,5 @@
 .navBody {
-  width: 50%;
+  width: 100%;
   display: flex;
   justify-content: space-evenly;
   align-items: center;
@@ -39,4 +39,10 @@
   transition: 0.3s linear;
   background-color: #39a7ff;
   color: #fff;
+}
+
+@media (max-width: 500px) {
+  .custom {
+    padding: 2px 6px;
+  }
 }

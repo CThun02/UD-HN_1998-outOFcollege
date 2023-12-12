@@ -199,8 +199,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Account findByUsername(String username) {
-        return accountRepository.findById(username).orElseThrow(() ->
-                new NotFoundException(ErrorCodeConfig.getMessage(Const.USER_NOT_FOUND)));
+        return accountRepository.findById(username).orElse(null);
     }
 
     @Override

@@ -80,5 +80,7 @@ public interface TimeLineRepo extends JpaRepository<Timeline, Long> {
             "WHERE b.id = :billId")
     BillInfoResponse getBillInfoByIdBillId(@Param("billId") Long id);
 
+    @Query("SELECT NEW java.lang.Long(COUNT(timline)) FROM Timeline timline where timline.bill.id = ?1")
+    Long getCountTimelineByBillId(Long billId);
 }
 

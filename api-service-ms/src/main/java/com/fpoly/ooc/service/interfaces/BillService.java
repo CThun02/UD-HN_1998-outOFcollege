@@ -2,6 +2,7 @@ package com.fpoly.ooc.service.interfaces;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.dto.BillStatusDTO;
+import com.fpoly.ooc.dto.NotificationDTO;
 import com.fpoly.ooc.entity.Address;
 import com.fpoly.ooc.entity.Bill;
 import com.fpoly.ooc.request.bill.BillRequest;
@@ -76,4 +77,6 @@ public interface BillService {
     BillReturnResponse getBillReturnByBillCode(String billCode);
 
     Bill updateBill(Bill bill);
+
+    List<NotificationDTO> findAllNotifications();
 }

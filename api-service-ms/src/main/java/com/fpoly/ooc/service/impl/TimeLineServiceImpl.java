@@ -4,12 +4,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
+import com.fpoly.ooc.dto.NotificationDTO;
 import com.fpoly.ooc.entity.Bill;
 import com.fpoly.ooc.entity.DeliveryNote;
 import com.fpoly.ooc.entity.Timeline;
 import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.TimeLineRepo;
 import com.fpoly.ooc.request.timeline.TimeLinerequest;
+import com.fpoly.ooc.responce.NotificationResponse;
 import com.fpoly.ooc.responce.bill.BillInfoResponse;
 import com.fpoly.ooc.responce.timeline.TimeLineResponse;
 import com.fpoly.ooc.responce.timeline.TimelineClientResponse;
@@ -19,6 +21,7 @@ import com.fpoly.ooc.responce.timeline.TimelineProductResponse;
 import com.fpoly.ooc.service.interfaces.BillDetailService;
 import com.fpoly.ooc.service.interfaces.BillService;
 import com.fpoly.ooc.service.interfaces.DeliveryNoteService;
+import com.fpoly.ooc.service.interfaces.NotificationService;
 import com.fpoly.ooc.service.interfaces.ProductImageServiceI;
 import com.fpoly.ooc.service.interfaces.TimeLineService;
 import lombok.extern.slf4j.Slf4j;
@@ -56,6 +59,9 @@ public class TimeLineServiceImpl implements TimeLineService {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @Override
     public List<TimeLineResponse> getAllTimeLineByBillId(Long id) {
@@ -150,6 +156,24 @@ public class TimeLineServiceImpl implements TimeLineService {
                 timeline.setStatus(request.getStatus());
             }
             timeLineRepo.save(timeline);
+        }
+
+        Long count = timeLineRepo.getCountTimelineByBillId(billId);
+        String notificationsJson = null;
+        List< NotificationDTO> notificationList = notificationService.notificationDTOList();
+        NotificationResponse notification = null;
+        if(count <= 1 && count > -1) {
+            notification = new NotificationResponse();
+            notification.setNotificationList(notificationList);
+            notification.setIsReload(true);
+            notificationsJson = objectMapper.writeValueAsString(notification);
+            template.convertAndSend("/topic/notifications-topic", notificationsJson);
+        } else {
+            notification = new NotificationResponse();
+            notification.setNotificationList(notificationList);
+            notification.setIsReload(false);
+            notificationsJson = objectMapper.writeValueAsString(notification);
+            template.convertAndSend("/topic/notifications-topic", notificationsJson);
         }
 
         String timelineJson = objectMapper.writeValueAsString(timeLineRepo.getTimeLineByBillId(bill.getId()));

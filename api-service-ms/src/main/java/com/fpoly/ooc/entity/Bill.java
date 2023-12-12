@@ -31,37 +31,39 @@ import java.util.List;
         name = "Bill.findAllNotifications",
         query = """
                     SELECT
-                            bill.id AS billId,
-                            bill.created_at AS orderDate,
-                            timeline.status AS status,
-                            product.product_name AS productName,
-                            brand.brand_name AS brandName,
-                            category.category_name AS categoryName,
-                            billDetail.quantity AS quantity,
-                            billDetail.price AS price,
-                            (SELECT TOP 1 productImage.path FROM DATN_DB_MS.dbo.product_image productImage
-                             WHERE productImage.product_detail_id = productDetail.id
-                             AND (productImage.status is null or productImage.status = 'ACTIVE')
-                            ) AS imagePath
+                        bill.id AS billId,
+                        bill.created_at AS orderDate,
+                        timeline.status AS status,
+                        product.product_name AS productName,
+                        brand.brand_name AS brandName,
+                        category.category_name AS categoryName,
+                        billDetail.quantity AS quantity,
+                        billDetail.price AS price,
+                        (SELECT TOP 1 productImage.path FROM DATN_DB_MS.dbo.product_image productImage
+                                                     WHERE productImage.product_detail_id = productDetail.id
+                                                     AND (productImage.status is null or productImage.status = 'ACTIVE')
+                                                    ) AS imagePath
                     FROM DATN_DB_MS.dbo.bill bill
-                        LEFT JOIN DATN_DB_MS.dbo.bill_detail billDetail ON bill.id = billDetail.bill_id
-                        LEFT JOIN DATN_DB_MS.dbo.product_detail productDetail ON billDetail.product_detail_id = productDetail.id
-                        LEFT JOIN DATN_DB_MS.dbo.time_line timeline ON timeline.bill_id = bill.id
-                        LEFT JOIN DATN_DB_MS.dbo.product product ON product.id = productDetail.product_id
-                        LEFT JOIN DATN_DB_MS.dbo.brand brand ON brand.id = productDetail.brand_id
-                        LEFT JOIN DATN_DB_MS.dbo.category category ON category.id = productDetail.category_id
-                        LEFT JOIN DATN_DB_MS.dbo.product_image productImage ON productImage.product_detail_id = productDetail.id
+                             LEFT JOIN DATN_DB_MS.dbo.bill_detail billDetail ON bill.id = billDetail.bill_id
+                             LEFT JOIN DATN_DB_MS.dbo.product_detail productDetail ON billDetail.product_detail_id = productDetail.id
+                             LEFT JOIN DATN_DB_MS.dbo.time_line timeline ON timeline.bill_id = bill.id
+                             LEFT JOIN DATN_DB_MS.dbo.product product ON product.id = productDetail.product_id
+                             LEFT JOIN DATN_DB_MS.dbo.brand brand ON brand.id = productDetail.brand_id
+                             LEFT JOIN DATN_DB_MS.dbo.category category ON category.id = productDetail.category_id
+                             LEFT JOIN DATN_DB_MS.dbo.product_image productImage ON productImage.product_detail_id = productDetail.id
                     WHERE
-                        lower(bill.bill_type) = lower('online')
-                        AND (productDetail.status is null or productDetail.status = 'ACTIVE')
-                        AND (product.status is null or product.status = 'ACTIVE')
-                        AND (brand.status is null or brand.status = 'ACTIVE')
-                        AND (category.status is null or category.status = 'ACTIVE')
-                        AND (productImage.status is null or productImage.status = 'ACTIVE')
-                        AND timeline.status = '1'
+                            lower(bill.bill_type) = lower('online')
+                      AND (bill.status != 'Completed')
+                      AND (productDetail.status is null or productDetail.status = 'ACTIVE')
+                      AND (product.status is null or product.status = 'ACTIVE')
+                      AND (brand.status is null or brand.status = 'ACTIVE')
+                      AND (category.status is null or category.status = 'ACTIVE')
+                      AND (productImage.status is null or productImage.status = 'ACTIVE')
+                      AND timeline.status = '1'
                     GROUP BY bill.id, bill.created_at, timeline.status, product.product_name,
-                        brand.brand_name, category.category_name, billDetail.quantity, billDetail.price,
-                        productDetail.id
+                             brand.brand_name, category.category_name, billDetail.quantity, billDetail.price,
+                             productDetail.id
+                    HAVING (SELECT count(*) FROM DATN_DB_MS.dbo.time_line subTimeline where subTimeline.bill_id = bill.id) = 1
                 """,
         resultSetMapping = "Mapping.findAllNotifications"
 )

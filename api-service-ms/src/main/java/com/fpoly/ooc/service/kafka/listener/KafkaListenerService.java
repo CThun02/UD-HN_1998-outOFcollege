@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
 import com.fpoly.ooc.dto.BillStatusDTO;
+import com.fpoly.ooc.dto.NotificationDTO;
 import com.fpoly.ooc.dto.TimelineBillDTO;
 import com.fpoly.ooc.entity.Bill;
 import com.fpoly.ooc.entity.Brand;
@@ -38,6 +39,7 @@ import com.fpoly.ooc.repository.SizeDAORepository;
 import com.fpoly.ooc.repository.SleeveDAORepository;
 import com.fpoly.ooc.repository.TimeLineRepo;
 import com.fpoly.ooc.request.productDetail.GetSizeAndColorRequest;
+import com.fpoly.ooc.responce.NotificationResponse;
 import com.fpoly.ooc.responce.product.ProductImageResponse;
 import com.fpoly.ooc.responce.productdetail.GetColorAndSizeAndQuantity;
 import com.fpoly.ooc.responce.productdetail.ProductDetailShopResponse;
@@ -440,7 +442,14 @@ public class KafkaListenerService {
         if(Objects.nonNull(billDb)) {
             String createBill = objectMapper.writeValueAsString(billRepo.getAllBillManagement(null, null,
                     null, null, null, null, null, null));
-            String notificationsJson = objectMapper.writeValueAsString(billRepo.findAllNotifications());
+
+            List<NotificationDTO> notificationList = billRepo.findAllNotifications();
+            NotificationResponse notification = new NotificationResponse();
+            notification.setNotificationList(notificationList);
+            notification.setIsReload(true);
+
+            String notificationsJson = objectMapper.writeValueAsString(notification);
+
             template.convertAndSend("/topic/new-bill-topic", createBill);
             template.convertAndSend("/topic/notifications-topic", notificationsJson);
             log.info("TimeLineJson: " + createBill);

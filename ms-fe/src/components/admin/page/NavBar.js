@@ -17,8 +17,7 @@ import {
   MenuFoldOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { useState } from "react";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { clearAuthToken, getAuthToken, getToken } from "../../../service/Token";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -32,37 +31,38 @@ const NavBar = () => {
   const [user, setUser] = useState("");
   const token = getToken(true);
   const navigate = useNavigate();
-  const [notifications, setNotifications] = useState([
-    { label: "3rd menu item", key: "3" },
-  ]);
+  const [notifications, setNotifications] = useState([]);
   const [pageNo, setPageNo] = useState(1);
   const [pageSize, setPageSize] = useState(3);
   const [apiNotification, contextHolder] = notification.useNotification();
   const { successMessage, clearNotification, context } =
     useContext(NotificationContext);
+  const [isMessage, setIsMessage] = useState(true);
 
   useEffect(() => {
     let isCheck = true;
     async function notification() {
       if (
-        successMessage !== "" &&
+        successMessage &&
+        successMessage !== "null" &&
         isCheck === true &&
         context === "confirm-order"
       ) {
-        apiNotification.success({
-          message: `Success`,
+        apiNotification.warning({
+          message: `Thông báo`,
           description: `${successMessage}`,
         });
+        console.log("testMessage1");
         clearNotification();
       }
+      console.log("testMessage2: ", successMessage);
+      console.log("testMessage3: ", context);
+      console.log("testMessage2: ", isCheck);
     }
-    console.log("successMessage:  ", successMessage);
-    console.log("context:  ", context);
-    return () => {
-      notification(true);
-      isCheck = false;
-    };
-  }, [successMessage, clearNotification, apiNotification, context]);
+
+    notification();
+    isCheck = false;
+  }, [successMessage, clearNotification, apiNotification, context, isMessage]);
 
   function handlePageSize(current, size) {
     setPageNo(current);
@@ -117,11 +117,13 @@ const NavBar = () => {
 
   return (
     <>
-      {contextHolder}
       <div className={styles.navBar}>
+        {contextHolder}
         <SockJs
           setValues={setNotifications}
           connectTo={"notifications-topic"}
+          setIsMessage={setIsMessage}
+          isMessage={true}
         />
         <div className={styles.navBar__contentPosition}>
           <Space>

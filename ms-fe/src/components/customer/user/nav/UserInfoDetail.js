@@ -15,8 +15,7 @@ import { useState } from "react";
 import Password from "antd/es/input/Password";
 import { useEffect } from "react";
 import axios from "axios";
-import bcrypt from 'bcryptjs';
-
+import bcrypt from "bcryptjs";
 
 function UserInfoDetail({ user, setIsRender }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -50,13 +49,18 @@ function UserInfoDetail({ user, setIsRender }) {
             </Row>
           </div>
 
-          <EditUser isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} user={user?.userInfomationDTO} setIsRender={setIsRender} />
+          <EditUser
+            isModalOpen={isModalOpen}
+            setIsModalOpen={setIsModalOpen}
+            user={user?.userInfomationDTO}
+            setIsRender={setIsRender}
+          />
 
           <div className={styles.body}>
             <Row style={{ margin: 0 }}>
-              <Col span={16} style={{ borderRight: "1px solid #ccc" }}>
+              <Col xs={24} sm={16} className={styles.border}>
                 <RowUserInfo
-                  title={"Tên đăng nhập"}
+                  title={"Tài khoản"}
                   data={user?.userInfomationDTO?.username}
                 />
                 <RowUserInfo title={"Mật khẩu"} data={"**********"} />
@@ -81,7 +85,7 @@ function UserInfoDetail({ user, setIsRender }) {
                   data={user?.userInfomationDTO?.date}
                 />
               </Col>
-              <Col span={8}>
+              <Col xs={24} sm={8}>
                 <div className={styles.center}>
                   <Avatar
                     size={{
@@ -113,10 +117,10 @@ function UserInfoDetail({ user, setIsRender }) {
 function RowUserInfo({ title, data }) {
   return (
     <Row>
-      <Col span={8} className={`${styles.textSize}`}>
+      <Col span={10} className={`${styles.textSize}`}>
         {title}
       </Col>
-      <Col span={16} className={`${styles.textSize} ${styles.textColor}`}>
+      <Col span={14} className={`${styles.textSize} ${styles.textColor}`}>
         {data ? (
           data
         ) : (
@@ -141,13 +145,13 @@ function EditUser({ setIsModalOpen, isModalOpen, user, setIsRender }) {
   });
 
   useEffect(() => {
-    if (user && 'password' in user) {
+    if (user && "password" in user) {
       const { password, ...userWithoutPassword } = user;
       setUserUpdate(userWithoutPassword);
     } else {
       setUserUpdate(user);
     }
-  }, [isModalOpen, user])
+  }, [isModalOpen, user]);
 
   const handleOk = () => {
     form
@@ -163,7 +167,10 @@ function EditUser({ setIsModalOpen, isModalOpen, user, setIsRender }) {
 
           if (result) {
             axios
-              .post(`http://localhost:8080/api/client/user/update-user`, formData)
+              .post(
+                `http://localhost:8080/api/client/user/update-user`,
+                formData
+              )
               .then((response) => {
                 setIsRender(response.data);
                 setIsModalOpen(false);
@@ -178,18 +185,17 @@ function EditUser({ setIsModalOpen, isModalOpen, user, setIsRender }) {
           } else {
             form.setFields([
               {
-                name: 'password',
-                errors: ['Mật khẩu không đúng'],
+                name: "password",
+                errors: ["Mật khẩu không đúng"],
               },
             ]);
           }
         });
       })
       .catch((error) => {
-        console.log('Validation failed:', error);
+        console.log("Validation failed:", error);
       });
   };
-
 
   const handleCancel = () => {
     setIsModalOpen(false);
@@ -297,7 +303,7 @@ function EditUser({ setIsModalOpen, isModalOpen, user, setIsRender }) {
 
           <Form.Item
             name={"rePassword"}
-            dependencies={['newPassword']}
+            dependencies={["newPassword"]}
             rules={[
               {
                 required: true,
@@ -305,7 +311,7 @@ function EditUser({ setIsModalOpen, isModalOpen, user, setIsRender }) {
               },
               ({ getFieldValue }) => ({
                 validator(_, value) {
-                  const newPassword = getFieldValue('newPassword');
+                  const newPassword = getFieldValue("newPassword");
                   if (!value || newPassword === value) {
                     return Promise.resolve();
                   }

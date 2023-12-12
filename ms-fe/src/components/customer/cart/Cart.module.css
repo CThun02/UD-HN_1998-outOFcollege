@@ -5,12 +5,17 @@
 }
 
 .container {
-  max-width: 1240px;
+  max-width: 1250px;
   min-height: 100vh;
   margin: 0 auto;
   height: auto;
 }
 
+.centerTable {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
 .table {
   width: 100%;
   background-color: #ffffff !important;
@@ -42,8 +47,18 @@
   display: inline-block;
 }
 
+.cartUser {
+  width: 95%;
+}
+
 .optionColor span {
   padding: 2px 12px;
   border-radius: 50%;
   margin-right: 8px;
+}
+
+@media (min-width: 1200px) {
+  .componentsResponsive {
+    display: none;
+  }
 }

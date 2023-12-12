@@ -40,3 +40,20 @@
 .input {
   padding: 10px 15px;
 }
+
+.border {
+  border-right: 1px solid #ccc;
+}
+
+@media (max-width: 500px) {
+  .content {
+    padding: 10px 20px;
+    border-radius: 4px;
+  }
+  .textSize {
+    font-size: 16px;
+  }
+  .border {
+    border-right: none;
+  }
+}

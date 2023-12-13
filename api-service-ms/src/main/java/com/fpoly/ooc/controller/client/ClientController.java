@@ -241,4 +241,9 @@ public class ClientController {
         return ResponseEntity.ok().body(timeLineService.getTimelineByBillCode(billCode));
     }
 
+    @PostMapping("/autoFillVoucher")
+    public ResponseEntity<?> autoFillVoucher(@RequestBody DisplayVoucherRequest req) {
+        return ResponseEntity.ok(voucherService.autoFillVoucher(req));
+    }
+
 }

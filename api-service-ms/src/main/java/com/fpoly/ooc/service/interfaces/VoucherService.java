@@ -6,6 +6,7 @@ import com.fpoly.ooc.request.voucher.DisplayVoucherRequest;
 import com.fpoly.ooc.request.voucher.VoucherRequest;
 import com.fpoly.ooc.responce.voucher.VoucherResponse;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -36,5 +37,7 @@ public interface VoucherService {
     Boolean isCheckTimeUse(String voucherCode, String username);
 
     Voucher updateVoucher(Voucher voucher);
+
+    VoucherResponse autoFillVoucher(DisplayVoucherRequest request);
 
 }

@@ -28,7 +28,7 @@ public interface VoucherRepository extends JpaRepository<Voucher, Long> {
 
     Optional<Voucher> findVoucherByVoucherName(String voucherName);
 
-    Optional<Voucher> findVoucherByVoucherCode(String code);
+    Optional<Voucher> findVoucherByVoucherCodeAndStatus(String code, String status);
 
     @Query("select new java.lang.Boolean((COUNT(*) > 0)) from VoucherAccount va " +
             "where va.voucherAccount.id = :idVoucher and lower(va.accountVoucher.username) = :username")
@@ -46,10 +46,15 @@ public interface VoucherRepository extends JpaRepository<Voucher, Long> {
             "v.limitQuantity, v.startDate, v.endDate, v.status, v.objectUse, v.voucherCondition) " +
             "from Voucher v " +
             "left join VoucherAccount va on v.id = va.voucherAccount.id " +
-            "where (:voucherCodeOrName is null or lower(v.voucherCode) like :voucherCodeOrName or lower(v.voucherName) like :voucherCodeOrName)" +
-            "and (:username is null or (lower(va.accountVoucher.username) = :username and va.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE )) " +
+            "where " +
+            "   (:voucherCodeOrName is null or lower(v.voucherCode) " +
+            "   like :voucherCodeOrName or lower(v.voucherName) " +
+            "   like :voucherCodeOrName) " +
             "and (:priceBill is null or v.voucherCondition <= :priceBill) " +
-            "or v.objectUse like 'all' " +
+            "and v.status = 'ACTIVE' " +
+            "and ((va.accountVoucher.username = case when :username is null then '' else :username end) " +
+            "   or v.objectUse = com.fpoly.ooc.constant.Const.OBJECT_USE_VOUCHER_ALL) " +
+            "and v.objectUse not in (case when :username is null then com.fpoly.ooc.constant.Const.OBJECT_USE_VOUCHER_MEMBERS else '' end)" +
             "group by v.id, v.voucherCode, v.voucherName, v.voucherValue, v.voucherValueMax, v.voucherMethod, " +
             "v.limitQuantity, v.startDate, v.endDate, v.status, v.objectUse, v.voucherCondition " +
             "order by v.voucherValue desc ")
@@ -64,4 +69,20 @@ public interface VoucherRepository extends JpaRepository<Voucher, Long> {
             "and (?2 is null or (lower(a.username) = ?2 and va.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE )) " +
             "and v.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE ")
     Boolean isCheckTimeUseAndAccount(String voucherCode, String username);
+
+    @Query("select new com.fpoly.ooc.responce.voucher.VoucherResponse(" +
+            "v.id, v.voucherCode, v.voucherName, v.voucherValue, v.voucherValueMax, v.voucherMethod, " +
+            "v.limitQuantity, v.startDate, v.endDate, v.status, v.objectUse, v.voucherCondition) " +
+            "from Voucher v " +
+            "left join VoucherAccount va on v.id = va.voucherAccount.id " +
+            "where " +
+            "(:priceBill is null or v.voucherCondition <= :priceBill) " +
+            "and v.status = 'ACTIVE' " +
+            "and ((va.accountVoucher.username = case when :username is null then '' else :username end) " +
+            "   or v.objectUse = com.fpoly.ooc.constant.Const.OBJECT_USE_VOUCHER_ALL) " +
+            "and v.objectUse not in (case when :username is null then com.fpoly.ooc.constant.Const.OBJECT_USE_VOUCHER_MEMBERS else '' end)" +
+            "group by v.id, v.voucherCode, v.voucherName, v.voucherValue, v.voucherValueMax, v.voucherMethod, " +
+            "v.limitQuantity, v.startDate, v.endDate, v.status, v.objectUse, v.voucherCondition " +
+            "order by v.voucherValue desc ")
+    List<VoucherResponse> autoFillVoucherByPrice(@Param("priceBill") BigDecimal price,@Param("username") String username);
 }

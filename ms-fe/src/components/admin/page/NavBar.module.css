@@ -48,3 +48,9 @@
   border-radius: 50%;
   background-color: #edf2f9;
 }
+
+.hover li:hover {
+  background-color: whitesmoke;
+  color: #fff;
+  transition: 0.3s linear;
+}

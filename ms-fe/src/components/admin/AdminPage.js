@@ -84,8 +84,15 @@ function AdminPage() {
                       path="return-bill/:billCode"
                       element={<BillReturn isAdmin={isAdmin} />}
                     ></Route>
-                  </Route>
-                  {/* ví dụ path= san-pham/hien-thi ->  
+                    {/* Trả hàng */}
+                    <Route path="return">
+                      <Route index element={<ReturnIndex />}></Route>
+                      <Route
+                        path="return-bill/:billCode"
+                        element={<BillReturn />}
+                      ></Route>
+                    </Route>
+                    {/* ví dụ path= san-pham/hien-thi ->  
                   {/* Tại quầy */}
                   <Route path="counter-sales">
                     <Route index element={<Bill isAdmin={isAdmin} />}></Route>
@@ -218,32 +225,32 @@ function AdminPage() {
                     element={<DetailForm isAdmin={isAdmin} roleId={2} />}
                   ></Route>
                 </Route>
-
-                {/* Not found */}
-                <Route
-                  path="*"
-                  element={
-                    <Result
-                      status={"404"}
-                      title={"404"}
-                      subTitle={"Xin lỗi, trang bạn truy cập không tồn tại."}
-                      extra={
-                        <Link to={"/admin"}>
-                          <Button type="primary">Back Home</Button>
-                        </Link>
-                      }
-                    />
-                  }
-                />
-              </Routes>
-              <div>
-                <Footer />
+                  {/* Not found */}
+                  <Route
+                    path="*"
+                    element={
+                      <Result
+                        status={"404"}
+                        title={"404"}
+                        subTitle={"Xin lỗi, trang bạn truy cập không tồn tại."}
+                        extra={
+                          <Link to={"/admin"}>
+                            <Button type="primary">Back Home</Button>
+                          </Link>
+                        }
+                      />
+                    }
+                  />
+                </Routes>
+                <div>
+                  <Footer />
+                </div>
               </div>
-            </div>
-          </Col>
-        </Row>
-      )}
-    </NotificationProvider>
+            </Col>
+          </Row>
+        )}
+      </NotificationProvider>
+    </>
   );
 }
 

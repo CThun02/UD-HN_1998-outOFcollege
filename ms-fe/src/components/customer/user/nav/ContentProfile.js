@@ -3,6 +3,7 @@ import styles from "./ContentProfile.module.css";
 import UserInfoDetail from "./UserInfoDetail";
 import FollowingOrder from "./following-order/FollowingOrder";
 import Address from "./user-address/Address";
+import Voucher from "./voucher/Voucher";
 
 function ContentProfile({ tab, user, setIsRender }) {
   return (
@@ -19,6 +20,7 @@ function ContentProfile({ tab, user, setIsRender }) {
           )}
 
           {tab === "followOrder" && <FollowingOrder tab={tab} />}
+          {tab === "vouchers" && <Voucher />}
         </div>
       </div>
     </div>

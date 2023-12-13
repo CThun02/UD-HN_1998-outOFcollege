@@ -234,7 +234,7 @@ const TimelineByBillCode = () => {
                                     <Col span={12} style={{ fontWeight: 500 }}>Ngày đặt hàng</Col>
                                     <Col span={12}>{timelines?.timelineCustomInfo?.orderDate}</Col>
                                     <Col span={12} style={{ fontWeight: 500 }}>Ngày nhận hàng</Col>
-                                    <Col span={12}>{timelines?.timelineCustomInfo?.dateOfReceipt}</Col>
+                                    <Col span={12}>{timelines?.timelineCustomInfo?.dateOfReceipt ?? '__'}</Col>
                                     <Col span={12} style={{ fontWeight: 500 }}>Địa chỉ</Col>
                                     <Col span={12}>
                                         {`${timelines?.timelineCustomInfo?.addressDetail} 

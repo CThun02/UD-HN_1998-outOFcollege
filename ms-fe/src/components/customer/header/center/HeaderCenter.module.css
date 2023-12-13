@@ -31,7 +31,7 @@
   color: #2fc1ff;
 }
 
-@media (max-width: 1800px) {
+@media (max-width: 1535px) {
   .flex {
     display: none;
   }

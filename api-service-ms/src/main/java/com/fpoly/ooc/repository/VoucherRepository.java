@@ -2,6 +2,7 @@ package com.fpoly.ooc.repository;
 
 import com.fpoly.ooc.entity.Voucher;
 import com.fpoly.ooc.request.voucher.VoucherRequest;
+import com.fpoly.ooc.responce.voucher.VoucherAccountResponse;
 import com.fpoly.ooc.responce.voucher.VoucherResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -64,4 +65,15 @@ public interface VoucherRepository extends JpaRepository<Voucher, Long> {
             "and (?2 is null or (lower(a.username) = ?2 and va.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE )) " +
             "and v.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE ")
     Boolean isCheckTimeUseAndAccount(String voucherCode, String username);
+
+    @Query("SELECT NEW com.fpoly.ooc.responce.voucher.VoucherAccountResponse(v.id, v.voucherCode, v.voucherName, v.startDate, " +
+            "   v.endDate, v.voucherValue, v.voucherValueMax, v.voucherMethod, v.voucherCondition, v.limitQuantity, v.objectUse, " +
+            "   va.accountVoucher.username, va.percentReduce, va.moneyReduce, va.status, va.createdAt ) " +
+            "FROM Voucher v join VoucherAccount va ON v.id = va.voucherAccount.id " +
+            "WHERE va.accountVoucher.username =:username " +
+            "   AND (:voucherCode IS NULL OR v.voucherCode LIKE %:voucherCode%)" +
+            "   AND v.status = 'ACTIVE'")
+    List<VoucherAccountResponse> getVoucherByUsernameAndVoucherCode(@Param("username") String username,
+                                                                    @Param("voucherCode") String voucherCode);
+
 }

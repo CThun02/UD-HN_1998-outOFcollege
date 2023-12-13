@@ -52,6 +52,7 @@ function DetailProduct({ setRenderHeader }) {
   useEffect(() => {
     async function getProductDetails() {
       try {
+        console.log(decodeData)
         const res = await axios.post(baseUrl + "/details-product", {
           productDetailId: decodeData.productDetailId,
           productId: decodeData.productId,

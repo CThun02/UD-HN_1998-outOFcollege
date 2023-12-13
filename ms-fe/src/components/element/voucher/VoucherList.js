@@ -25,11 +25,10 @@ function VoucherList({ data, setValue, value }) {
         </h3>
         <h3 className={styles.fontWeight400}>
           Đơn tối thiểu {data.voucherCondition}đ{" "}
-          {`${
-            data.voucherMethod === "%"
-              ? "Giảm tối đa " + data.voucherValueMax + "đ"
-              : ""
-          }`}
+          {`${data.voucherMethod === "%"
+            ? "Giảm tối đa " + data.voucherValueMax + "đ"
+            : ""
+            }`}
         </h3>
         <h4 className={`${styles.fontWeight400} ${styles.color}`}>
           HSD: {moment(data.endDate).format("DD.MM.YYYY")}

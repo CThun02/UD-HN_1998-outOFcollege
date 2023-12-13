@@ -91,7 +91,7 @@
   box-shadow: none;
 }
 
-@media (max-width: 1800px) {
+@media (max-width: 1535px) {
   .lineHeight {
     display: none;
   }

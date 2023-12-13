@@ -6,7 +6,7 @@ import {
   Row,
   Col,
   Form,
-  DatePicker,
+  message,
   Modal,
   Button,
   notification,
@@ -17,7 +17,7 @@ import styles from "../categorystyles/CategoryStyles.module.css";
 import axios from "axios";
 import { getToken } from "../../../service/Token";
 const { Option } = Select;
-const MaterialAdmin = function () {
+const MaterialAdmin = function ({ isAdmin }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   const [render, setRender] = useState();
@@ -40,9 +40,13 @@ const MaterialAdmin = function () {
       })
       .then((response) => {
         // Xử lý thành công
-        console.log("Thêm thành công");
+        setRender(Math.random());
         setIsModalVisible(false);
-        setRender(Math.random);
+        if (response.data) {
+          message.success("Thêm thành công");
+        } else {
+          message.error("Chất liệu đã tồn tại");
+        }
       })
       .catch((err) => {
         // Xử lý lỗi
@@ -73,17 +77,17 @@ const MaterialAdmin = function () {
               />
             </Row>
           </Col>
-          <Col span={12} offset={1}>
-            <Col span={5} offset={19}>
+          {isAdmin ? (
+            <Col span={14} style={{ textAlign: "end" }}>
               <Button className={styles.btnSeach} onClick={handleAdd}>
                 <PlusOutlined className={styles.faPlus} />
                 <span className={styles.titleSeach}>Thêm Chất Liệu</span>
               </Button>
             </Col>
-          </Col>
+          ) : null}
         </Row>
         <div className={styles.categoryTable}>
-          <MaterialTable renderTable={render}></MaterialTable>
+          <MaterialTable isAdmin={isAdmin} renderTable={render}></MaterialTable>
         </div>
         <Modal
           title="Thêm Thể Loại"

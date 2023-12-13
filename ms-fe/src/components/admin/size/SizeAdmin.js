@@ -10,6 +10,7 @@ import {
   Modal,
   Button,
   notification,
+  message,
 } from "antd";
 import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
 import SizeTable from "./SizeTable";
@@ -18,7 +19,7 @@ import axios from "axios";
 import { getToken } from "../../../service/Token";
 const { Option } = Select;
 
-const SizeAdmin = function () {
+const SizeAdmin = function ({ isAdmin }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [render, setRender] = useState();
   const handleAdd = () => {
@@ -40,9 +41,13 @@ const SizeAdmin = function () {
       })
       .then((response) => {
         // Xử lý thành công
-        console.log("Thêm thành công");
+        setRender(Math.random());
         setIsModalVisible(false);
-        setRender(Math.random);
+        if (response.data) {
+          message.success("Thêm thành công");
+        } else {
+          message.error("Kích cỡ đã tồn tại");
+        }
       })
       .catch((error) => {
         // Xử lý lỗi
@@ -74,17 +79,17 @@ const SizeAdmin = function () {
               />
             </Row>
           </Col>
-          <Col span={12} offset={1}>
-            <Col span={5} offset={19}>
+          {isAdmin ? (
+            <Col span={14} style={{ textAlign: "end" }}>
               <Button className={styles.btnSeach} onClick={handleAdd}>
                 <PlusOutlined className={styles.faPlus} />
                 <span className={styles.titleSeach}>Thêm Kích Thước</span>
               </Button>
             </Col>
-          </Col>
+          ) : null}
         </Row>
         <div className={styles.categoryTable}>
-          <SizeTable renderTable={render}></SizeTable>
+          <SizeTable isAdmin={isAdmin} renderTable={render}></SizeTable>
         </div>
         <Modal
           title="Thêm Size"

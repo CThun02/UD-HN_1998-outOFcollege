@@ -40,7 +40,7 @@ public class FormServiceImpl implements FormServiceI {
             o.setFormName(form.getFormName());
 
             try {
-                return kafkaUtil.sendingObjectWithKafka(form, Const.TOPIC_FORM);
+                return kafkaUtil.sendingObjectWithKafka(o, Const.TOPIC_FORM);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }

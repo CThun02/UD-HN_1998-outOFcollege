@@ -26,7 +26,7 @@ function UserAddress({ address, index, setIsRender }) {
     message.error("Click on No");
   };
 
-  const [openAdd, setOpenAdd] = useState(false)
+  const [openAdd, setOpenAdd] = useState(false);
 
   return (
     <div className={styles.userAddress}>
@@ -81,7 +81,8 @@ function UserAddress({ address, index, setIsRender }) {
                     onClick={() => setOpenAdd(true)}
                   />
 
-                  <EditAddress isModalOpen={openAdd}
+                  <EditAddress
+                    isModalOpen={openAdd}
                     handleAddressOk={() => console.log(123)}
                     handleAddressCancel={() => setOpenAdd(false)}
                     render={setIsRender}
@@ -102,14 +103,29 @@ function UserAddress({ address, index, setIsRender }) {
           <div className={styles.addressDetail}>
             <RowAddress title={"Họ tên"} data={address.fullName} />
             <RowAddress title={"Số điện thoại"} data={address.phoneNumber} />
-            <RowAddress title={"Thành phố"} data={address.city.substring(0, address.city.indexOf('|'))} />
-            <RowAddress title={"Huyện"} data={address.district.substring(0, address.district.indexOf('|'))} />
-            <RowAddress title={"Phường"} data={address.ward.substring(0, address.ward.indexOf('|'))} />
+            <RowAddress
+              title={"Thành phố"}
+              data={address.city?.substring(0, address.city.indexOf("|"))}
+            />
+            <RowAddress
+              title={"Huyện"}
+              data={address.district?.substring(
+                0,
+                address.district.indexOf("|")
+              )}
+            />
+            <RowAddress
+              title={"Phường"}
+              data={address.ward?.substring(0, address.ward.indexOf("|"))}
+            />
             <RowAddressDetail
               title={"Địa chỉ chi tiết"}
-              detailCity={`${address.city.substring(0, address.city.indexOf('|'))} 
-              - ${address.district.substring(0, address.district.indexOf('|'))}
-               -${address.ward.substring(0, address.ward.indexOf('|'))}`}
+              detailCity={`${address.city?.substring(
+                0,
+                address.city.indexOf("|")
+              )} 
+              - ${address.district?.substring(0, address.district.indexOf("|"))}
+               -${address.ward?.substring(0, address.ward.indexOf("|"))}`}
               detailHouse={`${address.street} - ${address.descriptionDetail}`}
             />
           </div>

@@ -42,7 +42,7 @@ public class SizeServiceImpl implements SizeServiceI {
             o.setSizeName(size.getSizeName());
             o.setStatus(size.getStatus());
             try {
-                return kafkaUtil.sendingObjectWithKafka(size, Const.TOPIC_SIZE);
+                return kafkaUtil.sendingObjectWithKafka(o, Const.TOPIC_SIZE);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }

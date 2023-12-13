@@ -10,6 +10,7 @@ import {
   Modal,
   Button,
   notification,
+  message,
 } from "antd";
 import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
 import SleeveTable from "./SleeveTable";
@@ -18,7 +19,7 @@ import axios from "axios";
 import { getToken } from "../../../service/Token";
 const { Option } = Select;
 
-const SleeveAdmin = function () {
+const SleeveAdmin = function ({ isAdmin }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [render, setRender] = useState();
   const handleAdd = () => {
@@ -40,9 +41,13 @@ const SleeveAdmin = function () {
       })
       .then((response) => {
         // Xử lý thành công
-        console.log("Thêm thành công");
+        setRender(Math.random());
         setIsModalVisible(false);
-        setRender(Math.random);
+        if (response.data) {
+          message.success("Thêm thành công");
+        } else {
+          message.error("Tay áo đã tồn tại");
+        }
       })
       .catch((error) => {
         // Xử lý lỗi
@@ -73,17 +78,17 @@ const SleeveAdmin = function () {
               />
             </Row>
           </Col>
-          <Col span={12} offset={1}>
-            <Col span={5} offset={18}>
+          {isAdmin ? (
+            <Col span={14} style={{ textAlign: "end" }}>
               <Button className={styles.btnSeach} onClick={handleAdd}>
                 <PlusOutlined className={styles.faPlus} />
                 <span className={styles.titleSeach}>Thêm Kiểu Tay Áo</span>
               </Button>
             </Col>
-          </Col>
+          ) : null}
         </Row>
         <div className={styles.categoryTable}>
-          <SleeveTable renderTable={render}></SleeveTable>
+          <SleeveTable isAdmin={isAdmin} renderTable={render}></SleeveTable>
         </div>
         <Modal
           title="Thêm Kiểu Tay Áo"

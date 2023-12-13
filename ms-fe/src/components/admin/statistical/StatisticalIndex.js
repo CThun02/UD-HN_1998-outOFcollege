@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Line } from "@ant-design/plots";
 import styles from "./StatisticalIndex.module.css";
 import axios from "axios";
@@ -36,6 +36,7 @@ import TableProdutSellTheMost from "./TableProdutSellTheMost";
 import ProductReturns from "./ProductReturns";
 import dayjs from "dayjs";
 import { getToken } from "../../../service/Token";
+import { useNavigate } from "react-router-dom";
 
 var currentDate = new Date();
 var yesterday = new Date(currentDate.getTime() - 24 * 60 * 60 * 1000);
@@ -54,7 +55,8 @@ var formattedDateYesterday =
   yesterday.getDate();
 const { Option } = Select;
 
-const StatisticalIndex = () => {
+const StatisticalIndex = ({ isAdmin }) => {
+  const navigate = useNavigate();
   const [data, setData] = useState([]);
   const [billRevenue, setBillRevenue] = useState({});
   const [billRevenueCompare, setBillRevenueCompare] = useState({});
@@ -517,12 +519,20 @@ const StatisticalIndex = () => {
   }
 
   useEffect(() => {
-    getDataRevenue();
-    getDataLineChart();
-    compareRevenue();
-    getGrowthStoreDataByTime("date", setGrowthStoreDayData);
-    getGrowthStoreDataByTime("month", setGrowthStoreMonthData);
-    getGrowthStoreDataByTime("year", setGrowthStoreYearData);
+    if (isAdmin === false) {
+      notification.warning({
+        message: "Thông báo",
+        description: "Bạn không có quyền truy cập",
+      });
+      navigate("/api/admin/counter-sales");
+    } else if (isAdmin === true) {
+      getDataRevenue();
+      getDataLineChart();
+      compareRevenue();
+      getGrowthStoreDataByTime("date", setGrowthStoreDayData);
+      getGrowthStoreDataByTime("month", setGrowthStoreMonthData);
+      getGrowthStoreDataByTime("year", setGrowthStoreYearData);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     dateCompare,
@@ -534,6 +544,7 @@ const StatisticalIndex = () => {
     dateLineChartValueTo,
     typeDateLineChart,
     reason,
+    isAdmin,
   ]);
   return (
     <>

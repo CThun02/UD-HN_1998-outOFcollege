@@ -27,28 +27,40 @@ function Header({ render, setRenderHeader }) {
   }, [render]);
 
   useEffect(() => {
-    if (href.includes("home") || selectedTab === "") {
+    if (
+      href.includes("home") ||
+      selectedTab === "" ||
+      href.includes("shopping") ||
+      href.includes("follow-order") ||
+      href.includes("about") ||
+      href.includes("contact") ||
+      href.includes("cart")
+    ) {
+      if (href.includes("home") || selectedTab === "") {
+        setSelectedTab("home");
+      }
+
+      if (href.includes("shopping")) {
+        setSelectedTab("shop");
+      }
+
+      if (href.includes("follow-order")) {
+        setSelectedTab("flowOder");
+      }
+
+      if (href.includes("about")) {
+        setSelectedTab("inducere");
+      }
+
+      if (href.includes("contact")) {
+        setSelectedTab("contact");
+      }
+
+      if (href.includes("cart")) {
+        setSelectedTab("cart");
+      }
+    } else {
       setSelectedTab("home");
-    }
-
-    if (href.includes("shopping")) {
-      setSelectedTab("shop");
-    }
-
-    if (href.includes("follow-order")) {
-      setSelectedTab("flowOder");
-    }
-
-    if (href.includes("about")) {
-      setSelectedTab("inducere");
-    }
-
-    if (href.includes("contact")) {
-      setSelectedTab("contact");
-    }
-
-    if (href.includes("cart")) {
-      setSelectedTab("cart");
     }
   }, []);
 

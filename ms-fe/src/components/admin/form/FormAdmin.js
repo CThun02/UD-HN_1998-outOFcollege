@@ -16,7 +16,7 @@ import styles from "./FormStyle.module.css";
 import axios from "axios";
 import { getToken } from "../../../service/Token";
 
-const FormAdmin = function () {
+const FormAdmin = function ({ isAdmin }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [render, setRender] = useState();
 
@@ -39,10 +39,13 @@ const FormAdmin = function () {
       })
       .then((response) => {
         // Xử lý thành công
-        console.log("Thêm thành công");
+        setRender(Math.random());
         setIsModalVisible(false);
-        setRender(Math.random);
-        message.success("Thêm thành công");
+        if (response.data) {
+          message.success("Thêm thành công");
+        } else {
+          message.error("Dáng áo đã tồn tại");
+        }
       })
       .catch((err) => {
         // Xử lý lỗi
@@ -53,7 +56,6 @@ const FormAdmin = function () {
             description: "Bạn không có quyền truy cập!",
           });
         }
-        console.error("Lỗi khi thêm dữ liệu", err);
       });
   };
 
@@ -72,8 +74,8 @@ const FormAdmin = function () {
               />
             </Row>
           </Col>
-          <Col span={13} offset={1}>
-            <Col span={9} offset={1}>
+          <Col span={14} style={{ textAlign: "end" }}>
+            {isAdmin ? (
               <Button
                 className={styles.btnSeach}
                 onClick={handleAdd}
@@ -82,11 +84,11 @@ const FormAdmin = function () {
                 <PlusOutlined className={styles.faPlus} />
                 <span className={styles.titleSeach}>Thêm Kiểu Dáng</span>
               </Button>
-            </Col>
+            ) : null}
           </Col>
         </Row>
         <div className={styles.materialTable}>
-          <FormTable renderTable={render}></FormTable>
+          <FormTable isAdmin={isAdmin} renderTable={render}></FormTable>
         </div>
       </div>
       <Modal

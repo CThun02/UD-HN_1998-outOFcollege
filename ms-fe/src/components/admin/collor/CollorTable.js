@@ -26,7 +26,7 @@ const CollorTable = function (props) {
   const [selectedItem, setSelectedItem] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [collorName, setCollorName] = useState("");
-  const [colorCode, setColorCode] = useState("");
+  const [colorCode, setColorCode] = useState("#1677FF");
   const [status, setStatus] = useState("");
   const [id, setid] = useState("");
 
@@ -51,11 +51,9 @@ const CollorTable = function (props) {
         },
       })
       .then((response) => {
-        // Xoá dữ liệu thành công
-        // Cập nhật lại danh sách dữ liệu sau khi xoá
+        message.success("Xóa thành công");
         const updatedData = data.filter((item) => item.id !== selectedData);
         setData(updatedData);
-        // Đóng modal
         setShowModal(false);
       })
       .catch((err) => {
@@ -122,8 +120,9 @@ const CollorTable = function (props) {
         }
       )
       .then((response) => {
-        setShowDetailsModal(false);
         setRender(Math.random);
+        setShowDetailsModal(false);
+        message.success("Chỉnh sửa thành công");
       })
       .catch((err) => {
         const status = err.response.status;
@@ -134,8 +133,6 @@ const CollorTable = function (props) {
           });
         }
       });
-    console.log(colorCode);
-    console.log(collorName);
   };
 
   useEffect(() => {
@@ -147,7 +144,6 @@ const CollorTable = function (props) {
       })
       .then((response) => {
         setData(response.data);
-        console.log(response.data);
       })
       .catch((err) => {
         const status = err.response.status;
@@ -163,7 +159,6 @@ const CollorTable = function (props) {
   return (
     <div>
       {contextHolder}
-      {console.log(data)}
       <Table
         pagination={{
           showSizeChanger: true,
@@ -200,6 +195,7 @@ const CollorTable = function (props) {
             render: (status, record) => (
               <>
                 <Switch
+                  disabled={!props.isAdmin}
                   onChange={(checked) => {
                     handleUpdateStatus(record.id, checked);
                   }}
@@ -225,13 +221,17 @@ const CollorTable = function (props) {
               <Space size="middle">
                 <Button
                   className={styles.btnDetails}
-                  type="link"
+                  type="primary"
+                  size="large"
+                  disabled={!props.isAdmin}
                   onClick={() => handleDetails(record)}
                   icon={<FormOutlined />}
                 />
                 <Button
                   className={styles.btnDetails}
-                  type="link"
+                  type="primary"
+                  size="large"
+                  disabled={!props.isAdmin}
                   onClick={() => handleDelete(record.id)}
                   icon={<DeleteFilled />}
                 />
@@ -251,7 +251,7 @@ const CollorTable = function (props) {
           <h6>Mã màu sắc</h6>
           <ColorPicker
             showText
-            color={colorCode}
+            value={colorCode}
             onChange={(e) => setColorCode(e.toHexString())}
           />
         </div>

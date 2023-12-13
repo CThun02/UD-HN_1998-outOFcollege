@@ -106,9 +106,3 @@
   text-decoration: line-through;
   margin-right: 10px;
 }
-
-@media (max-width: 768px) {
-  .product {
-    padding: 0;
-  }
-}

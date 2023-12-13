@@ -46,7 +46,7 @@ public class ColorServiceImpl implements ColorServiceI {
             o.setColorName(color.getColorName());
             o.setStatus(color.getStatus());
             try {
-                return kafkaUtil.sendingObjectWithKafka(color, Const.TOPIC_COLOR);
+                return kafkaUtil.sendingObjectWithKafka(o, Const.TOPIC_COLOR);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }

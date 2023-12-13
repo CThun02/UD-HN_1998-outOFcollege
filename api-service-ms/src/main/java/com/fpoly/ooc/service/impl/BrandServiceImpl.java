@@ -40,7 +40,7 @@ public class BrandServiceImpl implements BrandServiceI {
         return material1.map(o -> {
             o.setBrandName(brand.getBrandName());
             try {
-                return kafkaUtil.sendingObjectWithKafka(brand, Const.TOPIC_BRAND);
+                return kafkaUtil.sendingObjectWithKafka(o, Const.TOPIC_BRAND);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }

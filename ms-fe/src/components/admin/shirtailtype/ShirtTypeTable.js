@@ -44,8 +44,9 @@ const ShirtTypeTable = function (props) {
       )
       .then((response) => {
         // Đóng modal
+        setRender(Math.random());
         setShowDetailsModal(false);
-        setRender(Math.random);
+        message.success("Chỉnh sửa thành công");
       })
       .catch((error) => {
         const status = error.response.status;
@@ -119,6 +120,7 @@ const ShirtTypeTable = function (props) {
       .then((response) => {
         // Xoá dữ liệu thành công
         // Cập nhật lại danh sách dữ liệu sau khi xoá
+        message.success("Xóa thành công");
         const updatedData = data.filter((item) => item.id !== selectedData);
         setData(updatedData);
         // Đóng modal
@@ -193,6 +195,7 @@ const ShirtTypeTable = function (props) {
             render: (status, record) => (
               <>
                 <Switch
+                  disabled={!props.isAdmin}
                   onChange={(checked) => {
                     handleUpdateStatus(record.id, checked);
                   }}
@@ -218,13 +221,17 @@ const ShirtTypeTable = function (props) {
               <Space size="middle">
                 <Button
                   className={styles.btnDetails}
-                  type="link"
+                  type="primary"
+                  size="large"
+                  disabled={!props.isAdmin}
                   onClick={() => handleDetails(record)}
                   icon={<FormOutlined />}
                 />
                 <Button
                   className={styles.btnDetails}
-                  type="link"
+                  type="primary"
+                  size="large"
+                  disabled={!props.isAdmin}
                   onClick={() => handleDelete(record.id)}
                   icon={<DeleteFilled />}
                 />

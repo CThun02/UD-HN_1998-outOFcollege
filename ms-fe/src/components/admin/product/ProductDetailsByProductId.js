@@ -989,6 +989,7 @@ const ProductDetails = (props) => {
                   >
                     <Button
                       type="primary"
+                      disabled={!props.isAdmin}
                       onClick={() => {
                         confirm({
                           centered: true,
@@ -1079,7 +1080,8 @@ const ProductDetails = (props) => {
                         </Col>
                       );
                     })}
-                  {record.productImageResponse?.length < 3 ? (
+                  {record.productImageResponse?.length < 3 &&
+                  props.isAdmin === true ? (
                     <Col span={6}>
                       <Spin
                         tip="Vui lòng chờ..."
@@ -1212,7 +1214,7 @@ const ProductDetails = (props) => {
               message.success("Thêm ảnh thành công", 2);
             })
             .catch((err) => {
-              const status = err.response.status;
+              const status = err?.response?.status;
               if (status === 403) {
                 notification.error({
                   message: "Thông báo",
@@ -1223,7 +1225,7 @@ const ProductDetails = (props) => {
             });
         })
         .catch((err) => {
-          const status = err.response.status;
+          const status = err?.response?.status;
           if (status === 403) {
             notification.error({
               message: "Thông báo",
@@ -1261,7 +1263,7 @@ const ProductDetails = (props) => {
           setLoadingUpdateProduct(false);
         })
         .catch((err) => {
-          const status = err.response.status;
+          const status = err?.response?.status;
           if (status === 403) {
             notification.error({
               message: "Thông báo",
@@ -1294,7 +1296,7 @@ const ProductDetails = (props) => {
           setLoadingUpdateProduct(false);
         })
         .catch((err) => {
-          const status = err.response.status;
+          const status = err?.response?.status;
           if (status === 403) {
             notification.error({
               message: "Thông báo",
@@ -1327,7 +1329,7 @@ const ProductDetails = (props) => {
           setLoadingUpdateProduct(false);
         })
         .catch((err) => {
-          const status = err.response.status;
+          const status = err?.response?.status;
           if (status === 403) {
             notification.error({
               message: "Thông báo",
@@ -1360,7 +1362,7 @@ const ProductDetails = (props) => {
           setLoadingUpdateProduct(false);
         })
         .catch((err) => {
-          const status = err.response.status;
+          const status = err?.response?.status;
           if (status === 403) {
             notification.error({
               message: "Thông báo",
@@ -1397,7 +1399,7 @@ const ProductDetails = (props) => {
           setLoadingUpdateProduct(false);
         })
         .catch((err) => {
-          const status = err.response.status;
+          const status = err?.response?.status;
           if (status === 403) {
             notification.error({
               message: "Thông báo",
@@ -1434,7 +1436,7 @@ const ProductDetails = (props) => {
           setLoadingUpdateProduct(false);
         })
         .catch((err) => {
-          const status = err.response.status;
+          const status = err?.response?.status;
           if (status === 403) {
             notification.error({
               message: "Thông báo",
@@ -1471,7 +1473,7 @@ const ProductDetails = (props) => {
           setLoadingUpdateProduct(false);
         })
         .catch((err) => {
-          const status = err.response.status;
+          const status = err?.response?.status;
           if (status === 403) {
             notification.error({
               message: "Thông báo",
@@ -1507,7 +1509,7 @@ const ProductDetails = (props) => {
           setLoadingUpdateProduct(false);
         })
         .catch((err) => {
-          const status = err.response.status;
+          const status = err?.response?.status;
           if (status === 403) {
             notification.error({
               message: "Thông báo",
@@ -1543,7 +1545,7 @@ const ProductDetails = (props) => {
           setLoadingUpdateProduct(false);
         })
         .catch((err) => {
-          const status = err.response.status;
+          const status = err?.response?.status;
           if (status === 403) {
             notification.error({
               message: "Thông báo",
@@ -1580,7 +1582,7 @@ const ProductDetails = (props) => {
           setLoadingUpdateProduct(false);
         })
         .catch((err) => {
-          const status = err.response.status;
+          const status = err?.response?.status;
           if (status === 403) {
             notification.error({
               message: "Thông báo",
@@ -1616,7 +1618,7 @@ const ProductDetails = (props) => {
           setLoadingUpdateProduct(false);
         })
         .catch((err) => {
-          const status = err.response.status;
+          const status = err?.response?.status;
           if (status === 403) {
             notification.error({
               message: "Thông báo",
@@ -1713,7 +1715,7 @@ const ProductDetails = (props) => {
         })
         .catch((err) => {
           setLoadingUpdateProduct(false);
-          const status = err.response.status;
+          const status = err?.response?.status;
           if (status === 403) {
             notification.error({
               message: "Thông báo",
@@ -1868,7 +1870,7 @@ const ProductDetails = (props) => {
           setEditProduct(false);
         })
         .catch((err) => {
-          const status = err.response.status;
+          const status = err?.response?.status;
           if (status === 403) {
             notification.error({
               message: "Thông báo",
@@ -1891,20 +1893,21 @@ const ProductDetails = (props) => {
       .then((res) => {
         messageApi.success(`Xóa ảnh thành công`);
         deleteObject(ref(saveImage, productImage.path)).catch((err) => {
-          messageApi.error(`Gặp lỗi khi thao tác trên firebase`);
-          const status = err.response.status;
+          const status = err?.response?.status;
           if (status === 403) {
             notification.error({
               message: "Thông báo",
               description: "Bạn không có quyền truy cập!",
             });
+          } else {
+            messageApi.error(`Gặp lỗi khi thao tác trên firebase`);
           }
         });
         setRender(Math.random);
       })
       .catch((err) => {
         messageApi.error(`Gặp lỗi khi thao tác trên dữ liệu`);
-        const status = err.response.status;
+        const status = err?.response?.status;
         if (status === 403) {
           notification.error({
             message: "Thông báo",
@@ -1935,13 +1938,14 @@ const ProductDetails = (props) => {
         });
       })
       .catch((err) => {
-        messageApi.error(`Gặp lỗi khi thao tác trên dữ liệu`);
-        const status = err.response.status;
+        const status = err?.response?.status;
         if (status === 403) {
           notification.error({
             message: "Thông báo",
             description: "Bạn không có quyền truy cập!",
           });
+        } else {
+          messageApi.error(`Gặp lỗi khi thao tác trên dữ liệu`);
         }
       });
   }
@@ -1961,7 +1965,7 @@ const ProductDetails = (props) => {
         }
       })
       .catch((err) => {
-        const status = err.response.status;
+        const status = err?.response?.status;
         if (status === 403) {
           notification.error({
             message: "Thông báo",
@@ -2281,6 +2285,7 @@ const ProductDetails = (props) => {
                   ) : (
                     <Tooltip placement="right" title="Click to open form">
                       <EditFilled
+                        disabled={!props.isAdmin}
                         onClick={() => {
                           setEditProduct(true);
                         }}
@@ -2315,7 +2320,11 @@ const ProductDetails = (props) => {
                 )}
                 {editProduct ? (
                   <div style={{ textAlign: "center", marginTop: "10px" }}>
-                    <Button onClick={updateProduct} type="primary">
+                    <Button
+                      disabled={!props.isAdmin}
+                      onClick={updateProduct}
+                      type="primary"
+                    >
                       Xác nhận
                     </Button>
                   </div>
@@ -2866,7 +2875,7 @@ const ProductDetails = (props) => {
             <div style={{ margin: "30px 0", textAlign: "center" }}>
               <Button
                 type="primary"
-                disabled={selectedRowKeys.length === 0}
+                disabled={selectedRowKeys.length === 0 || !props.isAdmin}
                 onClick={() => {
                   updateProductDetails();
                 }}

@@ -1,12 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { Input, Row, Col, Form, Modal, Button, notification } from "antd";
+import {
+  Input,
+  Row,
+  Col,
+  Form,
+  Modal,
+  Button,
+  notification,
+  message,
+} from "antd";
 import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
 import ShirtTypeTable from "./ShirtTypeTable";
 import styles from "../categorystyles/CategoryStyles.module.css";
 import axios from "axios";
 import { getToken } from "../../../service/Token";
 
-const ShirtTailAdmin = function () {
+const ShirtTailAdmin = function ({ isAdmin }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   const [render, setRender] = useState();
@@ -22,16 +31,26 @@ const ShirtTailAdmin = function () {
     values.status = "ACTIVE";
     // Gọi API để thêm dữ liệu
     axios
-      .post("http://localhost:8080/api/admin/shirt-tail/create", values, {
-        headers: {
-          Authorization: `Bearer ${getToken(true)}`,
-        },
-      })
+      .post(
+        "http://localhost:8080/api/admin/shirt-tail/create?name=" +
+          values.shirtTailTypeName,
+        null,
+        {
+          headers: {
+            Authorization: `Bearer ${getToken(true)}`,
+          },
+        }
+      )
       .then((response) => {
         // Xử lý thành công
-        console.log("Thêm thành công");
+        setRender(Math.random());
         setIsModalVisible(false);
-        setRender(Math.random);
+        if (response.data) {
+          message.success("Thêm thành công");
+        } else {
+          message.error("Đuôi áo đã tồn tại");
+        }
+        setIsModalVisible(false);
       })
       .catch((error) => {
         // Xử lý lỗi
@@ -61,17 +80,20 @@ const ShirtTailAdmin = function () {
               />
             </Row>
           </Col>
-          <Col span={12} offset={1}>
-            <Col span={5} offset={18}>
+          {isAdmin ? (
+            <Col span={14} style={{ textAlign: "end" }}>
               <Button className={styles.btnSeach} onClick={handleAdd}>
                 <PlusOutlined className={styles.faPlus} />
                 <span className={styles.titleSeach}>Thêm Kiểu Đuôi Áo</span>
               </Button>
             </Col>
-          </Col>
+          ) : null}
         </Row>
         <div className={styles.categoryTable}>
-          <ShirtTypeTable renderTable={render}></ShirtTypeTable>
+          <ShirtTypeTable
+            isAdmin={isAdmin}
+            renderTable={render}
+          ></ShirtTypeTable>
         </div>
         <Modal
           title="Thêm Kiểu Đuôi Áo"

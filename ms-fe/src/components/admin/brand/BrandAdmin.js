@@ -15,7 +15,7 @@ import styles from "./BrandStyle.module.css";
 import axios from "axios";
 import { getToken } from "../../../service/Token";
 
-const BrandAdmin = function () {
+const BrandAdmin = function ({ isAdmin }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [render, setRender] = useState();
   const [api, contextHolder] = notification.useNotification();
@@ -38,15 +38,17 @@ const BrandAdmin = function () {
         },
       })
       .then((response) => {
-        // Xử lý thành công
-        console.log("Thêm thành công");
-        setIsModalVisible(false);
         setRender(Math.random);
-        message.success("Thêm thành công");
+
+        if (response.data) {
+          message.success("Thêm thành công");
+        } else {
+          message.error("Thương hiệu đã tồn tại");
+        }
+        setIsModalVisible(false);
       })
       .catch((error) => {
         // Xử lý lỗi
-        console.error("Lỗi khi thêm dữ liệu", error);
         const status = error?.response?.data?.status;
         if (status === 403) {
           api.error({
@@ -76,8 +78,8 @@ const BrandAdmin = function () {
               />
             </Row>
           </Col>
-          <Col span={13} offset={1}>
-            <Col span={9} offset={1}>
+          {isAdmin ? (
+            <Col span={14} style={{ textAlign: "end" }}>
               <Button
                 className={styles.btnSeach}
                 onClick={handleAdd1}
@@ -87,10 +89,10 @@ const BrandAdmin = function () {
                 <span className={styles.titleSeach}>Thêm Thương Hiệu</span>
               </Button>
             </Col>
-          </Col>
+          ) : null}
         </Row>
         <div className={styles.materialTable}>
-          <BrandTable renderTable={render}></BrandTable>
+          <BrandTable isAdmin={isAdmin} renderTable={render}></BrandTable>
         </div>
       </div>
       <Modal

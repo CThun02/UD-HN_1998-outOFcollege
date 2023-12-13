@@ -35,13 +35,11 @@ public class CategoryServiceImpl implements CategoryServiceI {
 
     @Override
     public Category update(Category category , Long id) {
-
         Optional<Category> material1 = repo.findById(id);
         return material1.map(o -> {
             o.setCategoryName(category.getCategoryName());
-
             try {
-                return kafkaUtil.sendingObjectWithKafka(category, Const.TOPIC_CATEGORY);
+                return kafkaUtil.sendingObjectWithKafka(o, Const.TOPIC_CATEGORY);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }

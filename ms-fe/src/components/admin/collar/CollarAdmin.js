@@ -15,7 +15,7 @@ import styles from "./CollarStyle.module.css";
 import axios from "axios";
 import { getToken } from "../../../service/Token";
 
-const CollarAdmin = function () {
+const CollarAdmin = function ({ isAdmin }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [render, setRender] = useState();
 
@@ -38,10 +38,13 @@ const CollarAdmin = function () {
       })
       .then((response) => {
         // Xử lý thành công
-        console.log("Thêm thành công");
+        setRender(Math.random());
         setIsModalVisible(false);
-        setRender(Math.random);
-        message.success("Thêm thành công");
+        if (response.data) {
+          message.success("Thêm thành công");
+        } else {
+          message.error("Cổ áo đã tồn tại");
+        }
       })
       .catch((err) => {
         const status = err.response.status;
@@ -70,8 +73,8 @@ const CollarAdmin = function () {
               />
             </Row>
           </Col>
-          <Col span={13} offset={1}>
-            <Col span={9} offset={1}>
+          {isAdmin ? (
+            <Col span={14} style={{ textAlign: "end" }}>
               <Button
                 className={styles.btnSeach}
                 onClick={handleAdd}
@@ -81,14 +84,14 @@ const CollarAdmin = function () {
                 <span className={styles.titleSeach}>Thêm Cổ Áo</span>
               </Button>
             </Col>
-          </Col>
+          ) : null}
         </Row>
         <div className={styles.materialTable}>
-          <CollarTable renderTable={render}></CollarTable>
+          <CollarTable isAdmin={isAdmin} renderTable={render}></CollarTable>
         </div>
       </div>
       <Modal
-        title="Thêm Cố Áo"
+        title="Thêm Cổ Áo"
         visible={isModalVisible}
         onCancel={handleCancel}
         footer={null}

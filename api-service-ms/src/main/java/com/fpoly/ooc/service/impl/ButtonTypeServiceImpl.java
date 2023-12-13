@@ -40,7 +40,7 @@ public class ButtonTypeServiceImpl implements ButtonTypeServiceI {
             o.setButtonName(buttonType.getButtonName());
             o.setStatus(buttonType.getStatus());
             try {
-                return kafkaUtil.sendingObjectWithKafka(buttonType, Const.TOPIC_BUTTON);
+                return kafkaUtil.sendingObjectWithKafka(o, Const.TOPIC_BUTTON);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }

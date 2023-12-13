@@ -1,6 +1,15 @@
 import React from "react";
 import { FormOutlined, DeleteFilled } from "@ant-design/icons";
-import { Table, Space, Button, Modal, Input, Switch, message, notification } from "antd";
+import {
+  Table,
+  Space,
+  Button,
+  Modal,
+  Input,
+  Switch,
+  message,
+  notification,
+} from "antd";
 import { useEffect, useState } from "react";
 import styles from "../categorystyles/CategoryStyles.module.css";
 import axios from "axios";
@@ -48,6 +57,7 @@ const SizeTable = function (props) {
         setData(updatedData);
         // Đóng modal
         setShowModal(false);
+        message.success("Xóa thành công!");
       })
       .catch((err) => console.log(err));
   };
@@ -67,8 +77,9 @@ const SizeTable = function (props) {
       )
       .then((response) => {
         // Đóng modal
-        setShowDetailsModal(false);
         setRender(Math.random);
+        setShowDetailsModal(false);
+        message.success("Chỉnh sửa thành công!");
       })
       .catch((err) => console.log(err));
   };
@@ -112,7 +123,6 @@ const SizeTable = function (props) {
       })
       .then((response) => {
         setData(response.data);
-        console.log(response.data);
       })
       .catch((error) => {
         const status = error.response.status;
@@ -161,6 +171,7 @@ const SizeTable = function (props) {
             render: (status, record) => (
               <>
                 <Switch
+                  disabled={!props.isAdmin}
                   onChange={(checked) => {
                     handleUpdateStatus(record.id, checked);
                   }}
@@ -186,13 +197,17 @@ const SizeTable = function (props) {
               <Space size="middle">
                 <Button
                   className={styles.btnDetails}
-                  type="link"
+                  type="primary"
+                  size="large"
+                  disabled={!props.isAdmin}
                   onClick={() => handleDetails(record)}
                   icon={<FormOutlined />}
                 />
                 <Button
                   className={styles.btnDetails}
-                  type="link"
+                  type="primary"
+                  size="large"
+                  disabled={!props.isAdmin}
                   onClick={() => handleDelete(record.id)}
                   icon={<DeleteFilled />}
                 />

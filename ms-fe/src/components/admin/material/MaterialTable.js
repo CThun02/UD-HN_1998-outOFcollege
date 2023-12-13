@@ -59,6 +59,7 @@ const MaterialTable = function (props) {
         setData(updatedData);
         // Đóng modal
         setShowModal(false);
+        message.success("Xóa thành công");
       })
       .catch((err) => {
         const status = err.response.status;
@@ -86,8 +87,9 @@ const MaterialTable = function (props) {
       )
       .then((response) => {
         // Đóng modal
-        setShowDetailsModal(false);
         setRender(Math.random);
+        setShowDetailsModal(false);
+        message.success("Chỉnh sửa thành công");
       })
       .catch((err) => {
         const status = err.response.status;
@@ -190,6 +192,7 @@ const MaterialTable = function (props) {
             render: (status, record) => (
               <>
                 <Switch
+                  disabled={!props.isAdmin}
                   onChange={(checked) => {
                     handleUpdateStatus(record.id, checked);
                   }}
@@ -215,13 +218,17 @@ const MaterialTable = function (props) {
               <Space size="middle">
                 <Button
                   className={styles.btnDetails}
-                  type="link"
+                  type="primary"
+                  size="large"
+                  disabled={!props.isAdmin}
                   onClick={() => handleDetails(record)}
                   icon={<FormOutlined />}
                 />
                 <Button
                   className={styles.btnDetails}
-                  type="link"
+                  type="primary"
+                  size="large"
+                  disabled={!props.isAdmin}
                   onClick={() => handleDelete(record.id)}
                   icon={<DeleteFilled />}
                 />

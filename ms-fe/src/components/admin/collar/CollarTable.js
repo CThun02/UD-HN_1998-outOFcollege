@@ -43,7 +43,6 @@ const CollarTable = function (props) {
     setSelectedData(id);
   };
   const handleUpdate = () => {
-    let collarType = {};
     axios
       .put(
         `http://localhost:8080/api/admin/collar/edit/${id}`,
@@ -57,8 +56,8 @@ const CollarTable = function (props) {
         }
       )
       .then((response) => {
-        setShowDetailsModal(false);
         setRender(Math.random);
+        setShowDetailsModal(false);
         message.success("Cập nhật thành công");
       })
       .catch((err) => {
@@ -75,8 +74,7 @@ const CollarTable = function (props) {
 
   const handleUpdateStatus = (id, statusUpdate) => {
     let mess = statusUpdate ? "Đang hoạt động" : "Ngưng hoạt động";
-
-    const updatedStatusValue = statusUpdate ? "ACTIVE" : "INACTIVE"; // Cập nhật trạng thái dựa trên giá trị của statusUpdate
+    const updatedStatusValue = statusUpdate ? "ACTIVE" : "INACTIVE";
 
     axios
       .put(
@@ -92,9 +90,7 @@ const CollarTable = function (props) {
       )
       .then((response) => {
         setRender(Math.random);
-        setTimeout(() => {
-          messageApi.success(mess, 2);
-        }, 500);
+        messageApi.success(mess, 2);
       })
       .catch((err) => {
         const status = err.response.status;
@@ -104,9 +100,7 @@ const CollarTable = function (props) {
             description: "Bạn không có quyền truy cập!",
           });
         }
-        setTimeout(() => {
-          messageApi.error(`Cập nhật trạng thái thất bại`, 2);
-        }, 500);
+        messageApi.error(`Cập nhật trạng thái thất bại`, 2);
       });
   };
   const handleConfirmDelete = () => {
@@ -119,6 +113,7 @@ const CollarTable = function (props) {
       .then((response) => {
         // Xoá dữ liệu thành công
         // Cập nhật lại danh sách dữ liệu sau khi xoá
+        message.success("Xóa tthành công");
         const updatedData = data.filter((item) => item.id !== selectedData);
         setData(updatedData);
         // Đóng modal
@@ -167,6 +162,9 @@ const CollarTable = function (props) {
           defaultPageSize: 5,
           showLessItems: true,
           style: { marginRight: "10px" },
+          onChange: (page) => {
+            setCurrentPage(page);
+          },
         }}
         dataSource={data}
         columns={[
@@ -192,6 +190,7 @@ const CollarTable = function (props) {
             render: (status, record) => (
               <>
                 <Switch
+                  disabled={!props.isAdmin}
                   onChange={(checked) => {
                     handleUpdateStatus(record.id, checked);
                   }}
@@ -218,13 +217,17 @@ const CollarTable = function (props) {
               <Space size="middle">
                 <Button
                   className={styles.btnDetails}
-                  type="link"
+                  type="primary"
+                  size="large"
+                  disabled={!props.isAdmin}
                   onClick={() => handleDetails(record)}
                   icon={<FormOutlined />}
                 />
                 <Button
                   className={styles.btnDetails}
-                  type="link"
+                  type="primary"
+                  size="large"
+                  disabled={!props.isAdmin}
                   onClick={() => handleDelete(record.id)}
                   icon={<DeleteFilled />}
                 />

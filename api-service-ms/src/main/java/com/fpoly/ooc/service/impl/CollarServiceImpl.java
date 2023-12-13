@@ -41,9 +41,8 @@ public class CollarServiceImpl implements CollarServiceI {
         Optional<CollarType> material1 = repo.findById(id);
         return material1.map(o -> {
             o.setCollarTypeName(collarType.getCollarTypeName());
-
             try {
-                return kafkaUtil.sendingObjectWithKafka(collarType, Const.TOPIC_COLLAR);
+                return kafkaUtil.sendingObjectWithKafka(o, Const.TOPIC_COLLAR);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }

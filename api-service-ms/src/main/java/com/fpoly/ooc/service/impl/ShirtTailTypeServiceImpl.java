@@ -39,7 +39,7 @@ public class ShirtTailTypeServiceImpl implements ShirtTailTypeServiceI {
             o.setShirtTailTypeName(shirtTailType.getShirtTailTypeName());
             o.setStatus(shirtTailType.getStatus());
             try {
-                return kafkaUtil.sendingObjectWithKafka(shirtTailType, Const.TOPIC_SHIRT_TAILS);
+                return kafkaUtil.sendingObjectWithKafka(o, Const.TOPIC_SHIRT_TAILS);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }

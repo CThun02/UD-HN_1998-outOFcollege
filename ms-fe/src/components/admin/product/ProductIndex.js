@@ -1,5 +1,6 @@
 import {
   EyeFilled,
+  EyeOutlined,
   FilterFilled,
   PlusOutlined,
   SearchOutlined,
@@ -23,7 +24,7 @@ import { Link } from "react-router-dom";
 import ProductOpenActive from "./ProductOpenActive";
 import { getToken } from "../../../service/Token";
 
-const ProductIndex = () => {
+const ProductIndex = ({ isAdmin }) => {
   const api = "http://localhost:8080/api/admin/";
   const [messageApi, contextHolder] = message.useMessage();
   const [productsTable, setProductsTable] = useState(null);
@@ -70,6 +71,7 @@ const ProductIndex = () => {
       render: (status, record, index) => (
         <>
           <Switch
+            disabled={isAdmin === false}
             onChange={(event) => {
               if (!event) {
                 updateStatus(record);
@@ -95,8 +97,12 @@ const ProductIndex = () => {
       render: (id) => (
         <>
           <Link to={`/api/admin/product/details/${id}`}>
-            <Button className={styles.product__button}>
-              <EyeFilled />
+            <Button
+              type="primary"
+              size="large"
+              className={styles.product__button}
+            >
+              <EyeOutlined />
             </Button>
           </Link>
         </>
@@ -224,13 +230,15 @@ const ProductIndex = () => {
             <TableOutlined /> Danh sách sản phẩm
           </h2>
           <Row className={styles.filter__search}>
-            <Col span={24}>
-              <Link to={"/api/admin/product/create-details"}>
-                <Button className={styles.product_tableButtonCreate}>
-                  <PlusOutlined />
-                </Button>
-              </Link>
-            </Col>
+            {isAdmin === true ? (
+              <Col span={24}>
+                <Link to={"/api/admin/product/create-details"}>
+                  <Button className={styles.product_tableButtonCreate}>
+                    <PlusOutlined />
+                  </Button>
+                </Link>
+              </Col>
+            ) : null}
           </Row>
           <div className={styles.product__tableProducts}>
             <Table

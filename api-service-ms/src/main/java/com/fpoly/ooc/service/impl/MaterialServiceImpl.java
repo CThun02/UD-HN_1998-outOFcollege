@@ -39,7 +39,7 @@ public class MaterialServiceImpl implements MaterialServiceI {
             o.setMaterialName(material.getMaterialName());
             o.setStatus(material.getStatus());
             try {
-                return kafkaUtil.sendingObjectWithKafka(material, Const.TOPIC_MATERIAL);
+                return kafkaUtil.sendingObjectWithKafka(o, Const.TOPIC_MATERIAL);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }

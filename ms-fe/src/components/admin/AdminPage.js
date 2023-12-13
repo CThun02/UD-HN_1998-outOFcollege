@@ -31,26 +31,35 @@ import StatisticalIndex from "./statistical/StatisticalIndex";
 import { useEffect, useState } from "react";
 import { NotificationProvider } from "../element/notification/Notification";
 import ReturnIndex from "./return/ReturnIndex";
-import { getToken } from "../../service/Token";
+import { getAuthToken, getToken } from "../../service/Token";
 import BillReturn from "./return/BillReturn";
 
 function AdminPage() {
   const [message, setMessage] = useState("");
   const token = getToken(true);
   const navigate = useNavigate();
-
+  const [data, setData] = useState(null);
+  const authToken = getAuthToken(true);
+  const isAdmin = data?.join().includes("ROLE_ADMIN");
   useEffect(() => {
     if (!token) {
       navigate("/authen/admin/sign-in");
     }
-  }, [navigate, token]);
-
+    if (!data) {
+      authToken
+        .then((res) => {
+          setData(res?.roles);
+        })
+        .catch((err) => {});
+    }
+    console.log(isAdmin);
+  }, [navigate, token, isAdmin, data, authToken]);
   return (
     <NotificationProvider>
       {token && (
         <Row style={{ margin: 0 }}>
           <Col span={4}>
-            <SideBar />
+            <SideBar isAdmin={isAdmin} />
           </Col>
           <Col span={20} className="h-100vh">
             <div>
@@ -62,112 +71,151 @@ function AdminPage() {
                   {/* Thống kê */}
                   <Route
                     path="statistical"
-                    element={<StatisticalIndex />}
+                    element={<StatisticalIndex isAdmin={isAdmin} />}
                   ></Route>
+
                   {/* Trả hàng */}
                   <Route path="return">
-                    <Route index element={<ReturnIndex />}></Route>
+                    <Route
+                      index
+                      element={<ReturnIndex isAdmin={isAdmin} />}
+                    ></Route>
                     <Route
                       path="return-bill/:billCode"
-                      element={<BillReturn />}
+                      element={<BillReturn isAdmin={isAdmin} />}
                     ></Route>
                   </Route>
                   {/* ví dụ path= san-pham/hien-thi ->  
                   {/* Tại quầy */}
                   <Route path="counter-sales">
-                    <Route index element={<Bill />}></Route>
+                    <Route index element={<Bill isAdmin={isAdmin} />}></Route>
                     <Route
                       path=":billId/timeline"
-                      element={<BillTimeLine />}
+                      element={<BillTimeLine isAdmin={isAdmin} />}
                     ></Route>
                   </Route>
                   {/* Đơn hàng */}
-                  <Route path="order" element={<BillManagement />}></Route>
-                  {/* Thu chi */}
-                  {/* ví dụ path= san-pham/hien-thi ->  
-                      path="income-and-expenses"
-                      element="income-and-expenses"
-                    ></Route>
-                    {/* Sản phẩm */}
+                  <Route
+                    path="order"
+                    element={<BillManagement isAdmin={isAdmin} />}
+                  ></Route>
+                  {/* sản phẩm */}
                   <Route path="product">
-                    <Route index element={<ProductIndex />} />
+                    <Route index element={<ProductIndex isAdmin={isAdmin} />} />
                     <Route
                       path={"details/:productId"}
-                      element={<ProductDetailsByProductId />}
+                      element={<ProductDetailsByProductId isAdmin={isAdmin} />}
                     />
                     <Route
                       path={"create-details"}
-                      element={<ProductCreateDetails />}
+                      element={<ProductCreateDetails isAdmin={isAdmin} />}
                     />
-                    {/* ví dụ path= san-pham/hien-thi ->  
-                    <Route path="hien-thi" element="el" />
-                    */}
                   </Route>
-                  <Route path="button" element={<ButtonAdmin />}></Route>
-                  <Route path="material" element={<MaterialAdmin />} />
-                  {/*sanpham chi tiet */}
-                  <Route path="pattern" element={<PatternAdmin />}></Route>
+                  <Route
+                    path="button"
+                    element={<ButtonAdmin isAdmin={isAdmin} />}
+                  ></Route>
+                  <Route
+                    path="material"
+                    element={<MaterialAdmin isAdmin={isAdmin} />}
+                  />
+                  <Route
+                    path="pattern"
+                    element={<PatternAdmin isAdmin={isAdmin} />}
+                  ></Route>
                   <Route
                     path="category"
-                    element={<CategoryAdmin></CategoryAdmin>}
+                    element={<CategoryAdmin isAdmin={isAdmin}></CategoryAdmin>}
                   ></Route>
                   <Route
                     path="brand"
-                    element={<BrandAdmin></BrandAdmin>}
+                    element={<BrandAdmin isAdmin={isAdmin}></BrandAdmin>}
                   ></Route>
-                  <Route path="form" element={<FormAdmin></FormAdmin>}></Route>
+                  <Route
+                    path="form"
+                    element={<FormAdmin isAdmin={isAdmin}></FormAdmin>}
+                  ></Route>
                   <Route
                     path="collar"
-                    element={<CollarAdmin></CollarAdmin>}
+                    element={<CollarAdmin isAdmin={isAdmin}></CollarAdmin>}
                   ></Route>
-                  <Route path="shirtTail" element={<ShirtailAdmin />}></Route>
-                  <Route path="sleeve" element={<SleeveAdmin />}></Route>
-                  <Route path="color" element={<CollorAdmin />}></Route>
-                  <Route path="size" element={<SizeAdmin />}></Route>
+                  <Route
+                    path="shirtTail"
+                    element={<ShirtailAdmin isAdmin={isAdmin} />}
+                  ></Route>
+                  <Route
+                    path="sleeve"
+                    element={<SleeveAdmin isAdmin={isAdmin} />}
+                  ></Route>
+                  <Route
+                    path="color"
+                    element={<CollorAdmin isAdmin={isAdmin} />}
+                  ></Route>
+                  <Route
+                    path="size"
+                    element={<SizeAdmin isAdmin={isAdmin} />}
+                  ></Route>
                   {/* Voucher */}
                   <Route path="vouchers">
-                    <Route index element={<Voucher message={message} />} />
+                    <Route
+                      index
+                      element={<Voucher isAdmin={isAdmin} message={message} />}
+                    />
                     <Route
                       path="save"
-                      element={<SaveVoucher setMessage={setMessage} />}
+                      element={
+                        <SaveVoucher
+                          isAdmin={isAdmin}
+                          setMessage={setMessage}
+                        />
+                      }
                     />
                     <Route
                       path="detail/:code"
-                      element={<SaveVoucher setMessage={setMessage} />}
+                      element={
+                        <SaveVoucher
+                          isAdmin={isAdmin}
+                          setMessage={setMessage}
+                        />
+                      }
                     />
                   </Route>
                   {/* Promotion */}
                   <Route path="promotion">
-                    <Route index element={<Promotion />} />
-                    <Route path="create" element={<CreatePromotion />} />
-                    <Route path="detail/:code" element={<CreatePromotion />} />
+                    <Route index element={<Promotion isAdmin={isAdmin} />} />
+                    <Route
+                      path="create"
+                      element={<CreatePromotion isAdmin={isAdmin} />}
+                    />
+                    <Route
+                      path="detail/:code"
+                      element={<CreatePromotion isAdmin={isAdmin} />}
+                    />
                   </Route>
-                  <Route path="category" element="category"></Route>
-                  <Route path="brand" element="brand"></Route>
                   {/* Tài khoản */}
                   <Route
                     path="employee"
-                    element={<CustomerAdmin roleId={1} />}
+                    element={<CustomerAdmin isAdmin={isAdmin} roleId={1} />}
                   ></Route>
                   <Route
                     path="employee/create"
-                    element={<AccountForm roleId={1} />}
+                    element={<AccountForm isAdmin={isAdmin} roleId={1} />}
                   ></Route>
                   <Route
                     path="employee/detail/:username"
-                    element={<DetailForm roleId={1} />}
+                    element={<DetailForm isAdmin={isAdmin} roleId={1} />}
                   ></Route>
                   <Route
                     path="customer"
-                    element={<CustomerAdmin roleId={2} />}
+                    element={<CustomerAdmin isAdmin={isAdmin} roleId={2} />}
                   ></Route>
                   <Route
                     path="customer/create"
-                    element={<AccountForm roleId={2} />}
+                    element={<AccountForm isAdmin={isAdmin} roleId={2} />}
                   ></Route>
                   <Route
                     path="customer/detail/:username"
-                    element={<DetailForm roleId={2} />}
+                    element={<DetailForm isAdmin={isAdmin} roleId={2} />}
                   ></Route>
                 </Route>
 

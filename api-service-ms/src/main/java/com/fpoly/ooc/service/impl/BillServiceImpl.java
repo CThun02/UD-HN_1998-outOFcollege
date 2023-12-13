@@ -112,13 +112,13 @@ public class BillServiceImpl implements BillService {
                 .billCode(request.getBillCode())
                 .build();
 
-        if (bill.getSymbol().equals("In-Store")) {
+        if (bill.getSymbol().equals("Received")) {
             bill.setCompletionDate(LocalDateTime.now());
         }
         bill.setStatus(request.getStatus());
         billRepo.save(bill);
 
-        if (!request.getEmailDetails().getRecipient().isEmpty()) {
+        if (!request.getEmailDetails().getRecipient().isEmpty() && request.getPaymentDetailId() != 2) {
             emailService.sendSimpleMail(request.getEmailDetails());
         }
 
@@ -264,7 +264,7 @@ public class BillServiceImpl implements BillService {
         Bill bill = billRepo.findById(dto.getId()).orElse(null);
         bill.setStatus(dto.getStatus());
         bill.setAmountPaid(dto.getAmountPaid());
-        if (dto.getStatus().equals("4")) {
+        if (dto.getTimelineStatus().equals("4")) {
             bill.setCompletionDate(LocalDateTime.now());
         }
 

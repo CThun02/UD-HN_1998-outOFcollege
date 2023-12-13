@@ -365,7 +365,7 @@ const Checkout = ({ setRenderHeader }) => {
     const bill = {
       billCode: billCodeGen,
       price: totalPrice,
-      priceReduce: totalPrice - voucherPrice(),
+      priceReduce: voucherPrice() < 0 ? shippingFee : voucherPrice(),
       paymentDetailId: formData.paymentDetailId,
       billType: "Online",
       symbol: "Shipping",
@@ -419,7 +419,6 @@ const Checkout = ({ setRenderHeader }) => {
               }>
                                                     </div>
                                                     <div style="width: 55%; padding: 4px;">
-<<<<<<< HEAD
                                                         <p>${!dataToken ? (item.data[0].product.productName + "-" + item.data[0].button.buttonName +
                 "-" +
                 item.data[0].brand.brandName +
@@ -455,87 +454,6 @@ const Checkout = ({ setRenderHeader }) => {
                   item?.cartDetailResponse?.sleeveType.sleeveName +
                   "-" +
                   item?.cartDetailResponse?.shirtTailType.shirtTailName)} <span style="display: inline-block">(x ${item.quantity})</span></p>
-=======
-                                                        <p>${!dataToken
-                ? item.data[0]
-                  .product
-                  .productName +
-                "-" +
-                item.data[0]
-                  .button
-                  .buttonName +
-                "-" +
-                item.data[0].brand
-                  .brandName +
-                "-" +
-                item.data[0]
-                  .category
-                  .categoryName +
-                "-" +
-                item.data[0]
-                  .material
-                  .materialName +
-                "-" +
-                item.data[0]
-                  .collar
-                  .collarTypeName +
-                "-" +
-                item.data[0]
-                  .sleeve
-                  .sleeveName +
-                "-" +
-                item.data[0]
-                  .shirtTail
-                  .shirtTailTypeName +
-                "-" +
-                item.data[0]
-                  .pattern
-                  .patternName +
-                "-" +
-                item.data[0].form
-                  .formName
-                : item
-                  .cartDetailResponse
-                  .productName +
-                "-" +
-                item
-                  .cartDetailResponse
-                  .buttonName +
-                "-" +
-                item
-                  .cartDetailResponse
-                  .brandName +
-                "-" +
-                item
-                  .cartDetailResponse
-                  .categoryName +
-                "-" +
-                item
-                  .cartDetailResponse
-                  .materialName +
-                "-" +
-                item
-                  .cartDetailResponse
-                  .collarName +
-                "-" +
-                item
-                  .cartDetailResponse
-                  .sleeveName +
-                "-" +
-                item
-                  .cartDetailResponse
-                  .shirtTailTypeName +
-                "-" +
-                item
-                  .cartDetailResponse
-                  .patternName +
-                "-" +
-                item
-                  .cartDetailResponse
-                  .formName
-              } <span style="display: inline-block">(x ${item.quantity
-              })</span></p>
->>>>>>> test
                                                     </div>
                                                     <div style="width: 25%; padding: 4px;">
                                                         <p>${dataToken
@@ -733,160 +651,6 @@ const Checkout = ({ setRenderHeader }) => {
                   billId: response.data.id,
                   price: totalPrice + shippingFee,
                   email: formData.email,
-                  messageBody: `<body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: Arial, sans-serif;">
-                                <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="width: 100%; max-width:720px; margin: 0 auto;">
-                                    <tr>
-                                        <td align="center" bgcolor="#ffffff" style="padding: 40px 0;">
-                                        <table style="width: 100%; padding: 0 20px;">
-                                        <tr>
-                                            <td style="text-align: left; width: 50%">
-                                                <img alt="Logo" src="https://firebasestorage.googleapis.com/v0/b/outofcollge.appspot.com/o/logo%2Flogo_OOC.png?alt=media&token=9dec0335-3b77-4c5b-a278-b5b22b9ecbb4" width="70%" />
-                                            </td>
-                                            <td style="text-align: right; vertical-align: middle; width: 50%">
-                                                <span>Đơn hàng ${billCodeGen}</span>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                            <div style="padding: 0 20px; margin-top: 24px;">
-                                                <span style="font-weight: 500; font-size: 24px;">Cảm ơn bạn đã mua hàng!</span><br><br>
-                                                <p style="text-align: justify;">Xin chào ${formData.fullName
-                    }, Chúng tôi đã nhận được đặt hàng của bạn và đã sẵn sàng để vận chuyển. Chúng tôi sẽ thông báo cho bạn khi đơn hàng được gửi đi.</p><br>
-                                                <div style="text-align: center">
-                                                    <a style="color: white; font-weight: 500; padding: 16px 20px; border-radius: 4px; background-color: #1666a2; margin-right: 20px;" href="http://localhost:3000/ms-shop/bill/${billCodeGen}">
-                                                        Xem đơn hàng
-                                                    </a>
-                                                    hoặc <a style="margin-left: 20px;" href="http://localhost:3000/">Đến cửa hàng</a>
-                                                </div>
-                                                <br>
-                                                <hr>
-                                                <br>
-                                                        <span>Thông tin đơn hàng</span>
-                                                        <div style="margin-top: 8px;">
-                                                        ${productDetails.map(
-                      (item, index) => {
-                        return `<div key={index} style="display: flex; justify-content: space-between; align-items: center; padding: 4px 20px;">
-                                                                    <div style="width: 20%; padding: 4px;">
-                                                                        <img alt="product" style="width: 100%; border: 1px solid #ccc; border-radius: 8px;" src=${item
-                            .data[0]
-                            .productImageResponse[0]
-                            .path
-                          }>
-                                                                    </div>
-                                                                    <div style="width: 55%; padding: 4px;">
-<<<<<<< HEAD
-                                                                        <p>${item.data[0].product.productName + "-" + item.data[0].button.buttonName +
-                          "-" +
-                          item.data[0]?.brand.brandName +
-                          "-" +
-                          item.data[0]?.category.categoryName +
-                          "-" +
-                          item.data[0]?.material.materialName +
-                          "-" +
-                          item.data[0]?.collar.collarTypeName +
-                          "-" +
-                          item.data[0]?.sleeve.sleeveName +
-                          "-" +
-                          item.data[0]?.shirtTail.shirtTailTypeName +
-                          "-" +
-                          item.data[0]?.pattern.patternName +
-                          "-" +
-                          item.data[0]?.form.formName} <span style="display: inline-block">(x ${item.quantity})</span></p>
-=======
-                                                                        <p>${item
-                            .data[0]
-                            .product
-                            .productName +
-                          "-" +
-                          item
-                            .data[0]
-                            .button
-                            .buttonName +
-                          "-" +
-                          item
-                            .data[0]
-                            .brand
-                            .brandName +
-                          "-" +
-                          item
-                            .data[0]
-                            .category
-                            .categoryName +
-                          "-" +
-                          item
-                            .data[0]
-                            .material
-                            .materialName +
-                          "-" +
-                          item
-                            .data[0]
-                            .collar
-                            .collarTypeName +
-                          "-" +
-                          item
-                            .data[0]
-                            .sleeve
-                            .sleeveName +
-                          "-" +
-                          item
-                            .data[0]
-                            .shirtTail
-                            .shirtTailTypeName +
-                          "-" +
-                          item
-                            .data[0]
-                            .pattern
-                            .patternName +
-                          "-" +
-                          item
-                            .data[0]
-                            .form
-                            .formName
-                          } <span style="display: inline-block">(x ${item.quantity
-                          })</span></p>
->>>>>>> test
-                                                                    </div>
-                                                                    <div style="width: 25%; padding: 4px;">
-                                                                        <p>${(
-                            item
-                              .data[0]
-                              .price *
-                            item.quantity
-                          ).toLocaleString(
-                            "vi-VN",
-                            {
-                              style:
-                                "currency",
-                              currency:
-                                "VND",
-                            }
-                          )}</p>
-                                                                    </div>
-                                                                </div>`;
-                      }
-                    )}
-                                                            <hr>
-                                                            <div style="width: 70%; float: right; padding: 4px 20px;">
-                                                                <div style="display: flex; justify-content: space-between; padding: 4px 0;">
-                                                                    <span>Tổng giá trị sản phẩm:</span>
-                                                                    <span style="font-weight: 500;">
-                                                                        ${totalPrice.toLocaleString(
-                      "vi-VN",
-                      {
-                        style:
-                          "currency",
-                        currency:
-                          "VND",
-                      }
-                    )}
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </body>`,
                 },
               })
               .then((response) => {
@@ -918,13 +682,14 @@ const Checkout = ({ setRenderHeader }) => {
         }
       },
     });
+
+    console.log(voucherPrice() < 0 ? shippingFee : voucherPrice());
   };
 
   const getAllCarts = async () => {
     const data = await token;
     setDataToken(data);
     let carts = JSON.parse(localStorage.getItem("checkout"));
-    console.log(carts);
     if (!carts) {
       navigate(`/ms-shop`);
     }
@@ -976,7 +741,7 @@ const Checkout = ({ setRenderHeader }) => {
       result = totalPrice;
     }
 
-    return result >= 0 ? result : 0;
+    return result
   };
 
   useEffect(() => {
@@ -1700,7 +1465,7 @@ const Checkout = ({ setRenderHeader }) => {
                         : voucherAdd?.voucherValue + "%"
                       : "0đ"}
                     {voucherAdd.voucherId ? (
-                      <bttuon
+                      <span
                         style={{
                           marginLeft: "20px",
                           color: "green",
@@ -1709,7 +1474,7 @@ const Checkout = ({ setRenderHeader }) => {
                         onClick={() => setVoucherAdd({})}
                       >
                         ❌
-                      </bttuon>
+                      </span>
                     ) : null}
                   </Col>
 
@@ -1717,7 +1482,7 @@ const Checkout = ({ setRenderHeader }) => {
                     Tổng cộng
                   </Col>
                   <Col span={6}>
-                    {numeral(voucherPrice() + shippingFee).format("0,0") + "đ"}
+                    {numeral(voucherPrice() < 0 ? shippingFee : voucherPrice() + shippingFee).format("0,0") + "đ"}
                   </Col>
                 </Row>
               </div>

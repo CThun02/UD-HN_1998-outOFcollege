@@ -3,13 +3,13 @@ package com.fpoly.ooc.controller;
 import com.fpoly.ooc.config.PaymentConfig;
 import com.fpoly.ooc.dto.EmailDetails;
 import com.fpoly.ooc.entity.Bill;
-import com.fpoly.ooc.entity.DeliveryNote;
 import com.fpoly.ooc.entity.Timeline;
 import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.BillRepo;
 import com.fpoly.ooc.repository.TimeLineRepo;
-import com.fpoly.ooc.service.interfaces.DeliveryNoteService;
+import com.fpoly.ooc.responce.timeline.TimelineClientResponse;
 import com.fpoly.ooc.service.interfaces.EmailService;
+import com.fpoly.ooc.service.interfaces.TimeLineService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -23,6 +23,7 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -46,18 +47,17 @@ public class PaymentController {
     private TimeLineRepo timeLineRepo;
 
     @Autowired
-    private EmailService emailService;
+    private TimeLineService timeLineService;
 
-    private String body = null;
+    @Autowired
+    private EmailService emailService;
 
     @GetMapping("/pay")
     public String payment(@RequestParam("price") Long price,
                           @RequestParam("billId") String billId,
-                          @RequestParam("email") String email,
-                          @RequestParam("messageBody") String messageBody
+                          @RequestParam("email") String email
     )
             throws UnsupportedEncodingException {
-        body = messageBody;
         String vnp_Version = "2.1.0";
         String vnp_Command = "pay";
         String orderType = "other";
@@ -135,15 +135,119 @@ public class PaymentController {
         String email = queryParams.get("email");
         if ("00".equals(responseCode)) {
             Bill bill = billRepo.findById(billId).orElseThrow(() -> new NotFoundException("Bill id không tồn tại"));
+            TimelineClientResponse timelineResponse = timeLineService.getTimelineByBillCode(bill.getBillCode());
             bill.setTransactionCode(transactionNo);
-            bill.setAmountPaid(new BigDecimal(amount));
+            bill.setAmountPaid(new BigDecimal(amount).divide(BigDecimal.valueOf(100L)));
             bill.setStatus("Paid");
             billRepo.save(bill);
+            StringBuilder stringBuilder = new StringBuilder();
+            BigDecimal totalPrice = BigDecimal.ZERO;
+            DecimalFormat formatter = new DecimalFormat("###,###,###");
+            for (int i = 0; i < timelineResponse.getLstProduct().size(); i++) {
+                BigDecimal productPrice = timelineResponse.getLstProduct().get(i).getProductPrice();
+                totalPrice = totalPrice.add(productPrice);
+                stringBuilder.append("<div key=\"{index}\" style=\"display: flex; justify-content: space-between; align-items: center; padding: 4px 20px\">\n" +
+                        "              <div style=\"width: 20%; padding: 4px\">");
+                stringBuilder.append("                <img\n");
+                stringBuilder.append("                  alt=\"product\"\n");
+                stringBuilder.append("                  style=\"width: 100%; border: 1px solid #ccc; border-radius: 8px\"\n");
+                stringBuilder.append("                  src=").append(timelineResponse.getLstProduct().get(i).getProductImageResponses().get(0).getPath());
+                stringBuilder.append("                  }\n");
+                stringBuilder.append("                />\n");
+                stringBuilder.append("              </div>\n");
+                stringBuilder.append("              <div style=\"width: 55%; padding: 4px\">\n");
+                stringBuilder.append("                <p>\n");
+                stringBuilder.append(timelineResponse.getLstProduct().get(i).getProductName())
+                        .append(timelineResponse.getLstProduct().get(i).getProductBrandName())
+                        .append("-")
+                        .append(timelineResponse.getLstProduct().get(i).getProductCateGoryName())
+                        .append("-")
+                        .append(timelineResponse.getLstProduct().get(i).getProductPatternName())
+                        .append("-")
+                        .append(timelineResponse.getLstProduct().get(i).getProductFormName())
+                        .append("-")
+                        .append(timelineResponse.getLstProduct().get(i).getProductButton())
+                        .append("-")
+                        .append(timelineResponse.getLstProduct().get(i).getProductMaterial())
+                        .append("-")
+                        .append(timelineResponse.getLstProduct().get(i).getProductCollar())
+                        .append("-")
+                        .append(timelineResponse.getLstProduct().get(i).getProductSleeve())
+                        .append("-")
+                        .append(timelineResponse.getLstProduct().get(i).getProductShirtTail());
+                stringBuilder.append("<span style=\"display: inline-block\">")
+                        .append(timelineResponse.getLstProduct().get(i).getQuantity())
+                        .append("</span>\n");
+                stringBuilder.append("                </p>\n");
+
+                stringBuilder.append("              </div>\n");
+                stringBuilder.append("              <div style=\"width: 25%; padding: 4px\">\n");
+                stringBuilder.append("                <p>")
+                        .append(formatter.format(timelineResponse.getLstProduct().get(i).getProductPrice().multiply(new BigDecimal(timelineResponse.getLstProduct().get(i).getQuantity())))+"đ");
+                stringBuilder.append("              </div>\n");
+                stringBuilder.append("</div>\n" +
+                        "            </div>");
+            }
+            String messagesBody = "<body style=\"margin: 0; padding: 0; background-color: #f4f4f4; font-family: Arial, sans-serif\">\n" +
+                    "  <table align=\"center\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"width: 100%; max-width: 720px; margin: 0 auto\">\n" +
+                    "    <tr>\n" +
+                    "      <td align=\"center\" bgcolor=\"#ffffff\" style=\"padding: 40px 0\">\n" +
+                    "        <table style=\"width: 100%; padding: 0 20px\">\n" +
+                    "          <tr>\n" +
+                    "            <td style=\"text-align: left; width: 50%\">\n" +
+                    "              <img\n" +
+                    "                alt=\"Logo\"\n" +
+                    "                src=\"https://firebasestorage.googleapis.com/v0/b/outofcollge.appspot.com/o/logo%2Flogo_OOC.png?alt=media&token=9dec0335-3b77-4c5b-a278-b5b22b9ecbb4\"\n" +
+                    "                width=\"70%\"\n" +
+                    "              />\n" +
+                    "            </td>\n" +
+                    "            <td style=\"text-align: right; vertical-align: middle; width: 50%\">\n" +
+                    "              <span>Đơn hàng "+bill.getBillCode()+"</span>\n" +
+                    "            </td>\n" +
+                    "          </tr>\n" +
+                    "        </table>\n" +
+                    "        <div style=\"padding: 0 20px; margin-top: 24px\">\n" +
+                    "          <span style=\"font-weight: 500; font-size: 24px\">Cảm ơn bạn đã mua hàng!</span><br /><br />\n" +
+                    "          <p style=\"text-align: justify\">\n" +
+                    "            Xin chào "+ timelineResponse.getTimelineCustomInfo().getFullName() +", Chúng tôi đã nhận được đặt hàng của bạn và đã sẵn sàng để vận chuyển. Chúng tôi sẽ thông báo cho bạn khi\n" +
+                    "            đơn hàng được gửi đi.\n" +
+                    "          </p>\n" +
+                    "          <br />\n" +
+                    "           <div style=\"text-align: center\">\n" +
+                    "            <a\n" +
+                    "              style=\"color: white; font-weight: 500; padding: 16px 20px; border-radius: 4px; background-color: #1666a2; margin-right: 20px\"\n" +
+                    "              href=\"http://localhost:3000/ms-shop/bill/"+bill.getBillCode()+"\"\n"+
+            "            >\n" +
+                    "              Xem đơn hàng\n" +
+                    "            </a>\n" +
+                    "            hoặc <a style=\"margin-left: 20px\" href=\"http://localhost:3000/\">Đến cửa hàng</a>\n" +
+                    "          </div>"+
+                    "          <br />\n" +
+                    "          <hr />\n" +
+                    "          <br />\n" +
+                    "          <span>Thông tin đơn hàng</span>\n" +
+                    "          <div style=\"margin-top: 8px\">\n" +
+                    stringBuilder.toString() +
+                    " <br />\n" +
+                    "            <hr />\n" +
+                    "            <div style=\"width: 70%; float: right; padding: 4px 20px\">\n" +
+                    "              <div style=\"text-align: center\">\n" +
+                    "                <span style=\"font-size: 24px\">Tổng giá trị sản phẩm:</span>\n" +
+                    "                <span style=\"font-size: 24px\"> " + formatter.format(totalPrice)+"đ </span>\n" +
+                    "              </div>\n" +
+                    "            </div>" +
+                    "          </div>\n" +
+                    "        </div>\n" +
+                    "      </td>\n" +
+                    "    </tr>\n" +
+                    "  </table>\n" +
+                    "</body>\n";
+
             EmailDetails emailDetails = new EmailDetails();
             List<String> mails = new ArrayList<>();
             mails.add(email);
             emailDetails.setRecipient(mails);
-            emailDetails.setMessageBody(body);
+            emailDetails.setMessageBody(messagesBody);
             emailDetails.setSubject("THÔNG BÁO XÁC NHẬN ĐƠN HÀNG " + bill.getBillCode());
             emailService.sendSimpleMail(emailDetails);
             response.sendRedirect("http://localhost:3000/ms-shop");

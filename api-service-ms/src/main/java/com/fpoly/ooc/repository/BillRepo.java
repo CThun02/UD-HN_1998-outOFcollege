@@ -73,11 +73,10 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
             " where b.status like ?1")
     List<BillReturnRequestResponse> getReturnRequestByStatus(String status);
 
-    @Query("SELECT DISTINCT new com.fpoly.ooc.responce.bill.BillManagementResponse(b.id, b.billCode, COUNT(bd.id)," +
+    @Query("SELECT DISTINCT new com.fpoly.ooc.responce.bill.BillManagementResponse(b.id, b.billCode, COUNT(tl.id)," +
             "   b.price, dn.name, dn.phoneNumber, b.createdAt, b.billType, b.symbol, b.status, dn.shipPrice," +
             "   b.priceReduce, b.createdBy, a.fullName, a.numberPhone) " +
             "FROM Bill b LEFT JOIN Account a ON a.username = b.account.username " +
-            "   LEFT JOIN BillDetail bd ON b.id = bd.bill.id " +
             "   LEFT JOIN DeliveryNote dn ON dn.bill.id = b.id " +
             "   LEFT JOIN Timeline tl ON tl.bill.id = b.id " +
             "WHERE (b.billCode like %:billCode% OR :billCode IS NULL) " +
@@ -86,11 +85,13 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
             "   AND (:status IS NULL OR b.status LIKE :status) " +
             "   AND (:billType IS NULL OR b.billType LIKE :billType)" +
             "   AND (:createdBy IS NULL OR b.createdBy LIKE :createdBy AND b.status not like 'Cancel') " +
+            "   AND (tl.status like '1' or tl.status like '2' or tl.status like '3' or tl.status like '4' " +
+            "       or tl.status like '5' or tl.status like '6') " +
             "GROUP BY b.id, b.billCode, b.price, b.createdAt, b.billType, b.status, " +
             "    b.symbol, dn.shipPrice, b.priceReduce, dn.name, dn.phoneNumber, b.createdBy, " +
             "    a.fullName, a.numberPhone " +
             "   having (:symbol IS NULL OR (b.symbol like :symbol and b.status not like 'Cancel' " +
-            "       AND (:count IS NULL OR COUNT(tl.id) = :count))) " +
+            "       AND (:count IS NULL OR COUNT(tl.id) = :count))) "+
             "ORDER BY b.createdAt DESC ")
     List<BillManagementResponse> getAllBillManagement(
             @Param("billCode") String billCode,

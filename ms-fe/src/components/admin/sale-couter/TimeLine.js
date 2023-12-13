@@ -80,7 +80,7 @@ const BillTimeLine = (addId) => {
             });
     };
 
-    const handleUpdateBillStatus = (status, price) => {
+    const handleUpdateBillStatus = (status, price, timelineStatus) => {
         axios
             .put(
                 `http://localhost:8080/api/admin/bill`,
@@ -88,6 +88,7 @@ const BillTimeLine = (addId) => {
                     id: billId,
                     status: status,
                     amountPaid: price,
+                    timelineStatus: timelineStatus
                 },
                 {
                     headers: {
@@ -148,7 +149,8 @@ const BillTimeLine = (addId) => {
                 ? billInfo.totalPrice + billInfo?.shipPrice - billInfo.priceReduce
                 : billInfo.symbol === "Shipping" && billInfo.status === "Paid"
                     ? billInfo.amountPaid
-                    : 0
+                    : 0,
+            timelines[timelines.length - 1]?.status
         );
         setIsModalConfirm(false);
     };
@@ -160,76 +162,77 @@ const BillTimeLine = (addId) => {
     const handleOkDetail = () => {
         setIsModalDetail(false);
     };
+    const getTimeline = async () => {
+        await axios
+            .get(`http://localhost:8080/api/admin/timeline/${billId}`, {
+                headers: {
+                    Authorization: `Bearer ${getToken(true)}`,
+                },
+            })
+            .then((response) => {
+                var timelinesPush = [];
+                for (let index = 0; index < response.data.length; index++) {
+                    if (!isNaN(response.data[index].status)) {
+                        timelinesPush.push(response.data[index]);
+                    }
+                }
+                setTimlneDisplay(timelinesPush);
+                setTimelines(response.data);
+            })
+            .catch((error) => {
+                const status = error.response?.status;
+                if (status === 403) {
+                    notification.error({
+                        message: "Thông báo",
+                        description: "Bạn không có quyền truy cập!",
+                    });
+                }
+            });
+    }
 
+    const getProduct = async () => {
+        axios
+            .get(`http://localhost:8080/api/admin/timeline/${billId}/product`, {
+                headers: {
+                    Authorization: `Bearer ${getToken(true)}`,
+                },
+            })
+            .then((response) => {
+                setTimelinesPoduct(response.data);
+            })
+            .catch((error) => {
+                console.log(error);
+                const status = error.response?.status;
+                if (status === 403) {
+                    notification.error({
+                        message: "Thông báo",
+                        description: "Bạn không có quyền truy cập!",
+                    });
+                }
+            });
+    }
+
+    const getInfo = async () => {
+        await axios
+            .get(`http://localhost:8080/api/admin/timeline/${billId}/info`, {
+                headers: {
+                    Authorization: `Bearer ${getToken(true)}`,
+                },
+            })
+            .then((response) => {
+                setBillInfo(response.data);
+            })
+            .catch((error) => {
+                const status = error.response?.status;
+                if (status === 403) {
+                    notification.error({
+                        message: "Thông báo",
+                        description: "Bạn không có quyền truy cập!",
+                    });
+                }
+            });
+    }
     useEffect(() => {
-        const getTimeline = async () => {
-            await axios
-                .get(`http://localhost:8080/api/admin/timeline/${billId}`, {
-                    headers: {
-                        Authorization: `Bearer ${getToken(true)}`,
-                    },
-                })
-                .then((response) => {
-                    var timelinesPush = [];
-                    for (let index = 0; index < response.data.length; index++) {
-                        if (!isNaN(response.data[index].status)) {
-                            timelinesPush.push(response.data[index]);
-                        }
-                    }
-                    setTimlneDisplay(timelinesPush);
-                    setTimelines(response.data);
-                })
-                .catch((error) => {
-                    const status = error.response?.status;
-                    if (status === 403) {
-                        notification.error({
-                            message: "Thông báo",
-                            description: "Bạn không có quyền truy cập!",
-                        });
-                    }
-                });
-        }
-        const getProduct = async () => {
-            axios
-                .get(`http://localhost:8080/api/admin/timeline/${billId}/product`, {
-                    headers: {
-                        Authorization: `Bearer ${getToken(true)}`,
-                    },
-                })
-                .then((response) => {
-                    setTimelinesPoduct(response.data);
-                })
-                .catch((error) => {
-                    console.log(error);
-                    const status = error.response?.status;
-                    if (status === 403) {
-                        notification.error({
-                            message: "Thông báo",
-                            description: "Bạn không có quyền truy cập!",
-                        });
-                    }
-                });
-        }
-        const getInfo = async () => {
-            await axios
-                .get(`http://localhost:8080/api/admin/timeline/${billId}/info`, {
-                    headers: {
-                        Authorization: `Bearer ${getToken(true)}`,
-                    },
-                })
-                .then((response) => {
-                    setBillInfo(response.data);
-                })
-                .catch((error) => {
-                    const status = error.response?.status;
-                    if (status === 403) {
-                        notification.error({
-                            message: "Thông báo",
-                            description: "Bạn không có quyền truy cập!",
-                        });
-                    }
-                });
-        }
         getTimeline()
         getProduct()
         getInfo()
@@ -835,13 +838,13 @@ const BillTimeLine = (addId) => {
                         <span style={{ width: "198px", display: "inline-block" }}>
                             Giá vận chuyển:
                         </span>
-                        <span>{numeral(billInfo.shipPrice).format("0,0") + "đ"}</span>
+                        <span>{numeral(billInfo?.shipPrice).format("0,0") + "đ"}</span>
                     </span>
                     <span className={styles.span}>
                         <span style={{ width: "200px", display: "inline-block" }}>
                             Giảm giá:
                         </span>
-                        <span>{numeral(billInfo.priceReduce)?.format("0,0") + "đ"}</span>
+                        <span>{numeral(billInfo?.priceReduce > 0 ? billInfo?.priceReduce : 0)?.format("0,0") + "đ"}</span>
                     </span>
                     <b className={styles.span}>
                         <span style={{ width: "200px", display: "inline-block" }}>
@@ -849,7 +852,7 @@ const BillTimeLine = (addId) => {
                         </span>
                         <span style={{ fontSize: "16px", color: "#FF0000" }}>
                             {numeral(
-                                billInfo.totalPrice + billInfo?.shipPrice - billInfo.priceReduce
+                                billInfo?.totalPrice + billInfo?.shipPrice - billInfo.priceReduce
                             ).format(0, 0) + "đ"}
                         </span>
                     </b>

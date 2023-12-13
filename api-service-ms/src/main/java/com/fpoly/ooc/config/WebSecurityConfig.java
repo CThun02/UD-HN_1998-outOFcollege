@@ -48,7 +48,7 @@ public class WebSecurityConfig {
                                 "/api/admin/sleeve", "/api/admin/shirt-tail", "/api/admin/size", "/api/admin/color",
                                 "/api/admin/category","/api/admin/brand", "/api/admin/pattern",
                                 "/api/admin/product/getMaxPrice", "/api/admin/product/getProductEdit",
-                                "/api/admin/form").hasAnyRole("EMPLOYEE", "ADMIN")
+                                "/api/admin/form").permitAll()
                         .requestMatchers(HttpMethod.GET,"api/admin/product/getproductfilterByCom",
                                 "api/admin/product/filterProductDetailByIdCom").hasAnyRole("EMPLOYEE", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/admin/promotion-product/").hasAnyRole("EMPLOYEE", "ADMIN")

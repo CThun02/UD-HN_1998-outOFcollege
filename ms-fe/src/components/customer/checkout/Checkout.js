@@ -575,21 +575,21 @@ const Checkout = ({ setRenderHeader }) => {
                                                                     <div style="width: 55%; padding: 4px;">
                                                                         <p>${item.data[0].product.productName + "-" + item.data[0].button.buttonName +
                                         "-" +
-                                        item.data[0].brand.brandName +
+                                        item.data[0]?.brand.brandName +
                                         "-" +
-                                        item.data[0].category.categoryName +
+                                        item.data[0]?.category.categoryName +
                                         "-" +
-                                        item.data[0].material.materialName +
+                                        item.data[0]?.material.materialName +
                                         "-" +
-                                        item.data[0].collar.collarTypeName +
+                                        item.data[0]?.collar.collarTypeName +
                                         "-" +
-                                        item.data[0].sleeve.sleeveName +
+                                        item.data[0]?.sleeve.sleeveName +
                                         "-" +
-                                        item.data[0].shirtTail.shirtTailTypeName +
+                                        item.data[0]?.shirtTail.shirtTailTypeName +
                                         "-" +
-                                        item.data[0].pattern.patternName +
+                                        item.data[0]?.pattern.patternName +
                                         "-" +
-                                        item.data[0].form.formName} <span style="display: inline-block">(x ${item.quantity})</span></p>
+                                        item.data[0]?.form.formName} <span style="display: inline-block">(x ${item.quantity})</span></p>
                                                                     </div>
                                                                     <div style="width: 25%; padding: 4px;">
                                                                         <p>${(item.data[0].price * item.quantity).toLocaleString("vi-VN", { style: "currency", currency: "VND" })}</p>
@@ -1034,7 +1034,7 @@ const Checkout = ({ setRenderHeader }) => {
                                                                             "-" +
                                                                             productDetail?.cartDetailResponse?.material.materialName +
                                                                             "-" +
-                                                                            productDetail?.cartDetailResponse?.collarType.collarName +
+                                                                            productDetail?.cartDetailResponse?.collarType.collarTypeName +
                                                                             "-" +
                                                                             productDetail?.cartDetailResponse?.sleeveType.sleeveName +
                                                                             "-" +

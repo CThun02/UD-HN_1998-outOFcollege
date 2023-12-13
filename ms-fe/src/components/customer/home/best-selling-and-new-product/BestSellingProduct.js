@@ -20,18 +20,17 @@ function BestSellingAndNewProduct({ arrays, title }) {
         </div>
       </div>
 
-      <div className={styles.products}>
-        <div className={styles.spacing}>
-          <List
-            grid={{ gutter: 16, column: 4 }}
-            dataSource={arrays}
-            renderItem={(item) => (
-              <List.Item>
-                <ProductsList data={item} key={item.productDetailId} />
-              </List.Item>
-            )}
-          />
-        </div>
+      <div className={styles.spacing}>
+        <Row className={styles.products}>
+          {arrays &&
+            arrays.map((item) => {
+              return (
+                <Col xs={12} xl={6}>
+                  <ProductsList data={item} key={item.productDetailId} />
+                </Col>
+              );
+            })}
+        </Row>
       </div>
     </div>
   );

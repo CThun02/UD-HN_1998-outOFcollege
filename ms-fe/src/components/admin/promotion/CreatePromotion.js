@@ -327,7 +327,7 @@ function CreatePromotion() {
   return (
     <>
       <Spin
-        tip="Loading..."
+        tip="Vui lòng chờ..."
         spinning={isLoading}
         size="large"
         style={{ width: "100%" }}

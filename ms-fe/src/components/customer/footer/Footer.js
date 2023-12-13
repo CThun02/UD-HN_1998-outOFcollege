@@ -11,13 +11,13 @@ function Footer() {
         <div className={styles.footer}>
           <div className={styles.flexCenter}>
             <Row className={styles.rowMargin}>
-              <Col span={10}>
+              <Col xl={8} xs={24}>
                 <LogoFooter />
               </Col>
-              <Col span={7}>
+              <Col xl={8} xs={24}>
                 <QuickLinks />
               </Col>
-              <Col span={7}>
+              <Col xl={8} xs={24}>
                 <FooterFollowUs />
               </Col>
             </Row>

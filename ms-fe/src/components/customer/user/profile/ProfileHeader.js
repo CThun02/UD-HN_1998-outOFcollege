@@ -1,4 +1,4 @@
-import { Avatar, Space } from "antd";
+import { Avatar, Row, Space } from "antd";
 import styles from "./ProfileHeader.module.css";
 import { UserOutlined } from "@ant-design/icons";
 
@@ -8,9 +8,8 @@ function ProfileHeader({ user }) {
     <div className={styles.background}>
       <div className={styles.position}>
         <div className={styles.image}></div>
-
         <div className={styles.absolute}>
-          <Space direction="horizontal" style={{ width: "100%" }} size={100}>
+          <Row className={styles.ProfileCss}>
             <div>
               <Avatar
                 size={{
@@ -27,10 +26,7 @@ function ProfileHeader({ user }) {
             </div>
             <div>
               <Space direction="vertical" size={10} style={{ width: "100%" }}>
-                <span
-                  className={`${styles.textColor} ${styles.textSize}`}
-                  style={{ fontSize: "2rem", fontWeight: "400" }}
-                >
+                <span className={`${styles.textColor} ${styles.fullName}`}>
                   {user?.userInfomationDTO?.fullName}
                 </span>
                 <span className={`${styles.textColor} ${styles.textSize}`}>
@@ -57,7 +53,7 @@ function ProfileHeader({ user }) {
             <div className={`${styles.textColor} ${styles.textHeader}`}>
               {hour >= 18 && hour < 23 && "Chào buổi tối, tốt lành."}
             </div>
-          </Space>
+          </Row>
         </div>
       </div>
     </div>

@@ -2,6 +2,7 @@ import { Route, Routes, Link } from "react-router-dom";
 import SignIn from "./sign-in/SignIn";
 import SignUp from "./sign-up/SignUp";
 import { Result, Button } from "antd";
+import FogotPassword from "./fogot-password/FogotPassword";
 
 function Authen({ isAuthenAdmin }) {
   return (
@@ -12,6 +13,7 @@ function Authen({ isAuthenAdmin }) {
           element={<SignIn isAuthenAdmin={isAuthenAdmin} />}
         />
         <Route path="sign-up" element={<SignUp />} />
+        <Route path="re-password" element={<FogotPassword />} />
         <Route
           path="*"
           element={

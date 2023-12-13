@@ -91,4 +91,12 @@ public interface AccountRepository extends JpaRepository<Account, String> {
             "and (account.numberPhone = ?1 or account.email = ?1 or account.username = ?1) " +
             "and (role.roleName = com.fpoly.ooc.constant.Const.ROLE_EMPLOYEE or role.roleName = com.fpoly.ooc.constant.Const.ROLE_ADMIN)")
     Account findEmployeeAndAdmintByLogin(String login);
+
+    @Query("""
+            SELECT account FROM Account account
+            WHERE account.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+            AND account.email = ?1
+            AND account.role.roleName = com.fpoly.ooc.constant.Const.ROLE_CUSTOMER
+        """)
+    Account findAccountByEmail(String email);
 }

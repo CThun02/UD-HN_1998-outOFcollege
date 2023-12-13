@@ -249,18 +249,19 @@ const EditAddress = ({
     }
 
     useEffect(() => {
-        axios.get(`${CLIENTURL}/address/${addressId}`)
-            .then((response) => {
-                let district =
-                    response.data.district?.substring(0, response.data.district.indexOf("|"));
-                let ward =
-                    response.data.ward?.substring(0, response.data.ward.indexOf("|"));
-                console.log(response.data)
-                console.log(ward, district)
-                setFormData(response.data)
-                console.log(formData)
-            })
-            .catch((error) => console.log(error))
+        if (addressId) {
+            axios.get(`${CLIENTURL}/address/${addressId}`)
+                .then((response) => {
+                    let district =
+                        response.data.district?.substring(0, response.data.district.indexOf("|"));
+                    let ward =
+                        response.data.ward?.substring(0, response.data.ward.indexOf("|"));
+                    console.log(response.data)
+                    console.log(ward, district)
+                    setFormData(response.data)
+                })
+                .catch((error) => console.log(error))
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [thisRender])
 

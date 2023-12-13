@@ -27,6 +27,7 @@
   display: flex;
   justify-content: flex-end;
   align-content: center;
+  height: 100%;
 }
 
 .flexEnd {
@@ -71,4 +72,32 @@
 .active {
   /* border-bottom: 1px solid #2fc1ff; */
   color: #2fc1ff;
+}
+
+.cssText {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+.menuUser {
+  display: none;
+  line-height: 70px;
+}
+
+.btnMenuUser {
+  border: none;
+  box-shadow: none;
+}
+
+@media (max-width: 1535px) {
+  .lineHeight {
+    display: none;
+  }
+  .menuUser {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 }

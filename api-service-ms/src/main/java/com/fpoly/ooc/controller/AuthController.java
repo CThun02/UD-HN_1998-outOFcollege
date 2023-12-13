@@ -2,12 +2,13 @@ package com.fpoly.ooc.controller;
 
 import com.fpoly.ooc.config.UserAuthenticationProvider;
 import com.fpoly.ooc.dto.CredentialsDTO;
+import com.fpoly.ooc.dto.RePasswordRequest;
+import com.fpoly.ooc.dto.SignUpGoogleDTO;
 import com.fpoly.ooc.dto.UserDTO;
 import com.fpoly.ooc.request.account.SignUpRequest;
 import com.fpoly.ooc.service.interfaces.AuthService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -46,4 +47,15 @@ public class AuthController {
         return ResponseEntity.ok().body(userAuthenticationProvider.getUsernameFromToken(token));
     }
 
+    @PostMapping("/rePassword")
+    public ResponseEntity<?> rePassword(@RequestBody RePasswordRequest rePasswordRequest) {
+        return ResponseEntity.ok(authService.forgotPassword(rePasswordRequest));
+    }
+
+    @PostMapping("/google")
+    public ResponseEntity<?> loginByConnectGoogle(@RequestBody SignUpGoogleDTO req) {
+        UserDTO createdUser = authService.loginWithConnectGoogle(req);
+        createdUser.setToken(userAuthenticationProvider.createToken(createdUser.getUsername()));
+        return ResponseEntity.ok(createdUser);
+    }
 }

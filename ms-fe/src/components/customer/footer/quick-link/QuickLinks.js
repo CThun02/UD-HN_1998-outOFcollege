@@ -11,7 +11,7 @@ function QuickLinks() {
         </Col>
       </Row>
       <Row className={styles.rowMargin}>
-        <Col span={10}>
+        <Col xs={24} xl={12}>
           <Space direction="vertical" size={10}>
             <Col span={24}>
               <Link className={styles.hyperLink}>Trang chủ</Link>
@@ -33,7 +33,7 @@ function QuickLinks() {
             </Col>
           </Space>
         </Col>
-        <Col span={12}>
+        <Col xs={24} xl={12}>
           <Space direction="vertical" size={10}>
             <Col span={24}>
               <Link className={styles.hyperLink}>Chính sách bảo mật</Link>

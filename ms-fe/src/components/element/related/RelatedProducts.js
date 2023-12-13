@@ -57,12 +57,12 @@ function RelatedProducts() {
       <div className={styles.content}>
         <div className={styles.divider}>
           <Divider plain className={styles.cssText}>
-            Sản phẩm liên quan
+            <h2 style={{ marginBottom: "30px" }}>Sản phẩm liên quan</h2>
           </Divider>
         </div>
 
         <Spin
-          tip="Loading..."
+          tip="Vui lòng chờ..."
           spinning={isLoading}
           size="large"
           style={{ width: "100%" }}
@@ -71,7 +71,15 @@ function RelatedProducts() {
             <div className={styles.positionRelative}>
               <div>
                 <List
-                  grid={{ gutter: 16, column: 4 }}
+                  grid={{
+                    gutter: 16,
+                    xs: 2,
+                    sm: 2,
+                    md: 4,
+                    lg: 4,
+                    xl: 4,
+                    xxl: 4,
+                  }}
                   dataSource={products}
                   renderItem={(item) => (
                     <List.Item>

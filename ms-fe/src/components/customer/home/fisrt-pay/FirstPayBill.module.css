@@ -1,6 +1,6 @@
 .padding {
   background-color: #111111;
-  padding: 60px 150px;
+  padding: 12% 5%;
   display: flex;
   align-items: center;
 }
@@ -17,4 +17,16 @@
   width: 150px;
   height: 50px !important;
   margin-left: 2rem;
+}
+
+@media (max-width: 940px) {
+  .padding {
+    display: block;
+  }
+  .textH2 {
+    display: block;
+  }
+  .btn {
+    margin: 0;
+  }
 }

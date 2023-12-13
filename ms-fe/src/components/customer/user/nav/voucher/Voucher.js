@@ -46,12 +46,11 @@ const Voucher = () => {
         children: (
             <div style={{ marginTop: '-40px' }}>
                 <p>Voucher Code: {item.voucherCode}</p>
-                <p>Start Date:{moment(item.startDate).format("DD.MM.YYYY")}</p>
+                <p>Start Date: {moment(item.startDate).format("DD.MM.YYYY")}</p>
                 <p>End Date: {moment(item.endDate).format("DD.MM.YYYY")}</p>
             </div>
         ),
     }));
-
 
     return (
         <div className={styles.content}>

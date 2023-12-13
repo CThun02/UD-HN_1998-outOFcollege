@@ -1,4 +1,4 @@
-import { Col, Divider, List, Row, Spin } from "antd";
+import { Button, Col, Divider, Drawer, List, Row, Spin } from "antd";
 import styles from "./Shop.module.css";
 import FilterShop from "./filter-shop/FilterShop";
 import ProductsList from "../../element/product-cart/ProductsList";
@@ -8,6 +8,7 @@ import { Link } from "react-router-dom";
 import SortAndResultSearch from "./sort-and-result/SortAndResultSearch";
 import axios from "axios";
 import SockJs from "../../../service/SockJs";
+import { FilterFilled } from "@ant-design/icons";
 
 const items = [
   {
@@ -23,6 +24,7 @@ const baseUrl = "http://localhost:8080/api/client/product";
 function Shop() {
   // data
   const [products, setProducts] = useState([]);
+  const [open, setOpen] = useState(false);
 
   //filter
   const [filter, setFilter] = useState({
@@ -66,7 +68,7 @@ function Shop() {
 
   return (
     <Spin
-      tip="Loading..."
+      tip="Vui lòng chờ..."
       spinning={isLoading}
       size="large"
       style={{ width: "100%" }}
@@ -83,18 +85,45 @@ function Shop() {
         </div>
         <div className={styles.content}>
           <div className={styles.body}>
+            <Drawer
+              placement={"left"}
+              closable={false}
+              onClose={() => setOpen(false)}
+              open={open}
+              key={"left"}
+            >
+              <FilterShop filter={filter} setFilter={setFilter} />
+            </Drawer>
             <Row>
-              <Col span={6}>
+              <Col xl={8} xxl={6} xs={24} className={styles.filter}>
                 <FilterShop filter={filter} setFilter={setFilter} />
               </Col>
-              <Col span={18}>
+              <Col xl={16} xxl={18} xs={24}>
+                <Button
+                  type="primary"
+                  onClick={() => setOpen(true)}
+                  size="large"
+                  icon={<FilterFilled />}
+                  className={styles.btnFilter}
+                >
+                  Bộ lọc
+                </Button>
                 <SortAndResultSearch
                   filter={filter}
                   setFilter={setFilter}
                   products={products}
                 />
+
                 <List
-                  grid={{ gutter: 16, column: 3 }}
+                  grid={{
+                    gutter: 16,
+                    xs: 1,
+                    sm: 2,
+                    md: 2,
+                    lg: 3,
+                    xl: 3,
+                    xxl: 3,
+                  }}
                   dataSource={products}
                   renderItem={(item) => (
                     <List.Item>

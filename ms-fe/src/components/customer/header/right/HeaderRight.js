@@ -1,7 +1,18 @@
-import { Badge, Popover, Space, notification } from "antd";
+import { Badge, Popover, Space, notification, Dropdown } from "antd";
 import styles from "./HeaderRight.module.css";
-import { Link } from "react-router-dom";
-import { UserOutlined, ShoppingCartOutlined } from "@ant-design/icons";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  UserOutlined,
+  ShoppingCartOutlined,
+  HomeOutlined,
+  ShopOutlined,
+  CarOutlined,
+  PhoneOutlined,
+  FileOutlined,
+  LoginOutlined,
+  LogoutOutlined,
+  MenuOutlined,
+} from "@ant-design/icons";
 import { getAuthToken, clearAuthToken } from "../../../../service/Token";
 import { useEffect } from "react";
 import { useState } from "react";
@@ -9,8 +20,9 @@ import axios from "axios";
 const cartAPI = "http://localhost:8080/api/client/cart";
 
 function HeaderRight(props) {
-  // const { showSuccessNotification } = useContext(NotificationContext);
   const [user, setUser] = useState("");
+  const navigate = useNavigate();
+  const [userImage, setUserImage] = useState(null);
   const [usernameEncode, setUsernameEncode] = useState("");
   const [data, setData] = useState(null);
   const [cartIndex, setCartIndex] = useState({
@@ -19,12 +31,150 @@ function HeaderRight(props) {
   });
   const [apiNotification, contextHolder] = notification.useNotification();
 
+  const items = [
+    {
+      label: (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100%",
+            padding: "12px",
+            borderBottom: "1px solid #d0f1ff",
+          }}
+          onClick={() => navigate("/ms-shop/user/" + usernameEncode)}
+        >
+          <span style={{ fontWeight: 500 }}>
+            Xin Chào, {user ? user : "quý khách"}
+          </span>
+          <img
+            width={48}
+            height={48}
+            style={{
+              marginLeft: "12px",
+              borderRadius: "50%",
+              border: "1px solid #edf2f9",
+            }}
+            alt=""
+            src={
+              userImage
+                ? userImage
+                : "https://img.freepik.com/premium-vector/camera-with-plus-sign-icon_625445-191.jpg?w=2000"
+            }
+          />
+        </div>
+      ),
+      key: "1",
+    },
+    {
+      label: (
+        <div
+          style={{ padding: "4px 12px" }}
+          onClick={() => navigate("/ms-shop")}
+        >
+          <span>
+            <HomeOutlined /> Trang chủ
+          </span>
+        </div>
+      ),
+      key: "2",
+    },
+    {
+      label: (
+        <div
+          style={{ padding: "4px 12px" }}
+          onClick={() => navigate("/ms-shop/shopping")}
+        >
+          <span>
+            <ShopOutlined /> Cửa hàng
+          </span>
+        </div>
+      ),
+      key: "3",
+    },
+    {
+      label: (
+        <div
+          style={{ padding: "4px 12px" }}
+          onClick={() => navigate("/ms-shop/follow-order")}
+        >
+          <span>
+            <CarOutlined /> Theo dõi đơn hàng
+          </span>
+        </div>
+      ),
+      key: "4",
+    },
+    {
+      label: (
+        <div
+          style={{ padding: "4px 12px" }}
+          onClick={() => navigate("/ms-shop/about")}
+        >
+          <span>
+            <FileOutlined /> Giới thiệu
+          </span>
+        </div>
+      ),
+      key: "5",
+    },
+    {
+      label: (
+        <div
+          style={{ padding: "4px 12px" }}
+          onClick={() => navigate("/ms-shop/contact")}
+        >
+          <span>
+            <PhoneOutlined /> Liên hệ
+          </span>
+        </div>
+      ),
+      key: "6",
+    },
+    {
+      label: (
+        <div
+          style={{ padding: "12px 12px", borderTop: "1px solid #edf2f9" }}
+          onClick={() => logOutOrIn(user ? "/ms-shop" : "/authen/sign-in")}
+        >
+          <span>
+            {user ? (
+              <>
+                <LogoutOutlined /> Đăng xuất
+              </>
+            ) : (
+              <>
+                <LoginOutlined /> Đăng nhập
+              </>
+            )}
+          </span>
+        </div>
+      ),
+      key: "7",
+    },
+  ];
+
+  function logOutOrIn(link) {
+    if (user) {
+      clearAuthToken();
+      setUser("");
+      notification.success({
+        message: "Thông báo",
+        description: "Đăng xuất thành công",
+      });
+      props.setRenderHeader(Math.random());
+    }
+    navigate(link);
+  }
+
   useEffect(() => {
     return () =>
       getAuthToken()
         .then((data) => {
           setUser(data?.fullName);
           setData(data?.username);
+          setUserImage(data?.image);
           if (data?.username) {
             axios
               .get(
@@ -66,7 +216,17 @@ function HeaderRight(props) {
 
   const content = (
     <div style={{ width: "100px" }}>
-      {user ? (
+      <p>
+        <Link to={"/authen/sign-in"} className={styles.link}>
+          Đăng nhập
+        </Link>
+      </p>
+    </div>
+  );
+
+  const contentLogout = (
+    <div style={{ width: "100px" }}>
+      {user && (
         <p>
           <Link
             onClick={() => {
@@ -84,14 +244,6 @@ function HeaderRight(props) {
             Đăng xuất
           </Link>
         </p>
-      ) : (
-        <>
-          <p>
-            <Link to={"/authen/sign-in"} className={styles.link}>
-              Đăng nhập
-            </Link>
-          </p>
-        </>
       )}
     </div>
   );
@@ -134,22 +286,71 @@ function HeaderRight(props) {
             </Link>
           </Badge>
           <Space>
-            <Popover content={content} placement="bottomLeft" trigger="hover">
-              <UserOutlined className={styles.iconSize} />
-            </Popover>
             {user ? (
-              <div style={{ marginLeft: "10px" }}>
+              <UserOutlined className={styles.iconSize} />
+            ) : (
+              <Popover content={content} placement="bottomLeft" trigger="hover">
+                <UserOutlined className={styles.iconSize} />
+              </Popover>
+            )}
+            {user ? (
+              <div
+                style={{ marginLeft: "10px" }}
+                className={styles.cssText}
+                title={user}
+              >
                 <span>Xin chào, </span>{" "}
-                <Link
-                  to={"/ms-shop/user/" + usernameEncode}
-                  className={styles.link}
+                <Popover
+                  content={contentLogout}
+                  placement="bottomLeft"
+                  trigger="hover"
                 >
-                  <strong>{user}</strong>
-                </Link>
+                  <Link
+                    to={"/ms-shop/user/" + usernameEncode}
+                    className={styles.link}
+                  >
+                    <strong>{user}</strong>
+                  </Link>
+                </Popover>
               </div>
             ) : null}
           </Space>
         </Space>
+      </div>
+      <div className={styles.menuUser}>
+        <Badge count={cartIndex.quantity}>
+          <Link
+            to={"/ms-shop/cart"}
+            onClick={() => {
+              handleCreateCartByUsername();
+              props.setSelectedTab("cart");
+            }}
+            className={styles.link}
+          >
+            <ShoppingCartOutlined
+              className={`${
+                props.selectedTab === "cart" ? styles.active : ""
+              } ${styles.iconSize}`}
+              style={{ marginRight: "12px" }}
+            />
+          </Link>
+        </Badge>
+        <Dropdown
+          menu={{
+            items,
+          }}
+          trigger={["click"]}
+        >
+          <MenuOutlined
+            className={`${props.selectedTab === "cart" ? styles.active : ""} ${
+              styles.iconSize
+            }`}
+            onClick={(e) => {
+              e.preventDefault();
+            }}
+            style={{ marginLeft: "12px" }}
+          />
+        </Dropdown>
       </div>
     </div>
   );

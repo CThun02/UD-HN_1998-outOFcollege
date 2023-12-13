@@ -6,6 +6,7 @@ import com.fpoly.ooc.repository.VoucherRepository;
 import com.fpoly.ooc.service.interfaces.EmailService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
@@ -19,6 +20,7 @@ import java.io.File;
 import java.util.concurrent.CompletableFuture;
 
 @Service
+@Slf4j
 public class EmailServiceImpl implements EmailService {
 
     @Autowired
@@ -89,7 +91,8 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public String sendSimpleMail(EmailDetails details){
+    @Async
+    public CompletableFuture<String> sendSimpleMail(EmailDetails details){
 
         try {
             MimeMessage message = javaMailSender.createMimeMessage();
@@ -101,10 +104,26 @@ public class EmailServiceImpl implements EmailService {
                 helper.setText(details.getMessageBody(), true);
                 javaMailSender.send(message);
 
-            return "DONE";
+            return CompletableFuture.completedFuture("DONE");
         } catch (Exception e) {
-            return "ERROR";
+            return CompletableFuture.completedFuture("ERROR");
         }
     }
 
+    @Override
+    @Async
+    public CompletableFuture<String> sendRePassword(EmailDetails details) {
+        try {
+            MimeMessage message = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            helper.setFrom(sender);
+            helper.setTo(details.getRecipient().get(0));
+            helper.setSubject(details.getSubject());
+            helper.setText(details.getMessageBody(), true);
+            javaMailSender.send(message);
+            return CompletableFuture.completedFuture("DONE");
+        } catch (Exception e) {
+            return CompletableFuture.completedFuture("ERROR");
+        }
+    }
 }

@@ -511,4 +511,11 @@ public class BillServiceImpl implements BillService {
     public List<NotificationDTO> findAllNotifications() {
         return billRepo.findAllNotifications();
     }
+
+    @Override
+    public Bill updateBillReturn(Long billId, BigDecimal priceReturn, Boolean mtc) {
+        Bill bill = this.findBillByBillId(billId);
+        bill.setPriceReduce(bill.getPriceReduce().subtract(priceReturn));
+        return bill;
+    }
 }

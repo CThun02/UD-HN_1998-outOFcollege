@@ -41,7 +41,7 @@ const BillManagement = () => {
   const [count, setCount] = useState("");
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
-  const [filterStatus, setFilterStatus] = useState(null)
+  const [filterStatus, setFilterStatus] = useState(null);
 
   const onRangeChange = (dates, dateStrings) => {
     if (dates) {
@@ -168,12 +168,12 @@ const BillManagement = () => {
           object === "Unpaid"
             ? "geekblue"
             : object === "Paid"
-              ? "green"
-              : object === "Cancel"
-                ? "red"
-                : object === "Complete"
-                  ? "green"
-                  : null;
+            ? "green"
+            : object === "Cancel"
+            ? "red"
+            : object === "Complete"
+            ? "green"
+            : null;
         return (
           <Space direction="vertical">
             <div style={{ width: "auto", display: "flex" }}>
@@ -181,10 +181,10 @@ const BillManagement = () => {
                 {object === "Unpaid"
                   ? "Chưa thanh toán"
                   : object === "Cancel"
-                    ? "Đã hủy"
-                    : object === "Complete"
-                      ? "Đã hoàn thành"
-                      : "Đã thanh toán"}
+                  ? "Đã hủy"
+                  : object === "Complete"
+                  ? "Đã hoàn thành"
+                  : "Đã thanh toán"}
               </Tag>
             </div>
           </Space>
@@ -196,7 +196,13 @@ const BillManagement = () => {
       key: "action",
       render: (text, record) => {
         return (
-          <Link to={filterStatus === "ReturnS" ? `/api/admin/return/return-bill/${record.billCode}` : `/api/admin/counter-sales/${record.billId}/timeline`}>
+          <Link
+            to={
+              filterStatus === "ReturnS"
+                ? `/api/admin/return/return-bill/${record.billCode}/bill`
+                : `/api/admin/counter-sales/${record.billId}/timeline`
+            }
+          >
             <Button>
               <EyeOutlined />
             </Button>
@@ -234,7 +240,9 @@ const BillManagement = () => {
       });
 
     axios
-      .get(`http://localhost:8080/api/client/countBill?billType=${billType}&startDate=${startDate}&endDate=${endDate}`)
+      .get(
+        `http://localhost:8080/api/client/countBill?billType=${billType}&startDate=${startDate}&endDate=${endDate}`
+      )
       .then((response) => setCountBill(response.data))
       .catch((error) => console.log(error));
   };
@@ -243,7 +251,16 @@ const BillManagement = () => {
     window.scrollTo(0, 0);
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [billCode, startDate, endDate, status, createdBy, symbol, count, billType]);
+  }, [
+    billCode,
+    startDate,
+    endDate,
+    status,
+    createdBy,
+    symbol,
+    count,
+    billType,
+  ]);
 
   const onChangeBill = (e) => {
     setFilterStatus(e);
@@ -267,7 +284,7 @@ const BillManagement = () => {
       setcreatedBy("");
       setSymbol("Shipping");
       setCount(2);
-    } else if (e === 'ReturnS') {
+    } else if (e === "ReturnS") {
       setStatus(e);
       setcreatedBy("");
       setSymbol("");
@@ -300,7 +317,7 @@ const BillManagement = () => {
               bordered={false}
               style={{ width: "12%", borderBottom: "1px solid #ccc" }}
               onChange={(e) => {
-                setBillType(e)
+                setBillType(e);
               }}
               defaultValue={""}
             >
@@ -350,20 +367,22 @@ const BillManagement = () => {
                     id === "1"
                       ? countBill.countAll
                       : id === "2"
-                        ? countBill.countConfirmW
-                        : id === "3"
-                          ? countBill.countConfirmS
-                          : id === "4"
-                            ? countBill.shipping
-                            : id === "5"
-                              ? countBill.complete
-                              : id === "6"
-                                ? countBill.cancel
-                                : id === "7"
-                                  ? countBill?.paid
-                                  : id === "8"
-                                    ? countBill?.unpaid
-                                    : id === '9' ? countBill.returnS : null
+                      ? countBill.countConfirmW
+                      : id === "3"
+                      ? countBill.countConfirmS
+                      : id === "4"
+                      ? countBill.shipping
+                      : id === "5"
+                      ? countBill.complete
+                      : id === "6"
+                      ? countBill.cancel
+                      : id === "7"
+                      ? countBill?.paid
+                      : id === "8"
+                      ? countBill?.unpaid
+                      : id === "9"
+                      ? countBill.returnS
+                      : null
                   }
                 >
                   <span style={{ padding: "20px" }}>
@@ -371,22 +390,22 @@ const BillManagement = () => {
                     {id === "1"
                       ? "Tất cả"
                       : id === "2"
-                        ? "Chờ xác nhận"
-                        : id === "3"
-                          ? "Chờ giao hàng"
-                          : id === "4"
-                            ? "Đang giao"
-                            : id === "5"
-                              ? "Đã hoàn thành"
-                              : id === "6"
-                                ? "Đã hủy"
-                                : id === "7"
-                                  ? "Đã thanh toán"
-                                  : id === "8"
-                                    ? "Chưa thanh toán"
-                                    : id === "9"
-                                      ? "Trả hàng"
-                                      : ''}
+                      ? "Chờ xác nhận"
+                      : id === "3"
+                      ? "Chờ giao hàng"
+                      : id === "4"
+                      ? "Đang giao"
+                      : id === "5"
+                      ? "Đã hoàn thành"
+                      : id === "6"
+                      ? "Đã hủy"
+                      : id === "7"
+                      ? "Đã thanh toán"
+                      : id === "8"
+                      ? "Chưa thanh toán"
+                      : id === "9"
+                      ? "Trả hàng"
+                      : ""}
                   </span>
                 </Badge>
               ),
@@ -394,21 +413,22 @@ const BillManagement = () => {
                 id === "1"
                   ? ""
                   : id === "2"
-                    ? "Client"
-                    : id === "3"
-                      ? "Confirmed"
-                      : id === "4"
-                        ? "Shipping"
-                        : id === "5"
-                          ? "Complete"
-                          : id === "6"
-                            ? "Cancel"
-                            : id === "7"
-                              ? "Paid"
-                              : id === "8"
-                                ? "Unpaid"
-                                : id === '9'
-                                  ? 'ReturnS' : "",
+                  ? "Client"
+                  : id === "3"
+                  ? "Confirmed"
+                  : id === "4"
+                  ? "Shipping"
+                  : id === "5"
+                  ? "Complete"
+                  : id === "6"
+                  ? "Cancel"
+                  : id === "7"
+                  ? "Paid"
+                  : id === "8"
+                  ? "Unpaid"
+                  : id === "9"
+                  ? "ReturnS"
+                  : "",
               children: (
                 <div style={{ padding: "8px" }}>
                   <span style={{ fontWeight: 500 }}>

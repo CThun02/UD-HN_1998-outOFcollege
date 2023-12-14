@@ -19,7 +19,9 @@ import com.fpoly.ooc.service.interfaces.AccountService;
 import com.fpoly.ooc.service.interfaces.EmailService;
 import com.fpoly.ooc.service.interfaces.VoucherAccountService;
 import com.fpoly.ooc.service.interfaces.VoucherService;
+import com.fpoly.ooc.util.CommonUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +32,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -165,6 +169,29 @@ public class VoucherServiceImpl implements VoucherService {
     }
 
     @Override
+    public List<VoucherResponse> searchVoucherByCode(String code) {
+        Voucher voucher = voucherRepository.findVoucherByVoucherCodeAndStatus(code, Const.STATUS_ACTIVE).orElse(null);
+        if (Objects.nonNull(voucher)) {
+            VoucherResponse voucherRes = new VoucherResponse();
+            voucherRes.setVoucherId(voucher.getId());
+            voucherRes.setVoucherCode(voucher.getVoucherCode());
+            voucherRes.setVoucherName(voucher.getVoucherName());
+            voucherRes.setVoucherValue(voucher.getVoucherValue());
+            voucherRes.setVoucherValueMax(voucher.getVoucherValueMax());
+            voucherRes.setVoucherMethod(voucher.getVoucherMethod());
+            voucherRes.setLimitQuantity(voucher.getLimitQuantity());
+            voucherRes.setStartDate(voucher.getStartDate());
+            voucherRes.setEndDate(voucher.getEndDate());
+            voucherRes.setStatus(voucher.getStatus());
+            voucherRes.setObjectUse(voucher.getObjectUse());
+            voucherRes.setVoucherCondition(voucher.getVoucherCondition());
+
+            return List.of(voucherRes);
+        }
+        return null;
+    }
+
+    @Override
     public Boolean isCheckAccountOwnerVoucher(Long idVoucher, String username) {
         return voucherRepository.isCheckAccountOwnerVoucher(idVoucher, Commons.lower(username));
     }
@@ -176,8 +203,9 @@ public class VoucherServiceImpl implements VoucherService {
 
     @Override
     public List<VoucherResponse> findAllVoucherResponseDisplayModalUsing(DisplayVoucherRequest request) {
+        log.warn("RequestData: " + request);
         return voucherRepository.findAllDisplayModalUsingVoucher(
-                StringUtils.isEmpty(request.getVoucherCodeOrName()) ? null : "%" + Commons.lower(request.getVoucherCodeOrName()) + "%",
+                StringUtils.isBlank(request.getVoucherCodeOrName()) ? null : "%" + Commons.lower(request.getVoucherCodeOrName()) + "%",
                 StringUtils.isBlank(request.getUsername()) ? null : Commons.lower(request.getUsername()),
                 StringUtils.isEmpty(String.valueOf(request.getPriceBill())) ? null : request.getPriceBill()
         );
@@ -186,7 +214,7 @@ public class VoucherServiceImpl implements VoucherService {
     @Override
     public Voucher findVoucherByVoucherCode(String voucherCode) {
         log.info("VoucherCode: " + voucherCode);
-        return voucherRepository.findVoucherByVoucherCode(voucherCode)
+        return voucherRepository.findVoucherByVoucherCodeAndStatus(voucherCode, Const.STATUS_ACTIVE)
                 .orElseThrow(() -> new NotFoundException(ErrorCodeConfig.getFormatMessage(Const.CODE_NOT_FOUND)));
     }
 
@@ -198,6 +226,38 @@ public class VoucherServiceImpl implements VoucherService {
     @Override
     public Voucher updateVoucher(Voucher voucher) {
         return voucherRepository.save(voucher);
+    }
+
+    @Override
+    public VoucherResponse autoFillVoucher(DisplayVoucherRequest req) {
+        if(Objects.isNull(req)) return null;
+        log.warn("DataReq: " + req);
+        List<VoucherResponse> voucherResList = voucherRepository
+                .autoFillVoucherByPrice(
+                        StringUtils.isEmpty(String.valueOf(req.getPriceBill())) ? null : req.getPriceBill(),
+                        StringUtils.isBlank(req.getUsername()) ? null : Commons.lower(req.getUsername())
+                );
+
+        if (CollectionUtils.isEmpty(voucherResList)) {
+            return null;
+        }
+
+        VoucherResponse voucherRes = CommonUtils.getOneElementsInArrays(voucherResList);
+        if(Objects.isNull(voucherRes)) {
+            return null;
+        }
+
+        VoucherResponse resultSort = null;
+        for (VoucherResponse res: voucherResList) {
+            if(Objects.nonNull(res.getVoucherValueMax()) && Objects.nonNull(voucherRes.getVoucherValue())) {
+                if (res.getVoucherValueMax().compareTo(voucherRes.getVoucherValue()) > 0) {
+                    resultSort = res;
+                    voucherRes = resultSort;
+                }
+            }
+        }
+
+        return Objects.nonNull(resultSort) ? resultSort : voucherRes;
     }
 
     private VoucherRequest convertVoucher(Voucher voucher) {

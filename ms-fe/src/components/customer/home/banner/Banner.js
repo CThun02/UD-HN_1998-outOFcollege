@@ -14,7 +14,7 @@ function Banner() {
     <div>
       <div className={styles.background}>
         <Row gutter={16} className={styles.spacing}>
-          <Col span={6}>
+          <Col xs={24} md={12} xl={6} style={{ padding: "30px 15px" }}>
             <Card
               bordered={false}
               className={`${styles.backgroundCard} ${styles.padding}`}
@@ -33,7 +33,7 @@ function Banner() {
               </Row>
             </Card>
           </Col>
-          <Col span={6}>
+          <Col xs={24} md={12} xl={6} style={{ padding: "30px 15px" }}>
             <Card
               bordered={false}
               className={`${styles.backgroundCard} ${styles.padding}`}
@@ -52,7 +52,7 @@ function Banner() {
               </Row>
             </Card>
           </Col>
-          <Col span={6}>
+          <Col xs={24} md={12} xl={6} style={{ padding: "30px 15px" }}>
             <Card
               bordered={false}
               className={`${styles.backgroundCard} ${styles.padding}`}
@@ -71,7 +71,7 @@ function Banner() {
               </Row>
             </Card>
           </Col>
-          <Col span={6}>
+          <Col xs={24} md={12} xl={6} style={{ padding: "30px 15px" }}>
             <Card
               bordered={false}
               className={`${styles.backgroundCard} ${styles.padding}`}

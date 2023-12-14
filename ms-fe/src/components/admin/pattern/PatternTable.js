@@ -35,7 +35,6 @@ const PatternTable = function (props) {
     setSelectedItem(item);
     setid(item?.id);
     setPatternName(item?.patternName);
-
     setShowDetailsModal(true);
   };
 
@@ -58,13 +57,8 @@ const PatternTable = function (props) {
         }
       )
       .then((response) => {
-        // Cập nhật lại danh sách dữ liệu sau khi cập nhật thành công
-
-        // Đóng modal
-        setShowDetailsModal(false);
         setRender(Math.random());
-
-        // Hiển thị thông báo thành công
+        setShowDetailsModal(false);
         message.success("Cập nhật thành công");
       })
       .catch((err) => {
@@ -97,9 +91,7 @@ const PatternTable = function (props) {
       )
       .then((response) => {
         setRender(Math.random);
-        setTimeout(() => {
-          messageApi.success(mess, 2);
-        }, 500);
+        messageApi.success(mess, 2);
       })
       .catch((error) => {
         const status = error.response.status;
@@ -110,9 +102,7 @@ const PatternTable = function (props) {
           });
           return;
         }
-        setTimeout(() => {
-          messageApi.error(`Cập nhật trạng thái thất bại`, 2);
-        }, 500);
+        messageApi.error(`Cập nhật trạng thái thất bại`, 2);
       });
   };
 
@@ -127,11 +117,9 @@ const PatternTable = function (props) {
         }
       )
       .then((response) => {
-        // Xoá dữ liệu thành công
-        // Cập nhật lại danh sách dữ liệu sau khi xoá
+        message.success("Xóa thành công");
         const updatedData = data.filter((item) => item.id !== selectedData);
         setData(updatedData);
-        // Đóng modal
         setShowModal(false);
       })
       .catch((err) => {
@@ -155,7 +143,6 @@ const PatternTable = function (props) {
       })
       .then((response) => {
         setData(response.data);
-        console.log(response.data);
       })
       .catch((err) => {
         const status = err.response.status;
@@ -171,7 +158,6 @@ const PatternTable = function (props) {
 
   return (
     <div>
-      {console.log(data)}
       <Table
         pagination={{
           showSizeChanger: true,
@@ -192,7 +178,7 @@ const PatternTable = function (props) {
           },
 
           {
-            title: "Tên Loại Vải",
+            title: "Tên Họa tiết",
             dataIndex: "patternName",
             key: "patternName",
           },
@@ -204,6 +190,7 @@ const PatternTable = function (props) {
             render: (status, record) => (
               <>
                 <Switch
+                  disabled={!props.isAdmin}
                   onChange={(checked) => {
                     handleUpdateStatus(record.id, checked);
                   }}
@@ -229,20 +216,20 @@ const PatternTable = function (props) {
               <Space size="middle">
                 <Button
                   className={styles.btnDetails}
-                  type="link"
+                  disabled={!props.isAdmin}
+                  type="primary"
+                  size="large"
                   onClick={() => handleDetails(record)}
                   icon={<FormOutlined />}
-                >
-                  Xem chi tiết
-                </Button>
+                ></Button>
                 <Button
                   className={styles.btnDetails}
-                  type="link"
+                  disabled={!props.isAdmin}
+                  type="primary"
+                  size="large"
                   onClick={() => handleDelete(record.id)}
                   icon={<DeleteFilled />}
-                >
-                  Xóa
-                </Button>
+                ></Button>
               </Space>
             ),
           },

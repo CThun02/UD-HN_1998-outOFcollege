@@ -1,27 +1,25 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  Select,
   Input,
   Row,
   Col,
   Form,
-  DatePicker,
   Modal,
   Button,
   ColorPicker,
   notification,
+  message,
 } from "antd";
 import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
 import CollorTable from "./CollorTable";
 import styles from "../categorystyles/CategoryStyles.module.css";
 import axios from "axios";
 import { getToken } from "../../../service/Token";
-const { Option } = Select;
 
-const CollorAdmin = function () {
+const CollorAdmin = function ({ isAdmin }) {
   const [render, setRender] = useState();
-  const [colorCode, setColorCode] = useState("");
+  const [colorCode, setColorCode] = useState("#1677FF");
   const [colorName, setColorName] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false);
 
@@ -49,9 +47,13 @@ const CollorAdmin = function () {
       })
       .then((response) => {
         // Xử lý thành công
-        console.log("Thêm thành công");
+        setRender(Math.random());
         setIsModalVisible(false);
-        setRender(Math.random);
+        if (response.data) {
+          message.success("Thêm thành công");
+        } else {
+          message.error("Màu sắc đã tồn tại");
+        }
       })
       .catch((err) => {
         // Xử lý lỗi
@@ -63,7 +65,6 @@ const CollorAdmin = function () {
           });
         }
       });
-    console.log(values);
   };
 
   useEffect(() => {}, [render]);
@@ -82,17 +83,17 @@ const CollorAdmin = function () {
               />
             </Row>
           </Col>
-          <Col span={12} offset={1}>
-            <Col span={5} offset={19}>
+          {isAdmin ? (
+            <Col span={14} style={{ textAlign: "end" }}>
               <Button className={styles.btnSeach} onClick={handleAdd}>
                 <PlusOutlined className={styles.faPlus} />
                 <span className={styles.titleSeach}>Thêm Màu Sắc</span>
               </Button>
             </Col>
-          </Col>
+          ) : null}
         </Row>
         <div className={styles.categoryTable}>
-          <CollorTable renderTable={render}></CollorTable>
+          <CollorTable isAdmin={isAdmin} renderTable={render}></CollorTable>
         </div>
         <Modal
           title="Thêm Màu Sắc"
@@ -113,7 +114,9 @@ const CollorAdmin = function () {
             >
               <ColorPicker
                 showText
-                onChange={(e) => setColorCode(e.toHexString())}
+                onChange={(e) => {
+                  setColorCode(e.toHexString());
+                }}
               />
             </Form.Item>
             <Form.Item

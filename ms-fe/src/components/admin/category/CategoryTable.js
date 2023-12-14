@@ -18,7 +18,7 @@ import { getToken } from "../../../service/Token";
 const CategoryTable = function (props) {
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [api, contextHolder] = notification.useNotification();
+  const [api, contextHolder] = message.useMessage();
 
   const [showModal, setShowModal] = useState(false);
   const [selectedData, setSelectedData] = useState(null);
@@ -38,7 +38,6 @@ const CategoryTable = function (props) {
   };
 
   const handleUpdate = () => {
-    let category = {};
     axios
       .put(
         `http://localhost:8080/api/admin/category/edit/${id}`,
@@ -53,9 +52,8 @@ const CategoryTable = function (props) {
       )
       .then((response) => {
         // Cập nhật lại danh sách dữ liệu sau khi cập nhật thành công
-
+        setRender(Math.random());
         setShowDetailsModal(false);
-        setRender(Math.random);
         message.success("Cập nhật thành công");
       })
       .catch((err) => {
@@ -72,7 +70,7 @@ const CategoryTable = function (props) {
   const handleUpdateStatus = (id, statusUpdate) => {
     let mess = statusUpdate ? "Đang hoạt động" : "Ngưng hoạt động";
 
-    const updatedStatusValue = statusUpdate ? "ACTIVE" : "INACTIVE"; // Cập nhật trạng thái dựa trên giá trị của statusUpdate
+    const updatedStatusValue = statusUpdate ? "ACTIVE" : "INACTIVE";
 
     axios
       .put(
@@ -88,9 +86,7 @@ const CategoryTable = function (props) {
       )
       .then((response) => {
         setRender(Math.random);
-        setTimeout(() => {
-          api.success(mess, 2);
-        }, 500);
+        api.success(mess, 2);
       })
       .catch((error) => {
         const status = error?.response?.data?.status;
@@ -123,11 +119,9 @@ const CategoryTable = function (props) {
         }
       )
       .then((response) => {
-        // Xoá dữ liệu thành công
-        // Cập nhật lại danh sách dữ liệu sau khi xoá
+        message.success("Xóa thành công");
         const updatedData = data.filter((item) => item.id !== selectedData);
         setData(updatedData);
-        // Đóng modal
         setShowModal(false);
       })
       .catch((err) => {
@@ -151,14 +145,12 @@ const CategoryTable = function (props) {
       })
       .then((response) => {
         setData(response.data);
-        console.log(response.data);
       })
       .catch((err) => console.log(err));
   }, [props.renderTable, render]);
 
   return (
     <div>
-      {console.log(data)}
       <Table
         pagination={{
           showSizeChanger: true,
@@ -190,6 +182,7 @@ const CategoryTable = function (props) {
             render: (status, record) => (
               <>
                 <Switch
+                  disabled={!props.isAdmin}
                   onChange={(checked) => {
                     handleUpdateStatus(record.id, checked);
                   }}
@@ -214,14 +207,18 @@ const CategoryTable = function (props) {
             render: (_, record) => (
               <Space size="middle">
                 <Button
+                  disabled={!props.isAdmin}
                   className={styles.btnDetails}
-                  type="link"
+                  type="primary"
+                  size="large"
                   onClick={() => handleDetails(record)}
                   icon={<FormOutlined />}
                 />
                 <Button
                   className={styles.btnDetails}
-                  type="link"
+                  disabled={!props.isAdmin}
+                  type="primary"
+                  size="large"
                   onClick={() => handleDelete(record.id)}
                   icon={<DeleteFilled />}
                 />

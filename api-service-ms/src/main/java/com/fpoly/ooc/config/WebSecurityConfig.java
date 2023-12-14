@@ -46,8 +46,11 @@ public class WebSecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/admin/bill/**").hasAnyRole("EMPLOYEE", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/admin/button", "/api/admin/collar", "/api/admin/material",
                                 "/api/admin/sleeve", "/api/admin/shirt-tail", "/api/admin/size", "/api/admin/color",
-                                "/api/admin/category","/api/admin/brand").permitAll()
-                        .requestMatchers(HttpMethod.GET,"api/admin/product/getproductfilterByCom").hasAnyRole("EMPLOYEE", "ADMIN")
+                                "/api/admin/category","/api/admin/brand", "/api/admin/pattern",
+                                "/api/admin/product/getMaxPrice", "/api/admin/product/getProductEdit",
+                                "/api/admin/form").permitAll()
+                        .requestMatchers(HttpMethod.GET,"api/admin/product/getproductfilterByCom",
+                                "api/admin/product/filterProductDetailByIdCom").hasAnyRole("EMPLOYEE", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/admin/promotion-product/").hasAnyRole("EMPLOYEE", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/admin/vouchers/").hasAnyRole("EMPLOYEE", "ADMIN")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")

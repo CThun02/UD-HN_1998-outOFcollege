@@ -24,6 +24,7 @@ import com.fpoly.ooc.service.interfaces.EmailService;
 import com.fpoly.ooc.service.interfaces.TimeLineService;
 import com.fpoly.ooc.service.interfaces.VoucherService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -244,6 +245,13 @@ public class ClientController {
     @PostMapping("/autoFillVoucher")
     public ResponseEntity<?> autoFillVoucher(@RequestBody DisplayVoucherRequest req) {
         return ResponseEntity.ok(voucherService.autoFillVoucher(req));
+    }
+
+    @GetMapping("/vouchers/{username}")
+    public ResponseEntity<?> getVoucherByUsernameAndVoucherCode(@PathVariable("username") String username,
+                                                                @RequestParam(value = "voucherCode", required = false) String voucherCode) {
+        return ResponseEntity.ok(voucherService.getVoucherByUsernameAndVoucherCode(username,
+                voucherCode.trim().equals("") ? null : voucherCode));
     }
 
 }

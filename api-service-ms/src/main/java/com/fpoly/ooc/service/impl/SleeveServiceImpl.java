@@ -40,7 +40,7 @@ public class SleeveServiceImpl implements SleeveServiceI {
             o.setSleeveName(sleeveType.getSleeveName());
             o.setStatus(sleeveType.getStatus());
             try {
-                return kafkaUtil.sendingObjectWithKafka(sleeveType, Const.TOPIC_SLEEVE);
+                return kafkaUtil.sendingObjectWithKafka(o, Const.TOPIC_SLEEVE);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }

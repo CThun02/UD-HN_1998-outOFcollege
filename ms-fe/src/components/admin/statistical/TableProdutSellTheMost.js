@@ -212,13 +212,6 @@ const TableProdutSellTheMost = ({ date, dateToP, type }) => {
           setData(res.data);
         })
         .catch((err) => {
-          const status = err.response.status;
-          if (status === 403) {
-            notification.error({
-              message: "Thông báo",
-              description: "Bạn không có quyền truy cập!",
-            });
-          }
           console.log(err);
         });
     }
@@ -226,21 +219,12 @@ const TableProdutSellTheMost = ({ date, dateToP, type }) => {
   return (
     <>
       <Table
-        pagination={{
-          showSizeChanger: true,
-          pageSizeOptions: [5, 10, 15, 20],
-          defaultPageSize: 5,
-          style: { marginRight: "10px" },
-          onChange: (currentPage, pageSize) => {
-            setCurrentPage(currentPage);
-            setPageSize(pageSize);
-          },
-        }}
+        pagination={false}
         scroll={{ y: 360 }}
         columns={columns}
         dataSource={
           data &&
-          data.map((record, index) => ({
+          data.slice(0, 10).map((record, index) => ({
             ...record,
             key: record.id,
           }))

@@ -37,9 +37,6 @@ public class ProductReturnService implements ProductReturnServiceI {
     public ProductReturn create(ProductReturnRequest request) {
         ProductReturn productReturn = request.dto();
         productReturn.setReason(request.getReason()== null?"PRODUCE":"OTHER");
-        Bill bill = billService.findBillByBillId(request.getBillId());
-        bill.setPriceReduce(bill.getPriceReduce().subtract(request.getPrice().multiply(BigDecimal.valueOf(request.getQuantity()))));
-        billService.updateBill(bill);
         if(productReturn.getReason().equals("OTHER")){
             ProductDetail productDetail = productDetailService.getOne(request.getProductDetailId());
             productDetail.setQuantity(productDetail.getQuantity() + request.getQuantity());
@@ -68,6 +65,18 @@ public class ProductReturnService implements ProductReturnServiceI {
     public List<ProductDetailDisplayResponse> getProductReturnByBillCode(String billCode) {
         List<ProductDetailDisplayResponse> productDetailDisplayResponses = new ArrayList<>();
         List<ProductDetailResponse> productDetailResponses = repo.getProductReturnByBillCode(billCode);
+        for (int i = 0; i < productDetailResponses.size(); i++) {
+            ProductDetailDisplayResponse productDetailDisplayResponse = new ProductDetailDisplayResponse(productDetailResponses.get(i),
+                    productImageService.getProductImageByProductDetailId(productDetailResponses.get(i).getId()));
+            productDetailDisplayResponses.add(productDetailDisplayResponse);
+        }
+        return productDetailDisplayResponses;
+    }
+
+    @Override
+    public List<ProductDetailDisplayResponse> getProductReturnDetailByProductDetailId(Long productDetailId, String reason) {
+        List<ProductDetailDisplayResponse> productDetailDisplayResponses = new ArrayList<>();
+        List<ProductDetailResponse> productDetailResponses = repo.getProductReturnDetailByProductDetailId(productDetailId, reason);
         for (int i = 0; i < productDetailResponses.size(); i++) {
             ProductDetailDisplayResponse productDetailDisplayResponse = new ProductDetailDisplayResponse(productDetailResponses.get(i),
                     productImageService.getProductImageByProductDetailId(productDetailResponses.get(i).getId()));

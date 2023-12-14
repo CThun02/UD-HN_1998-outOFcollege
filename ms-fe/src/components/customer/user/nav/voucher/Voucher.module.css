@@ -1,0 +1,42 @@
+.width {
+  width: 80%;
+}
+
+.content {
+  display: flex;
+  justify-content: center;
+}
+
+.fontWeight500 {
+  font-weight: 600;
+}
+
+.fontWeight400 {
+  font-weight: 400;
+}
+
+.fontWeight100 {
+  font-weight: 300;
+}
+
+.color {
+  color: #7d7c7c;
+}
+
+.padding {
+  padding: 10px;
+  padding-left: 10px;
+}
+
+.flex {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.customBorder {
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  margin-bottom: 8px; /* Để tạo khoảng cách giữa các Collapse.Panel */
+  padding: 8px; /* Điều chỉnh padding nếu cần thiết */
+}

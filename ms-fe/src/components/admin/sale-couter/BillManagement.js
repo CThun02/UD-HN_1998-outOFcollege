@@ -41,6 +41,7 @@ const BillManagement = () => {
   const [count, setCount] = useState("");
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
+  const [filterStatus, setFilterStatus] = useState(null);
 
   const onRangeChange = (dates, dateStrings) => {
     if (dates) {
@@ -143,9 +144,9 @@ const BillManagement = () => {
       render: (text, record) => {
         return (
           numeral(
-            record.totalPrice + record.shipPrice - record?.priceReduce < 0
+            record.totalPrice + record.shipPrice < 0
               ? 0
-              : record.totalPrice + record.shipPrice - record?.priceReduce
+              : record.totalPrice + record.shipPrice
           ).format("0,0") + "đ"
         );
       },
@@ -195,7 +196,13 @@ const BillManagement = () => {
       key: "action",
       render: (text, record) => {
         return (
-          <Link to={`/api/admin/counter-sales/${record.billId}/timeline`}>
+          <Link
+            to={
+              filterStatus === "ReturnS"
+                ? `/api/admin/return/return-bill/${record.billCode}/bill`
+                : `/api/admin/counter-sales/${record.billId}/timeline`
+            }
+          >
             <Button>
               <EyeOutlined />
             </Button>
@@ -233,7 +240,9 @@ const BillManagement = () => {
       });
 
     axios
-      .get(`http://localhost:8080/api/client/countBill?billType=${billType}&startDate=${startDate}&endDate=${endDate}`)
+      .get(
+        `http://localhost:8080/api/client/countBill?billType=${billType}&startDate=${startDate}&endDate=${endDate}`
+      )
       .then((response) => setCountBill(response.data))
       .catch((error) => console.log(error));
   };
@@ -242,9 +251,19 @@ const BillManagement = () => {
     window.scrollTo(0, 0);
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [billCode, startDate, endDate, status, createdBy, symbol, count, billType]);
+  }, [
+    billCode,
+    startDate,
+    endDate,
+    status,
+    createdBy,
+    symbol,
+    count,
+    billType,
+  ]);
 
   const onChangeBill = (e) => {
+    setFilterStatus(e);
     if (e === "") {
       setStatus("");
       setcreatedBy("");
@@ -265,6 +284,11 @@ const BillManagement = () => {
       setcreatedBy("");
       setSymbol("Shipping");
       setCount(2);
+    } else if (e === "ReturnS") {
+      setStatus(e);
+      setcreatedBy("");
+      setSymbol("");
+      setCount("");
     } else {
       setStatus(e);
       setcreatedBy("");
@@ -293,7 +317,7 @@ const BillManagement = () => {
               bordered={false}
               style={{ width: "12%", borderBottom: "1px solid #ccc" }}
               onChange={(e) => {
-                setBillType(e)
+                setBillType(e);
               }}
               defaultValue={""}
             >
@@ -332,6 +356,7 @@ const BillManagement = () => {
             CloseCircleOutlined,
             CheckCircleOutlined,
             ClockCircleOutlined,
+            ClockCircleOutlined,
           ].map((Icon, i) => {
             const id = String(i + 1);
             return {
@@ -355,6 +380,8 @@ const BillManagement = () => {
                       ? countBill?.paid
                       : id === "8"
                       ? countBill?.unpaid
+                      : id === "9"
+                      ? countBill.returnS
                       : null
                   }
                 >
@@ -376,6 +403,8 @@ const BillManagement = () => {
                       ? "Đã thanh toán"
                       : id === "8"
                       ? "Chưa thanh toán"
+                      : id === "9"
+                      ? "Trả hàng"
                       : ""}
                   </span>
                 </Badge>
@@ -397,6 +426,8 @@ const BillManagement = () => {
                   ? "Paid"
                   : id === "8"
                   ? "Unpaid"
+                  : id === "9"
+                  ? "ReturnS"
                   : "",
               children: (
                 <div style={{ padding: "8px" }}>

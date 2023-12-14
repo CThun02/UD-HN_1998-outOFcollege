@@ -126,7 +126,7 @@ const ProductReturns = ({ date, dateToP, type, reason }) => {
       datatIndex: "total",
       title: "Tổng Trả",
       render: (text, record, index) => {
-        return (record.price * record.quantity)?.toLocaleString("vi-VN", {
+        return record.price?.toLocaleString("vi-VN", {
           style: "currency",
           currency: "VND",
         });
@@ -200,13 +200,7 @@ const ProductReturns = ({ date, dateToP, type, reason }) => {
           setData(res.data);
         })
         .catch((err) => {
-          const status = err.response.status;
-          if (status === 403) {
-            notification.error({
-              message: "Thông báo",
-              description: "Bạn không có quyền truy cập!",
-            });
-          }
+          console.log(err);
         });
     }
   }, [pageSize, date, dateToP, type, reason, openModalProductReturns]);
@@ -217,6 +211,7 @@ const ProductReturns = ({ date, dateToP, type, reason }) => {
         open={openModalProductReturns}
         title={"Chi tiết sản phẩm hoàn trả"}
         productDetailId={productDetailId}
+        reason={reason}
       />
       <Table
         pagination={{

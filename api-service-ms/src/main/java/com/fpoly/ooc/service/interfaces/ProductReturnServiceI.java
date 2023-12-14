@@ -15,4 +15,5 @@ public interface ProductReturnServiceI {
 
     List<ProductDetailDisplayResponse> getProductReturnByBillCode(String billCode);
 
+    List<ProductDetailDisplayResponse> getProductReturnDetailByProductDetailId(Long productDetailId, String reason);
 }

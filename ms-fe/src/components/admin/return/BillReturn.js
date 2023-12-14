@@ -37,7 +37,7 @@ import ModalDetail from "../sale-couter/ModalDetail";
 
 var productsReturns = [];
 const BillReturn = () => {
-  const { billCode } = useParams();
+  const { billCode, name } = useParams();
   const navigate = useNavigate();
   const token = getAuthToken(true);
 
@@ -50,6 +50,20 @@ const BillReturn = () => {
   const [note, setNote] = useState("");
   const [modalDetail, setModalDetail] = useState(false);
   const [isLoad, setIsLoad] = useState(0);
+  const [voucher, setVoucher] = useState(null);
+  var payAfterReturn =
+    billInfo?.price -
+    totalPrice -
+    (voucher
+      ? voucher?.voucherCondition > billInfo?.price - totalPrice
+        ? 0
+        : voucher?.voucherMethod === "vnd"
+        ? voucher?.voucherValue
+        : ((billInfo?.price - totalPrice) * voucher?.voucherValue) / 100 >
+          voucher?.voucherValueMax
+        ? voucher?.voucherValueMax
+        : ((billInfo?.price - totalPrice) * voucher?.voucherValue) / 100
+      : 0);
 
   const handleShowModalProduct = (index, value) => {
     const newModalVisible = [...modalQuantityReturn];
@@ -227,75 +241,81 @@ const BillReturn = () => {
   ];
 
   async function confirmReload(status) {
-    console.log(productsReturns);
     const data = await token;
-    var productReturnString = "";
-    for (let index = 0; index < productsReturns.length; index++) {
-      productReturnString +=
-        " | Hoàn trả sản phẩm: " +
-        productsReturns[index]?.productCode +
-        "Id sản phẩm: " +
-        productsReturns[index]?.productImageResponses[0]?.productDetailId;
-    }
-    for (let index = Number(status); index <= Number(status) + 1; index++) {
-      await axios
-        .post(
-          `http://localhost:8080/api/admin/timeline/${billInfo?.id}`,
-          {
-            note: "Lý do: " + note + productReturnString,
-            status: index,
-            createdBy: data?.username + "_" + data?.fullName,
-          },
-          {
+    if (note) {
+      var productReturnString = "";
+      for (let index = 0; index < productsReturns.length; index++) {
+        productReturnString +=
+          " | Hoàn trả sản phẩm: " +
+          productsReturns[index]?.productCode +
+          " | Id sản phẩm: " +
+          productsReturns[index]?.productImageResponses[0]?.productDetailId;
+      }
+      for (let index = Number(status); index <= Number(status) + 1; index++) {
+        await axios
+          .post(
+            `http://localhost:8080/api/admin/timeline/${billInfo?.id}`,
+            {
+              note: "Lý do: " + note + productReturnString,
+              status: index,
+              createdBy: data?.username + "_" + data?.fullName,
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${getToken(true)}`,
+              },
+            }
+          )
+          .then((response) => {})
+          .catch((error) => {
+            const status = error.response.status;
+            if (status === 403) {
+              notification.error({
+                message: "Thông báo",
+                description: "Bạn không có quyền truy cập!",
+              });
+            }
+          });
+      }
+      for (let index = 0; index < productsReturns.length; index++) {
+        const request = {
+          productDetailId: productsReturns[index].productDetailId,
+          billId: billInfo.id,
+          reason: productsReturns[index].reason,
+          quantity: productsReturns[index].quantity,
+          price: productsReturns[index].productPrice,
+        };
+        await axios
+          .post(`http://localhost:8080/api/admin/product-return`, request, {
             headers: {
               Authorization: `Bearer ${getToken(true)}`,
             },
-          }
-        )
-        .then((response) => {})
-        .catch((error) => {
-          const status = error.response.status;
-          if (status === 403) {
-            notification.error({
-              message: "Thông báo",
-              description: "Bạn không có quyền truy cập!",
-            });
-          }
-        });
+          })
+          .then((response) => {})
+          .catch((error) => {
+            const status = error.response.status;
+            if (status === 403) {
+              notification.error({
+                message: "Thông báo",
+                description: "Bạn không có quyền truy cập!",
+              });
+            }
+          });
+      }
+      notification.success({
+        message: "Thông báo",
+        description: "Trả hàng thành công",
+      });
+      var id = productsReturns.map((item) => item.billDetailId);
+      changeStatusBillDetail(id, "ReturnS");
+      setRender(Math.random());
+      productsReturns = [];
+    } else {
+      notification.warning({
+        message: "Thông báo",
+        description: "Vui lòng nhập mô tả!",
+      });
     }
-    for (let index = 0; index < productsReturns.length; index++) {
-      const request = {
-        productDetailId: productsReturns[index].productDetailId,
-        billId: billInfo.id,
-        reason: productsReturns[index].reason,
-        quantity: productsReturns[index].quantity,
-        price: productsReturns[index].productPrice,
-      };
-      await axios
-        .post(`http://localhost:8080/api/admin/product-return`, request, {
-          headers: {
-            Authorization: `Bearer ${getToken(true)}`,
-          },
-        })
-        .then((response) => {})
-        .catch((error) => {
-          const status = error.response.status;
-          if (status === 403) {
-            notification.error({
-              message: "Thông báo",
-              description: "Bạn không có quyền truy cập!",
-            });
-          }
-        });
-    }
-    notification.success({
-      message: "Thông báo",
-      description: "Trả hàng thành công",
-    });
-    var id = productsReturns.map((item) => item.billDetailId);
-    changeStatusBillDetail(id, "ReturnS");
-    setRender(Math.random());
-    productsReturns = [];
   }
 
   function changeStatusBillDetail(id, status) {
@@ -406,7 +426,38 @@ const BillReturn = () => {
 
   useEffect(() => {
     if (billCode) {
-      searchBill();
+      if (name !== "bill") {
+        searchBill();
+      }
+      axios
+        .get(
+          "http://localhost:8080/api/admin/voucher-history/getVoucherByBillCode?billCode=" +
+            billCode,
+          {
+            headers: {
+              Authorization: `Bearer ${getToken(true)}`,
+            },
+          }
+        )
+        .then((res) => {
+          if (res.data) {
+            axios
+              .get("http://localhost:8080/api/admin/vouchers/" + res.data, {
+                headers: {
+                  Authorization: `Bearer ${getToken(true)}`,
+                },
+              })
+              .then((res) => {
+                setVoucher(res.data);
+              })
+              .catch((err) => {
+                console.log(err);
+              });
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
       axios
         .get(
           "http://localhost:8080/api/admin/product-return/getProductReturnByBillCode?billCode=" +
@@ -429,6 +480,9 @@ const BillReturn = () => {
               }
             )
             .then((response) => {
+              setReturned(
+                response.data.billDetails.some((item) => item.checkInPromotion)
+              );
               for (
                 let index = 0;
                 index < response.data.billDetails.length;
@@ -975,11 +1029,136 @@ const BillReturn = () => {
                 </span>
               </Col>
               <Col span={12} style={{ marginBottom: "10px" }}>
+                <span style={{ fontWeight: 600 }}>Giảm giá:</span>
+              </Col>
+              <Col span={12} style={{ marginBottom: "10px" }}>
+                <span style={{ fontWeight: 600, color: "rgb(63, 134, 0)" }}>
+                  {voucher
+                    ? voucher?.voucherMethod === "vnd"
+                      ? voucher?.voucherValue.toLocaleString("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                        })
+                      : (billInfo?.price * voucher?.voucherValue) / 100 >
+                        voucher?.voucherValueMax
+                      ? voucher?.voucherValue +
+                        "% - Giảm tối đa: " +
+                        voucher?.voucherValueMax.toLocaleString("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                        })
+                      : voucher?.voucherValue +
+                        "% - Giảm: " +
+                        (
+                          (billInfo?.price * voucher?.voucherValue) /
+                          100
+                        ).toLocaleString("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                        })
+                    : (0).toLocaleString("vi-VN", {
+                        style: "currency",
+                        currency: "VND",
+                      })}
+                </span>
+              </Col>
+              <Col span={12} style={{ marginBottom: "10px" }}>
+                <span style={{ fontWeight: 600 }}>Điều kiện giảm giá:</span>
+              </Col>
+              <Col span={12} style={{ marginBottom: "10px" }}>
+                <span style={{ fontWeight: 600, color: "rgb(63, 134, 0)" }}>
+                  {voucher
+                    ? voucher?.voucherCondition.toLocaleString("vi-VN", {
+                        style: "currency",
+                        currency: "VND",
+                      })
+                    : (0).toLocaleString("vi-VN", {
+                        style: "currency",
+                        currency: "VND",
+                      })}
+                </span>
+              </Col>
+              <Col span={12} style={{ marginBottom: "10px" }}>
+                <span style={{ fontWeight: 600 }}>Tổng giá thanh toán:</span>
+              </Col>
+              <Col span={12} style={{ marginBottom: "10px" }}>
+                <span style={{ fontWeight: 600, color: "rgb(63, 134, 0)" }}>
+                  {billInfo?.priceReduce.toLocaleString("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  })}
+                </span>
+              </Col>
+              <Divider />
+              <Col span={12} style={{ marginBottom: "10px" }}>
                 <span style={{ fontWeight: 600 }}>Tổng giá trả:</span>
               </Col>
               <Col span={12} style={{ marginBottom: "10px" }}>
                 <span style={{ fontWeight: 600, color: "rgb(255, 77, 79)" }}>
                   {totalPrice.toLocaleString("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  })}
+                </span>
+              </Col>
+              <Col span={12} style={{ marginBottom: "10px" }}>
+                <span style={{ fontWeight: 600 }}>Tổng giá gốc sau trả:</span>
+              </Col>
+              <Col span={12} style={{ marginBottom: "10px" }}>
+                <span style={{ fontWeight: 600, color: "rgb(255, 77, 79)" }}>
+                  {(billInfo?.price - totalPrice).toLocaleString("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  })}
+                </span>
+              </Col>
+              <Col span={12} style={{ marginBottom: "10px" }}>
+                <span style={{ fontWeight: 600 }}>Giảm giá sau trả:</span>
+              </Col>
+              <Col span={12} style={{ marginBottom: "10px" }}>
+                <span style={{ fontWeight: 600, color: "rgb(63, 134, 0)" }}>
+                  {voucher
+                    ? voucher?.voucherCondition > billInfo?.price - totalPrice
+                      ? "Không đủ điều kiện"
+                      : voucher?.voucherMethod === "vnd"
+                      ? voucher?.voucherValue.toLocaleString("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                        })
+                      : ((billInfo?.price - totalPrice) *
+                          voucher?.voucherValue) /
+                          100 >
+                        voucher?.voucherValueMax
+                      ? voucher?.voucherValue +
+                        "% - Giảm tối đa: " +
+                        voucher?.voucherValueMax.toLocaleString("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                        })
+                      : voucher?.voucherValue +
+                        "% - Giảm: " +
+                        (
+                          ((billInfo?.price - totalPrice) *
+                            voucher?.voucherValue) /
+                          100
+                        ).toLocaleString("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                        })
+                    : (0).toLocaleString("vi-VN", {
+                        style: "currency",
+                        currency: "VND",
+                      })}
+                </span>
+              </Col>
+              <Col span={12} style={{ marginBottom: "10px" }}>
+                <span style={{ fontWeight: 600 }}>
+                  Tổng giá thanh toán sau trả:
+                </span>
+              </Col>
+              <Col span={12} style={{ marginBottom: "10px" }}>
+                <span style={{ fontWeight: 600, color: "rgb(63, 134, 0)" }}>
+                  {payAfterReturn.toLocaleString("vi-VN", {
                     style: "currency",
                     currency: "VND",
                   })}
@@ -991,10 +1170,13 @@ const BillReturn = () => {
                 <span style={{ fontWeight: 600 }}>Tiền thừa trả khách:</span>
               </Col>
               <Col span={12} style={{ marginBottom: "10px" }}>
-                {totalPrice.toLocaleString("vi-VN", {
-                  style: "currency",
-                  currency: "VND",
-                })}
+                {(billInfo?.priceReduce - payAfterReturn).toLocaleString(
+                  "vi-VN",
+                  {
+                    style: "currency",
+                    currency: "VND",
+                  }
+                )}
               </Col>
               <Col span={24}>
                 <span style={{ fontWeight: 600 }}>

@@ -30,7 +30,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { getToken } from "../../../service/Token";
 
-const SideBar = () => {
+const SideBar = ({ isAdmin }) => {
   const token = getToken(true);
   const navigate = useNavigate();
   const href = "/api/admin/";
@@ -119,11 +119,13 @@ const SideBar = () => {
               handelClick(event.key);
             }}
             items={[
-              {
-                label: "Thống kê",
-                icon: <PieChartOutlined />,
-                key: "thongKe",
-              },
+              isAdmin
+                ? {
+                    label: "Thống kê",
+                    icon: <PieChartOutlined />,
+                    key: "thongKe",
+                  }
+                : null,
               {
                 label: "Bán hàng tại quầy",
                 icon: <ShopOutlined />,

@@ -1,10 +1,22 @@
 package com.fpoly.ooc.responce.cart;
 
+import com.fpoly.ooc.entity.Brand;
+import com.fpoly.ooc.entity.ButtonType;
+import com.fpoly.ooc.entity.Category;
+import com.fpoly.ooc.entity.CollarType;
+import com.fpoly.ooc.entity.Color;
+import com.fpoly.ooc.entity.Form;
+import com.fpoly.ooc.entity.Material;
+import com.fpoly.ooc.entity.Pattern;
+import com.fpoly.ooc.entity.ShirtTailType;
+import com.fpoly.ooc.entity.Size;
+import com.fpoly.ooc.entity.SleeveType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.awt.*;
 import java.math.BigDecimal;
 
 @AllArgsConstructor
@@ -19,29 +31,27 @@ public class CartDetailResponse {
 
     private String productName;
 
-    private String brandName;
+    private Brand brand;
 
-    private String categoryName;
+    private Category category;
 
-    private String patternName;
+    private Pattern pattern;
 
-    private String formName;
+    private Form form;
 
-    private String buttonName;
+    private ButtonType button;
 
-    private String materialName;
+    private Material material;
 
-    private String collarName;
+    private CollarType collarType;
 
-    private String sleeveName;
+    private SleeveType sleeveType;
 
-    private String shirtTailName;
+    private ShirtTailType shirtTailType;
 
-    private String sizeName;
+    private Size size;
 
-    private String colorName;
-
-    private String colorCode;
+    private Color color;
 
     private BigDecimal priceProductDetail;
 

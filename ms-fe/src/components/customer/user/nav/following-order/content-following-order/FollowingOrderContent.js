@@ -21,12 +21,21 @@ function FollowingOrderContent({ billCode, status, symbol, count, createdBy }) {
   const [render, setRender] = useState(false);
   const [openNote, setOpenNote] = useState(false);
   const [userInfo, setUserInfo] = useState({});
+  const token = getAuthToken();
+
 
   const getTimeline = async (billId) => {
     axios
       .get(`http://localhost:8080/api/client/timeline/${billId}`)
       .then((response) => {
-        setTimelineV1(response.data);
+        console.log(response.data)
+        var timelinesPush = [];
+        for (let index = 0; index < response.data.length; index++) {
+          if (!isNaN(response.data[index].status)) {
+            timelinesPush.push(response.data[index]);
+          }
+        }
+        setTimelineV1(timelinesPush);
       })
       .catch((error) => {
         console.log(error);
@@ -93,15 +102,9 @@ function FollowingOrderContent({ billCode, status, symbol, count, createdBy }) {
 
   const handleRePurchase = async (id) => {
     const data = await token;
-
     await axios
-      .get(`${cartAPI}`, {
-        params: {
-          username: data?.username,
-        },
-      })
+      .get(`${cartAPI}?username=${data?.username}`)
       .then((response) => {
-        console.log(response.data);
         try {
           const cart = {
             username: data?.username,
@@ -141,8 +144,6 @@ function FollowingOrderContent({ billCode, status, symbol, count, createdBy }) {
       });
   };
 
-  const token = getAuthToken();
-
   const userINfo = () => {
     let code = billCode ? billCode : timelines[0]?.billCode;
     axios
@@ -156,10 +157,10 @@ function FollowingOrderContent({ billCode, status, symbol, count, createdBy }) {
   };
 
   useEffect(() => {
-    const getAll = () => {
+    const getAll = async () => {
       setLoading(false);
-      const data = token;
-      axios
+      const data = await token;
+      await axios
         .get(
           `http://localhost:8080/api/client/timelineByUser?username=${data?.username ? data?.username : ""
           }&billCode=${billCode}&status=${status}&symbol=${symbol}&count=${count}&createdBy=${createdBy}`
@@ -239,11 +240,8 @@ function FollowingOrderContent({ billCode, status, symbol, count, createdBy }) {
                       {timelines?.map((timeline) => {
                         return (
                           <Row style={{ margin: 0 }}>
-                            <Col span={3}>
-                              <Carousel
-                                style={{ maxWidth: "300px" }}
-                                autoplay
-                              >
+                            <Col md={3}>
+                              <Carousel autoplay>
                                 {timeline.productImageResponses &&
                                   timeline.productImageResponses.map(
                                     (item) => {
@@ -262,7 +260,7 @@ function FollowingOrderContent({ billCode, status, symbol, count, createdBy }) {
                                   )}
                               </Carousel>
                             </Col>
-                            <Col span={18}>
+                            <Col md={18}>
                               <Space
                                 Space
                                 style={{ width: "100%", marginLeft: "16px" }}
@@ -270,7 +268,7 @@ function FollowingOrderContent({ billCode, status, symbol, count, createdBy }) {
                                 direction="vertical"
                               >
                                 <Row>
-                                  <Col span={24}>
+                                  <Col md={24}>
                                     <div
                                       className="m-5"
                                       style={{
@@ -335,7 +333,7 @@ function FollowingOrderContent({ billCode, status, symbol, count, createdBy }) {
                               </Space>
                             </Col>
                             <Col
-                              span={3}
+                              md={3}
                               style={{
                                 display: "flex",
                                 justifyContent: "flex-end",
@@ -358,7 +356,7 @@ function FollowingOrderContent({ billCode, status, symbol, count, createdBy }) {
                           </Row>
                         );
                       })}
-                      <Col span={24} style={{}}>
+                      <Col md={24} style={{}}>
                         <div
                           style={{
                             display: "flex",
@@ -405,8 +403,8 @@ function FollowingOrderContent({ billCode, status, symbol, count, createdBy }) {
                     <Row
                       style={{ padding: 10, borderBottom: "1px solid gray" }}
                     >
-                      <Col span={3}>
-                        <Carousel style={{ maxWidth: "300px" }} autoplay>
+                      <Col md={8} xxl={4}>
+                        <Carousel autoplay>
                           {timeline.productImageResponses &&
                             timeline.productImageResponses.map((item) => {
                               return (
@@ -420,7 +418,7 @@ function FollowingOrderContent({ billCode, status, symbol, count, createdBy }) {
                             })}
                         </Carousel>
                       </Col>
-                      <Col span={18}>
+                      <Col md={16} xxl={20}>
                         <Space
                           Space
                           style={{ width: "100%", marginLeft: "16px" }}
@@ -428,7 +426,7 @@ function FollowingOrderContent({ billCode, status, symbol, count, createdBy }) {
                           direction="vertical"
                         >
                           <Row>
-                            <Col span={24}>
+                            <Col md={24}>
                               <div
                                 className="m-5"
                                 style={{
@@ -492,7 +490,8 @@ function FollowingOrderContent({ billCode, status, symbol, count, createdBy }) {
                         </Space>
                       </Col>
                       <Col
-                        span={3}
+                        md={6}
+                        xl={24}
                         style={{
                           display: "flex",
                           justifyContent: "flex-end",
@@ -509,8 +508,8 @@ function FollowingOrderContent({ billCode, status, symbol, count, createdBy }) {
                           })}
                         </span>
                       </Col>
-                      <Col span={17}></Col>
-                      <Col span={7}>
+                      <Col md={17}></Col>
+                      <Col md={7}>
                         <Button
                           style={{ marginRight: 20 }}
                           onClick={() => handleOpen(timeline.billId)}
@@ -523,6 +522,7 @@ function FollowingOrderContent({ billCode, status, symbol, count, createdBy }) {
                           onClick={() =>
                             handleRePurchase(timeline.productDetailId)
                           }
+                          className={styles.btnBuyAgain}
                         >
                           Mua lại
                         </Button>
@@ -535,8 +535,7 @@ function FollowingOrderContent({ billCode, status, symbol, count, createdBy }) {
         </div>
       ) : (
         <>Đang tải...</>
-      )
-      }
+      )}
       <ModalConfirm
         isModalOpen={openNote}
         handleCancel={() => setOpenNote(false)}
@@ -548,7 +547,7 @@ function FollowingOrderContent({ billCode, status, symbol, count, createdBy }) {
         handleCancel={handleCancel}
         userInfo={userInfo}
       />
-    </div >
+    </div>
   );
 }
 

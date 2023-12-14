@@ -14,3 +14,9 @@
 .address {
   border: 1px solid #ccc;
 }
+
+@media (max-width: 500px) {
+  .width {
+    width: 100%;
+  }
+}

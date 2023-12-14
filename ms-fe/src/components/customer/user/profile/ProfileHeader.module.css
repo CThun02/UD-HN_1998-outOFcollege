@@ -19,11 +19,20 @@
 .position {
   position: relative;
 }
-
+.fullName {
+  font-size: 2rem;
+  font-weight: 400;
+}
+.ProfileCss {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-evenly;
+}
 .absolute {
   position: absolute;
-  bottom: 50px;
-  left: 300px;
+  width: 100%;
+  bottom: 20%;
 }
 
 .textColor {
@@ -37,4 +46,18 @@
 .textHeader {
   font-size: 1.5rem;
   font-weight: 400;
+}
+
+@media (max-width: 1200px) {
+  .fullName {
+    font-size: 20px;
+    font-weight: 500;
+  }
+  .textSize {
+    font-size: 16px;
+  }
+  .textHeader {
+    font-size: 18px;
+    font-weight: 500;
+  }
 }

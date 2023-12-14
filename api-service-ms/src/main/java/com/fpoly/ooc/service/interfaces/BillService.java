@@ -19,6 +19,7 @@ import com.fpoly.ooc.responce.bill.BillRevenueCompareDate;
 import com.fpoly.ooc.responce.bill.BillRevenueDisplay;
 import com.fpoly.ooc.responce.bill.CountQuantityBillResponse;
 import com.fpoly.ooc.responce.product.ProductDetailSellResponse;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -79,4 +80,6 @@ public interface BillService {
     Bill updateBill(Bill bill);
 
     List<NotificationDTO> findAllNotifications();
+
+    Bill updateBillReturn(Long billId, BigDecimal priceReturn, Boolean mtc);
 }

@@ -4,7 +4,7 @@
 }
 
 .spacing {
-  padding: 0 200px;
+  padding: 0 10%;
 }
 
 .cardBody {
@@ -29,8 +29,7 @@
 }
 
 .sizeBody {
-  width: 370px;
-  height: 365px;
+  height: 400px;
   background-color: #fff;
   position: relative;
   padding: 20px 30px;
@@ -44,7 +43,7 @@
 
 .position {
   position: absolute;
-  bottom: 18px;
+  top: 48%;
   right: 20px;
 }
 
@@ -54,4 +53,10 @@
   font-size: 20px !important;
   font-weight: 500;
   background-color: rgb(47, 193, 255);
+}
+
+@media (max-width: 2100px) {
+  .marginBetween {
+    margin: 0 12px;
+  }
 }

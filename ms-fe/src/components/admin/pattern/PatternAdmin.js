@@ -15,7 +15,7 @@ import styles from "./PatternlStyle.module.css";
 import axios from "axios";
 import { getToken } from "../../../service/Token";
 
-const PatternAdmin = function () {
+const PatternAdmin = function ({ isAdmin }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [render, setRender] = useState();
   const [searchKeyword, setSearchKeyword] = useState("");
@@ -38,12 +38,13 @@ const PatternAdmin = function () {
         },
       })
       .then((response) => {
-        // Xử lý thành công
-        console.log("Thêm thành công");
-        setIsModalVisible(false);
         setRender(Math.random);
-        // Hiển thị thông báo thành công
-        message.success("Thêm thành công");
+        if (response.data) {
+          message.success("Thêm thành công");
+        } else {
+          message.error("Họa tiết đã tồn tại");
+        }
+        setIsModalVisible(false);
       })
       .catch((error) => {
         // Xử lý lỗi
@@ -54,15 +55,6 @@ const PatternAdmin = function () {
             description: "Bạn không có quyền truy cập!",
           });
           return;
-        }
-        if (error.response && error.response.status === 409) {
-          // Nếu lỗi trùng tên mẫu, hiển thị thông báo lỗi
-          Modal.error({
-            title: "Lỗi",
-            content: "Tên loại vải đã tồn tại. Vui lòng chọn tên khác.",
-          });
-        } else {
-          console.error("Lỗi khi thêm dữ liệu", error);
         }
       });
   };
@@ -82,8 +74,8 @@ const PatternAdmin = function () {
               />
             </Row>
           </Col>
-          <Col span={13} offset={1}>
-            <Col span={9} offset={1}>
+          {isAdmin ? (
+            <Col span={14} style={{ textAlign: "end" }}>
               <Button
                 className={styles.btnSeach}
                 type="primary"
@@ -93,10 +85,10 @@ const PatternAdmin = function () {
                 <span className={styles.titleSeach}>Thêm Họa tiết</span>
               </Button>
             </Col>
-          </Col>
+          ) : null}
         </Row>
         <div className={styles.materialTable}>
-          <PatternTable renderTable={render}></PatternTable>
+          <PatternTable isAdmin={isAdmin} renderTable={render}></PatternTable>
         </div>
       </div>
       <Modal

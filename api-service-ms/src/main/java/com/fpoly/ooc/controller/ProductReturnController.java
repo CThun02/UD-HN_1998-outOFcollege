@@ -39,4 +39,9 @@ public class ProductReturnController {
     public ResponseEntity<?> getProductReturnByBillCode(@RequestParam String billCode) {
         return ResponseEntity.ok(service.getProductReturnByBillCode(billCode));
     }
+
+    @GetMapping("/getProductReturnDetailByProductDetailId")
+    public ResponseEntity<?> getProductReturnDetailByProductDetailId(@RequestParam Long productDetailId, @RequestParam String reason) {
+        return ResponseEntity.ok(service.getProductReturnDetailByProductDetailId(productDetailId, reason));
+    }
 }

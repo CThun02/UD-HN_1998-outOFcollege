@@ -1,12 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { Input, Row, Col, Form, Modal, Button, notification } from "antd";
+import {
+  Input,
+  Row,
+  Col,
+  Form,
+  Modal,
+  Button,
+  notification,
+  message,
+} from "antd";
 import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
 import ButtonTable from "./ButtonTable";
 import styles from "../categorystyles/CategoryStyles.module.css";
 import axios from "axios";
 import { getToken } from "../../../service/Token";
 
-const ButtonAdmin = function () {
+const ButtonAdmin = function ({ isAdmin }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [api, contextHolder] = notification.useNotification();
   const [render, setRender] = useState();
@@ -21,22 +30,27 @@ const ButtonAdmin = function () {
 
   const handleSubmit = (values) => {
     // Gọi API để thêm dữ liệu
-    values.status = "ACTIVE";
     axios
-      .post("http://localhost:8080/api/admin/button/create", values, {
-        headers: {
-          Authorization: `Bearer ${getToken(true)}`,
-        },
-      })
+      .post(
+        "http://localhost:8080/api/admin/button/create?buttonTypeName=" +
+          values.buttonName,
+        null,
+        {
+          headers: {
+            Authorization: `Bearer ${getToken(true)}`,
+          },
+        }
+      )
       .then((response) => {
-        // Xử lý thành công
-        console.log("Thêm thành công");
+        setRender(Math.random());
         setIsModalVisible(false);
-        setRender(Math.random);
+        if (response.data) {
+          message.success("Thêm thành công");
+        } else {
+          message.error("Cúc áo đã tồn tại");
+        }
       })
       .catch((error) => {
-        // Xử lý lỗi
-        console.error("Lỗi khi thêm dữ liệu", error);
         const status = error?.response?.data?.status;
         if (status === 403) {
           api.error({
@@ -65,17 +79,17 @@ const ButtonAdmin = function () {
               />
             </Row>
           </Col>
-          <Col span={12} offset={1}>
-            <Col span={5} offset={18}>
+          {isAdmin ? (
+            <Col span={14} style={{ textAlign: "end" }}>
               <Button className={styles.btnSeach} onClick={handleAdd}>
                 <PlusOutlined className={styles.faPlus} />
                 <span className={styles.titleSeach}>Thêm Kiểu Cúc Áo</span>
               </Button>
             </Col>
-          </Col>
+          ) : null}
         </Row>
         <div className={styles.categoryTable}>
-          <ButtonTable renderTable={render}></ButtonTable>
+          <ButtonTable isAdmin={isAdmin} renderTable={render}></ButtonTable>
         </div>
         <Modal
           title="Thêm Kiểu Cúc Áo"

@@ -440,7 +440,8 @@ public class KafkaListenerService {
         }
 
         if(Objects.nonNull(billDb)) {
-            String createBill = objectMapper.writeValueAsString(billRepo.getAllBillManagement(null, null,
+            String createBill = objectMapper.writeValueAsString(billRepo
+                    .getAllBillManagement(null, null,
                     null, null, null, null, null, null));
 
             List<NotificationDTO> notificationList = billRepo.findAllNotifications();

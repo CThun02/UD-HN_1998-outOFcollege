@@ -41,7 +41,7 @@ public class PatternServiceImpl implements PatternServiceI {
             o.setPatternName(pattern.getPatternName());
 
             try {
-                return kafkaUtil.sendingObjectWithKafka(pattern, Const.TOPIC_PATTERN);
+                return kafkaUtil.sendingObjectWithKafka(o, Const.TOPIC_PATTERN);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }

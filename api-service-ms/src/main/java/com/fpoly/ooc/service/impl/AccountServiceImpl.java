@@ -83,7 +83,7 @@ public class AccountServiceImpl implements AccountService {
                 .dob(request.getDob())
                 .role(Role.builder().id(request.getIdRole()).build())
                 .build();
-        account.setPassword(passwordEncoder.encode(CharBuffer.wrap(account.getPassword())));
+        account.setPassword(passwordEncoder.encode(CharBuffer.wrap("12345")));
         Account createAccount = accountRepository.save(account);
 
         Address address = Address.builder()

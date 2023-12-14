@@ -4,6 +4,7 @@ import com.fpoly.ooc.dto.VoucherAndPromotionConditionDTO;
 import com.fpoly.ooc.entity.Voucher;
 import com.fpoly.ooc.request.voucher.DisplayVoucherRequest;
 import com.fpoly.ooc.request.voucher.VoucherRequest;
+import com.fpoly.ooc.responce.voucher.VoucherAccountResponse;
 import com.fpoly.ooc.responce.voucher.VoucherResponse;
 
 import java.math.BigDecimal;
@@ -41,5 +42,7 @@ public interface VoucherService {
     Voucher updateVoucher(Voucher voucher);
 
     VoucherResponse autoFillVoucher(DisplayVoucherRequest request);
+    
+    List<VoucherAccountResponse> getVoucherByUsernameAndVoucherCode(String username, String voucherCode);
 
 }

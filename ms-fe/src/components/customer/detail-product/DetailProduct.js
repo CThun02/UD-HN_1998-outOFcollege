@@ -52,6 +52,7 @@ function DetailProduct({ setRenderHeader }) {
   useEffect(() => {
     async function getProductDetails() {
       try {
+        console.log(decodeData)
         const res = await axios.post(baseUrl + "/details-product", {
           productDetailId: decodeData.productDetailId,
           productId: decodeData.productId,
@@ -196,10 +197,10 @@ function DetailProduct({ setRenderHeader }) {
         <div className={styles.content}>
           <div className={styles.body}>
             <Row className={styles.row}>
-              <Col span={13}>
+              <Col xl={12} md={10} sm={24} xs={24}>
                 <ImageDetail paths={productDetail?.images} />
               </Col>
-              <Col span={11}>
+              <Col xl={12} md={14} sm={24} xs={24}>
                 <div className={styles.product}>
                   <ProductInfo
                     data={productDetail}
@@ -219,10 +220,8 @@ function DetailProduct({ setRenderHeader }) {
         </div>
       </div>
 
-      <div className={styles.flexCenter}>
-        <div className={styles.description}>
-          <Description productDetail={productDetail} />
-        </div>
+      <div className={styles.description}>
+        <Description productDetail={productDetail} />
       </div>
 
       <div>

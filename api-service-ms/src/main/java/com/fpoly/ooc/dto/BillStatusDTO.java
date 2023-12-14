@@ -11,6 +11,8 @@ public class BillStatusDTO {
 
     private String status;
 
+    private String timelineStatus;
+
     private BigDecimal amountPaid;
-    
+
 }

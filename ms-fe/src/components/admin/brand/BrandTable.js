@@ -21,7 +21,7 @@ const BrandTable = function (props) {
   const [currentPage, setCurrentPage] = useState(1);
   const [showModal, setShowModal] = useState(false);
   const [selectedData, setSelectedData] = useState(null);
-  const [api, contextHolderNotification] = notification.useNotification();
+  const [api, contextHolderNotification] = message.useMessage();
 
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [brandName, setBrandName] = useState("");
@@ -32,7 +32,6 @@ const BrandTable = function (props) {
 
   const handleDetails = (item) => {
     setid(item?.id);
-    console.log(item);
     setBrandName(item?.brandName);
     setShowDetailsModal(true);
   };
@@ -42,7 +41,6 @@ const BrandTable = function (props) {
     setSelectedData(id);
   };
   const handleUpdate = () => {
-    let brand = {};
     axios
       .put(
         `http://localhost:8080/api/admin/brand/edit/${id}`,
@@ -57,8 +55,8 @@ const BrandTable = function (props) {
       )
       .then((response) => {
         // Đóng modal
-        setShowDetailsModal(false);
         setRender(Math.random);
+        setShowDetailsModal(false);
         message.success("Cập nhật thành công");
       })
       .catch((err) => {
@@ -73,9 +71,7 @@ const BrandTable = function (props) {
   };
   const handleUpdateStatus = (id, statusUpdate) => {
     let mess = statusUpdate ? "Đang hoạt động" : "Ngưng hoạt động";
-
-    const updatedStatusValue = statusUpdate ? "ACTIVE" : "INACTIVE"; // Cập nhật trạng thái dựa trên giá trị của statusUpdate
-
+    const updatedStatusValue = statusUpdate ? "ACTIVE" : "INACTIVE";
     axios
       .put(
         `http://localhost:8080/api/admin/brand/update/${id}`,
@@ -89,10 +85,8 @@ const BrandTable = function (props) {
         }
       )
       .then((response) => {
-        setRender(Math.random);
-        setTimeout(() => {
-          api.success(mess, 2);
-        }, 500);
+        setRender(Math.random());
+        api.success(mess, 2);
       })
       .catch((error) => {
         const status = error?.response?.data?.status;
@@ -117,11 +111,9 @@ const BrandTable = function (props) {
         },
       })
       .then((response) => {
-        // Xoá dữ liệu thành công
-        // Cập nhật lại danh sách dữ liệu sau khi xoá
+        message.success("Xóa thành công");
         const updatedData = data.filter((item) => item.id !== selectedData);
         setData(updatedData);
-        // Đóng modal
         setShowModal(false);
       })
       .catch((err) => {
@@ -146,7 +138,6 @@ const BrandTable = function (props) {
         })
         .then((response) => {
           setData(response.data);
-          console.log(response.data);
         })
         .catch((err) => {
           const status = err?.response?.data?.status;
@@ -162,7 +153,6 @@ const BrandTable = function (props) {
 
   return (
     <div>
-      {console.log(data)}
       {contextHolderNotification}
       <Table
         pagination={{
@@ -196,6 +186,7 @@ const BrandTable = function (props) {
             render: (status, record) => (
               <>
                 <Switch
+                  disabled={!props.isAdmin}
                   onChange={(checked) => {
                     handleUpdateStatus(record.id, checked);
                   }}
@@ -215,19 +206,23 @@ const BrandTable = function (props) {
             key: "createdBy",
           },
           {
-            title: "Action",
+            title: "Thao tác",
             key: "action",
             render: (_, record) => (
               <Space size="middle">
                 <Button
                   className={styles.btnDetails}
-                  type="link"
+                  disabled={!props.isAdmin}
+                  type="primary"
+                  size="large"
                   onClick={() => handleDetails(record)}
                   icon={<FormOutlined />}
                 />
                 <Button
                   className={styles.btnDetails}
-                  type="link"
+                  disabled={!props.isAdmin}
+                  type="primary"
+                  size="large"
                   onClick={() => handleDelete(record.id)}
                   icon={<DeleteFilled />}
                 />

@@ -956,12 +956,13 @@ const Bill = () => {
       billCode: activeKey,
       accountId: account?.username,
       price: totalPrice,
-      priceReduce: totalPrice - voucherPrice(),
+      priceReduce: voucherPrice(),
       amountPaid: typeShipping[index]
         ? 0
-        : selectedOption === 2
+        : Number(selectedOption) === 2
         ? voucherPrice() + shippingFee
         : amountPaid,
+
       billType: "In-Store",
       symbol: typeShipping[index] ? "Shipping" : symbol,
       status: typeShipping[index]
@@ -981,102 +982,105 @@ const Bill = () => {
       emailDetails: {
         recipient: selectedAddress.email ? [selectedAddress.email] : [email],
         messageBody: `<body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: Arial, sans-serif;">
-        <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="width: 100%; max-width:720px; margin: 0 auto;">
-            <tr>
-                <td align="center" bgcolor="#ffffff" style="padding: 40px 0;">
-                <table style="width: 100%; padding: 0 20px;">
+            <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="width: 100%; max-width:720px; margin: 0 auto;">
                 <tr>
-                    <td style="text-align: left; width: 50%">
-                        <img alt="Logo" src="https://firebasestorage.googleapis.com/v0/b/outofcollge.appspot.com/o/logo%2Flogo_OOC.png?alt=media&token=9dec0335-3b77-4c5b-a278-b5b22b9ecbb4" width="70%" />
-                    </td>
-                    <td style="text-align: right; vertical-align: middle; width: 50%">
-                        <span>Đơn hàng ${activeKey}</span>
-                    </td>
-                </tr>
-            </table>
-                    <div style="padding: 0 20px; margin-top: 24px;">
-                        <span style="font-weight: 500; font-size: 24px;">Cảm ơn bạn đã mua hàng!</span><br><br>
-                        <p style="text-align: justify;">Xin chào ${fullname}, Chúng tôi đã nhận được đặt hàng của bạn và đã sẵn sàng để vận chuyển. Chúng tôi sẽ thông báo cho bạn khi đơn hàng được gửi đi.</p><br>
-                        <div style="text-align: center">
-                            <a style="color: white; font-weight: 500; padding: 16px 20px; border-radius: 4px; background-color: #1666a2; margin-right: 20px;" href="http://localhost:3000/ms-shop/bill/${activeKey}">
-                                Xem đơn hàng
-                            </a>
-                            hoặc <a style="margin-left: 20px;" href="http://localhost:3000/">Đến cửa hàng</a>
-                        </div>
-                        <br>
-                        <hr>
-                        <br>
-                                <span>Thông tin đơn hàng</span>
-                                <div style="margin-top: 8px;">
-                                ${productDetails.map((item, index) => {
-                                  return `<div key={index} style="display: flex; justify-content: space-between; align-items: center; padding: 4px 20px;">
-                                            <div style="width: 20%; padding: 4px;">
-                                                <img alt="product" style="width: 100%; border: 1px solid #ccc; border-radius: 8px;" src=${
-                                                  item.productDetail
-                                                    .productImageResponse[0]
-                                                    .path
-                                                }>
-                                            </div>
-                                            <div style="width: 55%; padding: 4px;">
-                                                <p>${
-                                                  item.productDetail.product
-                                                    .productName +
-                                                  "-" +
-                                                  item.productDetail.button
-                                                    .buttonName +
-                                                  "-" +
-                                                  item.productDetail.brand
-                                                    .brandName +
-                                                  "-" +
-                                                  item.productDetail.category
-                                                    .categoryName +
-                                                  "-" +
-                                                  item.productDetail.collar
-                                                    .materialName +
-                                                  "-" +
-                                                  item.productDetail.color
-                                                    .collarName +
-                                                  "-" +
-                                                  item.productDetail.sleeve
-                                                    .sleeveName +
-                                                  "-" +
-                                                  item.productDetail.shirtTail
-                                                    .shirtTailTypeName +
-                                                  "-" +
-                                                  item.productDetail
-                                                    .patternName +
-                                                  "-" +
-                                                  item.productDetail.formName
-                                                } <span style="display: inline-block">(x ${
-                                    item.quantity
-                                  })</span></p >
-                                            </div >
-  <div style="width: 25%; padding: 4px;">
-    <p>${item.priceReduce?.toLocaleString("vi-VN", {
-      style: "currency",
-      currency: "VND",
-    })}</p>
-  </div >
-                                        </div > `;
-                                })}
-<hr>
-  <div style="width: 70%; float: right; padding: 4px 20px;">
-    <div style="display: flex; justify-content: space-between; padding: 4px 0;">
-      <span>Tổng giá trị sản phẩm:</span>
-      <span style="font-weight: 500;">
-        ${(voucherPrice() + (shippingFee ?? 0))?.toLocaleString("vi-VN", {
+
+                    <td align="center" bgcolor="#ffffff" style="padding: 40px 0;">
+                    <table style="width: 100%; padding: 0 20px;">
+                    <tr>
+                        <td style="text-align: left; width: 50%">
+                            <img alt="Logo" src="https://firebasestorage.googleapis.com/v0/b/outofcollge.appspot.com/o/logo%2Flogo_OOC.png?alt=media&token=9dec0335-3b77-4c5b-a278-b5b22b9ecbb4" width="70%" />
+                        </td>
+                        <td style="text-align: right; vertical-align: middle; width: 50%">
+                            <span>Đơn hàng ${activeKey}</span>
+                        </td>
+                    </tr>
+                </table>
+                        <div style="padding: 0 20px; margin-top: 24px;">
+                            <span style="font-weight: 500; font-size: 24px;">Cảm ơn bạn đã mua hàng!</span><br><br>
+                            <p style="text-align: justify;">Xin chào ${fullname}, Chúng tôi đã nhận được đặt hàng của bạn và đã sẵn sàng để vận chuyển. Chúng tôi sẽ thông báo cho bạn khi đơn hàng được gửi đi.</p><br>
+                            <div style="text-align: center">
+                                <a style="color: white; font-weight: 500; padding: 16px 20px; border-radius: 4px; background-color: #1666a2; margin-right: 20px;" href="http://localhost:3000/ms-shop/bill/${activeKey}">
+                                    Xem đơn hàng
+                                </a>
+                                hoặc <a style="margin-left: 20px;" href="http://localhost:3000/">Đến cửa hàng</a>
+                            </div>
+                            <br>
+                            <hr>
+                            <br>
+                                    <span>Thông tin đơn hàng</span>
+                                    <div style="margin-top: 8px;">
+                                    ${productDetails.map((item, index) => {
+                                      return `<div key={index} style="display: flex; justify-content: space-between; align-items: center; padding: 4px 20px;">
+                                                <div style="width: 20%; padding: 4px;">
+                                                    <img alt="product" style="width: 100%; border: 1px solid #ccc; border-radius: 8px;" src=${
+                                                      item.productDetail
+                                                        .productImageResponse[0]
+                                                        .path
+                                                    }>
+                                                </div>
+                                                <div style="width: 55%; padding: 4px;">
+                                                    <p>${
+                                                      item.productDetail.product
+                                                        .productName +
+                                                      "-" +
+                                                      item.productDetail.button
+                                                        .buttonName +
+                                                      "-" +
+                                                      item.productDetail.brand
+                                                        .brandName +
+                                                      "-" +
+                                                      item.productDetail
+                                                        .category.categoryName +
+                                                      "-" +
+                                                      item.productDetail.collar
+                                                        .materialName +
+                                                      "-" +
+                                                      item.productDetail.color
+                                                        .collarName +
+                                                      "-" +
+                                                      item.productDetail.sleeve
+                                                        .sleeveName +
+                                                      "-" +
+                                                      item.productDetail
+                                                        .shirtTail
+                                                        .shirtTailTypeName +
+                                                      "-" +
+                                                      item.productDetail
+                                                        .patternName +
+                                                      "-" +
+                                                      item.productDetail
+                                                        .formName
+                                                    } <span style="display: inline-block">(x ${
+                                        item.quantity
+                                      })</span></p >
+                                                </div >
+      <div style="width: 25%; padding: 4px;">
+        <p>${item.priceReduce?.toLocaleString("vi-VN", {
           style: "currency",
           currency: "VND",
-        })}
-      </span>
+        })}</p>
+      </div >
+                                            </div > `;
+                                    })}
+    <hr>
+      <div style="width: 70%; float: right; padding: 4px 20px;">
+        <div style="display: flex; justify-content: space-between; padding: 4px 0;">
+          <span>Tổng giá trị sản phẩm:</span>
+          <span style="font-weight: 500;">
+            ${(voucherPrice() + (shippingFee ?? 0))?.toLocaleString("vi-VN", {
+              style: "currency",
+              currency: "VND",
+            })}
+          </span>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
-                    </div >
-                </td >
-            </tr >
-        </table >
-    </body > `,
+                        </div >
+                    </td >
+                </tr >
+            </table >
+        </body > `,
         subject: `THÔNG BÁO XÁC NHẬN ĐƠN HÀNG ${activeKey} `,
       },
     };

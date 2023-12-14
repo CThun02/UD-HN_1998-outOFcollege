@@ -589,17 +589,14 @@ const Checkout = ({ setRenderHeader }) => {
                 productDetails[i].cartDetailResponse.productDetailId,
               price: productDetails[i]?.promotion[0]
                 ? (productDetails[i]?.promotion[0]?.promotionMethod === "vnd"
-                  ? productDetails[i].cartDetailResponse?.quantity *
-                  productDetails[i]?.cartDetailResponse
+                  ? productDetails[i]?.cartDetailResponse
                     ?.priceProductDetail -
                   productDetails[i]?.promotion[0]?.promotionValue
                   : ((100 - productDetails[i]?.promotion[0]?.promotionValue) /
                     100) *
                   productDetails[i]?.cartDetailResponse
-                    ?.priceProductDetail) *
-                productDetails[i].cartDetailResponse?.quantity
-                : productDetails[i].cartDetailResponse?.quantity *
-                productDetails[i]?.cartDetailResponse?.priceProductDetail,
+                    ?.priceProductDetail)
+                : productDetails[i]?.cartDetailResponse?.priceProductDetail,
               quantity: productDetails[i].cartDetailResponse.quantity,
             };
             formData.lstBillDetailRequest.push(billDetail);
@@ -611,16 +608,14 @@ const Checkout = ({ setRenderHeader }) => {
               price: productDetails[i].data[0].promotion[0]
                 ? (productDetails[i].data[0].promotion[0]?.promotionMethod ===
                   "vnd"
-                  ? productDetails[i].data[0].price *
-                  productDetails[i]?.quantity -
+                  ? productDetails[i].data[0].price -
                   productDetails[i].data[0].promotion[0]?.promotionValue
                   : ((100 -
                     productDetails[i].data[0].promotion[0]
                       ?.promotionValue) /
                     100) *
-                  productDetails[i].data[0].price) *
-                productDetails[i]?.quantity
-                : productDetails[i].data[0].price * productDetails[i]?.quantity,
+                  productDetails[i].data[0].price)
+                : productDetails[i].data[0].price,
               quantity: productDetails[i].quantity,
             };
             formData.lstBillDetailRequest.push(billDetail);
@@ -1267,12 +1262,8 @@ const Checkout = ({ setRenderHeader }) => {
                                               ?.promotionValue) /
                                             100) *
                                           productDetail?.cartDetailResponse
-                                            ?.priceProductDetail) *
-                                        productDetail.cartDetailResponse
-                                          ?.quantity
-                                        : productDetail.cartDetailResponse
-                                          ?.quantity *
-                                        productDetail?.cartDetailResponse
+                                            ?.priceProductDetail)
+                                        : productDetail?.cartDetailResponse
                                           ?.priceProductDetail
                                     ).format("0,0") + "đ"}
                                   </div>

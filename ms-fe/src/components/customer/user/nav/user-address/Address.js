@@ -3,8 +3,10 @@ import styles from "./Address.module.css";
 import { Col, DatePicker, Form, Input, Modal, Radio, Row, Space } from "antd";
 import { PlusCircleOutlined } from "@ant-design/icons";
 import { useState } from "react";
+import EditAddress from "../../../../element/edit-address/EditAddress";
 
 function Address({ address, setIsRender }) {
+  const [open, setOpen] = useState(false)
   return (
     <div className={styles.address}>
       <div className={styles.content}>
@@ -27,8 +29,13 @@ function Address({ address, setIsRender }) {
                     style={{
                       fontSize: "1.25rem",
                     }}
+                    onClick={() => setOpen(true)}
                     className={styles.plusIcon}
                   />
+                  {open && <EditAddress
+                    isModalOpen={open}
+                    handleAddressCancel={() => setOpen(false)}
+                  />}
                 </Col>
               )}
             </Row>

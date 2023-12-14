@@ -41,6 +41,7 @@ const BillManagement = () => {
   const [count, setCount] = useState("");
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
+  const [filterStatus, setFilterStatus] = useState(null)
 
   const onRangeChange = (dates, dateStrings) => {
     if (dates) {
@@ -195,7 +196,7 @@ const BillManagement = () => {
       key: "action",
       render: (text, record) => {
         return (
-          <Link to={`/api/admin/counter-sales/${record.billId}/timeline`}>
+          <Link to={filterStatus === "ReturnS" ? `/api/admin/return/return-bill/${record.billCode}` : `/api/admin/counter-sales/${record.billId}/timeline`}>
             <Button>
               <EyeOutlined />
             </Button>
@@ -245,6 +246,7 @@ const BillManagement = () => {
   }, [billCode, startDate, endDate, status, createdBy, symbol, count, billType]);
 
   const onChangeBill = (e) => {
+    setFilterStatus(e);
     if (e === "") {
       setStatus("");
       setcreatedBy("");
@@ -265,6 +267,11 @@ const BillManagement = () => {
       setcreatedBy("");
       setSymbol("Shipping");
       setCount(2);
+    } else if (e === 'ReturnS') {
+      setStatus(e);
+      setcreatedBy("");
+      setSymbol("");
+      setCount("");
     } else {
       setStatus(e);
       setcreatedBy("");
@@ -356,7 +363,7 @@ const BillManagement = () => {
                                   ? countBill?.paid
                                   : id === "8"
                                     ? countBill?.unpaid
-                                    : null
+                                    : id === '9' ? countBill.returnS : null
                   }
                 >
                   <span style={{ padding: "20px" }}>

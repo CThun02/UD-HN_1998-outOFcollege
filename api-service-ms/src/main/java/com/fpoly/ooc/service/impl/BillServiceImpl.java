@@ -32,6 +32,7 @@ import com.fpoly.ooc.service.interfaces.EmailService;
 import com.fpoly.ooc.service.interfaces.ProductDetailServiceI;
 import com.fpoly.ooc.service.interfaces.ProductImageServiceI;
 import com.fpoly.ooc.service.interfaces.VoucherAccountService;
+import com.fpoly.ooc.service.interfaces.VoucherHistoryService;
 import com.fpoly.ooc.service.interfaces.VoucherService;
 import com.fpoly.ooc.service.kafka.KafkaUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -65,7 +66,7 @@ public class BillServiceImpl implements BillService {
     private TimeLineRepo timeLineRepo;
 
     @Autowired
-    private VoucherHistoryRepository voucherHistoryRepository;
+    private VoucherHistoryService voucherHistoryService;
 
     @Autowired
     private ProductImageServiceI productImageService;
@@ -175,7 +176,7 @@ public class BillServiceImpl implements BillService {
                     .priceReduce(bill.getPriceReduce())
                     .voucherCode(request.getVoucherCode())
                     .build();
-            voucherHistoryRepository.save(voucherHistory);
+            voucherHistoryService.saveVoucherHistory(voucherHistory);
 
             if (request.getAccountId() != null && request.getVoucherCode() != null) {
                 VoucherAccount voucherAccount =
@@ -232,6 +233,8 @@ public class BillServiceImpl implements BillService {
                 "Paid", null, null, null, billType).size());
         countQuantityBillResponse.setUnpaid(billRepo.getAllBillManagement(null, startDate, endDate,
                 "UnPaid", null, null, null, billType).size());
+        countQuantityBillResponse.setReturnS(billRepo.getAllBillManagement(null, startDate, endDate,
+                "ReturnS", null, null, null, billType).size());
         return countQuantityBillResponse;
     }
 
@@ -270,9 +273,21 @@ public class BillServiceImpl implements BillService {
 
         billRepo.save(bill);
         if (dto.getStatus().equals("Cancel")) {
-//            VoucherAccount voucherAccount = voucherAccountService.findVoucherAccountByUsernameAndVoucherCode();
-//             voucherAccount.setStatus(Const.STATUS_ACTIVE);
-//             voucherAccountService.updateStatus(voucherAccount);
+            VoucherHistory voucherHistory = voucherHistoryService.findHistoryByBillCode(bill.getBillCode());
+            if(voucherHistory != null){
+                VoucherAccount voucherAccount = voucherAccountService
+                        .findVoucherAccountByUsernameAndVoucherCode(bill.getAccount().getUsername(), voucherHistory.getVoucherCode());
+                Voucher voucher = null;
+                if (voucherAccount != null) {
+                    voucherAccount.setStatus(Const.STATUS_ACTIVE);
+                    voucher = voucherAccount.getVoucherAccount();
+                    voucherAccountService.updateStatus(voucherAccount);
+                } else {
+                    voucher = voucherService.findVoucherByVoucherCode(voucherHistory.getVoucherCode());
+                }
+                voucher.setLimitQuantity(voucher.getLimitQuantity() + 1);
+                voucherService.updateVoucher(voucher);
+            }
         }
         kafkaUtil.sendingObjectWithKafka(dto, Const.TOPIC_TIME_LINE);
         return 1;
@@ -469,7 +484,7 @@ public class BillServiceImpl implements BillService {
 
     @Override
     public Bill updateBill(Bill bill) {
-        VoucherHistory voucherHistory = voucherHistoryRepository.findVoucherHistoryByBill_BillCode(bill.getBillCode());
+        VoucherHistory voucherHistory = voucherHistoryService.findHistoryByBillCode(bill.getBillCode());
         BigDecimal price = bill.getPrice();
         BigDecimal priceReduce = BigDecimal.valueOf(0);
         if (voucherHistory != null) {

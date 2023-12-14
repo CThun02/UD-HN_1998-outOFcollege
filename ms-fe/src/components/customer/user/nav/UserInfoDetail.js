@@ -2,9 +2,11 @@ import {
   Avatar,
   Button,
   Col,
+  DatePicker,
   Form,
   Input,
   Modal,
+  Radio,
   Row,
   Space,
   notification,
@@ -389,6 +391,35 @@ function EditUser({ setIsModalOpen, isModalOpen, user, setIsRender }) {
               size="large"
               className={styles.input}
             />
+          </Form.Item>
+          <Form.Item
+            name="gender"
+            rules={[
+              {
+                required: true,
+                message: '* Vui lòng chọn giới tính',
+              },
+            ]}
+          >
+            <Radio.Group>
+              <Radio value={true}>Nam</Radio>
+              <Radio value={false}>Nữ</Radio>
+            </Radio.Group>
+          </Form.Item>
+          <Form.Item
+            name={"dob"}
+            rules={[
+              {
+                type: "dob",
+                message: "* Vui lòng nhập đúng định dạng Email",
+              },
+              {
+                required: true,
+                message: "* Không được bỏ trống",
+              },
+            ]}
+          >
+            <DatePicker onChange={(date, dateString) => console.log(date, dateString)} />
           </Form.Item>
         </Space>
       </Form>

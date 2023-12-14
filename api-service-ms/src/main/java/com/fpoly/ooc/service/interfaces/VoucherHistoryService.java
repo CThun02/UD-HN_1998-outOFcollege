@@ -9,4 +9,8 @@ public interface VoucherHistoryService {
 
     VoucherHistory save(VoucherHistorySaveDTO dto);
 
+    VoucherHistory findHistoryByBillCode(String billCode);
+
+    VoucherHistory saveVoucherHistory(VoucherHistory voucherHistory);
+
 }

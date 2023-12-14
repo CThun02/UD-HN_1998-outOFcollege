@@ -446,47 +446,44 @@ const BillTimeLine = (addId) => {
                                     timlinesDisplay.map((data, index) => (
                                         <TimelineEvent
                                             key={index}
-                                            color={data?.status === "0" ? "#FF0000" : "#00cc00"}
+                                            color={
+                                                data.status === "0" || data.status === "-1"
+                                                    ? "#FF0000"
+                                                    : data.status === "5"
+                                                        ? "#f0ad4e"
+                                                        : "#00cc00"
+                                            }
                                             icon={
-                                                data?.status === "1"
+                                                data.status === "1"
                                                     ? FaRegFileAlt
-                                                    : data?.status === "0"
+                                                    : data.status === "0"
                                                         ? FaTimes
-                                                        : data?.status === "2"
+                                                        : data.status === "2"
                                                             ? FaRegFileAlt
-                                                            : data?.status === "3"
+                                                            : data.status === "3"
                                                                 ? FaTruck
-                                                                : data?.status === "4"
-                                                                    ? FaTruck
-                                                                    : data?.status === "5"
-                                                                        ? FaTruck
-                                                                        : data?.status === 'Update' ? CheckCircleOutlined
-                                                                            : data?.status === 'Delete' ? DeleteRowOutlined
-                                                                                : data?.status === 'confirm' ? DeleteRowOutlined
-                                                                                    : data?.status === 'rollback' ? DeleteRowOutlined
-                                                                                        : null
+                                                                : CheckCircleOutlined
                                             }
                                             title={
-                                                data?.status === "0" ? (
+                                                data.status === "0" ? (
                                                     <h3>Đã hủy</h3>
-                                                ) : data?.status === "1" ? (
+                                                ) : data.status === "1" ? (
                                                     <h3>Chờ xác nhận</h3>
-                                                ) : data?.status === "2" ? (
+                                                ) : data.status === "2" ? (
                                                     <h3>Chờ giao hàng</h3>
-                                                ) : data?.status === "3" ? (
+                                                ) : data.status === "3" ? (
                                                     <h3>
                                                         Đã đóng gói & <br /> đang được giao
                                                     </h3>
-                                                ) : data?.status === "4" ? (
+                                                ) : data.status === "4" ? (
                                                     <h3>Giao hàng thành công</h3>
-                                                ) : data?.status === "5" ? (
-                                                    <h3>Yêu cầu trả hàng</h3>
-                                                ) : data?.status === "6" ? (
+                                                ) : data.status === "5" ? (
+                                                    <h3>yêu cầu trả hàng</h3>
+                                                ) : data.status === "-1" ? (
+                                                    <h3>Trả hàng thất bại</h3>
+                                                ) : (
                                                     <h3>Trả hàng thành công</h3>
-                                                ) : data?.status === 'Update' ? (<h3>
-                                                    Cập nhật sản phẩm
-                                                </h3>) : data?.status === 'Delete' ? (<h3>Xóa sản phẩm</h3>) : data?.status === 'Confirm' ? (<h3>Chờ giao hàng</h3>) : data?.status === 'Rollback'
-                                                    ? (<h3>Quay lại xác nhận</h3>) : (<h3>.</h3>)
+                                                )
                                             }
                                             subtitle={data.createdDate}
                                         />
@@ -535,10 +532,13 @@ const BillTimeLine = (addId) => {
                     </div>
                 </div>
                 <div className={styles.btnHeader} style={{ marginTop: 24 }}>
-                    {billInfo?.symbol !== "Received" &&
-                        timelines[timelines.length - 1]?.status !== '4' &&
-                        timelines[timelines.length - 1]?.status !== '5' &&
-                        timelines[timelines.length - 1]?.status !== "0" && (
+                    {(billInfo?.symbol !== "Received" &&
+                        (String(timelines[timelines.length - 1]?.status) !== '4' &&
+                            String(timelines[timelines.length - 1]?.status) !== '5' &&
+                            String(timelines[timelines.length - 1]?.status) !== "0" &&
+                            String(timelines[timelines.length - 1]?.status) !== "6"))
+                        &&
+                        (
                             <>
                                 <Button
                                     type="primary"
@@ -566,9 +566,11 @@ const BillTimeLine = (addId) => {
                             Quay trở lại xác nhận
                         </Button>}
                     {billInfo?.symbol !== "Received" &&
-                        timelines[timelines.length - 1]?.status !== "3" &&
-                        timelines[timelines.length - 1]?.status !== '4' &&
-                        timelines[timelines.length - 1]?.status !== "0" && (
+                        String(timelines[timelines.length - 1]?.status) !== "3" &&
+                        String(timelines[timelines.length - 1]?.status) !== '4' &&
+                        String(timelines[timelines.length - 1]?.status) !== "0" &&
+                        String(timelines[timelines.length - 1]?.status) !== "6" &&
+                        (
                             <Button
                                 type="primary"
                                 danger
@@ -769,16 +771,13 @@ const BillTimeLine = (addId) => {
                                     </Col>
                                     <Col span={14}>
                                         <span>
-                                            {billInfo?.amountPaid +
-                                                billInfo?.priceReduce -
-                                                billInfo.shipPrice -
-                                                billInfo.totalPrice <=
-                                                0
-                                                ? "__"
-                                                : billInfo?.amountPaid +
-                                                billInfo?.priceReduce -
-                                                billInfo.shipPrice -
-                                                billInfo.totalPrice}
+                                            {(billInfo?.amountPaid -
+                                                billInfo?.priceReduce +
+                                                billInfo.shipPrice).toLocaleString("vi-VN", {
+                                                    style: "currency",
+                                                    currency: "VND",
+                                                })
+                                            }
                                         </span>
                                     </Col>
                                 </Row>
@@ -844,7 +843,7 @@ const BillTimeLine = (addId) => {
                         <span style={{ width: "200px", display: "inline-block" }}>
                             Giảm giá:
                         </span>
-                        <span>{numeral(billInfo?.priceReduce > 0 ? billInfo?.priceReduce : 0)?.format("0,0") + "đ"}</span>
+                        <span>{numeral(billInfo?.price - billInfo?.priceReduce)?.format("0,0") + "đ"}</span>
                     </span>
                     <b className={styles.span}>
                         <span style={{ width: "200px", display: "inline-block" }}>
@@ -852,7 +851,7 @@ const BillTimeLine = (addId) => {
                         </span>
                         <span style={{ fontSize: "16px", color: "#FF0000" }}>
                             {numeral(
-                                billInfo?.totalPrice + billInfo?.shipPrice - billInfo.priceReduce
+                                billInfo?.priceReduce + billInfo?.shipPrice
                             ).format(0, 0) + "đ"}
                         </span>
                     </b>

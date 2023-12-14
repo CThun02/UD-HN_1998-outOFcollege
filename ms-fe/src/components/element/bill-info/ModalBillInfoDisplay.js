@@ -128,13 +128,13 @@ const ModalBillInfoDisplay = ({ open, cancel, billCode }) => {
                                                 </Text>
                                             </View>
                                             <View style={{ flex: 1 }}>
-                                                <Text>{item.productPrice}</Text>
+                                                <Text>{item.productPrice.toLocaleString("vi-VN", { style: "currency", currency: "VND" })}</Text>
                                             </View>
                                             <View style={{ flex: 1 }}>
                                                 <Text>{item.quantity}</Text>
                                             </View>
                                             <View style={{ flex: 1 }}>
-                                                <Text>{item.quantity * item.productPrice}</Text>
+                                                <Text>{Number(item.quantity * item.productPrice)?.toLocaleString("vi-VN", { style: "currency", currency: "VND" })}</Text>
                                             </View>
                                         </View>
                                     ))}
@@ -144,7 +144,7 @@ const ModalBillInfoDisplay = ({ open, cancel, billCode }) => {
                                         <Text>Tổng giá trị hóa đơn: {bill.totalPrice.toLocaleString("vi-VN", { style: "currency", currency: "VND" })}</Text>
                                         <Text>Tổng tiền thanh toán: {(bill.totalPrice + (bill.shippingFee ?? 0)).toLocaleString("vi-VN", { style: "currency", currency: "VND" })}</Text>
                                         <Text>Tổng tiền khách trả: {bill.amountPaid?.toLocaleString("vi-VN", { style: "currency", currency: "VND" })}</Text>
-                                        <Text>Tổng tiền trả lại: {(bill.amountPaid - (bill.totalPrice + bill.shippingFee)).toLocaleString("vi-VN", { style: "currency", currency: "VND" })}</Text>
+                                        <Text>Tổng tiền trả lại: {(bill.amountPaid - (bill?.priceReduce + bill.shippingFee)).toLocaleString("vi-VN", { style: "currency", currency: "VND" })}</Text>
                                     </View>
                                     <View style={{ flex: 1 }}>
                                         <Text>

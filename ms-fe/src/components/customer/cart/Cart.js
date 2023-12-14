@@ -381,7 +381,7 @@ const Cart = (props) => {
                       "-" +
                       record?.cartDetailResponse.sleeveType.sleeveName +
                       "-" +
-                      record?.cartDetailResponse.shirtTailType.shirtTailName +
+                      record?.cartDetailResponse.shirtTailType.shirtTailTypeName +
                       "-" +
                       record?.cartDetailResponse.pattern.patternName +
                       "-" +

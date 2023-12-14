@@ -1208,35 +1208,25 @@ const Checkout = ({ setRenderHeader }) => {
                                   </div>
                                   <div style={{ width: 256 }}>
                                     <span>
-                                      {productDetail?.cartDetailResponse
-                                        .productName +
+                                      {productDetail?.cartDetailResponse.productName +
                                         "-" +
-                                        productDetail?.cartDetailResponse
-                                          .buttonName +
+                                        productDetail?.cartDetailResponse.button.buttonName +
                                         "-" +
-                                        productDetail?.cartDetailResponse
-                                          .brandName +
+                                        productDetail?.cartDetailResponse.brand.brandName +
                                         "-" +
-                                        productDetail?.cartDetailResponse
-                                          .categoryName +
+                                        productDetail?.cartDetailResponse.category.categoryName +
                                         "-" +
-                                        productDetail?.cartDetailResponse
-                                          .materialName +
+                                        productDetail?.cartDetailResponse.material.materialName +
                                         "-" +
-                                        productDetail?.cartDetailResponse
-                                          .collarName +
+                                        productDetail?.cartDetailResponse.collarType.collarTypeName +
                                         "-" +
-                                        productDetail?.cartDetailResponse
-                                          .sleeveName +
+                                        productDetail?.cartDetailResponse.sleeveType.sleeveName +
                                         "-" +
-                                        productDetail?.cartDetailResponse
-                                          .shirtTailTypeName +
+                                        productDetail?.cartDetailResponse.shirtTailType.shirtTailTypeName +
                                         "-" +
-                                        productDetail?.cartDetailResponse
-                                          .patternName +
+                                        productDetail?.cartDetailResponse.pattern.patternName +
                                         "-" +
-                                        productDetail?.cartDetailResponse
-                                          .formName}
+                                        productDetail?.cartDetailResponse.form.formName}
                                     </span>
                                     <div
                                       style={{
@@ -1250,14 +1240,14 @@ const Checkout = ({ setRenderHeader }) => {
                                           width: 20,
                                           borderRadius: "50%",
                                           backgroundColor:
-                                            productDetail?.cartDetailResponse
+                                            productDetail?.cartDetailResponse.color
                                               .colorCode,
                                         }}
                                       ></div>
                                       /
                                       <span>
                                         {
-                                          productDetail?.cartDetailResponse
+                                          productDetail?.cartDetailResponse.size
                                             .sizeName
                                         }
                                       </span>

@@ -27,4 +27,6 @@ public class CountQuantityBillResponse {
 
     private Integer unpaid;
 
+    private Integer returnS;
+
 }

@@ -7,6 +7,8 @@ import com.fpoly.ooc.entity.Bill;
 import com.fpoly.ooc.entity.Voucher;
 import com.fpoly.ooc.entity.VoucherHistory;
 import com.fpoly.ooc.exception.NotFoundException;
+import com.fpoly.ooc.repository.VoucherHistoryRepository;
+import com.fpoly.ooc.repository.VoucherRepository;
 import com.fpoly.ooc.service.interfaces.BillService;
 import com.fpoly.ooc.service.interfaces.VoucherHistoryService;
 import com.fpoly.ooc.service.interfaces.VoucherService;
@@ -21,12 +23,13 @@ public class VoucherHistoryServiceImpl implements VoucherHistoryService {
     @Autowired
     private VoucherService voucherService;
 
+
     @Autowired
-    private BillService billService;
+    private VoucherHistoryRepository voucherHistoryRepository;
 
     @Override
     public VoucherHistory save(VoucherHistorySaveDTO dto) {
-
+        BillService billService = new BillServiceImpl();
         if(voucherService.isCheckTimeUse(dto.getVoucherCode(), null)) {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.VOUCHER_END_OF_USE));
         }
@@ -39,5 +42,15 @@ public class VoucherHistoryServiceImpl implements VoucherHistoryService {
         voucherHistory.setBill(bill);
 
         return null;
+    }
+
+    @Override
+    public VoucherHistory findHistoryByBillCode(String billCode) {
+        return voucherHistoryRepository.findVoucherHistoryByBill_BillCode(billCode);
+    }
+
+    @Override
+    public VoucherHistory saveVoucherHistory(VoucherHistory voucherHistory) {
+        return voucherHistoryRepository.save(voucherHistory);
     }
 }

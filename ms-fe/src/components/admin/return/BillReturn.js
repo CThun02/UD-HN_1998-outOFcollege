@@ -36,7 +36,7 @@ import { Timeline, TimelineEvent } from "@mailtop/horizontal-timeline";
 import ModalDetail from "../sale-couter/ModalDetail";
 
 var productsReturns = [];
-const BillReturn = () => {
+const BillReturn = ({ name }) => {
   const { billCode } = useParams();
   const navigate = useNavigate();
   const token = getAuthToken(true);
@@ -174,7 +174,7 @@ const BillReturn = () => {
                 onChange={(e) => {
                   if (
                     Math.abs(Number(e.target.value)) >
-                      Number(record.quantity) ||
+                    Number(record.quantity) ||
                     Number(e.target.value) === 0
                   ) {
                     setQuantity(1);
@@ -252,7 +252,7 @@ const BillReturn = () => {
             },
           }
         )
-        .then((response) => {})
+        .then((response) => { })
         .catch((error) => {
           const status = error.response.status;
           if (status === 403) {
@@ -277,7 +277,7 @@ const BillReturn = () => {
             Authorization: `Bearer ${getToken(true)}`,
           },
         })
-        .then((response) => {})
+        .then((response) => { })
         .catch((error) => {
           const status = error.response.status;
           if (status === 403) {
@@ -301,14 +301,13 @@ const BillReturn = () => {
   function changeStatusBillDetail(id, status) {
     axios
       .put(
-        `http://localhost:8080/api/admin/bill/billDetail/change-status?status=${
-          status === "5" || status === "3"
-            ? "ReturnW"
-            : status === "-1"
+        `http://localhost:8080/api/admin/bill/billDetail/change-status?status=${status === "5" || status === "3"
+          ? "ReturnW"
+          : status === "-1"
             ? "ReturnC"
             : status === "ACTIVE"
-            ? "ACTIVE"
-            : "ReturnS"
+              ? "ACTIVE"
+              : "ReturnS"
         }`,
         id,
         {
@@ -371,7 +370,7 @@ const BillReturn = () => {
     await axios
       .get(
         `http://localhost:8080/api/admin/bill/getBillByBillCode?billCode=` +
-          billCode,
+        billCode,
         {
           headers: {
             Authorization: `Bearer ${getToken(true)}`,
@@ -385,7 +384,7 @@ const BillReturn = () => {
           if (
             response.data.status !== "Complete" ||
             now.getTime() - new Date(response.data.completionDate).getTime() >
-              sevenDay
+            sevenDay
           ) {
             navigate("/api/admin/return");
           }
@@ -406,11 +405,13 @@ const BillReturn = () => {
 
   useEffect(() => {
     if (billCode) {
-      searchBill();
+      if (name !== "bill") {
+        searchBill();
+      }
       axios
         .get(
           "http://localhost:8080/api/admin/product-return/getProductReturnByBillCode?billCode=" +
-            billCode,
+          billCode,
           {
             headers: {
               Authorization: `Bearer ${getToken(true)}`,
@@ -421,7 +422,7 @@ const BillReturn = () => {
           axios
             .get(
               `http://localhost:8080/api/admin/bill/getBillReturnByBillCode?billCode=` +
-                billCode,
+              billCode,
               {
                 headers: {
                   Authorization: `Bearer ${getToken(true)}`,
@@ -460,9 +461,9 @@ const BillReturn = () => {
               ) {
                 if (
                   response.data.billDetails[index].billDetailStatus ===
-                    "ReturnW" ||
+                  "ReturnW" ||
                   response.data.billDetails[index].billDetailStatus ===
-                    "ReturnS"
+                  "ReturnS"
                 ) {
                   if (
                     !productsReturns.some(
@@ -547,19 +548,19 @@ const BillReturn = () => {
                           data.status === "0" || data.status === "-1"
                             ? "#FF0000"
                             : data.status === "5"
-                            ? "#f0ad4e"
-                            : "#00cc00"
+                              ? "#f0ad4e"
+                              : "#00cc00"
                         }
                         icon={
                           data.status === "1"
                             ? FaRegFileAlt
                             : data.status === "0"
-                            ? FaTimes
-                            : data.status === "2"
-                            ? FaRegFileAlt
-                            : data.status === "3"
-                            ? FaTruck
-                            : CheckCircleOutlined
+                              ? FaTimes
+                              : data.status === "2"
+                                ? FaRegFileAlt
+                                : data.status === "3"
+                                  ? FaTruck
+                                  : CheckCircleOutlined
                         }
                         title={
                           data.status === "0" ? (
@@ -595,21 +596,21 @@ const BillReturn = () => {
                           data.status === "0" || data.status === "-1"
                             ? "#FF0000"
                             : data.status === "3"
-                            ? "#f0ad4e"
-                            : "#00cc00"
+                              ? "#f0ad4e"
+                              : "#00cc00"
                         }
                         icon={
                           data.status === "1"
                             ? FaRegFileAlt
                             : data.status === "0"
-                            ? FaTimes
-                            : data.status === "2"
-                            ? FaRegCheckCircle
-                            : data.status === "3"
-                            ? FaClock
-                            : data.status === "4"
-                            ? FaRocket
-                            : null
+                              ? FaTimes
+                              : data.status === "2"
+                                ? FaRegCheckCircle
+                                : data.status === "3"
+                                  ? FaClock
+                                  : data.status === "4"
+                                    ? FaRocket
+                                    : null
                         }
                         title={
                           data.status === "1" ? (

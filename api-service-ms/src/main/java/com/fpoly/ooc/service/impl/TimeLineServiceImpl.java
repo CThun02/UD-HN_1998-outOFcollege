@@ -201,7 +201,7 @@ public class TimeLineServiceImpl implements TimeLineService {
     }
 
     @Override
-    public List<TimelineProductDisplayResponse> getListTimelineByUser(String username,
+    public List<TimelineProductDisplayResponse> getListTimelineByUser(String username,get
                                                                       String billCode,
                                                                       String status,
                                                                       String symbol,

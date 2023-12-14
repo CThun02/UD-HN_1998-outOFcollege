@@ -37,9 +37,6 @@ public class ProductReturnService implements ProductReturnServiceI {
     public ProductReturn create(ProductReturnRequest request) {
         ProductReturn productReturn = request.dto();
         productReturn.setReason(request.getReason()== null?"PRODUCE":"OTHER");
-        Bill bill = billService.findBillByBillId(request.getBillId());
-        bill.setPriceReduce(bill.getPriceReduce().subtract(request.getPrice().multiply(BigDecimal.valueOf(request.getQuantity()))));
-        billService.updateBill(bill);
         if(productReturn.getReason().equals("OTHER")){
             ProductDetail productDetail = productDetailService.getOne(request.getProductDetailId());
             productDetail.setQuantity(productDetail.getQuantity() + request.getQuantity());

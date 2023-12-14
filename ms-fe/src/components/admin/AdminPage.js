@@ -50,7 +50,7 @@ function AdminPage() {
         .then((res) => {
           setData(res?.roles);
         })
-        .catch((err) => { });
+        .catch((err) => {});
     }
     console.log(isAdmin);
   }, [navigate, token, isAdmin, data, authToken]);
@@ -81,7 +81,7 @@ function AdminPage() {
                       element={<ReturnIndex isAdmin={isAdmin} />}
                     ></Route>
                     <Route
-                      path="return-bill/:billCode"
+                      path="return-bill/:billCode/:name"
                       element={<BillReturn isAdmin={isAdmin} />}
                     ></Route>
                   </Route>

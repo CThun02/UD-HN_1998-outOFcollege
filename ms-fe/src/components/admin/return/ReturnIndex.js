@@ -27,7 +27,6 @@ const ReturnIndex = () => {
         }
       )
       .then((response) => {
-        console.log(response.data);
         var now = Date.now();
         var sevenDay = 7 * 24 * 60 * 60 * 1000;
         if (response.data) {
@@ -36,16 +35,22 @@ const ReturnIndex = () => {
               message: "Thông báo",
               description: "Hóa đơn chưa hoàn thành để thực hiện hoàn trả!",
             });
-          } else if (
-            now.getTime() - new Date(response.data.completionDate).getTime() >
-            sevenDay
-          ) {
-            notification.error({
-              message: "Thông báo",
-              description: "Hóa đơn đã vượt quá 7 ngày để hoàn trả!",
-            });
           } else {
-            navigate("/api/admin/return/return-bill/" + response.data.billCode);
+            if (
+              now - new Date(response.data.completionDate).getTime() >
+              sevenDay
+            ) {
+              notification.error({
+                message: "Thông báo",
+                description: "Hóa đơn đã vượt quá 7 ngày để hoàn trả!",
+              });
+            } else {
+              navigate(
+                "/api/admin/return/return-bill/" +
+                  response.data.billCode +
+                  "/return"
+              );
+            }
           }
         } else {
           notification.error({

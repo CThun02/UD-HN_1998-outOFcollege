@@ -19,7 +19,7 @@ const ReturnIndex = () => {
     axios
       .get(
         `http://localhost:8080/api/admin/bill/getBillByBillCode?billCode=` +
-        billCode,
+          billCode,
         {
           headers: {
             Authorization: `Bearer ${getToken(true)}`,
@@ -27,7 +27,8 @@ const ReturnIndex = () => {
         }
       )
       .then((response) => {
-        var now = new Date();
+        console.log(response.data);
+        var now = Date.now();
         var sevenDay = 7 * 24 * 60 * 60 * 1000;
         if (response.data) {
           if (response.data.status !== "Complete") {
@@ -52,10 +53,9 @@ const ReturnIndex = () => {
             description: "Không tìm thấy hóa đơn",
           });
         }
-        console.log(response.data);
       })
       .catch((error) => {
-        const status = error.response.status;
+        const status = error?.response?.status;
         if (status === 403) {
           notification.error({
             message: "Thông báo",

@@ -26,6 +26,8 @@ public interface VoucherService {
 
     VoucherRequest findByVoucherCode(String code);
 
+    List<VoucherResponse> searchVoucherByCode(String code);
+
     Boolean isCheckAccountOwnerVoucher(Long idVoucher, String username);
 
     List<VoucherResponse> findAllNoFilter();

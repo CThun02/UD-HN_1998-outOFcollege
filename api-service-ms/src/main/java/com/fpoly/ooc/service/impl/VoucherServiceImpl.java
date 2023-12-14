@@ -168,6 +168,29 @@ public class VoucherServiceImpl implements VoucherService {
     }
 
     @Override
+    public List<VoucherResponse> searchVoucherByCode(String code) {
+        Voucher voucher = voucherRepository.findVoucherByVoucherCodeAndStatus(code, Const.STATUS_ACTIVE).orElse(null);
+        if (Objects.nonNull(voucher)) {
+            VoucherResponse voucherRes = new VoucherResponse();
+            voucherRes.setVoucherId(voucher.getId());
+            voucherRes.setVoucherCode(voucher.getVoucherCode());
+            voucherRes.setVoucherName(voucher.getVoucherName());
+            voucherRes.setVoucherValue(voucher.getVoucherValue());
+            voucherRes.setVoucherValueMax(voucher.getVoucherValueMax());
+            voucherRes.setVoucherMethod(voucher.getVoucherMethod());
+            voucherRes.setLimitQuantity(voucher.getLimitQuantity());
+            voucherRes.setStartDate(voucher.getStartDate());
+            voucherRes.setEndDate(voucher.getEndDate());
+            voucherRes.setStatus(voucher.getStatus());
+            voucherRes.setObjectUse(voucher.getObjectUse());
+            voucherRes.setVoucherCondition(voucher.getVoucherCondition());
+
+            return List.of(voucherRes);
+        }
+        return null;
+    }
+
+    @Override
     public Boolean isCheckAccountOwnerVoucher(Long idVoucher, String username) {
         return voucherRepository.isCheckAccountOwnerVoucher(idVoucher, Commons.lower(username));
     }

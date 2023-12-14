@@ -24,10 +24,12 @@ function VoucherList({ data, setValue, value }) {
           {`${data.voucherMethod === "vnd" ? "đ" : "%"}`}
         </h3>
         <h3 className={styles.fontWeight400}>
-          Đơn tối thiểu {data.voucherCondition}đ{" "}
+          Đơn tối thiểu {numeral(data.voucherCondition).format("0,0")}đ{" "}
           {`${
             data.voucherMethod === "%"
-              ? "Giảm tối đa " + data.voucherValueMax + "đ"
+              ? "Giảm tối đa " +
+                numeral(data.voucherValueMax).format("0,0") +
+                "đ"
               : ""
           }`}
         </h3>

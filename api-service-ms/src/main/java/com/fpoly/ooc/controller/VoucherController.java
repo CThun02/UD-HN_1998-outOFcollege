@@ -57,6 +57,11 @@ public class VoucherController {
         return ResponseEntity.ok().body(voucherService.findByVoucherCode(code));
     }
 
+    @GetMapping("/search/{code}")
+    public ResponseEntity<?> searchVoucherByCode(@PathVariable("code") String code) {
+        return ResponseEntity.ok().body(voucherService.searchVoucherByCode(code));
+    }
+
     @PostMapping("/display-modal-using")
     public ResponseEntity<?> displayModalUsingVoucher(@RequestBody DisplayVoucherRequest request) {
         return ResponseEntity.ok(voucherService.findAllVoucherResponseDisplayModalUsing(request));

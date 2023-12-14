@@ -45,6 +45,8 @@ import numeral from "numeral";
 import SearchNameOrCodeVoucher from "../../element/voucher/SearchNameOrCodeVoucher";
 import { getToken } from "../../../service/Token";
 
+const urlAutofillVoucher = "http://localhost:8080/api/client/autoFillVoucher";
+
 const Bill = () => {
   var initialItems = [];
   const [modalVisible, setModalVisible] = useState([]);
@@ -143,21 +145,22 @@ const Bill = () => {
               >
                 {record.productDetail.promotion?.length > 0 ? (
                   <Badge.Ribbon
-                    text={`Giảm ${record.productDetail.promotion[0].promotionValue
-                      ? record.productDetail.promotion[0].promotionMethod ===
-                        "%"
-                        ? record.productDetail.promotion[0].promotionValue +
-                        " " +
-                        record.productDetail.promotion[0].promotionMethod
-                        : record.productDetail.promotion[0].promotionValue.toLocaleString(
-                          "vi-VN",
-                          {
-                            style: "currency",
-                            currency: "VND",
-                          }
-                        )
-                      : null
-                      }`}
+                    text={`Giảm ${
+                      record.productDetail.promotion[0].promotionValue
+                        ? record.productDetail.promotion[0].promotionMethod ===
+                          "%"
+                          ? record.productDetail.promotion[0].promotionValue +
+                            " " +
+                            record.productDetail.promotion[0].promotionMethod
+                          : record.productDetail.promotion[0].promotionValue.toLocaleString(
+                              "vi-VN",
+                              {
+                                style: "currency",
+                                currency: "VND",
+                              }
+                            )
+                        : null
+                    }`}
                     color="red"
                   >
                     <Carousel style={{ maxWidth: "300px" }} autoplay>
@@ -296,20 +299,20 @@ const Bill = () => {
               {record.productDetail.promotionValue
                 ? record.productDetail.promotionMethod === "%"
                   ? (
-                    (record.productDetail.price *
-                      (100 - Number(record.productDetail.promotionValue))) /
-                    100
-                  )?.toLocaleString("vi-VN", {
-                    style: "currency",
-                    currency: "VND",
-                  })
+                      (record.productDetail.price *
+                        (100 - Number(record.productDetail.promotionValue))) /
+                      100
+                    )?.toLocaleString("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    })
                   : (
-                    record.productDetail.price -
-                    Number(record.productDetail.promotionValue)
-                  )?.toLocaleString("vi-VN", {
-                    style: "currency",
-                    currency: "VND",
-                  })
+                      record.productDetail.price -
+                      Number(record.productDetail.promotionValue)
+                    )?.toLocaleString("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    })
                 : null}
             </span>
           </div>
@@ -445,7 +448,7 @@ const Bill = () => {
   const [isOpenFormVoucher, setIsOpenFormVoucher] = useState(false);
   const [voucherAdd, setVoucherAdd] = useState({});
   const [typeShipping, setTypeShipping] = useState([]);
-  const [email, setEmail] = useState("")
+  const [email, setEmail] = useState("");
 
   // xóa tài khoản
   const handleDeleteAccount = () => {
@@ -677,7 +680,7 @@ const Bill = () => {
     }
     const visible = [...switchChange];
     visible[index] = checked;
-    setRemainAmount(-1)
+    setRemainAmount(-1);
     setSwitchChange(visible);
     setSymbol(checked ? "Shipping" : "Received");
     if (!checked) {
@@ -703,11 +706,11 @@ const Bill = () => {
   const onChange = (newActiveKey) => {
     setCartId(newActiveKey);
     setActiveKey(newActiveKey);
-    setSelectedOption(1)
-    setSelectedProvince(null)
-    setSelectedDictrict(null)
-    setSelectedWard(null)
-    handleDeleteAccount()
+    setSelectedOption(1);
+    setSelectedProvince(null);
+    setSelectedDictrict(null);
+    setSelectedWard(null);
+    handleDeleteAccount();
   };
 
   // gen mã hóa đơn
@@ -819,7 +822,7 @@ const Bill = () => {
     axios
       .get(
         "http://localhost:8080/api/admin/product/getproductdetailbyidpd?productDetailId=" +
-        result,
+          result,
         {
           headers: {
             Authorization: `Bearer ${getToken(true)}`,
@@ -858,8 +861,8 @@ const Bill = () => {
             priceReduce: response.data.promotionValue
               ? response.data.promotionMethod === "%"
                 ? (response.data.price *
-                  (100 - Number(response.data.promotionValue))) /
-                100
+                    (100 - Number(response.data.promotionValue))) /
+                  100
                 : response.data.price - Number(response.data.promotionValue)
               : response.data.price,
           });
@@ -933,7 +936,7 @@ const Bill = () => {
 
   useEffect(() => {
     handleDeleteAccount();
-  }, [])
+  }, []);
 
   const [symbol, setSymbol] = useState("Received");
   const [note, setNote] = useState("");
@@ -957,13 +960,15 @@ const Bill = () => {
       amountPaid: typeShipping[index]
         ? 0
         : selectedOption === 2
-          ? voucherPrice() + shippingFee
-          : amountPaid,
+        ? voucherPrice() + shippingFee
+        : amountPaid,
       billType: "In-Store",
       symbol: typeShipping[index] ? "Shipping" : symbol,
-      status: typeShipping[index] ? "Unpaid"
-        : !typeShipping[index] && switchChange[index] ? "Paid"
-          : "Complete",
+      status: typeShipping[index]
+        ? "Unpaid"
+        : !typeShipping[index] && switchChange[index]
+        ? "Paid"
+        : "Complete",
       note: note,
       paymentDetailId: Number(selectedOption),
       lstBillDetailRequest: [],
@@ -1004,43 +1009,65 @@ const Bill = () => {
                                 <span>Thông tin đơn hàng</span>
                                 <div style="margin-top: 8px;">
                                 ${productDetails.map((item, index) => {
-          return (
-            `<div key={index} style="display: flex; justify-content: space-between; align-items: center; padding: 4px 20px;">
+                                  return `<div key={index} style="display: flex; justify-content: space-between; align-items: center; padding: 4px 20px;">
                                             <div style="width: 20%; padding: 4px;">
-                                                <img alt="product" style="width: 100%; border: 1px solid #ccc; border-radius: 8px;" src=${item.productDetail.productImageResponse[0].path}>
+                                                <img alt="product" style="width: 100%; border: 1px solid #ccc; border-radius: 8px;" src=${
+                                                  item.productDetail
+                                                    .productImageResponse[0]
+                                                    .path
+                                                }>
                                             </div>
                                             <div style="width: 55%; padding: 4px;">
-                                                <p>${(item.productDetail.product.productName + "-" + item.productDetail.button.buttonName +
-              "-" +
-              item.productDetail.brand.brandName +
-              "-" +
-              item.productDetail.category.categoryName +
-              "-" +
-              item.productDetail.collar.materialName +
-              "-" +
-              item.productDetail.color.collarName +
-              "-" +
-              item.productDetail.sleeve.sleeveName +
-              "-" +
-              item.productDetail.shirtTail.shirtTailTypeName +
-              "-" +
-              item.productDetail.patternName +
-              "-" +
-              item.productDetail.formName)
-            } <span style="display: inline-block">(x ${item.quantity})</span></p >
+                                                <p>${
+                                                  item.productDetail.product
+                                                    .productName +
+                                                  "-" +
+                                                  item.productDetail.button
+                                                    .buttonName +
+                                                  "-" +
+                                                  item.productDetail.brand
+                                                    .brandName +
+                                                  "-" +
+                                                  item.productDetail.category
+                                                    .categoryName +
+                                                  "-" +
+                                                  item.productDetail.collar
+                                                    .materialName +
+                                                  "-" +
+                                                  item.productDetail.color
+                                                    .collarName +
+                                                  "-" +
+                                                  item.productDetail.sleeve
+                                                    .sleeveName +
+                                                  "-" +
+                                                  item.productDetail.shirtTail
+                                                    .shirtTailTypeName +
+                                                  "-" +
+                                                  item.productDetail
+                                                    .patternName +
+                                                  "-" +
+                                                  item.productDetail.formName
+                                                } <span style="display: inline-block">(x ${
+                                    item.quantity
+                                  })</span></p >
                                             </div >
   <div style="width: 25%; padding: 4px;">
-    <p>${(item.priceReduce)?.toLocaleString("vi-VN", { style: "currency", currency: "VND" })}</p>
+    <p>${item.priceReduce?.toLocaleString("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    })}</p>
   </div >
-                                        </div > `
-          );
-        })}
+                                        </div > `;
+                                })}
 <hr>
   <div style="width: 70%; float: right; padding: 4px 20px;">
     <div style="display: flex; justify-content: space-between; padding: 4px 0;">
       <span>Tổng giá trị sản phẩm:</span>
       <span style="font-weight: 500;">
-        ${(voucherPrice() + (shippingFee ?? 0))?.toLocaleString("vi-VN", { style: "currency", currency: "VND" })}
+        ${(voucherPrice() + (shippingFee ?? 0))?.toLocaleString("vi-VN", {
+          style: "currency",
+          currency: "VND",
+        })}
       </span>
     </div>
   </div>
@@ -1050,8 +1077,8 @@ const Bill = () => {
             </tr >
         </table >
     </body > `,
-        subject: `THÔNG BÁO XÁC NHẬN ĐƠN HÀNG ${activeKey} `
-      }
+        subject: `THÔNG BÁO XÁC NHẬN ĐƠN HÀNG ${activeKey} `,
+      },
     };
 
     const billAddress = {
@@ -1067,12 +1094,12 @@ const Bill = () => {
     const schema = Yup.object().shape({
       fullName: Yup.string().required("Họ và tên không được để trống"),
       sdt: Yup.string()
-        .required('Số điện thoại không được để trống')
-        .matches(/^[0-9]{10}$/, 'Số điện thoại phải có đúng 10 chữ số'),
+        .required("Số điện thoại không được để trống")
+        .matches(/^[0-9]{10}$/, "Số điện thoại phải có đúng 10 chữ số"),
       city: Yup.string().required("Tỉnh/thành phố không được để trống"),
       district: Yup.string().required("Quận/huyện không được để trống"),
       ward: Yup.string().required("Phường/xã không được để trống"),
-      email: Yup.string().email('Địa chỉ email không hợp lệ')
+      email: Yup.string().email("Địa chỉ email không hợp lệ"),
     });
 
     if (productDetails.length <= 0) {
@@ -1187,7 +1214,6 @@ const Bill = () => {
     const inputValue = e.target.value;
     let calculatedValue = 0;
     if (switchChange[index]) {
-
       calculatedValue = inputValue - voucherPrice() - shippingFee;
     } else {
       calculatedValue = inputValue - voucherPrice();
@@ -1202,6 +1228,27 @@ const Bill = () => {
       setInputError("");
     }
   };
+
+  useEffect(() => {
+    async function autoFillVoucher() {
+      try {
+        const res = await axios.post(urlAutofillVoucher, {
+          priceBill: totalPrice ? totalPrice : null,
+          username: null,
+        });
+        const data = await res.data;
+        setVoucherAdd(data);
+      } catch (err) {
+        notification.error({
+          message: "Lỗi",
+          description: "Hệ thống xảy ra lỗi",
+          duration: 2,
+        });
+      }
+    }
+
+    autoFillVoucher();
+  }, [totalPrice]);
 
   return (
     <>
@@ -1226,7 +1273,10 @@ const Bill = () => {
               <Tabs.TabPane
                 key={item.key}
                 tab={
-                  <Badge count={productDetails.length ? productDetails.length : 0} showZero>
+                  <Badge
+                    count={productDetails.length ? productDetails.length : 0}
+                    showZero
+                  >
                     <span style={{ padding: 10 }}>{item.label}</span>
                   </Badge>
                 }
@@ -1424,9 +1474,9 @@ const Bill = () => {
                               value={
                                 selectedAddress?.city
                                   ? selectedAddress?.city.substring(
-                                    0,
-                                    selectedAddress?.city.indexOf("|")
-                                  )
+                                      0,
+                                      selectedAddress?.city.indexOf("|")
+                                    )
                                   : selectedProvince
                               }
                             >
@@ -1463,9 +1513,9 @@ const Bill = () => {
                               value={
                                 selectedAddress?.district
                                   ? selectedAddress?.district.substring(
-                                    0,
-                                    selectedAddress.district.indexOf("|")
-                                  )
+                                      0,
+                                      selectedAddress.district.indexOf("|")
+                                    )
                                   : selectedDictrict
                               }
                             >
@@ -1500,9 +1550,9 @@ const Bill = () => {
                               value={
                                 selectedAddress?.ward
                                   ? selectedAddress?.ward.substring(
-                                    0,
-                                    selectedAddress?.ward.indexOf("|")
-                                  )
+                                      0,
+                                      selectedAddress?.ward.indexOf("|")
+                                    )
                                   : selectedWard
                               }
                             >
@@ -1567,11 +1617,11 @@ const Bill = () => {
                             productDetails.length > 0
                               ? true
                               : notification.error({
-                                message: "Lỗi",
-                                description:
-                                  "Chưa có sản phẩm trong giỏ hàng.",
-                                duration: 2,
-                              })
+                                  message: "Lỗi",
+                                  description:
+                                    "Chưa có sản phẩm trong giỏ hàng.",
+                                  duration: 2,
+                                })
                           )
                         }
                       >
@@ -1697,7 +1747,7 @@ const Bill = () => {
                                 fontSize: " 16px",
                               }}
                             >
-                              {(voucherPrice())?.toLocaleString("vi-VN", {
+                              {voucherPrice()?.toLocaleString("vi-VN", {
                                 style: "currency",
                                 currency: "VND",
                               })}
@@ -1705,7 +1755,7 @@ const Bill = () => {
                           )}
                         </Col>
                         {Number(selectedOption) !== 2 &&
-                          !typeShipping[index] ? (
+                        !typeShipping[index] ? (
                           <>
                             <Col span={8} style={{ marginTop: "8px" }}>
                               <span
@@ -1753,37 +1803,35 @@ const Bill = () => {
                             </span>
                           </>
                         ) : null}
-                        {
-                          Number(selectedOption) !== 2 &&
-                            !typeShipping[index] ? (
-                            <Col span={24}>
-                              {remainAmount > 0 && (
-                                <Row style={{ marginTop: "8px" }}>
-                                  <Col span={16}>
-                                    <span
-                                      style={{ fontSize: "16px", width: "200%" }}
-                                    >
-                                      Tiền thừa
-                                    </span>
-                                  </Col>
-                                  <Col span={8}>
-                                    <span
-                                      style={{
-                                        fontSize: "16px",
-                                        color: "red",
-                                      }}
-                                    >
-                                      {remainAmount?.toLocaleString("vi-VN", {
-                                        style: "currency",
-                                        currency: "VND",
-                                      })}
-                                    </span>
-                                  </Col>
-                                </Row>
-                              )}
-                            </Col>
-                          ) : null
-                        }
+                        {Number(selectedOption) !== 2 &&
+                        !typeShipping[index] ? (
+                          <Col span={24}>
+                            {remainAmount > 0 && (
+                              <Row style={{ marginTop: "8px" }}>
+                                <Col span={16}>
+                                  <span
+                                    style={{ fontSize: "16px", width: "200%" }}
+                                  >
+                                    Tiền thừa
+                                  </span>
+                                </Col>
+                                <Col span={8}>
+                                  <span
+                                    style={{
+                                      fontSize: "16px",
+                                      color: "red",
+                                    }}
+                                  >
+                                    {remainAmount?.toLocaleString("vi-VN", {
+                                      style: "currency",
+                                      currency: "VND",
+                                    })}
+                                  </span>
+                                </Col>
+                              </Row>
+                            )}
+                          </Col>
+                        ) : null}
                         <TextArea
                           onChange={(e) => setNote(e.target.value)}
                           rows={3}
@@ -1829,14 +1877,14 @@ const Bill = () => {
                             Xác nhận thanh toán
                           </Button>
                         </div>
-                      </Row >
-                    </Col >
-                  </Row >
-                </div >
-              </Tabs.TabPane >
+                      </Row>
+                    </Col>
+                  </Row>
+                </div>
+              </Tabs.TabPane>
             );
           })}
-      </Tabs >
+      </Tabs>
       {console.log(account)}
       <FormUsingVoucher
         priceBill={totalPrice}

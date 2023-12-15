@@ -244,6 +244,11 @@ public class ClientController {
         return ResponseEntity.ok().body(timeLineService.getTimelineByBillCode(billCode));
     }
 
+    @PostMapping("/autoFillVoucher")
+    public ResponseEntity<?> autoFillVoucher(@RequestBody DisplayVoucherRequest req) {
+        return ResponseEntity.ok(voucherService.autoFillVoucher(req));
+    }
+
     @GetMapping("/vouchers/{username}")
     public ResponseEntity<?> getVoucherByUsernameAndVoucherCode(@PathVariable("username") String username,
                                                                 @RequestParam(value = "voucherCode", required = false) String voucherCode) {

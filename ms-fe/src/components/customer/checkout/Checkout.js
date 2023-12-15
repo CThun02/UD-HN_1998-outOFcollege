@@ -25,6 +25,8 @@ import FormUsingVoucher from "../../element/voucher/FormUsingVoucher.js";
 import { Font } from "@react-pdf/renderer";
 import { NotificationContext } from "../../element/notification/NotificationAuthen";
 
+const urlAutofillVoucher = "http://localhost:8080/api/client/autoFillVoucher";
+
 const Checkout = ({ setRenderHeader }) => {
   const { showSuccessNotification } = useContext(NotificationContext);
   const [provinces, setProvinces] = useState([]);
@@ -86,6 +88,35 @@ const Checkout = ({ setRenderHeader }) => {
     formData.ward = e;
     setSelectedWard(e?.substring(e.indexOf("|") + 1));
   };
+
+  useEffect(() => {
+    getAuthToken()
+      .then((data) => {
+        setUsername(data?.username);
+      })
+      .catch((err) => console.log(err));
+  }, []);
+
+  useEffect(() => {
+    async function autoFillVoucher() {
+      try {
+        const res = await axios.post(urlAutofillVoucher, {
+          priceBill: totalPrice ? totalPrice : null,
+          username: username ? username : null,
+        });
+        const data = await res.data;
+        setVoucherAdd(data);
+      } catch (err) {
+        notification.error({
+          message: "Lỗi",
+          description: "Hệ thống xảy ra lỗi",
+          duration: 2,
+        });
+      }
+    }
+
+    autoFillVoucher();
+  }, [totalPrice, username]);
 
   const fetchProvince = async () => {
     await axios
@@ -1407,12 +1438,12 @@ const Checkout = ({ setRenderHeader }) => {
                   Chọn mã giảm giá
                 </Button>
                 <FormUsingVoucher
-                  priceBill={totalPrice}
+                  priceBill={totalPrice ? totalPrice : null}
                   voucher={voucherAdd}
                   setVoucher={setVoucherAdd}
                   isOpen={isOpenFormVoucher}
                   setIsOpen={setIsOpenFormVoucher}
-                  username={dataToken?.username}
+                  username={dataToken?.username ? dataToken?.username : ""}
                 />
                 {console.log(voucherAdd)}
               </div>
@@ -1422,7 +1453,7 @@ const Checkout = ({ setRenderHeader }) => {
                   padding: "10px",
                 }}
               >
-                <Row>
+                <Row style={{ margin: "0" }}>
                   <Col span={18} className={styles.textLeft}>
                     Tạm tính
                   </Col>
@@ -1465,6 +1496,15 @@ const Checkout = ({ setRenderHeader }) => {
                   <Col span={6}>
                     {numeral(voucherPrice() < 0 ? shippingFee : voucherPrice() + shippingFee).format("0,0") + "đ"}
                   </Col>
+
+                  {voucherAdd.voucherId ? (
+                    <Col span={24} className={styles.textLeft}>
+                      <span
+                        style={{ color: "#ff9130" }}
+                      >{`Đang áp dụng voucher `}</span>{" "}
+                      <strong>{voucherAdd?.voucherName}</strong>
+                    </Col>
+                  ) : null}
                 </Row>
               </div>
               <div>

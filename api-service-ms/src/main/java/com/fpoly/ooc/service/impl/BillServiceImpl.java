@@ -144,12 +144,28 @@ public class BillServiceImpl implements BillService {
             }
         }
 
-        PaymentDetail paymentDetail = PaymentDetail.builder()
-                .bill(bill)
-                .payment(Payment.builder().id(request.getPaymentDetailId()).build())
-                .price(request.getPrice())
-                .build();
-        paymentDetailRepo.save(paymentDetail);
+        if (request.getPaymentDetailId() == 3) {
+            PaymentDetail paymentDetailLan1Nd = PaymentDetail.builder()
+                    .bill(bill)
+                    .payment(Payment.builder().id(1L).build())
+                    .price(bill.getAmountPaid())
+                    .build();
+            paymentDetailRepo.save(paymentDetailLan1Nd);
+
+            PaymentDetail paymentDetail2Nd = PaymentDetail.builder()
+                    .bill(bill)
+                    .payment(Payment.builder().id(2L).build())
+                    .price(bill.getPriceReduce().subtract(request.getPriceAmount()))
+                    .build();
+            paymentDetailRepo.save(paymentDetail2Nd);
+        } else {
+            PaymentDetail paymentDetail = PaymentDetail.builder()
+                    .bill(bill)
+                    .payment(Payment.builder().id(request.getPaymentDetailId()).build())
+                    .price(request.getPrice())
+                    .build();
+            paymentDetailRepo.save(paymentDetail);
+        }
 
         if (request.getBillType().equals("In-Store")) {
             for (int i = 0; i < 2; i++) {

@@ -28,8 +28,6 @@ public class TimeLineResponse {
 
     private String billType;
 
-    private String paymentName;
-
     private String billStatus;
 
     @JsonFormat(pattern = "HH:mm:ss dd/MM/yyyy ")

@@ -23,7 +23,7 @@ const ModalAccount = ({
   const add = (value) => {
     cart.account = value;
     address(
-      value.accountAddress.filter(
+      value?.accountAddress?.filter(
         (address) => address.defaultaddress === true
       )[0]
     );
@@ -84,7 +84,7 @@ const ModalAccount = ({
   function filter(keyword) {
     axios
       .get(
-        `http://localhost:8080/api/admin/account/getAllCustomer?keyword=${keyword}`,
+        `http://localhost:8080/api/admin/account/getAllCustomer?keyword=${keyword}&roleId=2&status=ACTIVE`,
         {
           headers: {
             Authorization: `Bearer ${getToken(true)}`,

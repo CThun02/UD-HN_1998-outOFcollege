@@ -15,7 +15,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { UserOutlined } from "@ant-design/icons";
 import axios from "axios";
 import moment from "moment/moment";
-import numeral from "numeral";
 import TextArea from "antd/es/input/TextArea";
 import FloatingLabels from "../../element/FloatingLabels/FloatingLabels";
 import * as yup from "yup";
@@ -395,7 +394,7 @@ const Checkout = ({ setRenderHeader }) => {
     const bill = {
       billCode: billCodeGen,
       price: totalPrice,
-      priceReduce: voucherPrice() < 0 ? shippingFee : voucherPrice(),
+      priceReduce: voucherPrice() === 0 ? totalPrice : voucherPrice(),
       paymentDetailId: formData.paymentDetailId,
       billType: "Online",
       symbol: "Shipping",
@@ -708,7 +707,7 @@ const Checkout = ({ setRenderHeader }) => {
       },
     });
 
-    console.log(voucherPrice() < 0 ? shippingFee : voucherPrice());
+    // console.log(voucherPrice(), totalPrice);
   };
 
   const getAllCarts = async () => {
@@ -752,11 +751,11 @@ const Checkout = ({ setRenderHeader }) => {
     let result = totalPrice;
 
     if (voucherAdd && voucherAdd.voucherMethod === "vnd") {
-      if (result > (voucherAdd.voucherCondition ?? 0)) {
-        result -= voucherAdd.voucherValue ?? 0;
+      if (result >= (voucherAdd.voucherCondition ?? 0)) {
+        result -= voucherAdd.voucherValue;
       }
     } else if (voucherAdd && voucherAdd.voucherMethod === "%") {
-      if (result > voucherAdd.voucherCondition) {
+      if (result >= voucherAdd.voucherCondition) {
         const discountPercent = voucherAdd.voucherValue ?? 0;
         const maxDiscount = voucherAdd.voucherValueMax ?? 0;
         let discount = (totalPrice * discountPercent) / 100;
@@ -766,7 +765,7 @@ const Checkout = ({ setRenderHeader }) => {
       result = totalPrice;
     }
 
-    return result
+    return result >= 0 ? result : 0;
   };
 
   useEffect(() => {
@@ -1279,7 +1278,7 @@ const Checkout = ({ setRenderHeader }) => {
                                     </div>
                                   </div>
                                   <div>
-                                    {numeral(
+                                    {(
                                       productDetail?.promotion[0]
                                         ? (productDetail?.promotion[0]
                                           ?.promotionMethod === "vnd"
@@ -1295,7 +1294,10 @@ const Checkout = ({ setRenderHeader }) => {
                                             ?.priceProductDetail)
                                         : productDetail?.cartDetailResponse
                                           ?.priceProductDetail
-                                    ).format("0,0") + "đ"}
+                                    )?.toLocaleString("vi-VN", {
+                                      style: "currency",
+                                      currency: "VND",
+                                    })}
                                   </div>
                                 </Space>
                               </div>
@@ -1397,7 +1399,7 @@ const Checkout = ({ setRenderHeader }) => {
                                     </div>
                                   </div>
                                   <div>
-                                    {numeral(
+                                    {(
                                       productDetail.data[0].promotion[0]
                                         ? (productDetail.data[0].promotion[0]
                                           ?.promotionMethod === "vnd"
@@ -1413,7 +1415,10 @@ const Checkout = ({ setRenderHeader }) => {
                                         productDetail?.quantity
                                         : productDetail?.quantity *
                                         productDetail.data[0].price
-                                    ).format("0,0") + "đ"}
+                                    )?.toLocaleString("vi-VN", {
+                                      style: "currency",
+                                      currency: "VND",
+                                    })}
                                   </div>
                                 </Space>
                               </div>
@@ -1456,12 +1461,18 @@ const Checkout = ({ setRenderHeader }) => {
                   <Col span={18} className={styles.textLeft}>
                     Tạm tính
                   </Col>
-                  <Col span={6}>{numeral(totalPrice).format("0,0") + "đ"}</Col>
+                  <Col span={6}>{(totalPrice)?.toLocaleString("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  })}</Col>
                   <Col span={18} className={styles.textLeft}>
                     Phí vận chuyển
                   </Col>
                   <Col span={6}>
-                    {numeral(shippingFee).format("0,0 đ") + "đ"}
+                    {(shippingFee)?.toLocaleString("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    })}
                   </Col>
                   <Col span={18} className={styles.textLeft}>
                     Giảm giá
@@ -1493,7 +1504,10 @@ const Checkout = ({ setRenderHeader }) => {
                     Tổng cộng
                   </Col>
                   <Col span={6}>
-                    {numeral(voucherPrice() < 0 ? shippingFee : voucherPrice() + shippingFee).format("0,0") + "đ"}
+                    {(voucherPrice() < 0 ? shippingFee : voucherPrice() + shippingFee)?.toLocaleString("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    })}
                   </Col>
 
                   {voucherAdd.voucherId ? (

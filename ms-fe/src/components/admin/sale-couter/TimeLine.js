@@ -413,6 +413,7 @@ const BillTimeLine = (addId) => {
             title: "Thao tác",
             key: "productPrice",
             render: (_, record) => {
+                console.log(timelinePoduct)
                 return (
                     <>
                         <Space size="middle">
@@ -425,8 +426,10 @@ const BillTimeLine = (addId) => {
                                     setPdCode(record.productCode)
                                     setBdId(record.billDetailId)
                                     setIsModalConfirm(true)
+                                    setAction('Delete')
                                 }}
-                                disabled={Number(timlinesDisplay[timlinesDisplay.length - 1]?.status) !== 1}
+                                disabled={(Number(timlinesDisplay[timlinesDisplay.length - 1]?.status) !== 1)
+                                    || (timelinePoduct?.length === 1)}
                             ></Button>
                         </Space >
                     </>
@@ -850,7 +853,8 @@ const BillTimeLine = (addId) => {
                         </span>
                         <span style={{ fontSize: "16px", color: "#FF0000" }}>
                             {numeral(
-                                billInfo?.priceReduce + billInfo?.shipPrice
+                                (billInfo?.priceReduce === billInfo.voucherPrice) ? billInfo?.shipPrice
+                                    : (billInfo?.priceReduce + billInfo?.shipPrice)
                             ).format(0, 0) + "đ"}
                         </span>
                     </b>

@@ -32,6 +32,7 @@ import {
   ShoppingCartOutlined,
   WalletOutlined,
   InteractionOutlined,
+  ShopOutlined,
 } from "@ant-design/icons";
 import * as Yup from "yup";
 import axios from "axios";
@@ -1306,6 +1307,10 @@ const Bill = () => {
 
   return (
     <>
+      <h1 style={{ textAlign: "center" }}>
+        <ShopOutlined /> Bán hàng tại quầy
+      </h1>
+      <br />
       <QRReader
         visible={modalQRScanOpen}
         key={cartId}

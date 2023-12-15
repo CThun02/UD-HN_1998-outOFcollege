@@ -187,9 +187,14 @@ public class BillServiceImpl implements BillService {
             voucher.setLimitQuantity(voucher.getLimitQuantity() - 1);
             voucherService.updateVoucher(voucher);
 
+            BigDecimal calculatedPrice = bill.getPrice().subtract(bill.getPriceReduce());
+            if (calculatedPrice.compareTo(BigDecimal.ZERO) == 0) {
+                calculatedPrice = bill.getPriceReduce();
+            }
+
             VoucherHistory voucherHistory = VoucherHistory.builder()
                     .bill(bill)
-                    .priceReduce(bill.getPrice().subtract(bill.getPriceReduce()))
+                    .priceReduce(calculatedPrice)
                     .voucherCode(request.getVoucherCode())
                     .build();
             voucherHistoryService.saveVoucherHistory(voucherHistory);

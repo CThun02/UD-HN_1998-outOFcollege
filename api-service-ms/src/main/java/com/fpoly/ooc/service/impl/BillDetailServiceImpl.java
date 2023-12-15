@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.entity.Bill;
 import com.fpoly.ooc.entity.BillDetail;
+import com.fpoly.ooc.entity.Product;
 import com.fpoly.ooc.entity.ProductDetail;
 import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.BillDetailRepo;
@@ -45,6 +46,7 @@ public class BillDetailServiceImpl implements BillDetailService {
         BillDetail savedBillDetail = null;
 
         if (request.getBillDetailId() != null) {
+            // update nó chạy vào hàm này
             billDetail = billDetailRepo.findById(request.getBillDetailId()).orElse(null);
             billDetail.setQuantity(request.getQuantity());
             savedBillDetail = billDetailRepo.save(billDetail);
@@ -56,19 +58,31 @@ public class BillDetailServiceImpl implements BillDetailService {
                 Boolean check = true;
                 for (BillDetail billDetailUpdate : existingBillDetail) {
                     if (request.getProductDetailId() == billDetailUpdate.getProductDetail().getId()) {
+                        System.out.println("Check QUANTITY" + request.getQuantity());
                         billDetailUpdate.setQuantity(billDetailUpdate.getQuantity() + request.getQuantity());
                         billDetailUpdate.setPrice(request.getPrice());
-                        billDetailUpdate.setStatus(Const.STATUS_INACTIVE);
                         savedBillDetail = billDetailRepo.save(billDetailUpdate);
                         check = false;
                         break;
                     }
                 }
+
                 if (check) {
                     savedBillDetail = billDetailRepo.save(billDetail);
                 }
             }
         }
+
+        if(savedBillDetail != null){
+            ProductDetail productDetail = productDetailService.findById(savedBillDetail.getProductDetail().getId());
+//            productDetail.setQuantity(productDetail.getQuantity() - request.getQuantity());
+//            try {
+//                productDetailService.update(productDetail);
+//            } catch (JsonProcessingException e) {
+//                e.printStackTrace();
+//            }
+        }
+
         BigDecimal priceBill = billDetailRepo.getTotalPriceByBillCode(bill.getBillCode());
         bill.setPrice(priceBill);
         billService.updateBill(bill);

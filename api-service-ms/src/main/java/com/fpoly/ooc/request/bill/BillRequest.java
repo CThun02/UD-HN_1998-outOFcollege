@@ -71,4 +71,5 @@ public class BillRequest {
 
     private EmailDetails emailDetails;
 
+    private BigDecimal priceAmount;
 }

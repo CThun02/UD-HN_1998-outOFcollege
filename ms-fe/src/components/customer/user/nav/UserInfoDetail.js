@@ -18,6 +18,8 @@ import Password from "antd/es/input/Password";
 import { useEffect } from "react";
 import axios from "axios";
 import bcrypt from "bcryptjs";
+import moment from "moment";
+const format = 'YYYY-MM-DD'
 
 function UserInfoDetail({ user, setIsRender }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -80,11 +82,11 @@ function UserInfoDetail({ user, setIsRender }) {
                 />
                 <RowUserInfo
                   title={"Giới tính"}
-                  data={user?.userInfomationDTO?.gender}
+                  data={user?.userInfomationDTO?.gender === true ? 'Nam' : 'Nữ'}
                 />
                 <RowUserInfo
                   title={"Ngày sinh"}
-                  data={user?.userInfomationDTO?.date}
+                  data={moment(user?.userInfomationDTO?.date).format('DD/MM/YYYY')}
                 />
               </Col>
               <Col xs={24} sm={8}>
@@ -143,13 +145,17 @@ function EditUser({ setIsModalOpen, isModalOpen, user, setIsRender }) {
     email: "",
     phoneNumber: "",
     fullName: "",
+    gender: true,
+    dateOfBirth: '',
     role: "customer",
   });
-
+  const [dob, setDob] = useState(null)
   useEffect(() => {
     if (user && "password" in user) {
       const { password, ...userWithoutPassword } = user;
-      setUserUpdate(userWithoutPassword);
+
+      setDob(moment(user.date).format('YYYY-MM-DD'))
+      setUserUpdate(userWithoutPassword)
     } else {
       setUserUpdate(user);
     }
@@ -178,7 +184,7 @@ function EditUser({ setIsModalOpen, isModalOpen, user, setIsRender }) {
                 setIsModalOpen(false);
                 notification.success({
                   message: "Thông báo",
-                  description: "Thanh toán thành công",
+                  description: "Sửa thông tin thành công",
                   duration: 2,
                 });
                 form.resetFields();
@@ -238,103 +244,6 @@ function EditUser({ setIsModalOpen, isModalOpen, user, setIsRender }) {
           </Form.Item>
 
           <Form.Item
-            name={"password"}
-            rules={[
-              {
-                required: true,
-                message: "* Mật khẩu không được bỏ trống",
-                whitespace: true,
-              },
-              ({ getFieldValue }) => ({
-                validator(_, value) {
-                  if (value.length >= 10) {
-                    if (/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/.test(value)) {
-                      return Promise.resolve();
-                    } else {
-                      return Promise.reject(
-                        "* Mật khẩu chứa kí tự in hoa và kí tự thường và số"
-                      );
-                    }
-                  } else {
-                    return Promise.resolve();
-                  }
-                },
-              }),
-            ]}
-          >
-            <Password
-              name={"password"}
-              placeholder="Nhập mật khẩu cũ"
-              size="large"
-              className={styles.input}
-            />
-          </Form.Item>
-
-          <Form.Item
-            name={"newPassword"}
-            rules={[
-              {
-                required: true,
-                message: "* Mật khẩu mới không được bỏ trống",
-                whitespace: true,
-              },
-              ({ getFieldValue }) => ({
-                validator(_, value) {
-                  if (value.length >= 10) {
-                    if (/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/.test(value)) {
-                      return Promise.resolve();
-                    } else {
-                      return Promise.reject(
-                        "* Mật khẩu mới chứa kí tự in hoa và kí tự thường và số"
-                      );
-                    }
-                  } else {
-                    return Promise.resolve();
-                  }
-                },
-              }),
-            ]}
-          >
-            <Password
-              name={"newPassword"}
-              placeholder="Nhập mật khẩu mới"
-              size="large"
-              className={styles.input}
-            />
-          </Form.Item>
-
-          <Form.Item
-            name={"rePassword"}
-            dependencies={["newPassword"]}
-            rules={[
-              {
-                required: true,
-                message: "* Không được bỏ trống",
-              },
-              ({ getFieldValue }) => ({
-                validator(_, value) {
-                  const newPassword = getFieldValue("newPassword");
-                  if (!value || newPassword === value) {
-                    return Promise.resolve();
-                  }
-                  return Promise.reject(
-                    new Error(
-                      "* Nhập lại mật khẩu mới phải trùng với mật khẩu đã nhập"
-                    )
-                  );
-                },
-              }),
-            ]}
-          >
-            <Password
-              name={"rePassword"}
-              placeholder="Nhập lại mật khẩu"
-              size="large"
-              className={styles.input}
-            />
-          </Form.Item>
-
-          <Form.Item
             name={"fullName"}
             rules={[
               {
@@ -351,6 +260,7 @@ function EditUser({ setIsModalOpen, isModalOpen, user, setIsRender }) {
               className={styles.input}
             />
           </Form.Item>
+
           <Form.Item
             name={"phoneNumber"}
             rules={[
@@ -372,6 +282,7 @@ function EditUser({ setIsModalOpen, isModalOpen, user, setIsRender }) {
               className={styles.input}
             />
           </Form.Item>
+
           <Form.Item
             name={"email"}
             rules={[
@@ -392,12 +303,13 @@ function EditUser({ setIsModalOpen, isModalOpen, user, setIsRender }) {
               className={styles.input}
             />
           </Form.Item>
+
           <Form.Item
             name="gender"
             rules={[
               {
                 required: true,
-                message: '* Vui lòng chọn giới tính',
+                message: 'Vui lòng chọn giới tính',
               },
             ]}
           >
@@ -406,20 +318,19 @@ function EditUser({ setIsModalOpen, isModalOpen, user, setIsRender }) {
               <Radio value={false}>Nữ</Radio>
             </Radio.Group>
           </Form.Item>
+
           <Form.Item
-            name={"dob"}
+            label="Ngày sinh"
+            name="dateOfBirth"
             rules={[
               {
-                type: "dob",
-                message: "* Vui lòng nhập đúng định dạng Email",
-              },
-              {
                 required: true,
-                message: "* Không được bỏ trống",
+                message: 'Ngày sinh không được bỏ trống!',
               },
             ]}
+            initialValue={moment(dob)}
           >
-            <DatePicker onChange={(date, dateString) => console.log(date, dateString)} />
+            <DatePicker format={format} disabledDate={current => current && current > moment().endOf('day')} />
           </Form.Item>
         </Space>
       </Form>

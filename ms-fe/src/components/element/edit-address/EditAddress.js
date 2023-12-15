@@ -227,30 +227,32 @@ const EditAddress = ({
       setError(validationErrors);
       return;
     }
+    console.log(`ối dồi ôi`, addressId)
+    if (addressId) {
+      await axios
+        .put(`${CLIENTURL}/update-address/${addressId}`, formData)
+        .then((response) => {
+          console.log(response.data);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
 
-    await axios
-      .put(`${CLIENTURL}/update-address/${addressId}`, formData)
-      .then((response) => {
-        console.log(response.data);
-      })
-      .catch((error) => {
-        console.log(error);
+      await axios
+        .put(`${CLIENTURL}/update-delivery-note/${billId}`, {
+          shipDate: leadtime,
+          shipPrice: shippingFee,
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      notification.success({
+        message: "Thông báo",
+        description: "Sửa thông tin thành công",
+        duration: 2,
       });
 
-    await axios
-      .put(`${CLIENTURL}/update-delivery-note/${billId}`, {
-        shipDate: leadtime,
-        shipPrice: shippingFee,
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-    notification.success({
-      message: "Thông báo",
-      description: "Sửa thông tin thành công",
-      duration: 2,
-    });
-
+    }
     handleAddressCancel();
     setThisRender(Math.random);
     setFormData({});
@@ -258,23 +260,14 @@ const EditAddress = ({
   };
 
   useEffect(() => {
-    axios
-      .get(`${CLIENTURL}/address/${addressId}`)
-      .then((response) => {
-        let district = response.data.district?.substring(
-          0,
-          response.data.district.indexOf("|")
-        );
-        let ward = response.data.ward?.substring(
-          0,
-          response.data.ward.indexOf("|")
-        );
-        console.log(response.data);
-        console.log(ward, district);
-        setFormData(response.data);
-        console.log(formData);
-      })
-      .catch((error) => console.log(error));
+    if (addressId) {
+      axios
+        .get(`${CLIENTURL}/address/${addressId}`)
+        .then((response) => {
+          setFormData(response.data);
+        })
+        .catch((error) => console.log(error));
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [thisRender]);
 

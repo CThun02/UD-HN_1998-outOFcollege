@@ -22,6 +22,7 @@ import com.fpoly.ooc.service.interfaces.BillDetailService;
 import com.fpoly.ooc.service.interfaces.BillService;
 import com.fpoly.ooc.service.interfaces.DeliveryNoteService;
 import com.fpoly.ooc.service.interfaces.NotificationService;
+import com.fpoly.ooc.service.interfaces.PaymentService;
 import com.fpoly.ooc.service.interfaces.ProductImageServiceI;
 import com.fpoly.ooc.service.interfaces.TimeLineService;
 import lombok.extern.slf4j.Slf4j;
@@ -52,9 +53,6 @@ public class TimeLineServiceImpl implements TimeLineService {
     private DeliveryNoteService deliveryNoteService;
 
     @Autowired
-    private BillDetailService billDetailService;
-
-    @Autowired
     private SimpMessagingTemplate template;
 
     @Autowired
@@ -62,6 +60,9 @@ public class TimeLineServiceImpl implements TimeLineService {
 
     @Autowired
     private NotificationService notificationService;
+
+    @Autowired
+    private PaymentService paymentService;
 
     @Override
     public List<TimeLineResponse> getAllTimeLineByBillId(Long id) {
@@ -160,9 +161,9 @@ public class TimeLineServiceImpl implements TimeLineService {
 
         Long count = timeLineRepo.getCountTimelineByBillId(billId);
         String notificationsJson = null;
-        List< NotificationDTO> notificationList = notificationService.notificationDTOList();
+        List<NotificationDTO> notificationList = notificationService.notificationDTOList();
         NotificationResponse notification = null;
-        if(count <= 1 && count > -1) {
+        if (count <= 1 && count > -1) {
             notification = new NotificationResponse();
             notification.setNotificationList(notificationList);
             notification.setIsReload(true);
@@ -197,11 +198,20 @@ public class TimeLineServiceImpl implements TimeLineService {
 
     @Override
     public BillInfoResponse getBillInfoByBillId(Long id) {
-        return timeLineRepo.getBillInfoByIdBillId(id);
+        BillInfoResponse getInfo = timeLineRepo.getBillInfoByIdBillId(id);
+        BillInfoResponse billInfoResponse =
+                new BillInfoResponse(getInfo.getBillId(), getInfo.getBillCode(), getInfo.getTransaction(), getInfo.getSymbol(),
+                        getInfo.getBillType(), getInfo.getTotalPrice(), getInfo.getPriceReduce(), getInfo.getShipPrice(),
+                        getInfo.getAmountPaid(), getInfo.getShipDate(), getInfo.getCreatedDate(), getInfo.getFullName(),
+                        getInfo.getPhoneNumber(), getInfo.getAddressId(), getInfo.getAddressDetaill(), getInfo.getWard(),
+                        getInfo.getDistrict(), getInfo.getCity(), getInfo.getStatus(), getInfo.getVoucherPrice());
+
+        billInfoResponse.setLstPaymentDetail(paymentService.findPaymentDetailByBillId(id));
+        return billInfoResponse;
     }
 
     @Override
-    public List<TimelineProductDisplayResponse> getListTimelineByUser(String username,get
+    public List<TimelineProductDisplayResponse> getListTimelineByUser(String username,
                                                                       String billCode,
                                                                       String status,
                                                                       String symbol,

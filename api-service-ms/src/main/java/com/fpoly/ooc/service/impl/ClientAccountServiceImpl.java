@@ -12,19 +12,16 @@ import com.fpoly.ooc.repository.AccountRepository;
 import com.fpoly.ooc.repository.AddressRepository;
 import com.fpoly.ooc.request.account.UserDetailsRequest;
 import com.fpoly.ooc.request.address.AddressRequest;
-import com.fpoly.ooc.service.interfaces.AuthService;
 import com.fpoly.ooc.service.interfaces.ClientAccountService;
 import com.fpoly.ooc.util.CommonUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.nio.CharBuffer;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @Slf4j
@@ -88,13 +85,14 @@ public class ClientAccountServiceImpl implements ClientAccountService {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.PASSWORD_NOT_CORRECT));
         }
 
-        account.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        if (request.getNewPassword() != null) {
+            account.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        }
         account.setFullName(request.getFullName());
         account.setEmail(request.getEmail());
         account.setNumberPhone(request.getPhoneNumber());
         account.setGender(request.getGender());
         account.setDob(request.getDateOfBirth());
-        account.setIdNo(request.getNationalIdentificationCard());
         account.setAvatar(request.getAvatar());
 
         return userInfomationDTO(accountRepository.save(account));

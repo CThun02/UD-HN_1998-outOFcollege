@@ -144,12 +144,28 @@ public class BillServiceImpl implements BillService {
             }
         }
 
-        PaymentDetail paymentDetail = PaymentDetail.builder()
-                .bill(bill)
-                .payment(Payment.builder().id(request.getPaymentDetailId()).build())
-                .price(request.getPrice())
-                .build();
-        paymentDetailRepo.save(paymentDetail);
+        if (request.getPaymentDetailId() == 3) {
+            PaymentDetail paymentDetailLan1Nd = PaymentDetail.builder()
+                    .bill(bill)
+                    .payment(Payment.builder().id(1L).build())
+                    .price(bill.getAmountPaid())
+                    .build();
+            paymentDetailRepo.save(paymentDetailLan1Nd);
+
+            PaymentDetail paymentDetail2Nd = PaymentDetail.builder()
+                    .bill(bill)
+                    .payment(Payment.builder().id(2L).build())
+                    .price(bill.getPriceReduce().subtract(request.getPriceAmount()))
+                    .build();
+            paymentDetailRepo.save(paymentDetail2Nd);
+        } else {
+            PaymentDetail paymentDetail = PaymentDetail.builder()
+                    .bill(bill)
+                    .payment(Payment.builder().id(request.getPaymentDetailId()).build())
+                    .price(request.getPrice())
+                    .build();
+            paymentDetailRepo.save(paymentDetail);
+        }
 
         if (request.getBillType().equals("In-Store")) {
             for (int i = 0; i < 2; i++) {
@@ -173,7 +189,7 @@ public class BillServiceImpl implements BillService {
 
             VoucherHistory voucherHistory = VoucherHistory.builder()
                     .bill(bill)
-                    .priceReduce(bill.getPriceReduce())
+                    .priceReduce(bill.getPrice().subtract(bill.getPriceReduce()))
                     .voucherCode(request.getVoucherCode())
                     .build();
             voucherHistoryService.saveVoucherHistory(voucherHistory);
@@ -274,7 +290,7 @@ public class BillServiceImpl implements BillService {
         billRepo.save(bill);
         if (dto.getStatus().equals("Cancel")) {
             VoucherHistory voucherHistory = voucherHistoryService.findHistoryByBillCode(bill.getBillCode());
-            if(voucherHistory != null){
+            if (voucherHistory != null) {
                 VoucherAccount voucherAccount = voucherAccountService
                         .findVoucherAccountByUsernameAndVoucherCode(bill.getAccount().getUsername(), voucherHistory.getVoucherCode());
                 Voucher voucher = null;
@@ -502,7 +518,8 @@ public class BillServiceImpl implements BillService {
             }
         }
         price = (bill.getPrice()).subtract(priceReduce);
-        bill.setPrice(price);
+        bill.setPrice(bill.getPrice());
+        bill.setPriceReduce(price);
         return billRepo.save(bill);
     }
 

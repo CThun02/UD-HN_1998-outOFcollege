@@ -512,9 +512,15 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
-    public Bill updateBillReturn(Long billId, BigDecimal priceReturn, Boolean mtc) {
+    public Bill updateBillReturn(Long billId, BigDecimal priceReturn, BigDecimal voucherPrice) {
         Bill bill = this.findBillByBillId(billId);
         bill.setPriceReduce(bill.getPriceReduce().subtract(priceReturn));
-        return bill;
+        bill.setStatus("ReturnS");
+        VoucherHistory voucherHistory = voucherHistoryService.findHistoryByBillCode(bill.getBillCode());
+        if(voucherHistory != null){
+            voucherHistory.setPriceReduce(voucherPrice);
+            voucherHistoryService.saveVoucherHistory(voucherHistory);
+        }
+        return billRepo.save(bill);
     }
 }

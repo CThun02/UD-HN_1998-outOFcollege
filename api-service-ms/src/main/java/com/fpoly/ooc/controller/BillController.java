@@ -68,8 +68,8 @@ public class BillController {
 
     @PutMapping("/updateBillReturn")
     public ResponseEntity<?> updateBillReturn(@RequestParam Long billId, @RequestParam BigDecimal priceReturn,
-                                                            @RequestParam Boolean mtc){
-        return ResponseEntity.ok(billService.updateBillReturn(billId, priceReturn, mtc));
+                                              @RequestParam BigDecimal voucherPrice){
+        return ResponseEntity.ok(billService.updateBillReturn(billId, priceReturn, voucherPrice));
     }
 
     @GetMapping("/filterProductDetailSellByIdCom")

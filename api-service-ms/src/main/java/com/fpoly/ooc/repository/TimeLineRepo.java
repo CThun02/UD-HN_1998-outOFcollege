@@ -15,15 +15,13 @@ import java.util.List;
 public interface TimeLineRepo extends JpaRepository<Timeline, Long> {
 
     @Query("SELECT DISTINCT new com.fpoly.ooc.responce.timeline.TimeLineResponse( t.id, t.bill.id, t.note, t.status, " +
-            "   t.createdAt, t.createdBy, t.bill.billType, p.paymentName, b.status, b.completionDate, b.price, " +
+            "   t.createdAt, t.createdBy, t.bill.billType, b.status, b.completionDate, b.price, " +
             "   add.descriptionDetail + ' ' + add.ward + ' ' + add.district + ' ' + add.city )" +
             "FROM Timeline t " +
             "   LEFT JOIN Bill b ON t.bill.id = b.id " +
             "   LEFT JOIN BillDetail bd ON bd.bill.id = b.id " +
             "   LEFT JOIN DeliveryNote dn ON dn.bill.id = b.id " +
             "   LEFT JOIN Address add ON add.id = dn.address.id " +
-            "   LEFT JOIN PaymentDetail pd ON pd.bill.id = b.id " +
-            "   LEFT JOIN Payment p ON p.id = pd.payment.id " +
             "WHERE b.id = :billId " +
             "ORDER BY t.id")
     List<TimeLineResponse> getTimeLineByBillId(@Param("billId") Long id);
@@ -70,13 +68,13 @@ public interface TimeLineRepo extends JpaRepository<Timeline, Long> {
             @Param("createdBy") String createdBy);
 
     @Query("SELECT new com.fpoly.ooc.responce.bill.BillInfoResponse(b.id, b.billCode,b.transactionCode, b.symbol, b.billType, " +
-            "    b.price, b.priceReduce, dn.shipPrice, b.amountPaid, dn.shipDate, pd.payment.paymentName, b.createdAt, " +
+            "    b.price, b.priceReduce, dn.shipPrice, b.amountPaid, dn.shipDate, b.createdAt, " +
             "    add.fullName, add.sdt, add.id, " +
-            "    add.descriptionDetail +  ' ' + add.ward + ' ' + add.district + ' ' + add.city, b.status) " +
+            "    add.descriptionDetail, add.ward, add.district, add.city, b.status, vh.priceReduce) " +
             "FROM Bill b " +
             "   LEFT JOIN DeliveryNote dn ON b.id = dn.bill.id " +
             "   LEFT JOIN Address add ON add.id = dn.address.id " +
-            "   LEFT JOIN PaymentDetail pd ON pd.bill.id = b.id " +
+            "   LEFT JOIN VoucherHistory vh ON vh.bill.id = b.id " +
             "WHERE b.id = :billId")
     BillInfoResponse getBillInfoByIdBillId(@Param("billId") Long id);
 

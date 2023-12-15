@@ -50,6 +50,8 @@ public class Const {
     public static final String OPERATION_ERROR = "OPERATION_ERROR";
     public static final String HTML_TITLE = "SEND_EMAIL_TEMPLATE_TITLE";
     public static final String HTML_BODY = "SEND_EMAIL_TEMPLATE_BODY";
+    public static final String OBJECT_USE_VOUCHER_ALL = "all";
+    public static final String OBJECT_USE_VOUCHER_MEMBERS = "member";
 
 
     //ErrorCode

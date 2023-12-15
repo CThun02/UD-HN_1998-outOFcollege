@@ -21,14 +21,13 @@ import com.fpoly.ooc.service.interfaces.BillService;
 import com.fpoly.ooc.service.interfaces.CartDetailService;
 import com.fpoly.ooc.service.interfaces.DeliveryNoteService;
 import com.fpoly.ooc.service.interfaces.EmailService;
+import com.fpoly.ooc.service.interfaces.PaymentService;
 import com.fpoly.ooc.service.interfaces.TimeLineService;
 import com.fpoly.ooc.service.interfaces.VoucherService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -81,6 +80,9 @@ public class ClientController {
 
     @Autowired
     private AccountService accountService;
+
+    @Autowired
+    private PaymentService paymentService;
 
     @GetMapping("/address")
     public ResponseEntity<?> getAll(@RequestParam("username") String username) {
@@ -240,6 +242,11 @@ public class ClientController {
     @GetMapping("/getTimelineClientByBillCode/{billCode}")
     public ResponseEntity<?> getTest(@PathVariable("billCode") String billCode) {
         return ResponseEntity.ok().body(timeLineService.getTimelineByBillCode(billCode));
+    }
+
+    @PostMapping("/autoFillVoucher")
+    public ResponseEntity<?> autoFillVoucher(@RequestBody DisplayVoucherRequest req) {
+        return ResponseEntity.ok(voucherService.autoFillVoucher(req));
     }
 
     @GetMapping("/vouchers/{username}")

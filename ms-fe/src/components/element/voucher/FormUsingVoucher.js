@@ -7,7 +7,9 @@ import "./global.css";
 import { getToken } from "../../../service/Token";
 
 const href = window.location.href;
-const baseUrl = `http://localhost:8080/api/${href.includes('admin') ? `admin` : `client`}/vouchers`;
+const baseUrl = `http://localhost:8080/api/${
+  href.includes("admin") ? `admin` : `client`
+}/vouchers`;
 
 function FormUsingVoucher({
   setIsOpen,
@@ -19,6 +21,7 @@ function FormUsingVoucher({
 }) {
   const [vouchers, setVouchers] = useState([]);
   const [voucherCodeOrName, setVoucherCodeOrName] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
   const handleOnChange = (value) => {
     setVoucher(value);
@@ -34,25 +37,56 @@ function FormUsingVoucher({
 
   useEffect(() => {
     async function getVouchers() {
-      try {
-        const condition = {
-          username,
-          priceBill,
-          voucherCodeOrName,
-        };
-        const res = await axios.post(
-          baseUrl + "/display-modal-using",
-          condition,
-          {
-            headers: {
-              Authorization: `Bearer ${getToken(true)}`,
-            },
-          }
+      if (voucherCodeOrName) {
+        const filter = vouchers?.filter(
+          (e) =>
+            e?.voucherName
+              ?.toLowerCase()
+              .includes(voucherCodeOrName?.toLowerCase()) ||
+            e?.voucherCode?.includes(voucherCodeOrName)
         );
-        const data = await res.data;
-        setVouchers(data);
-      } catch (err) {
-        console.log(err);
+        if (filter?.length > 0) {
+          setVouchers(filter);
+          setIsLoading((bool) => !bool);
+        } else {
+          try {
+            const res = await axios.get(
+              baseUrl + "/search/" + voucherCodeOrName,
+              {
+                headers: {
+                  Authorization: `Bearer ${getToken(true)}`,
+                },
+              }
+            );
+            const data = await res.data;
+            setVouchers(data);
+            setIsLoading((bool) => !bool);
+          } catch (err) {
+            console.log(err);
+          }
+        }
+      } else {
+        try {
+          const condition = {
+            username,
+            priceBill,
+            voucherCodeOrName,
+          };
+          const res = await axios.post(
+            baseUrl + "/display-modal-using",
+            condition,
+            {
+              headers: {
+                Authorization: `Bearer ${getToken(true)}`,
+              },
+            }
+          );
+          const data = await res.data;
+          setVouchers(data);
+          setIsLoading((bool) => !bool);
+        } catch (err) {
+          console.log(err);
+        }
       }
     }
     getVouchers();
@@ -76,22 +110,26 @@ function FormUsingVoucher({
         />
       </div>
       <Space style={{ width: "100%" }} direction="vertical">
-        <Radio.Group
-          onChange={(e) => {
-            handleOnChange(e.target.value);
-          }}
-          value={voucher}
-        >
-          {vouchers.map((data) => (
-            data.status !== 'CANCEL' &&
-            <VoucherList
-              key={data.voucherId}
-              data={data}
-              setValue={setVoucher}
-              value={voucher}
-            />
-          ))}
-        </Radio.Group>
+        {vouchers.length > 0 ? (
+          <Radio.Group
+            onChange={(e) => {
+              handleOnChange(e.target.value);
+            }}
+            value={voucher}
+          >
+            {vouchers?.map(
+              (data) =>
+                data.status !== "CANCEL" && (
+                  <VoucherList
+                    key={data.voucherId}
+                    data={data}
+                    setValue={setVoucher}
+                    value={voucher}
+                  />
+                )
+            )}
+          </Radio.Group>
+        ) : null}
       </Space>
     </Modal>
   );

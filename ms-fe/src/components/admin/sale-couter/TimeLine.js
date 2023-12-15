@@ -16,7 +16,7 @@ import ModalDetail from "./ModalDetail";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import numeral from "numeral";
-import { CheckCircleOutlined, DeleteOutlined, DeleteRowOutlined } from "@ant-design/icons";
+import { CheckCircleOutlined, DeleteOutlined } from "@ant-design/icons";
 import { getAuthToken, getToken } from "../../../service/Token";
 import ModalBillInfoDisplay from "../../element/bill-info/ModalBillInfoDisplay";
 import ModalProduct from "./ModalProduct";
@@ -146,7 +146,7 @@ const BillTimeLine = (addId) => {
                     Number(timelines[timelines.length - 1]?.status) === 4
                     && billInfo.status !== "Paid"
                     && action !== "cancel")
-                ? billInfo.totalPrice + billInfo?.shipPrice - billInfo.priceReduce
+                ? billInfo.priceReduce + billInfo?.shipPrice
                 : billInfo.symbol === "Shipping" && billInfo.status === "Paid"
                     ? billInfo.amountPaid
                     : 0,
@@ -689,8 +689,8 @@ const BillTimeLine = (addId) => {
                             </Col>
                             <Col span={12}>
                                 <SpanBorder
-                                    child={billInfo?.paymentName === "Cash" ? "Tiền mặt"
-                                        : "ATM" || "__"}
+                                    child={(billInfo?.lstPaymentDetail?.length > 1 ? 'Tiền mặt + Chuyển khoản' :
+                                        billInfo?.lstPaymentDetail?.length === 1 ? (billInfo?.lstPaymentDetail.paymentName === "Cash" ? "Tiền mặt" : "ATM") : '') || "__"}
                                     color={"#1677ff"}
                                 />
                             </Col>
@@ -771,13 +771,12 @@ const BillTimeLine = (addId) => {
                                     </Col>
                                     <Col span={14}>
                                         <span>
-                                            {(billInfo?.amountPaid -
-                                                billInfo?.priceReduce +
-                                                billInfo.shipPrice).toLocaleString("vi-VN", {
-                                                    style: "currency",
-                                                    currency: "VND",
-                                                })
-                                            }
+                                            {(billInfo?.amountPaid > 0 ? billInfo?.amountPaid -
+                                                (billInfo?.priceReduce +
+                                                    billInfo.shipPrice) : 0).toLocaleString("vi-VN", {
+                                                        style: "currency",
+                                                        currency: "VND",
+                                                    })}
                                         </span>
                                     </Col>
                                 </Row>
@@ -843,7 +842,7 @@ const BillTimeLine = (addId) => {
                         <span style={{ width: "200px", display: "inline-block" }}>
                             Giảm giá:
                         </span>
-                        <span>{numeral(billInfo?.price - billInfo?.priceReduce)?.format("0,0") + "đ"}</span>
+                        <span>{numeral(billInfo?.voucherPrice)?.format("0,0") + "đ"}</span>
                     </span>
                     <b className={styles.span}>
                         <span style={{ width: "200px", display: "inline-block" }}>

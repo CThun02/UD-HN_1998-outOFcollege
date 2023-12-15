@@ -60,8 +60,9 @@ public class MsJobService {
             voucherService.findAllNoFilter().forEach(e -> {
                 if (!(e.getStatus().equals(Const.STATUS_CANCEL))) {
                     String status = isCheckDateTime(e.getStartDate(), e.getEndDate());
-                    voucherService.updateStatus(e.getVoucherCode(),
-                            status == null ? e.getStatus() : status);
+                    String isCheckQuantity = isCheckQuantityThan0(e.getLimitQuantity(), status != null ? status : e.getStatus());
+
+                    voucherService.updateStatus(e.getVoucherCode(), isCheckQuantity);
                 }
             });
 
@@ -148,6 +149,16 @@ public class MsJobService {
 
         log.info("nullable");
         return null;
+    }
+
+    private String isCheckQuantityThan0(Integer quantity, String status) {
+        if(quantity == null) return Const.STATUS_INACTIVE;
+
+        if(Const.STATUS_ACTIVE.equals(status) && quantity <= 0) {
+            return Const.STATUS_INACTIVE;
+        }
+
+        return status;
     }
 
 }

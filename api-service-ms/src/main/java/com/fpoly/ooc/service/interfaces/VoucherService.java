@@ -7,6 +7,7 @@ import com.fpoly.ooc.request.voucher.VoucherRequest;
 import com.fpoly.ooc.responce.voucher.VoucherAccountResponse;
 import com.fpoly.ooc.responce.voucher.VoucherResponse;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -26,6 +27,8 @@ public interface VoucherService {
 
     VoucherRequest findByVoucherCode(String code);
 
+    List<VoucherResponse> searchVoucherByCode(String code);
+
     Boolean isCheckAccountOwnerVoucher(Long idVoucher, String username);
 
     List<VoucherResponse> findAllNoFilter();
@@ -38,6 +41,8 @@ public interface VoucherService {
 
     Voucher updateVoucher(Voucher voucher);
 
+    VoucherResponse autoFillVoucher(DisplayVoucherRequest request);
+    
     List<VoucherAccountResponse> getVoucherByUsernameAndVoucherCode(String username, String voucherCode);
 
 }

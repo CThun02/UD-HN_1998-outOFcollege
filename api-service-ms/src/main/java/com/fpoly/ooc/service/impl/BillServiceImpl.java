@@ -148,7 +148,7 @@ public class BillServiceImpl implements BillService {
             PaymentDetail paymentDetailLan1Nd = PaymentDetail.builder()
                     .bill(bill)
                     .payment(Payment.builder().id(1L).build())
-                    .price(bill.getAmountPaid())
+                    .price(request.getPriceAmount())
                     .build();
             paymentDetailRepo.save(paymentDetailLan1Nd);
 

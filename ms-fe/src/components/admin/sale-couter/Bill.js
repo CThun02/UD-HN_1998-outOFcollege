@@ -412,6 +412,7 @@ const Bill = () => {
     setSelectedOption(value);
     if (value === "2") {
       setAmountPaid(0);
+      setTransactionCode('')
     }
   };
 
@@ -614,11 +615,11 @@ const Bill = () => {
     let result = totalPrice;
 
     if (voucherAdd && voucherAdd.voucherMethod === "vnd") {
-      if (result > (voucherAdd.voucherCondition ?? 0)) {
+      if (result >= (voucherAdd.voucherCondition ?? 0)) {
         result -= voucherAdd.voucherValue ?? 0;
       }
     } else if (voucherAdd && voucherAdd.voucherMethod === "%") {
-      if (result > voucherAdd.voucherCondition) {
+      if (result >= voucherAdd.voucherCondition) {
         const discountPercent = voucherAdd.voucherValue ?? 0;
         const maxDiscount = voucherAdd.voucherValueMax ?? 0;
         let discount = (totalPrice * discountPercent) / 100;
@@ -809,6 +810,19 @@ const Bill = () => {
   const getProductDetails = () => {
     var cart = JSON.parse(localStorage.getItem(cartId));
     var productDetails = cart.productDetails;
+    for (let index = 0; index < productDetails.length; index++) {
+      var productDetailId = productDetails[index].productDetail.id;
+      axios.get("http://localhost:8080/api/admin/product/getproductdetailbyidpd?productDetailId=" + productDetailId, {
+        headers: {
+          Authorization: `Bearer ${getToken(true)}`,
+        },
+      }).then(res => {
+        if (res?.data?.quantity <= 0) {
+          cart.productDetails = productDetails.splice(index, 1);
+          localStorage.setItem(cartId, JSON.stringify(cart));
+        }
+      })
+    }
     setProductDetails(productDetails);
     setAccount(cart.account);
   };
@@ -993,7 +1007,7 @@ const Bill = () => {
       addressId: selectedAddress?.id,
       fullname: selectedAddress?.fullName,
       phoneNumber: selectedAddress.numberPhone,
-      transactionCode: selectedOption === "2" ? transactionCode : null,
+      transactionCode: (Number(selectedOption) === 2 || Number(selectedOption) === 3) ? transactionCode : null,
       voucherCode: voucherAdd?.voucherCode ?? null,
       createdBy: "user3",
       priceAmount: Number(selectedOption) === 3 ? amountPaid : null,
@@ -1244,12 +1258,14 @@ const Bill = () => {
         },
       });
     }
+    console.log(amountPaid)
   };
 
   const [inputError, setInputError] = useState("");
   const [transactionError, setTransactionError] = useState('')
   const handleChangeInput = (e, index) => {
     const inputValue = e.target.value;
+    setAmountPaid(inputValue);
     let calculatedValue = 0;
     if (switchChange[index]) {
       calculatedValue = inputValue - voucherPrice() - shippingFee;
@@ -1262,7 +1278,6 @@ const Bill = () => {
     if (calculatedValue < 0) {
       setInputError("Số tiền không đủ");
     } else {
-      setAmountPaid(inputValue);
       setInputError("");
       setTransactionError('')
     }
@@ -1449,7 +1464,6 @@ const Bill = () => {
                             <Col span={24}>
                               <div className="m-5">
                                 <b style={{ color: "red" }}></b> Email
-                                {console.log(selectedAddress)}
                                 <Input
                                   placeholder="nhập email"
                                   value={selectedAddress?.email}
@@ -1928,7 +1942,6 @@ const Bill = () => {
             );
           })}
       </Tabs >
-      {console.log(account)}
       < FormUsingVoucher
         priceBill={totalPrice}
         voucher={voucherAdd}

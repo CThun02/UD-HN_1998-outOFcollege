@@ -58,7 +58,6 @@ const Checkout = ({ setRenderHeader }) => {
   const [voucherAdd, setVoucherAdd] = useState({});
   const [isOpenFormVoucher, setIsOpenFormVoucher] = useState(false);
   const [username, setUsername] = useState(null);
-  const [bill, setBill] = useState(null);
 
   const handleProvincesChange = (e) => {
     formData.city = e;

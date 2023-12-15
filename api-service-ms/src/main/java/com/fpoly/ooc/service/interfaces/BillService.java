@@ -81,5 +81,5 @@ public interface BillService {
 
     List<NotificationDTO> findAllNotifications();
 
-    Bill updateBillReturn(Long billId, BigDecimal priceReturn, Boolean mtc);
+    Bill updateBillReturn(Long billId, BigDecimal priceReturn, BigDecimal voucherPrice);
 }

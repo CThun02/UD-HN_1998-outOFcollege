@@ -51,19 +51,17 @@ const BillReturn = () => {
   const [modalDetail, setModalDetail] = useState(false);
   const [isLoad, setIsLoad] = useState(0);
   const [voucher, setVoucher] = useState(null);
-  var payAfterReturn =
-    billInfo?.price -
-    totalPrice -
-    (voucher
-      ? voucher?.voucherCondition > billInfo?.price - totalPrice
-        ? 0
-        : voucher?.voucherMethod === "vnd"
-        ? voucher?.voucherValue
-        : ((billInfo?.price - totalPrice) * voucher?.voucherValue) / 100 >
-          voucher?.voucherValueMax
-        ? voucher?.voucherValueMax
-        : ((billInfo?.price - totalPrice) * voucher?.voucherValue) / 100
-      : 0);
+  var voucherPrice = voucher
+    ? voucher?.voucherCondition > billInfo?.price - totalPrice
+      ? 0
+      : voucher?.voucherMethod === "vnd"
+      ? voucher?.voucherValue
+      : ((billInfo?.price - totalPrice) * voucher?.voucherValue) / 100 >
+        voucher?.voucherValueMax
+      ? voucher?.voucherValueMax
+      : ((billInfo?.price - totalPrice) * voucher?.voucherValue) / 100
+    : 0;
+  var payAfterReturn = billInfo?.price - totalPrice - voucherPrice;
 
   const handleShowModalProduct = (index, value) => {
     const newModalVisible = [...modalQuantityReturn];
@@ -239,7 +237,6 @@ const BillReturn = () => {
       },
     },
   ];
-
   async function confirmReload(status) {
     const data = await token;
     if (note) {
@@ -280,7 +277,7 @@ const BillReturn = () => {
       for (let index = 0; index < productsReturns.length; index++) {
         const request = {
           productDetailId: productsReturns[index].productDetailId,
-          billId: billInfo.id,
+          billId: billInfo?.id,
           reason: productsReturns[index].reason,
           quantity: productsReturns[index].quantity,
           price: productsReturns[index].productPrice,
@@ -308,6 +305,11 @@ const BillReturn = () => {
       });
       var id = productsReturns.map((item) => item.billDetailId);
       changeStatusBillDetail(id, "ReturnS");
+      changeBillAfterReturn(
+        billInfo?.id,
+        billInfo?.priceReduce - payAfterReturn,
+        voucherPrice
+      );
       setRender(Math.random());
       productsReturns = [];
     } else {
@@ -316,6 +318,31 @@ const BillReturn = () => {
         description: "Vui lòng nhập mô tả!",
       });
     }
+  }
+  function changeBillAfterReturn(billId, priceReturn, voucherPrice) {
+    axios
+      .put(
+        `http://localhost:8080/api/admin/bill/updateBillReturn?billId=${billId}&priceReturn=${priceReturn}&voucherPrice=${voucherPrice}`,
+        null,
+        {
+          headers: {
+            Authorization: `Bearer ${getToken(true)}`,
+          },
+        }
+      )
+      .then((response) => {
+        setRender(response.data);
+      })
+      .catch((error) => {
+        const status = error?.response?.status;
+        if (status === 403) {
+          notification.error({
+            message: "Thông báo",
+            description: "Bạn không có quyền truy cập!",
+          });
+        }
+        return;
+      });
   }
 
   function changeStatusBillDetail(id, status) {
@@ -409,6 +436,9 @@ const BillReturn = () => {
           ) {
             navigate("/api/admin/return");
           }
+          if (response.data.status === "ReturnS") {
+            navigate(`/api/admin/return/return-bill/${billCode}/bill`);
+          }
         } else {
           navigate("/api/admin/return");
         }
@@ -480,52 +510,39 @@ const BillReturn = () => {
               }
             )
             .then((response) => {
+              setBillInfor(response.data);
               setReturned(
-                response.data.billDetails.some((item) => item.checkInPromotion)
+                response.data.billDetails?.every(
+                  (item) => item.checkInPromotion === true
+                )
               );
-              for (
-                let index = 0;
-                index < response.data.billDetails.length;
-                index++
-              ) {
-                if (
-                  response.data.billDetails[index].billDetailStatus ===
-                  "ReturnW"
+              if (response?.data?.status === "ReturnS") {
+                setReturned("returned");
+                for (
+                  let index = 0;
+                  index < response.data.billDetails.length;
+                  index++
                 ) {
-                  setReturned("request");
-                }
-                if (
-                  response.data.billDetails[index].billDetailStatus ===
-                  "ReturnS"
-                ) {
-                  setReturned("returned");
-                }
-                if (
-                  response.data.billDetails[index].billDetailStatus ===
-                  "ReturnC"
-                ) {
-                  setReturned("cancel");
-                }
-              }
-              for (
-                let index = 0;
-                index < response.data.billDetails.length;
-                index++
-              ) {
-                if (
-                  response.data.billDetails[index].billDetailStatus ===
-                    "ReturnW" ||
-                  response.data.billDetails[index].billDetailStatus ===
-                    "ReturnS"
-                ) {
-                  if (
-                    !productsReturns.some(
-                      (item) =>
-                        item.productDetailId ===
-                        response.data.billDetails[index].productDetailId
-                    )
-                  ) {
-                    productsReturns.push(response.data.billDetails[index]);
+                  for (let j = 0; j < res.data.length; j++) {
+                    if (
+                      res.data[j].id ===
+                      response.data.billDetails[index].productDetailId
+                    ) {
+                      let productReturn = {
+                        ...response.data.billDetails[index],
+                      };
+                      productReturn.quantity = res.data[j].quantity;
+                      productReturn.reason = res.data[j].descriptionDetail;
+                      if (
+                        productsReturns.every(
+                          (item) =>
+                            item.productDetailId !==
+                            productReturn.productDetailId
+                        )
+                      ) {
+                        productsReturns.push(productReturn);
+                      }
+                    }
                   }
                 }
               }
@@ -535,25 +552,9 @@ const BillReturn = () => {
                   productsReturns[index].productPrice *
                   productsReturns[index].quantity;
               }
-              for (
-                let index = 0;
-                index < response.data.billDetails.length;
-                index++
-              ) {
-                for (let i = 0; i < res.data.length; i++) {
-                  if (
-                    response.data.billDetails[index].productDetailId ===
-                    res.data[i].id
-                  ) {
-                    productsReturns[index].reason =
-                      res.data[i].descriptionDetail;
-                    break;
-                  }
-                }
-              }
+
               seTotalPrice(total);
               setIsLoad(1);
-              setBillInfor(response.data);
             })
             .catch((error) => {
               const status = error?.response?.status;
@@ -595,50 +596,60 @@ const BillReturn = () => {
               {billInfo?.symbol !== "Received" ? (
                 <Timeline minEvents={6} placeholder className={styles.timeLine}>
                   {billInfo?.timeLines &&
-                    billInfo?.timeLines.map((data) => (
-                      <TimelineEvent
-                        color={
-                          data.status === "0" || data.status === "-1"
-                            ? "#FF0000"
-                            : data.status === "5"
-                            ? "#f0ad4e"
-                            : "#00cc00"
-                        }
-                        icon={
-                          data.status === "1"
-                            ? FaRegFileAlt
-                            : data.status === "0"
-                            ? FaTimes
-                            : data.status === "2"
-                            ? FaRegFileAlt
-                            : data.status === "3"
-                            ? FaTruck
-                            : CheckCircleOutlined
-                        }
-                        title={
-                          data.status === "0" ? (
-                            <h3>Đã hủy</h3>
-                          ) : data.status === "1" ? (
-                            <h3>Chờ xác nhận</h3>
-                          ) : data.status === "2" ? (
-                            <h3>Chờ giao hàng</h3>
-                          ) : data.status === "3" ? (
-                            <h3>
-                              Đã đóng gói & <br /> đang được giao
-                            </h3>
-                          ) : data.status === "4" ? (
-                            <h3>Giao hàng thành công</h3>
-                          ) : data.status === "5" ? (
-                            <h3>yêu cầu trả hàng</h3>
-                          ) : data.status === "-1" ? (
-                            <h3>Trả hàng thất bại</h3>
-                          ) : (
-                            <h3>Trả hàng thành công</h3>
-                          )
-                        }
-                        subtitle={data.createdDate}
-                      />
-                    ))}
+                    billInfo?.timeLines
+                      .filter(
+                        (item) =>
+                          item.status === "1" ||
+                          item.status === "2" ||
+                          item.status === "3" ||
+                          item.status === "4" ||
+                          item.status === "5" ||
+                          item.status === "6"
+                      )
+                      .map((data) => (
+                        <TimelineEvent
+                          color={
+                            data.status === "0" || data.status === "-1"
+                              ? "#FF0000"
+                              : data.status === "5"
+                              ? "#f0ad4e"
+                              : "#00cc00"
+                          }
+                          icon={
+                            data.status === "1"
+                              ? FaRegFileAlt
+                              : data.status === "0"
+                              ? FaTimes
+                              : data.status === "2"
+                              ? FaRegFileAlt
+                              : data.status === "3"
+                              ? FaTruck
+                              : CheckCircleOutlined
+                          }
+                          title={
+                            data.status === "0" ? (
+                              <h3>Đã hủy</h3>
+                            ) : data.status === "1" ? (
+                              <h3>Chờ xác nhận</h3>
+                            ) : data.status === "2" ? (
+                              <h3>Chờ giao hàng</h3>
+                            ) : data.status === "3" ? (
+                              <h3>
+                                Đã đóng gói & <br /> đang được giao
+                              </h3>
+                            ) : data.status === "4" ? (
+                              <h3>Giao hàng thành công</h3>
+                            ) : data.status === "5" ? (
+                              <h3>yêu cầu trả hàng</h3>
+                            ) : data.status === "-1" ? (
+                              <h3>Trả hàng thất bại</h3>
+                            ) : (
+                              <h3>Trả hàng thành công</h3>
+                            )
+                          }
+                          subtitle={data.createdDate}
+                        />
+                      ))}
                 </Timeline>
               ) : (
                 <Timeline minEvents={2} placeholder className={styles.timeLine}>
@@ -1083,7 +1094,19 @@ const BillReturn = () => {
               </Col>
               <Col span={12} style={{ marginBottom: "10px" }}>
                 <span style={{ fontWeight: 600, color: "rgb(63, 134, 0)" }}>
-                  {billInfo?.priceReduce.toLocaleString("vi-VN", {
+                  {(
+                    billInfo?.price -
+                    (voucher
+                      ? voucher?.voucherCondition > billInfo?.price
+                        ? 0
+                        : voucher?.voucherMethod === "vnd"
+                        ? voucher?.voucherValue
+                        : (billInfo?.price * voucher?.voucherValue) / 100 >
+                          voucher?.voucherValueMax
+                        ? voucher?.voucherValueMax
+                        : (billInfo?.price * voucher?.voucherValue) / 100
+                      : 0)
+                  ).toLocaleString("vi-VN", {
                     style: "currency",
                     currency: "VND",
                   })}
@@ -1170,13 +1193,31 @@ const BillReturn = () => {
                 <span style={{ fontWeight: 600 }}>Tiền thừa trả khách:</span>
               </Col>
               <Col span={12} style={{ marginBottom: "10px" }}>
-                {(billInfo?.priceReduce - payAfterReturn).toLocaleString(
-                  "vi-VN",
-                  {
-                    style: "currency",
-                    currency: "VND",
-                  }
-                )}
+                {billInfo?.status === "ReturnS"
+                  ? (
+                      billInfo?.price -
+                      (voucher
+                        ? voucher?.voucherCondition > billInfo?.price
+                          ? 0
+                          : voucher?.voucherMethod === "vnd"
+                          ? voucher?.voucherValue
+                          : (billInfo?.price * voucher?.voucherValue) / 100 >
+                            voucher?.voucherValueMax
+                          ? voucher?.voucherValueMax
+                          : (billInfo?.price * voucher?.voucherValue) / 100
+                        : 0) -
+                      payAfterReturn
+                    ).toLocaleString("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    })
+                  : (billInfo?.priceReduce - payAfterReturn).toLocaleString(
+                      "vi-VN",
+                      {
+                        style: "currency",
+                        currency: "VND",
+                      }
+                    )}
               </Col>
               <Col span={24}>
                 <span style={{ fontWeight: 600 }}>

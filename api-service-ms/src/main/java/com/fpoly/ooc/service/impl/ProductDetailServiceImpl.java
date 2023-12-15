@@ -66,10 +66,10 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
 
     @Override
     public ProductDetail create(ProductDetail productDetail) throws JsonProcessingException {
-        ProductDetail productDetailDb = repo.save(productDetail);
         if(productDetail.getQuantity() == 0){
             productDetail.setStatus(Const.STATUS_INACTIVE);
         }
+        ProductDetail productDetailDb = repo.save(productDetail);
         return productDetailDb;
     }
 

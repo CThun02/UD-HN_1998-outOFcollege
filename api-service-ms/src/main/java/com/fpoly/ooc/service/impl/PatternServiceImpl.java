@@ -35,7 +35,6 @@ public class PatternServiceImpl implements PatternServiceI {
 
     @Override
     public Pattern update(Pattern pattern, Long id) {
-
         Optional<Pattern> material1 = repo.findById(id);
         return material1.map(o -> {
             o.setPatternName(pattern.getPatternName());

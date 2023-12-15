@@ -36,7 +36,7 @@ public class ProductReturnService implements ProductReturnServiceI {
     @Override
     public ProductReturn create(ProductReturnRequest request) {
         ProductReturn productReturn = request.dto();
-        productReturn.setReason(request.getReason()== null?"PRODUCE":"OTHER");
+        productReturn.setReason(request.getReason()== null || request.getReason().equals("PRODUCE")?"PRODUCE":"OTHER");
         if(productReturn.getReason().equals("OTHER")){
             ProductDetail productDetail = productDetailService.getOne(request.getProductDetailId());
             productDetail.setQuantity(productDetail.getQuantity() + request.getQuantity());

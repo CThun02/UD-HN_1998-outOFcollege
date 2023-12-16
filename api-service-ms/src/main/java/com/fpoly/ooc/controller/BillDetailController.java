@@ -25,7 +25,7 @@ public class BillDetailController {
 
 
     @PostMapping("/create-bill-detail")
-    public ResponseEntity<?> createdBillDetail(@RequestBody BillDetailRequest request) {
+    public ResponseEntity<?> createdBillDetail(@RequestBody BillDetailRequest request) throws JsonProcessingException {
         BillDetail billDetail = billDetailService.createBillDetail(request);
         request.setBillDetailId(billDetail.getId());
         return ResponseEntity.ok("ok");
@@ -38,7 +38,7 @@ public class BillDetailController {
 
     @DeleteMapping("")
     public ResponseEntity<?> deleteBillDetail(@RequestParam("billId") Long billId,
-                                              @RequestParam("billDetailId") Long billDetailId) {
+                                              @RequestParam("billDetailId") Long billDetailId) throws JsonProcessingException {
         return ResponseEntity.ok(billDetailService.deleteBillDetail(billId, billDetailId));
     }
 

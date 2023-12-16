@@ -137,17 +137,18 @@ const BillTimeLine = (addId) => {
                     && Number(timelines[timelines.length - 1]?.status) === 4
                 )
                     ? "Complete"
-                    : billInfo.symbol === "Shipping" && billInfo.status === "Paid"
+                    : billInfo.symbol === "Shipping" && billInfo?.status === "Paid"
                         ? "Paid" : 'Unpaid',
             action === "cancel" ? 0 : (billInfo?.symbol === "Received" &&
                 Number(timelines[timelines.length - 1]?.status) === 2 &&
                 action !== "cancel") ||
                 (billInfo.symbol === "Shipping" &&
                     Number(timelines[timelines.length - 1]?.status) === 4
-                    && billInfo.status !== "Paid"
+                    && billInfo?.status !== "Paid"
                     && action !== "cancel")
-                ? billInfo.priceReduce + billInfo?.shipPrice
-                : billInfo.symbol === "Shipping" && billInfo.status === "Paid"
+                ? ((Number(billInfo?.priceReduce) === (Number(billInfo?.voucherPrice)))
+                    ? billInfo?.shipPrice : billInfo.priceReduce + billInfo?.shipPrice)
+                : billInfo.symbol === "Shipping" && billInfo?.status === "Paid"
                     ? billInfo.amountPaid
                     : 0,
             timelines[timelines.length - 1]?.status
@@ -172,7 +173,7 @@ const BillTimeLine = (addId) => {
             .then((response) => {
                 var timelinesPush = [];
                 for (let index = 0; index < response.data.length; index++) {
-                    if (!isNaN(response.data[index].status)) {
+                    if (!isNaN(response.data[index]?.status)) {
                         timelinesPush.push(response.data[index]);
                     }
                 }
@@ -241,6 +242,14 @@ const BillTimeLine = (addId) => {
 
     const updateQUantityBillDetail = (record, value, index) => {
         let quantityOld = timelinePoduct[index].quantity
+        if ((value - record.quantity) > record.productQuantity) {
+            notification.warning({
+                message: "Thông báo",
+                description: "Đã vượt quá số lượng tồn",
+                duration: 1,
+            });
+            return;
+        }
         axios
             .post(`http://localhost:8080/api/admin/bill-detail/create-bill-detail`, {
                 billId: record.billId,
@@ -254,7 +263,6 @@ const BillTimeLine = (addId) => {
                 },
             })
             .then((response) => {
-                setRender(Math.random())
                 notification.success({
                     message: "Thông báo",
                     description: "Cập nhật thành công",
@@ -262,21 +270,14 @@ const BillTimeLine = (addId) => {
                 });
                 handleCreateTimeline(`Cập nhật sản phẩm: ${record.productCode} |  ${(Number(quantityOld) - Number(value)) > 0 ? (Number(quantityOld) - Number(value)) : (Math.abs(Number(quantityOld) - Number(value)))
                     } `, "Update", null)
+                setRender(Math.random())
             })
             .catch((err) => {
-                notification.success({
-                    message: "Thông báo",
-                    description: "Cập nhật thành công",
-                    duration: 2
-                });
-                handleCreateTimeline(`Cập nhật sản phẩm: ${record.productCode} | ${quantityOld - value > 0 ? quantityOld - value : Math.abs(quantityOld - value)} `, "Update", null)
-                setRender(Math.random())
                 console.log(err)
             })
     }
 
     const handleDeleteBillDetail = (pdCode, bdID, note) => {
-        setAction('Delete')
         handleCreateTimeline(note + ' | ' + pdCode, "Delete", null)
         axios.delete(`http://localhost:8080/api/admin/bill-detail?billId=${billId}&billDetailId=${bdID}`, {
             headers: {
@@ -384,14 +385,13 @@ const BillTimeLine = (addId) => {
             dataIndex: "quantity",
             key: "quantity",
             render: (text, record, index) => {
-                console.log(Number(timlinesDisplay[timlinesDisplay.length - 1]?.status))
                 return (
                     <InputNumber
                         min={1}
-                        max={record.quantity >= record.productQuantity}
-                        value={record.quantity}
-                        onChange={(e) =>
-                            updateQUantityBillDetail(record, e, index)
+                        max={record >= record.productQuantity}
+                        defaultValue={record.quantity}
+                        onBlur={(e) =>
+                            updateQUantityBillDetail(record, e.target.value, index)
                         }
                         disabled={Number(timlinesDisplay[timlinesDisplay.length - 1]?.status) !== 1}
                     />
@@ -425,8 +425,10 @@ const BillTimeLine = (addId) => {
                                     setPdCode(record.productCode)
                                     setBdId(record.billDetailId)
                                     setIsModalConfirm(true)
+                                    setAction('Delete')
                                 }}
-                                disabled={Number(timlinesDisplay[timlinesDisplay.length - 1]?.status) !== 1}
+                                disabled={(Number(timlinesDisplay[timlinesDisplay.length - 1]?.status) !== 1)
+                                    || (timelinePoduct?.length === 1)}
                             ></Button>
                         </Space >
                     </>
@@ -690,7 +692,7 @@ const BillTimeLine = (addId) => {
                             <Col span={12}>
                                 <SpanBorder
                                     child={(billInfo?.lstPaymentDetail?.length > 1 ? 'Tiền mặt + Chuyển khoản' :
-                                        billInfo?.lstPaymentDetail?.length === 1 ? (billInfo?.lstPaymentDetail.paymentName === "Cash" ? "Tiền mặt" : "ATM") : '') || "__"}
+                                        billInfo?.lstPaymentDetail?.length === 1 ? (billInfo?.lstPaymentDetail[0].paymentName === "Cash" ? "Tiền mặt" : "Chuyển khoản") : '') || "__"}
                                     color={"#1677ff"}
                                 />
                             </Col>
@@ -850,7 +852,8 @@ const BillTimeLine = (addId) => {
                         </span>
                         <span style={{ fontSize: "16px", color: "#FF0000" }}>
                             {numeral(
-                                billInfo?.priceReduce + billInfo?.shipPrice
+                                (billInfo?.priceReduce === billInfo.voucherPrice) ? billInfo?.shipPrice
+                                    : (billInfo?.priceReduce + billInfo?.shipPrice)
                             ).format(0, 0) + "đ"}
                         </span>
                     </b>

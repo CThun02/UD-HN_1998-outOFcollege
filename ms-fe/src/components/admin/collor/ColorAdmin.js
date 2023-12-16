@@ -11,7 +11,12 @@ import {
   notification,
   message,
 } from "antd";
-import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  SearchOutlined,
+  PlusOutlined,
+  TableOutlined,
+  HighlightOutlined,
+} from "@ant-design/icons";
 import CollorTable from "./CollorTable";
 import styles from "../categorystyles/CategoryStyles.module.css";
 import axios from "axios";
@@ -57,7 +62,7 @@ const CollorAdmin = function ({ isAdmin }) {
       })
       .catch((err) => {
         // Xử lý lỗi
-        const status = err.response.status;
+        const status = err?.response?.status;
         if (status === 403) {
           notification.error({
             message: "Thông báo",
@@ -71,8 +76,14 @@ const CollorAdmin = function ({ isAdmin }) {
   return (
     <div className={styles.category}>
       <div className={styles.customer}>
+        <h1 style={{ textAlign: "center" }}>
+          <HighlightOutlined /> Quản lý màu sắc
+        </h1>
         <Row className={styles.titleTB}>
-          <h3>Danh Sách Màu Sắc</h3>
+          <h2>
+            {" "}
+            <TableOutlined /> Danh Sách màu sắc
+          </h2>
         </Row>
         <Row className={styles.adminMenu}>
           <Col span={10}>

@@ -8,7 +8,6 @@ import {
   Modal,
   Input,
   message,
-  Switch,
   notification,
 } from "antd";
 import { useEffect, useState } from "react";
@@ -62,7 +61,7 @@ const PatternTable = function (props) {
         message.success("Cập nhật thành công");
       })
       .catch((err) => {
-        const status = err.response.status;
+        const status = err?.response?.status;
         if (status === 403) {
           notification.error({
             message: "Thông báo",
@@ -70,39 +69,6 @@ const PatternTable = function (props) {
           });
           return;
         }
-      });
-  };
-  const handleUpdateStatus = (id, statusUpdate) => {
-    let mess = statusUpdate ? "Đang hoạt động" : "Ngưng hoạt động";
-
-    const updatedStatusValue = statusUpdate ? "ACTIVE" : "INACTIVE"; // Cập nhật trạng thái dựa trên giá trị của statusUpdate
-
-    axios
-      .put(
-        `http://localhost:8080/api/admin/pattern/update/${id}`,
-        {
-          status: updatedStatusValue,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${getToken(true)}`,
-          },
-        }
-      )
-      .then((response) => {
-        setRender(Math.random);
-        messageApi.success(mess, 2);
-      })
-      .catch((error) => {
-        const status = error.response.status;
-        if (status === 403) {
-          notification.error({
-            message: "Thông báo",
-            description: "Bạn không có quyền truy cập!",
-          });
-          return;
-        }
-        messageApi.error(`Cập nhật trạng thái thất bại`, 2);
       });
   };
 
@@ -123,7 +89,7 @@ const PatternTable = function (props) {
         setShowModal(false);
       })
       .catch((err) => {
-        const status = err.response.status;
+        const status = err?.response?.status;
         if (status === 403) {
           notification.error({
             message: "Thông báo",
@@ -145,13 +111,19 @@ const PatternTable = function (props) {
         setData(response.data);
       })
       .catch((err) => {
-        const status = err.response.status;
+        const status = err?.response?.status;
         if (status === 403) {
           notification.error({
             message: "Thông báo",
             description: "Bạn không có quyền truy cập!",
           });
           return;
+        } else {
+          setShowModal(false);
+          notification.error({
+            message: "Lỗi",
+            description: "Không thể xóa dữ liệu!",
+          });
         }
       });
   }, [props.renderTable, render]);
@@ -181,23 +153,6 @@ const PatternTable = function (props) {
             title: "Tên Họa tiết",
             dataIndex: "patternName",
             key: "patternName",
-          },
-          {
-            key: "status",
-            title: "Trạng thái",
-            dataIndex: "status",
-            width: 150,
-            render: (status, record) => (
-              <>
-                <Switch
-                  disabled={!props.isAdmin}
-                  onChange={(checked) => {
-                    handleUpdateStatus(record.id, checked);
-                  }}
-                  checked={status === "ACTIVE"}
-                />
-              </>
-            ),
           },
           {
             title: "Ngày tạo",

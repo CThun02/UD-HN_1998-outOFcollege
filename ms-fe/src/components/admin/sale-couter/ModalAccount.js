@@ -1,5 +1,5 @@
 import { SearchOutlined } from "@ant-design/icons";
-import { Button, Col, Modal, Row, Table, notification } from "antd";
+import { Button, Col, Modal, Row, Table, notification, Radio } from "antd";
 import Input from "antd/es/input/Input";
 import axios from "axios";
 import React from "react";
@@ -19,6 +19,43 @@ const ModalAccount = ({
   const [loading, setLoadding] = useState(true);
   const [renderThis, setRenderThis] = useState(null);
   var cart = JSON.parse(localStorage.getItem(cartId));
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
+  const [visibleCreate, setVisibleCreate] = useState(false);
+  const [account, setAcount] = useState({
+    idNo: generateUniqueRandomHex(12),
+    image: "none",
+    fullName: " ",
+    email: " ",
+    numberPhone: " ",
+    city: "empty" ,
+    district: "empty" ,
+    ward: "empty" ,
+    password: "12345",
+    descriptionDetail: "empty" ,
+    dob: " ",
+    gender: true,
+    idRole: 2,
+  })
+
+  function generateRandomHex(length) {
+    return Array.from({ length }, () =>
+      Math.floor(Math.random() * 16).toString(16)
+    ).join("");
+  }
+
+  function generateUniqueRandomHex(length) {
+    var generatedCodes = {};
+
+    while (true) {
+      var code = generateRandomHex(length);
+
+      if (!generatedCodes[code]) {
+        generatedCodes[code] = true;
+        return code;
+      }
+    }
+  }
 
   const add = (value) => {
     cart.account = value;
@@ -27,11 +64,17 @@ const ModalAccount = ({
         (address) => address.defaultaddress === true
       )[0]
     );
-    console.log(value.accountAddress);
     localStorage.setItem(cartId, JSON.stringify(cart));
     render(Math.random);
     onCancel();
   };
+
+  const handelSetAccount = (field, value)=>{
+    setAcount((account) => ({
+      ...account,
+      [field]: value,
+    }));
+  }
 
   const columns = [
     {
@@ -39,7 +82,11 @@ const ModalAccount = ({
       dataIndex: "index",
       key: "index",
       render: (text, record, index) => {
-        return index + 1;
+        return (
+          <span id={record.id}>
+            {(currentPage - 1) * pageSize + (index + 1)}
+          </span>
+        );
       },
     },
     {
@@ -113,6 +160,65 @@ const ModalAccount = ({
       <Modal
         title="Tìm kiếm khách hàng"
         key={cartId}
+        open={visibleCreate}
+        onCancel={() => {
+          setVisibleCreate(false)
+          setRenderThis(visible);
+        }}
+        centered
+        footer={null}
+      >
+        <Row>
+          <Col offset={2} span={20}>
+            <Row>
+              <Col span={24}>
+                <span style={{fontWeight:"500"}}>Tên khách hàng</span>
+                <Input 
+                value={account.fullName} 
+                onChange={(event)=>{handelSetAccount("fullName", event.target.value)}} 
+                style={{width:"100%"}} size="small" 
+                status={account.fullName===""?"error":null}
+                />
+              </Col>
+              <Col span={24}>
+                <span style={{fontWeight:"500"}}>Số điện thoại</span>
+                <Input 
+                  value={account.numberPhone} 
+                  onChange={(event)=>{handelSetAccount("numberPhone", event.target.value.replace(/[^\d]/g, ""))}}  
+                  style={{width:"100%"}} size="small" 
+                  status={account.numberPhone===""?"error":null}
+                />
+              </Col>
+              <Col span={24}>
+                <span style={{fontWeight:"500"}}>Email</span>
+                <Input 
+                  value={account.email} 
+                  onChange={(event)=>{handelSetAccount("email", event.target.value.replace(" ", ""))}}  
+                  style={{width:"100%"}} size="small" 
+                  status={account.email===""?"error":null}
+                />
+              </Col>
+              <Col span={24}>
+                <span style={{fontWeight:"500"}}>Giới tính</span>
+                <Radio.Group 
+                  value={account.gender} 
+                  onChange={(event)=>{handelSetAccount("gender", event.target.value)}}
+                >
+                  <Radio value={true}>Nam</Radio>
+                  <Radio value={false}>Nữ</Radio>
+                </Radio.Group>
+              </Col>
+            </Row>
+            <Col span={24} style={{textAlign:"center"}}>
+              <Button type="primary" size="large">Xác nhận</Button>
+            </Col>
+          </Col>
+        </Row>
+      </Modal>
+      <Modal
+        centered
+        title="Tìm kiếm khách hàng"
+        key={cartId}
         open={visible}
         onCancel={() => {
           onCancel();
@@ -122,7 +228,7 @@ const ModalAccount = ({
         width={1000}
       >
         <Row>
-          <Col span={12} style={{ marginBottom: "12px" }}>
+          <Col span={12} style={{ marginBottom: "24px" }}>
             <Input
               className={styles.filter_inputSearch}
               placeholder="Nhập tên, số điện thoại khách hàng"
@@ -132,9 +238,11 @@ const ModalAccount = ({
               }}
             />
           </Col>
+          <Col span={12} style={{ textAlign:"end" }}>
+            <Button size="large" type="primary" onClick={()=>{setVisibleCreate(true)}}>Thêm khách hàng</Button>
+          </Col>
           <Col span={24}>
             <Table
-              pagination={false}
               columns={columns}
               dataSource={
                 data &&
@@ -143,6 +251,17 @@ const ModalAccount = ({
                   key: record.id,
                 }))
               }
+              pagination={{
+                showSizeChanger: true,
+                pageSizeOptions: [5, 10, 15, 20],
+                defaultPageSize: 5,
+                showLessItems: true,
+                style: { marginRight: "10px" },
+                onChange: (currentPage, pageSize) => {
+                  setCurrentPage(currentPage);
+                  setPageSize(pageSize);
+                },
+              }}
               loading={loading}
             />
           </Col>

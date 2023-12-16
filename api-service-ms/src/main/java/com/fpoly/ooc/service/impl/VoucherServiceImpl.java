@@ -169,6 +169,11 @@ public class VoucherServiceImpl implements VoucherService {
     }
 
     @Override
+    public VoucherRequest getDetailVoucherByCode(String code) {
+        return convertVoucher(findVoucherByCode(code));
+    }
+
+    @Override
     public List<VoucherResponse> searchVoucherByCode(String code) {
         Voucher voucher = voucherRepository.findVoucherByVoucherCodeAndStatus(code, Const.STATUS_ACTIVE).orElse(null);
         if (Objects.nonNull(voucher)) {
@@ -278,6 +283,10 @@ public class VoucherServiceImpl implements VoucherService {
                 .isCheckSendEmail(voucher.getIsSendEmail())
                 .usernames(convertVoucherAccount(voucher.getVoucherAccount()))
                 .build();
+    }
+
+    private Voucher findVoucherByCode(String code) {
+        return voucherRepository.findVoucherByVoucherCode(code).orElse(null);
     }
 
     private Voucher convertVoucherRequest(VoucherRequest request, Voucher voucherDb) {

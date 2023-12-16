@@ -29,6 +29,8 @@ public interface VoucherRepository extends JpaRepository<Voucher, Long> {
 
     Optional<Voucher> findVoucherByVoucherName(String voucherName);
 
+    Optional<Voucher> findVoucherByVoucherCode(String code);
+
     Optional<Voucher> findVoucherByVoucherCodeAndStatus(String code, String status);
 
     @Query("select new java.lang.Boolean((COUNT(*) > 0)) from VoucherAccount va " +

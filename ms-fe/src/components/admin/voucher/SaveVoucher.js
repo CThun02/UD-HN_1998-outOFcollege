@@ -71,12 +71,12 @@ const validationSchema = Yup.object().shape({
     .required("* Ngày bắt đầu không được bỏ trống")
     .test(
       "start-date-current",
-      "* Ngày bắt đầu phải lớn hơn ngày hiện tại tối thiểu 10 phút",
+      "* Ngày bắt đầu phải lớn hơn ngày hiện tại 30 giây",
       function (startDate) {
-        // const { status } = this.parent;
-        // if (startDate && status !== "ACTIVE") {
-        //   return startDate > dayjs().add(10, "minute");
-        // }
+        const { status } = this.parent;
+        if (startDate && status !== "ACTIVE") {
+          return startDate > dayjs().add(30, "seconds");
+        }
         return true;
       }
     ),
@@ -298,7 +298,7 @@ function SaveVoucher() {
       if (code) {
         async function getVoucher() {
           await axios
-            .get(baseUrl + code, {
+            .get(baseUrl + "detail/" + code, {
               headers: {
                 Authorization: `Bearer ${getToken(true)}`,
               },

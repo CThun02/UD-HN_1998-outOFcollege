@@ -34,7 +34,8 @@ function Header({ render, setRenderHeader }) {
       href.includes("follow-order") ||
       href.includes("about") ||
       href.includes("contact") ||
-      href.includes("cart")
+      href.includes("cart") ||
+      href.includes("checkout")
     ) {
       if (href.includes("home") || selectedTab === "") {
         setSelectedTab("home");
@@ -56,13 +57,13 @@ function Header({ render, setRenderHeader }) {
         setSelectedTab("contact");
       }
 
-      if (href.includes("cart")) {
+      if (href.includes("cart") || href.includes("checkout")) {
         setSelectedTab("cart");
       }
     } else {
       setSelectedTab("home");
     }
-  }, []);
+  }, [href]);
 
   return (
     <div

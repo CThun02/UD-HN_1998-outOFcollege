@@ -4,11 +4,10 @@ import {
   Table,
   Space,
   Button,
-  Switch,
   Modal,
   Input,
-  notification,
   message,
+  notification,
 } from "antd";
 import { useEffect, useState } from "react";
 import styles from "../categorystyles/CategoryStyles.module.css";
@@ -64,42 +63,6 @@ const ButtonTable = function (props) {
       });
   };
 
-  const handleUpdateStatus = (id, statusUpdate) => {
-    let mess = statusUpdate ? "Đang hoạt động" : "Ngưng hoạt động";
-    const updatedStatusValue = statusUpdate ? "ACTIVE" : "INACTIVE"; // Cập nhật trạng thái dựa trên giá trị của statusUpdate
-    axios
-      .put(
-        `http://localhost:8080/api/admin/button/updateStatus/${id}`,
-        {
-          status: updatedStatusValue,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${getToken(true)}`,
-          },
-        }
-      )
-      .then((response) => {
-        setRender(Math.random);
-        if (statusUpdate) {
-          api.success(mess, 2);
-        } else {
-          api.error(mess, 2);
-        }
-      })
-      .catch((error) => {
-        const status = error?.response?.data?.status;
-        if (status === 403) {
-          api.error({
-            message: "Lỗi",
-            description: "Bạn không có quyền xem nội dung này",
-          });
-          return;
-        }
-        api.error(`Cập nhật trạng thái thất bại`, 2);
-      });
-  };
-
   const handleUpdate = () => {
     axios
       .put(
@@ -122,11 +85,17 @@ const ButtonTable = function (props) {
       .catch((err) => {
         const status = err?.response?.data?.status;
         if (status === 403) {
-          api.error({
+          notification.error({
             message: "Lỗi",
             description: "Bạn không có quyền xem nội dung này",
           });
           return;
+        } else {
+          setShowModal(false);
+          notification.error({
+            message: "Lỗi",
+            description: "Không thể xóa dữ liệu!",
+          });
         }
       });
   };
@@ -179,23 +148,6 @@ const ButtonTable = function (props) {
             title: "Kiểu cúc áo",
             dataIndex: "buttonName",
             key: "buttonName",
-          },
-          {
-            key: "status",
-            title: "Trạng thái",
-            dataIndex: "status",
-            width: 150,
-            render: (status, record) => (
-              <>
-                <Switch
-                  disabled={!props.isAdmin}
-                  onChange={(checked) => {
-                    handleUpdateStatus(record.id, checked);
-                  }}
-                  checked={status === "ACTIVE"}
-                />
-              </>
-            ),
           },
           {
             title: "Ngày tạo",

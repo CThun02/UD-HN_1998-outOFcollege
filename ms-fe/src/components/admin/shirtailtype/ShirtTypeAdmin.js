@@ -9,7 +9,12 @@ import {
   notification,
   message,
 } from "antd";
-import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  SearchOutlined,
+  PlusOutlined,
+  TableOutlined,
+  DownOutlined,
+} from "@ant-design/icons";
 import ShirtTypeTable from "./ShirtTypeTable";
 import styles from "../categorystyles/CategoryStyles.module.css";
 import axios from "axios";
@@ -68,8 +73,14 @@ const ShirtTailAdmin = function ({ isAdmin }) {
   return (
     <div className={styles.category}>
       <div className={styles.customer}>
+        <h1 style={{ textAlign: "center" }}>
+          <DownOutlined /> Quản lý đuôi áo
+        </h1>
         <Row className={styles.titleTB}>
-          <h3>Danh Sách Đuôi Áo</h3>
+          <h2>
+            {" "}
+            <TableOutlined /> Danh Sách đuôi áo
+          </h2>
         </Row>
         <Row className={styles.adminMenu}>
           <Col span={10}>

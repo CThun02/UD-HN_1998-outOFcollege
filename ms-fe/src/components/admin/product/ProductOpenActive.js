@@ -2,7 +2,7 @@ import { Button, message, notification, Switch } from "antd";
 import Checkbox from "antd/es/checkbox/Checkbox";
 import Modal from "antd/es/modal/Modal";
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getToken } from "../../../service/Token";
 
@@ -49,8 +49,9 @@ const ProductOpenActive = ({ product, onCancel, open, render }) => {
         messageApi.error(`Cập nhật trạng thái thất bại`, 2);
       });
   }
+  
   return (
-    <Modal footer={null} onCancel={onCancel} centered open={open}>
+    <Modal footer={null} onCancel={onCancel} centered open={open && product.quantity>0}>
       {contextHolder}
       <h6> Sản phẩm đang tạm ngưng kinh doanh</h6>
       <p>Vui lòng mở kinh doanh ở bên dưới!</p>

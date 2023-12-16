@@ -148,21 +148,22 @@ const Bill = () => {
               >
                 {record.productDetail.promotion?.length > 0 ? (
                   <Badge.Ribbon
-                    text={`Giảm ${record.productDetail.promotion[0].promotionValue
-                      ? record.productDetail.promotion[0].promotionMethod ===
-                        "%"
-                        ? record.productDetail.promotion[0].promotionValue +
-                        " " +
-                        record.productDetail.promotion[0].promotionMethod
-                        : record.productDetail.promotion[0].promotionValue.toLocaleString(
-                          "vi-VN",
-                          {
-                            style: "currency",
-                            currency: "VND",
-                          }
-                        )
-                      : null
-                      }`}
+                    text={`Giảm ${
+                      record.productDetail.promotion[0].promotionValue
+                        ? record.productDetail.promotion[0].promotionMethod ===
+                          "%"
+                          ? record.productDetail.promotion[0].promotionValue +
+                            " " +
+                            record.productDetail.promotion[0].promotionMethod
+                          : record.productDetail.promotion[0].promotionValue.toLocaleString(
+                              "vi-VN",
+                              {
+                                style: "currency",
+                                currency: "VND",
+                              }
+                            )
+                        : null
+                    }`}
                     color="red"
                   >
                     <Carousel style={{ maxWidth: "300px" }} autoplay>
@@ -301,20 +302,20 @@ const Bill = () => {
               {record.productDetail.promotionValue
                 ? record.productDetail.promotionMethod === "%"
                   ? (
-                    (record.productDetail.price *
-                      (100 - Number(record.productDetail.promotionValue))) /
-                    100
-                  )?.toLocaleString("vi-VN", {
-                    style: "currency",
-                    currency: "VND",
-                  })
+                      (record.productDetail.price *
+                        (100 - Number(record.productDetail.promotionValue))) /
+                      100
+                    )?.toLocaleString("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    })
                   : (
-                    record.productDetail.price -
-                    Number(record.productDetail.promotionValue)
-                  )?.toLocaleString("vi-VN", {
-                    style: "currency",
-                    currency: "VND",
-                  })
+                      record.productDetail.price -
+                      Number(record.productDetail.promotionValue)
+                    )?.toLocaleString("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    })
                 : null}
             </span>
           </div>
@@ -366,7 +367,7 @@ const Bill = () => {
           }}
         >
           <Avatar src={<DollarOutlined style={{ color: "black" }} />} />
-          <div >Tiền mặt</div>
+          <div>Tiền mặt</div>
         </div>
       ),
       value: "1",
@@ -383,7 +384,7 @@ const Bill = () => {
           }}
         >
           <Avatar src={<SwapOutlined style={{ color: "black" }} />} />
-          <div > Chuyển khoản</div>
+          <div> Chuyển khoản</div>
         </div>
       ),
       value: "2",
@@ -400,8 +401,8 @@ const Bill = () => {
           }}
         >
           <Avatar src={<InteractionOutlined style={{ color: "black" }} />} />
-          <div >Cả 2</div>
-        </div >
+          <div>Cả 2</div>
+        </div>
       ),
       value: "3",
     },
@@ -855,7 +856,7 @@ const Bill = () => {
     axios
       .get(
         "http://localhost:8080/api/admin/product/getproductdetailbyidpd?productDetailId=" +
-        result,
+          result,
         {
           headers: {
             Authorization: `Bearer ${getToken(true)}`,
@@ -894,8 +895,8 @@ const Bill = () => {
             priceReduce: response.data.promotionValue
               ? response.data.promotionMethod === "%"
                 ? (response.data.price *
-                  (100 - Number(response.data.promotionValue))) /
-                100
+                    (100 - Number(response.data.promotionValue))) /
+                  100
                 : response.data.price - Number(response.data.promotionValue)
               : response.data.price,
           });
@@ -914,7 +915,7 @@ const Bill = () => {
         });
       })
       .catch((err) => {
-        const status = err.response.status;
+        const status = err?.response?.status;
         if (status === 403) {
           notification.error({
             message: "Thông báo",
@@ -993,15 +994,17 @@ const Bill = () => {
       amountPaid: typeShipping[index]
         ? 0
         : Number(selectedOption) === 2
-          ? voucherPrice() + shippingFee
-          : Number(selectedOption) === 3 ? voucherPrice() + shippingFee : amountPaid,
+        ? voucherPrice() + shippingFee
+        : Number(selectedOption) === 3
+        ? voucherPrice() + shippingFee
+        : amountPaid,
       billType: "In-Store",
       symbol: typeShipping[index] ? "Shipping" : symbol,
       status: typeShipping[index]
         ? "Unpaid"
         : !typeShipping[index] && switchChange[index]
-          ? "Paid"
-          : "Complete",
+        ? "Paid"
+        : "Complete",
       note: note,
       paymentDetailId: Number(selectedOption),
       lstBillDetailRequest: [],
@@ -1044,64 +1047,67 @@ const Bill = () => {
                                     <span>Thông tin đơn hàng</span>
                                     <div style="margin-top: 8px;">
                                     ${productDetails.map((item, index) => {
-          return `<div key={index} style="display: flex; justify-content: space-between; align-items: center; padding: 4px 20px;">
+                                      return `<div key={index} style="display: flex; justify-content: space-between; align-items: center; padding: 4px 20px;">
                                                 <div style="width: 20%; padding: 4px;">
-                                                    <img alt="product" style="width: 100%; border: 1px solid #ccc; border-radius: 8px;" src=${item.productDetail
-              .productImageResponse[0]
-              .path
-            }>
+                                                    <img alt="product" style="width: 100%; border: 1px solid #ccc; border-radius: 8px;" src=${
+                                                      item.productDetail
+                                                        .productImageResponse[0]
+                                                        .path
+                                                    }>
                                                 </div>
                                                 <div style="width: 55%; padding: 4px;">
-                                                    <p>${item.productDetail.product
-              .productName +
-            "-" +
-            item.productDetail.button
-              .buttonName +
-            "-" +
-            item.productDetail.brand
-              .brandName +
-            "-" +
-            item.productDetail
-              .category.categoryName +
-            "-" +
-            item.productDetail.collar
-              .materialName +
-            "-" +
-            item.productDetail.color
-              .collarName +
-            "-" +
-            item.productDetail.sleeve
-              .sleeveName +
-            "-" +
-            item.productDetail
-              .shirtTail
-              .shirtTailTypeName +
-            "-" +
-            item.productDetail
-              .patternName +
-            "-" +
-            item.productDetail
-              .formName
-            } <span style="display: inline-block">(x ${item.quantity
-            })</span></p >
+                                                    <p>${
+                                                      item.productDetail.product
+                                                        .productName +
+                                                      "-" +
+                                                      item.productDetail.button
+                                                        .buttonName +
+                                                      "-" +
+                                                      item.productDetail.brand
+                                                        .brandName +
+                                                      "-" +
+                                                      item.productDetail
+                                                        .category.categoryName +
+                                                      "-" +
+                                                      item.productDetail.collar
+                                                        .materialName +
+                                                      "-" +
+                                                      item.productDetail.color
+                                                        .collarName +
+                                                      "-" +
+                                                      item.productDetail.sleeve
+                                                        .sleeveName +
+                                                      "-" +
+                                                      item.productDetail
+                                                        .shirtTail
+                                                        .shirtTailTypeName +
+                                                      "-" +
+                                                      item.productDetail
+                                                        .patternName +
+                                                      "-" +
+                                                      item.productDetail
+                                                        .formName
+                                                    } <span style="display: inline-block">(x ${
+                                        item.quantity
+                                      })</span></p >
                                                 </div >
       <div style="width: 25%; padding: 4px;">
         <p>${item.priceReduce?.toLocaleString("vi-VN", {
-              style: "currency",
-              currency: "VND",
-            })}</p>
+          style: "currency",
+          currency: "VND",
+        })}</p>
       </div >
                                             </div > `;
-        })}
+                                    })}
     <hr>
       <div style="width: 70%; float: right; padding: 4px 20px;">
         <div style="display: flex; justify-content: space-between; padding: 4px 0;">
           <span>Tổng giá trị sản phẩm:</span>
           <span style="font-weight: 500;">
             ${(voucherPrice() + (shippingFee ?? 0))?.toLocaleString("vi-VN", {
-          style: "currency",
-          currency: "VND",
-        })}
+              style: "currency",
+              currency: "VND",
+            })}
           </span>
         </div>
       </div>
@@ -1135,18 +1141,18 @@ const Bill = () => {
       ward: Yup.string().required("Phường/xã không được để trống"),
       email: Yup.string().email("Địa chỉ email không hợp lệ"),
     });
-    console.log(remainAmount, `123`)
+    console.log(remainAmount, `123`);
     if (Number(selectedOption) === 3) {
       if (remainAmount === -1) {
-        setInputError("Bạn chưa nhập tiền")
+        setInputError("Bạn chưa nhập tiền");
       } else {
-        setInputError('')
+        setInputError("");
       }
 
       if (transactionCode.trim().length === 0) {
         setTransactionError("Mã giao dịch không được để trống");
       } else {
-        setTransactionError('')
+        setTransactionError("");
       }
 
       if (inputError && transactionError) {
@@ -1161,7 +1167,8 @@ const Bill = () => {
         duration: 2,
       });
     } else if (
-      Number(selectedOption) === 1 && ((remainAmount < 0 && !typeShipping[index]) || isNaN(remainAmount))
+      Number(selectedOption) === 1 &&
+      ((remainAmount < 0 && !typeShipping[index]) || isNaN(remainAmount))
     ) {
       return setInputError("Tiền không đủ");
     } else if (Number(selectedOption) === 3 && transactionCode.trim() === "") {
@@ -1219,7 +1226,8 @@ const Bill = () => {
                 headers: {
                   Authorization: `Bearer ${getToken(true)} `,
                 },
-              });
+              }
+            );
 
             if (switchChange[index]) {
               await axios.post(
@@ -1263,7 +1271,7 @@ const Bill = () => {
   };
 
   const [inputError, setInputError] = useState("");
-  const [transactionError, setTransactionError] = useState('')
+  const [transactionError, setTransactionError] = useState("");
   const handleChangeInput = (e, index) => {
     const inputValue = e.target.value;
     setAmountPaid(inputValue);
@@ -1280,7 +1288,7 @@ const Bill = () => {
       setInputError("Số tiền không đủ");
     } else {
       setInputError("");
-      setTransactionError('')
+      setTransactionError("");
     }
   };
 
@@ -1532,9 +1540,9 @@ const Bill = () => {
                               value={
                                 selectedAddress?.city
                                   ? selectedAddress?.city.substring(
-                                    0,
-                                    selectedAddress?.city.indexOf("|")
-                                  )
+                                      0,
+                                      selectedAddress?.city.indexOf("|")
+                                    )
                                   : selectedProvince
                               }
                             >
@@ -1571,9 +1579,9 @@ const Bill = () => {
                               value={
                                 selectedAddress?.district
                                   ? selectedAddress?.district.substring(
-                                    0,
-                                    selectedAddress.district.indexOf("|")
-                                  )
+                                      0,
+                                      selectedAddress.district.indexOf("|")
+                                    )
                                   : selectedDictrict
                               }
                             >
@@ -1608,9 +1616,9 @@ const Bill = () => {
                               value={
                                 selectedAddress?.ward
                                   ? selectedAddress?.ward.substring(
-                                    0,
-                                    selectedAddress?.ward.indexOf("|")
-                                  )
+                                      0,
+                                      selectedAddress?.ward.indexOf("|")
+                                    )
                                   : selectedWard
                               }
                             >
@@ -1675,11 +1683,11 @@ const Bill = () => {
                             productDetails.length > 0
                               ? true
                               : notification.error({
-                                message: "Lỗi",
-                                description:
-                                  "Chưa có sản phẩm trong giỏ hàng.",
-                                duration: 2,
-                              })
+                                  message: "Lỗi",
+                                  description:
+                                    "Chưa có sản phẩm trong giỏ hàng.",
+                                  duration: 2,
+                                })
                           )
                         }
                       >
@@ -1813,8 +1821,8 @@ const Bill = () => {
                           )}
                         </Col>
                         {(Number(selectedOption) !== 2 &&
-                          !typeShipping[index]) || Number(selectedOption) === 3 ? (
-
+                          !typeShipping[index]) ||
+                        Number(selectedOption) === 3 ? (
                           <>
                             <Col span={8} style={{ marginTop: "8px" }}>
                               <span
@@ -1846,40 +1854,37 @@ const Bill = () => {
                             </Col>
                           </>
                         ) : null}
-                        {
-                          Number(selectedOption) !== 2 &&
-                            !typeShipping[index] ? (
-                            <Col span={24}>
-                              {remainAmount > 0 && (
-                                <Row style={{ marginTop: "8px" }}>
-                                  <Col span={16}>
-                                    <span
-                                      style={{ fontSize: "16px", width: "200%" }}
-                                    >
-                                      Tiền thừa
-                                    </span>
-                                  </Col>
-                                  <Col span={8}>
-                                    <span
-                                      style={{
-                                        fontSize: "16px",
-                                        color: "red",
-                                      }}
-                                    >
-                                      {remainAmount?.toLocaleString("vi-VN", {
-                                        style: "currency",
-                                        currency: "VND",
-                                      })}
-                                    </span>
-                                  </Col>
-                                </Row>
-                              )}
-                            </Col>
-                          ) : null
-                        }
-                        {Number(selectedOption) === 2
-                          || Number(selectedOption) === 3 ? (
-
+                        {Number(selectedOption) !== 2 &&
+                        !typeShipping[index] ? (
+                          <Col span={24}>
+                            {remainAmount > 0 && (
+                              <Row style={{ marginTop: "8px" }}>
+                                <Col span={16}>
+                                  <span
+                                    style={{ fontSize: "16px", width: "200%" }}
+                                  >
+                                    Tiền thừa
+                                  </span>
+                                </Col>
+                                <Col span={8}>
+                                  <span
+                                    style={{
+                                      fontSize: "16px",
+                                      color: "red",
+                                    }}
+                                  >
+                                    {remainAmount?.toLocaleString("vi-VN", {
+                                      style: "currency",
+                                      currency: "VND",
+                                    })}
+                                  </span>
+                                </Col>
+                              </Row>
+                            )}
+                          </Col>
+                        ) : null}
+                        {Number(selectedOption) === 2 ||
+                        Number(selectedOption) === 3 ? (
                           <>
                             <Input
                               placeholder="Nhập mã giao dịch"
@@ -1892,7 +1897,7 @@ const Bill = () => {
                             />
                             <span style={{ fontSize: "16px", color: "red" }}>
                               {transactionError}
-                            </span >
+                            </span>
                           </>
                         ) : null}
                         <TextArea
@@ -1903,13 +1908,17 @@ const Bill = () => {
                         />
                         <Col span={24} style={{ marginTop: "20px" }}>
                           {!typeShipping[index] && (
-                            <Flex gap="small" align="center" style={{ width: "100%" }} vertical>
+                            <Flex
+                              gap="small"
+                              align="center"
+                              style={{ width: "100%" }}
+                              vertical
+                            >
                               <Segmented
                                 options={options}
                                 style={{ marginBottom: "20px", height: "100%" }}
                                 onChange={(e) => handleOptionChange(e, index)}
-                              >
-                              </Segmented>
+                              ></Segmented>
                             </Flex>
                           )}
                           {switchChange[index] && (
@@ -1938,12 +1947,12 @@ const Bill = () => {
                           >
                             Xác nhận thanh toán
                           </Button>
-                        </Col >
-                      </Row >
-                    </Col >
-                  </Row >
-                </div >
-              </Tabs.TabPane >
+                        </Col>
+                      </Row>
+                    </Col>
+                  </Row>
+                </div>
+              </Tabs.TabPane>
             );
           })}
       </Tabs >

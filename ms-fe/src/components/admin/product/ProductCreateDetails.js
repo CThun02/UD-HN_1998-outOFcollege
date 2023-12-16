@@ -55,6 +55,7 @@ const ProductCreateDetails = () => {
   const [brandCreate, setBrandCreate] = useState("");
   const [categoryCreate, setCategoryCreate] = useState("");
   const [sizeCreate, setSizeCreate] = useState("");
+  const [renderExist, setRenderExist] = useState("");
   const [colorCreate, setColorCreate] = useState({
     colorCode: "",
     colorName: "",
@@ -100,12 +101,6 @@ const ProductCreateDetails = () => {
   var productDetailsCreate = renderProductDetails();
 
   //fucntion
-  function handleSetProductDetail(field, value) {
-    setProductDetail((prevProduct) => ({
-      ...prevProduct,
-      [field]: value,
-    }));
-  }
 
   function handleSetColorCreate(field, value) {
     setColorCreate((prevColor) => ({
@@ -146,7 +141,7 @@ const ProductCreateDetails = () => {
             })
             .then((res) => {
               setLoadingProduct(false);
-              if (res.data) {
+              if (res?.data) {
                 notification.open({
                   message: "Thông báo",
                   description: "Thêm mới sản phẩm thành công",
@@ -156,7 +151,7 @@ const ProductCreateDetails = () => {
                 setmodalProductCreate(false);
                 handleSetProduct("id", res.data.id);
                 setRender(Math.random());
-                handleSetProductDetail("productId", res.data.id);
+                setRenderExist(Math.random());
               } else {
                 notification.warning({
                   message: "Thông báo",
@@ -165,7 +160,7 @@ const ProductCreateDetails = () => {
               }
             })
             .catch((err) => {
-              const status = err.response.status;
+              const status = err?.response?.status;
               if (status === 403) {
                 notification.error({
                   message: "Thông báo",
@@ -174,9 +169,7 @@ const ProductCreateDetails = () => {
               }
             });
         },
-        onCancel() {
-          console.log("Cancel");
-        },
+        onCancel() {},
       });
     } else {
       messageApi.error("Vui lòng nhập đầy đủ các trường");
@@ -185,17 +178,17 @@ const ProductCreateDetails = () => {
 
   function getProductDetailsExist() {
     if (
-      product.id !== null &&
-      product.id !== undefined &&
-      button.key !== undefined &&
-      collar.key !== undefined &&
-      material.key !== undefined &&
-      sleeve.key !== undefined &&
-      shirtTail.key !== undefined &&
-      form.key !== undefined &&
-      pattern.key !== undefined &&
-      brand.key !== undefined &&
-      category.key !== undefined
+      product.id &&
+      product.id &&
+      button.key &&
+      collar.key &&
+      material.key &&
+      sleeve.key &&
+      shirtTail.key &&
+      form.key &&
+      pattern.key &&
+      brand.key &&
+      category.key
     ) {
       let productDetailRequest = { ...productDetail };
       productDetailRequest.productId = product.id;
@@ -258,19 +251,6 @@ const ProductCreateDetails = () => {
             }
             setArrayByColors.push(object);
           }
-          if (productDetailsExist.length !== 0) {
-            notification.open({
-              type: "warning",
-              label: "Thông báo",
-              description: (
-                <span>
-                  Sản phẩm có sẵn một số màu sắc và kích cỡ!
-                  <br />
-                  Vui lòng kiểm tra dưới mục sản phẩm có sẵn
-                </span>
-              ),
-            });
-          }
           setproductDetailsExist(setArrayByColors);
         });
     }
@@ -295,19 +275,7 @@ const ProductCreateDetails = () => {
     } else if (field === "category") {
       setCategory(value);
     }
-    if (
-      button.key !== undefined &&
-      collar.key !== undefined &&
-      material.key !== undefined &&
-      sleeve.key !== undefined &&
-      shirtTail.key !== undefined &&
-      form.key !== undefined &&
-      pattern.key !== undefined &&
-      brand.key !== undefined &&
-      category.key !== undefined
-    ) {
-      setRender(Math.random());
-    }
+    setRenderExist(Math.random());
   }
 
   function renderProductDetails() {
@@ -401,7 +369,7 @@ const ProductCreateDetails = () => {
               setisLoading(false);
             })
             .catch((err) => {
-              const status = err.response.status;
+              const status = err?.response?.status;
               if (status === 403) {
                 notification.error({
                   message: "Thông báo",
@@ -447,7 +415,7 @@ const ProductCreateDetails = () => {
               setisLoading(false);
             })
             .catch((err) => {
-              const status = err.response.status;
+              const status = err?.response?.status;
               if (status === 403) {
                 notification.error({
                   message: "Thông báo",
@@ -489,7 +457,7 @@ const ProductCreateDetails = () => {
               setBrandCreate(" ");
             })
             .catch((err) => {
-              const status = err.response.status;
+              const status = err?.response?.status;
               if (status === 403) {
                 notification.error({
                   message: "Thông báo",
@@ -531,7 +499,7 @@ const ProductCreateDetails = () => {
               setisLoading(false);
             })
             .catch((err) => {
-              const status = err.response.status;
+              const status = err?.response?.status;
               if (status === 403) {
                 notification.error({
                   message: "Thông báo",
@@ -573,7 +541,7 @@ const ProductCreateDetails = () => {
               setisLoading(false);
             })
             .catch((err) => {
-              const status = err.response.status;
+              const status = err?.response?.status;
               if (status === 403) {
                 notification.error({
                   message: "Thông báo",
@@ -619,7 +587,7 @@ const ProductCreateDetails = () => {
               setisLoading(false);
             })
             .catch((err) => {
-              const status = err.response.status;
+              const status = err?.response?.status;
               if (status === 403) {
                 notification.error({
                   message: "Thông báo",
@@ -667,7 +635,7 @@ const ProductCreateDetails = () => {
               setisLoading(false);
             })
             .catch((err) => {
-              const status = err.response.status;
+              const status = err?.response?.status;
               if (status === 403) {
                 notification.error({
                   message: "Thông báo",
@@ -715,7 +683,7 @@ const ProductCreateDetails = () => {
               setisLoading(false);
             })
             .catch((err) => {
-              const status = err.response.status;
+              const status = err?.response?.status;
               if (status === 403) {
                 notification.error({
                   message: "Thông báo",
@@ -761,7 +729,7 @@ const ProductCreateDetails = () => {
               setisLoading(false);
             })
             .catch((err) => {
-              const status = err.response.status;
+              const status = err?.response?.status;
               if (status === 403) {
                 notification.error({
                   message: "Thông báo",
@@ -807,7 +775,7 @@ const ProductCreateDetails = () => {
               setisLoading(false);
             })
             .catch((err) => {
-              const status = err.response.status;
+              const status = err?.response?.status;
               if (status === 403) {
                 notification.error({
                   message: "Thông báo",
@@ -852,7 +820,7 @@ const ProductCreateDetails = () => {
               }
             })
             .catch((err) => {
-              const status = err.response.status;
+              const status = err?.response?.status;
               if (status === 403) {
                 notification.error({
                   message: "Thông báo",
@@ -876,9 +844,13 @@ const ProductCreateDetails = () => {
       })
       .then((res) => {
         setProductList(res.data);
+        if (!product?.id) {
+          setProduct(res?.data[0]);
+        }
+        // handleSetProductDetailCom;
       })
       .catch((err) => {
-        const status = err.response.status;
+        const status = err?.response?.status;
         if (status === 403) {
           notification.error({
             message: "Thông báo",
@@ -894,9 +866,16 @@ const ProductCreateDetails = () => {
       })
       .then((res) => {
         setBrands(res.data);
+        if (!brand?.key) {
+          handleSetProductDetailCom("brand", {
+            key: res?.data[0].id,
+            value: res?.data[0].id,
+            label: res?.data[0].brandName,
+          });
+        }
       })
       .catch((error) => {
-        const status = error.response.status;
+        const status = error?.response?.status;
         if (status === 403) {
           notification.error({
             message: "Thông báo",
@@ -912,9 +891,16 @@ const ProductCreateDetails = () => {
       })
       .then((res) => {
         setCategories(res.data);
+        if (!category?.key) {
+          handleSetProductDetailCom("category", {
+            key: res?.data[0].id,
+            value: res?.data[0].id,
+            label: res?.data[0].categoryName,
+          });
+        }
       })
       .catch((error) => {
-        const status = error.response.status;
+        const status = error?.response?.status;
         if (status === 403) {
           notification.error({
             message: "Thông báo",
@@ -932,7 +918,7 @@ const ProductCreateDetails = () => {
         setSizes(response.data);
       })
       .catch((error) => {
-        const status = error.response.status;
+        const status = error?.response?.status;
         if (status === 403) {
           notification.error({
             message: "Thông báo",
@@ -950,7 +936,7 @@ const ProductCreateDetails = () => {
         setColors(response.data);
       })
       .catch((error) => {
-        const status = error.response.status;
+        const status = error?.response?.status;
         if (status === 403) {
           notification.error({
             message: "Thông báo",
@@ -966,9 +952,16 @@ const ProductCreateDetails = () => {
       })
       .then((response) => {
         setButtons(response.data);
+        if (!button?.key) {
+          handleSetProductDetailCom("button", {
+            key: response?.data[0].id,
+            value: response?.data[0].id,
+            label: response?.data[0].buttonName,
+          });
+        }
       })
       .catch((error) => {
-        const status = error.response.status;
+        const status = error?.response?.status;
         if (status === 403) {
           notification.error({
             message: "Thông báo",
@@ -984,9 +977,16 @@ const ProductCreateDetails = () => {
       })
       .then((response) => {
         setMaterials(response.data);
+        if (!material?.key) {
+          handleSetProductDetailCom("material", {
+            key: response?.data[0].id,
+            value: response?.data[0].id,
+            label: response?.data[0].materialName,
+          });
+        }
       })
       .catch((error) => {
-        const status = error.response.status;
+        const status = error?.response?.status;
         if (status === 403) {
           notification.error({
             message: "Thông báo",
@@ -1002,9 +1002,16 @@ const ProductCreateDetails = () => {
       })
       .then((response) => {
         setCollars(response.data);
+        if (!collar?.key) {
+          handleSetProductDetailCom("collar", {
+            key: response?.data[0].id,
+            value: response?.data[0].id,
+            label: response?.data[0].collarName,
+          });
+        }
       })
       .catch((error) => {
-        const status = error.response.status;
+        const status = error?.response?.status;
         if (status === 403) {
           notification.error({
             message: "Thông báo",
@@ -1020,9 +1027,16 @@ const ProductCreateDetails = () => {
       })
       .then((response) => {
         setshirtTails(response.data);
+        if (!shirtTail?.key) {
+          handleSetProductDetailCom("shirtTail", {
+            key: response?.data[0].id,
+            value: response?.data[0].id,
+            label: response?.data[0].shirtTailTypeName,
+          });
+        }
       })
       .catch((error) => {
-        const status = error.response.status;
+        const status = error?.response?.status;
         if (status === 403) {
           notification.error({
             message: "Thông báo",
@@ -1038,9 +1052,16 @@ const ProductCreateDetails = () => {
       })
       .then((response) => {
         setSleeves(response.data);
+        if (!sleeve?.key) {
+          handleSetProductDetailCom("sleeve", {
+            key: response?.data[0].id,
+            value: response?.data[0].id,
+            label: response?.data[0].sleeveName,
+          });
+        }
       })
       .catch((error) => {
-        const status = error.response.status;
+        const status = error?.response?.status;
         if (status === 403) {
           notification.error({
             message: "Thông báo",
@@ -1057,9 +1078,16 @@ const ProductCreateDetails = () => {
       })
       .then((res) => {
         setPatterns(res.data);
+        if (!pattern?.key) {
+          handleSetProductDetailCom("pattern", {
+            key: res?.data[0].id,
+            value: res?.data[0].id,
+            label: res?.data[0].patternName,
+          });
+        }
       })
       .catch((error) => {
-        const status = error.response.status;
+        const status = error?.response?.status;
         if (status === 403) {
           notification.error({
             message: "Thông báo",
@@ -1075,9 +1103,16 @@ const ProductCreateDetails = () => {
       })
       .then((res) => {
         setForms(res.data);
+        if (!form?.key) {
+          handleSetProductDetailCom("form", {
+            key: res?.data[0].id,
+            value: res?.data[0].id,
+            label: res?.data[0].formName,
+          });
+        }
       })
       .catch((error) => {
-        const status = error.response.status;
+        const status = error?.response?.status;
         if (status === 403) {
           notification.error({
             message: "Thông báo",
@@ -1085,9 +1120,11 @@ const ProductCreateDetails = () => {
           });
         }
       });
-    getProductDetailsExist();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [render]);
+  useEffect(() => {
+    getProductDetailsExist();
+  }, [renderExist]);
   return (
     <>
       <Spin
@@ -1231,17 +1268,9 @@ const ProductCreateDetails = () => {
                                 "productName",
                                 input === "" ? product.productName : input
                               );
-                              console.log(input, option);
                               return (option?.label ?? "").includes(input);
                             }}
                             size="large"
-                            filterSort={(optionA, optionB) =>
-                              (optionA?.label ?? "")
-                                .toLowerCase()
-                                .localeCompare(
-                                  (optionB?.label ?? "").toLowerCase()
-                                )
-                            }
                             filterOption={(input, option) =>
                               (option?.label ?? "")
                                 .toLowerCase()
@@ -1251,9 +1280,9 @@ const ProductCreateDetails = () => {
                               setProduct(
                                 productList?.find((item) => item.id === index)
                               );
-                              handleSetProductDetail("productId", index);
+                              setRenderExist(Math.random());
                             }}
-                            value={productDetail.productId}
+                            value={product.id}
                           >
                             {productList &&
                               productList.map((item, index) => {
@@ -1345,6 +1374,7 @@ const ProductCreateDetails = () => {
                                 onChange={(event, record) => {
                                   handleSetProductDetailCom("brand", record);
                                 }}
+                                value={brand?.value}
                                 placeholder="Brand"
                                 onSearch={(input, option) => {
                                   setBrandCreate(
@@ -1356,13 +1386,6 @@ const ProductCreateDetails = () => {
                                   (option?.label ?? "")
                                     .toLowerCase()
                                     .includes(input.toLowerCase())
-                                }
-                                filterSort={(optionA, optionB) =>
-                                  (optionA?.label ?? "")
-                                    .toLowerCase()
-                                    .localeCompare(
-                                      (optionB?.label ?? "").toLowerCase()
-                                    )
                                 }
                               >
                                 {brands &&
@@ -1396,13 +1419,7 @@ const ProductCreateDetails = () => {
                                   );
                                   return (option?.label ?? "").includes(input);
                                 }}
-                                filterSort={(optionA, optionB) =>
-                                  (optionA?.label ?? "")
-                                    .toLowerCase()
-                                    .localeCompare(
-                                      (optionB?.label ?? "").toLowerCase()
-                                    )
-                                }
+                                value={category?.value}
                                 filterOption={(input, option) =>
                                   (option?.label ?? "")
                                     .toLowerCase()
@@ -1451,17 +1468,11 @@ const ProductCreateDetails = () => {
                                   );
                                   return (option?.label ?? "").includes(input);
                                 }}
+                                value={button?.value}
                                 filterOption={(input, option) =>
                                   (option?.label ?? "")
                                     .toLowerCase()
                                     .includes(input.toLowerCase())
-                                }
-                                filterSort={(optionA, optionB) =>
-                                  (optionA?.label ?? "")
-                                    .toLowerCase()
-                                    .localeCompare(
-                                      (optionB?.label ?? "").toLowerCase()
-                                    )
                                 }
                                 notFoundContent={
                                   <div
@@ -1500,6 +1511,7 @@ const ProductCreateDetails = () => {
                                 onChange={(event, record) => {
                                   handleSetProductDetailCom("material", record);
                                 }}
+                                value={material?.value}
                                 onSearch={(input, option) => {
                                   setMaterialCreate(
                                     input === "" ? materialCreate : input
@@ -1510,13 +1522,6 @@ const ProductCreateDetails = () => {
                                   (option?.label ?? "")
                                     .toLowerCase()
                                     .includes(input.toLowerCase())
-                                }
-                                filterSort={(optionA, optionB) =>
-                                  (optionA?.label ?? "")
-                                    .toLowerCase()
-                                    .localeCompare(
-                                      (optionB?.label ?? "").toLowerCase()
-                                    )
                                 }
                                 notFoundContent={
                                   <div
@@ -1561,13 +1566,7 @@ const ProductCreateDetails = () => {
                                   );
                                   return (option?.label ?? "").includes(input);
                                 }}
-                                filterSort={(optionA, optionB) =>
-                                  (optionA?.label ?? "")
-                                    .toLowerCase()
-                                    .localeCompare(
-                                      (optionB?.label ?? "").toLowerCase()
-                                    )
-                                }
+                                value={collar?.value}
                                 filterOption={(input, option) =>
                                   (option?.label ?? "")
                                     .toLowerCase()
@@ -1615,19 +1614,13 @@ const ProductCreateDetails = () => {
                                     .toLowerCase()
                                     .includes(input.toLowerCase())
                                 }
+                                value={sleeve?.value}
                                 onSearch={(input, option) => {
                                   setSleeveCreate(
                                     input === "" ? sleeveCreate : input
                                   );
                                   return (option?.label ?? "").includes(input);
                                 }}
-                                filterSort={(optionA, optionB) =>
-                                  (optionA?.label ?? "")
-                                    .toLowerCase()
-                                    .localeCompare(
-                                      (optionB?.label ?? "").toLowerCase()
-                                    )
-                                }
                                 notFoundContent={
                                   <div
                                     style={{ textAlign: "center" }}
@@ -1668,6 +1661,7 @@ const ProductCreateDetails = () => {
                                     record
                                   );
                                 }}
+                                value={shirtTail?.value}
                                 filterOption={(input, option) =>
                                   (option?.label ?? "")
                                     .toLowerCase()
@@ -1679,13 +1673,6 @@ const ProductCreateDetails = () => {
                                   );
                                   return (option?.label ?? "").includes(input);
                                 }}
-                                filterSort={(optionA, optionB) =>
-                                  (optionA?.label ?? "")
-                                    .toLowerCase()
-                                    .localeCompare(
-                                      (optionB?.label ?? "").toLowerCase()
-                                    )
-                                }
                                 notFoundContent={
                                   <div
                                     style={{ textAlign: "center" }}
@@ -1727,6 +1714,7 @@ const ProductCreateDetails = () => {
                                     .toLowerCase()
                                     .includes(input.toLowerCase())
                                 }
+                                value={pattern?.value}
                                 placeholder="Pattern"
                                 className={styles.product__createDetailsSelect}
                                 onSearch={(input, option) => {
@@ -1735,13 +1723,6 @@ const ProductCreateDetails = () => {
                                   );
                                   return (option?.label ?? "").includes(input);
                                 }}
-                                filterSort={(optionA, optionB) =>
-                                  (optionA?.label ?? "")
-                                    .toLowerCase()
-                                    .localeCompare(
-                                      (optionB?.label ?? "").toLowerCase()
-                                    )
-                                }
                                 notFoundContent={
                                   <div
                                     style={{ textAlign: "center" }}
@@ -1778,6 +1759,7 @@ const ProductCreateDetails = () => {
                                 onChange={(event, record) => {
                                   handleSetProductDetailCom("form", record);
                                 }}
+                                value={form?.value}
                                 filterOption={(input, option) =>
                                   (option?.label ?? "")
                                     .toLowerCase()
@@ -1790,13 +1772,6 @@ const ProductCreateDetails = () => {
                                   );
                                   return (option?.label ?? "").includes(input);
                                 }}
-                                filterSort={(optionA, optionB) =>
-                                  (optionA?.label ?? "")
-                                    .toLowerCase()
-                                    .localeCompare(
-                                      (optionB?.label ?? "").toLowerCase()
-                                    )
-                                }
                                 notFoundContent={
                                   <div
                                     style={{ textAlign: "center" }}
@@ -1915,13 +1890,6 @@ const ProductCreateDetails = () => {
                                   );
                                   return (option?.label ?? "").includes(input);
                                 }}
-                                filterSort={(optionA, optionB) =>
-                                  (optionA?.label ?? "")
-                                    .toLowerCase()
-                                    .localeCompare(
-                                      (optionB?.label ?? "").toLowerCase()
-                                    )
-                                }
                                 notFoundContent={
                                   <div
                                     style={{ textAlign: "center" }}
@@ -1973,13 +1941,6 @@ const ProductCreateDetails = () => {
                                   );
                                   return (option?.label ?? "").includes(input);
                                 }}
-                                filterSort={(optionA, optionB) =>
-                                  (optionA?.label ?? "")
-                                    .toLowerCase()
-                                    .localeCompare(
-                                      (optionB?.label ?? "").toLowerCase()
-                                    )
-                                }
                                 notFoundContent={
                                   <div
                                     style={{ textAlign: "center" }}

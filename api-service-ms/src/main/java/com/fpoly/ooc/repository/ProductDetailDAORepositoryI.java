@@ -60,7 +60,7 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
 
     @Modifying
     @Transactional
-    @Query("Update ProductDetail  pd set pd.status = ?2 where pd.product.id =?1")
+    @Query("Update ProductDetail  pd set pd.status = ?2 where pd.product.id =?1 and pd.quantity > 0")
     public void updateProductDetailsByProductId(Long productId, String status);
 
     @Query("SELECT new java.lang.Long(pd.id) " +

@@ -6,7 +6,6 @@ import {
   Button,
   Modal,
   Input,
-  Switch,
   message,
   notification,
 } from "antd";
@@ -62,11 +61,17 @@ const MaterialTable = function (props) {
         message.success("Xóa thành công");
       })
       .catch((err) => {
-        const status = err.response.status;
+        const status = err?.response?.status;
         if (status === 403) {
           notification.error({
             message: "Thông báo",
             description: "Bạn không có quyền truy cập!",
+          });
+        } else {
+          setShowModal(false);
+          notification.error({
+            message: "Lỗi",
+            description: "Không thể xóa dữ liệu!",
           });
         }
       });
@@ -92,51 +97,13 @@ const MaterialTable = function (props) {
         message.success("Chỉnh sửa thành công");
       })
       .catch((err) => {
-        const status = err.response.status;
+        const status = err?.response?.status;
         if (status === 403) {
           notification.error({
             message: "Thông báo",
             description: "Bạn không có quyền truy cập!",
           });
         }
-      });
-  };
-
-  const handleUpdateStatus = (id, statusUpdate) => {
-    let mess = statusUpdate ? "Đang hoạt động" : "Ngưng hoạt động";
-
-    const updatedStatusValue = statusUpdate ? "ACTIVE" : "INACTIVE"; // Cập nhật trạng thái dựa trên giá trị của statusUpdate
-
-    axios
-      .put(
-        `http://localhost:8080/api/admin/material/updateStatus/${id}`,
-        {
-          status: updatedStatusValue,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${getToken(true)}`,
-          },
-        }
-      )
-      .then((response) => {
-        setRender(Math.random);
-        if (statusUpdate) {
-          messageApi.success(mess, 2);
-        } else {
-          messageApi.error(mess, 2);
-        }
-      })
-      .catch((err) => {
-        const status = err.response.status;
-        if (status === 403) {
-          notification.error({
-            message: "Thông báo",
-            description: "Bạn không có quyền truy cập!",
-          });
-          return;
-        }
-        messageApi.error(`Cập nhật trạng thái thất bại`, 2);
       });
   };
 
@@ -152,7 +119,7 @@ const MaterialTable = function (props) {
         console.log(response.data);
       })
       .catch((err) => {
-        const status = err.response.status;
+        const status = err?.response?.status;
         if (status === 403) {
           notification.error({
             message: "Thông báo",
@@ -183,23 +150,6 @@ const MaterialTable = function (props) {
             title: "Chất liệu",
             dataIndex: "materialName",
             key: "materialName",
-          },
-          {
-            key: "status",
-            title: "Trạng thái",
-            dataIndex: "status",
-            width: 150,
-            render: (status, record) => (
-              <>
-                <Switch
-                  disabled={!props.isAdmin}
-                  onChange={(checked) => {
-                    handleUpdateStatus(record.id, checked);
-                  }}
-                  checked={status === "ACTIVE"}
-                />
-              </>
-            ),
           },
           {
             title: "Ngày tạo",

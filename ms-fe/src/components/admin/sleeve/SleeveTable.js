@@ -7,7 +7,6 @@ import {
   Modal,
   Input,
   message,
-  Switch,
   notification,
 } from "antd";
 import { useEffect, useState } from "react";
@@ -87,50 +86,19 @@ const SleeveTable = function (props) {
         setShowDetailsModal(false);
       })
       .catch((err) => {
-        const status = err.response.status;
+        const status = err?.response?.status;
         if (status === 403) {
           notification.error({
             message: "Thông báo",
             description: "Bạn không có quyền truy cập!",
           });
-        }
-      });
-  };
-
-  const handleUpdateStatus = (id, statusUpdate) => {
-    let mess = statusUpdate ? "Đang hoạt động" : "Ngưng hoạt động";
-
-    const updatedStatusValue = statusUpdate ? "ACTIVE" : "INACTIVE"; // Cập nhật trạng thái dựa trên giá trị của statusUpdate
-
-    axios
-      .put(
-        `http://localhost:8080/api/admin/sleeve/updateStatus/${id}`,
-        {
-          status: updatedStatusValue,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${getToken(true)}`,
-          },
-        }
-      )
-      .then((response) => {
-        setRender(Math.random);
-        if (statusUpdate) {
-          messageApi.success(mess, 2);
         } else {
-          messageApi.error(mess, 2);
-        }
-      })
-      .catch((error) => {
-        const status = error.response.status;
-        if (status === 403) {
+          setShowModal(false);
           notification.error({
-            message: "Thông báo",
-            description: "Bạn không có quyền truy cập!",
+            message: "Lỗi",
+            description: "Không thể xóa dữ liệu!",
           });
         }
-        messageApi.error(`Cập nhật trạng thái thất bại`, 2);
       });
   };
 
@@ -146,7 +114,7 @@ const SleeveTable = function (props) {
         console.log(response.data);
       })
       .catch((err) => {
-        const status = err.response.status;
+        const status = err?.response?.status;
         if (status === 403) {
           notification.error({
             message: "Thông báo",
@@ -178,28 +146,10 @@ const SleeveTable = function (props) {
               return (currentPage - 1) * 5 + data.indexOf(record) + 1;
             },
           },
-
           {
             title: "Kiểu tay áo",
             dataIndex: "sleeveName",
             key: "sleeveName",
-          },
-          {
-            key: "status",
-            title: "Trạng thái",
-            dataIndex: "status",
-            width: 150,
-            render: (status, record) => (
-              <>
-                <Switch
-                  disabled={!props.isAdmin}
-                  onChange={(checked) => {
-                    handleUpdateStatus(record.id, checked);
-                  }}
-                  checked={status === "ACTIVE"}
-                />
-              </>
-            ),
           },
           {
             title: "Ngày tạo",

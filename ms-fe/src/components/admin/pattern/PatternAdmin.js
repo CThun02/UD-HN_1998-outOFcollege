@@ -9,7 +9,12 @@ import {
   message,
   notification,
 } from "antd";
-import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  SearchOutlined,
+  PlusOutlined,
+  TableOutlined,
+  SlidersOutlined,
+} from "@ant-design/icons";
 import PatternTable from "./PatternTable";
 import styles from "./PatternlStyle.module.css";
 import axios from "axios";
@@ -62,8 +67,14 @@ const PatternAdmin = function ({ isAdmin }) {
   return (
     <div className={styles.material}>
       <div className={styles.radiusFrame}>
+        <h1 style={{ textAlign: "center" }}>
+          <SlidersOutlined /> Quản lý họa tiết
+        </h1>
         <Row className={styles.titleTB}>
-          <h3>Danh Sách Họa tiết</h3>
+          <h2>
+            {" "}
+            <TableOutlined /> Danh Sách họa tiết
+          </h2>
         </Row>
         <Row className={styles.adminMenu}>
           <Col span={10}>

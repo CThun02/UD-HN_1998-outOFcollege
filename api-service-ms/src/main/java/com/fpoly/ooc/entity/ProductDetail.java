@@ -111,7 +111,8 @@ import java.util.List;
                                  INNER JOIN promotion pSub ON ppdSub.promotion_id = pSub.id
                                  INNER JOIN dbo.product_detail pdSub ON pdSub.id = ppdSub.product_detail_id
                              WHERE
-                                 ppdSub.product_detail_id IN (
+                                 pSub.status = 'ACTIVE'
+                                 AND ppdSub.product_detail_id IN (
                                  SELECT pdSecondSub.id
                                  FROM product_detail pdSecondSub
                                  WHERE pdSecondSub.product_id = pt.id
@@ -133,7 +134,9 @@ import java.util.List;
                             (select top 1 pSub.promotion_value
                                               from promotion_product_detail ppdSub inner join promotion pSub on ppdSub.promotion_id = pSub.id
                                               inner join dbo.product_detail pdSub on pdSub.id = ppdSub.product_detail_id
-                                              where ppdSub.product_detail_id in (
+                                              where
+                                                pSub.status = 'ACTIVE'
+                                                and ppdSub.product_detail_id in (
                                               SELECT pdSecondSub.id
                                                  FROM product_detail pdSecondSub
                                                  WHERE pdSecondSub.product_id = pt.id

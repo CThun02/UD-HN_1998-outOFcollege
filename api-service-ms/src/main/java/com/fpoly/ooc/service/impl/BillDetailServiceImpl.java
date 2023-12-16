@@ -128,7 +128,11 @@ public class BillDetailServiceImpl implements BillDetailService {
         ProductDetail productDetail = productDetailService.findById(billDetail.getProductDetail().getId());
         Integer quantityUpdayte = productDetail.getQuantity() + billDetail.getQuantity();
         productDetail.setQuantity(quantityUpdayte);
-        productDetailService.updateNotRT(productDetail);
+        try{
+            productDetailService.update(productDetail);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
         billDetailRepo.deleteById(billDetailId);
 

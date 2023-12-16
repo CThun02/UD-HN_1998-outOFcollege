@@ -46,8 +46,29 @@ public class BillDetailServiceImpl implements BillDetailService {
         BillDetail savedBillDetail = null;
 
         if (request.getBillDetailId() != null) {
-            // update nó chạy vào hàm này
             billDetail = billDetailRepo.findById(request.getBillDetailId()).orElse(null);
+
+            ProductDetail productDetail = productDetailService.findById(request.getProductDetailId());
+            if (billDetail.getQuantity() > request.getQuantity()) {
+                productDetail.setQuantity(productDetail.getQuantity() +
+                        (billDetail.getQuantity()) - request.getQuantity());
+                try {
+                    productDetailService.update(productDetail);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if (billDetail.getQuantity() < request.getQuantity()) {
+                productDetail.setQuantity(productDetail.getQuantity() -
+                        (request.getQuantity() - billDetail.getQuantity()));
+                try {
+                    productDetailService.update(productDetail);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
             billDetail.setQuantity(request.getQuantity());
             savedBillDetail = billDetailRepo.save(billDetail);
         } else {
@@ -58,7 +79,6 @@ public class BillDetailServiceImpl implements BillDetailService {
                 Boolean check = true;
                 for (BillDetail billDetailUpdate : existingBillDetail) {
                     if (request.getProductDetailId() == billDetailUpdate.getProductDetail().getId()) {
-                        System.out.println("Check QUANTITY" + request.getQuantity());
                         billDetailUpdate.setQuantity(billDetailUpdate.getQuantity() + request.getQuantity());
                         billDetailUpdate.setPrice(request.getPrice());
                         savedBillDetail = billDetailRepo.save(billDetailUpdate);
@@ -68,19 +88,18 @@ public class BillDetailServiceImpl implements BillDetailService {
                 }
 
                 if (check) {
+                    ProductDetail productDetail = productDetailService.findById(request.getProductDetailId());
+
+                    productDetail.setQuantity(productDetail.getQuantity() - request.getQuantity());
+                    try {
+                        productDetailService.update(productDetail);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
                     savedBillDetail = billDetailRepo.save(billDetail);
                 }
             }
-        }
-
-        if(savedBillDetail != null){
-            ProductDetail productDetail = productDetailService.findById(savedBillDetail.getProductDetail().getId());
-//            productDetail.setQuantity(productDetail.getQuantity() - request.getQuantity());
-//            try {
-//                productDetailService.update(productDetail);
-//            } catch (JsonProcessingException e) {
-//                e.printStackTrace();
-//            }
         }
 
         BigDecimal priceBill = billDetailRepo.getTotalPriceByBillCode(bill.getBillCode());
@@ -105,11 +124,18 @@ public class BillDetailServiceImpl implements BillDetailService {
     public BillDetail deleteBillDetail(Long billId, Long billDetailId) {
         Bill bill = billService.findBillByBillId(billId);
         BillDetail billDetail = billDetailRepo.findById(billDetailId).orElse(null);
+
+        ProductDetail productDetail = productDetailService.findById(billDetail.getProductDetail().getId());
+        Integer quantityUpdayte = productDetail.getQuantity() + billDetail.getQuantity();
+        productDetail.setQuantity(quantityUpdayte);
+        productDetailService.updateNotRT(productDetail);
+
         billDetailRepo.deleteById(billDetailId);
 
         BigDecimal priceBill = billDetailRepo.getTotalPriceByBillCode(bill.getBillCode());
         bill.setPrice(priceBill);
         billService.updateBill(bill);
+
         return billDetail;
     }
 
@@ -157,7 +183,7 @@ public class BillDetailServiceImpl implements BillDetailService {
 
     @Override
     public List<BillDetail> findBillDetailByBillCode(String billCode) {
-        if (billCode == null){
+        if (billCode == null) {
             throw new NotFoundException(Const.CODE_NOT_FOUND);
         }
         return billDetailRepo.findBillDetailByBill_BillCode(billCode);

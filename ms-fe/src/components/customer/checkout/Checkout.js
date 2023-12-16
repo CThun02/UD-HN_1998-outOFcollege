@@ -1469,7 +1469,7 @@ const Checkout = ({ setRenderHeader }) => {
                     Phí vận chuyển
                   </Col>
                   <Col span={6}>
-                    {(shippingFee)?.toLocaleString("vi-VN", {
+                    {(shippingFee ?? 0)?.toLocaleString("vi-VN", {
                       style: "currency",
                       currency: "VND",
                     })}

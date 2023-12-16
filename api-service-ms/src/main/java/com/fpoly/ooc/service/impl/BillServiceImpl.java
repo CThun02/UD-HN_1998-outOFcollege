@@ -184,6 +184,9 @@ public class BillServiceImpl implements BillService {
 
         if (request.getVoucherCode() != null) {
             Voucher voucher = voucherService.findVoucherByVoucherCode(request.getVoucherCode());
+            if(voucher.getLimitQuantity() <= 1){
+                voucher.setStatus(Const.STATUS_INACTIVE);
+            }
             voucher.setLimitQuantity(voucher.getLimitQuantity() - 1);
             voucherService.updateVoucher(voucher);
 

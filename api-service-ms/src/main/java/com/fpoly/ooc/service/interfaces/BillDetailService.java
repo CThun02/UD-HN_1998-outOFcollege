@@ -10,11 +10,11 @@ import java.util.List;
 
 public interface BillDetailService {
 
-    BillDetail createBillDetail(BillDetailRequest request);
+    BillDetail createBillDetail(BillDetailRequest request) throws JsonProcessingException;
 
     BillDetail updateBill(Long id, String status);
 
-    BillDetail deleteBillDetail(Long BillId, Long billDetailId);
+    BillDetail deleteBillDetail(Long BillId, Long billDetailId) throws JsonProcessingException;
 
     BillDetail updateBillDetail(BillDetailRequest request) throws JsonProcessingException;
 

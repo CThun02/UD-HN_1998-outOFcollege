@@ -25,6 +25,7 @@ import { saveImage } from "../../../config/FireBase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
 import { getToken } from "../../../service/Token";
+import numeral from "numeral";
 
 var imgList = [];
 const ProductDetailsTable = (props) => {
@@ -33,6 +34,7 @@ const ProductDetailsTable = (props) => {
   const [render, setRender] = useState(null);
   const navigate = useNavigate();
   const { confirm } = Modal;
+  const [prices, setPrices] = useState([]);
   var product = props.product;
   var productDetailsDisplay = getProductDetailsDisplay();
   const productImage = {
@@ -57,8 +59,22 @@ const ProductDetailsTable = (props) => {
     status: "ACTIVE",
   };
 
+  function changePrice(index, price) {
+    var pricesCopy = [...prices];
+    pricesCopy[index] = numeral(price).format("0,0");
+    setPrices(pricesCopy);
+  }
+
   function getProductDetailsDisplay() {
+    if (props.productDetails.length !== prices.length) {
+      setPrices(
+        [...props.productDetails].map((item) =>
+          numeral(item.price).format("0,0")
+        )
+      );
+    }
     let allProductDetailsCopy = [...props.productDetails];
+
     let uniQueProductDetails = [];
     for (let i = 0; i < allProductDetailsCopy.length; i++) {
       let productDetails = [allProductDetailsCopy[i]];
@@ -143,7 +159,7 @@ const ProductDetailsTable = (props) => {
                 })
                 .then((res) => {})
                 .catch((err) => {
-                  const status = err.response.status;
+                  const status = err?.response?.status;
                   if (status === 403) {
                     notification.error({
                       message: "Thông báo",
@@ -153,7 +169,7 @@ const ProductDetailsTable = (props) => {
                 });
             })
             .catch((err) => {
-              const status = err.response.status;
+              const status = err?.response?.status;
               if (status === 403) {
                 notification.error({
                   message: "Thông báo",
@@ -339,7 +355,7 @@ const ProductDetailsTable = (props) => {
   }
   useEffect(() => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [product.id, render, props.render]);
+  }, [render, props.render]);
   return (
     <>
       {contextHolder}
@@ -488,15 +504,20 @@ const ProductDetailsTable = (props) => {
                   render={(text, record, index) => {
                     return (
                       <Input
-                        type={"number"}
                         id={`price${record.id}`}
+                        value={prices[record.id]}
+                        onChange={(event) => {
+                          changePrice(
+                            record.id,
+                            event.target.value.replace(/\D/g, "")
+                          );
+                        }}
                         onBlur={(event) => {
                           props.productDetails[record.id].price =
-                            event.target.value;
+                            event.target.value.replace(/\D/g, "");
                         }}
                         prefix="VND"
                         disabled={record.status === "DELETED"}
-                        defaultValue={record.price}
                         style={{ textAlign: "center" }}
                       />
                     );

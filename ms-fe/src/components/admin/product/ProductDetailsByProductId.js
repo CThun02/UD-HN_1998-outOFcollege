@@ -7,6 +7,7 @@ import {
   CheckCircleTwoTone,
   DeleteFilled,
   ReloadOutlined,
+  CheckOutlined,
 } from "@ant-design/icons";
 import {
   Button,
@@ -23,7 +24,9 @@ import {
   Spin,
   Table,
   Tooltip,
+  Switch
 } from "antd";
+import numeral from "numeral";
 import Card from "antd/es/card/Card";
 import Input from "antd/es/input/Input";
 import TextArea from "antd/es/input/TextArea";
@@ -41,6 +44,7 @@ import {
 } from "firebase/storage";
 import { saveImage } from "../../../config/FireBase";
 import ProductOpenActive from "./ProductOpenActive";
+import { useNavigate } from "react-router-dom";
 import { getToken } from "../../../service/Token";
 import { QRCodeSVG } from "qrcode.react";
 
@@ -48,6 +52,7 @@ var productDetailsUpdate = [];
 const ProductDetails = (props) => {
   const api = "http://localhost:8080/api/admin/";
   const [messageApi, contextHolder] = message.useMessage();
+  const navigate = useNavigate();
   const { confirm } = Modal;
   const { productId } = useParams();
   const [product, setProduct] = useState({
@@ -108,6 +113,7 @@ const ProductDetails = (props) => {
   const [loadingUpdateProduct, setLoadingUpdateProduct] = useState(false);
   const [loadingProductImage, setLoadingProductImage] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [priceUpdate, setPriceUpdate] = useState([]);
   const [productDetailUpdate, setProductDetailUpdate] = useState({
     id: "",
     product: product,
@@ -186,6 +192,35 @@ const ProductDetails = (props) => {
         );
       },
     },
+    
+    {
+      key: "status",
+      dataIndex: "status",
+      title: "Trạng thái",
+      render: (text, record, index) => {
+        return (
+          <Switch
+            checkedChildren={<CheckOutlined />}
+            unCheckedChildren={<CloseOutlined />}
+            checked={record.status === "ACTIVE"}
+            onChange={event=>{
+              if(record.quantity<=0){
+                notification.error({
+                  message:"Thông báo",
+                  description:"Sản phẩm không có số lượng tồn để bật kinh doanh!"
+                })
+            }else{
+              var productDetail = {...record}
+              productDetail.status = event?"ACTIVE":"INACTIVE"
+              updateProductDetail(productDetail,
+                                true,
+                                index);
+            }
+            }}
+        />
+        );
+      },
+    },
     {
       key: "quantity",
       dataIndex: "quantity",
@@ -196,8 +231,13 @@ const ProductDetails = (props) => {
             size="small"
             style={{ textAlign: "center" }}
             defaultValue={record.quantity}
+            type={"number"}
             onBlur={(event) =>
-              getProductDetailsUpdate(record, "quantity", event.target.value)
+              getProductDetailsUpdate(
+                record,
+                "quantity",
+                event.target.value.replace(/\D/g, "")
+              )
             }
           />
         ) : (
@@ -209,14 +249,22 @@ const ProductDetails = (props) => {
       key: "price",
       dataIndex: "price",
       title: "Giá",
-      render: (text, record, index) => {
-        return selectedRowKeys.some((key) => key === record.id) ? (
+      render: (text, record) => {
+        const index = selectedRowKeys.findIndex((key) => key === record.id);
+        return index >= 0 ? (
           <Input
             size="small"
             style={{ textAlign: "center" }}
-            defaultValue={record.price}
+            value={priceUpdate[index]}
+            onChange={(event) => {
+              changePrice(event.target.value.replace(/\D/g, ""), index);
+            }}
             onBlur={(event) =>
-              getProductDetailsUpdate(record, "price", event.target.value)
+              getProductDetailsUpdate(
+                record,
+                "price",
+                event.target.value.replace(/\D/g, "")
+              )
             }
           />
         ) : (
@@ -237,8 +285,13 @@ const ProductDetails = (props) => {
             size="small"
             style={{ textAlign: "center" }}
             defaultValue={record.weight}
+            type={"number"}
             onBlur={(event) =>
-              getProductDetailsUpdate(record, "weight", event.target.value)
+              getProductDetailsUpdate(
+                record,
+                "weight",
+                event.target.value.replace(/\D/g, "")
+              )
             }
           />
         ) : (
@@ -922,10 +975,12 @@ const ProductDetails = (props) => {
                       </span>
                       <Input
                         prefix="VND"
-                        type={"number"}
-                        value={productDetailUpdate.price}
+                        value={numeral(productDetailUpdate.price).format("0,0")}
                         onChange={(event) =>
-                          handleSetProductDetail("price", event.target.value)
+                          handleSetProductDetail(
+                            "price",
+                            event.target.value.replace(/\D/g, "")
+                          )
                         }
                         status={productDetailUpdate.price === "" ? "error" : ""}
                       />
@@ -1129,31 +1184,9 @@ const ProductDetails = (props) => {
                 }}
                 type="primary"
                 size={"large"}
+                disable={record.status === "INACTIVE"}
               >
                 <EditFilled />
-              </Button>
-              <Button
-                onClick={() => {
-                  confirm({
-                    centered: true,
-                    title: `Xóa sản phẩm`,
-                    content: "Xác nhận Xóa",
-                    onOk() {
-                      deleteProductDetail(
-                        record,
-                        record.status === "ACTIVE" ? "DELETED" : "ACTIVE"
-                      );
-                    },
-                  });
-                }}
-                type="primary"
-                size={"large"}
-              >
-                {record.status === "ACTIVE" ? (
-                  <DeleteFilled />
-                ) : (
-                  <ReloadOutlined />
-                )}
               </Button>
             </Space>
           </>
@@ -1165,7 +1198,10 @@ const ProductDetails = (props) => {
     selectedRowKeys,
     onChange: onSelectChange,
   };
+
   //functions
+
+
   function addProductImage(productDetail, event) {
     setLoadingProductImage(true);
     var imageQuantity = productDetail.productImageResponse.length;
@@ -1631,8 +1667,23 @@ const ProductDetails = (props) => {
     }
   }
 
+  function changePrice(price, index) {
+    var priceCopy = [...priceUpdate];
+    priceCopy[index] = numeral(price).format("0,0");
+    setPriceUpdate(priceCopy);
+  }
+
   function onSelectChange(newSelectedRowKeys) {
     setSelectedRowKeys(newSelectedRowKeys);
+    var priceUpdate = [];
+    for (let index = 0; index < newSelectedRowKeys.length; index++) {
+      for (let i = 0; i < productDetails?.length; i++) {
+        if (newSelectedRowKeys[index] === productDetails[i].id) {
+          priceUpdate.push(numeral(productDetails[i].price).format("0,0"));
+        }
+      }
+      setPriceUpdate(priceUpdate);
+    }
     setRender(Math.random);
   }
 
@@ -1696,6 +1747,7 @@ const ProductDetails = (props) => {
           },
         })
         .then((res) => {
+          setRender(Math.random());
           if (notifi) {
             setLoadingUpdateProduct(false);
             if (res.data.id === productDetailUpdateCopy.id) {
@@ -1704,7 +1756,6 @@ const ProductDetails = (props) => {
                 message: "Thông báo",
                 description: "Cập nhật sản phẩm thành công!",
               });
-              setRender(Math.random());
             } else {
               notification.error({
                 message: "Thông báo",
@@ -1762,18 +1813,17 @@ const ProductDetails = (props) => {
                     </span>
                   ),
                 });
-                return null;
               } else {
                 updateProductDetail(productDetail);
+                notification.success({
+                  message: "Thông báo",
+                  description: <span>Chỉnh sửa sản phẩm thành công</span>,
+                });
               }
             }
           }
         }
         setSelectedRowKeys([]);
-        notification.success({
-          message: "Thông báo",
-          description: <span>Chỉnh sửa sản phẩm thành công</span>,
-        });
         setRender(Math.random());
         setLoadingUpdateProducts(false);
       },
@@ -1868,6 +1918,7 @@ const ProductDetails = (props) => {
             icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
           });
           setEditProduct(false);
+          handleCancel()
         })
         .catch((err) => {
           const status = err?.response?.status;
@@ -1916,41 +1967,15 @@ const ProductDetails = (props) => {
         }
       });
   }
-  function deleteProductDetail(productDetail, status) {
-    delete productDetail["key"];
-    productDetail.status = status;
-
-    axios
-      .put(
-        api + "product/updateProductDetail?method='Deleted'",
-        productDetail,
-        {
-          headers: {
-            Authorization: `Bearer ${getToken(true)}`,
-          },
-        }
-      )
-      .then((res) => {
-        setRender(Math.random);
-        notification.success({
-          message: "Thông báo",
-          description: `cập nhật sản phẩm thành công!`,
-        });
-      })
-      .catch((err) => {
-        const status = err?.response?.status;
-        if (status === 403) {
-          notification.error({
-            message: "Thông báo",
-            description: "Bạn không có quyền truy cập!",
-          });
-        } else {
-          messageApi.error(`Gặp lỗi khi thao tác trên dữ liệu`);
-        }
-      });
-  }
 
   useEffect(() => {
+    if(product?.status === "INACTIVE"){
+      notification.error({
+        message: "Thông báo",
+        description: "Vui lòng bật trạng thái kinh doanh của sản phẩm để tiếp tục!",
+      });
+      navigate("/api/admin/product");
+    }
     axios
       .get(api + "product/getMaxPrice?productId=" + productId, {
         headers: {
@@ -2193,9 +2218,9 @@ const ProductDetails = (props) => {
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
+    render,
     maxPrice,
     productId,
-    render,
     brand,
     button,
     category,
@@ -2256,12 +2281,14 @@ const ProductDetails = (props) => {
               </Button>
             </div>
           </Modal>
-          <h2>
-            <FilePptOutlined /> Chỉnh sửa sản phẩm
+          <h2 style={{marginBottom:"24px"}}>
+            <FilePptOutlined /> Chỉnh sửa sản phẩm - {product.productName} <EditFilled
+                        disabled={!props.isAdmin}
+                        onClick={() => {
+                          showModal(true)
+                        }}
+                      />
           </h2>
-          <Button type="primary" onClick={showModal}>
-            <EyeOutlined />
-          </Button>
           <Modal
             title={product.productCode}
             open={isModalOpen}
@@ -2273,27 +2300,7 @@ const ProductDetails = (props) => {
               <Col span={16}>
                 <p style={{ fontWeight: 500 }}>
                   sản phẩm{"  "}
-                  {editProduct ? (
-                    <Tooltip placement="right" title="Click to close form">
-                      <CloseOutlined
-                        onClick={() => {
-                          setEditProduct(false);
-                          setRender(Math.random);
-                        }}
-                      />
-                    </Tooltip>
-                  ) : (
-                    <Tooltip placement="right" title="Click to open form">
-                      <EditFilled
-                        disabled={!props.isAdmin}
-                        onClick={() => {
-                          setEditProduct(true);
-                        }}
-                      />
-                    </Tooltip>
-                  )}
                 </p>
-                {editProduct ? (
                   <Input
                     size="small"
                     value={product.productName}
@@ -2302,23 +2309,15 @@ const ProductDetails = (props) => {
                     }
                     status={product.productName.trim() === "" ? "error" : ""}
                   />
-                ) : (
-                  <span>{product.productName}</span>
-                )}
               </Col>
               <Col span={24}>
                 <span style={{ fontWeight: 500 }}>Mô tả</span>
-                {editProduct ? (
                   <TextArea
                     onChange={(event) =>
                       handleSetProduct("description", event.target.value)
                     }
                     value={product.description}
                   />
-                ) : (
-                  <p>{product.description}</p>
-                )}
-                {editProduct ? (
                   <div style={{ textAlign: "center", marginTop: "10px" }}>
                     <Button
                       disabled={!props.isAdmin}
@@ -2328,9 +2327,6 @@ const ProductDetails = (props) => {
                       Xác nhận
                     </Button>
                   </div>
-                ) : (
-                  <hr />
-                )}
               </Col>
             </Row>
           </Modal>

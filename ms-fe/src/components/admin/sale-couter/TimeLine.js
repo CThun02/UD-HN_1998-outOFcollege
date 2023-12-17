@@ -749,7 +749,10 @@ const BillTimeLine = (addId) => {
                                     </Col>
                                     <Col span={14}>
                                         <span>
-                                            {billInfo?.address?.replace(/[0-9|-]/g, "") || "__"}
+                                            {billInfo?.ward ? `${billInfo?.addressDetail ?? ''} 
+                                        ${billInfo?.ward?.substring(0, billInfo?.ward.indexOf('|'))} 
+                                        ${billInfo?.district?.substring(0, billInfo?.district.indexOf('|'))} 
+                                        ${billInfo?.city?.substring(0, billInfo?.city.indexOf('|'))}` : '__'}
                                         </span>
                                     </Col>
                                 </Row>

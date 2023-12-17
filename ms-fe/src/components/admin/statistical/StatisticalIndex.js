@@ -15,6 +15,7 @@ import {
   ClockCircleOutlined,
   EuroOutlined,
   CarOutlined,
+  PieChartOutlined,
 } from "@ant-design/icons";
 import {
   Col,
@@ -359,7 +360,7 @@ const StatisticalIndex = ({ isAdmin }) => {
           setIsLoading(false);
         })
         .catch((err) => {
-          const status = err.response.status;
+          const status = err?.response?.status;
           if (status === 403) {
             notification.error({
               message: "Thông báo",
@@ -506,7 +507,7 @@ const StatisticalIndex = ({ isAdmin }) => {
           setBillRevenue(res.data);
         })
         .catch((err) => {
-          const status = err.response.status;
+          const status = err?.response?.status;
           if (status === 403) {
             notification.error({
               message: "Thông báo",
@@ -549,6 +550,12 @@ const StatisticalIndex = ({ isAdmin }) => {
   return (
     <>
       <Row>
+        <Col span={24}>
+          <h1 style={{ textAlign: "center" }}>
+            <PieChartOutlined /> Thống kê
+          </h1>
+          <br />
+        </Col>
         <Col span={16}>
           <div className={`${styles.bgWhite} ${styles.fixHeightDefault} me-5`}>
             <h2>

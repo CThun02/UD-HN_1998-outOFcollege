@@ -149,19 +149,19 @@ const Bill = () => {
                 {record.productDetail.promotion?.length > 0 ? (
                   <Badge.Ribbon
                     text={`Giảm ${record.productDetail.promotion[0].promotionValue
-                      ? record.productDetail.promotion[0].promotionMethod ===
-                        "%"
-                        ? record.productDetail.promotion[0].promotionValue +
-                        " " +
-                        record.productDetail.promotion[0].promotionMethod
-                        : record.productDetail.promotion[0].promotionValue.toLocaleString(
-                          "vi-VN",
-                          {
-                            style: "currency",
-                            currency: "VND",
-                          }
-                        )
-                      : null
+                        ? record.productDetail.promotion[0].promotionMethod ===
+                          "%"
+                          ? record.productDetail.promotion[0].promotionValue +
+                          " " +
+                          record.productDetail.promotion[0].promotionMethod
+                          : record.productDetail.promotion[0].promotionValue.toLocaleString(
+                            "vi-VN",
+                            {
+                              style: "currency",
+                              currency: "VND",
+                            }
+                          )
+                        : null
                       }`}
                     color="red"
                   >
@@ -366,7 +366,7 @@ const Bill = () => {
           }}
         >
           <Avatar src={<DollarOutlined style={{ color: "black" }} />} />
-          <div >Tiền mặt</div>
+          <div>Tiền mặt</div>
         </div>
       ),
       value: "1",
@@ -383,7 +383,7 @@ const Bill = () => {
           }}
         >
           <Avatar src={<SwapOutlined style={{ color: "black" }} />} />
-          <div > Chuyển khoản</div>
+          <div> Chuyển khoản</div>
         </div>
       ),
       value: "2",
@@ -400,8 +400,8 @@ const Bill = () => {
           }}
         >
           <Avatar src={<InteractionOutlined style={{ color: "black" }} />} />
-          <div >Cả 2</div>
-        </div >
+          <div>Cả 2</div>
+        </div>
       ),
       value: "3",
     },
@@ -914,7 +914,7 @@ const Bill = () => {
         });
       })
       .catch((err) => {
-        const status = err.response.status;
+        const status = err?.response?.status;
         if (status === 403) {
           notification.error({
             message: "Thông báo",
@@ -994,7 +994,9 @@ const Bill = () => {
         ? 0
         : Number(selectedOption) === 2
           ? voucherPrice() + shippingFee
-          : Number(selectedOption) === 3 ? voucherPrice() + shippingFee : amountPaid,
+          : Number(selectedOption) === 3
+            ? voucherPrice() + shippingFee
+            : amountPaid,
       billType: "In-Store",
       symbol: typeShipping[index] ? "Shipping" : symbol,
       status: typeShipping[index]
@@ -1135,18 +1137,18 @@ const Bill = () => {
       ward: Yup.string().required("Phường/xã không được để trống"),
       email: Yup.string().email("Địa chỉ email không hợp lệ"),
     });
-    console.log(remainAmount, `123`)
+    console.log(remainAmount, `123`);
     if (Number(selectedOption) === 3) {
       if (remainAmount === -1) {
-        setInputError("Bạn chưa nhập tiền")
+        setInputError("Bạn chưa nhập tiền");
       } else {
-        setInputError('')
+        setInputError("");
       }
 
       if (transactionCode.trim().length === 0) {
         setTransactionError("Mã giao dịch không được để trống");
       } else {
-        setTransactionError('')
+        setTransactionError("");
       }
 
       if (inputError && transactionError) {
@@ -1161,7 +1163,8 @@ const Bill = () => {
         duration: 2,
       });
     } else if (
-      Number(selectedOption) === 1 && ((remainAmount < 0 && !typeShipping[index]) || isNaN(remainAmount))
+      Number(selectedOption) === 1 &&
+      ((remainAmount < 0 && !typeShipping[index]) || isNaN(remainAmount))
     ) {
       return setInputError("Tiền không đủ");
     } else if (Number(selectedOption) === 3 && transactionCode.trim() === "") {
@@ -1219,7 +1222,8 @@ const Bill = () => {
                 headers: {
                   Authorization: `Bearer ${getToken(true)} `,
                 },
-              });
+              }
+            );
 
             if (switchChange[index]) {
               await axios.post(
@@ -1263,7 +1267,7 @@ const Bill = () => {
   };
 
   const [inputError, setInputError] = useState("");
-  const [transactionError, setTransactionError] = useState('')
+  const [transactionError, setTransactionError] = useState("");
   const handleChangeInput = (e, index) => {
     const inputValue = e.target.value;
     setAmountPaid(inputValue);
@@ -1280,7 +1284,7 @@ const Bill = () => {
       setInputError("Số tiền không đủ");
     } else {
       setInputError("");
-      setTransactionError('')
+      setTransactionError("");
     }
   };
 
@@ -1813,8 +1817,8 @@ const Bill = () => {
                           )}
                         </Col>
                         {(Number(selectedOption) !== 2 &&
-                          !typeShipping[index]) || Number(selectedOption) === 3 ? (
-
+                          !typeShipping[index]) ||
+                          Number(selectedOption) === 3 ? (
                           <>
                             <Col span={8} style={{ marginTop: "8px" }}>
                               <span
@@ -1846,40 +1850,37 @@ const Bill = () => {
                             </Col>
                           </>
                         ) : null}
-                        {
-                          Number(selectedOption) !== 2 &&
-                            !typeShipping[index] ? (
-                            <Col span={24}>
-                              {remainAmount > 0 && (
-                                <Row style={{ marginTop: "8px" }}>
-                                  <Col span={16}>
-                                    <span
-                                      style={{ fontSize: "16px", width: "200%" }}
-                                    >
-                                      Tiền thừa
-                                    </span>
-                                  </Col>
-                                  <Col span={8}>
-                                    <span
-                                      style={{
-                                        fontSize: "16px",
-                                        color: "red",
-                                      }}
-                                    >
-                                      {remainAmount?.toLocaleString("vi-VN", {
-                                        style: "currency",
-                                        currency: "VND",
-                                      })}
-                                    </span>
-                                  </Col>
-                                </Row>
-                              )}
-                            </Col>
-                          ) : null
-                        }
-                        {Number(selectedOption) === 2
-                          || Number(selectedOption) === 3 ? (
-
+                        {Number(selectedOption) !== 2 &&
+                          !typeShipping[index] ? (
+                          <Col span={24}>
+                            {remainAmount > 0 && (
+                              <Row style={{ marginTop: "8px" }}>
+                                <Col span={16}>
+                                  <span
+                                    style={{ fontSize: "16px", width: "200%" }}
+                                  >
+                                    Tiền thừa
+                                  </span>
+                                </Col>
+                                <Col span={8}>
+                                  <span
+                                    style={{
+                                      fontSize: "16px",
+                                      color: "red",
+                                    }}
+                                  >
+                                    {remainAmount?.toLocaleString("vi-VN", {
+                                      style: "currency",
+                                      currency: "VND",
+                                    })}
+                                  </span>
+                                </Col>
+                              </Row>
+                            )}
+                          </Col>
+                        ) : null}
+                        {Number(selectedOption) === 2 ||
+                          Number(selectedOption) === 3 ? (
                           <>
                             <Input
                               placeholder="Nhập mã giao dịch"
@@ -1892,7 +1893,7 @@ const Bill = () => {
                             />
                             <span style={{ fontSize: "16px", color: "red" }}>
                               {transactionError}
-                            </span >
+                            </span>
                           </>
                         ) : null}
                         <TextArea
@@ -1903,13 +1904,17 @@ const Bill = () => {
                         />
                         <Col span={24} style={{ marginTop: "20px" }}>
                           {!typeShipping[index] && (
-                            <Flex gap="small" align="center" style={{ width: "100%" }} vertical>
+                            <Flex
+                              gap="small"
+                              align="center"
+                              style={{ width: "100%" }}
+                              vertical
+                            >
                               <Segmented
                                 options={options}
                                 style={{ marginBottom: "20px", height: "100%" }}
                                 onChange={(e) => handleOptionChange(e, index)}
-                              >
-                              </Segmented>
+                              ></Segmented>
                             </Flex>
                           )}
                           {switchChange[index] && (
@@ -1938,12 +1943,12 @@ const Bill = () => {
                           >
                             Xác nhận thanh toán
                           </Button>
-                        </Col >
-                      </Row >
-                    </Col >
-                  </Row >
-                </div >
-              </Tabs.TabPane >
+                        </Col>
+                      </Row>
+                    </Col>
+                  </Row>
+                </div>
+              </Tabs.TabPane>
             );
           })}
       </Tabs >

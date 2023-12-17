@@ -9,7 +9,12 @@ import {
   notification,
   message,
 } from "antd";
-import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  SearchOutlined,
+  PlusOutlined,
+  TableOutlined,
+  PlayCircleOutlined,
+} from "@ant-design/icons";
 import ButtonTable from "./ButtonTable";
 import styles from "../categorystyles/CategoryStyles.module.css";
 import axios from "axios";
@@ -67,8 +72,14 @@ const ButtonAdmin = function ({ isAdmin }) {
     <div className={styles.category}>
       {contextHolder}
       <div className={styles.customer}>
+        <h1 style={{ textAlign: "center" }}>
+          <PlayCircleOutlined /> Quản lý nút áo
+        </h1>
         <Row className={styles.titleTB}>
-          <h3>Danh Sách Cúc Áo</h3>
+          <h2>
+            {" "}
+            <TableOutlined /> Danh Sách nút áo
+          </h2>
         </Row>
         <Row className={styles.adminMenu}>
           <Col span={10}>

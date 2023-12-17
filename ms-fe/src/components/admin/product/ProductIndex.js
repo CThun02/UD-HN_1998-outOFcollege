@@ -2,6 +2,7 @@ import {
   EyeFilled,
   EyeOutlined,
   FilterFilled,
+  PicCenterOutlined,
   PlusOutlined,
   SearchOutlined,
   TableOutlined,
@@ -34,6 +35,8 @@ const ProductIndex = ({ isAdmin }) => {
   const [openModalEditActiveProduct, setOpenModalEditActiveProduct] = useState(
     []
   );
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
   function handlesetOpenModalEditActiveProduct(index, value) {
     const newModalVisible = [...openModalEditActiveProduct];
     newModalVisible[index] = value;
@@ -46,7 +49,11 @@ const ProductIndex = ({ isAdmin }) => {
       dataIndex: "index",
       width: 50,
       render: (text, record, index) => {
-        return index + 1;
+        return (
+          <span id={record.id}>
+            {(currentPage - 1) * pageSize + (index + 1)}
+          </span>
+        );
       },
     },
     {
@@ -76,7 +83,14 @@ const ProductIndex = ({ isAdmin }) => {
               if (!event) {
                 updateStatus(record);
               } else {
-                handlesetOpenModalEditActiveProduct(index, event);
+                if(record.quantity<=0){
+                  notification.error({
+                    message:"Thông báo",
+                    description:"Không thể bật trạng thái hoạt động!"
+                  })
+                }else{
+                  handlesetOpenModalEditActiveProduct(index, event);
+                }
               }
             }}
             checked={status === "ACTIVE" ? true : false}
@@ -94,12 +108,13 @@ const ProductIndex = ({ isAdmin }) => {
       key: "6",
       title: "Thao tác",
       dataIndex: "id",
-      render: (id) => (
+      render: (id, record) => (
         <>
-          <Link to={`/api/admin/product/details/${id}`}>
+          <Link to={`/api/admin/product/details/${record.id}`}>
             <Button
               type="primary"
               size="large"
+              disabled={record.status === "INACTIVE"}
               className={styles.product__button}
             >
               <EyeOutlined />
@@ -186,6 +201,9 @@ const ProductIndex = ({ isAdmin }) => {
       {contextHolder}
       <div className={styles.product__index}>
         <div className={styles.product__filter}>
+          <h1 style={{ textAlign: "center" }}>
+            <PicCenterOutlined /> Quản lý sản phẩm
+          </h1>
           <h2>
             <FilterFilled /> Bộ lọc
           </h2>
@@ -257,6 +275,10 @@ const ProductIndex = ({ isAdmin }) => {
                 defaultPageSize: 5,
                 showLessItems: true,
                 style: { marginRight: "10px" },
+                onChange: (currentPage, pageSize) => {
+                  setCurrentPage(currentPage);
+                  setPageSize(pageSize);
+                },
               }}
             />
             <br />

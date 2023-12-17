@@ -174,7 +174,7 @@ const BillManagement = () => {
                 ? "red"
                 : object === "Complete"
                   ? "green"
-                  : null;
+                  : object === 'ReturnS' ? "warning" : '';
         return (
           <Space direction="vertical">
             <div style={{ width: "auto", display: "flex" }}>
@@ -185,7 +185,8 @@ const BillManagement = () => {
                     ? "Đã hủy"
                     : object === "Complete"
                       ? "Đã hoàn thành"
-                      : "Đã thanh toán"}
+                      : object === 'ReturnS' ? 'Trả hàng'
+                        : "Đã thanh toán"}
               </Tag>
             </div>
           </Space>

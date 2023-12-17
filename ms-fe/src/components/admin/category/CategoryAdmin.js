@@ -31,6 +31,7 @@ const CategoryAdmin = function ({ isAdmin }) {
 
   const handleCancel = () => {
     setIsModalVisible(false);
+    setRender(Math.random())
   };
 
   const handleSubmit = (values) => {
@@ -44,7 +45,7 @@ const CategoryAdmin = function ({ isAdmin }) {
       })
       .then((response) => {
         // Xử lý thành công
-        setRender(Math.random);
+        setRender(Math.random());
         if (response.data) {
           message.success("Thêm thành công");
         } else {
@@ -62,7 +63,7 @@ const CategoryAdmin = function ({ isAdmin }) {
         }
       });
   };
-  useState(() => {}, [render]);
+  useState(() => { }, [render]);
   return (
     <div className={styles.material}>
       <h1 style={{ textAlign: "center" }}>

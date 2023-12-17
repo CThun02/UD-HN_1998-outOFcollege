@@ -28,6 +28,10 @@ public class PdfResponse {
 
     private BigDecimal amountPaid;
 
+    private BigDecimal voucherPrice;
+
+    private BigDecimal priceReduce;
+
     private List<TimelineProductResponse> lstProductDetail;
 
 }

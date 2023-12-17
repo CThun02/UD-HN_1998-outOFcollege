@@ -169,12 +169,12 @@ const BillManagement = () => {
           object === "Unpaid"
             ? "geekblue"
             : object === "Paid"
-            ? "green"
-            : object === "Cancel"
-            ? "red"
-            : object === "Complete"
-            ? "green"
-            : null;
+              ? "green"
+              : object === "Cancel"
+                ? "red"
+                : object === "Complete"
+                  ? "green"
+                  : object === 'ReturnS' ? "warning" : '';
         return (
           <Space direction="vertical">
             <div style={{ width: "auto", display: "flex" }}>
@@ -182,10 +182,11 @@ const BillManagement = () => {
                 {object === "Unpaid"
                   ? "Chưa thanh toán"
                   : object === "Cancel"
-                  ? "Đã hủy"
-                  : object === "Complete"
-                  ? "Đã hoàn thành"
-                  : "Đã thanh toán"}
+                    ? "Đã hủy"
+                    : object === "Complete"
+                      ? "Đã hoàn thành"
+                      : object === 'ReturnS' ? 'Trả hàng'
+                        : "Đã thanh toán"}
               </Tag>
             </div>
           </Space>

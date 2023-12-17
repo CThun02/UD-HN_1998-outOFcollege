@@ -141,10 +141,10 @@ const ModalBillInfoDisplay = ({ open, cancel, billCode }) => {
                                 </View>
                                 <View style={{ flexDirection: 'row', fontFamily: 'Roboto' }}>
                                     <View style={{ flex: 1 }}>
-                                        <Text>Tổng giá trị hóa đơn: {bill.totalPrice.toLocaleString("vi-VN", { style: "currency", currency: "VND" })}</Text>
-                                        <Text>Tổng tiền thanh toán: {(bill.totalPrice + (bill.shippingFee ?? 0)).toLocaleString("vi-VN", { style: "currency", currency: "VND" })}</Text>
-                                        <Text>Tổng tiền khách trả: {bill.amountPaid?.toLocaleString("vi-VN", { style: "currency", currency: "VND" })}</Text>
-                                        <Text>Tổng tiền trả lại: {(bill.amountPaid - (bill?.priceReduce + bill.shippingFee)).toLocaleString("vi-VN", { style: "currency", currency: "VND" })}</Text>
+                                        <Text>Thành tiền: {bill.totalPrice.toLocaleString("vi-VN", { style: "currency", currency: "VND" })}</Text>
+                                        <Text>Giá vận chuyển: {(bill.shippingFee ?? 0).toLocaleString("vi-VN", { style: "currency", currency: "VND" })}</Text>
+                                        <Text>Giảm giá: {bill.amountPaid?.toLocaleString("vi-VN", { style: "currency", currency: "VND" })}</Text>
+                                        <Text>Tổng cộng: {(bill.amountPaid - (bill?.priceReduce + bill.shippingFee)).toLocaleString("vi-VN", { style: "currency", currency: "VND" })}</Text>
                                     </View>
                                     <View style={{ flex: 1 }}>
                                         <Text>
@@ -241,26 +241,27 @@ const ModalBillInfoDisplay = ({ open, cancel, billCode }) => {
                                     </table>
                                     ---------------------------------------------------------
                                     <Row>
-                                        <Col span={18}>TỔNG GIÁ TRỊ HÓA ĐƠN</Col>
-                                        <Col span={6}>{bill?.totalPrice.toLocaleString("vi-VN", {
+                                        <Col span={12}>Thành tiền</Col>
+                                        <Col span={12}>{bill?.totalPrice.toLocaleString("vi-VN", {
                                             style: "currency",
                                             currency: "VND",
                                         })}</Col>
-                                        <Col span={18}>TỔNG TIỀN THANH TOÁN</Col>
-                                        <Col span={6}>{(bill?.totalPrice + (bill?.shippingFee ?? 0)).toLocaleString("vi-VN", {
+                                        <Col span={12}>Giá vận chuyển</Col>
+                                        <Col span={12}>{(bill?.shippingFee ?? 0).toLocaleString("vi-VN", {
                                             style: "currency",
                                             currency: "VND",
                                         })}</Col>
-                                        <Col span={18}>TỔNG TIỀN KHÁCH TRẢ</Col>
-                                        <Col span={6}>{bill?.amountPaid?.toLocaleString("vi-VN", {
+                                        <Col span={12}>Giảm giá</Col>
+                                        <Col span={12}>{bill?.voucherPrice?.toLocaleString("vi-VN", {
                                             style: "currency",
                                             currency: "VND",
                                         })}</Col>
-                                        <Col span={18}>TỔNG TIỀN TRẢ LẠI</Col>
-                                        <Col span={6}>{((bill?.amountPaid - (bill?.totalPrice + bill?.shippingFee)) >= 0 ? (bill?.amountPaid - (bill?.totalPrice + bill?.shippingFee)) : 0).toLocaleString("vi-VN", {
-                                            style: "currency",
-                                            currency: "VND",
-                                        })}</Col>
+                                        <Col span={12}>Tổng cộng</Col>
+                                        <Col span={12}>{((bill?.priceReduce === bill.voucherPrice) ? bill?.shipPrice
+                                            : (bill?.priceReduce + bill?.shippingFee)).toLocaleString("vi-VN", {
+                                                style: "currency",
+                                                currency: "VND",
+                                            })}</Col>
                                     </Row>
                                     <QRCodeSVG width={"100%"} value={billCode + ""} />
                                 </div>

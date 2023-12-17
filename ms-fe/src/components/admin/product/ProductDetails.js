@@ -201,7 +201,7 @@ const ProductDetails = (props) => {
       title: "Số lượng",
       width: 110,
       render: (text, record, index) => {
-        return record.quantity;
+        return record.quantity <= 0 ? <span style={{ color: "#ccc" }}>Hết hàng</span> : record.quantity;
       },
     },
     {
@@ -285,14 +285,18 @@ const ProductDetails = (props) => {
               </Button>
             </div>
           </Modal>
-          <Button
-            type="primary"
-            onClick={() => {
-              handleShowModalModalQuantity(index);
-            }}
-          >
-            Chọn
-          </Button>
+          {console.log(record.quantity)}
+          {record.quantity <= 0 ?
+            (<span style={{ color: "#ccc" }}>Hết hàng</span>)
+            : record.status === "INACTIVE" ? (<span style={{ color: "#ccc" }}>Ngưng kinh doanh</span>) :
+              <Button
+                type="primary"
+                onClick={() => {
+                  handleShowModalModalQuantity(index);
+                }}
+              >
+                Chọn
+              </Button>}
         </>
       ),
     },

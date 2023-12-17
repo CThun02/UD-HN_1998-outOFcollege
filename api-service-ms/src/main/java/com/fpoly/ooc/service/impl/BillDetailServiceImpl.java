@@ -9,11 +9,13 @@ import com.fpoly.ooc.entity.ProductDetail;
 import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.BillDetailRepo;
 import com.fpoly.ooc.request.bill.BillDetailRequest;
+import com.fpoly.ooc.responce.bill.BillInfoResponse;
 import com.fpoly.ooc.responce.bill.BillResponse;
 import com.fpoly.ooc.responce.pdf.PdfResponse;
 import com.fpoly.ooc.responce.timeline.TimelineProductResponse;
 import com.fpoly.ooc.service.interfaces.BillDetailService;
 import com.fpoly.ooc.service.interfaces.ProductDetailServiceI;
+import com.fpoly.ooc.service.interfaces.TimeLineService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +35,9 @@ public class BillDetailServiceImpl implements BillDetailService {
 
     @Autowired
     private ProductDetailServiceI productDetailService;
+
+    @Autowired
+    private TimeLineService timeLineService;
 
     @Override
     public BillDetail createBillDetail(BillDetailRequest request) {
@@ -169,16 +174,19 @@ public class BillDetailServiceImpl implements BillDetailService {
 
     @Override
     public PdfResponse pdfResponse(String billCode) {
-        BillResponse bill = billService.getBillByBillCode(billCode);
+        Bill bill = billService.findBillByBillCode(billCode);
+        BillInfoResponse response = timeLineService.getBillInfoByBillId(bill.getId());
         List<TimelineProductResponse> lstProductDT = billDetailRepo.lstProductDT(billCode);
 
         PdfResponse pdfResponse = PdfResponse.builder()
                 .billCode(billCode)
-                .BillCreatedAt(bill.getCreatedAt())
+                .BillCreatedAt(response.getCreatedDate())
                 .billCreatedBy(bill.getCreatedBy())
-                .totalPrice(bill.getPrice())
-                .shippingFee(bill.getShippingPrice())
-                .amountPaid(bill.getAmountPaid())
+                .totalPrice(response.getTotalPrice())
+                .shippingFee(response.getShipPrice())
+                .amountPaid(response.getAmountPaid())
+                .voucherPrice(response.getVoucherPrice())
+                .priceReduce(response.getPriceReduce())
                 .lstProductDetail(lstProductDT)
                 .build();
 

@@ -214,6 +214,7 @@ import java.util.List;
                 select
                       min(productDetail.price) AS MinPrice,
                       max(productDetail.price) AS MaxPrice,
+                      sum(productDetail.quantity) AS Quantity,
                       (SELECT TOP 1
                            pSub.promotion_method
                        FROM
@@ -319,6 +320,7 @@ import java.util.List;
                 columns = {
                         @ColumnResult(name = "MinPrice", type = BigDecimal.class),
                         @ColumnResult(name = "MaxPrice", type = BigDecimal.class),
+                        @ColumnResult(name = "Quantity", type = Long.class),
                         @ColumnResult(name = "PromotionMethod", type = String.class),
                         @ColumnResult(name = "PromotionValue", type = BigDecimal.class),
                 }

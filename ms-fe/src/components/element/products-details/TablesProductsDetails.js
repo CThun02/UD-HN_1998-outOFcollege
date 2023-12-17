@@ -147,7 +147,7 @@ function TablesProductsDetails({
               ...rowSelection,
             }}
             columns={columns}
-            dataSource={productsDetails.map((p, index) => ({
+            dataSource={productsDetails?.map((p, index) => ({
               stt: calculateStt(index),
               key: p.productDetailsId,
               product: {

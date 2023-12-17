@@ -30,4 +30,12 @@ public class GetColorAndSizeAndQuantity {
         this.promotionType = promotionType;
         this.promotionValue = promotionValue;
     }
+
+    public GetColorAndSizeAndQuantity(BigDecimal priceProductMin, BigDecimal priceProductMax, String promotionType,
+                                      BigDecimal promotionValue) {
+        this.priceProductMin = priceProductMin;
+        this.priceProductMax = priceProductMax;
+        this.promotionType = promotionType;
+        this.promotionValue = promotionValue;
+    }
 }

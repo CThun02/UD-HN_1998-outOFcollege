@@ -61,6 +61,8 @@ public class TimelineProductDisplayResponse {
 
     private String address;
 
+    private Integer productQuantity;
+
     private List<ProductImageResponse> productImageResponses;
 
     private Boolean checkInPromotion;
@@ -87,5 +89,6 @@ public class TimelineProductDisplayResponse {
         this.productCateGoryName = timelineProductResponse.getProductCateGoryName();
         this.billDetailStatus = timelineProductResponse.getBillDetailStatus();
         this.productCode = timelineProductResponse.getProductCode();
+        this.productQuantity = timelineProductResponse.getProductQuantity();
     }
 }

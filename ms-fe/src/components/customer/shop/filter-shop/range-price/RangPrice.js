@@ -56,7 +56,9 @@ function RangPrice({ filter, setFilter }) {
                 <Input
                   name="minPrice"
                   className={styles.input}
-                  value={filter.minPrice}
+                  value={
+                    filter.minPrice ? numeral(filter.minPrice).format("0,0") : 0
+                  }
                   onChange={(e) =>
                     setFilter({
                       ...filter,
@@ -71,9 +73,9 @@ function RangPrice({ filter, setFilter }) {
                 <Input
                   name="maxPrice"
                   className={styles.input}
-                  value={
+                  value={numeral(
                     filter.maxPrice ? filter.maxPrice : defulatRangePriceMax
-                  }
+                  ).format("0,0")}
                   onChange={(e) =>
                     setFilter({
                       ...filter,

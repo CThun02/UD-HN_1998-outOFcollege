@@ -64,6 +64,7 @@ import java.util.List;
                              brand.brand_name, category.category_name, billDetail.quantity, billDetail.price,
                              productDetail.id
                     HAVING (SELECT count(*) FROM DATN_DB_MS.dbo.time_line subTimeline where subTimeline.bill_id = bill.id) = 1
+                    ORDER BY bill.created_at DESC
                 """,
         resultSetMapping = "Mapping.findAllNotifications"
 )

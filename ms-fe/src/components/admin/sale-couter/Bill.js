@@ -32,6 +32,7 @@ import {
   ShoppingCartOutlined,
   WalletOutlined,
   InteractionOutlined,
+  ShopOutlined,
 } from "@ant-design/icons";
 import * as Yup from "yup";
 import axios from "axios";
@@ -412,9 +413,10 @@ const Bill = () => {
 
   const handleOptionChange = (value, index) => {
     setSelectedOption(value);
-    if (value === "2") {
-      setAmountPaid(0);
-    }
+    setAmountPaid(0);
+    setTransactionCode('');
+    setRemainAmount(0)
+    setPrice(0)
   };
 
   // xóa sản phẩm trong giỏ hàng
@@ -616,11 +618,11 @@ const Bill = () => {
     let result = totalPrice;
 
     if (voucherAdd && voucherAdd.voucherMethod === "vnd") {
-      if (result > (voucherAdd.voucherCondition ?? 0)) {
+      if (result >= (voucherAdd.voucherCondition ?? 0)) {
         result -= voucherAdd.voucherValue ?? 0;
       }
     } else if (voucherAdd && voucherAdd.voucherMethod === "%") {
-      if (result > voucherAdd.voucherCondition) {
+      if (result >= voucherAdd.voucherCondition) {
         const discountPercent = voucherAdd.voucherValue ?? 0;
         const maxDiscount = voucherAdd.voucherValueMax ?? 0;
         let discount = (totalPrice * discountPercent) / 100;
@@ -812,6 +814,19 @@ const Bill = () => {
   const getProductDetails = () => {
     var cart = JSON.parse(localStorage.getItem(cartId));
     var productDetails = cart.productDetails;
+    for (let index = 0; index < productDetails.length; index++) {
+      var productDetailId = productDetails[index].productDetail.id;
+      axios.get("http://localhost:8080/api/admin/product/getproductdetailbyidpd?productDetailId=" + productDetailId, {
+        headers: {
+          Authorization: `Bearer ${getToken(true)}`,
+        },
+      }).then(res => {
+        if (res?.data?.quantity <= 0) {
+          cart.productDetails = productDetails.splice(index, 1);
+          localStorage.setItem(cartId, JSON.stringify(cart));
+        }
+      })
+    }
     setProductDetails(productDetails);
     setAccount(cart.account);
   };
@@ -1128,7 +1143,6 @@ const Bill = () => {
       ward: Yup.string().required("Phường/xã không được để trống"),
       email: Yup.string().email("Địa chỉ email không hợp lệ"),
     });
-    console.log(remainAmount, `123`);
     if (Number(selectedOption) === 3) {
       if (remainAmount === -1) {
         setInputError("Bạn chưa nhập tiền");
@@ -1258,7 +1272,9 @@ const Bill = () => {
 
   const [inputError, setInputError] = useState("");
   const [transactionError, setTransactionError] = useState("");
+
   const handleChangeInput = (inputValue, index) => {
+    setAmountPaid(inputValue);
     let calculatedValue = 0;
     if (switchChange[index]) {
       calculatedValue = inputValue - voucherPrice() - shippingFee;
@@ -1267,11 +1283,9 @@ const Bill = () => {
     }
     setRemainAmount(calculatedValue);
     numeral(inputValue).format("0,0");
-
-    if (calculatedValue < 0) {
+    if (calculatedValue < 0 && selectedOption!=="3") {
       setInputError("Số tiền không đủ");
     } else {
-      setAmountPaid(inputValue);
       setInputError("");
       setTransactionError("");
     }
@@ -1300,6 +1314,10 @@ const Bill = () => {
 
   return (
     <>
+      <h1 style={{ textAlign: "center" }}>
+        <ShopOutlined /> Bán hàng tại quầy
+      </h1>
+      <br />
       <QRReader
         visible={modalQRScanOpen}
         key={cartId}
@@ -1458,7 +1476,6 @@ const Bill = () => {
                             <Col span={24}>
                               <div className="m-5">
                                 <b style={{ color: "red" }}></b> Email
-                                {console.log(selectedAddress)}
                                 <Input
                                   placeholder="nhập email"
                                   value={selectedAddress?.email}
@@ -1941,8 +1958,9 @@ const Bill = () => {
               </Tabs.TabPane>
             );
           })}
-      </Tabs>
-      <FormUsingVoucher
+
+      </Tabs >
+      < FormUsingVoucher
         priceBill={totalPrice}
         voucher={voucherAdd}
         setVoucher={setVoucherAdd}

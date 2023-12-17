@@ -55,6 +55,7 @@ const Bill = () => {
   const [modalVisible, setModalVisible] = useState([]);
   const [modalAccountVisible, setModalAccountVisible] = useState([]);
   const [modalQRScanOpen, setModalQRScanOpen] = useState(false);
+  const [price, setPrice] = useState("");
   function getCart() {
     initialItems = [];
     var checkEmpty = 0;
@@ -411,10 +412,10 @@ const Bill = () => {
 
   const handleOptionChange = (value, index) => {
     setSelectedOption(value);
-    if (value === "2") {
-      setAmountPaid(0);
-      setTransactionCode("");
-    }
+    setAmountPaid(0);
+    setTransactionCode('');
+    setRemainAmount(0)
+    setPrice(0)
   };
 
   // xóa sản phẩm trong giỏ hàng
@@ -724,6 +725,7 @@ const Bill = () => {
 
   // chuyển tab
   const onChange = (newActiveKey) => {
+    setPrice("0")
     setCartId(newActiveKey);
     setActiveKey(newActiveKey);
     setSelectedOption(1);
@@ -1015,11 +1017,11 @@ const Bill = () => {
       lstBillDetailRequest: [],
       addressId: selectedAddress?.id,
       fullname: selectedAddress?.fullName,
-      phoneNumber: selectedAddress.numberPhone,
       transactionCode:
         Number(selectedOption) === 2 || Number(selectedOption) === 3
           ? transactionCode
           : null,
+      phoneNumber: selectedAddress?.numberPhone,
       voucherCode: voucherAdd?.voucherCode ?? null,
       createdBy: "user3",
       priceAmount: Number(selectedOption) === 3 ? amountPaid : null,
@@ -1147,7 +1149,6 @@ const Bill = () => {
       ward: Yup.string().required("Phường/xã không được để trống"),
       email: Yup.string().email("Địa chỉ email không hợp lệ"),
     });
-    console.log(remainAmount, `123`);
     if (Number(selectedOption) === 3) {
       if (remainAmount === -1) {
         setInputError("Bạn chưa nhập tiền");
@@ -1242,7 +1243,7 @@ const Bill = () => {
                   billId: response.data.id,
                   addressId: account ? selectedAddress?.id : addressId,
                   name: account ? account.fullName : fullname,
-                  phoneNumber: account ? account.numberPhone : phoneNumber,
+                  phoneNumber: account ? account?.numberPhone : phoneNumber,
                   shipDate: switchChange[index] === true ? leadtime : null,
                   shipPrice: switchChange[index] === true ? shippingFee : null,
                 },
@@ -1273,13 +1274,12 @@ const Bill = () => {
         },
       });
     }
-    console.log(amountPaid);
   };
 
   const [inputError, setInputError] = useState("");
   const [transactionError, setTransactionError] = useState("");
-  const handleChangeInput = (e, index) => {
-    const inputValue = e.target.value;
+
+  const handleChangeInput = (inputValue, index) => {
     setAmountPaid(inputValue);
     let calculatedValue = 0;
     if (switchChange[index]) {
@@ -1289,8 +1289,7 @@ const Bill = () => {
     }
     setRemainAmount(calculatedValue);
     numeral(inputValue).format("0,0");
-
-    if (calculatedValue < 0) {
+    if (calculatedValue < 0 && selectedOption!=="3") {
       setInputError("Số tiền không đủ");
     } else {
       setInputError("");
@@ -1843,9 +1842,13 @@ const Bill = () => {
                             </Col>
                             <Col span={16}>
                               <Input
-                                type="number"
                                 className={styles.input_noneBorder}
-                                onChange={(e) => handleChangeInput(e, index)}
+                                value={price}
+                                onChange={(e) => {
+                                    handleChangeInput(e.target.value.replace(/\D/g, ""), index)
+                                    setPrice(numeral(e.target.value.replace(/\D/g, "")).format("0,0"))
+                                  }
+                                }
                               />
                               {inputError && (
                                 <span
@@ -1961,8 +1964,9 @@ const Bill = () => {
               </Tabs.TabPane>
             );
           })}
-      </Tabs>
-      <FormUsingVoucher
+
+      </Tabs >
+      < FormUsingVoucher
         priceBill={totalPrice}
         voucher={voucherAdd}
         setVoucher={setVoucherAdd}

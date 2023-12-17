@@ -640,7 +640,7 @@ const BillReturn = () => {
                             ) : data.status === "4" ? (
                               <h3>Giao hàng thành công</h3>
                             ) : data.status === "5" ? (
-                              <h3>yêu cầu trả hàng</h3>
+                              <h3>Yêu cầu trả hàng</h3>
                             ) : data.status === "-1" ? (
                               <h3>Trả hàng thất bại</h3>
                             ) : (
@@ -684,7 +684,7 @@ const BillReturn = () => {
                           ) : data.status === "0" ? (
                             <h3>Đã hủy</h3>
                           ) : data.status === "3" ? (
-                            <h3>yêu cầu trả hàng</h3>
+                            <h3>Yêu cầu trả hàng</h3>
                           ) : data.status === "-1" ? (
                             <h3>Trả hàng thất bại</h3>
                           ) : (
@@ -935,13 +935,29 @@ const BillReturn = () => {
                               {record.productSize}
                             </span>
                             <br />
-                            <b>Số lượng: </b>
+                            <b>Số lượng trả: </b>
                             <span
                               style={{
                                 marginLeft: "8px",
                               }}
                             >
                               {record.quantity}
+                            </span>
+                            <br />
+                            <b>Số lượng còn lại: </b>
+                            <span
+                              style={{
+                                marginLeft: "8px",
+                              }}
+                            >
+                              {
+                                console.log(productsReturns, record, billInfo?.billDetails.findIndex(item => item.productDetailId === record.id))
+                              }
+                              {
+                                billInfo?.billDetails?.findIndex(item => item.productDetailId === record.productDetailId)>=0?
+                                billInfo?.billDetails[billInfo?.billDetails?.findIndex(item => item.productDetailId === record.productDetailId)].quantity - record.quantity:
+                                record.quantity
+                              }
                             </span>
                             <br />
                             <b>Tổng giá hoàn trả: </b>

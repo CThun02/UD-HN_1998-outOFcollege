@@ -241,7 +241,7 @@ function FollowingOrderContent({ billCode, status, symbol, count, createdBy }) {
                         return (
                           <Row style={{ margin: 0 }}>
                             <Col md={3}>
-                              <Carousel autoplay>
+                              <Carousel  style={{maxWidth:"300px"}} autoplay>
                                 {timeline.productImageResponses &&
                                   timeline.productImageResponses.map(
                                     (item) => {
@@ -404,7 +404,7 @@ function FollowingOrderContent({ billCode, status, symbol, count, createdBy }) {
                       style={{ padding: 10, borderBottom: "1px solid gray" }}
                     >
                       <Col md={8} xxl={4}>
-                        <Carousel autoplay>
+                        <Carousel  style={{maxWidth:"300px"}} autoplay>
                           {timeline.productImageResponses &&
                             timeline.productImageResponses.map((item) => {
                               return (

@@ -109,7 +109,7 @@ const ProductDetails = (props) => {
                       }`}
                     color="red"
                   >
-                    <Carousel autoplay>
+                    <Carousel style={{maxWidth:"300px"}} autoplay>
                       {record.productImageResponse &&
                         record.productImageResponse.map((item) => {
                           return (
@@ -124,7 +124,7 @@ const ProductDetails = (props) => {
                     </Carousel>
                   </Badge.Ribbon>
                 ) : (
-                  <Carousel autoplay>
+                  <Carousel style={{maxWidth:"300px"}} autoplay>
                     {record.productImageResponse &&
                       record.productImageResponse.map((item) => {
                         return (
@@ -271,6 +271,7 @@ const ProductDetails = (props) => {
             footer={null}
           >
             <Input
+              type={"number"}
               defaultValue={1}
               onChange={(event) => handleChangeQuantity(event.target.value)}
             />
@@ -349,7 +350,12 @@ const ProductDetails = (props) => {
           : "tồn không đủ"
           }`,
       });
-    } else {
+    } else if(productDetailCreate.quantity <= 0){
+      notification.error({
+        message: "Thông báo",
+        description: `Số lượng sản phẩm phải lớn hơn 0`,
+      });
+    }else {
       productDetailCreate.productDetail = record;
       productDetailCreate.priceReduce =
         record.promotion.length !== 0

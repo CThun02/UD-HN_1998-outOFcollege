@@ -10,7 +10,7 @@ function TypeCategory() {
       <div className={styles.background}>
         <div className={styles.spacing}>
           <Row>
-            <Col xs={24} xxl={8} style={{ margin: "12px 0" }}>
+            <Col xs={24} xl={8} style={{ margin: "12px 0" }}>
               <div className={`${styles.marginBetween} ${styles.sizeBody}`}>
                 <div className={styles.position}>
                   <img
@@ -36,7 +36,7 @@ function TypeCategory() {
               </div>
             </Col>
 
-            <Col xs={24} xxl={8} style={{ margin: "12px 0" }}>
+            <Col xs={24} xl={8} style={{ margin: "12px 0" }}>
               <div className={`${styles.marginBetween} ${styles.sizeBody}`}>
                 <div className={styles.position}>
                   <img
@@ -62,7 +62,7 @@ function TypeCategory() {
               </div>
             </Col>
 
-            <Col xs={24} xxl={8} style={{ margin: "12px 0" }}>
+            <Col xs={24} xl={8} style={{ margin: "12px 0" }}>
               <div className={`${styles.marginBetween} ${styles.sizeBody}`}>
                 <div className={styles.position}>
                   <img

@@ -327,7 +327,7 @@ const Cart = (props) => {
                         }`}
                       color="red"
                     >
-                      <Carousel autoplay>
+                      <Carousel  style={{maxWidth:"300px"}} autoplay>
                         {record.productImageResponse &&
                           record?.productImageResponse.map((item) => {
                             return (
@@ -342,7 +342,7 @@ const Cart = (props) => {
                       </Carousel>
                     </Badge.Ribbon>
                   ) : (
-                    <Carousel autoplay>
+                    <Carousel  style={{maxWidth:"300px"}} autoplay>
                       {record.productImageResponse &&
                         record?.productImageResponse.map((item) => {
                           return (

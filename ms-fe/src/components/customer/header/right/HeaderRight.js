@@ -262,29 +262,30 @@ function HeaderRight(props) {
     <div className={styles.flex}>
       {contextHolder}
       <div className={styles.lineHeight}>
-        <Space direction="horizontal" style={{ width: "100%" }} size={36}>
-          <p className={styles.cssParagraph}>
-            {cartIndex.totalPrice?.toLocaleString("vi-VN", {
-              style: "currency",
-              currency: "VND",
-            })}
-          </p>
-          <Badge count={cartIndex.quantity}>
-            <Link
-              to={"/ms-shop/cart"}
-              onClick={() => {
-                handleCreateCartByUsername();
-                props.setSelectedTab("cart");
-              }}
-              className={styles.link}
-            >
-              <ShoppingCartOutlined
-                className={`${
-                  props.selectedTab === "cart" ? styles.active : ""
-                } ${styles.iconSize}`}
-              />
-            </Link>
-          </Badge>
+          <div style={{display:"inline-block", marginRight:"16px"}}>
+            <p className={styles.cssParagraph}>
+              {cartIndex.totalPrice?.toLocaleString("vi-VN", {
+                style: "currency",
+                currency: "VND",
+              })}
+            </p>
+            <Badge count={cartIndex.quantity}>
+              <Link
+                to={"/ms-shop/cart"}
+                onClick={() => {
+                  handleCreateCartByUsername();
+                  props.setSelectedTab("cart");
+                }}
+                className={styles.link}
+              >
+                <ShoppingCartOutlined
+                  className={`${
+                    props.selectedTab === "cart" ? styles.active : ""
+                  } ${styles.iconSize}`}
+                />
+              </Link>
+            </Badge>
+          </div>
           <Space>
             {user ? (
               <UserOutlined className={styles.iconSize} />
@@ -315,7 +316,6 @@ function HeaderRight(props) {
               </div>
             ) : null}
           </Space>
-        </Space>
       </div>
       <div className={styles.menuUser}>
         <Badge count={cartIndex.quantity}>

@@ -58,7 +58,7 @@ const TableProdutSellTheMost = ({ date, dateToP, type }) => {
                     }`}
                     color="red"
                   >
-                    <Carousel autoplay>
+                    <Carousel  style={{maxWidth:"300px"}} autoplay>
                       {record.productImageResponse &&
                         record.productImageResponse.map((item) => {
                           return (
@@ -73,7 +73,7 @@ const TableProdutSellTheMost = ({ date, dateToP, type }) => {
                     </Carousel>
                   </Badge.Ribbon>
                 ) : (
-                  <Carousel autoplay>
+                  <Carousel  style={{maxWidth:"300px"}} autoplay>
                     {record.productImageResponse &&
                       record.productImageResponse.map((item) => {
                         return (

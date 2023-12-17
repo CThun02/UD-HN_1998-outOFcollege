@@ -150,19 +150,19 @@ const Bill = () => {
                 {record.productDetail.promotion?.length > 0 ? (
                   <Badge.Ribbon
                     text={`Giảm ${record.productDetail.promotion[0].promotionValue
-                        ? record.productDetail.promotion[0].promotionMethod ===
-                          "%"
-                          ? record.productDetail.promotion[0].promotionValue +
-                          " " +
-                          record.productDetail.promotion[0].promotionMethod
-                          : record.productDetail.promotion[0].promotionValue.toLocaleString(
-                            "vi-VN",
-                            {
-                              style: "currency",
-                              currency: "VND",
-                            }
-                          )
-                        : null
+                      ? record.productDetail.promotion[0].promotionMethod ===
+                        "%"
+                        ? record.productDetail.promotion[0].promotionValue +
+                        " " +
+                        record.productDetail.promotion[0].promotionMethod
+                        : record.productDetail.promotion[0].promotionValue.toLocaleString(
+                          "vi-VN",
+                          {
+                            style: "currency",
+                            currency: "VND",
+                          }
+                        )
+                      : null
                       }`}
                     color="red"
                   >
@@ -818,7 +818,7 @@ const Bill = () => {
       axios
         .get(
           "http://localhost:8080/api/admin/product/getproductdetailbyidpd?productDetailId=" +
-            productDetailId,
+          productDetailId,
           {
             headers: {
               Authorization: `Bearer ${getToken(true)}`,
@@ -1059,11 +1059,10 @@ const Bill = () => {
                                     ${productDetails.map((item, index) => {
           return `<div key={index} style="display: flex; justify-content: space-between; align-items: center; padding: 4px 20px;">
                                                 <div style="width: 20%; padding: 4px;">
-                                                    <img alt="product" style="width: 100%; border: 1px solid #ccc; border-radius: 8px;" src=${
-                                                      item.productDetail
-                                                        ?.productImageResponse[0]
-                                                        ?.path
-                                                    }>
+                                                    <img alt="product" style="width: 100%; border: 1px solid #ccc; border-radius: 8px;" src=${item.productDetail
+              ?.productImageResponse[0]
+              ?.path
+            }>
                                                 </div>
                                                 <div style="width: 55%; padding: 4px;">
                                                     <p>${item.productDetail.product
@@ -1289,7 +1288,7 @@ const Bill = () => {
     }
     setRemainAmount(calculatedValue);
     numeral(inputValue).format("0,0");
-    if (calculatedValue < 0 && selectedOption!=="3") {
+    if (calculatedValue < 0 && selectedOption !== "3") {
       setInputError("Số tiền không đủ");
     } else {
       setInputError("");
@@ -1742,7 +1741,10 @@ const Bill = () => {
                           >
                             {voucherAdd?.voucherValue
                               ? voucherAdd.voucherMethod === "vnd"
-                                ? voucherAdd?.voucherValue + "đ"
+                                ? voucherAdd?.voucherValue?.toLocaleString("vi-VN", {
+                                  style: "currency",
+                                  currency: "VND",
+                                })
                                 : voucherAdd?.voucherValue + "%"
                               : "0đ"}
                           </span>
@@ -1845,9 +1847,9 @@ const Bill = () => {
                                 className={styles.input_noneBorder}
                                 value={price}
                                 onChange={(e) => {
-                                    handleChangeInput(e.target.value.replace(/\D/g, ""), index)
-                                    setPrice(numeral(e.target.value.replace(/\D/g, "")).format("0,0"))
-                                  }
+                                  handleChangeInput(e.target.value.replace(/\D/g, ""), index)
+                                  setPrice(numeral(e.target.value.replace(/\D/g, "")).format("0,0"))
+                                }
                                 }
                               />
                               {inputError && (

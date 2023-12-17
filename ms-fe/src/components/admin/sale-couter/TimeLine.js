@@ -314,7 +314,7 @@ const BillTimeLine = (addId) => {
                 return (
                     <Row>
                         <Col span={4}>
-                            <Carousel  style={{maxWidth:"300px"}} autoplay className={styles.slider}>
+                            <Carousel autoplay className={styles.slider}>
                                 {record.productImageResponses &&
                                     record.productImageResponses.map((productImage, index) => {
                                         return (
@@ -480,7 +480,7 @@ const BillTimeLine = (addId) => {
                                                 ) : data.status === "4" ? (
                                                     <h3>Giao hàng thành công</h3>
                                                 ) : data.status === "5" ? (
-                                                    <h3>Yêu cầu trả hàng</h3>
+                                                    <h3>yêu cầu trả hàng</h3>
                                                 ) : data.status === "-1" ? (
                                                     <h3>Trả hàng thất bại</h3>
                                                 ) : (
@@ -748,13 +748,8 @@ const BillTimeLine = (addId) => {
                                         <span>Địa chỉ</span>
                                     </Col>
                                     <Col span={14}>
-                                        {console.log(billInfo)}
                                         <span>
-                                            {billInfo?.ward ? `${billInfo?.addressDetail ?? ''} 
-                                        ${billInfo?.ward?.substring(0, billInfo?.ward.indexOf('|'))} 
-                                        ${billInfo?.district?.substring(0, billInfo?.district.indexOf('|'))} 
-                                        ${billInfo?.city?.substring(0, billInfo?.city.indexOf('|'))}` : '__'}
-
+                                            {billInfo?.address?.replace(/[0-9|-]/g, "") || "__"}
                                         </span>
                                     </Col>
                                 </Row>
@@ -766,7 +761,7 @@ const BillTimeLine = (addId) => {
                                     </Col>
                                     <Col span={14}>
                                         <span>
-                                            {numeral(billInfo?.amountPaid).format("0,0") + " đ"}
+                                            {numeral(billInfo.amountPaid).format("0,0") + "đ"}
                                         </span>
                                     </Col>
                                 </Row>

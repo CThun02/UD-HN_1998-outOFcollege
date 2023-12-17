@@ -12,6 +12,7 @@ import com.fpoly.ooc.request.category.CategoryRequest;
 import com.fpoly.ooc.service.interfaces.CategoryServiceI;
 import com.fpoly.ooc.service.kafka.KafkaUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -58,7 +59,7 @@ public class CategoryServiceImpl implements CategoryServiceI {
 
     @Override
     public List<Category> findAll() {
-        return repo.findAll();
+        return repo.findAll(Sort.by(Sort.Order.desc("createdAt")));
     }
 
     @Override

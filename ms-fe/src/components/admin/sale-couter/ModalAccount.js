@@ -174,34 +174,34 @@ const ModalAccount = ({
               <Col span={24}>
                 <span style={{fontWeight:"500"}}>Tên khách hàng</span>
                 <Input 
-                value={account.fullName} 
+                value={account?.fullName} 
                 onChange={(event)=>{handelSetAccount("fullName", event.target.value)}} 
                 style={{width:"100%"}} size="small" 
-                status={account.fullName===""?"error":null}
+                status={account?.fullName===""?"error":null}
                 />
               </Col>
               <Col span={24}>
                 <span style={{fontWeight:"500"}}>Số điện thoại</span>
                 <Input 
-                  value={account.numberPhone} 
+                  value={account?.numberPhone} 
                   onChange={(event)=>{handelSetAccount("numberPhone", event.target.value.replace(/[^\d]/g, ""))}}  
                   style={{width:"100%"}} size="small" 
-                  status={account.numberPhone===""?"error":null}
+                  status={account?.numberPhone===""?"error":null}
                 />
               </Col>
               <Col span={24}>
                 <span style={{fontWeight:"500"}}>Email</span>
                 <Input 
-                  value={account.email} 
+                  value={account?.email} 
                   onChange={(event)=>{handelSetAccount("email", event.target.value.replace(" ", ""))}}  
                   style={{width:"100%"}} size="small" 
-                  status={account.email===""?"error":null}
+                  status={account?.email===""?"error":null}
                 />
               </Col>
               <Col span={24}>
                 <span style={{fontWeight:"500"}}>Giới tính</span>
                 <Radio.Group 
-                  value={account.gender} 
+                  value={account?.gender} 
                   onChange={(event)=>{handelSetAccount("gender", event.target.value)}}
                 >
                   <Radio value={true}>Nam</Radio>

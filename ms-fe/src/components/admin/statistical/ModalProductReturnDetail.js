@@ -46,7 +46,7 @@ const ModalProductReturnDetail = ({
                   marginRight: "10px",
                 }}
               >
-                <Carousel autoplay>
+                <Carousel  style={{maxWidth:"300px"}} autoplay>
                   {record.productImageResponse &&
                     record.productImageResponse.map((item) => {
                       return (

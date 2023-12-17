@@ -22,7 +22,7 @@ const ModalConfirm = ({ isModalOpen, handleOk, handleCancel, action }) => {
 
     return (
         <>
-            <Modal title="Ghi chú" open={isModalOpen}
+            <Modal title={(<>Ghi chú <span style={{color:"red"}}>{action==="rollback" && "*"}</span></>)} open={isModalOpen}
                 onOk={() => handleOkConfirm()}
                 onCancel={handleCancel}>
                 <TextArea rows={4}

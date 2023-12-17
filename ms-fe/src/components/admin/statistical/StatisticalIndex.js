@@ -149,7 +149,7 @@ const StatisticalIndex = ({ isAdmin }) => {
                     }`}
                     color="red"
                   >
-                    <Carousel autoplay>
+                    <Carousel  style={{maxWidth:"300px"}} autoplay>
                       {record.productImageResponse &&
                         record.productImageResponse.map((item) => {
                           return (
@@ -164,7 +164,7 @@ const StatisticalIndex = ({ isAdmin }) => {
                     </Carousel>
                   </Badge.Ribbon>
                 ) : (
-                  <Carousel autoplay>
+                  <Carousel  style={{maxWidth:"300px"}} autoplay>
                     {record.productImageResponse &&
                       record.productImageResponse.map((item) => {
                         return (

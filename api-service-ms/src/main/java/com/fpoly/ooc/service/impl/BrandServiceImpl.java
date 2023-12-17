@@ -12,6 +12,7 @@ import com.fpoly.ooc.request.brand.BrandRequest;
 import com.fpoly.ooc.service.interfaces.BrandServiceI;
 import com.fpoly.ooc.service.kafka.KafkaUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -60,7 +61,7 @@ public class BrandServiceImpl implements BrandServiceI {
 
     @Override
     public List<Brand> findAll() {
-        return repo.findAll();
+        return repo.findAll(Sort.by(Sort.Order.desc("createdAt")));
     }
 
     @Override

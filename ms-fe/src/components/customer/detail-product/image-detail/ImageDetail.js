@@ -3,7 +3,7 @@ import { Carousel } from "antd";
 function ImageDetail({ paths }) {
   return (
     <>
-      <Carousel autoplay>
+      <Carousel  style={{maxWidth:"300px"}} autoplay>
         {paths?.map((item) => (
           <img src={item.path} alt="product" key={item.id} />
         ))}

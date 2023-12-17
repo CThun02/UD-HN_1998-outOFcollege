@@ -6,6 +6,7 @@ import {
   PlusOutlined,
   TableOutlined,
   FilterFilled,
+  UserOutlined,
 } from "@ant-design/icons";
 import CustomerTable from "./CustomerAdminTable";
 import styles from "./styles/CustomerIndex.module.css";
@@ -67,7 +68,11 @@ const CustomerAddminIndex = function (props) {
   return (
     <>
       {contextHolder}
+
       <div className={styles.customer}>
+        <h1 style={{ textAlign: "center" }}>
+          <UserOutlined /> Quản lý {roleId === 2 ? "khách hàng" : "nhân viên"}
+        </h1>
         <h2>
           <FilterFilled /> Bộ lọc
         </h2>

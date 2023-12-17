@@ -40,7 +40,7 @@ const MyForm = (props) => {
   const [loading, setLoading] = useState(false);
   const [visible, setVisible] = useState(false);
   const [accountScan, setAccountScan] = useState({
-    idNo: roleId === 2 ? generateUniqueRandomHex(12) : " ",
+    idNo: generateUniqueRandomHex(12),
     image: "none",
     fullName: " ",
     email: " ",
@@ -158,7 +158,7 @@ const MyForm = (props) => {
         setWards(response.data.data);
       })
       .catch((err) => {
-        const status = err.response.status;
+        const status = err?.response?.status;
         if (status === 403) {
           notification.error({
             message: "Thông báo",
@@ -237,7 +237,7 @@ const MyForm = (props) => {
                   })
                   .catch((err) => {
                     setLoading(false);
-                    const status = err.response.status;
+                    const status = err?.response?.status;
                     if (status === 400) {
                       notification.error({
                         message: "Thông báo",
@@ -252,7 +252,7 @@ const MyForm = (props) => {
                   });
               })
               .catch((err) => {
-                const status = err.response.status;
+                const status = err?.response?.status;
                 if (status === 403) {
                   notification.error({
                     message: "Thông báo",

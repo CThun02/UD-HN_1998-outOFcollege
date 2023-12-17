@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import styles from "./ReturnIndex.module.css";
 import { getToken } from "../../../service/Token";
 import { useNavigate } from "react-router-dom";
-import { QrcodeOutlined, SearchOutlined } from "@ant-design/icons";
+import { CarOutlined, QrcodeOutlined, SearchOutlined } from "@ant-design/icons";
 import logoOOC from "../../../Assets/img/logo/logo_OOC.svg";
 import QRReader from "../../../service/QRReader";
 
@@ -78,6 +78,9 @@ const ReturnIndex = () => {
         setData={searchBill}
       />
       <div className={styles.returnIndex}>
+        <h1 style={{ textAlign: "center" }}>
+          <CarOutlined /> Trả hàng
+        </h1>
         <img alt="" style={{ width: "12%" }} src={logoOOC} />
         <h2 style={{ textAlign: "center" }}>Tìm kiếm đơn hàng</h2>
         <Input

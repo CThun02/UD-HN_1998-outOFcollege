@@ -10,7 +10,12 @@ import {
   message,
   notification,
 } from "antd";
-import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  SearchOutlined,
+  PlusOutlined,
+  TableOutlined,
+  StrikethroughOutlined,
+} from "@ant-design/icons";
 import FormTable from "./FormTable";
 import styles from "./FormStyle.module.css";
 import axios from "axios";
@@ -49,7 +54,7 @@ const FormAdmin = function ({ isAdmin }) {
       })
       .catch((err) => {
         // Xử lý lỗi
-        const status = err.response.status;
+        const status = err?.response?.status;
         if (status === 403) {
           notification.error({
             message: "Thông báo",
@@ -61,9 +66,15 @@ const FormAdmin = function ({ isAdmin }) {
 
   return (
     <div className={styles.material}>
+      <h1 style={{ textAlign: "center" }}>
+        <StrikethroughOutlined /> Quản lý dáng áo
+      </h1>
       <div className={styles.radiusFrame}>
         <Row className={styles.titleTB}>
-          <h3>Danh Sách Kiểu dáng</h3>
+          <h2>
+            {" "}
+            <TableOutlined /> Danh Sách dáng áo
+          </h2>
         </Row>
         <Row className={styles.adminMenu}>
           <Col span={10}>

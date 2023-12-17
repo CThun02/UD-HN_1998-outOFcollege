@@ -49,16 +49,23 @@ const TimelineByBillCode = () => {
                                     {timelineDíplay &&
                                         timelineDíplay.map((data) => (
                                             <TimelineEvent
-                                                color={data.status === "0" ? "#FF0000" : "#00cc00"}
+                                                color={
+                                                    data.status === "0" || data.status === "-1"
+                                                        ? "#FF0000"
+                                                        : data.status === "5"
+                                                            ? "#f0ad4e"
+                                                            : "#00cc00"
+                                                }
                                                 icon={
-                                                    data.status === "1" ? FaRegFileAlt
-                                                        : data.status === "0" ? FaTimes
-                                                            : data.status === "2" ? FaRegFileAlt
-                                                                : data.status === "3" ? FaTruck
-                                                                    : data.status === "4" ? CheckCircleOutlined
-                                                                        : data.status === "5" ? FaTimes
-                                                                            : data.status === "6" ? FaRegFileAlt
-                                                                                : null
+                                                    data.status === "1"
+                                                        ? FaRegFileAlt
+                                                        : data.status === "0"
+                                                            ? FaTimes
+                                                            : data.status === "2"
+                                                                ? FaRegFileAlt
+                                                                : data.status === "3"
+                                                                    ? FaTruck
+                                                                    : CheckCircleOutlined
                                                 }
                                                 title={
                                                     data.billType === 'Online' && timelines?.timelineCustomInfo ? <>{

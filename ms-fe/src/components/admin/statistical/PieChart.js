@@ -93,7 +93,7 @@ const PieChart = ({ formattedDateNow }) => {
           setBillRevenueCompare(res.data);
         })
         .catch((err) => {
-          const status = err.response.status;
+          const status = err?.response?.status;
           if (status === 403) {
             notification.error({
               message: "Thông báo",

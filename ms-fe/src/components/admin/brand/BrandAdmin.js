@@ -9,7 +9,12 @@ import {
   message,
   notification,
 } from "antd";
-import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  SearchOutlined,
+  PlusOutlined,
+  TableOutlined,
+  FontSizeOutlined,
+} from "@ant-design/icons";
 import BrandTable from "./BrandTable";
 import styles from "./BrandStyle.module.css";
 import axios from "axios";
@@ -64,10 +69,16 @@ const BrandAdmin = function ({ isAdmin }) {
 
   return (
     <div className={styles.material}>
+      <h1 style={{ textAlign: "center" }}>
+        <FontSizeOutlined /> Quản lý thương hiệu
+      </h1>
       {contextHolder}
       <div className={styles.radiusFrame}>
         <Row className={styles.titleTB}>
-          <h3>Danh Sách Chất Liệu</h3>
+          <h2>
+            {" "}
+            <TableOutlined /> Danh Sách thương hiệu
+          </h2>
         </Row>
         <Row className={styles.adminMenu}>
           <Col span={10}>

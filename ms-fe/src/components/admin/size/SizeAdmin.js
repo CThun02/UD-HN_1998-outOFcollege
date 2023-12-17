@@ -12,7 +12,12 @@ import {
   notification,
   message,
 } from "antd";
-import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  SearchOutlined,
+  PlusOutlined,
+  TableOutlined,
+  FullscreenOutlined,
+} from "@ant-design/icons";
 import SizeTable from "./SizeTable";
 import styles from "../categorystyles/CategoryStyles.module.css";
 import axios from "axios";
@@ -67,8 +72,14 @@ const SizeAdmin = function ({ isAdmin }) {
   return (
     <div className={styles.category}>
       <div className={styles.customer}>
+        <h1 style={{ textAlign: "center" }}>
+          <FullscreenOutlined /> Quản lý kích cỡ
+        </h1>
         <Row className={styles.titleTB}>
-          <h3>Danh Sách Kích Thước</h3>
+          <h2>
+            {" "}
+            <TableOutlined /> Danh Sách kích cỡ
+          </h2>
         </Row>
         <Row className={styles.adminMenu}>
           <Col span={10}>

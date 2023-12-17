@@ -19,6 +19,7 @@ import {
   EyeOutlined,
   FilterFilled,
   SearchOutlined,
+  ShoppingOutlined,
   TableOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
@@ -301,6 +302,9 @@ const BillManagement = () => {
     <div>
       <SockJs connectTo={"new-bill-topic"} setValues={setData} />
       <section className={styles.filter}>
+        <h1 style={{ textAlign: "center" }}>
+          <ShoppingOutlined /> Quản lý hóa đơn
+        </h1>
         <h2 style={{ marginBottom: "10px" }}>
           <FilterFilled /> Bộ lọc
         </h2>
@@ -432,7 +436,7 @@ const BillManagement = () => {
               children: (
                 <div style={{ padding: "8px" }}>
                   <span style={{ fontWeight: 500 }}>
-                    <TableOutlined /> Danh sách yêu cầu
+                    <TableOutlined />
                   </span>
                   <Table
                     style={{ marginTop: "10px" }}

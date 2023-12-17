@@ -148,7 +148,7 @@ public class BillServiceImpl implements BillService {
             PaymentDetail paymentDetailLan1Nd = PaymentDetail.builder()
                     .bill(bill)
                     .payment(Payment.builder().id(1L).build())
-                    .price(bill.getAmountPaid())
+                    .price(request.getPriceAmount())
                     .build();
             paymentDetailRepo.save(paymentDetailLan1Nd);
 
@@ -184,12 +184,20 @@ public class BillServiceImpl implements BillService {
 
         if (request.getVoucherCode() != null) {
             Voucher voucher = voucherService.findVoucherByVoucherCode(request.getVoucherCode());
+            if(voucher.getLimitQuantity() <= 1){
+                voucher.setStatus(Const.STATUS_INACTIVE);
+            }
             voucher.setLimitQuantity(voucher.getLimitQuantity() - 1);
             voucherService.updateVoucher(voucher);
 
+            BigDecimal calculatedPrice = bill.getPrice().subtract(bill.getPriceReduce());
+            if (calculatedPrice.compareTo(BigDecimal.ZERO) == 0) {
+                calculatedPrice = bill.getPriceReduce();
+            }
+
             VoucherHistory voucherHistory = VoucherHistory.builder()
                     .bill(bill)
-                    .priceReduce(bill.getPrice().subtract(bill.getPriceReduce()))
+                    .priceReduce(calculatedPrice)
                     .voucherCode(request.getVoucherCode())
                     .build();
             voucherHistoryService.saveVoucherHistory(voucherHistory);

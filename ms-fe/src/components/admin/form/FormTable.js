@@ -6,7 +6,6 @@ import {
   Space,
   Button,
   Modal,
-  Switch,
   Input,
   message,
   notification,
@@ -61,47 +60,19 @@ const FormTable = function (props) {
         message.success("Cập nhật thành công");
       })
       .catch((err) => {
-        const status = err.response.status;
+        const status = err?.response?.status;
         if (status === 403) {
           notification.error({
             message: "Thông báo",
             description: "Bạn không có quyền truy cập!",
           });
-        }
-      });
-  };
-
-  const handleUpdateStatus = (id, statusUpdate) => {
-    let mess = statusUpdate ? "Đang hoạt động" : "Ngưng hoạt động";
-
-    const updatedStatusValue = statusUpdate ? "ACTIVE" : "INACTIVE"; // Cập nhật trạng thái dựa trên giá trị của statusUpdate
-
-    axios
-      .put(
-        `http://localhost:8080/api/admin/form/update/${id}`,
-        {
-          status: updatedStatusValue,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${getToken(true)}`,
-          },
-        }
-      )
-      .then((response) => {
-        setRender(Math.random);
-        messageApi.success(mess, 2);
-      })
-      .catch((err) => {
-        const status = err.response.status;
-        if (status === 403) {
+        } else {
+          setShowModal(false);
           notification.error({
-            message: "Thông báo",
-            description: "Bạn không có quyền truy cập!",
+            message: "Lỗi",
+            description: "Không thể xóa dữ liệu!",
           });
-          return;
         }
-        messageApi.error(`Cập nhật trạng thái thất bại`, 2);
       });
   };
   const handleConfirmDelete = () => {
@@ -118,7 +89,7 @@ const FormTable = function (props) {
         setShowModal(false);
       })
       .catch((err) => {
-        const status = err.response.status;
+        const status = err?.response?.status;
         if (status === 403) {
           notification.error({
             message: "Thông báo",
@@ -139,7 +110,7 @@ const FormTable = function (props) {
         setData(response.data);
       })
       .catch((err) => {
-        const status = err.response.status;
+        const status = err?.response?.status;
         if (status === 403) {
           notification.error({
             message: "Thông báo",
@@ -174,23 +145,6 @@ const FormTable = function (props) {
             title: "Kiểu dáng",
             dataIndex: "formName",
             key: "formName",
-          },
-          {
-            key: "status",
-            title: "Trạng thái",
-            dataIndex: "status",
-            width: 150,
-            render: (status, record) => (
-              <>
-                <Switch
-                  disabled={!props.isAdmin}
-                  onChange={(checked) => {
-                    handleUpdateStatus(record.id, checked);
-                  }}
-                  checked={status === "ACTIVE"}
-                />
-              </>
-            ),
           },
           {
             title: "Ngày tạo",

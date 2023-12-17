@@ -11,7 +11,12 @@ import {
   Button,
   notification,
 } from "antd";
-import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  SearchOutlined,
+  PlusOutlined,
+  TableOutlined,
+  LoginOutlined,
+} from "@ant-design/icons";
 import MaterialTable from "./MaterialTable";
 import styles from "../categorystyles/CategoryStyles.module.css";
 import axios from "axios";
@@ -50,7 +55,7 @@ const MaterialAdmin = function ({ isAdmin }) {
       })
       .catch((err) => {
         // Xử lý lỗi
-        const status = err.response.status;
+        const status = err?.response?.status;
         if (status === 403) {
           notification.error({
             message: "Thông báo",
@@ -65,8 +70,14 @@ const MaterialAdmin = function ({ isAdmin }) {
   return (
     <div className={styles.category}>
       <div className={styles.customer}>
+        <h1 style={{ textAlign: "center" }}>
+          <LoginOutlined /> Quản lý chất liệu
+        </h1>
         <Row className={styles.titleTB}>
-          <h3>Danh Sách Chất Liệu</h3>
+          <h2>
+            {" "}
+            <TableOutlined /> Danh Sách chất liệu
+          </h2>
         </Row>
         <Row className={styles.adminMenu}>
           <Col span={10}>

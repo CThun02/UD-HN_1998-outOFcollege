@@ -9,7 +9,12 @@ import {
   message,
   notification,
 } from "antd";
-import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  SearchOutlined,
+  PlusOutlined,
+  TableOutlined,
+  PauseOutlined,
+} from "@ant-design/icons";
 import CollarTable from "./CollarTable";
 import styles from "./CollarStyle.module.css";
 import axios from "axios";
@@ -47,7 +52,7 @@ const CollarAdmin = function ({ isAdmin }) {
         }
       })
       .catch((err) => {
-        const status = err.response.status;
+        const status = err?.response?.status;
         if (status === 403) {
           notification.error({
             message: "Thông báo",
@@ -60,9 +65,15 @@ const CollarAdmin = function ({ isAdmin }) {
 
   return (
     <div className={styles.material}>
+      <h1 style={{ textAlign: "center" }}>
+        <PauseOutlined /> Quản lý loại cổ áo
+      </h1>
       <div className={styles.radiusFrame}>
         <Row className={styles.titleTB}>
-          <h3>Danh Sách Cổ Áo</h3>
+          <h2>
+            {" "}
+            <TableOutlined /> Danh Sách loại cổ áo
+          </h2>
         </Row>
         <Row className={styles.adminMenu}>
           <Col span={10}>

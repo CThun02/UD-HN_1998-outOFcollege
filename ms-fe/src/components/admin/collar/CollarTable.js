@@ -8,7 +8,6 @@ import {
   Modal,
   Input,
   message,
-  Switch,
   notification,
 } from "antd";
 import { useEffect, useState } from "react";
@@ -61,7 +60,7 @@ const CollarTable = function (props) {
         message.success("Cập nhật thành công");
       })
       .catch((err) => {
-        const status = err.response.status;
+        const status = err?.response?.status;
         if (status === 403) {
           notification.error({
             message: "Thông báo",
@@ -72,37 +71,6 @@ const CollarTable = function (props) {
       });
   };
 
-  const handleUpdateStatus = (id, statusUpdate) => {
-    let mess = statusUpdate ? "Đang hoạt động" : "Ngưng hoạt động";
-    const updatedStatusValue = statusUpdate ? "ACTIVE" : "INACTIVE";
-
-    axios
-      .put(
-        `http://localhost:8080/api/admin/collar/update/${id}`,
-        {
-          status: updatedStatusValue,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${getToken(true)}`,
-          },
-        }
-      )
-      .then((response) => {
-        setRender(Math.random);
-        messageApi.success(mess, 2);
-      })
-      .catch((err) => {
-        const status = err.response.status;
-        if (status === 403) {
-          notification.error({
-            message: "Thông báo",
-            description: "Bạn không có quyền truy cập!",
-          });
-        }
-        messageApi.error(`Cập nhật trạng thái thất bại`, 2);
-      });
-  };
   const handleConfirmDelete = () => {
     axios
       .delete(`http://localhost:8080/api/admin/collar/delete/${selectedData}`, {
@@ -120,11 +88,17 @@ const CollarTable = function (props) {
         setShowModal(false);
       })
       .catch((err) => {
-        const status = err.response.status;
+        const status = err?.response?.status;
         if (status === 403) {
           notification.error({
             message: "Thông báo",
             description: "Bạn không có quyền truy cập!",
+          });
+        } else {
+          setShowModal(false);
+          notification.error({
+            message: "Lỗi",
+            description: "Không thể xóa dữ liệu!",
           });
         }
       });
@@ -142,7 +116,7 @@ const CollarTable = function (props) {
         console.log(response.data);
       })
       .catch((err) => {
-        const status = err.response.status;
+        const status = err?.response?.status;
         if (status === 403) {
           notification.error({
             message: "Thông báo",
@@ -181,23 +155,6 @@ const CollarTable = function (props) {
             title: "Cổ áo",
             dataIndex: "collarTypeName",
             key: "collarTypeName",
-          },
-          {
-            key: "status",
-            title: "Trạng thái",
-            dataIndex: "status",
-            width: 150,
-            render: (status, record) => (
-              <>
-                <Switch
-                  disabled={!props.isAdmin}
-                  onChange={(checked) => {
-                    handleUpdateStatus(record.id, checked);
-                  }}
-                  checked={status === "ACTIVE"}
-                />
-              </>
-            ),
           },
           {
             title: "Ngày tạo",

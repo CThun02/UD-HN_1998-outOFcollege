@@ -12,7 +12,12 @@ import {
   notification,
   message,
 } from "antd";
-import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  SearchOutlined,
+  PlusOutlined,
+  TableOutlined,
+  DingtalkOutlined,
+} from "@ant-design/icons";
 import SleeveTable from "./SleeveTable";
 import styles from "../categorystyles/CategoryStyles.module.css";
 import axios from "axios";
@@ -66,8 +71,14 @@ const SleeveAdmin = function ({ isAdmin }) {
   return (
     <div className={styles.category}>
       <div className={styles.customer}>
+        <h1 style={{ textAlign: "center" }}>
+          <DingtalkOutlined /> Quản lý tay áo
+        </h1>
         <Row className={styles.titleTB}>
-          <h3>Danh Sách Tay Áo</h3>
+          <h2>
+            {" "}
+            <TableOutlined /> Danh Sách tay áo
+          </h2>
         </Row>
         <Row className={styles.adminMenu}>
           <Col span={10}>

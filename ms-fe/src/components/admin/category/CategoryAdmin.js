@@ -9,7 +9,12 @@ import {
   message,
   notification,
 } from "antd";
-import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  SearchOutlined,
+  PlusOutlined,
+  TableOutlined,
+  SafetyCertificateOutlined,
+} from "@ant-design/icons";
 import CategoryTable from "./CategoryTable";
 import styles from "./CategoryStyle.module.css";
 import axios from "axios";
@@ -60,10 +65,16 @@ const CategoryAdmin = function ({ isAdmin }) {
   useState(() => {}, [render]);
   return (
     <div className={styles.material}>
+      <h1 style={{ textAlign: "center" }}>
+        <SafetyCertificateOutlined /> Quản lý loại sản phẩm
+      </h1>
       {contextHolder}
       <div className={styles.radiusFrame}>
         <Row className={styles.titleTB}>
-          <h3>Danh Sách Chất Liệu</h3>
+          <h2>
+            {" "}
+            <TableOutlined /> Danh Sách loại sản phẩm
+          </h2>
         </Row>
         <Row className={styles.adminMenu}>
           <Col span={10}>

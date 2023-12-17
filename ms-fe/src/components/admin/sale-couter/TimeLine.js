@@ -749,7 +749,10 @@ const BillTimeLine = (addId) => {
                                     </Col>
                                     <Col span={14}>
                                         <span>
-                                            {billInfo?.address?.replace(/[0-9|-]/g, "") || "__"}
+                                            {billInfo?.ward ? `${billInfo?.addressDetail ?? ''} 
+                                        ${billInfo?.ward?.substring(0, billInfo?.ward.indexOf('|'))} 
+                                        ${billInfo?.district?.substring(0, billInfo?.district.indexOf('|'))} 
+                                        ${billInfo?.city?.substring(0, billInfo?.city.indexOf('|'))}` : '__'}
                                         </span>
                                     </Col>
                                 </Row>
@@ -851,10 +854,13 @@ const BillTimeLine = (addId) => {
                             Tổng cộng:{" "}
                         </span>
                         <span style={{ fontSize: "16px", color: "#FF0000" }}>
-                            {numeral(
-                                (billInfo?.priceReduce === billInfo.voucherPrice) ? billInfo?.shipPrice
-                                    : (billInfo?.priceReduce + billInfo?.shipPrice)
-                            ).format(0, 0) + "đ"}
+                            {((
+                                (billInfo?.priceReduce === billInfo.voucherPrice) ? ((billInfo?.priceReduce + (billInfo?.shipPrice ?? 0)))
+                                    : (billInfo?.priceReduce + (billInfo?.shipPrice ?? 0))
+                            ) ?? 0)?.toLocaleString("vi-VN", {
+                                style: "currency",
+                                currency: "VND",
+                            })}
                         </span>
                     </b>
                 </div>

@@ -254,7 +254,7 @@ function Promotion() {
         }
       }
 
-      return () => getPromotions();
+      getPromotions();
     },
     [
       codeOrName,

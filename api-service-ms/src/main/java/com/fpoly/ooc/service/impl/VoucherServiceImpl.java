@@ -125,7 +125,7 @@ public class VoucherServiceImpl implements VoucherService {
 
     @Override
     public Voucher updateStatus(String code, String status) {
-        Voucher voucher = findVoucherByVoucherCode(code);
+        Voucher voucher = findVoucherByCode(code);
         voucher.setStatus(status);
 
         return voucherRepository.save(voucher);

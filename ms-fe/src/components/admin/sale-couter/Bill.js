@@ -413,7 +413,7 @@ const Bill = () => {
     setSelectedOption(value);
     if (value === "2") {
       setAmountPaid(0);
-      setTransactionCode('')
+      setTransactionCode("");
     }
   };
 
@@ -813,16 +813,22 @@ const Bill = () => {
     var productDetails = cart.productDetails;
     for (let index = 0; index < productDetails.length; index++) {
       var productDetailId = productDetails[index].productDetail.id;
-      axios.get("http://localhost:8080/api/admin/product/getproductdetailbyidpd?productDetailId=" + productDetailId, {
-        headers: {
-          Authorization: `Bearer ${getToken(true)}`,
-        },
-      }).then(res => {
-        if (res?.data?.quantity <= 0) {
-          cart.productDetails = productDetails.splice(index, 1);
-          localStorage.setItem(cartId, JSON.stringify(cart));
-        }
-      })
+      axios
+        .get(
+          "http://localhost:8080/api/admin/product/getproductdetailbyidpd?productDetailId=" +
+            productDetailId,
+          {
+            headers: {
+              Authorization: `Bearer ${getToken(true)}`,
+            },
+          }
+        )
+        .then((res) => {
+          if (res?.data?.quantity <= 0) {
+            cart.productDetails = productDetails.splice(index, 1);
+            localStorage.setItem(cartId, JSON.stringify(cart));
+          }
+        });
     }
     setProductDetails(productDetails);
     setAccount(cart.account);
@@ -1010,7 +1016,10 @@ const Bill = () => {
       addressId: selectedAddress?.id,
       fullname: selectedAddress?.fullName,
       phoneNumber: selectedAddress.numberPhone,
-      transactionCode: (Number(selectedOption) === 2 || Number(selectedOption) === 3) ? transactionCode : null,
+      transactionCode:
+        Number(selectedOption) === 2 || Number(selectedOption) === 3
+          ? transactionCode
+          : null,
       voucherCode: voucherAdd?.voucherCode ?? null,
       createdBy: "user3",
       priceAmount: Number(selectedOption) === 3 ? amountPaid : null,
@@ -1048,10 +1057,11 @@ const Bill = () => {
                                     ${productDetails.map((item, index) => {
           return `<div key={index} style="display: flex; justify-content: space-between; align-items: center; padding: 4px 20px;">
                                                 <div style="width: 20%; padding: 4px;">
-                                                    <img alt="product" style="width: 100%; border: 1px solid #ccc; border-radius: 8px;" src=${item.productDetail
-              .productImageResponse[0]
-              .path
-            }>
+                                                    <img alt="product" style="width: 100%; border: 1px solid #ccc; border-radius: 8px;" src=${
+                                                      item.productDetail
+                                                        ?.productImageResponse[0]
+                                                        ?.path
+                                                    }>
                                                 </div>
                                                 <div style="width: 55%; padding: 4px;">
                                                     <p>${item.productDetail.product
@@ -1263,7 +1273,7 @@ const Bill = () => {
         },
       });
     }
-    console.log(amountPaid)
+    console.log(amountPaid);
   };
 
   const [inputError, setInputError] = useState("");
@@ -1951,8 +1961,8 @@ const Bill = () => {
               </Tabs.TabPane>
             );
           })}
-      </Tabs >
-      < FormUsingVoucher
+      </Tabs>
+      <FormUsingVoucher
         priceBill={totalPrice}
         voucher={voucherAdd}
         setVoucher={setVoucherAdd}

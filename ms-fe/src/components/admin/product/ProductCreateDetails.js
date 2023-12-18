@@ -147,7 +147,6 @@ const ProductCreateDetails = () => {
                   description: "Thêm mới sản phẩm thành công",
                   icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
                 });
-                handleSetProduct("description", " ");
                 setmodalProductCreate(false);
                 handleSetProduct("id", res.data.id);
                 setRender(Math.random());

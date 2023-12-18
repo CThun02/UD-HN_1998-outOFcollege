@@ -12,6 +12,7 @@ import com.fpoly.ooc.request.pattern.PatternRequest;
 import com.fpoly.ooc.service.interfaces.PatternServiceI;
 import com.fpoly.ooc.service.kafka.KafkaUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -60,7 +61,7 @@ public class PatternServiceImpl implements PatternServiceI {
 
     @Override
     public List<Pattern> findAll() {
-        return repo.findAll();
+        return repo.findAll(Sort.by(Sort.Order.desc("createdAt")));
     }
 
     @Override

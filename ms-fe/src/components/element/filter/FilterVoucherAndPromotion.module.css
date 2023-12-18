@@ -23,3 +23,8 @@
   height: 2.9rem !important;
   align-items: center;
 }
+
+.title {
+  display: flex;
+  justify-content: center;
+}

@@ -44,6 +44,8 @@ public class WebSecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/admin/bill/**").hasAnyRole("EMPLOYEE", "ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/admin/bill/**").hasAnyRole("EMPLOYEE", "ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/admin/bill/**").hasAnyRole("EMPLOYEE", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/admin/product/getproductdetailbyidpd").hasAnyRole("EMPLOYEE", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/admin/vouchers/display-modal-using").hasAnyRole("EMPLOYEE", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/admin/button", "/api/admin/collar", "/api/admin/material",
                                 "/api/admin/sleeve", "/api/admin/shirt-tail", "/api/admin/size", "/api/admin/color",
                                 "/api/admin/category","/api/admin/brand", "/api/admin/pattern",

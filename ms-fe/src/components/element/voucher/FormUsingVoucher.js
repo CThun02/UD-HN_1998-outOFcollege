@@ -1,4 +1,4 @@
-import { Modal, Space, Radio, Input } from "antd";
+import { Modal, Space, Radio, Input, notification } from "antd";
 import styles from "./FormUsingVoucher.module.css";
 import { useEffect, useState } from "react";
 import VoucherList from "./VoucherList";
@@ -22,6 +22,7 @@ function FormUsingVoucher({
   const [vouchers, setVouchers] = useState([]);
   const [voucherCodeOrName, setVoucherCodeOrName] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [apiNotification, contextHolder] = notification.useNotification();
 
   const handleOnChange = (value) => {
     setVoucher(value);
@@ -85,7 +86,16 @@ function FormUsingVoucher({
           setVouchers(data);
           setIsLoading((bool) => !bool);
         } catch (err) {
-          console.log(err);
+          const status = err?.response?.data?.status;
+
+          if (status === 403) {
+            apiNotification.error({
+              message: "Lỗi",
+              description: "Bạn không có quyền xem nội dung này",
+            });
+            setVouchers([]);
+            return;
+          }
         }
       }
     }
@@ -93,45 +103,48 @@ function FormUsingVoucher({
   }, [priceBill, username, voucherCodeOrName]);
 
   return (
-    <Modal
-      title="Chọn mã giảm giá"
-      open={isOpen}
-      footer={null}
-      onCancel={handleCancel}
-      className={styles.scroll}
-      centered
-    >
-      <div style={{ padding: "10px 0" }}>
-        <Input
-          placeholder="Nhập mã hoặc tên voucher"
-          size="large"
-          onChange={(e) => setVoucherCodeOrName(e.target.value)}
-          value={voucherCodeOrName}
-        />
-      </div>
-      <Space style={{ width: "100%" }} direction="vertical">
-        {vouchers.length > 0 ? (
-          <Radio.Group
-            onChange={(e) => {
-              handleOnChange(e.target.value);
-            }}
-            value={voucher}
-          >
-            {vouchers?.map(
-              (data) =>
-                data.status !== "CANCEL" && (
-                  <VoucherList
-                    key={data.voucherId}
-                    data={data}
-                    setValue={setVoucher}
-                    value={voucher}
-                  />
-                )
-            )}
-          </Radio.Group>
-        ) : null}
-      </Space>
-    </Modal>
+    <>
+      {contextHolder}
+      <Modal
+        title="Chọn mã giảm giá"
+        open={isOpen}
+        footer={null}
+        onCancel={handleCancel}
+        className={styles.scroll}
+        centered
+      >
+        <div style={{ padding: "10px 0" }}>
+          <Input
+            placeholder="Nhập mã hoặc tên voucher"
+            size="large"
+            onChange={(e) => setVoucherCodeOrName(e.target.value)}
+            value={voucherCodeOrName}
+          />
+        </div>
+        <Space style={{ width: "100%" }} direction="vertical">
+          {vouchers.length > 0 ? (
+            <Radio.Group
+              onChange={(e) => {
+                handleOnChange(e.target.value);
+              }}
+              value={voucher}
+            >
+              {vouchers?.map(
+                (data) =>
+                  data.status !== "CANCEL" && (
+                    <VoucherList
+                      key={data.voucherId}
+                      data={data}
+                      setValue={setVoucher}
+                      value={voucher}
+                    />
+                  )
+              )}
+            </Radio.Group>
+          ) : null}
+        </Space>
+      </Modal>
+    </>
   );
 }
 

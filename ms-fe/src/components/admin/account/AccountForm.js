@@ -238,10 +238,11 @@ const MyForm = (props) => {
                   .catch((err) => {
                     setLoading(false);
                     const status = err?.response?.status;
+                    console.log("data: ", err?.response);
                     if (status === 400) {
                       notification.error({
                         message: "Thông báo",
-                        description: `${err.response.data}`,
+                        description: `${err?.response?.data}`,
                       });
                     } else if (status === 403) {
                       notification.error({

@@ -229,14 +229,6 @@ function SignIn({ isAuthenAdmin }) {
                         </Divider>
                       </div>
                       <div className={styles.flex}>
-                        <Button size="large" className={styles.logoIcon}>
-                          <img
-                            src={facebookLogo}
-                            alt="facebook"
-                            style={{ width: "20px", marginRight: "10px" }}
-                          />
-                          <span>Facebook</span>
-                        </Button>
                         {isAuthenAdmin ? (
                           <GoogleOAuthProvider clientId="142772119548-58psqiarvspr1356mm7itghqsqbbl38d.apps.googleusercontent.com">
                             <GoogleLogin

@@ -102,6 +102,20 @@ const Bill = () => {
       setRendered(Math.random());
       return;
     }
+
+    if (value <= 0) {
+      notification.warning({
+        message: "Thông báo",
+        description: "Số lượng sản phẩm phải là số nguyên dương",
+        duration: 1,
+      });
+      productDetails[index].quantity = 1;
+      cart.productDetails = productDetails;
+      localStorage.setItem(cartId, JSON.stringify(cart));
+      setRendered(Math.random());
+      return;
+    }
+
     if (value > productDetails[index].productDetail.quantity) {
       notification.warning({
         message: "Thông báo",

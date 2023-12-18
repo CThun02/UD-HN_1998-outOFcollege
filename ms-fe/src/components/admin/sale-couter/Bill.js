@@ -84,8 +84,6 @@ const Bill = () => {
   }
 
   getCart();
-  console.log(initialItems)
-
   // danh sách table
   const initializeModalStates = () => {
     const initialState = items.map(() => false);
@@ -104,6 +102,20 @@ const Bill = () => {
       setRendered(Math.random());
       return;
     }
+
+    if (value <= 0) {
+      notification.warning({
+        message: "Thông báo",
+        description: "Số lượng sản phẩm phải là số nguyên dương",
+        duration: 1,
+      });
+      productDetails[index].quantity = 1;
+      cart.productDetails = productDetails;
+      localStorage.setItem(cartId, JSON.stringify(cart));
+      setRendered(Math.random());
+      return;
+    }
+
     if (value > productDetails[index].productDetail.quantity) {
       notification.warning({
         message: "Thông báo",
@@ -415,9 +427,9 @@ const Bill = () => {
   const handleOptionChange = (value, index) => {
     setSelectedOption(value);
     setAmountPaid(0);
-    setTransactionCode('');
-    setRemainAmount(0)
-    setPrice(0)
+    setTransactionCode("");
+    setRemainAmount(0);
+    setPrice(0);
   };
 
   // xóa sản phẩm trong giỏ hàng
@@ -727,7 +739,8 @@ const Bill = () => {
 
   // chuyển tab
   const onChange = (newActiveKey) => {
-    setPrice("0")
+    console.log("newActiveKey: ", newActiveKey);
+    setPrice("0");
     setCartId(newActiveKey);
     setActiveKey(newActiveKey);
     setSelectedOption(1);
@@ -735,6 +748,11 @@ const Bill = () => {
     setSelectedDictrict(null);
     setSelectedWard(null);
     handleDeleteAccount();
+  };
+
+  const countCardWait = (key) => {
+    const dataLocal = JSON.parse(window.localStorage.getItem(key));
+    return dataLocal?.productDetails?.length;
   };
 
   // gen mã hóa đơn
@@ -1300,22 +1318,23 @@ const Bill = () => {
 
   useEffect(() => {
     async function autoFillVoucher() {
-      try {
-        const res = await axios.post(urlAutofillVoucher, {
-          priceBill: totalPrice ? totalPrice : null,
-          username: null,
-        });
-        const data = await res.data;
-        setVoucherAdd(data);
-      } catch (err) {
-        notification.error({
-          message: "Lỗi",
-          description: "Hệ thống xảy ra lỗi",
-          duration: 2,
-        });
+      if (totalPrice > 0) {
+        try {
+          const res = await axios.post(urlAutofillVoucher, {
+            priceBill: totalPrice ? totalPrice : null,
+            username: null,
+          });
+          const data = await res.data;
+          setVoucherAdd(data);
+        } catch (err) {
+          notification.error({
+            message: "Lỗi",
+            description: "Hệ thống xảy ra lỗi",
+            duration: 2,
+          });
+        }
       }
     }
-
     autoFillVoucher();
   }, [totalPrice]);
 
@@ -1346,16 +1365,12 @@ const Bill = () => {
               <Tabs.TabPane
                 key={item.key}
                 tab={
-                  <Badge
-                    count={item?.count}
-                    showZero
-                  >
+                  <Badge count={countCardWait(item.key)} showZero>
                     <span style={{ padding: 10 }}>{item.label}</span>
                   </Badge>
                 }
                 items={item}
               >
-                {console.log(item)}
                 <div className={styles.tabContent}>
                   <Row>
                     <Col span={12}>
@@ -1850,10 +1865,16 @@ const Bill = () => {
                                 className={styles.input_noneBorder}
                                 value={price}
                                 onChange={(e) => {
-                                  handleChangeInput(e.target.value.replace(/\D/g, ""), index)
-                                  setPrice(numeral(e.target.value.replace(/\D/g, "")).format("0,0"))
-                                }
-                                }
+                                  handleChangeInput(
+                                    e.target.value.replace(/\D/g, ""),
+                                    index
+                                  );
+                                  setPrice(
+                                    numeral(
+                                      e.target.value.replace(/\D/g, "")
+                                    ).format("0,0")
+                                  );
+                                }}
                               />
                               {inputError && (
                                 <span
@@ -1969,9 +1990,8 @@ const Bill = () => {
               </Tabs.TabPane>
             );
           })}
-
-      </Tabs >
-      < FormUsingVoucher
+      </Tabs>
+      <FormUsingVoucher
         priceBill={totalPrice}
         voucher={voucherAdd}
         setVoucher={setVoucherAdd}

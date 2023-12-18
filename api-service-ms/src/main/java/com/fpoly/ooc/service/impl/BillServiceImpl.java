@@ -48,6 +48,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @Slf4j
@@ -509,26 +510,35 @@ public class BillServiceImpl implements BillService {
     @Override
     public Bill updateBill(Bill bill) {
         VoucherHistory voucherHistory = voucherHistoryService.findHistoryByBillCode(bill.getBillCode());
-        BigDecimal price = bill.getPrice();
-        BigDecimal priceReduce = BigDecimal.valueOf(0);
+        Double price = bigDecimalConvertDouble(bill.getPrice());
+        Double priceReduce = 0d;
         if (voucherHistory != null) {
             Voucher voucher = voucherService.findVoucherByVoucherCode(voucherHistory.getVoucherCode());
-            BigDecimal condition = voucher == null ? BigDecimal.valueOf(0) : voucher.getVoucherCondition();
-            if (price.compareTo(condition) > 0 && voucher != null) {
+            Double condition = voucher == null ? 0d : bigDecimalConvertDouble(voucher.getVoucherCondition());
+            if (price > condition && voucher != null) {
                 if (voucher.getVoucherMethod().equals("%")) {
-                    priceReduce = (price.multiply(voucher.getVoucherValue())).divide(BigDecimal.valueOf(100));
-                    if (priceReduce.compareTo(voucher.getVoucherValueMax()) > 0) {
-                        priceReduce = voucher.getVoucherValueMax();
+                    Double voucherValue = bigDecimalConvertDouble(voucher.getVoucherValue());
+                    priceReduce = price * voucherValue / 100;
+                    if (priceReduce > bigDecimalConvertDouble(voucher.getVoucherValueMax())) {
+                        priceReduce = bigDecimalConvertDouble(voucher.getVoucherValueMax());
                     }
-                } else if (voucher.getVoucherMethod().equals("VND")) {
-                    priceReduce = voucher.getVoucherValue();
+                } else if (voucher.getVoucherMethod().equalsIgnoreCase("VND")) {
+                    priceReduce = bigDecimalConvertDouble(voucher.getVoucherValue());
                 }
             }
         }
-        price = (bill.getPrice()).subtract(priceReduce);
+        price = bigDecimalConvertDouble(bill.getPrice()) - priceReduce;
         bill.setPrice(bill.getPrice());
-        bill.setPriceReduce(price);
+        bill.setPriceReduce(new BigDecimal(price));
         return billRepo.save(bill);
+    }
+
+    private Double bigDecimalConvertDouble(BigDecimal value) {
+        if (Objects.nonNull(value)) {
+            return Double.valueOf(String.valueOf(value));
+        }
+
+        return null;
     }
 
     @Override

@@ -673,12 +673,13 @@ const Checkout = ({ setRenderHeader }) => {
               .get(`http://localhost:8080/api/client/pay`, {
                 params: {
                   billId: response.data.id,
-                  price: totalPrice + shippingFee,
+                  price: voucherPrice() + shippingFee,
                   email: formData.email,
                 },
               })
               .then((response) => {
                 window.location.href = `${response.data}`;
+                console.log('response: ', response)
                 //notifications
               })
               .catch((error) => {

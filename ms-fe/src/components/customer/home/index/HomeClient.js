@@ -7,7 +7,7 @@ import FirstPayBill from "../fisrt-pay/FirstPayBill";
 import BestSellingAndNewProduct from "../best-selling-and-new-product/BestSellingProduct";
 import { FloatButton, notification } from "antd";
 import { ArrowUpOutlined } from "@ant-design/icons";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import axios from "axios";
 import { NotificationContext } from "../../../element/notification/NotificationAuthen";
 import SockJs from "../../../../service/SockJs";
@@ -15,6 +15,7 @@ import SockJs from "../../../../service/SockJs";
 const baseUrl = "http://localhost:8080/api/client/product";
 
 function HomeClient() {
+  const { code } = useParams();
   const [bestSellings, setBestSellings] = useState([]);
   const [newProducs, setNewProducts] = useState([]);
   const [apiNotification, contextHolder] = notification.useNotification();

@@ -29,6 +29,7 @@ import { Link } from "react-router-dom";
 import { getToken } from "../../../service/Token";
 import numeral from "numeral";
 import SockJs from "../../../service/SockJs";
+import locale from 'antd/lib/locale/vi_VN'; // Import Ant Design Vietnamese locale
 const { RangePicker } = DatePicker;
 
 const BillManagement = () => {
@@ -315,6 +316,8 @@ const BillManagement = () => {
             className={styles.filter_inputSearch}
             presets={rangePresets}
             onChange={onRangeChange}
+            locale={locale}
+            placeholder={['Ngày bắt đầu', 'Ngày kết thúc']}
           />
           <span style={{ margin: "0 20px", fontWeight: 500 }}>
             Loại hóa đơn

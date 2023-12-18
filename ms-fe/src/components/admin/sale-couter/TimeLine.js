@@ -728,7 +728,7 @@ const BillTimeLine = (addId) => {
                                         <h6>Tên khách hàng</h6>
                                     </Col>
                                     <Col span={14}>
-                                        <span>{billInfo.fullName || "khách lẻ"}</span>
+                                        <span>{billInfo?.fullName ? billInfo?.fullName : billInfo.accountName}</span>
                                     </Col>
                                 </Row>
                             </Col>

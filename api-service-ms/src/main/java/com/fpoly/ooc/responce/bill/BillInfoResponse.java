@@ -59,13 +59,15 @@ public class BillInfoResponse {
 
     private BigDecimal voucherPrice;
 
+    private String accountName;
+
     private List<PaymentDetailResponse> lstPaymentDetail;
 
     public BillInfoResponse(Long billId, String billCode, String transaction, String symbol, String billType,
                             BigDecimal totalPrice, BigDecimal priceReduce, BigDecimal shipPrice, BigDecimal amountPaid,
                             LocalDateTime shipDate, LocalDateTime createdDate, String fullName, String phoneNumber,
                             Long addressId, String addressDetaill, String ward, String district, String city,
-                            String status, BigDecimal voucherPrice) {
+                            String status, BigDecimal voucherPrice, String accountName) {
         this.billId = billId;
         this.billCode = billCode;
         this.transaction = transaction;
@@ -86,5 +88,6 @@ public class BillInfoResponse {
         this.city = city;
         this.status = status;
         this.voucherPrice = voucherPrice;
+        this.accountName = accountName;
     }
 }

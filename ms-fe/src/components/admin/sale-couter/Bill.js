@@ -102,6 +102,20 @@ const Bill = () => {
       setRendered(Math.random());
       return;
     }
+
+    if (value <= 0) {
+      notification.warning({
+        message: "Thông báo",
+        description: "Số lượng sản phẩm phải là số nguyên dương",
+        duration: 1,
+      });
+      productDetails[index].quantity = 1;
+      cart.productDetails = productDetails;
+      localStorage.setItem(cartId, JSON.stringify(cart));
+      setRendered(Math.random());
+      return;
+    }
+
     if (value > productDetails[index].productDetail.quantity) {
       notification.warning({
         message: "Thông báo",
@@ -150,19 +164,19 @@ const Bill = () => {
                 {record.productDetail.promotion?.length > 0 ? (
                   <Badge.Ribbon
                     text={`Giảm ${record.productDetail.promotion[0].promotionValue
-                        ? record.productDetail.promotion[0].promotionMethod ===
-                          "%"
-                          ? record.productDetail.promotion[0].promotionValue +
-                          " " +
-                          record.productDetail.promotion[0].promotionMethod
-                          : record.productDetail.promotion[0].promotionValue.toLocaleString(
-                            "vi-VN",
-                            {
-                              style: "currency",
-                              currency: "VND",
-                            }
-                          )
-                        : null
+                      ? record.productDetail.promotion[0].promotionMethod ===
+                        "%"
+                        ? record.productDetail.promotion[0].promotionValue +
+                        " " +
+                        record.productDetail.promotion[0].promotionMethod
+                        : record.productDetail.promotion[0].promotionValue.toLocaleString(
+                          "vi-VN",
+                          {
+                            style: "currency",
+                            currency: "VND",
+                          }
+                        )
+                      : null
                       }`}
                     color="red"
                   >
@@ -413,9 +427,9 @@ const Bill = () => {
   const handleOptionChange = (value, index) => {
     setSelectedOption(value);
     setAmountPaid(0);
-    setTransactionCode('');
-    setRemainAmount(0)
-    setPrice(0)
+    setTransactionCode("");
+    setRemainAmount(0);
+    setPrice(0);
   };
 
   // xóa sản phẩm trong giỏ hàng
@@ -725,7 +739,8 @@ const Bill = () => {
 
   // chuyển tab
   const onChange = (newActiveKey) => {
-    setPrice("0")
+    console.log("newActiveKey: ", newActiveKey);
+    setPrice("0");
     setCartId(newActiveKey);
     setActiveKey(newActiveKey);
     setSelectedOption(1);
@@ -733,6 +748,11 @@ const Bill = () => {
     setSelectedDictrict(null);
     setSelectedWard(null);
     handleDeleteAccount();
+  };
+
+  const countCardWait = (key) => {
+    const dataLocal = JSON.parse(window.localStorage.getItem(key));
+    return dataLocal?.productDetails?.length;
   };
 
   // gen mã hóa đơn
@@ -818,7 +838,7 @@ const Bill = () => {
       axios
         .get(
           "http://localhost:8080/api/admin/product/getproductdetailbyidpd?productDetailId=" +
-            productDetailId,
+          productDetailId,
           {
             headers: {
               Authorization: `Bearer ${getToken(true)}`,
@@ -1059,11 +1079,10 @@ const Bill = () => {
                                     ${productDetails.map((item, index) => {
           return `<div key={index} style="display: flex; justify-content: space-between; align-items: center; padding: 4px 20px;">
                                                 <div style="width: 20%; padding: 4px;">
-                                                    <img alt="product" style="width: 100%; border: 1px solid #ccc; border-radius: 8px;" src=${
-                                                      item.productDetail
-                                                        ?.productImageResponse[0]
-                                                        ?.path
-                                                    }>
+                                                    <img alt="product" style="width: 100%; border: 1px solid #ccc; border-radius: 8px;" src=${item.productDetail
+              ?.productImageResponse[0]
+              ?.path
+            }>
                                                 </div>
                                                 <div style="width: 55%; padding: 4px;">
                                                     <p>${item.productDetail.product
@@ -1289,7 +1308,7 @@ const Bill = () => {
     }
     setRemainAmount(calculatedValue);
     numeral(inputValue).format("0,0");
-    if (calculatedValue < 0 && selectedOption!=="3") {
+    if (calculatedValue < 0 && selectedOption !== "3") {
       setInputError("Số tiền không đủ");
     } else {
       setInputError("");
@@ -1299,22 +1318,23 @@ const Bill = () => {
 
   useEffect(() => {
     async function autoFillVoucher() {
-      try {
-        const res = await axios.post(urlAutofillVoucher, {
-          priceBill: totalPrice ? totalPrice : null,
-          username: null,
-        });
-        const data = await res.data;
-        setVoucherAdd(data);
-      } catch (err) {
-        notification.error({
-          message: "Lỗi",
-          description: "Hệ thống xảy ra lỗi",
-          duration: 2,
-        });
+      if (totalPrice > 0) {
+        try {
+          const res = await axios.post(urlAutofillVoucher, {
+            priceBill: totalPrice ? totalPrice : null,
+            username: null,
+          });
+          const data = await res.data;
+          setVoucherAdd(data);
+        } catch (err) {
+          notification.error({
+            message: "Lỗi",
+            description: "Hệ thống xảy ra lỗi",
+            duration: 2,
+          });
+        }
       }
     }
-
     autoFillVoucher();
   }, [totalPrice]);
 
@@ -1345,10 +1365,7 @@ const Bill = () => {
               <Tabs.TabPane
                 key={item.key}
                 tab={
-                  <Badge
-                    count={productDetails.length ? productDetails.length : 0}
-                    showZero
-                  >
+                  <Badge count={countCardWait(item.key)} showZero>
                     <span style={{ padding: 10 }}>{item.label}</span>
                   </Badge>
                 }
@@ -1742,7 +1759,10 @@ const Bill = () => {
                           >
                             {voucherAdd?.voucherValue
                               ? voucherAdd.voucherMethod === "vnd"
-                                ? voucherAdd?.voucherValue + "đ"
+                                ? voucherAdd?.voucherValue?.toLocaleString("vi-VN", {
+                                  style: "currency",
+                                  currency: "VND",
+                                })
                                 : voucherAdd?.voucherValue + "%"
                               : "0đ"}
                           </span>
@@ -1845,10 +1865,16 @@ const Bill = () => {
                                 className={styles.input_noneBorder}
                                 value={price}
                                 onChange={(e) => {
-                                    handleChangeInput(e.target.value.replace(/\D/g, ""), index)
-                                    setPrice(numeral(e.target.value.replace(/\D/g, "")).format("0,0"))
-                                  }
-                                }
+                                  handleChangeInput(
+                                    e.target.value.replace(/\D/g, ""),
+                                    index
+                                  );
+                                  setPrice(
+                                    numeral(
+                                      e.target.value.replace(/\D/g, "")
+                                    ).format("0,0")
+                                  );
+                                }}
                               />
                               {inputError && (
                                 <span
@@ -1964,9 +1990,8 @@ const Bill = () => {
               </Tabs.TabPane>
             );
           })}
-
-      </Tabs >
-      < FormUsingVoucher
+      </Tabs>
+      <FormUsingVoucher
         priceBill={totalPrice}
         voucher={voucherAdd}
         setVoucher={setVoucherAdd}

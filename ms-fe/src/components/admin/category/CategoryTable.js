@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import styles from "./CategoryStyle.module.css";
 import axios from "axios";
 import { getToken } from "../../../service/Token";
+import SockJs from "../../../service/SockJs";
 
 const CategoryTable = function (props) {
   const [data, setData] = useState([]);
@@ -120,6 +121,7 @@ const CategoryTable = function (props) {
 
   return (
     <div>
+      <SockJs connectTo={"category-topic"} setValues={setData} />
       <Table
         pagination={{
           showSizeChanger: true,

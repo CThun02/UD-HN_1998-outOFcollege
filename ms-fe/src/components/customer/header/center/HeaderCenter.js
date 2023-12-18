@@ -2,17 +2,11 @@ import { Space } from "antd";
 import { Link } from "react-router-dom";
 
 import styles from "./HeaderCenter.module.css";
-import { useState } from "react";
-import { useEffect } from "react";
 
-function HeaderCenter({selectedTab, setSelectedTab}) {
- 
-
+function HeaderCenter({ selectedTab, setSelectedTab }) {
   function handleOnChangeTab(tabName) {
     setSelectedTab(tabName);
   }
-
-  
 
   return (
     <div className={`${styles.lineHeight} ${styles.flex}`}>

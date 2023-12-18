@@ -147,24 +147,28 @@ function TablesProductsDetails({
               ...rowSelection,
             }}
             columns={columns}
-            dataSource={productsDetails?.map((p, index) => ({
-              stt: calculateStt(index),
-              key: p.productDetailsId,
-              product: {
-                productName: p.productName,
-                path: p.imageDefault,
-                button: p.buttonTypeName,
-                material: p.materialType,
-                collar: p.collarType,
-                shirtTail: p.shirtTailType,
-                sleeve: p.sleeveType,
-                size: p.size,
-                color: p.color,
-              },
-              price: p.price,
-              quantity: p.quantity,
-              isCheckExistsInPromotion: p.isCheckExistsInPromotion,
-            }))}
+            dataSource={
+              productsDetails?.length > 0
+                ? productsDetails?.map((p, index) => ({
+                    stt: calculateStt(index),
+                    key: p.productDetailsId,
+                    product: {
+                      productName: p.productName,
+                      path: p.imageDefault,
+                      button: p.buttonTypeName,
+                      material: p.materialType,
+                      collar: p.collarType,
+                      shirtTail: p.shirtTailType,
+                      sleeve: p.sleeveType,
+                      size: p.size,
+                      color: p.color,
+                    },
+                    price: p.price,
+                    quantity: p.quantity,
+                    isCheckExistsInPromotion: p.isCheckExistsInPromotion,
+                  }))
+                : null
+            }
             pagination={{
               showSizeChanger: true,
               pageSizeOptions: [5, 10, 15, 20],

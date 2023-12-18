@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import styles from "../categorystyles/CategoryStyles.module.css";
 import axios from "axios";
 import { getToken } from "../../../service/Token";
+import SockJs from "../../../service/SockJs";
 
 const MaterialTable = function (props) {
   const [data, setData] = useState([]);
@@ -131,8 +132,9 @@ const MaterialTable = function (props) {
 
   return (
     <div>
+      <SockJs connectTo={"material-topic"} setValues={setData} />
+
       {contextHolder}
-      {console.log(data)}
       <Table
         pagination={{ pageSize: 5 }}
         dataSource={data}

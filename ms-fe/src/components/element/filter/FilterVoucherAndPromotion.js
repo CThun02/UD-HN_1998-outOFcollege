@@ -49,6 +49,7 @@ function FilterVoucherAndPromotion({
   setEndDate,
   status,
   setStatus,
+  title,
 }) {
   function handleSearchNameOrCode(query) {
     setSearchNameOrCode(query);
@@ -72,6 +73,11 @@ function FilterVoucherAndPromotion({
 
   return (
     <div className={styles.filter}>
+      {title && (
+        <div className={`${styles.title} ${styles.color}`}>
+          <h1>{title}</h1>
+        </div>
+      )}
       <Space size={18} style={{ width: "100%" }} direction="vertical">
         <Row>
           <Space size={10} className={styles.color}>

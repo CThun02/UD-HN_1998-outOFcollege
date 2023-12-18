@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fpoly.ooc.responce.productdetail.GetColorAndSizeAndQuantity;
 import com.fpoly.ooc.responce.productdetail.ProductDetailShop;
 import com.fpoly.ooc.responce.productdetail.ProductsDetailsResponse;
 import com.fpoly.ooc.responce.voucher.VoucherResponse;
@@ -181,7 +182,6 @@ import java.util.List;
                             WHERE
                                 pd.status = 'ACTIVE'
                                 AND (pie.product_detail_id is null or pie.status = 'ACTIVE')
-                                AND (pp.product_detail_id is null or pp.status = 'ACTIVE')
                                 AND pt.status = 'ACTIVE'
                                 AND c.status = 'ACTIVE'
                                 AND br.status = 'ACTIVE'
@@ -193,7 +193,6 @@ import java.util.List;
                                 AND collar.status = 'ACTIVE'
                                 AND sleeve.status = 'ACTIVE'
                                 AND shirtTail.status = 'ACTIVE'
-                                AND (pp.promotion_id is null or pn.status = 'ACTIVE')
                                 AND (?1 IS NULL OR lower(pt.product_name) LIKE ?1 OR lower(c.category_name) LIKE ?1 OR lower(br.brand_name) like ?1
                                     OR lower(cy.category_name) LIKE ?1 OR lower(patt.pattern_name) LIKE ?1 OR lower(f.form_name) LIKE ?1
                                     OR lower(mate.material_name) LIKE ?1 OR lower(collar.collar_type_name) LIKE ?1 OR sleeve.seleeve_name LIKE ?1
@@ -208,6 +207,125 @@ import java.util.List;
                             GROUP BY pt.id, br.id, cy.id, patt.id, f.id, button.id, mate.id, collar.id, sleeve.id, shirtTail.id,
                              c.category_name, pt.product_name, br.brand_name
                 """, resultSetMapping = "Mapping.ProductDetailShop")
+
+@NamedNativeQuery(
+        name = "ProductDetail.findColorAndSize",
+        query = """
+                select
+                      min(productDetail.price) AS MinPrice,
+                      max(productDetail.price) AS MaxPrice,
+                      sum(productDetail.quantity) AS Quantity,
+                      (SELECT TOP 1
+                           pSub.promotion_method
+                       FROM
+                           promotion_product_detail ppdSub
+                               INNER JOIN promotion pSub ON ppdSub.promotion_id = pSub.id
+                               INNER JOIN dbo.product_detail pdSub ON pdSub.id = ppdSub.product_detail_id
+                       WHERE
+                               pSub.status = 'ACTIVE'
+                         AND ppdSub.product_detail_id IN (
+                           SELECT pdSecondSub.id
+                           FROM product_detail pdSecondSub
+                           WHERE pdSecondSub.product_id = product.id
+                             and pdSecondSub.brand_id = b.id
+                             and pdSecondSub.category_id = cate.id
+                             and pdSecondSub.pattern_id = patt.id
+                             and pdSecondSub.form_id = form.id
+                             and pdSecondSub.button_id = button.id
+                             and pdSecondSub.material_id = mate.id
+                             and pdSecondSub.collar_id = collar.id
+                             and pdSecondSub.sleeve_id = sleeve.id
+                             and pdSecondSub.shirt_tail_id = shirt.id)
+                       ORDER BY
+                           CASE
+                               WHEN pSub.promotion_method = 'vnd' THEN pSub.promotion_value
+                               WHEN pSub.promotion_method = '%' THEN ((pSub.promotion_value / 100) * MAX(productDetail.price))
+                               END DESC
+                      ) AS 'PromotionMethod',
+                      (select top 1 pSub.promotion_value
+                       from promotion_product_detail ppdSub inner join promotion pSub on ppdSub.promotion_id = pSub.id
+                                                            inner join dbo.product_detail pdSub on pdSub.id = ppdSub.product_detail_id
+                       where
+                               pSub.status = 'ACTIVE'
+                         and ppdSub.product_detail_id in (
+                           SELECT pdSecondSub.id
+                           FROM product_detail pdSecondSub
+                           WHERE pdSecondSub.product_id = product.id
+                             and pdSecondSub.brand_id = b.id
+                             and pdSecondSub.category_id = cate.id
+                             and pdSecondSub.pattern_id = patt.id
+                             and pdSecondSub.form_id = form.id
+                             and pdSecondSub.button_id = button.id
+                             and pdSecondSub.material_id = mate.id
+                             and pdSecondSub.collar_id = collar.id
+                             and pdSecondSub.sleeve_id = sleeve.id
+                             and pdSecondSub.shirt_tail_id = shirt.id
+                       )
+                       ORDER BY
+                           CASE
+                               WHEN pSub.promotion_method = 'vnd' THEN pSub.promotion_value
+                               WHEN pSub.promotion_method = '%' THEN ((pSub.promotion_value / 100) * MAX(productDetail.price))
+                               END DESC
+                      )  AS 'PromotionValue'
+                  from product_detail productDetail
+                           left join product product on productDetail.product_id = product.id
+                           left join color color on productDetail.color_id = color.id
+                           left join size s on productDetail.size_id = s.id
+                           left join brand b on productDetail.brand_id = b.id
+                           left join category cate on productDetail.category_id = cate.id
+                           left join pattern patt on productDetail.pattern_id = patt.id
+                           left join form form on productDetail.form_id = form.id
+                           left join button_type button on productDetail.button_id = button.id
+                           left join material mate on productDetail.material_id = mate.id
+                           left join collar_type collar on productDetail.collar_id = collar.id
+                           left join sleeve_type sleeve on productDetail.sleeve_id = sleeve.id
+                           left join shirt_tail_type shirt on productDetail.shirt_tail_id = shirt.id
+                           left join promotion_product_detail promotionProduct on productDetail.id = promotionProduct.product_detail_id
+                           left join promotion promotion on promotion.id = promotionProduct.promotion_id
+                  where
+                    productDetail.status = 'ACTIVE'
+                    and color.status = 'ACTIVE'
+                    and s.status = 'ACTIVE'
+                    and b.status = 'ACTIVE'
+                    and cate.status = 'ACTIVE'
+                    and patt.status = 'ACTIVE'
+                    and form.status = 'ACTIVE'
+                    and button.status = 'ACTIVE'
+                    and mate.status = 'ACTIVE'
+                    and collar.status = 'ACTIVE'
+                    and sleeve.status = 'ACTIVE'
+                    and shirt.status = 'ACTIVE'
+                    and (?2 is null or b.id = ?2)
+                    and (?3 is null or cate.id = ?3)
+                    and (?4 is null or patt.id = ?4)
+                    and (?5 is null or form.id = ?5)
+                    and (?6 is null or button.id = ?6)
+                    and (?7 is null or mate.id = ?7)
+                    and (?8 is null or collar.id = ?8)
+                    and (?9 is null or sleeve.id = ?9)
+                    and (?10 is null or shirt.id = ?10)
+                    and (?11 is null or color.id  = ?11)
+                    and (?12 is null or s.id = ?12)
+                    and product.id = ?1
+                  group by promotion.promotion_value, promotion.promotion_method, product.id, cate.id,
+                           patt.id, b.id, form.id, button.id, mate.id, collar.id, sleeve.id, shirt.id
+                """,
+        resultSetMapping = "Mapping.GetColorAndSizeAndQuantity"
+)
+
+@SqlResultSetMapping(
+        name = "Mapping.GetColorAndSizeAndQuantity",
+        classes = @ConstructorResult(
+                targetClass = GetColorAndSizeAndQuantity.class,
+                columns = {
+                        @ColumnResult(name = "MinPrice", type = BigDecimal.class),
+                        @ColumnResult(name = "MaxPrice", type = BigDecimal.class),
+                        @ColumnResult(name = "Quantity", type = Long.class),
+                        @ColumnResult(name = "PromotionMethod", type = String.class),
+                        @ColumnResult(name = "PromotionValue", type = BigDecimal.class),
+                }
+        )
+)
 
 @SqlResultSetMapping(
         name = "Mapping.ProductsDetailsResponse",

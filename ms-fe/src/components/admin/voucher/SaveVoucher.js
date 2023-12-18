@@ -51,11 +51,11 @@ const validationSchema = Yup.object().shape({
     .matches(/^[0-9,]+$/, "Sai định dạng")
     .test(
       "voucher-value",
-      "* Giá trị không được vượt quá 100%",
+      "* Giá trị giảm phải nằm trong khoảng 1 -> 50%",
       function (voucherValue) {
         const { voucherMethod } = this.parent;
         if (voucherValue && voucherMethod !== "vnd") {
-          return voucherValue < 100;
+          return voucherValue < 50 && voucherValue > 0;
         }
         return true;
       }
@@ -217,13 +217,13 @@ function SaveVoucher() {
                     : voucher?.voucherValue,
                   voucherValueMax: isNaN(voucher?.voucherValueMax)
                     ? Number.parseInt(
-                        voucher?.voucherValueMax?.replace(/,/g, "")
-                      )
+                      voucher?.voucherValueMax?.replace(/,/g, "")
+                    )
                     : voucher?.voucherValueMax,
                   voucherCondition: isNaN(voucher?.voucherCondition)
                     ? Number.parseInt(
-                        voucher?.voucherCondition?.replace(/,/g, "")
-                      )
+                      voucher?.voucherCondition?.replace(/,/g, "")
+                    )
                     : voucher?.voucherCondition,
                   voucherId: voucher?.voucherId ? voucher?.voucherId : "",
                   voucherCode: voucher?.voucherCode ? voucher?.voucherCode : "",
@@ -454,7 +454,7 @@ function SaveVoucher() {
                             <Col span={24}>
                               {code ? (
                                 <FloatingLabels
-                                  label="Tên voucher"
+                                  label="Tên phiếu giảm giá"
                                   name="voucherNameCurrent"
                                   value={values.voucherNameCurrent}
                                   zIndex={true}
@@ -478,7 +478,7 @@ function SaveVoucher() {
                                     status={
                                       (touched.voucherNameCurrent &&
                                         errors.voucherNameCurrent) ||
-                                      errorsServer?.voucherNameCurrent
+                                        errorsServer?.voucherNameCurrent
                                         ? "error"
                                         : "success"
                                     }
@@ -523,7 +523,7 @@ function SaveVoucher() {
                                     status={
                                       (touched.voucherName &&
                                         errors.voucherName) ||
-                                      errorsServer?.voucherName
+                                        errorsServer?.voucherName
                                         ? "error"
                                         : "success"
                                     }
@@ -591,7 +591,7 @@ function SaveVoucher() {
                                     status={
                                       (touched.voucherValue &&
                                         errors.voucherValue) ||
-                                      errorsServer?.voucherValue
+                                        errorsServer?.voucherValue
                                         ? "error"
                                         : ""
                                     }
@@ -639,7 +639,7 @@ function SaveVoucher() {
                                       status={
                                         (touched.voucherValue &&
                                           errors.voucherValue) ||
-                                        errorsServer.voucherValue
+                                          errorsServer.voucherValue
                                           ? "error"
                                           : ""
                                       }
@@ -686,7 +686,7 @@ function SaveVoucher() {
                                       status={
                                         (touched?.voucherValueMax &&
                                           errors.voucherValueMax) ||
-                                        errorsServer.voucherValueMax
+                                          errorsServer.voucherValueMax
                                           ? "error"
                                           : ""
                                       }
@@ -736,7 +736,7 @@ function SaveVoucher() {
                                   status={
                                     (touched.limitQuantity &&
                                       errors.limitQuantity) ||
-                                    errorsServer.limitQuantity
+                                      errorsServer.limitQuantity
                                       ? "error"
                                       : ""
                                   }
@@ -783,7 +783,7 @@ function SaveVoucher() {
                                   status={
                                     (touched.voucherCondition &&
                                       errors.voucherCondition) ||
-                                    errorsServer.voucherCondition
+                                      errorsServer.voucherCondition
                                       ? "error"
                                       : ""
                                   }
@@ -829,7 +829,7 @@ function SaveVoucher() {
                                   onBlur={handleBlur}
                                   status={
                                     (touched.startDate && errors.startDate) ||
-                                    errorsServer.startDate
+                                      errorsServer.startDate
                                       ? "error"
                                       : ""
                                   }
@@ -874,7 +874,7 @@ function SaveVoucher() {
                                   onBlur={handleBlur}
                                   status={
                                     (touched.endDate && errors.endDate) ||
-                                    errorsServer.endDate
+                                      errorsServer.endDate
                                       ? "error"
                                       : ""
                                   }
@@ -979,11 +979,10 @@ function SaveVoucher() {
                                     navigate("/api/admin/vouchers")
                                   }
                                 >
-                                  {`${
-                                    values.status === "INACTIVE"
-                                      ? "Quay lại"
-                                      : "Hủy"
-                                  }`}
+                                  {`${values.status === "INACTIVE"
+                                    ? "Quay lại"
+                                    : "Hủy"
+                                    }`}
                                 </Button>
 
                                 <Button
@@ -992,10 +991,10 @@ function SaveVoucher() {
                                   size="large"
                                   disabled={
                                     values.status === "INACTIVE" ||
-                                    values.status === "CANCEL" ||
-                                    values.usernames.length === 0
+                                      values.status === "CANCEL" ||
+                                      values.usernames.length === 0
                                       ? values.objectUse === "member" &&
-                                        customers.length === 0
+                                      customers.length === 0
                                       : false
                                   }
                                 >
@@ -1013,7 +1012,7 @@ function SaveVoucher() {
                               >
                                 {(values.objectUse === "member" &&
                                   values.isCheckSendEmail) ||
-                                customers.length ? (
+                                  customers.length ? (
                                   <Button
                                     type="primary"
                                     ghost

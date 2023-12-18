@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 import styles from "./CollarStyle.module.css";
 import axios from "axios";
 import { getToken } from "../../../service/Token";
+import SockJs from "../../../service/SockJs";
 
 const CollarTable = function (props) {
   const [data, setData] = useState([]);
@@ -128,7 +129,8 @@ const CollarTable = function (props) {
 
   return (
     <div>
-      {console.log(data)}
+      <SockJs connectTo={"collar-topic"} setValues={setData} />
+
       <Table
         pagination={{
           showSizeChanger: true,

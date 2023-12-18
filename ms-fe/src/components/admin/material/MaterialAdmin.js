@@ -101,7 +101,7 @@ const MaterialAdmin = function ({ isAdmin }) {
           <MaterialTable isAdmin={isAdmin} renderTable={render}></MaterialTable>
         </div>
         <Modal
-          title="Thêm Thể Loại"
+          title="Thêm chất liệu"
           visible={isModalVisible}
           onCancel={handleCancel}
           footer={null}
@@ -113,7 +113,7 @@ const MaterialAdmin = function ({ isAdmin }) {
               rules={[
                 {
                   required: true,
-                  message: "Vui lòng nhập tên chất loại",
+                  message: "Vui lòng nhập tên chất liệu",
                 },
               ]}
             >

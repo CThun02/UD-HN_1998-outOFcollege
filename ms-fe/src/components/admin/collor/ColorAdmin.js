@@ -115,7 +115,7 @@ const CollorAdmin = function ({ isAdmin }) {
           <Form onFinish={handleSubmit}>
             <Form.Item
               value="colorCode"
-              label="Color Code"
+              label="Mã màu"
               rules={[
                 {
                   required: true,
@@ -132,7 +132,7 @@ const CollorAdmin = function ({ isAdmin }) {
             </Form.Item>
             <Form.Item
               value="colorName"
-              label="Color Name"
+              label="Tên màu"
               rules={[
                 {
                   required: true,

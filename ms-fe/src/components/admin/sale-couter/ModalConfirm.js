@@ -11,7 +11,7 @@ const ModalConfirm = ({ isModalOpen, handleOk, handleCancel, action }) => {
             if (note.length < 50) {
                 notification.error({
                     message: "Thông báo",
-                    description: "Nhập lý do!",
+                    description: "Nhập lý do >= 50 ký tự!",
                 });
                 return
             }
@@ -22,7 +22,7 @@ const ModalConfirm = ({ isModalOpen, handleOk, handleCancel, action }) => {
 
     return (
         <>
-            <Modal title={(<>Ghi chú <span style={{color:"red"}}>{action==="rollback" && "*"}</span></>)} open={isModalOpen}
+            <Modal title={(<>Ghi chú <span style={{ color: "red" }}>{action === "rollback" && "*"}</span></>)} open={isModalOpen}
                 onOk={() => handleOkConfirm()}
                 onCancel={handleCancel}>
                 <TextArea rows={4}

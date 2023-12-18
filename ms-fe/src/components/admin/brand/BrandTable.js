@@ -15,6 +15,7 @@ import { useEffect, useState } from "react";
 import styles from "./BrandStyle.module.css";
 import axios from "axios";
 import { getToken } from "../../../service/Token";
+import SockJs from "../../../service/SockJs";
 
 const BrandTable = function (props) {
   const [data, setData] = useState([]);
@@ -125,6 +126,7 @@ const BrandTable = function (props) {
 
   return (
     <div>
+      <SockJs connectTo={"brand-topic"} setValues={setData} />
       {contextHolderNotification}
       <Table
         pagination={{

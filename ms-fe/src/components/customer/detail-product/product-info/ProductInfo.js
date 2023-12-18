@@ -5,7 +5,7 @@ import ChooseSize from "../../../element/choose-size/ChooseSize";
 import Quantity from "../../../element/quantity/Quantity";
 import { faCartPlus, faCirclePlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Col, Rate, Row, Space, Tag, notification } from "antd";
+import { Button, Col, Modal, Rate, Row, Space, Tag, notification } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import numeral from "numeral";
 import { useState } from "react";
@@ -13,6 +13,8 @@ import { now } from "moment";
 import { useEffect } from "react";
 import { getAuthToken } from "../../../../service/Token";
 import axios from "axios";
+
+const image = "/change-size/change-size.jpg";
 
 function ProductInfo({
   data,
@@ -28,6 +30,19 @@ function ProductInfo({
   const navigate = useNavigate();
   const token = getAuthToken();
   const cartAPI = "http://localhost:8080/api/client/cart";
+  const [isOpen, setIsOpen] = useState(false);
+
+  const showModal = () => {
+    setIsOpen(true);
+  };
+
+  const handleOk = () => {
+    setIsOpen(false);
+  };
+
+  const handleCancel = () => {
+    setIsOpen(false);
+  };
 
   function handleChangePrice(value) {
     if (!isNaN(value)) {
@@ -329,7 +344,25 @@ function ProductInfo({
               </span>
             </Col>
             <Col span={10}>
-              <Link>Bảng quy đổi kích cỡ</Link>
+              <Button
+                type="primary"
+                onClick={showModal}
+                className={`${styles.buttonModal}`}
+              >
+                Bảng quy đổi kích cỡ
+              </Button>
+              <Modal
+                title="Bảng quy đổi kích cỡ"
+                open={isOpen}
+                onOk={handleOk}
+                onCancel={handleCancel}
+              >
+                <img
+                  src={image}
+                  alt="change-size-option"
+                  style={{ width: "100%" }}
+                />
+              </Modal>
             </Col>
           </Row>
         </div>

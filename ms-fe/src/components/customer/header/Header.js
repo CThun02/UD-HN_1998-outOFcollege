@@ -35,7 +35,8 @@ function Header({ render, setRenderHeader }) {
       href.includes("about") ||
       href.includes("contact") ||
       href.includes("cart") ||
-      href.includes("checkout")
+      href.includes("checkout") ||
+      href.includes("bill")
     ) {
       if (href.includes("home") || selectedTab === "") {
         setSelectedTab("home");
@@ -59,6 +60,10 @@ function Header({ render, setRenderHeader }) {
 
       if (href.includes("cart") || href.includes("checkout")) {
         setSelectedTab("cart");
+      }
+
+      if (href.includes("bill")) {
+        setSelectedTab("flowOder");
       }
     } else {
       setSelectedTab("home");

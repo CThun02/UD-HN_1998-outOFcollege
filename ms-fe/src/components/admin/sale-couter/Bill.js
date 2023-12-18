@@ -84,6 +84,8 @@ const Bill = () => {
   }
 
   getCart();
+  console.log(initialItems)
+
   // danh sách table
   const initializeModalStates = () => {
     const initialState = items.map(() => false);
@@ -1345,7 +1347,7 @@ const Bill = () => {
                 key={item.key}
                 tab={
                   <Badge
-                    count={productDetails.length ? productDetails.length : 0}
+                    count={item?.count}
                     showZero
                   >
                     <span style={{ padding: 10 }}>{item.label}</span>
@@ -1353,6 +1355,7 @@ const Bill = () => {
                 }
                 items={item}
               >
+                {console.log(item)}
                 <div className={styles.tabContent}>
                   <Row>
                     <Col span={12}>

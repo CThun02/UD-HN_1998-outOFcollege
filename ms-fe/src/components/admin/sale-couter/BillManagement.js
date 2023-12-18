@@ -372,22 +372,22 @@ const BillManagement = () => {
                     id === "1"
                       ? countBill.countAll
                       : id === "2"
-                      ? countBill.countConfirmW
-                      : id === "3"
-                      ? countBill.countConfirmS
-                      : id === "4"
-                      ? countBill.shipping
-                      : id === "5"
-                      ? countBill.complete
-                      : id === "6"
-                      ? countBill.cancel
-                      : id === "7"
-                      ? countBill?.paid
-                      : id === "8"
-                      ? countBill?.unpaid
-                      : id === "9"
-                      ? countBill.returnS
-                      : null
+                        ? countBill.countConfirmW
+                        : id === "3"
+                          ? countBill.countConfirmS
+                          : id === "4"
+                            ? countBill.shipping
+                            : id === "5"
+                              ? countBill.complete
+                              : id === "6"
+                                ? countBill.cancel
+                                : id === "7"
+                                  ? countBill?.paid
+                                  : id === "8"
+                                    ? countBill?.unpaid
+                                    : id === "9"
+                                      ? countBill.returnS
+                                      : null
                   }
                 >
                   <span style={{ padding: "20px" }}>
@@ -395,22 +395,22 @@ const BillManagement = () => {
                     {id === "1"
                       ? "Tất cả"
                       : id === "2"
-                      ? "Chờ xác nhận"
-                      : id === "3"
-                      ? "Chờ giao hàng"
-                      : id === "4"
-                      ? "Đang giao"
-                      : id === "5"
-                      ? "Đã hoàn thành"
-                      : id === "6"
-                      ? "Đã hủy"
-                      : id === "7"
-                      ? "Đã thanh toán"
-                      : id === "8"
-                      ? "Chưa thanh toán"
-                      : id === "9"
-                      ? "Trả hàng"
-                      : ""}
+                        ? "Chờ xác nhận"
+                        : id === "3"
+                          ? "Chờ giao hàng"
+                          : id === "4"
+                            ? "Đang giao"
+                            : id === "5"
+                              ? "Đã hoàn thành"
+                              : id === "6"
+                                ? "Đã hủy"
+                                : id === "7"
+                                  ? "Đã thanh toán"
+                                  : id === "8"
+                                    ? "Chưa thanh toán"
+                                    : id === "9"
+                                      ? "Trả hàng"
+                                      : ""}
                   </span>
                 </Badge>
               ),
@@ -418,22 +418,22 @@ const BillManagement = () => {
                 id === "1"
                   ? ""
                   : id === "2"
-                  ? "Client"
-                  : id === "3"
-                  ? "Confirmed"
-                  : id === "4"
-                  ? "Shipping"
-                  : id === "5"
-                  ? "Complete"
-                  : id === "6"
-                  ? "Cancel"
-                  : id === "7"
-                  ? "Paid"
-                  : id === "8"
-                  ? "Unpaid"
-                  : id === "9"
-                  ? "ReturnS"
-                  : "",
+                    ? "Client"
+                    : id === "3"
+                      ? "Confirmed"
+                      : id === "4"
+                        ? "Shipping"
+                        : id === "5"
+                          ? "Complete"
+                          : id === "6"
+                            ? "Cancel"
+                            : id === "7"
+                              ? "Paid"
+                              : id === "8"
+                                ? "Unpaid"
+                                : id === "9"
+                                  ? "ReturnS"
+                                  : "",
               children: (
                 <div style={{ padding: "8px" }}>
                   <span style={{ fontWeight: 500 }}>

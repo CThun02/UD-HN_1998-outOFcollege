@@ -454,7 +454,7 @@ function SaveVoucher() {
                             <Col span={24}>
                               {code ? (
                                 <FloatingLabels
-                                  label="Tên voucher"
+                                  label="Tên phiếu giảm giá"
                                   name="voucherNameCurrent"
                                   value={values.voucherNameCurrent}
                                   zIndex={true}

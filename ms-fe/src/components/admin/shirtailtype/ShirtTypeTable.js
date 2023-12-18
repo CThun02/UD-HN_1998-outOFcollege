@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import styles from "../categorystyles/CategoryStyles.module.css";
 import axios from "axios";
 import { getToken } from "../../../service/Token";
+import SockJs from "../../../service/SockJs";
 
 const ShirtTypeTable = function (props) {
   const [data, setData] = useState([]);
@@ -132,7 +133,8 @@ const ShirtTypeTable = function (props) {
   return (
     <div>
       {contextHolder}
-      {console.log(data)}
+      <SockJs connectTo={"shirtTail-topic"} setValues={setData} />
+
       <Table
         pagination={{
           showSizeChanger: true,

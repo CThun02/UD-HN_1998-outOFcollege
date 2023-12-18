@@ -73,12 +73,12 @@ const ButtonAdmin = function ({ isAdmin }) {
       {contextHolder}
       <div className={styles.customer}>
         <h1 style={{ textAlign: "center" }}>
-          <PlayCircleOutlined /> Quản lý nút áo
+          <PlayCircleOutlined /> Quản lý cúc áo
         </h1>
         <Row className={styles.titleTB}>
           <h2>
             {" "}
-            <TableOutlined /> Danh Sách nút áo
+            <TableOutlined /> Danh Sách cúc áo
           </h2>
         </Row>
         <Row className={styles.adminMenu}>

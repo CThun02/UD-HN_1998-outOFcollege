@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 import styles from "./PatternlStyle.module.css";
 import axios from "axios";
 import { getToken } from "../../../service/Token";
+import SockJs from "../../../service/SockJs";
 
 const PatternTable = function (props) {
   const [data, setData] = useState([]);
@@ -130,6 +131,7 @@ const PatternTable = function (props) {
 
   return (
     <div>
+      <SockJs connectTo={"pattern-topic"} setValues={setData} />
       <Table
         pagination={{
           showSizeChanger: true,

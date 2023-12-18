@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 import styles from "../categorystyles/CategoryStyles.module.css";
 import axios from "axios";
 import { getToken } from "../../../service/Token";
+import SockJs from "../../../service/SockJs";
 
 const CollorTable = function (props) {
   const [data, setData] = useState([]);
@@ -126,6 +127,7 @@ const CollorTable = function (props) {
   return (
     <div>
       {contextHolder}
+      <SockJs connectTo={"color-topic"} setValues={setData} />
       <Table
         pagination={{
           showSizeChanger: true,

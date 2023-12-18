@@ -103,7 +103,7 @@ const SizeAdmin = function ({ isAdmin }) {
           <SizeTable isAdmin={isAdmin} renderTable={render}></SizeTable>
         </div>
         <Modal
-          title="Thêm Size"
+          title="Thêm kích cỡ"
           visible={isModalVisible}
           onCancel={handleCancel}
           footer={null}
@@ -115,7 +115,7 @@ const SizeAdmin = function ({ isAdmin }) {
               rules={[
                 {
                   required: true,
-                  message: "Vui lòng nhập size",
+                  message: "Vui lòng nhập kích cỡ",
                 },
               ]}
             >

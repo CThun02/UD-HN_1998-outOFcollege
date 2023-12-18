@@ -344,7 +344,7 @@ const Cart = (props) => {
                       }`}
                       color="red"
                     >
-                      <Carousel  style={{maxWidth:"300px"}} autoplay>
+                      <Carousel style={{ maxWidth: "300px" }} autoplay>
                         {record.productImageResponse &&
                           record?.productImageResponse.map((item) => {
                             return (
@@ -359,7 +359,7 @@ const Cart = (props) => {
                       </Carousel>
                     </Badge.Ribbon>
                   ) : (
-                    <Carousel  style={{maxWidth:"300px"}} autoplay>
+                    <Carousel style={{ maxWidth: "300px" }} autoplay>
                       {record.productImageResponse &&
                         record?.productImageResponse.map((item) => {
                           return (
@@ -838,7 +838,7 @@ const Cart = (props) => {
                     }
                   }
                 }
-                localStorage.removeItem("user");
+                // localStorage.removeItem("user");
               }
 
               axios.post(`${cartAPI} `, cart);

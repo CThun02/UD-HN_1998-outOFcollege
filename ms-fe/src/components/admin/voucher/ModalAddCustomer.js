@@ -270,7 +270,7 @@ function ModalAddCustomer({
               <Row>
                 <Col span={6}>
                   <FloatingLabels
-                    label="Search...."
+                    label="Tìm kiếm theo tên...."
                     name="searchText"
                     value={searchText}
                     zIndex={true}
@@ -287,7 +287,7 @@ function ModalAddCustomer({
                 <Col span={1}></Col>
                 <Col span={4}>
                   <FloatingLabels
-                    label="Search...."
+                    label="Giới tính"
                     name="gender"
                     value={true}
                     zIndex={true}

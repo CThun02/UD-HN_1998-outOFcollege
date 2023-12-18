@@ -103,7 +103,7 @@ const PatternAdmin = function ({ isAdmin }) {
         </div>
       </div>
       <Modal
-        title="Thêm Thể Loại"
+        title="Thêm họa tiết"
         visible={isModalVisible}
         onCancel={handleCancel}
         footer={null}
@@ -111,11 +111,11 @@ const PatternAdmin = function ({ isAdmin }) {
         <Form onFinish={handleSubmit}>
           <Form.Item
             name="patternName"
-            label="Tên Loại Vải"
+            label="Tên họa tiết"
             rules={[
               {
                 required: true,
-                message: "Vui lòng nhập tên loại vải",
+                message: "Vui lòng nhập loại họa tiết",
               },
             ]}
           >

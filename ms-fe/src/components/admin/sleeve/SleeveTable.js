@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import styles from "../categorystyles/CategoryStyles.module.css";
 import axios from "axios";
 import { getToken } from "../../../service/Token";
+import SockJs from "../../../service/SockJs";
 
 const SleeveTable = function (props) {
   const [data, setData] = useState([]);
@@ -127,7 +128,7 @@ const SleeveTable = function (props) {
   return (
     <div>
       {contextHolder}
-      {console.log(data)}
+      <SockJs connectTo={"sleeveType-topic"} setValues={setData} />
       <Table
         pagination={{
           showSizeChanger: true,

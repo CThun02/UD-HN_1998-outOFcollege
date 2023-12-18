@@ -93,7 +93,7 @@ const FormAdmin = function ({ isAdmin }) {
                 type="primary"
               >
                 <PlusOutlined className={styles.faPlus} />
-                <span className={styles.titleSeach}>Thêm Kiểu Dáng</span>
+                <span className={styles.titleSeach}>Thêm dáng áo</span>
               </Button>
             ) : null}
           </Col>
@@ -103,7 +103,7 @@ const FormAdmin = function ({ isAdmin }) {
         </div>
       </div>
       <Modal
-        title="Thêm Thể Loại"
+        title="Thêm dáng áo"
         visible={isModalVisible}
         onCancel={handleCancel}
         footer={null}

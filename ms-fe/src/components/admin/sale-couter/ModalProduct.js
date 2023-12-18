@@ -28,7 +28,6 @@ const ModalProduct = ({ visible, onCancel, cartId, render, billId }) => {
         description: "Thêm sản phẩm vào giỏ hàng thành công!",
       });
     }
-
   }
 
   let notifi = () => {

@@ -314,7 +314,7 @@ const BillTimeLine = (addId) => {
                 return (
                     <Row>
                         <Col span={4}>
-                            <Carousel  style={{maxWidth:"300px"}} autoplay className={styles.slider}>
+                            <Carousel autoplay className={styles.slider}>
                                 {record.productImageResponses &&
                                     record.productImageResponses.map((productImage, index) => {
                                         return (
@@ -480,7 +480,7 @@ const BillTimeLine = (addId) => {
                                                 ) : data.status === "4" ? (
                                                     <h3>Giao hàng thành công</h3>
                                                 ) : data.status === "5" ? (
-                                                    <h3>Yêu cầu trả hàng</h3>
+                                                    <h3>yêu cầu trả hàng</h3>
                                                 ) : data.status === "-1" ? (
                                                     <h3>Trả hàng thất bại</h3>
                                                 ) : (
@@ -728,7 +728,7 @@ const BillTimeLine = (addId) => {
                                         <h6>Tên khách hàng</h6>
                                     </Col>
                                     <Col span={14}>
-                                        <span>{billInfo.fullName || "khách lẻ"}</span>
+                                        <span>{billInfo?.fullName ? billInfo?.fullName : billInfo.accountName}</span>
                                     </Col>
                                 </Row>
                             </Col>
@@ -748,13 +748,11 @@ const BillTimeLine = (addId) => {
                                         <span>Địa chỉ</span>
                                     </Col>
                                     <Col span={14}>
-                                        {console.log(billInfo)}
                                         <span>
                                             {billInfo?.ward ? `${billInfo?.addressDetail ?? ''} 
                                         ${billInfo?.ward?.substring(0, billInfo?.ward.indexOf('|'))} 
                                         ${billInfo?.district?.substring(0, billInfo?.district.indexOf('|'))} 
                                         ${billInfo?.city?.substring(0, billInfo?.city.indexOf('|'))}` : '__'}
-
                                         </span>
                                     </Col>
                                 </Row>
@@ -766,7 +764,7 @@ const BillTimeLine = (addId) => {
                                     </Col>
                                     <Col span={14}>
                                         <span>
-                                            {numeral(billInfo?.amountPaid).format("0,0") + " đ"}
+                                            {numeral(billInfo.amountPaid).format("0,0") + "đ"}
                                         </span>
                                     </Col>
                                 </Row>
@@ -856,10 +854,13 @@ const BillTimeLine = (addId) => {
                             Tổng cộng:{" "}
                         </span>
                         <span style={{ fontSize: "16px", color: "#FF0000" }}>
-                            {numeral(
-                                (billInfo?.priceReduce === billInfo.voucherPrice) ? billInfo?.shipPrice
-                                    : (billInfo?.priceReduce + billInfo?.shipPrice)
-                            ).format(0, 0) + "đ"}
+                            {((
+                                (billInfo?.priceReduce === billInfo.voucherPrice) ? ((billInfo?.priceReduce + (billInfo?.shipPrice ?? 0)))
+                                    : (billInfo?.priceReduce + (billInfo?.shipPrice ?? 0))
+                            ) ?? 0)?.toLocaleString("vi-VN", {
+                                style: "currency",
+                                currency: "VND",
+                            })}
                         </span>
                     </b>
                 </div>

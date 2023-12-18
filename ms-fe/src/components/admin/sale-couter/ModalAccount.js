@@ -28,11 +28,11 @@ const ModalAccount = ({
     fullName: " ",
     email: " ",
     numberPhone: " ",
-    city: "empty" ,
-    district: "empty" ,
-    ward: "empty" ,
+    city: "empty",
+    district: "empty",
+    ward: "empty",
     password: "12345",
-    descriptionDetail: "empty" ,
+    descriptionDetail: "empty",
     dob: " ",
     gender: true,
     idRole: 2,
@@ -61,7 +61,9 @@ const ModalAccount = ({
     cart.account = value;
     address(
       value?.accountAddress?.filter(
-        (address) => address.defaultaddress === true
+        (address) => (
+          address.defaultaddress === true
+        )
       )[0]
     );
     localStorage.setItem(cartId, JSON.stringify(cart));
@@ -69,7 +71,7 @@ const ModalAccount = ({
     onCancel();
   };
 
-  const handelSetAccount = (field, value)=>{
+  const handelSetAccount = (field, value) => {
     setAcount((account) => ({
       ...account,
       [field]: value,
@@ -172,44 +174,44 @@ const ModalAccount = ({
           <Col offset={2} span={20}>
             <Row>
               <Col span={24}>
-                <span style={{fontWeight:"500"}}>Tên khách hàng</span>
-                <Input 
-                value={account?.fullName} 
-                onChange={(event)=>{handelSetAccount("fullName", event.target.value)}} 
-                style={{width:"100%"}} size="small" 
-                status={account?.fullName===""?"error":null}
+                <span style={{ fontWeight: "500" }}>Tên khách hàng</span>
+                <Input
+                  value={account?.fullName}
+                  onChange={(event) => { handelSetAccount("fullName", event.target.value) }}
+                  style={{ width: "100%" }} size="small"
+                  status={account?.fullName === "" ? "error" : null}
                 />
               </Col>
               <Col span={24}>
-                <span style={{fontWeight:"500"}}>Số điện thoại</span>
-                <Input 
-                  value={account?.numberPhone} 
-                  onChange={(event)=>{handelSetAccount("numberPhone", event.target.value.replace(/[^\d]/g, ""))}}  
-                  style={{width:"100%"}} size="small" 
-                  status={account?.numberPhone===""?"error":null}
+                <span style={{ fontWeight: "500" }}>Số điện thoại</span>
+                <Input
+                  value={account?.numberPhone}
+                  onChange={(event) => { handelSetAccount("numberPhone", event.target.value.replace(/[^\d]/g, "")) }}
+                  style={{ width: "100%" }} size="small"
+                  status={account?.numberPhone === "" ? "error" : null}
                 />
               </Col>
               <Col span={24}>
-                <span style={{fontWeight:"500"}}>Email</span>
-                <Input 
-                  value={account?.email} 
-                  onChange={(event)=>{handelSetAccount("email", event.target.value.replace(" ", ""))}}  
-                  style={{width:"100%"}} size="small" 
-                  status={account?.email===""?"error":null}
+                <span style={{ fontWeight: "500" }}>Email</span>
+                <Input
+                  value={account?.email}
+                  onChange={(event) => { handelSetAccount("email", event.target.value.replace(" ", "")) }}
+                  style={{ width: "100%" }} size="small"
+                  status={account?.email === "" ? "error" : null}
                 />
               </Col>
               <Col span={24}>
-                <span style={{fontWeight:"500"}}>Giới tính</span>
-                <Radio.Group 
-                  value={account?.gender} 
-                  onChange={(event)=>{handelSetAccount("gender", event.target.value)}}
+                <span style={{ fontWeight: "500" }}>Giới tính</span>
+                <Radio.Group
+                  value={account?.gender}
+                  onChange={(event) => { handelSetAccount("gender", event.target.value) }}
                 >
                   <Radio value={true}>Nam</Radio>
                   <Radio value={false}>Nữ</Radio>
                 </Radio.Group>
               </Col>
             </Row>
-            <Col span={24} style={{textAlign:"center"}}>
+            <Col span={24} style={{ textAlign: "center" }}>
               <Button type="primary" size="large">Xác nhận</Button>
             </Col>
           </Col>
@@ -238,8 +240,8 @@ const ModalAccount = ({
               }}
             />
           </Col>
-          <Col span={12} style={{ textAlign:"end" }}>
-            <Button size="large" type="primary" onClick={()=>{setVisibleCreate(true)}}>Thêm khách hàng</Button>
+          <Col span={12} style={{ textAlign: "end" }}>
+            <Button size="large" type="primary" onClick={() => { setVisibleCreate(true) }}>Thêm khách hàng</Button>
           </Col>
           <Col span={24}>
             <Table

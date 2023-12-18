@@ -77,6 +77,7 @@ const ProductCreateDetails = () => {
   const [isLoading, setisLoading] = useState(false);
   const [modalProductCreate, setmodalProductCreate] = useState(false);
   const [product, setProduct] = useState({
+    id: "",
     productName: "",
     description: "",
     status: "ACTIVE",
@@ -128,7 +129,7 @@ const ProductCreateDetails = () => {
     if (!check) {
       confirm({
         centered: true,
-        title: `Thêm mới sản phẩm ${product.productName}`,
+        title: `Thêm mới sản phẩm ${product?.productName}`,
         icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
         content: "Xác nhận thêm mới",
         onOk() {
@@ -147,9 +148,8 @@ const ProductCreateDetails = () => {
                   description: "Thêm mới sản phẩm thành công",
                   icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
                 });
-                handleSetProduct("description", " ");
                 setmodalProductCreate(false);
-                handleSetProduct("id", res.data.id);
+                handleSetProduct("id", res.data?.id);
                 setRender(Math.random());
                 setRenderExist(Math.random());
               } else {
@@ -169,7 +169,7 @@ const ProductCreateDetails = () => {
               }
             });
         },
-        onCancel() {},
+        onCancel() { },
       });
     } else {
       messageApi.error("Vui lòng nhập đầy đủ các trường");
@@ -178,17 +178,16 @@ const ProductCreateDetails = () => {
 
   function getProductDetailsExist() {
     if (
-      product.id &&
-      product.id &&
-      button.key &&
-      collar.key &&
-      material.key &&
-      sleeve.key &&
-      shirtTail.key &&
-      form.key &&
-      pattern.key &&
-      brand.key &&
-      category.key
+      product?.id &&
+      button?.key &&
+      collar?.key &&
+      material?.key &&
+      sleeve?.key &&
+      shirtTail?.key &&
+      form?.key &&
+      pattern?.key &&
+      brand?.key &&
+      category?.key
     ) {
       let productDetailRequest = { ...productDetail };
       productDetailRequest.productId = product.id;
@@ -204,26 +203,26 @@ const ProductCreateDetails = () => {
       axios
         .get(
           api +
-            "product/filterProductDetailByIdCom?productId=" +
-            productDetailRequest.productId +
-            "&buttonId=" +
-            productDetailRequest.buttonId +
-            "&materialId=" +
-            productDetailRequest.materialId +
-            "&shirtTailId=" +
-            productDetailRequest.shirtTailId +
-            "&sleeveId=" +
-            productDetailRequest.sleeveId +
-            "&collarId=" +
-            productDetailRequest.collarId +
-            "&brandId=" +
-            productDetailRequest.brandId +
-            "&categoryId=" +
-            productDetailRequest.categoryId +
-            "&patternId=" +
-            productDetailRequest.patternId +
-            "&formId=" +
-            productDetailRequest.formId,
+          "product/filterProductDetailByIdCom?productId=" +
+          productDetailRequest?.productId +
+          "&buttonId=" +
+          productDetailRequest.buttonId +
+          "&materialId=" +
+          productDetailRequest.materialId +
+          "&shirtTailId=" +
+          productDetailRequest.shirtTailId +
+          "&sleeveId=" +
+          productDetailRequest.sleeveId +
+          "&collarId=" +
+          productDetailRequest.collarId +
+          "&brandId=" +
+          productDetailRequest.brandId +
+          "&categoryId=" +
+          productDetailRequest.categoryId +
+          "&patternId=" +
+          productDetailRequest.patternId +
+          "&formId=" +
+          productDetailRequest.formId,
           {
             headers: {
               Authorization: `Bearer ${getToken(true)}`,
@@ -378,7 +377,7 @@ const ProductCreateDetails = () => {
               }
             });
         },
-        onCancel() {},
+        onCancel() { },
       });
     } else {
       messageApi.error("Vui lòng nhập hoạt tiết!", 1);
@@ -424,7 +423,7 @@ const ProductCreateDetails = () => {
               }
             });
         },
-        onCancel() {},
+        onCancel() { },
       });
     } else {
       messageApi.error("Vui lòng nhập dáng áo!", 1);
@@ -466,7 +465,7 @@ const ProductCreateDetails = () => {
               }
             });
         },
-        onCancel() {},
+        onCancel() { },
       });
     } else {
       messageApi.error("Vui lòng nhập thương hiệu!", 1);
@@ -508,7 +507,7 @@ const ProductCreateDetails = () => {
               }
             });
         },
-        onCancel() {},
+        onCancel() { },
       });
     } else {
       messageApi.error("Vui lòng nhập loại sản phẩm!", 1);
@@ -550,7 +549,7 @@ const ProductCreateDetails = () => {
               }
             });
         },
-        onCancel() {},
+        onCancel() { },
       });
     } else {
       messageApi.error("Vui lòng nhập dáng áo!", 1);
@@ -596,7 +595,7 @@ const ProductCreateDetails = () => {
               }
             });
         },
-        onCancel() {},
+        onCancel() { },
       });
     } else {
       messageApi.error("Vui lòng nhập nút áo!", 1);
@@ -644,7 +643,7 @@ const ProductCreateDetails = () => {
               }
             });
         },
-        onCancel() {},
+        onCancel() { },
       });
     } else {
       messageApi.error("Vui lòng nhập chất liệu!", 1);
@@ -692,7 +691,7 @@ const ProductCreateDetails = () => {
               }
             });
         },
-        onCancel() {},
+        onCancel() { },
       });
     } else {
       messageApi.error("Vui lòng nhập cổ áo!", 1);
@@ -738,7 +737,7 @@ const ProductCreateDetails = () => {
               }
             });
         },
-        onCancel() {},
+        onCancel() { },
       });
     } else {
       messageApi.error("Vui lòng nhập tay áo!", 1);
@@ -784,7 +783,7 @@ const ProductCreateDetails = () => {
               }
             });
         },
-        onCancel() {},
+        onCancel() { },
       });
     } else {
       messageApi.error("Vui lòng nhập kích cỡ!", 1);
@@ -829,7 +828,7 @@ const ProductCreateDetails = () => {
               }
             });
         },
-        onCancel() {},
+        onCancel() { },
       });
     } else {
       messageApi.error("Vui lòng nhập màu sắc!", 1);
@@ -1195,23 +1194,23 @@ const ProductCreateDetails = () => {
                       <span style={{ fontWeight: 500 }}>Tên sản phẩm</span>
                       <Input
                         placeholder="Product name"
-                        value={product.productName}
+                        value={product?.productName}
                         onChange={(event) =>
                           handleSetProduct("productName", event.target.value)
                         }
-                        status={product.productName === "" ? "error" : ""}
+                        status={product?.productName === "" ? "error" : ""}
                       ></Input>
                     </div>
                     <div className="m-5">
                       <span style={{ fontWeight: 500 }}>Mô tả</span>
                       <TextArea
-                        value={product.description}
+                        value={product?.description}
                         placeholder="Description"
                         allowClear
                         onChange={(event) =>
                           handleSetProduct("description", event.target.value)
                         }
-                        status={product.description === "" ? "error" : ""}
+                        status={product?.description === "" ? "error" : ""}
                       />
                     </div>
                     <br />
@@ -1254,7 +1253,7 @@ const ProductCreateDetails = () => {
                                   setmodalProductCreate(true);
                                   handleSetProduct(
                                     "productName",
-                                    product.productName
+                                    product?.productName
                                   );
                                 }}
                               >
@@ -1266,7 +1265,7 @@ const ProductCreateDetails = () => {
                             onSearch={(input, option) => {
                               handleSetProduct(
                                 "productName",
-                                input === "" ? product.productName : input
+                                input === "" ? product?.productName : input
                               );
                               return (option?.label ?? "").includes(input);
                             }}
@@ -1282,17 +1281,17 @@ const ProductCreateDetails = () => {
                               );
                               setRenderExist(Math.random());
                             }}
-                            value={product.id}
+                            value={product?.id}
                           >
                             {productList &&
                               productList.map((item, index) => {
                                 return (
                                   <Select.Option
-                                    key={item.id}
-                                    label={item.productName}
-                                    value={item.id}
+                                    key={item?.id}
+                                    label={item?.productName}
+                                    value={item?.id}
                                   >
-                                    {item.productName}
+                                    {item?.productName}
                                   </Select.Option>
                                 );
                               })}
@@ -1315,14 +1314,14 @@ const ProductCreateDetails = () => {
                               backgroundColor: "white",
                               boxShadow: "rgba(0, 0, 0, 0.05) 0px 1px 2px 0px",
                             },
-                            label: <h6>{product.productName || "Sản phẩm"}</h6>,
+                            label: <h6>{product?.productName || "Sản phẩm"}</h6>,
                             children: (
                               <Row>
                                 <Col span={24}>
                                   <div className="m-5">
                                     <h6>Mô tả</h6>
                                     <p>
-                                      {product.description || "Description"}
+                                      {product?.description || "Description"}
                                     </p>
                                     <hr />
                                   </div>
@@ -1392,9 +1391,9 @@ const ProductCreateDetails = () => {
                                   brands.map((item) => {
                                     return (
                                       <Select.Option
-                                        value={item.id}
+                                        value={item?.id}
                                         label={item.brandName}
-                                        key={item.id}
+                                        key={item?.id}
                                       >
                                         {item.brandName}
                                       </Select.Option>
@@ -1440,9 +1439,9 @@ const ProductCreateDetails = () => {
                                   categories.map((item) => {
                                     return (
                                       <Select.Option
-                                        value={item.id}
+                                        value={item?.id}
                                         label={item.categoryName}
-                                        key={item.id}
+                                        key={item?.id}
                                       >
                                         {item.categoryName}
                                       </Select.Option>
@@ -1489,9 +1488,9 @@ const ProductCreateDetails = () => {
                                   buttons.map((item) => {
                                     return (
                                       <Select.Option
-                                        value={item.id}
+                                        value={item?.id}
                                         label={item.buttonName}
-                                        key={item.id}
+                                        key={item?.id}
                                       >
                                         {item.buttonName}
                                       </Select.Option>
@@ -1538,9 +1537,9 @@ const ProductCreateDetails = () => {
                                   materials.map((item) => {
                                     return (
                                       <Select.Option
-                                        value={item.id}
+                                        value={item?.id}
                                         label={item.materialName}
-                                        key={item.id}
+                                        key={item?.id}
                                       >
                                         {item.materialName}
                                       </Select.Option>
@@ -1587,8 +1586,8 @@ const ProductCreateDetails = () => {
                                   collars.map((item) => {
                                     return (
                                       <Select.Option
-                                        value={item.id}
-                                        key={item.id}
+                                        value={item?.id}
+                                        key={item?.id}
                                         label={item.collarTypeName}
                                       >
                                         {item.collarTypeName}
@@ -1636,9 +1635,9 @@ const ProductCreateDetails = () => {
                                   sleeves.map((item) => {
                                     return (
                                       <Select.Option
-                                        value={item.id}
+                                        value={item?.id}
                                         label={item.sleeveName}
-                                        key={item.id}
+                                        key={item?.id}
                                       >
                                         {item.sleeveName}
                                       </Select.Option>
@@ -1688,9 +1687,9 @@ const ProductCreateDetails = () => {
                                   shirtTails.map((item) => {
                                     return (
                                       <Select.Option
-                                        value={item.id}
+                                        value={item?.id}
                                         label={item.shirtTailTypeName}
-                                        key={item.id}
+                                        key={item?.id}
                                       >
                                         {item.shirtTailTypeName}
                                       </Select.Option>
@@ -1739,8 +1738,8 @@ const ProductCreateDetails = () => {
                                     return (
                                       <Select.Option
                                         label={item.patternName}
-                                        value={item.id}
-                                        key={item.id}
+                                        value={item?.id}
+                                        key={item?.id}
                                       >
                                         {item.patternName}
                                       </Select.Option>
@@ -1788,8 +1787,8 @@ const ProductCreateDetails = () => {
                                     return (
                                       <Select.Option
                                         label={item.formName}
-                                        value={item.id}
-                                        key={item.id}
+                                        value={item?.id}
+                                        key={item?.id}
                                       >
                                         {item.formName}
                                       </Select.Option>
@@ -1818,7 +1817,7 @@ const ProductCreateDetails = () => {
                                           color: "red",
                                         }}
                                       >
-                                        <h6>{product.productName}</h6>
+                                        <h6>{product?.productName}</h6>
                                         {productDetailsExist.length === 0 ? (
                                           <span>Không có sẵn sản phẩm nào</span>
                                         ) : (
@@ -1872,7 +1871,7 @@ const ProductCreateDetails = () => {
                               <Select
                                 showSearch
                                 maxTagCount={"responsive"}
-                                placeholder="size"
+                                placeholder="Chọn kích cỡ"
                                 optionFilterProp="children"
                                 mode="multiple"
                                 className={styles.product__createDetailsSelect}
@@ -1905,9 +1904,9 @@ const ProductCreateDetails = () => {
                                   sizes.map((item) => {
                                     return (
                                       <Select.Option
-                                        key={item.id}
+                                        key={item?.id}
                                         label={item.sizeName}
-                                        value={item.id}
+                                        value={item?.id}
                                       >
                                         {item.sizeName}
                                       </Select.Option>
@@ -1922,7 +1921,7 @@ const ProductCreateDetails = () => {
                               <Select
                                 showSearch
                                 maxTagCount={"responsive"}
-                                placeholder="Color"
+                                placeholder="Chọn màu sắc"
                                 optionFilterProp="children"
                                 mode="multiple"
                                 className={styles.product__createDetailsSelect}
@@ -1956,7 +1955,7 @@ const ProductCreateDetails = () => {
                                   colors.map((item) => {
                                     return (
                                       <Select.Option
-                                        key={item.id}
+                                        key={item?.id}
                                         label={item.colorName}
                                         value={item.colorCode}
                                       >
@@ -1983,9 +1982,9 @@ const ProductCreateDetails = () => {
             </Col>
           </Row>
         </div>
-        {product.productId !== null &&
-        colorsCreate.length > 0 &&
-        productDetailsCreate.length > 0 ? (
+        {product?.productId !== null &&
+          colorsCreate.length > 0 &&
+          productDetailsCreate.length > 0 ? (
           <ProductDetailsTable
             setLoading={setisLoading}
             product={product}

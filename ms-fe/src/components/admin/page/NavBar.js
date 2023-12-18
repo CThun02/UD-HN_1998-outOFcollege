@@ -130,7 +130,7 @@ const NavBar = () => {
             <Button className={styles.navBar__button}>
               <MenuFoldOutlined />
             </Button>
-            <Breadcrumb
+            {/* <Breadcrumb
               items={[
                 {
                   href: "http://localhost:3000/api/admin",
@@ -145,7 +145,7 @@ const NavBar = () => {
                   ),
                 },
               ]}
-            />
+            /> */}
           </Space>
           <Space>
             <Button className={styles.navBar__button}>

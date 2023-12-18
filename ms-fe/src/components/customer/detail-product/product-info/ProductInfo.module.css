@@ -106,3 +106,13 @@
   text-decoration: line-through;
   margin-right: 10px;
 }
+
+.buttonModal {
+  background-color: #fff;
+  color: #111111;
+}
+
+.buttonModal:hover {
+  cursor: pointer;
+  background-color: rgb(2, 132, 199);
+}

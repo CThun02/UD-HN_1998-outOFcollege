@@ -284,6 +284,7 @@ function Promotion() {
         setEndDate={setEndDate}
         status={status}
         setStatus={setStatus}
+        title={"Giảm giá sản phẩm"}
       />
       <SockJs setValues={setPromotions} connectTo="promotion" />
       <div className={styles.content}>

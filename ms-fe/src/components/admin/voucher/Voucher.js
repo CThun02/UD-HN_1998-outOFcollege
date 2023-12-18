@@ -295,6 +295,7 @@ function Voucher() {
         setEndDate={setSearchEndDate}
         status={searchStatus}
         setStatus={setSearchStatus}
+        title={"Phiếu giảm giá"}
       />
       <div className={styles.content}>
         <Space style={{ width: "100%" }} direction="vertical" size={16}>
@@ -304,7 +305,7 @@ function Voucher() {
                 <i>
                   <UnorderedListOutlined />
                 </i>
-                <h2>Danh sách Voucher</h2>
+                <h2>Danh sách phiếu giảm giá</h2>
               </Space>
             </Col>
 

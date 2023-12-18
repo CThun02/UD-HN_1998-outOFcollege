@@ -93,23 +93,24 @@ const ProductDetails = (props) => {
               >
                 {record.promotion.length !== 0 ? (
                   <Badge.Ribbon
-                    text={`Giảm ${record.promotion[0].promotionValue
-                      ? record.promotion[0].promotionMethod === "%"
-                        ? record.promotion[0].promotionValue +
-                        " " +
-                        record.promotion[0].promotionMethod
-                        : record.promotion[0].promotionValue.toLocaleString(
-                          "vi-VN",
-                          {
-                            style: "currency",
-                            currency: "VND",
-                          }
-                        )
-                      : null
-                      }`}
+                    text={`Giảm ${
+                      record?.promotion[0].promotionValue
+                        ? record.promotion[0].promotionMethod === "%"
+                          ? record.promotion[0].promotionValue +
+                            " " +
+                            record.promotion[0].promotionMethod
+                          : record.promotion[0].promotionValue.toLocaleString(
+                              "vi-VN",
+                              {
+                                style: "currency",
+                                currency: "VND",
+                              }
+                            )
+                        : null
+                    }`}
                     color="red"
                   >
-                    <Carousel style={{maxWidth:"300px"}} autoplay>
+                    <Carousel style={{ maxWidth: "300px" }} autoplay>
                       {record.productImageResponse &&
                         record.productImageResponse.map((item) => {
                           return (
@@ -124,7 +125,7 @@ const ProductDetails = (props) => {
                     </Carousel>
                   </Badge.Ribbon>
                 ) : (
-                  <Carousel style={{maxWidth:"300px"}} autoplay>
+                  <Carousel style={{ maxWidth: "300px" }} autoplay>
                     {record.productImageResponse &&
                       record.productImageResponse.map((item) => {
                         return (
@@ -201,7 +202,11 @@ const ProductDetails = (props) => {
       title: "Số lượng",
       width: 110,
       render: (text, record, index) => {
-        return record.quantity <= 0 ? <span style={{ color: "#ccc" }}>Hết hàng</span> : record.quantity;
+        return record.quantity <= 0 ? (
+          <span style={{ color: "#ccc" }}>Hết hàng</span>
+        ) : (
+          record.quantity
+        );
       },
     },
     {
@@ -233,19 +238,19 @@ const ProductDetails = (props) => {
               {record.promotion.length !== 0
                 ? record.promotion[0].promotionMethod === "%"
                   ? (
-                    (record.price *
-                      (100 - Number(record.promotion[0].promotionValue))) /
-                    100
-                  ).toLocaleString("vi-VN", {
-                    style: "currency",
-                    currency: "VND",
-                  })
+                      (record.price *
+                        (100 - Number(record.promotion[0].promotionValue))) /
+                      100
+                    ).toLocaleString("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    })
                   : (
-                    record.price - Number(record.promotion[0].promotionValue)
-                  ).toLocaleString("vi-VN", {
-                    style: "currency",
-                    currency: "VND",
-                  })
+                      record.price - Number(record.promotion[0].promotionValue)
+                    ).toLocaleString("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    })
                 : null}
             </span>
           </div>
@@ -287,17 +292,20 @@ const ProductDetails = (props) => {
             </div>
           </Modal>
           {console.log(record.quantity)}
-          {record.quantity <= 0 ?
-            (<span style={{ color: "#ccc" }}>Hết hàng</span>)
-            : record.status === "INACTIVE" ? (<span style={{ color: "#ccc" }}>Ngưng kinh doanh</span>) :
-              <Button
-                type="primary"
-                onClick={() => {
-                  handleShowModalModalQuantity(index);
-                }}
-              >
-                Chọn
-              </Button>}
+          {record.quantity <= 0 ? (
+            <span style={{ color: "#ccc" }}>Hết hàng</span>
+          ) : record.status === "INACTIVE" ? (
+            <span style={{ color: "#ccc" }}>Ngưng kinh doanh</span>
+          ) : (
+            <Button
+              type="primary"
+              onClick={() => {
+                handleShowModalModalQuantity(index);
+              }}
+            >
+              Chọn
+            </Button>
+          )}
         </>
       ),
     },
@@ -345,24 +353,25 @@ const ProductDetails = (props) => {
     ) {
       notification.error({
         message: "Thông báo",
-        description: `Số lượng sản phẩm ${productDetailCreate.quantity > 100
-          ? "thêm tối đa 100"
-          : "tồn không đủ"
-          }`,
+        description: `Số lượng sản phẩm ${
+          productDetailCreate.quantity > 100
+            ? "thêm tối đa 100"
+            : "tồn không đủ"
+        }`,
       });
-    } else if(productDetailCreate.quantity <= 0){
+    } else if (productDetailCreate.quantity <= 0) {
       notification.error({
         message: "Thông báo",
         description: `Số lượng sản phẩm phải lớn hơn 0`,
       });
-    }else {
+    } else {
       productDetailCreate.productDetail = record;
       productDetailCreate.priceReduce =
         record.promotion.length !== 0
           ? record.promotion[0].promotionMethod === "%"
             ? (record.price *
-              (100 - Number(record.promotion[0].promotionValue)))
-            / 100
+                (100 - Number(record.promotion[0].promotionValue))) /
+              100
             : record.price - Number(record.promotion[0].promotionValue)
           : record.price;
       props.productDetailsCreate?.push(productDetailCreate);
@@ -371,50 +380,57 @@ const ProductDetails = (props) => {
 
       const data = token;
 
-      props.billId ? axios.post(`http://localhost:8080/api/admin/bill-detail/create-bill-detail`, {
-        billId: props.billId,
-        productDetailId: productDetailCreate.productDetail.id,
-        quantity: productDetailCreate.quantity,
-        price: productDetailCreate.priceReduce,
-      }, {
-        headers: {
-          Authorization: `Bearer ${getToken(true)}`,
-        },
-      })
-        .then(response => {
-          const values = {
-            note: `
-              ${productDetailCreate.productDetail.id} `,
-            status: "Update",
-            createdBy: data?.username + "_" + data?.fullName,
-          };
-          axios
-            .post(`http://localhost:8080/api/admin/timeline/${props.billId}`, values, {
-              headers: {
-                Authorization: `Bearer ${getToken(true)}`,
+      props.billId
+        ? axios
+            .post(
+              `http://localhost:8080/api/admin/bill-detail/create-bill-detail`,
+              {
+                billId: props.billId,
+                productDetailId: productDetailCreate.productDetail.id,
+                quantity: productDetailCreate.quantity,
+                price: productDetailCreate.priceReduce,
               },
-            })
+              {
+                headers: {
+                  Authorization: `Bearer ${getToken(true)}`,
+                },
+              }
+            )
             .then((response) => {
-
+              const values = {
+                note: `
+              ${productDetailCreate.productDetail.id} `,
+                status: "Update",
+                createdBy: data?.username + "_" + data?.fullName,
+              };
+              axios
+                .post(
+                  `http://localhost:8080/api/admin/timeline/${props.billId}`,
+                  values,
+                  {
+                    headers: {
+                      Authorization: `Bearer ${getToken(true)}`,
+                    },
+                  }
+                )
+                .then((response) => {})
+                .catch((error) => {});
+              notification.success({
+                message: "Thông báo",
+                description: "Cập nhật thành công!",
+                duration: 2,
+              });
             })
             .catch((error) => {
+              const status = error.response?.status;
+              if (status === 403) {
+                notification.error({
+                  message: "Thông báo",
+                  description: "Bạn không có quyền truy cập!",
+                });
+              }
             })
-          notification.success({
-            message: "Thông báo",
-            description: "Cập nhật thành công!",
-            duration: 2
-          });
-        })
-        .catch(error => {
-
-          const status = error.response?.status;
-          if (status === 403) {
-            notification.error({
-              message: "Thông báo",
-              description: "Bạn không có quyền truy cập!",
-            });
-          }
-        }) : props.action()
+        : props.action();
     }
   }
 
@@ -423,34 +439,34 @@ const ProductDetails = (props) => {
     axios
       .get(
         api +
-        "bill/filterProductDetailSellByIdCom?productId=" +
-        product +
-        "&brandId=" +
-        brand +
-        "&categoryId=" +
-        category +
-        "&buttonId=" +
-        button +
-        "&materialId=" +
-        material +
-        "&shirtTailId=" +
-        shirtTail +
-        "&sleeveId=" +
-        sleeve +
-        "&collarId=" +
-        collar +
-        "&colorId=" +
-        color +
-        "&sizeId=" +
-        size +
-        "&patternId=" +
-        pattern +
-        "&formId=" +
-        form +
-        "&minPrice=" +
-        price[0] +
-        "&maxPrice=" +
-        price[1],
+          "bill/filterProductDetailSellByIdCom?productId=" +
+          product +
+          "&brandId=" +
+          brand +
+          "&categoryId=" +
+          category +
+          "&buttonId=" +
+          button +
+          "&materialId=" +
+          material +
+          "&shirtTailId=" +
+          shirtTail +
+          "&sleeveId=" +
+          sleeve +
+          "&collarId=" +
+          collar +
+          "&colorId=" +
+          color +
+          "&sizeId=" +
+          size +
+          "&patternId=" +
+          pattern +
+          "&formId=" +
+          form +
+          "&minPrice=" +
+          price[0] +
+          "&maxPrice=" +
+          price[1],
         {
           headers: {
             Authorization: `Bearer ${getToken(true)}`,

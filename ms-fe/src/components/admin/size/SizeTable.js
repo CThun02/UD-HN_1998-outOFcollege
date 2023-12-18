@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import styles from "../categorystyles/CategoryStyles.module.css";
 import axios from "axios";
 import { getToken } from "../../../service/Token";
+import SockJs from "../../../service/SockJs";
 
 const SizeTable = function (props) {
   const [data, setData] = useState([]);
@@ -118,7 +119,8 @@ const SizeTable = function (props) {
   return (
     <div>
       {contextHolder}
-      {console.log(data)}
+      <SockJs connectTo={"size-topic"} setValues={setData} />
+
       <Table
         pagination={{
           showSizeChanger: true,

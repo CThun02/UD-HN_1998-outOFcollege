@@ -76,7 +76,7 @@ function Shop() {
       <SockJs setValues={setProducts} connectTo={"productDetailShop-topic"} />
       <div className={styles.shop}>
         <div className={styles.breadCrumb}>
-          <BreadCrumb title={"Shop"} items={items} />
+          <BreadCrumb title={"Cửa hàng"} items={items} />
         </div>
         <div className={styles.divider}>
           <div className={styles.dividerSize}>

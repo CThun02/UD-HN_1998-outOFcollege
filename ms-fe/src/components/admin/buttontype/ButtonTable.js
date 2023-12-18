@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import styles from "../categorystyles/CategoryStyles.module.css";
 import axios from "axios";
 import { getToken } from "../../../service/Token";
+import SockJs from "../../../service/SockJs";
 
 const ButtonTable = function (props) {
   const [data, setData] = useState([]);
@@ -125,6 +126,7 @@ const ButtonTable = function (props) {
   return (
     <div>
       {contextHolder}
+      <SockJs connectTo={"button-topic"} setValues={setData} />
       <Table
         pagination={{
           showSizeChanger: true,

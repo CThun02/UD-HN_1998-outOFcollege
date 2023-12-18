@@ -1,5 +1,6 @@
 package com.fpoly.ooc.request.product;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fpoly.ooc.common.Commons;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,8 +16,8 @@ import java.util.List;
 @NoArgsConstructor
 public class ProductDetailCondition {
     private String productName;
-    private BigDecimal minPrice;
-    private BigDecimal maxPrice;
+    private String minPrice;
+    private String maxPrice;
     private List<Long> categories;
     private List<Long> brands;
     private List<Long> colors;
@@ -40,11 +41,11 @@ public class ProductDetailCondition {
     }
 
     public BigDecimal getMinPrice() {
-        return isValidPrice(minPrice);
+        return isValidPrice(convertStringToBigDecimal(minPrice));
     }
 
     public BigDecimal getMaxPrice() {
-        return isValidPrice(maxPrice);
+        return isValidPrice(convertStringToBigDecimal(maxPrice));
     }
 
     public List<Long> getSizes() {
@@ -53,6 +54,19 @@ public class ProductDetailCondition {
 
     public String getSort() {
         return StringUtils.isNotEmpty(Commons.lower(sort)) ? Commons.lower(sort) : null;
+    }
+
+    private BigDecimal convertStringToBigDecimal(String value) {
+        if (StringUtils.isBlank(value)) {
+            return null;
+        }
+
+        String replace = null;
+        if (value.contains(",")) {
+            replace = value.replace(",", "");
+        }
+
+        return StringUtils.isNotBlank(replace) ? new BigDecimal(replace) : null;
     }
 
     private List<Long> isCheckNullList(List<Long> lists) {

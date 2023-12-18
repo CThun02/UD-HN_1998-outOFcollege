@@ -3,6 +3,8 @@ import styles from "./Description.module.css";
 import { useState } from "react";
 import ComponentDetail from "./ComponentDetail";
 
+const image = "/change-size/change-size.jpg";
+
 function Description({ productDetail }) {
   const [tab, setTab] = useState("description");
 
@@ -139,11 +141,11 @@ function Description({ productDetail }) {
           )}
           {tab === "exchangeSize" && (
             <div
-              className={`${styles.cssParagraph} ${
+              className={`${styles.flexCenter} ${styles.cssParagraph} ${
                 tab === "exchangeSize" ? styles.open : styles.hidden
               }`}
             >
-              exchangeSize
+              <img src={image} alt="change-size-option" />
             </div>
           )}
         </div>

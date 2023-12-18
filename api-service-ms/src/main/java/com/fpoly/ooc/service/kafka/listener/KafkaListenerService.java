@@ -256,7 +256,7 @@ public class KafkaListenerService {
 
         if(Objects.nonNull(shirtTailDb)) {
             String shirtTailsJson = objectMapper.writeValueAsString(shirtTailTypeDAORepository.findAll());
-            template.convertAndSend("/topic/shirtTail-topic", shirtTailsJson);
+            template.convertAndSend("/topic/size-topic", shirtTailsJson);
             log.info("ShirtTailTypeJson: " + shirtTailsJson);
         }
     }

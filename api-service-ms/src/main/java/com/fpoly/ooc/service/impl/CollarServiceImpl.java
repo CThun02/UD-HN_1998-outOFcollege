@@ -14,6 +14,7 @@ import com.fpoly.ooc.request.collar.CollarRequest;
 import com.fpoly.ooc.service.interfaces.CollarServiceI;
 import com.fpoly.ooc.service.kafka.KafkaUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -62,7 +63,7 @@ public class CollarServiceImpl implements CollarServiceI {
 
     @Override
     public List<CollarType> findAll() {
-        return repo.findAll();
+        return repo.findAll(Sort.by(Sort.Order.desc("createdAt")));
     }
 
     @Override

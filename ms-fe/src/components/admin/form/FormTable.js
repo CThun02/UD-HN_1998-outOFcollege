@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 import styles from "./FormStyle.module.css";
 import axios from "axios";
 import { getToken } from "../../../service/Token";
+import SockJs from "../../../service/SockJs";
 
 const FormTable = function (props) {
   const [data, setData] = useState([]);
@@ -122,6 +123,8 @@ const FormTable = function (props) {
 
   return (
     <div>
+      <SockJs connectTo={"form-topic"} setValues={setData} />
+
       <Table
         pagination={{
           showSizeChanger: true,

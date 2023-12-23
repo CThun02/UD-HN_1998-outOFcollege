@@ -671,7 +671,15 @@ const BillTimeLine = (addId) => {
                                 <span>Ngày mua hàng</span>
                             </Col>
                             <Col span={12}>
-                                <SpanBorder child={billInfo.createdDate} color={"#1677ff"} />
+                                <SpanBorder child={billInfo?.createdDate} color={"#1677ff"} />
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col span={12}>
+                                <span>Ngày nhận hàng</span>
+                            </Col>
+                            <Col span={12}>
+                                <SpanBorder child={billInfo?.completionDate ?? '__'} color={"#1677ff"} />
                             </Col>
                         </Row>
                         <Row>
@@ -782,6 +790,16 @@ const BillTimeLine = (addId) => {
                                                         style: "currency",
                                                         currency: "VND",
                                                     })}
+                                        </span>
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Col span={10}>
+                                        <span>Ghi chú</span>
+                                    </Col>
+                                    <Col span={14}>
+                                        <span>
+                                            {(billInfo?.note ?? '__')}
                                         </span>
                                     </Col>
                                 </Row>

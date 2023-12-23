@@ -213,7 +213,8 @@ public class TimeLineServiceImpl implements TimeLineService {
                         getInfo.getBillType(), getInfo.getTotalPrice(), getInfo.getPriceReduce(), getInfo.getShipPrice(),
                         getInfo.getAmountPaid(), getInfo.getShipDate(), getInfo.getCreatedDate(), getInfo.getFullName(),
                         getInfo.getPhoneNumber(), getInfo.getAddressId(), getInfo.getAddressDetaill(), getInfo.getWard(),
-                        getInfo.getDistrict(), getInfo.getCity(), getInfo.getStatus(), getInfo.getVoucherPrice(), getInfo.getAccountName());
+                        getInfo.getDistrict(), getInfo.getCity(), getInfo.getStatus(), getInfo.getVoucherPrice(),
+                        getInfo.getAccountName(), getInfo.getCompletionDate(), getInfo.getNote());
 
         billInfoResponse.setLstPaymentDetail(paymentService.findPaymentDetailByBillId(id));
         return billInfoResponse;

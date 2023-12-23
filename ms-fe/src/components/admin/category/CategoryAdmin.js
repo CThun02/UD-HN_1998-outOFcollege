@@ -55,7 +55,6 @@ const CategoryAdmin = function ({ isAdmin }) {
       })
       .catch((error) => {
         // Xử lý lỗi
-        console.error("Lỗi khi thêm dữ liệu", error);
         const status = error?.response?.data?.status;
         if (status === 403) {
           message.error("Bạn không có quyền xem nội dung này");
@@ -92,7 +91,7 @@ const CategoryAdmin = function ({ isAdmin }) {
                 type="primary"
               >
                 <PlusOutlined className={styles.faPlus} />
-                <span className={styles.titleSeach}>Thêm Thể Loại</span>
+                <span className={styles.titleSeach}></span>
               </Button>
             </Col>
           ) : null}

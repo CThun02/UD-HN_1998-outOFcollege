@@ -171,9 +171,17 @@ values(1,'https://firebasestorage.googleapis.com/v0/b/outofcollge.appspot.com/o/
 (39,'https://firebasestorage.googleapis.com/v0/b/outofcollge.appspot.com/o/products%2FPants%20B%2FRed%2F1700578136416Pants_B222421342?alt=media&token=a0d4cd96-15c7-4e4c-a215-fb127b996ed2','ACTIVE'),
 (40,'https://firebasestorage.googleapis.com/v0/b/outofcollge.appspot.com/o/products%2FPants%20B%2FRed%2F1700578136416Pants_B222421342?alt=media&token=a0d4cd96-15c7-4e4c-a215-fb127b996ed2','ACTIVE');
 
-select * from product_detail
-select * from product_image
 insert into payment(payment_name, status)
 values('Cash','ACTIVE'),
 ('Credit Card', 'ACTIVE');
+
+insert into role(role_name, status)
+values('ROLE_ADMIN', 'ACTIVE'),
+		('ROLE_CUSTOMER', 'ACTIVE'),
+		('ROLE_EMPLOYEE', 'ACTIVE');
+
+insert into account(username,full_name, role_id, dob, gender, phone_number, email, id_no, password, status)
+values('admin', 'ADMIN',1,'09-09-2000',1,'0987654321','kienptph26901', '01828312832','123', 'ACTIVE'),
+('usser', 'USER', 2,'09-09-2000',1,'0987654321','kienptph26901', '01828312852','123', 'ACTIVE'),
+('employee','EMPLOYEE', 3,'09-09-2000',1,'0987654321','kienptph26901', '01828382832','123', 'ACTIVE')
 

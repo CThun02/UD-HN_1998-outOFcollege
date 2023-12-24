@@ -67,18 +67,20 @@ public interface TimeLineRepo extends JpaRepository<Timeline, Long> {
             @Param("count") Integer count,
             @Param("createdBy") String createdBy);
 
+    @Query("SELECT NEW java.lang.Long(COUNT(timline)) FROM Timeline timline where timline.bill.id = ?1")
+    Long getCountTimelineByBillId(Long billId);
+
     @Query("SELECT new com.fpoly.ooc.responce.bill.BillInfoResponse(b.id, b.billCode,b.transactionCode, b.symbol, b.billType, " +
             "    b.price, b.priceReduce, dn.shipPrice, b.amountPaid, dn.shipDate, b.createdAt, " +
             "    add.fullName, add.sdt, add.id, " +
-            "    add.descriptionDetail, add.ward, add.district, add.city, b.status, vh.priceReduce) " +
+            "    add.descriptionDetail, add.ward, add.district, add.city, b.status, vh.priceReduce, acc.fullName, b.completionDate," +
+            "    b.note) " +
             "FROM Bill b " +
             "   LEFT JOIN DeliveryNote dn ON b.id = dn.bill.id " +
             "   LEFT JOIN Address add ON add.id = dn.address.id " +
             "   LEFT JOIN VoucherHistory vh ON vh.bill.id = b.id " +
-            "WHERE b.id = :billId")
-    BillInfoResponse getBillInfoByIdBillId(@Param("billId") Long id);
-
-    @Query("SELECT NEW java.lang.Long(COUNT(timline)) FROM Timeline timline where timline.bill.id = ?1")
-    Long getCountTimelineByBillId(Long billId);
+            "   LEFT JOIN Account acc ON acc.username = b.account.username " +
+            "WHERE b.id = :billId ")
+    List<BillInfoResponse> getBillInfoByIdBillId(@Param("billId") Long id);
 }
 

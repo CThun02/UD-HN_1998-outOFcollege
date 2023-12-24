@@ -10,6 +10,7 @@ import com.fpoly.ooc.request.material.MaterialRequest;
 import com.fpoly.ooc.service.interfaces.MaterialServiceI;
 import com.fpoly.ooc.service.kafka.KafkaUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -58,7 +59,7 @@ public class MaterialServiceImpl implements MaterialServiceI {
 
     @Override
     public List<Material> findAll() {
-        return repo.findAll();
+        return repo.findAll(Sort.by(Sort.Order.desc("createdAt")));
     }
 
     @Override

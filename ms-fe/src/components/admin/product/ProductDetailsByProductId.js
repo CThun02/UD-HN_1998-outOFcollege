@@ -192,7 +192,7 @@ const ProductDetails = (props) => {
         );
       },
     },
-    
+
     {
       key: "status",
       dataIndex: "status",
@@ -203,21 +203,21 @@ const ProductDetails = (props) => {
             checkedChildren={<CheckOutlined />}
             unCheckedChildren={<CloseOutlined />}
             checked={record.status === "ACTIVE"}
-            onChange={event=>{
-              if(record.quantity<=0){
+            onChange={event => {
+              if (record.quantity <= 0) {
                 notification.error({
-                  message:"Thông báo",
-                  description:"Sản phẩm không có số lượng tồn để bật kinh doanh!"
+                  message: "Thông báo",
+                  description: "Sản phẩm không có số lượng tồn để bật kinh doanh!"
                 })
-            }else{
-              var productDetail = {...record}
-              productDetail.status = event?"ACTIVE":"INACTIVE"
-              updateProductDetail(productDetail,
-                                true,
-                                index);
-            }
+              } else {
+                var productDetail = { ...record }
+                productDetail.status = event ? "ACTIVE" : "INACTIVE"
+                updateProductDetail(productDetail,
+                  true,
+                  index);
+              }
             }}
-        />
+          />
         );
       },
     },
@@ -1117,10 +1117,10 @@ const ProductDetails = (props) => {
                                   onConfirm={() =>
                                     record.productImageResponse?.length === 1
                                       ? notification.warning({
-                                          message: "Thông báo",
-                                          description:
-                                            "Mỗi sản phẩm phải có ít nhất một ảnh!",
-                                        })
+                                        message: "Thông báo",
+                                        description:
+                                          "Mỗi sản phẩm phải có ít nhất một ảnh!",
+                                      })
                                       : deleteProductImage(productImage)
                                   }
                                   okText="Xóa"
@@ -1136,7 +1136,7 @@ const ProductDetails = (props) => {
                       );
                     })}
                   {record.productImageResponse?.length < 3 &&
-                  props.isAdmin === true ? (
+                    props.isAdmin === true ? (
                     <Col span={6}>
                       <Spin
                         tip="Vui lòng chờ..."
@@ -1798,7 +1798,6 @@ const ProductDetails = (props) => {
                 productDetail.quantity === "" ||
                 productDetail.weight === ""
               ) {
-                setLoading(false);
                 notification.error({
                   message: "Thông báo",
                   description: (
@@ -1814,17 +1813,21 @@ const ProductDetails = (props) => {
                   ),
                 });
               } else {
-                updateProductDetail(productDetail);
-                notification.success({
-                  message: "Thông báo",
-                  description: <span>Chỉnh sửa sản phẩm thành công</span>,
-                });
+                updateProductDetail(productDetail, false);
+
               }
             }
           }
         }
         setSelectedRowKeys([]);
-        setRender(Math.random());
+        setTimeout(() => {
+          setLoading(false);
+          setRender(Math.random());
+          notification.success({
+            message: "Thông báo",
+            description: <span>Chỉnh sửa sản phẩm thành công</span>,
+          });
+        }, 1000)
         setLoadingUpdateProducts(false);
       },
     });
@@ -1835,34 +1838,34 @@ const ProductDetails = (props) => {
     axios
       .get(
         api +
-          "product/filterProductDetailByIdCom?productId=" +
-          productId +
-          "&brandId=" +
-          brand +
-          "&categoryId=" +
-          category +
-          "&buttonId=" +
-          button +
-          "&materialId=" +
-          material +
-          "&shirtTailId=" +
-          shirtTail +
-          "&sleeveId=" +
-          sleeve +
-          "&collarId=" +
-          collar +
-          "&colorId=" +
-          color +
-          "&sizeId=" +
-          size +
-          "&patternId=" +
-          pattern +
-          "&formId=" +
-          form +
-          "&minPrice=" +
-          price[0] +
-          "&maxPrice=" +
-          price[1],
+        "product/filterProductDetailByIdCom?productId=" +
+        productId +
+        "&brandId=" +
+        brand +
+        "&categoryId=" +
+        category +
+        "&buttonId=" +
+        button +
+        "&materialId=" +
+        material +
+        "&shirtTailId=" +
+        shirtTail +
+        "&sleeveId=" +
+        sleeve +
+        "&collarId=" +
+        collar +
+        "&colorId=" +
+        color +
+        "&sizeId=" +
+        size +
+        "&patternId=" +
+        pattern +
+        "&formId=" +
+        form +
+        "&minPrice=" +
+        price[0] +
+        "&maxPrice=" +
+        price[1],
         {
           headers: {
             Authorization: `Bearer ${getToken(true)}`,
@@ -1969,7 +1972,7 @@ const ProductDetails = (props) => {
   }
 
   useEffect(() => {
-    if(product?.status === "INACTIVE"){
+    if (product?.status === "INACTIVE") {
       notification.error({
         message: "Thông báo",
         description: "Vui lòng bật trạng thái kinh doanh của sản phẩm để tiếp tục!",
@@ -2238,7 +2241,7 @@ const ProductDetails = (props) => {
       <ProductOpenActive
         product={product}
         render={() => setRender(Math.random())}
-        onCancel={() => {}}
+        onCancel={() => { }}
         open={product?.status === "INACTIVE"}
       />
       <Spin
@@ -2281,13 +2284,13 @@ const ProductDetails = (props) => {
               </Button>
             </div>
           </Modal>
-          <h2 style={{marginBottom:"24px"}}>
+          <h2 style={{ marginBottom: "24px" }}>
             <FilePptOutlined /> Chỉnh sửa sản phẩm - {product.productName} <EditFilled
-                        disabled={!props.isAdmin}
-                        onClick={() => {
-                          showModal(true)
-                        }}
-                      />
+              disabled={!props.isAdmin}
+              onClick={() => {
+                showModal(true)
+              }}
+            />
           </h2>
           <Modal
             title={product.productCode}
@@ -2301,32 +2304,32 @@ const ProductDetails = (props) => {
                 <p style={{ fontWeight: 500 }}>
                   sản phẩm{"  "}
                 </p>
-                  <Input
-                    size="small"
-                    value={product.productName}
-                    onChange={(event) =>
-                      handleSetProduct("productName", event.target.value)
-                    }
-                    status={product.productName.trim() === "" ? "error" : ""}
-                  />
+                <Input
+                  size="small"
+                  value={product.productName}
+                  onChange={(event) =>
+                    handleSetProduct("productName", event.target.value)
+                  }
+                  status={product.productName.trim() === "" ? "error" : ""}
+                />
               </Col>
               <Col span={24}>
                 <span style={{ fontWeight: 500 }}>Mô tả</span>
-                  <TextArea
-                    onChange={(event) =>
-                      handleSetProduct("description", event.target.value)
-                    }
-                    value={product.description}
-                  />
-                  <div style={{ textAlign: "center", marginTop: "10px" }}>
-                    <Button
-                      disabled={!props.isAdmin}
-                      onClick={updateProduct}
-                      type="primary"
-                    >
-                      Xác nhận
-                    </Button>
-                  </div>
+                <TextArea
+                  onChange={(event) =>
+                    handleSetProduct("description", event.target.value)
+                  }
+                  value={product.description}
+                />
+                <div style={{ textAlign: "center", marginTop: "10px" }}>
+                  <Button
+                    disabled={!props.isAdmin}
+                    onClick={updateProduct}
+                    type="primary"
+                  >
+                    Xác nhận
+                  </Button>
+                </div>
               </Col>
             </Row>
           </Modal>

@@ -35,10 +35,10 @@ public class BillInfoResponse {
 
     private BigDecimal amountPaid;
 
-    @JsonFormat(pattern = "dd/MM/yyyy ")
+    @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDateTime shipDate;
 
-    @JsonFormat(pattern = "HH:mm:ss dd/MM/yyyy ")
+    @JsonFormat(pattern = "HH:mm:ss dd/MM/yyyy")
     private LocalDateTime createdDate;
 
     private String fullName;
@@ -59,13 +59,21 @@ public class BillInfoResponse {
 
     private BigDecimal voucherPrice;
 
+    private String accountName;
+
+    @JsonFormat(pattern = "HH:mm:ss dd/MM/yyyy")
+    private LocalDateTime completionDate;
+
+    private String note;
+
     private List<PaymentDetailResponse> lstPaymentDetail;
 
     public BillInfoResponse(Long billId, String billCode, String transaction, String symbol, String billType,
                             BigDecimal totalPrice, BigDecimal priceReduce, BigDecimal shipPrice, BigDecimal amountPaid,
                             LocalDateTime shipDate, LocalDateTime createdDate, String fullName, String phoneNumber,
                             Long addressId, String addressDetaill, String ward, String district, String city,
-                            String status, BigDecimal voucherPrice) {
+                            String status, BigDecimal voucherPrice, String accountName, LocalDateTime completionDate,
+                            String note) {
         this.billId = billId;
         this.billCode = billCode;
         this.transaction = transaction;
@@ -86,5 +94,8 @@ public class BillInfoResponse {
         this.city = city;
         this.status = status;
         this.voucherPrice = voucherPrice;
+        this.accountName = accountName;
+        this.completionDate = completionDate;
+        this.note = note;
     }
 }

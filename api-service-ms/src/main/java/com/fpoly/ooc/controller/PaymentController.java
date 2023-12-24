@@ -250,7 +250,7 @@ public class PaymentController {
             emailDetails.setMessageBody(messagesBody);
             emailDetails.setSubject("THÔNG BÁO XÁC NHẬN ĐƠN HÀNG " + bill.getBillCode());
             emailService.sendSimpleMail(emailDetails);
-            response.sendRedirect("http://localhost:3000/ms-shop");
+            response.sendRedirect("http://localhost:3000/ms-shop/");
         } else {
             Bill bill = billRepo.findById(billId).orElseThrow(() -> new NotFoundException("Bill id không tồn tại"));
             bill.setTransactionCode(transactionNo);

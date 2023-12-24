@@ -11,6 +11,7 @@ import com.fpoly.ooc.request.buttontype.ButtonTypeRequest;
 import com.fpoly.ooc.service.interfaces.ButtonTypeServiceI;
 import com.fpoly.ooc.service.kafka.KafkaUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -59,7 +60,7 @@ public class ButtonTypeServiceImpl implements ButtonTypeServiceI {
 
     @Override
     public List<ButtonType> findAll() {
-        return repo.findAll();
+        return repo.findAll(Sort.by(Sort.Order.desc("createdAt")));
     }
 
     @Override

@@ -50,11 +50,11 @@ const validationSchema = Yup.object().shape({
     .matches(/^[0-9,]+$/, "Sai định dạng")
     .test(
       "promotion-value",
-      "* Giá trị không được vượt quá 100%",
+      "* Giá trị giảm phải nằm trong khoảng 1 -> 50%",
       function (promotionValue) {
         const { promotionMethod } = this.parent;
         if (promotionValue && promotionMethod !== "vnd") {
-          return promotionValue < 100;
+          return promotionValue < 50 && promotionValue > 0;
         }
         return true;
       }
@@ -189,8 +189,8 @@ function CreatePromotion() {
                   ),
                   promotionValue: isNaN(promotion?.promotionValue)
                     ? Number.parseInt(
-                        promotion?.promotionValue?.replace(/,/g, "")
-                      )
+                      promotion?.promotionValue?.replace(/,/g, "")
+                    )
                     : promotion?.promotionValue,
                   promotionId: promotion?.promotionId
                     ? promotion?.promotionId
@@ -414,7 +414,7 @@ function CreatePromotion() {
                                   status={
                                     (touched.promotionName &&
                                       errors.promotionName) ||
-                                    errorsServer?.promotionName
+                                      errorsServer?.promotionName
                                       ? "error"
                                       : "success"
                                   }
@@ -491,7 +491,7 @@ function CreatePromotion() {
                                   status={
                                     (touched.promotionValue &&
                                       errors.promotionValue) ||
-                                    errorsServer?.promotionValue
+                                      errorsServer?.promotionValue
                                       ? "error"
                                       : "success"
                                   }
@@ -540,7 +540,7 @@ function CreatePromotion() {
                                   }
                                   status={
                                     (touched.startDate && errors.startDate) ||
-                                    errorsServer?.startDate
+                                      errorsServer?.startDate
                                       ? "error"
                                       : "success"
                                   }
@@ -585,7 +585,7 @@ function CreatePromotion() {
                                   onBlur={handleBlur}
                                   status={
                                     (touched.endDate && errors.endDate) ||
-                                    errorsServer?.endDate
+                                      errorsServer?.endDate
                                       ? "error"
                                       : "success"
                                   }

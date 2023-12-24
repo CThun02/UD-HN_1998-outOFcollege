@@ -25,6 +25,7 @@ import com.fpoly.ooc.service.interfaces.NotificationService;
 import com.fpoly.ooc.service.interfaces.PaymentService;
 import com.fpoly.ooc.service.interfaces.ProductImageServiceI;
 import com.fpoly.ooc.service.interfaces.TimeLineService;
+import com.fpoly.ooc.util.CommonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -199,13 +201,21 @@ public class TimeLineServiceImpl implements TimeLineService {
 
     @Override
     public BillInfoResponse getBillInfoByBillId(Long id) {
-        BillInfoResponse getInfo = timeLineRepo.getBillInfoByIdBillId(id);
+        List<BillInfoResponse> getInfoList = timeLineRepo.getBillInfoByIdBillId(id);
+
+        BillInfoResponse getInfo = CommonUtils.getOneElementsInArrays(getInfoList);
+
+        if (Objects.isNull(getInfo)) {
+            return null;
+        }
+
         BillInfoResponse billInfoResponse =
                 new BillInfoResponse(getInfo.getBillId(), getInfo.getBillCode(), getInfo.getTransaction(), getInfo.getSymbol(),
                         getInfo.getBillType(), getInfo.getTotalPrice(), getInfo.getPriceReduce(), getInfo.getShipPrice(),
                         getInfo.getAmountPaid(), getInfo.getShipDate(), getInfo.getCreatedDate(), getInfo.getFullName(),
                         getInfo.getPhoneNumber(), getInfo.getAddressId(), getInfo.getAddressDetaill(), getInfo.getWard(),
-                        getInfo.getDistrict(), getInfo.getCity(), getInfo.getStatus(), getInfo.getVoucherPrice());
+                        getInfo.getDistrict(), getInfo.getCity(), getInfo.getStatus(), getInfo.getVoucherPrice(),
+                        getInfo.getAccountName(), getInfo.getCompletionDate(), getInfo.getNote());
 
         billInfoResponse.setLstPaymentDetail(paymentService.findPaymentDetailByBillId(id));
         return billInfoResponse;

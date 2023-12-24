@@ -217,6 +217,7 @@ public class AccountServiceImpl implements AccountService {
                     .gender(account.getGender())
                     .email(account.getEmail())
                     .numberPhone(account.getNumberPhone())
+                    .accountAddress(account.getAddAdress().stream().map(e->e.getAddressDetail()).collect(Collectors.toList()))
                     .build();
             lstAccountDetailResponces.add(accountDetailResponce);
         }

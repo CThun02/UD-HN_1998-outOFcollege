@@ -66,6 +66,10 @@ public class BillDetailServiceImpl implements BillDetailService {
                 throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BUY_QUANTITY_THAN_QUANTITY_IN_STORE));
             }
 
+            if (billDetail.getQuantity() - request.getQuantity() < 0) {
+                throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BUY_QUANTITY_THAN_QUANTITY_IN_STORE));
+            }
+
             if (billDetail.getQuantity() > request.getQuantity()) {
                 productDetail.setQuantity(productDetail.getQuantity() +
                         (billDetail.getQuantity()) - request.getQuantity());
@@ -137,9 +141,9 @@ public class BillDetailServiceImpl implements BillDetailService {
         ProductDetail productDetail = productDetailService.findById(billDetail.getProductDetail().getId());
         Integer quantityUpdayte = productDetail.getQuantity() + billDetail.getQuantity();
         productDetail.setQuantity(quantityUpdayte);
-        try{
+        try {
             productDetailService.update(productDetail);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

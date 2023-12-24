@@ -3,6 +3,7 @@ package com.fpoly.ooc.service.interfaces;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.dto.ProductDetailsDTO;
 import com.fpoly.ooc.entity.ProductDetail;
+import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.request.product.ProductDetailCondition;
 import com.fpoly.ooc.request.product.ProductDetailRequest;
 import com.fpoly.ooc.request.productDetail.GetSizeAndColorRequest;
@@ -21,14 +22,14 @@ import java.util.Optional;
 
 public interface ProductDetailServiceI {
     public ProductDetail create(ProductDetail productDetail) throws JsonProcessingException;
-    public ProductDetail update(ProductDetail productDetail) throws JsonProcessingException;
+    public ProductDetail update(ProductDetail productDetail) throws JsonProcessingException, NotFoundException;
     public Boolean delete(Long id);
     public ProductDetail getOne(Long id);
     public List<ProductDetailDisplayResponse> filterProductDetailsByIdCom(ProductDetailRequest request,
                                                                           BigDecimal minPrice, BigDecimal maxPrice);
     public ProductDetailDisplayResponse getOnePDDisplayById(Long id);
     public List<ProductDetailResponse> searchProductDetail(String keyWords);
-    ProductDetail findById(Long id);
+    ProductDetail findById(Long id) throws NotFoundException;
     List<Long> findAllIdsResponseProductDetails(Long idPromotion);
     List<ProductsDetailsResponse> findListProductdetailsByListProductId(ProductDetailsDTO productDetailsDTO);
     public BigDecimal getMaxPricePDByProductId(Long productId);
@@ -37,7 +38,7 @@ public interface ProductDetailServiceI {
     public void updateProductDetailsByProductId(Long productId, String status);
     Optional<List<ProductDetailShop>> getAllProductDetailShop(ProductDetailCondition req);
     Optional<BigDecimal> getPriceMax();
-    Optional<GetColorAndSizeAndQuantity> getColorAndSize(GetSizeAndColorRequest req);
-    Optional<ProductDetailShopResponse> getProductDetailsShop(GetSizeAndColorRequest req);
+    Optional<GetColorAndSizeAndQuantity> getColorAndSize(GetSizeAndColorRequest req) throws NotFoundException;
+    Optional<ProductDetailShopResponse> getProductDetailsShop(GetSizeAndColorRequest req) throws NotFoundException;
 
 }

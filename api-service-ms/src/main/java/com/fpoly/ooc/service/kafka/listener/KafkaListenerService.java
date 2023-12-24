@@ -319,12 +319,11 @@ public class KafkaListenerService {
     }
 
     @KafkaListener(topics = Const.TOPIC_PRODUCT_DETAIL, groupId = Const.KAFKA_GROUP_ID)
-    public void listenerAddProductDetail(String productDetailJson) throws JsonProcessingException {
+    public void listenerAddProductDetail(String productDetailJson) throws JsonProcessingException, NotFoundException {
         ProductDetail productDetail = null;
         if (StringUtils.isNotBlank(productDetailJson)) {
             productDetail = objectMapper.readValue(productDetailJson, ProductDetail.class);
         }
-
 
         if(Objects.nonNull(productDetail)) {
             ProductDetail productDetailDb = productDetailDAORepositoryI.save(productDetail);

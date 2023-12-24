@@ -17,7 +17,7 @@ import java.util.Objects;
 @Slf4j
 public class CommonUtils {
 
-    public static Account isValidArraysAccount(List<Account> accounts) {
+    public static Account isValidArraysAccount(List<Account> accounts) throws NotFoundException {
         Account account = null;
 
         if (CollectionUtils.isEmpty(accounts)) {

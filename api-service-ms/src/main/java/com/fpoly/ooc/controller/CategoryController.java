@@ -3,6 +3,7 @@ package com.fpoly.ooc.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.entity.Brand;
 import com.fpoly.ooc.entity.Category;
+import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.request.category.CategoryRequest;
 import com.fpoly.ooc.request.form.FormRequest;
 import com.fpoly.ooc.service.interfaces.CategoryServiceI;
@@ -25,13 +26,13 @@ public class CategoryController {
     }
 
     @PostMapping("")
-    public ResponseEntity<?> create(@RequestParam String categoryName) throws JsonProcessingException {
+    public ResponseEntity<?> create(@RequestParam String categoryName) throws JsonProcessingException, NotFoundException {
         Category category = Category.builder().categoryName(categoryName).build();
         return ResponseEntity.ok(service.create(category));
     }
 
     @PostMapping("create")
-    public ResponseEntity<?> create(@RequestBody Category category) throws JsonProcessingException {
+    public ResponseEntity<?> create(@RequestBody Category category) throws JsonProcessingException, NotFoundException {
         return ResponseEntity.ok(service.create(category));
     }
 
@@ -40,7 +41,7 @@ public class CategoryController {
         return ResponseEntity.ok(service.update(category, id));
     }
     @PutMapping("update/{id}")
-    public ResponseEntity<?> updateStatus(@RequestBody CategoryRequest request, @PathVariable Long id){
+    public ResponseEntity<?> updateStatus(@RequestBody CategoryRequest request, @PathVariable Long id) throws NotFoundException {
         return ResponseEntity.ok(service.updateStatus(request, id).getId());
     }
 

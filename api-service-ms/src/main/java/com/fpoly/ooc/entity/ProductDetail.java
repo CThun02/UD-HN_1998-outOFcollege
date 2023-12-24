@@ -458,6 +458,9 @@ public class ProductDetail extends BaseEntity {
     @Column(name = "weight")
     private Float weight;
 
+    @Column(name = "version")
+    private Long version;
+
     @Column(name = "description_detail")
     private String descriptionDetail;
 

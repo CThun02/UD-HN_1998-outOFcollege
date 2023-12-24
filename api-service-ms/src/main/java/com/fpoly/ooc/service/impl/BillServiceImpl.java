@@ -5,27 +5,44 @@ import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
 import com.fpoly.ooc.dto.BillStatusDTO;
 import com.fpoly.ooc.dto.NotificationDTO;
-import com.fpoly.ooc.dto.VoucherAccountConditionDTO;
-import com.fpoly.ooc.dto.VoucherAccountUsedDTO;
-import com.fpoly.ooc.entity.*;
+import com.fpoly.ooc.entity.Account;
+import com.fpoly.ooc.entity.Address;
+import com.fpoly.ooc.entity.Bill;
+import com.fpoly.ooc.entity.BillDetail;
+import com.fpoly.ooc.entity.DeliveryNote;
+import com.fpoly.ooc.entity.Payment;
+import com.fpoly.ooc.entity.PaymentDetail;
+import com.fpoly.ooc.entity.ProductDetail;
+import com.fpoly.ooc.entity.Timeline;
+import com.fpoly.ooc.entity.Voucher;
+import com.fpoly.ooc.entity.VoucherAccount;
+import com.fpoly.ooc.entity.VoucherHistory;
 import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.BillDetailRepo;
 import com.fpoly.ooc.repository.BillRepo;
 import com.fpoly.ooc.repository.PaymentDetailRepo;
 import com.fpoly.ooc.repository.TimeLineRepo;
-import com.fpoly.ooc.repository.VoucherHistoryRepository;
 import com.fpoly.ooc.request.bill.BillDetailRequest;
 import com.fpoly.ooc.request.bill.BillRequest;
 import com.fpoly.ooc.request.product.ProductDetailRequest;
-import com.fpoly.ooc.request.voucher.VoucherRequest;
-import com.fpoly.ooc.responce.bill.*;
 import com.fpoly.ooc.responce.account.GetListCustomer;
+import com.fpoly.ooc.responce.bill.BillGrowthResponse;
+import com.fpoly.ooc.responce.bill.BillLineChartResponse;
+import com.fpoly.ooc.responce.bill.BillManagementResponse;
+import com.fpoly.ooc.responce.bill.BillResponse;
+import com.fpoly.ooc.responce.bill.BillReturnRequestResponse;
+import com.fpoly.ooc.responce.bill.BillReturnResponse;
+import com.fpoly.ooc.responce.bill.BillRevenue;
+import com.fpoly.ooc.responce.bill.BillRevenueCompare;
+import com.fpoly.ooc.responce.bill.BillRevenueCompareDate;
+import com.fpoly.ooc.responce.bill.BillRevenueDisplay;
+import com.fpoly.ooc.responce.bill.CountQuantityBillResponse;
 import com.fpoly.ooc.responce.product.ProductDetailDisplayResponse;
 import com.fpoly.ooc.responce.product.ProductDetailResponse;
 import com.fpoly.ooc.responce.product.ProductDetailSellResponse;
-import com.fpoly.ooc.responce.product.ProductImageResponse;
 import com.fpoly.ooc.responce.timeline.TimelineProductDisplayResponse;
 import com.fpoly.ooc.responce.timeline.TimelineProductResponse;
+import com.fpoly.ooc.service.interfaces.AccountService;
 import com.fpoly.ooc.service.interfaces.BillService;
 import com.fpoly.ooc.service.interfaces.DeliveryNoteService;
 import com.fpoly.ooc.service.interfaces.EmailService;
@@ -35,19 +52,19 @@ import com.fpoly.ooc.service.interfaces.VoucherAccountService;
 import com.fpoly.ooc.service.interfaces.VoucherHistoryService;
 import com.fpoly.ooc.service.interfaces.VoucherService;
 import com.fpoly.ooc.service.kafka.KafkaUtil;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @Slf4j
@@ -92,13 +109,18 @@ public class BillServiceImpl implements BillService {
     @Autowired
     private KafkaUtil kafkaUtil;
 
-    @Transactional
-    @Override
-    public Bill createBill(BillRequest request) throws JsonProcessingException {
-        Account accountBuilder = null;
+    @Autowired
+    private AccountService accountService;
 
-        if (request.getAccountId() != null) {
-            accountBuilder = Account.builder().username(request.getAccountId()).build();
+    @Override
+    @Transactional(rollbackOn = Exception.class)
+    public Bill createBill(BillRequest request) throws JsonProcessingException, NotFoundException {
+        Account accountBuilder = null;
+        Boolean isUser = Boolean.FALSE;
+
+        if (Objects.nonNull(request.getAccountId())) {
+            isUser = Boolean.TRUE;
+            accountBuilder = accountService.findByUsername(request.getAccountId());
         }
 
         Bill bill = Bill.builder()
@@ -124,24 +146,32 @@ public class BillServiceImpl implements BillService {
         }
 
         for (BillDetailRequest billDetailRequest : request.getLstBillDetailRequest()) {
+            ProductDetail productDetail = productDetailService.findById(billDetailRequest.getProductDetailId());
+
+            if (Objects.isNull(productDetail)) {
+                throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_SERVICE));
+            }
+
+            if (productDetail.getQuantity() - billDetailRequest.getQuantity() < 0) {
+                throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BUY_QUANTITY_THAN_QUANTITY_IN_STORE));
+            }
+
             BillDetail billDetail = BillDetail.builder()
                     .bill(bill)
                     .productDetail(ProductDetail.builder().id(billDetailRequest.getProductDetailId()).build())
                     .price(billDetailRequest.getPrice())
                     .quantity(billDetailRequest.getQuantity())
-                    .status(Const.STATUS_INACTIVE)
+                    .status(Const.STATUS_ACTIVE)
                     .build();
-            BillDetail billDetail1 = billDetailRepo.save(billDetail);
+            BillDetail billDetailDb = billDetailRepo.save(billDetail);
 
-            if (billDetail1 != null) {
-                ProductDetail productDetail = productDetailService.getOne(billDetail.getProductDetail().getId());
-                productDetail.setQuantity(productDetail.getQuantity() - billDetail.getQuantity());
-                try {
-                    productDetailService.update(productDetail);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+            BillDetail findBill = billDetailRepo.findById(billDetailDb.getId()).orElse(null);
+            if (Objects.isNull(findBill)) {
+                throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_SERVICE));
             }
+
+            productDetail.setQuantity(productDetail.getQuantity() - billDetail.getQuantity());
+            productDetailService.update(productDetail);
         }
 
         if (request.getPaymentDetailId() == 3) {
@@ -182,11 +212,17 @@ public class BillServiceImpl implements BillService {
             timeLineRepo.save(timeline);
         }
 
-        if (request.getVoucherCode() != null) {
-            Voucher voucher = voucherService.findVoucherByVoucherCode(request.getVoucherCode());
-            if(voucher.getLimitQuantity() <= 1){
-                voucher.setStatus(Const.STATUS_INACTIVE);
+        if (StringUtils.isNotBlank(request.getVoucherCode())) {
+            Voucher voucher = voucherService.isVoucherUsable(request.getVoucherCode());
+
+            if (Objects.isNull(voucher)) {
+                throw new NotFoundException(ErrorCodeConfig.getFormatMessage(Const.ERROR_VOUCHER_CODE_NOT_FOUND, request.getVoucherCode()));
             }
+
+            if (voucher.getLimitQuantity() <= 0) {
+                throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_VOUCHER_USABLE));
+            }
+
             voucher.setLimitQuantity(voucher.getLimitQuantity() - 1);
             voucherService.updateVoucher(voucher);
 
@@ -202,10 +238,10 @@ public class BillServiceImpl implements BillService {
                     .build();
             voucherHistoryService.saveVoucherHistory(voucherHistory);
 
-            if (request.getAccountId() != null && request.getVoucherCode() != null) {
+            if (isUser) {
                 VoucherAccount voucherAccount =
                         voucherAccountService.findVoucherAccountByUsernameAndVoucherCode(request.getAccountId(), request.getVoucherCode());
-                if (voucherAccount != null) {
+                if (Objects.nonNull(voucherAccount)) {
                     voucherAccount.setStatus(Const.STATUS_USED);
                     voucherAccountService.updateStatus(voucherAccount);
                 }
@@ -262,9 +298,9 @@ public class BillServiceImpl implements BillService {
         return countQuantityBillResponse;
     }
 
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackOn = Exception.class)
     @Override
-    public void deleteBill(Long id) {
+    public void deleteBill(Long id) throws NotFoundException {
         Bill bill = billRepo.findById(id).orElse(null);
         if (bill == null) {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND));
@@ -283,12 +319,17 @@ public class BillServiceImpl implements BillService {
         return billRepo.getListCustomer();
     }
 
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackOn = Exception.class)
     @Override
-    public Integer updateBillStatus(BillStatusDTO dto) throws JsonProcessingException {
+    public Integer updateBillStatus(BillStatusDTO dto) throws JsonProcessingException, NotFoundException {
         log.warn("BillStatusDTORequest: " + dto);
 
         Bill bill = billRepo.findById(dto.getId()).orElse(null);
+
+        if (Objects.isNull(bill)) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_NOT_FOUND));
+        }
+
         bill.setStatus(dto.getStatus());
         bill.setAmountPaid(dto.getAmountPaid());
         if (dto.getTimelineStatus().equals("4")) {
@@ -323,7 +364,7 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
-    public Bill findBillByBillId(Long id) {
+    public Bill findBillByBillId(Long id) throws NotFoundException {
         return billRepo.findById(id)
                 .orElseThrow(() -> new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND)));
     }
@@ -507,7 +548,7 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
-    public Bill updateBill(Bill bill) {
+    public Bill updateBill(Bill bill) throws NotFoundException {
         VoucherHistory voucherHistory = voucherHistoryService.findHistoryByBillCode(bill.getBillCode());
         BigDecimal price = bill.getPrice();
         BigDecimal priceReduce = BigDecimal.valueOf(0);
@@ -537,7 +578,7 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
-    public Bill updateBillReturn(Long billId, BigDecimal priceReturn, BigDecimal voucherPrice) {
+    public Bill updateBillReturn(Long billId, BigDecimal priceReturn, BigDecimal voucherPrice) throws NotFoundException {
         Bill bill = this.findBillByBillId(billId);
         bill.setPriceReduce(bill.getPriceReduce().subtract(priceReturn));
         bill.setStatus("ReturnS");

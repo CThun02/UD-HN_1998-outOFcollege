@@ -38,7 +38,7 @@ public class ClientAccountController {
     private ClientAccountService clientAccountService;
 
     @GetMapping("{username}")
-    public ResponseEntity<?> userDetail(@PathVariable("username") String username) {
+    public ResponseEntity<?> userDetail(@PathVariable("username") String username) throws NotFoundException {
         if (StringUtils.isBlank(username) || StringUtils.isEmpty(username)) {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.USER_NOT_FOUND));
         }
@@ -47,24 +47,24 @@ public class ClientAccountController {
     }
 
     @PostMapping("/update-user")
-    public ResponseEntity<?> updateUser(@RequestBody UserDetailsRequest request) {
+    public ResponseEntity<?> updateUser(@RequestBody UserDetailsRequest request) throws NotFoundException {
         return ResponseEntity.ok().body(clientAccountService.updateUserDetail(request));
     }
 
     @PostMapping("/update-address")
     public ResponseEntity<?> updateAddress(@RequestBody AddressRequest request,
-                                           @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String token) {
+                                           @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String token) throws NotFoundException {
         UserDTO userDTO = userAuthenticationProvider.getUsernameFromToken(validToken(token));
         return ResponseEntity.ok().body(clientAccountService.updateAddress(request, userDTO.getUsername()));
     }
 
     @GetMapping("/address-detail")
-    public ResponseEntity<?> getAddressDetail(@Param("addressId") Long addressId) {
+    public ResponseEntity<?> getAddressDetail(@Param("addressId") Long addressId) throws NotFoundException {
         return ResponseEntity.ok(clientAccountService.getAddress(addressId));
     }
 
     @GetMapping("/user-detail")
-    public ResponseEntity<?> getUserDetail(@Param("username") String username) {
+    public ResponseEntity<?> getUserDetail(@Param("username") String username) throws NotFoundException {
         return ResponseEntity.ok().body(clientAccountService.getUserDetail(username));
     }
 

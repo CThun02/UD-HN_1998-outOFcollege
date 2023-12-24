@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.dto.ProductDetailsDTO;
 import com.fpoly.ooc.entity.*;
+import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.ProductDetailDAORepositoryI;
 import com.fpoly.ooc.request.product.ProductDetailCondition;
 import com.fpoly.ooc.request.product.ProductDetailRequest;
@@ -144,7 +145,7 @@ public class ProductController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<?> updateProduct(@RequestBody ProductRequest request) throws JsonProcessingException {
+    public ResponseEntity<?> updateProduct(@RequestBody ProductRequest request) throws JsonProcessingException, NotFoundException {
         Product product = request.dto();
         product.setDeletedAt(null);
         return ResponseEntity.ok(service.update(product));
@@ -153,7 +154,7 @@ public class ProductController {
     @PutMapping("/updateProductStatus")
     public ResponseEntity<?> updateProductStatus(@RequestParam Long productId,
                                                  @RequestParam String status,
-                                                 @RequestParam(defaultValue = "false") Boolean openAll) throws JsonProcessingException {
+                                                 @RequestParam(defaultValue = "false") Boolean openAll) throws JsonProcessingException, NotFoundException {
         Product product = service.getOne(productId);
         if ((openAll && status.equals("ACTIVE")) || status.equals("INACTIVE")) {
             productDetailService.updateProductDetailsByProductId(productId, status);
@@ -165,7 +166,7 @@ public class ProductController {
 
     @PutMapping("/updateProductDetail")
     public ResponseEntity<?> updateProductDetail(@RequestBody ProductDetail productDetail,
-                                                 @RequestParam(name = "method", defaultValue = "Update") String method) throws JsonProcessingException {
+                                                 @RequestParam(name = "method", defaultValue = "Update") String method) throws JsonProcessingException, NotFoundException {
         if (method.equals("Deleted")) {
             if (productDetail.getStatus().equals("DELETED")) {
                 productDetail.setDeletedAt(LocalDateTime.now());

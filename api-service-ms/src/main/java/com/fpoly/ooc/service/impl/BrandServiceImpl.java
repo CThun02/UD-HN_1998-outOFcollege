@@ -26,7 +26,7 @@ public class BrandServiceImpl implements BrandServiceI {
     private KafkaUtil kafkaUtil;
 
     @Override
-    public Brand create(Brand brand) throws JsonProcessingException {
+    public Brand create(Brand brand) throws JsonProcessingException, NotFoundException {
         Brand brandCheck = this.findFirstByBrandName(brand.getBrandName());
         if(brandCheck==null){
             return kafkaUtil.sendingObjectWithKafka(brand, Const.TOPIC_BRAND);
@@ -43,6 +43,8 @@ public class BrandServiceImpl implements BrandServiceI {
             try {
                 return kafkaUtil.sendingObjectWithKafka(o, Const.TOPIC_BRAND);
             } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            } catch (NotFoundException e) {
                 throw new RuntimeException(e);
             }
         }).orElse(null);
@@ -75,7 +77,7 @@ public class BrandServiceImpl implements BrandServiceI {
     }
 
     @Override
-    public Brand updateStatus(BrandRequest request, Long id) {
+    public Brand updateStatus(BrandRequest request, Long id) throws NotFoundException {
         Brand brand = repo.findById(id).orElseThrow(() ->
                 new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND)));
         brand.setStatus(request.getStatus());

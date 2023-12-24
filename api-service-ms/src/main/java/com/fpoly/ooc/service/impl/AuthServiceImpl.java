@@ -39,7 +39,7 @@ public class AuthServiceImpl implements AuthService {
     private EmailService emailService;
 
     @Override
-    public UserDTO login(CredentialsDTO dto) {
+    public UserDTO login(CredentialsDTO dto) throws NotFoundException {
         Account account = accountService.findAccountByLogin(dto.getLogin(), dto.getRole());
 
         if(account == null) {
@@ -102,7 +102,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Async
-    public CompletableFuture<UserDTO> forgotPassword(RePasswordRequest rePasswordReq) {
+    public CompletableFuture<UserDTO> forgotPassword(RePasswordRequest rePasswordReq) throws NotFoundException {
         if(!StringUtils.isNotBlank(rePasswordReq.getEmail())) {
             return CompletableFuture.completedFuture(null);
         }

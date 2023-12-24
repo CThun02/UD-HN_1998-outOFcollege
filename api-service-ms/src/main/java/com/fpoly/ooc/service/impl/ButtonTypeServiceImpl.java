@@ -24,7 +24,7 @@ public class ButtonTypeServiceImpl implements ButtonTypeServiceI {
     private KafkaUtil kafkaUtil;
 
     @Override
-    public ButtonType create(ButtonType buttonType) throws JsonProcessingException {
+    public ButtonType create(ButtonType buttonType) throws JsonProcessingException, NotFoundException {
         ButtonType buttonCheck = repo.findFirstByButtonName(buttonType.getButtonName());
         if(buttonCheck==null){
             return kafkaUtil.sendingObjectWithKafka(buttonType, Const.TOPIC_BUTTON);
@@ -41,7 +41,7 @@ public class ButtonTypeServiceImpl implements ButtonTypeServiceI {
             o.setStatus(buttonType.getStatus());
             try {
                 return kafkaUtil.sendingObjectWithKafka(o, Const.TOPIC_BUTTON);
-            } catch (JsonProcessingException e) {
+            } catch (JsonProcessingException | NotFoundException e) {
                 throw new RuntimeException(e);
             }
         }).orElse(null);
@@ -68,7 +68,7 @@ public class ButtonTypeServiceImpl implements ButtonTypeServiceI {
     }
 
     @Override
-    public ButtonType updateStatus(ButtonTypeRequest request, Long id) {
+    public ButtonType updateStatus(ButtonTypeRequest request, Long id) throws NotFoundException {
         ButtonType buttonType = repo.findById(id).orElseThrow(() ->
                 new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND)));
         buttonType.setStatus(request.getStatus());

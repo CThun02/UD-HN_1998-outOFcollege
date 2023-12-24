@@ -41,7 +41,7 @@ public class AddressServiceImpl implements AddressServiceI {
     }
 
     @Override
-    public Address getOne(Long id) {
+    public Address getOne(Long id) throws NotFoundException {
         return repo.findById(id)
                 .orElseThrow(() -> new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND)));
 

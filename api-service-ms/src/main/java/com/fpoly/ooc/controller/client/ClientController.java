@@ -7,6 +7,7 @@ import com.fpoly.ooc.entity.Account;
 import com.fpoly.ooc.entity.Address;
 import com.fpoly.ooc.entity.AddressDetail;
 import com.fpoly.ooc.entity.Bill;
+import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.BillRepo;
 import com.fpoly.ooc.request.DeliveryNoteRequest;
 import com.fpoly.ooc.request.bill.BillRequest;
@@ -90,7 +91,7 @@ public class ClientController {
     }
 
     @PostMapping("/bill")
-    public ResponseEntity<?> createBill(@RequestBody(required = false) BillRequest request) throws JsonProcessingException {
+    public ResponseEntity<?> createBill(@RequestBody(required = false) BillRequest request) throws JsonProcessingException, NotFoundException {
         return ResponseEntity.ok(billService.createBill(request));
     }
 
@@ -105,7 +106,7 @@ public class ClientController {
     }
 
     @PutMapping("/createAddress")
-    public ResponseEntity<?> createAddress(@RequestBody Address address, @RequestParam String userName) {
+    public ResponseEntity<?> createAddress(@RequestBody Address address, @RequestParam String userName) throws NotFoundException {
         Address addressCreate = addressService.create(address);
         AddressDetail addressDetailCreate = AddressDetail.builder().accountAddress(Account.builder().username(userName).build())
                 .addressDetail(Address.builder().id(addressCreate.getId()).build()).build();
@@ -170,14 +171,14 @@ public class ClientController {
     }
 
     @GetMapping("/timeline/{billId}")
-    public ResponseEntity<?> timelineResponse(@PathVariable("billId") Long billId) {
+    public ResponseEntity<?> timelineResponse(@PathVariable("billId") Long billId) throws NotFoundException {
         return ResponseEntity.ok(timeLineService.getAllTimeLineByBillId(billId));
     }
 
     @PostMapping("/create-timeline/{id}")
     public ResponseEntity<?> createTimelineByBillId(
             @PathVariable("id") Long id,
-            @RequestBody(required = false) TimeLinerequest request) throws JsonProcessingException {
+            @RequestBody(required = false) TimeLinerequest request) throws JsonProcessingException, NotFoundException {
         Bill bill;
         bill = billRepo.findById(id).orElse(null);
         if (bill != null) {
@@ -190,7 +191,7 @@ public class ClientController {
 
 
     @PutMapping("/change-status-bill")
-    public ResponseEntity<?> updateBillStatus(@RequestBody BillStatusDTO dto) throws JsonProcessingException {
+    public ResponseEntity<?> updateBillStatus(@RequestBody BillStatusDTO dto) throws JsonProcessingException, NotFoundException {
         return ResponseEntity.ok(billService.updateBillStatus(dto));
     }
 
@@ -230,7 +231,7 @@ public class ClientController {
     }
 
     @GetMapping("/address/{id}")
-    public ResponseEntity<?> findByAddress(@PathVariable("id") Long id) {
+    public ResponseEntity<?> findByAddress(@PathVariable("id") Long id) throws NotFoundException {
         return ResponseEntity.ok(addressService.getOne(id));
     }
 
@@ -240,7 +241,7 @@ public class ClientController {
     }
 
     @GetMapping("/getTimelineClientByBillCode/{billCode}")
-    public ResponseEntity<?> getTest(@PathVariable("billCode") String billCode) {
+    public ResponseEntity<?> getTest(@PathVariable("billCode") String billCode) throws NotFoundException {
         return ResponseEntity.ok().body(timeLineService.getTimelineByBillCode(billCode));
     }
 

@@ -3,6 +3,7 @@ package com.fpoly.ooc.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.entity.CollarType;
 import com.fpoly.ooc.entity.Pattern;
+import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.request.form.FormRequest;
 import com.fpoly.ooc.request.pattern.PatternRequest;
 import com.fpoly.ooc.service.interfaces.PatternServiceI;
@@ -25,12 +26,12 @@ public class PatternController {
     }
 
     @PostMapping("")
-    public ResponseEntity<?> create(@RequestParam String categoryName) throws JsonProcessingException {
+    public ResponseEntity<?> create(@RequestParam String categoryName) throws JsonProcessingException, NotFoundException {
         Pattern pattern = Pattern.builder().patternName(categoryName).build();
         return ResponseEntity.ok(service.create(pattern));
     }
     @PostMapping("create")
-    public ResponseEntity<?> create(@RequestBody Pattern pattern) throws JsonProcessingException {
+    public ResponseEntity<?> create(@RequestBody Pattern pattern) throws JsonProcessingException, NotFoundException {
         return ResponseEntity.ok(service.create(pattern));
     }
 
@@ -40,7 +41,7 @@ public class PatternController {
         return ResponseEntity.ok(service.update(pattern, id));
     }
     @PutMapping("update/{id}")
-    public ResponseEntity<?> updateStatus(@RequestBody PatternRequest patternRequest, @PathVariable Long id){
+    public ResponseEntity<?> updateStatus(@RequestBody PatternRequest patternRequest, @PathVariable Long id) throws NotFoundException {
         return ResponseEntity.ok(service.updateStatus(patternRequest, id).getId());
     }
 

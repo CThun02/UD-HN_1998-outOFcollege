@@ -33,7 +33,7 @@ public class ClientAccountServiceImpl implements ClientAccountService {
     private PasswordEncoder passwordEncoder;
 
     @Override
-    public UserDetailsDTO userDetailsDto(String username) {
+    public UserDetailsDTO userDetailsDto(String username) throws NotFoundException {
         UserDetailsDTO userDetailsDTO = new UserDetailsDTO();
         if (StringUtils.isEmpty(username) || StringUtils.isBlank(username)) {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.USER_NOT_FOUND));
@@ -48,7 +48,7 @@ public class ClientAccountServiceImpl implements ClientAccountService {
     }
 
     @Override
-    public AddressDTO updateAddress(AddressRequest request, String username) {
+    public AddressDTO updateAddress(AddressRequest request, String username) throws NotFoundException {
         Address address = addressRepository.findById(request.getIdAddress()).orElseThrow(() ->
                 new NotFoundException(ErrorCodeConfig.getMessage(Const.ADDRESS_NOT_FOUND))
         );
@@ -76,7 +76,7 @@ public class ClientAccountServiceImpl implements ClientAccountService {
     }
 
     @Override
-    public UserInfomationDTO updateUserDetail(UserDetailsRequest request) {
+    public UserInfomationDTO updateUserDetail(UserDetailsRequest request) throws NotFoundException {
         List<Account> accounts = accountRepository.findLoginByUsername(request.getUsername());
 
         Account account = CommonUtils.isValidArraysAccount(accounts);
@@ -99,7 +99,7 @@ public class ClientAccountServiceImpl implements ClientAccountService {
     }
 
     @Override
-    public AddressDTO getAddress(Long addressId) {
+    public AddressDTO getAddress(Long addressId) throws NotFoundException {
         Address address = addressRepository.findById(addressId).orElseThrow(() ->
                 new NotFoundException(ErrorCodeConfig.getMessage(Const.ADDRESS_NOT_FOUND))
         );
@@ -107,7 +107,7 @@ public class ClientAccountServiceImpl implements ClientAccountService {
     }
 
     @Override
-    public UserInfomationDTO getUserDetail(String username) {
+    public UserInfomationDTO getUserDetail(String username) throws NotFoundException {
         List<Account> accounts = accountRepository.findLoginByUsername(username);
 
         Account account = CommonUtils.isValidArraysAccount(accounts);

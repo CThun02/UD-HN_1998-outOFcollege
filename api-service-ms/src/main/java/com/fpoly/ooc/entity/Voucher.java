@@ -103,6 +103,9 @@ public class Voucher extends BaseEntity{
     @Column(name = "private")
     private String objectUse;
 
+    @Column(name = "version")
+    private Long version;
+
     @Column(name = "is_send_email")
     private Boolean isSendEmail;
 

@@ -23,7 +23,7 @@ public class ShirtTailTypeServiceImpl implements ShirtTailTypeServiceI {
     private KafkaUtil kafkaUtil;
 
     @Override
-    public ShirtTailType create(ShirtTailType shirtTailType) throws JsonProcessingException {
+    public ShirtTailType create(ShirtTailType shirtTailType) throws JsonProcessingException, NotFoundException {
         ShirtTailType check = repo.findFirstByShirtTailTypeName(shirtTailType.getShirtTailTypeName());
         if(check==null){
             return kafkaUtil.sendingObjectWithKafka(shirtTailType, Const.TOPIC_SHIRT_TAILS);
@@ -40,7 +40,7 @@ public class ShirtTailTypeServiceImpl implements ShirtTailTypeServiceI {
             o.setStatus(shirtTailType.getStatus());
             try {
                 return kafkaUtil.sendingObjectWithKafka(o, Const.TOPIC_SHIRT_TAILS);
-            } catch (JsonProcessingException e) {
+            } catch (JsonProcessingException | NotFoundException e) {
                 throw new RuntimeException(e);
             }
         }).orElse(null);
@@ -67,7 +67,7 @@ public class ShirtTailTypeServiceImpl implements ShirtTailTypeServiceI {
     }
 
     @Override
-    public ShirtTailType updateStatus(ShirtTailTypeRequest request, Long id) {
+    public ShirtTailType updateStatus(ShirtTailTypeRequest request, Long id) throws NotFoundException {
         ShirtTailType shirtTailType = repo.findById(id).orElseThrow(() ->
                 new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND)));
         shirtTailType.setStatus(request.getStatus());

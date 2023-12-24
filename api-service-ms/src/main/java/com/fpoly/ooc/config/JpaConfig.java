@@ -41,7 +41,11 @@ public class JpaConfig {
                 log.info("Authentication: " + uri);
 
                 if (uri.contains("admin") && (authentication == null || !authentication.isAuthenticated())) {
-                    throw new NotFoundException(ErrorCodeConfig.getMessage(Const.JWT_AUTHENTICATION));
+                    try {
+                        throw new NotFoundException(ErrorCodeConfig.getMessage(Const.JWT_AUTHENTICATION));
+                    } catch (NotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
 
                 log.warn("authentication: " + authentication);

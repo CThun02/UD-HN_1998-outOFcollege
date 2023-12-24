@@ -24,7 +24,7 @@ public class FormServiceImpl implements FormServiceI {
     private KafkaUtil kafkaUtil;
 
     @Override
-    public Form create(Form form) throws JsonProcessingException {
+    public Form create(Form form) throws JsonProcessingException, NotFoundException {
         Form formCheck = repo.findFirstByFormName(form.getFormName());
         if(formCheck==null){
             return kafkaUtil.sendingObjectWithKafka(form, Const.TOPIC_FORM);
@@ -41,7 +41,7 @@ public class FormServiceImpl implements FormServiceI {
 
             try {
                 return kafkaUtil.sendingObjectWithKafka(o, Const.TOPIC_FORM);
-            } catch (JsonProcessingException e) {
+            } catch (JsonProcessingException | NotFoundException e) {
                 throw new RuntimeException(e);
             }
         }).orElse(null);
@@ -74,7 +74,7 @@ public class FormServiceImpl implements FormServiceI {
     }
 
     @Override
-    public Form updateStatus(FormRequest request, Long id) {
+    public Form updateStatus(FormRequest request, Long id) throws NotFoundException {
         Form form = repo.findById(id).orElseThrow(() ->
                 new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND)));
         form.setStatus(request.getStatus());

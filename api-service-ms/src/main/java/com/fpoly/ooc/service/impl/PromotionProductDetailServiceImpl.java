@@ -41,7 +41,7 @@ public class PromotionProductDetailServiceImpl implements PromotionProductDetail
     }
 
     @Override
-    public void deletePromotionProduct(DeleteProductDetailInPromotionDTO dto) {
+    public void deletePromotionProduct(DeleteProductDetailInPromotionDTO dto) throws NotFoundException {
         List<Long> ids = promotionProductDetailRepository.findIdPromotionProduct(dto.getProductDetailIds(), dto.getPromotionId());
 
         if (ids == null) {

@@ -2,6 +2,7 @@ package com.fpoly.ooc.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.entity.Size;
+import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.request.size.SizeRequest;
 import com.fpoly.ooc.service.interfaces.SizeServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,7 @@ public class SizeController {
     }
 
     @PostMapping("create")
-    public ResponseEntity<?> create(@RequestBody Size size) throws JsonProcessingException {
+    public ResponseEntity<?> create(@RequestBody Size size) throws JsonProcessingException, NotFoundException {
         return ResponseEntity.ok(service.create(size));
     }
 
@@ -34,7 +35,7 @@ public class SizeController {
     }
 
     @PutMapping("updateStatus/{id}")
-    public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestBody SizeRequest request) {
+    public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestBody SizeRequest request) throws NotFoundException {
         return ResponseEntity.ok(service.updateStatus(request, id).getId());
     }
 

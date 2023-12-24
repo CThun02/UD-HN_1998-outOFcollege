@@ -26,6 +26,7 @@ import com.fpoly.ooc.service.interfaces.PaymentService;
 import com.fpoly.ooc.service.interfaces.ProductImageServiceI;
 import com.fpoly.ooc.service.interfaces.TimeLineService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -65,7 +66,7 @@ public class TimeLineServiceImpl implements TimeLineService {
     private PaymentService paymentService;
 
     @Override
-    public List<TimeLineResponse> getAllTimeLineByBillId(Long id) {
+    public List<TimeLineResponse> getAllTimeLineByBillId(Long id) throws NotFoundException {
         Bill bill = billService.findBillByBillId(id);
         if (bill == null) {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND));
@@ -75,7 +76,7 @@ public class TimeLineServiceImpl implements TimeLineService {
     }
 
     @Override
-    public TimelineClientResponse getTimelineByBillCode(String billCode) {
+    public TimelineClientResponse getTimelineByBillCode(String billCode) throws NotFoundException {
         if (billCode == null) {
             throw new NotFoundException(Const.CODE_NOT_FOUND);
         }
@@ -117,10 +118,10 @@ public class TimeLineServiceImpl implements TimeLineService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public Timeline createTimeLine(Long billId, TimeLinerequest request) throws JsonProcessingException {
+    public Timeline createTimeLine(Long billId, TimeLinerequest request) throws JsonProcessingException, NotFoundException {
         Bill bill = billService.findBillByBillId(billId);
         if (bill == null) {
-            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND));
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_NOT_FOUND));
         }
         Timeline timeline = new Timeline();
 
@@ -141,7 +142,7 @@ public class TimeLineServiceImpl implements TimeLineService {
             if (request.getStatus() == null) {
                 List<TimeLineResponse> lst = timeLineRepo.getTimeLineByBillId(billId);
                 Integer statusIncrease = 0;
-                if (lst.isEmpty()) {
+                if (CollectionUtils.isEmpty(lst)) {
                     statusIncrease++;
                 } else {
                     statusIncrease = Integer.valueOf(lst.get(lst.size() - 1).getStatus());

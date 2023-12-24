@@ -2,6 +2,7 @@ package com.fpoly.ooc.service.impl;
 
 import com.fpoly.ooc.entity.Address;
 import com.fpoly.ooc.entity.AddressDetail;
+import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.AddressDetailRepository;
 import com.fpoly.ooc.service.interfaces.AddressDetailService;
 import com.fpoly.ooc.service.interfaces.AddressServiceI;
@@ -29,7 +30,7 @@ public class AddressDetailImpl implements AddressDetailService
     }
 
     @Override
-    public AddressDetail create(AddressDetail addressDetail) {
+    public AddressDetail create(AddressDetail addressDetail) throws NotFoundException {
         List<Address> addressList = addressServiceI.getListAddress(addressDetail.getAccountAddress().getUsername());
         if(addressList.size()==0){
             Address address = addressServiceI.getOne(addressDetail.getAddressDetail().getId());

@@ -1,6 +1,7 @@
 package com.fpoly.ooc.controller;
 
 import com.fpoly.ooc.entity.Cart;
+import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.request.cart.CartRequest;
 import com.fpoly.ooc.service.interfaces.CartDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +26,7 @@ public class CartController {
     private CartDetailService cartDetailService;
 
     @GetMapping()
-    public ResponseEntity<?> getALl(@RequestParam("username") String username) {
+    public ResponseEntity<?> getALl(@RequestParam("username") String username) throws NotFoundException {
         return ResponseEntity.ok(cartDetailService.getAllCart(username));
     }
 
@@ -35,24 +36,24 @@ public class CartController {
     }
 
     @PostMapping("")
-    public ResponseEntity<?> createCartDetail(@RequestBody CartRequest request) {
+    public ResponseEntity<?> createCartDetail(@RequestBody CartRequest request) throws NotFoundException {
         Cart cart = cartDetailService.createCartDetail(request);
         return ResponseEntity.ok(cart == null ? false : true);
     }
 
     @PostMapping("/createCart")
-    public ResponseEntity<?> createCart(@RequestParam("username") String username) {
+    public ResponseEntity<?> createCart(@RequestParam("username") String username) throws NotFoundException {
         return ResponseEntity.ok(cartDetailService.createCart(username));
     }
 
     @PutMapping("")
     public ResponseEntity<?> updateQuantity(@RequestParam("cartDetailId") Long cartDetailId,
-                                            @RequestParam("quantity") Integer quantity) {
+                                            @RequestParam("quantity") Integer quantity) throws NotFoundException {
         return ResponseEntity.ok(cartDetailService.updateQuantity(cartDetailId, quantity));
     }
 
     @DeleteMapping("/{cartDetailId}")
-    public ResponseEntity<?> deleteCartDetail(@PathVariable("cartDetailId") Long cartDetailId) {
+    public ResponseEntity<?> deleteCartDetail(@PathVariable("cartDetailId") Long cartDetailId) throws NotFoundException {
         return ResponseEntity.ok(cartDetailService.deleteProductDetailFromCart(cartDetailId));
     }
 

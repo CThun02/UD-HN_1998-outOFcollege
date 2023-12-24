@@ -66,7 +66,7 @@ public class PromotionServiceImpl implements PromotionService {
 
     @Transactional
     @Override
-    public Promotion saveOrUpdate(PromotionRequest promotionRequest) {
+    public Promotion saveOrUpdate(PromotionRequest promotionRequest) throws NotFoundException {
         Promotion promotion = promotionRepository.save(promotion(promotionRequest));
 
         for (Long id : promotionRequest.getProductDetailIds()) {
@@ -88,7 +88,7 @@ public class PromotionServiceImpl implements PromotionService {
     }
 
     @Override
-    public PromotionRequest findByIdProductDetail(String promotionCode) {
+    public PromotionRequest findByIdProductDetail(String promotionCode) throws NotFoundException {
         Promotion promotion = findByCode(promotionCode);
         log.info("promotionRequest: " + promotion);
 
@@ -110,7 +110,7 @@ public class PromotionServiceImpl implements PromotionService {
     }
 
     @Override
-    public Promotion findByCode(String code) {
+    public Promotion findByCode(String code) throws NotFoundException {
         log.info("PromotionCode: " + code);
         return promotionRepository
                 .findPromotionByPromotionCode(code)
@@ -119,13 +119,13 @@ public class PromotionServiceImpl implements PromotionService {
     }
 
     @Override
-    public Promotion findById(Long id) {
+    public Promotion findById(Long id) throws NotFoundException {
         return promotionRepository.findById(id).orElseThrow(
                 () -> new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND)));
     }
 
     @Override
-    public Promotion updateStatus(String code) {
+    public Promotion updateStatus(String code) throws NotFoundException {
         Promotion promotion = findByCode(code);
 
         promotion.setStatus(Const.STATUS_CANCEL);
@@ -135,7 +135,7 @@ public class PromotionServiceImpl implements PromotionService {
     }
 
     @Override
-    public Promotion updateStatus(String code, String status) {
+    public Promotion updateStatus(String code, String status) throws NotFoundException {
         Promotion promotion = findByCode(code);
 
         promotion.setStatus(status);
@@ -153,7 +153,7 @@ public class PromotionServiceImpl implements PromotionService {
         return promotionRepository.getPromotionByProductDetailId(pdId, status);
     }
 
-    private Promotion promotion(PromotionRequest request) {
+    private Promotion promotion(PromotionRequest request) throws NotFoundException {
         Promotion promotionDb = null;
         if(request.getPromotionId() != null) {
             promotionDb = promotionRepository.findById(request.getPromotionId()).orElse(null);

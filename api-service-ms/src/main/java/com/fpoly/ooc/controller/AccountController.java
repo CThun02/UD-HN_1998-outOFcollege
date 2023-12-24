@@ -4,6 +4,7 @@ import com.fpoly.ooc.dto.CustomerConditionDTO;
 import com.fpoly.ooc.entity.Account;
 import com.fpoly.ooc.entity.Address;
 import com.fpoly.ooc.entity.AddressDetail;
+import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.request.account.AccountRequest;
 import com.fpoly.ooc.service.interfaces.AccountService;
 import com.fpoly.ooc.service.interfaces.AddressDetailService;
@@ -45,7 +46,7 @@ public class AccountController {
     }
 
     @GetMapping("address-detail/{username}")
-    public ResponseEntity<?> getAddressDetailsByUsername(@PathVariable String username) {
+    public ResponseEntity<?> getAddressDetailsByUsername(@PathVariable String username) throws NotFoundException {
         return ResponseEntity.ok(service.getAddressDetailsByUsername(username));
     }
 
@@ -70,7 +71,7 @@ public class AccountController {
     }
 
     @PutMapping("update/{username}")
-    public ResponseEntity<?> update(@PathVariable String username, @RequestBody AccountRequest request) {
+    public ResponseEntity<?> update(@PathVariable String username, @RequestBody AccountRequest request) throws NotFoundException {
         return ResponseEntity.ok(service.update(request, username));
     }
 
@@ -80,7 +81,7 @@ public class AccountController {
     }
 
     @PutMapping("/createAddress")
-    public ResponseEntity<?> createAddress(@RequestBody Address address, @RequestParam String userName) {
+    public ResponseEntity<?> createAddress(@RequestBody Address address, @RequestParam String userName) throws NotFoundException {
         Address addressCreate = addressService.create(address);
         AddressDetail addressDetailCreate = AddressDetail.builder().accountAddress(Account.builder().username(userName).build())
                 .addressDetail(addressCreate).build();

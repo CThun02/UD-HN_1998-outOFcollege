@@ -24,7 +24,7 @@ public class MaterialServiceImpl implements MaterialServiceI {
     private KafkaUtil kafkaUtil;
 
     @Override
-    public Material create(Material material) throws JsonProcessingException {
+    public Material create(Material material) throws JsonProcessingException, NotFoundException {
         Material materialCheck = repo.findFirstByMaterialName(material.getMaterialName());
         if(materialCheck==null){
             return kafkaUtil.sendingObjectWithKafka(material, Const.TOPIC_MATERIAL);
@@ -41,7 +41,7 @@ public class MaterialServiceImpl implements MaterialServiceI {
             o.setStatus(material.getStatus());
             try {
                 return kafkaUtil.sendingObjectWithKafka(o, Const.TOPIC_MATERIAL);
-            } catch (JsonProcessingException e) {
+            } catch (JsonProcessingException | NotFoundException e) {
                 throw new RuntimeException(e);
             }
         }).orElse(null);
@@ -68,7 +68,7 @@ public class MaterialServiceImpl implements MaterialServiceI {
     }
 
     @Override
-    public Material updateStatus(MaterialRequest request, Long id) {
+    public Material updateStatus(MaterialRequest request, Long id) throws NotFoundException {
         Material material = repo.findById(id).orElseThrow(() ->
                 new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND)));
         material.setStatus(request.getStatus());

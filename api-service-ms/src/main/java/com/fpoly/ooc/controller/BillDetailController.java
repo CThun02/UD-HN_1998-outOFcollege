@@ -2,6 +2,7 @@ package com.fpoly.ooc.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.entity.BillDetail;
+import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.request.bill.BillDetailRequest;
 import com.fpoly.ooc.service.interfaces.BillDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,20 +26,20 @@ public class BillDetailController {
 
 
     @PostMapping("/create-bill-detail")
-    public ResponseEntity<?> createdBillDetail(@RequestBody BillDetailRequest request) throws JsonProcessingException {
+    public ResponseEntity<?> createdBillDetail(@RequestBody BillDetailRequest request) throws JsonProcessingException, NotFoundException {
         BillDetail billDetail = billDetailService.createBillDetail(request);
         request.setBillDetailId(billDetail.getId());
         return ResponseEntity.ok("ok");
     }
 
     @PutMapping()
-    public ResponseEntity<?> updateBillDetail(@RequestBody BillDetailRequest request) throws JsonProcessingException {
+    public ResponseEntity<?> updateBillDetail(@RequestBody BillDetailRequest request) throws JsonProcessingException, NotFoundException {
         return ResponseEntity.ok(billDetailService.updateBillDetail(request));
     }
 
     @DeleteMapping("")
     public ResponseEntity<?> deleteBillDetail(@RequestParam("billId") Long billId,
-                                              @RequestParam("billDetailId") Long billDetailId) throws JsonProcessingException {
+                                              @RequestParam("billDetailId") Long billDetailId) throws JsonProcessingException, NotFoundException {
         return ResponseEntity.ok(billDetailService.deleteBillDetail(billId, billDetailId));
     }
 

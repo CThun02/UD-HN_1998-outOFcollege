@@ -3,6 +3,7 @@ package com.fpoly.ooc.service.interfaces;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.entity.Timeline;
+import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.request.timeline.TimeLinerequest;
 import com.fpoly.ooc.responce.bill.BillInfoResponse;
 import com.fpoly.ooc.responce.timeline.TimeLineResponse;
@@ -13,11 +14,11 @@ import java.util.List;
 
 public interface TimeLineService {
 
-    List<TimeLineResponse> getAllTimeLineByBillId(Long id);
+    List<TimeLineResponse> getAllTimeLineByBillId(Long id) throws NotFoundException;
 
-   TimelineClientResponse getTimelineByBillCode(String billCode);
+   TimelineClientResponse getTimelineByBillCode(String billCode) throws NotFoundException;
 
-    Timeline createTimeLine(Long billid, TimeLinerequest request) throws JsonProcessingException;
+    Timeline createTimeLine(Long billid, TimeLinerequest request) throws JsonProcessingException, NotFoundException;
 
     List<TimelineProductDisplayResponse> getTimelineProductByBillId(Long id);
 

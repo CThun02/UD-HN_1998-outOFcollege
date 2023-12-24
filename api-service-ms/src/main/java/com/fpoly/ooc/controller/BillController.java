@@ -2,6 +2,7 @@ package com.fpoly.ooc.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.dto.BillStatusDTO;
+import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.request.bill.BillRequest;
 import com.fpoly.ooc.request.product.ProductDetailRequest;
 import com.fpoly.ooc.service.interfaces.BillDetailService;
@@ -68,7 +69,7 @@ public class BillController {
 
     @PutMapping("/updateBillReturn")
     public ResponseEntity<?> updateBillReturn(@RequestParam Long billId, @RequestParam BigDecimal priceReturn,
-                                              @RequestParam BigDecimal voucherPrice){
+                                              @RequestParam BigDecimal voucherPrice) throws NotFoundException {
         return ResponseEntity.ok(billService.updateBillReturn(billId, priceReturn, voucherPrice));
     }
 
@@ -97,7 +98,7 @@ public class BillController {
     }
 
     @PostMapping()
-    public ResponseEntity<?> createBill(@RequestBody(required = false) BillRequest request) throws JsonProcessingException {
+    public ResponseEntity<?> createBill(@RequestBody(required = false) BillRequest request) throws JsonProcessingException, NotFoundException {
         return ResponseEntity.ok(billService.createBill(request));
     }
 
@@ -185,13 +186,13 @@ public class BillController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteBill(@PathVariable("id") Long id) {
+    public ResponseEntity<?> deleteBill(@PathVariable("id") Long id) throws NotFoundException {
         billService.deleteBill(id);
         return ResponseEntity.ok().body("Xóa thành công");
     }
 
     @PutMapping("")
-    public ResponseEntity<?> updateBillStatus(@RequestBody BillStatusDTO dto) throws JsonProcessingException {
+    public ResponseEntity<?> updateBillStatus(@RequestBody BillStatusDTO dto) throws JsonProcessingException, NotFoundException {
         return ResponseEntity.ok(billService.updateBillStatus(dto));
     }
 

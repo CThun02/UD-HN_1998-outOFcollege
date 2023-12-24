@@ -47,7 +47,7 @@ public class VoucherAccountServiceImpl implements VoucherAccountService {
     }
 
     @Override
-    public VoucherAccount updateAccountUsed(VoucherAccountUsedDTO dto) {
+    public VoucherAccount updateAccountUsed(VoucherAccountUsedDTO dto) throws NotFoundException {
         VoucherAccount voucherAccount = voucherAccountRepository
                 .findVoucherAccountByAccountVoucher_UsernameAndVoucherAccount_Id(dto.getUsername(), dto.getVoucherId())
                 .orElseThrow(() -> new NotFoundException(ErrorCodeConfig.getMessage(Const.VOUCHER_ACCOUNT_NOT_FOUND)));

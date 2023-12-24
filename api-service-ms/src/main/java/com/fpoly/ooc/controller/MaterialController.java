@@ -3,6 +3,7 @@ package com.fpoly.ooc.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.entity.Material;
+import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.request.material.MaterialRequest;
 import com.fpoly.ooc.service.interfaces.MaterialServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,7 @@ public class MaterialController {
     }
 
     @PostMapping("create")
-    public ResponseEntity<?> create(@RequestBody Material material) throws JsonProcessingException {
+    public ResponseEntity<?> create(@RequestBody Material material) throws JsonProcessingException, NotFoundException {
         return ResponseEntity.ok(service.create(material));
     }
 
@@ -42,7 +43,7 @@ public class MaterialController {
     }
 
     @PutMapping("updateStatus/{id}")
-    public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestBody MaterialRequest request) {
+    public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestBody MaterialRequest request) throws NotFoundException {
         return ResponseEntity.ok(service.updateStatus(request, id).getId());
     }
 

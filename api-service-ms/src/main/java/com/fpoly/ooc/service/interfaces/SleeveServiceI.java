@@ -2,12 +2,13 @@ package com.fpoly.ooc.service.interfaces;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.entity.SleeveType;
+import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.request.sleevetype.SleeveTypeRequest;
 
 import java.util.List;
 
 public interface SleeveServiceI {
-    public SleeveType create(SleeveType sleeveType) throws JsonProcessingException;
+    public SleeveType create(SleeveType sleeveType) throws JsonProcessingException, NotFoundException;
 
     public SleeveType update(SleeveType sleeveType, Long id);
 
@@ -17,5 +18,5 @@ public interface SleeveServiceI {
 
     public SleeveType getOne(Long id);
 
-    SleeveType updateStatus(SleeveTypeRequest request, Long id);
+    SleeveType updateStatus(SleeveTypeRequest request, Long id) throws NotFoundException;
 }

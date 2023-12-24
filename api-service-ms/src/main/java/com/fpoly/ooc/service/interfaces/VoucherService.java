@@ -2,6 +2,7 @@ package com.fpoly.ooc.service.interfaces;
 
 import com.fpoly.ooc.dto.VoucherAndPromotionConditionDTO;
 import com.fpoly.ooc.entity.Voucher;
+import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.request.voucher.DisplayVoucherRequest;
 import com.fpoly.ooc.request.voucher.VoucherRequest;
 import com.fpoly.ooc.responce.voucher.VoucherAccountResponse;
@@ -15,9 +16,9 @@ public interface VoucherService {
 
     List<VoucherResponse> findAllVoucher(VoucherAndPromotionConditionDTO voucherConditionDTO);
 
-    CompletableFuture<Voucher> saveOrUpdate(VoucherRequest voucherRequest);
+    CompletableFuture<Voucher> saveOrUpdate(VoucherRequest voucherRequest) throws NotFoundException;
 
-    Voucher updateStatus(String code);
+    Voucher updateStatus(String code) throws NotFoundException;
 
     Voucher updateStatus(String code, String status);
 
@@ -25,7 +26,7 @@ public interface VoucherService {
 
     Voucher findVoucherById(Long id);
 
-    VoucherRequest findByVoucherCode(String code);
+    VoucherRequest findByVoucherCode(String code) throws NotFoundException;
 
     VoucherRequest getDetailVoucherByCode(String code);
 
@@ -37,7 +38,9 @@ public interface VoucherService {
 
     List<VoucherResponse> findAllVoucherResponseDisplayModalUsing(DisplayVoucherRequest request);
 
-    Voucher findVoucherByVoucherCode(String voucherCode);
+    Voucher findVoucherByVoucherCode(String voucherCode) throws NotFoundException;
+
+    Voucher isVoucherUsable(String voucherCode);
 
     Boolean isCheckTimeUse(String voucherCode, String username);
 

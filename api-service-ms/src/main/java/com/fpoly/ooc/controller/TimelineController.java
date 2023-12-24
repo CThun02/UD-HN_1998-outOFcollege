@@ -2,9 +2,11 @@ package com.fpoly.ooc.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.entity.Bill;
+import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.BillRepo;
 import com.fpoly.ooc.request.timeline.TimeLinerequest;
 import com.fpoly.ooc.service.interfaces.TimeLineService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/admin/timeline")
 @CrossOrigin("*")
+@Slf4j
 public class TimelineController {
 
     @Autowired
@@ -32,7 +35,7 @@ public class TimelineController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getAllTimeLineByBillId(@PathVariable("id") Long id) {
+    public ResponseEntity<?> getAllTimeLineByBillId(@PathVariable("id") Long id) throws NotFoundException {
         return ResponseEntity.ok(timeLineService.getAllTimeLineByBillId(id));
     }
 
@@ -44,12 +47,12 @@ public class TimelineController {
     @PostMapping("/{id}")
     public ResponseEntity<?> createTimelineByBillId(
             @PathVariable("id") Long id,
-            @RequestBody(required = false) TimeLinerequest request) throws JsonProcessingException {
-        Bill bill;
-        bill = billRepo.findById(id).orElse(null);
+            @RequestBody(required = false) TimeLinerequest request) throws JsonProcessingException, NotFoundException {
+        Bill bill = billRepo.findById(id).orElse(null);
+
         if (bill != null) {
             bill.setCreatedBy(request.getCreatedBy());
-            billRepo.saveAndFlush(bill);
+            billRepo.save(bill);
         }
 
         return ResponseEntity.ok(timeLineService.createTimeLine(id, request));

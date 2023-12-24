@@ -2,6 +2,8 @@ package com.fpoly.ooc.exception.handle;
 
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.exc.InvalidDefinitionException;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
 import com.fpoly.ooc.dto.ErrorDTO;
@@ -53,6 +55,24 @@ public class MsHandleException {
         errors.put("status", Const.HTTP_ERROR_CODE);
         errors.put("message", ex.getMessage());
         errors.put(ex.getField(), ex.getMessage());
+
+        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({JsonProcessingException.class})
+    public ResponseEntity<Map<String, Object>> notFoundException(JsonProcessingException ex) {
+        Map<String, Object> errors = new HashMap<>();
+        errors.put("status", Const.HTTP_ERROR_CODE);
+        errors.put("message", "Chuyển đỏi dữ liệu thất bại");
+
+        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({InvalidDefinitionException.class})
+    public ResponseEntity<Map<String, Object>> invalidDefinitionException(InvalidDefinitionException ex) {
+        Map<String, Object> errors = new HashMap<>();
+        errors.put("status", Const.HTTP_ERROR_CODE);
+        errors.put("message", "Chuyển đổi dữ liệu thất bại");
 
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }

@@ -126,7 +126,7 @@ public class PaymentController {
     public void paymentInfo(
             @RequestParam Map<String, String> queryParams,
             HttpServletResponse response
-    ) throws IOException {
+    ) throws IOException, NotFoundException {
         String responseCode = queryParams.get("vnp_ResponseCode");
         String bankCode = queryParams.get("vnp_BankCode");
         String amount = queryParams.get("vnp_Amount");

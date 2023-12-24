@@ -27,7 +27,7 @@ public class SizeServiceImpl implements SizeServiceI {
     private KafkaUtil kafkaUtil;
 
     @Override
-    public Size create(Size size) throws JsonProcessingException {
+    public Size create(Size size) throws JsonProcessingException, NotFoundException {
         Size sizeCheck = repo.findFirstBySizeName(size.getSizeName());
         if(sizeCheck==null){
             return kafkaUtil.sendingObjectWithKafka(size, Const.TOPIC_SIZE);
@@ -44,7 +44,7 @@ public class SizeServiceImpl implements SizeServiceI {
             o.setStatus(size.getStatus());
             try {
                 return kafkaUtil.sendingObjectWithKafka(o, Const.TOPIC_SIZE);
-            } catch (JsonProcessingException e) {
+            } catch (JsonProcessingException | NotFoundException e) {
                 throw new RuntimeException(e);
             }
         }).orElse(null);
@@ -71,7 +71,7 @@ public class SizeServiceImpl implements SizeServiceI {
     }
 
     @Override
-    public Size updateStatus(SizeRequest request, Long id) {
+    public Size updateStatus(SizeRequest request, Long id) throws NotFoundException {
         Size size = repo.findById(id).orElseThrow(() ->
                 new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND)));
         size.setStatus(request.getStatus());

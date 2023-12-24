@@ -25,7 +25,7 @@ public class ColorServiceImpl implements ColorServiceI {
     private KafkaUtil kafkaUtil;
 
     @Override
-    public Color create(Color color) throws JsonProcessingException {
+    public Color create(Color color) throws JsonProcessingException, NotFoundException {
         Color existColor = repo.findFirstByColorCodeOrColorName(color.getColorCode(), color.getColorName());
         if (existColor == null) {
             return kafkaUtil.sendingObjectWithKafka(color, Const.TOPIC_COLOR);
@@ -34,7 +34,7 @@ public class ColorServiceImpl implements ColorServiceI {
     }
 
     @Override
-    public Color update(Color color, Long id) {
+    public Color update(Color color, Long id) throws NotFoundException {
         Color existColor = repo.findFirstByColorCodeOrColorName(color.getColorCode(), color.getColorName());
         if (existColor != null) {
             throw new IllegalArgumentException("Mã màu sắc đã tồn tại");
@@ -48,7 +48,7 @@ public class ColorServiceImpl implements ColorServiceI {
             o.setStatus(color.getStatus());
             try {
                 return kafkaUtil.sendingObjectWithKafka(o, Const.TOPIC_COLOR);
-            } catch (JsonProcessingException e) {
+            } catch (JsonProcessingException | NotFoundException e) {
                 throw new RuntimeException(e);
             }
         }).orElseThrow(() ->
@@ -76,7 +76,7 @@ public class ColorServiceImpl implements ColorServiceI {
     }
 
     @Override
-    public Color updateStatus(ColorRequest request, Long id) {
+    public Color updateStatus(ColorRequest request, Long id) throws NotFoundException {
 
         Color color = repo.findById(id).orElseThrow(() ->
                 new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND)));

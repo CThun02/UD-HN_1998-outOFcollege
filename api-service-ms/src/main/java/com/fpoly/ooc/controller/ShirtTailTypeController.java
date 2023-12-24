@@ -3,6 +3,7 @@ package com.fpoly.ooc.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.entity.Brand;
 import com.fpoly.ooc.entity.ShirtTailType;
+import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.request.shirttailtype.ShirtTailTypeRequest;
 import com.fpoly.ooc.service.interfaces.ShirtTailTypeServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,7 @@ public class ShirtTailTypeController {
     }
 
     @PostMapping("create")
-    public ResponseEntity<?> create(@RequestParam String name) throws JsonProcessingException {
+    public ResponseEntity<?> create(@RequestParam String name) throws JsonProcessingException, NotFoundException {
         ShirtTailType shirtTailType = ShirtTailType.builder().shirtTailTypeName(name).build();
         return ResponseEntity.ok(service.create(shirtTailType));
     }
@@ -36,7 +37,7 @@ public class ShirtTailTypeController {
     }
 
     @PutMapping("updateStatus/{id}")
-    public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestBody ShirtTailTypeRequest request) {
+    public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestBody ShirtTailTypeRequest request) throws NotFoundException {
         return ResponseEntity.ok(service.updateStatus(request, id).getId());
     }
 

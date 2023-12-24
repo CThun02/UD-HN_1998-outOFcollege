@@ -313,6 +313,8 @@ const ProductDetails = (props) => {
   //functions
 
   function handleChangeQuantity(quantity) {
+    console.log("record1: ", quantity);
+
     setQuantiy(quantity);
   }
 
@@ -422,13 +424,25 @@ const ProductDetails = (props) => {
               });
             })
             .catch((error) => {
-              const status = error.response?.status;
-              if (status === 403) {
-                notification.error({
-                  message: "Thông báo",
-                  description: "Bạn không có quyền truy cập!",
-                });
+              console.log(error);
+              const errorCode = error.response?.data;
+              let description = "";
+              if (errorCode?.status === 403) {
+                description = "Bạn không có quyền truy cập!";
               }
+
+              if (errorCode?.status === 500) {
+                description = `${errorCode?.message}`;
+              }
+
+              if (errorCode?.status === "BAD_REQUEST") {
+                description = `${errorCode?.message}`;
+              }
+
+              notification.error({
+                message: "Lỗi",
+                description: description,
+              });
             })
         : props.action();
     }

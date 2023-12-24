@@ -345,7 +345,7 @@ const Checkout = ({ setRenderHeader }) => {
       let cartDetailId = productDetails[i].cartDetailResponse.cartDetailId;
       axios
         .delete(`${cartAPI}/${cartDetailId}`)
-        .then((response) => { })
+        .then((response) => {})
         .catch((error) => {
           console.log(error);
         });
@@ -422,8 +422,9 @@ const Checkout = ({ setRenderHeader }) => {
                     </table>
                             <div style="padding: 0 20px; margin-top: 24px;">
                                 <span style="font-weight: 500; font-size: 24px;">Cảm ơn bạn đã mua hàng!</span><br><br>
-                                <p style="text-align: justify;">Xin chào ${formData.fullName
-          }, Chúng tôi đã nhận được đặt hàng của bạn và đã sẵn sàng để vận chuyển. Chúng tôi sẽ thông báo cho bạn khi đơn hàng được gửi đi.</p><br>
+                                <p style="text-align: justify;">Xin chào ${
+                                  formData.fullName
+                                }, Chúng tôi đã nhận được đặt hàng của bạn và đã sẵn sàng để vận chuyển. Chúng tôi sẽ thông báo cho bạn khi đơn hàng được gửi đi.</p><br>
                                 <div style="text-align: center">
                                     <a style="color: white; font-weight: 500; padding: 16px 20px; border-radius: 4px; background-color: #1666a2; margin-right: 20px;" href="http://localhost:3000/ms-shop/bill/${billCodeGen}">
                                         Xem đơn hàng
@@ -436,139 +437,196 @@ const Checkout = ({ setRenderHeader }) => {
                                         <span>Thông tin đơn hàng</span>
                                         <div style="margin-top: 8px;">
                                         ${productDetails.map((item, index) => {
-            return `<div key={index} style="display: flex; justify-content: space-between; align-items: center; padding: 4px 20px;">
+                                          return `<div key={index} style="display: flex; justify-content: space-between; align-items: center; padding: 4px 20px;">
                                                     <div style="width: 20%; padding: 4px;">
-                                                        <img alt="product" style="width: 100%; border: 1px solid #ccc; border-radius: 8px;" src=${dataToken
-                ? item
-                  .productImageResponse[0]
-                  .path
-                : item.data[0]
-                  .productImageResponse[0]
-                  .path
-              }>
+                                                        <img alt="product" style="width: 100%; border: 1px solid #ccc; border-radius: 8px;" src=${
+                                                          dataToken
+                                                            ? item
+                                                                .productImageResponse[0]
+                                                                ?.path
+                                                            : item.data[0]
+                                                                .productImageResponse[0]
+                                                                ?.path
+                                                        }>
                                                     </div>
                                                     <div style="width: 55%; padding: 4px;">
-                                                        <p>${!dataToken ? (item.data[0].product.productName + "-" + item.data[0].button.buttonName +
-                "-" +
-                item.data[0].brand.brandName +
-                "-" +
-                item.data[0].category.categoryName +
-                "-" +
-                item.data[0].material.materialName +
-                "-" +
-                item.data[0].collar.collarTypeName +
-                "-" +
-                item.data[0].sleeve.sleeveName +
-                "-" +
-                item.data[0].shirtTail.shirtTailTypeName +
-                "-" +
-                item.data[0].pattern.patternName +
-                "-" +
-                item.data[0].form.formName) : (item?.cartDetailResponse.productName +
-                  "-" +
-                  item?.cartDetailResponse?.brand.brandName +
-                  "-" +
-                  item?.cartDetailResponse?.category.categoryName +
-                  "-" +
-                  item?.cartDetailResponse?.pattern.patternName +
-                  "-" +
-                  item?.cartDetailResponse?.form.formName +
-                  "-" +
-                  item?.cartDetailResponse?.button.buttonName +
-                  "-" +
-                  item?.cartDetailResponse?.material.materialName +
-                  "-" +
-                  item?.cartDetailResponse?.collarType.collarName +
-                  "-" +
-                  item?.cartDetailResponse?.sleeveType.sleeveName +
-                  "-" +
-                  item?.cartDetailResponse?.shirtTailType.shirtTailName)} <span style="display: inline-block">(x ${item.quantity})</span></p>
+                                                        <p>${
+                                                          !dataToken
+                                                            ? item.data[0]
+                                                                .product
+                                                                .productName +
+                                                              "-" +
+                                                              item.data[0]
+                                                                .button
+                                                                .buttonName +
+                                                              "-" +
+                                                              item.data[0].brand
+                                                                .brandName +
+                                                              "-" +
+                                                              item.data[0]
+                                                                .category
+                                                                .categoryName +
+                                                              "-" +
+                                                              item.data[0]
+                                                                .material
+                                                                .materialName +
+                                                              "-" +
+                                                              item.data[0]
+                                                                .collar
+                                                                .collarTypeName +
+                                                              "-" +
+                                                              item.data[0]
+                                                                .sleeve
+                                                                .sleeveName +
+                                                              "-" +
+                                                              item.data[0]
+                                                                .shirtTail
+                                                                .shirtTailTypeName +
+                                                              "-" +
+                                                              item.data[0]
+                                                                .pattern
+                                                                .patternName +
+                                                              "-" +
+                                                              item.data[0].form
+                                                                .formName
+                                                            : item
+                                                                ?.cartDetailResponse
+                                                                .productName +
+                                                              "-" +
+                                                              item
+                                                                ?.cartDetailResponse
+                                                                ?.brand
+                                                                .brandName +
+                                                              "-" +
+                                                              item
+                                                                ?.cartDetailResponse
+                                                                ?.category
+                                                                .categoryName +
+                                                              "-" +
+                                                              item
+                                                                ?.cartDetailResponse
+                                                                ?.pattern
+                                                                .patternName +
+                                                              "-" +
+                                                              item
+                                                                ?.cartDetailResponse
+                                                                ?.form
+                                                                .formName +
+                                                              "-" +
+                                                              item
+                                                                ?.cartDetailResponse
+                                                                ?.button
+                                                                .buttonName +
+                                                              "-" +
+                                                              item
+                                                                ?.cartDetailResponse
+                                                                ?.material
+                                                                .materialName +
+                                                              "-" +
+                                                              item
+                                                                ?.cartDetailResponse
+                                                                ?.collarType
+                                                                .collarName +
+                                                              "-" +
+                                                              item
+                                                                ?.cartDetailResponse
+                                                                ?.sleeveType
+                                                                .sleeveName +
+                                                              "-" +
+                                                              item
+                                                                ?.cartDetailResponse
+                                                                ?.shirtTailType
+                                                                .shirtTailName
+                                                        } <span style="display: inline-block">(x ${
+                                            item.quantity
+                                          })</span></p>
                                                     </div>
                                                     <div style="width: 25%; padding: 4px;">
-                                                        <p>${dataToken
-                ? (item
-                  ?.promotion[0]
-                  ? (item
-                    ?.promotion[0]
-                    ?.promotionMethod ===
-                    "vnd"
-                    ? item
-                      ?.promotion[0]
-                      ?.promotionValue
-                    : ((100 -
-                      item
-                        ?.promotion[0]
-                        ?.promotionValue) /
-                      100) *
-                    item
-                      ?.cartDetailResponse
-                      ?.priceitem) *
-                  item
-                    .cartDetailResponse
-                    ?.quantity
-                  : item
-                    .cartDetailResponse
-                    ?.quantity *
-                  item
-                    ?.cartDetailResponse
-                    ?.priceProductDetail
-                ).toLocaleString(
-                  "vi-VN",
-                  {
-                    style:
-                      "currency",
-                    currency:
-                      "VND",
-                  }
-                )
-                : (item.data[0]
-                  .promotion[0]
-                  ? (item.data[0]
-                    .promotion[0]
-                    ?.promotionMethod ===
-                    "vnd"
-                    ? item
-                      .data[0]
-                      .promotion[0]
-                      ?.promotionValue
-                    : ((100 -
-                      item
-                        .data[0]
-                        .promotion[0]
-                        ?.promotionValue) /
-                      100) *
-                    item
-                      .data[0]
-                      .price) *
-                  item?.quantity
-                  : item?.quantity *
-                  item.data[0]
-                    .price
-                ).toLocaleString(
-                  "vi-VN",
-                  {
-                    style:
-                      "currency",
-                    currency:
-                      "VND",
-                  }
-                )
-              }</p>
+                                                        <p>${
+                                                          dataToken
+                                                            ? (item
+                                                                ?.promotion[0]
+                                                                ? (item
+                                                                    ?.promotion[0]
+                                                                    ?.promotionMethod ===
+                                                                  "vnd"
+                                                                    ? item
+                                                                        ?.promotion[0]
+                                                                        ?.promotionValue
+                                                                    : ((100 -
+                                                                        item
+                                                                          ?.promotion[0]
+                                                                          ?.promotionValue) /
+                                                                        100) *
+                                                                      item
+                                                                        ?.cartDetailResponse
+                                                                        ?.priceitem) *
+                                                                  item
+                                                                    .cartDetailResponse
+                                                                    ?.quantity
+                                                                : item
+                                                                    .cartDetailResponse
+                                                                    ?.quantity *
+                                                                  item
+                                                                    ?.cartDetailResponse
+                                                                    ?.priceProductDetail
+                                                              ).toLocaleString(
+                                                                "vi-VN",
+                                                                {
+                                                                  style:
+                                                                    "currency",
+                                                                  currency:
+                                                                    "VND",
+                                                                }
+                                                              )
+                                                            : (item.data[0]
+                                                                .promotion[0]
+                                                                ? (item.data[0]
+                                                                    .promotion[0]
+                                                                    ?.promotionMethod ===
+                                                                  "vnd"
+                                                                    ? item
+                                                                        .data[0]
+                                                                        .promotion[0]
+                                                                        ?.promotionValue
+                                                                    : ((100 -
+                                                                        item
+                                                                          .data[0]
+                                                                          .promotion[0]
+                                                                          ?.promotionValue) /
+                                                                        100) *
+                                                                      item
+                                                                        .data[0]
+                                                                        .price) *
+                                                                  item?.quantity
+                                                                : item?.quantity *
+                                                                  item.data[0]
+                                                                    .price
+                                                              ).toLocaleString(
+                                                                "vi-VN",
+                                                                {
+                                                                  style:
+                                                                    "currency",
+                                                                  currency:
+                                                                    "VND",
+                                                                }
+                                                              )
+                                                        }</p>
                                                     </div >
                                                 </div > `;
-          })}
+                                        })}
                                             <hr>
                                             <div style="width: 70%; float: right; padding: 4px 20px;">
                                                 <div style="display: flex; justify-content: space-between; padding: 4px 0;">
                                                     <span>Tổng giá trị sản phẩm:</span>
                                                     <span style="font-weight: 500;">
                                                         ${totalPrice.toLocaleString(
-            "vi-VN",
-            {
-              style: "currency",
-              currency: "VND",
-            }
-          )}
+                                                          "vi-VN",
+                                                          {
+                                                            style: "currency",
+                                                            currency: "VND",
+                                                          }
+                                                        )}
                                                     </span>
                                                 </div>
                                             </div>
@@ -599,7 +657,7 @@ const Checkout = ({ setRenderHeader }) => {
       } catch (errors) {
         const validationErrors = {};
         errors.inner.forEach((err) => {
-          validationErrors[err.path] = err.message;
+          validationErrors[err?.path] = err.message;
         });
         setError(validationErrors);
         return;
@@ -617,14 +675,12 @@ const Checkout = ({ setRenderHeader }) => {
               productDetailId:
                 productDetails[i].cartDetailResponse.productDetailId,
               price: productDetails[i]?.promotion[0]
-                ? (productDetails[i]?.promotion[0]?.promotionMethod === "vnd"
-                  ? productDetails[i]?.cartDetailResponse
-                    ?.priceProductDetail -
-                  productDetails[i]?.promotion[0]?.promotionValue
+                ? productDetails[i]?.promotion[0]?.promotionMethod === "vnd"
+                  ? productDetails[i]?.cartDetailResponse?.priceProductDetail -
+                    productDetails[i]?.promotion[0]?.promotionValue
                   : ((100 - productDetails[i]?.promotion[0]?.promotionValue) /
-                    100) *
-                  productDetails[i]?.cartDetailResponse
-                    ?.priceProductDetail)
+                      100) *
+                    productDetails[i]?.cartDetailResponse?.priceProductDetail
                 : productDetails[i]?.cartDetailResponse?.priceProductDetail,
               quantity: productDetails[i].cartDetailResponse.quantity,
             };
@@ -635,15 +691,14 @@ const Checkout = ({ setRenderHeader }) => {
             const billDetail = {
               productDetailId: productDetails[i].data[0].id,
               price: productDetails[i].data[0].promotion[0]
-                ? (productDetails[i].data[0].promotion[0]?.promotionMethod ===
+                ? productDetails[i].data[0].promotion[0]?.promotionMethod ===
                   "vnd"
                   ? productDetails[i].data[0].price -
-                  productDetails[i].data[0].promotion[0]?.promotionValue
+                    productDetails[i].data[0].promotion[0]?.promotionValue
                   : ((100 -
-                    productDetails[i].data[0].promotion[0]
-                      ?.promotionValue) /
-                    100) *
-                  productDetails[i].data[0].price)
+                      productDetails[i].data[0].promotion[0]?.promotionValue) /
+                      100) *
+                    productDetails[i].data[0].price
                 : productDetails[i].data[0].price,
               quantity: productDetails[i].quantity,
             };
@@ -699,7 +754,14 @@ const Checkout = ({ setRenderHeader }) => {
 
           setRenderHeader(Math.random());
         } catch (error) {
-          console.log(error);
+          const errorMessage = error?.response?.data;
+          if (errorMessage?.status === 500) {
+            notification.error({
+              message: "Lỗi",
+              description: `${errorMessage?.message}`,
+              duration: 2,
+            });
+          }
         }
         if (!dataToken) {
           removeProductDetailCart();
@@ -724,23 +786,23 @@ const Checkout = ({ setRenderHeader }) => {
       for (let i = 0; i < carts?.length; i++) {
         let priceReduced = carts[i]?.promotion[0]
           ? (carts[i]?.promotion[0]?.promotionMethod === "vnd"
-            ? carts[i]?.cartDetailResponse?.priceProductDetail -
-            carts[i]?.promotion[0]?.promotionValue
-            : ((100 - carts[i]?.promotion[0]?.promotionValue) / 100) *
-            carts[i]?.cartDetailResponse?.priceProductDetail) *
-          carts[i].cartDetailResponse?.quantity
+              ? carts[i]?.cartDetailResponse?.priceProductDetail -
+                carts[i]?.promotion[0]?.promotionValue
+              : ((100 - carts[i]?.promotion[0]?.promotionValue) / 100) *
+                carts[i]?.cartDetailResponse?.priceProductDetail) *
+            carts[i].cartDetailResponse?.quantity
           : carts[i]?.cartDetailResponse?.priceProductDetail *
-          carts[i].cartDetailResponse?.quantity;
+            carts[i].cartDetailResponse?.quantity;
         totalPrice += priceReduced;
       }
     } else {
       for (let i = 0; i < carts?.length; i++) {
         let priceReduced = carts[i].data[0].promotion[0]
           ? (carts[i].data[0].promotion[0]?.promotionMethod === "vnd"
-            ? carts[i].data[0].price -
-            carts[i].data[0].promotion[0]?.promotionValue
-            : ((100 - carts[i].data[0].promotion[0]?.promotionValue) / 100) *
-            carts[i].data[0].price) * carts[i]?.quantity
+              ? carts[i].data[0].price -
+                carts[i].data[0].promotion[0]?.promotionValue
+              : ((100 - carts[i].data[0].promotion[0]?.promotionValue) / 100) *
+                carts[i].data[0].price) * carts[i]?.quantity
           : carts[i].data[0].price * carts[i]?.quantity;
         totalPrice += priceReduced;
       }
@@ -967,9 +1029,9 @@ const Checkout = ({ setRenderHeader }) => {
                         value={
                           dataToken
                             ? defaultAddress.city?.substring(
-                              0,
-                              defaultAddress.city.indexOf("|")
-                            )
+                                0,
+                                defaultAddress.city.indexOf("|")
+                              )
                             : formData.city
                         }
                         allowClear
@@ -1004,9 +1066,9 @@ const Checkout = ({ setRenderHeader }) => {
                         value={
                           dataToken
                             ? defaultAddress?.district?.substring(
-                              0,
-                              defaultAddress.district.indexOf("|")
-                            )
+                                0,
+                                defaultAddress.district.indexOf("|")
+                              )
                             : formData.district
                         }
                         optionFilterProp="children"
@@ -1046,9 +1108,9 @@ const Checkout = ({ setRenderHeader }) => {
                         value={
                           dataToken
                             ? defaultAddress.ward?.substring(
-                              0,
-                              defaultAddress.ward.indexOf("|")
-                            )
+                                0,
+                                defaultAddress.ward.indexOf("|")
+                              )
                             : formData.ward
                         }
                         optionFilterProp="children"
@@ -1233,25 +1295,35 @@ const Checkout = ({ setRenderHeader }) => {
                                   </div>
                                   <div style={{ width: 256 }}>
                                     <span>
-                                      {productDetail?.cartDetailResponse.productName +
+                                      {productDetail?.cartDetailResponse
+                                        .productName +
                                         "-" +
-                                        productDetail?.cartDetailResponse.button.buttonName +
+                                        productDetail?.cartDetailResponse.button
+                                          .buttonName +
                                         "-" +
-                                        productDetail?.cartDetailResponse.brand.brandName +
+                                        productDetail?.cartDetailResponse.brand
+                                          .brandName +
                                         "-" +
-                                        productDetail?.cartDetailResponse.category.categoryName +
+                                        productDetail?.cartDetailResponse
+                                          .category.categoryName +
                                         "-" +
-                                        productDetail?.cartDetailResponse.material.materialName +
+                                        productDetail?.cartDetailResponse
+                                          .material.materialName +
                                         "-" +
-                                        productDetail?.cartDetailResponse.collarType.collarTypeName +
+                                        productDetail?.cartDetailResponse
+                                          .collarType.collarTypeName +
                                         "-" +
-                                        productDetail?.cartDetailResponse.sleeveType.sleeveName +
+                                        productDetail?.cartDetailResponse
+                                          .sleeveType.sleeveName +
                                         "-" +
-                                        productDetail?.cartDetailResponse.shirtTailType.shirtTailTypeName +
+                                        productDetail?.cartDetailResponse
+                                          .shirtTailType.shirtTailTypeName +
                                         "-" +
-                                        productDetail?.cartDetailResponse.pattern.patternName +
+                                        productDetail?.cartDetailResponse
+                                          .pattern.patternName +
                                         "-" +
-                                        productDetail?.cartDetailResponse.form.formName}
+                                        productDetail?.cartDetailResponse.form
+                                          .formName}
                                     </span>
                                     <div
                                       style={{
@@ -1265,8 +1337,8 @@ const Checkout = ({ setRenderHeader }) => {
                                           width: 20,
                                           borderRadius: "50%",
                                           backgroundColor:
-                                            productDetail?.cartDetailResponse.color
-                                              .colorCode,
+                                            productDetail?.cartDetailResponse
+                                              .color.colorCode,
                                         }}
                                       ></div>
                                       /
@@ -1279,21 +1351,20 @@ const Checkout = ({ setRenderHeader }) => {
                                     </div>
                                   </div>
                                   <div>
-                                    {(
-                                      productDetail?.promotion[0]
-                                        ? (productDetail?.promotion[0]
+                                    {(productDetail?.promotion[0]
+                                      ? productDetail?.promotion[0]
                                           ?.promotionMethod === "vnd"
-                                          ? productDetail?.cartDetailResponse
+                                        ? productDetail?.cartDetailResponse
                                             ?.priceProductDetail -
                                           productDetail?.promotion[0]
                                             ?.promotionValue
-                                          : ((100 -
+                                        : ((100 -
                                             productDetail?.promotion[0]
                                               ?.promotionValue) /
                                             100) *
                                           productDetail?.cartDetailResponse
-                                            ?.priceProductDetail)
-                                        : productDetail?.cartDetailResponse
+                                            ?.priceProductDetail
+                                      : productDetail?.cartDetailResponse
                                           ?.priceProductDetail
                                     )?.toLocaleString("vi-VN", {
                                       style: "currency",
@@ -1400,21 +1471,19 @@ const Checkout = ({ setRenderHeader }) => {
                                     </div>
                                   </div>
                                   <div>
-                                    {(
-                                      productDetail.data[0].promotion[0]
-                                        ? (productDetail.data[0].promotion[0]
+                                    {(productDetail.data[0].promotion[0]
+                                      ? (productDetail.data[0].promotion[0]
                                           ?.promotionMethod === "vnd"
                                           ? productDetail.data[0].price -
-                                          productDetail.data[0].promotion[0]
-                                            ?.promotionValue
+                                            productDetail.data[0].promotion[0]
+                                              ?.promotionValue
                                           : ((100 -
-                                            productDetail.data[0]
-                                              .promotion[0]
-                                              ?.promotionValue) /
-                                            100) *
-                                          productDetail.data[0].price) *
+                                              productDetail.data[0].promotion[0]
+                                                ?.promotionValue) /
+                                              100) *
+                                            productDetail.data[0].price) *
                                         productDetail?.quantity
-                                        : productDetail?.quantity *
+                                      : productDetail?.quantity *
                                         productDetail.data[0].price
                                     )?.toLocaleString("vi-VN", {
                                       style: "currency",
@@ -1450,7 +1519,6 @@ const Checkout = ({ setRenderHeader }) => {
                   setIsOpen={setIsOpenFormVoucher}
                   username={dataToken?.username ? dataToken?.username : ""}
                 />
-                {console.log(voucherAdd)}
               </div>
               <div
                 style={{
@@ -1462,10 +1530,12 @@ const Checkout = ({ setRenderHeader }) => {
                   <Col span={18} className={styles.textLeft}>
                     Tạm tính
                   </Col>
-                  <Col span={6}>{(totalPrice)?.toLocaleString("vi-VN", {
-                    style: "currency",
-                    currency: "VND",
-                  })}</Col>
+                  <Col span={6}>
+                    {totalPrice?.toLocaleString("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    })}
+                  </Col>
                   <Col span={18} className={styles.textLeft}>
                     Phí vận chuyển
                   </Col>
@@ -1482,9 +1552,9 @@ const Checkout = ({ setRenderHeader }) => {
                     {voucherAdd?.voucherValue
                       ? voucherAdd.voucherMethod === "vnd"
                         ? voucherAdd?.voucherValue.toLocaleString("vi-VN", {
-                          style: "currency",
-                          currency: "VND",
-                        })
+                            style: "currency",
+                            currency: "VND",
+                          })
                         : voucherAdd?.voucherValue + "%"
                       : "0đ"}
                     {voucherAdd.voucherId ? (
@@ -1505,7 +1575,10 @@ const Checkout = ({ setRenderHeader }) => {
                     Tổng cộng
                   </Col>
                   <Col span={6}>
-                    {(voucherPrice() < 0 ? shippingFee : voucherPrice() + shippingFee)?.toLocaleString("vi-VN", {
+                    {(voucherPrice() < 0
+                      ? shippingFee
+                      : voucherPrice() + shippingFee
+                    )?.toLocaleString("vi-VN", {
                       style: "currency",
                       currency: "VND",
                     })}

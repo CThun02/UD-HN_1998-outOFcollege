@@ -14,6 +14,7 @@ import {
   Radio,
   Table,
   Tooltip,
+  message,
 } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import SpanBorder from "../sale-couter/SpanBorder";
@@ -161,7 +162,7 @@ const BillReturn = () => {
       key: "total",
       title: "Tổng tiền",
       render: (_, record) => {
-        return record.productPrice?.toLocaleString("vi-VN", {
+        return (record.productPrice* record.quantity)?.toLocaleString("vi-VN", {
           style: "currency",
           currency: "VND",
         });
@@ -182,16 +183,14 @@ const BillReturn = () => {
             >
               <Input
                 value={quantity}
-                type={"number"}
                 onChange={(e) => {
-                  if (
-                    Math.abs(Number(e.target.value)) >
-                      Number(record.quantity) ||
-                    Number(e.target.value) === 0
-                  ) {
-                    setQuantity(1);
-                  } else {
-                    setQuantity(e.target.value);
+                  var checkQuantity = e.target.value.replace(/[^\d]/g, "");
+                  setQuantity(checkQuantity);
+                  if(checkQuantity>record.quantity){
+                    notification.error({
+                      message:"Thông báo",
+                      description:"Vượt quá số lượng có thể hoàn trả!"
+                    });
                   }
                 }}
               />
@@ -201,6 +200,7 @@ const BillReturn = () => {
                     onClick={() => {
                       reloadProduct(index, record);
                     }}
+                    disabled={quantity<0 || quantity>record.quantity}
                     type="primary"
                     size="large"
                   >

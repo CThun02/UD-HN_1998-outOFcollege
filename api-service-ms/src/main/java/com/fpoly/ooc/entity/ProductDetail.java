@@ -14,6 +14,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -468,4 +469,28 @@ public class ProductDetail extends BaseEntity {
     @OneToMany(mappedBy = "productDetailId")
     private List<PromotionProduct> promotionProductList;
 
+    @Override
+    public String toString() {
+        return "ProductDetail{" +
+                "id=" + id +
+                ", product=" + product +
+                ", category=" + category +
+                ", brand=" + brand +
+                ", pattern=" + pattern +
+                ", form=" + form +
+                ", button=" + button +
+                ", material=" + material +
+                ", collar=" + collar +
+                ", sleeve=" + sleeve +
+                ", size=" + size +
+                ", color=" + color +
+                ", shirtTail=" + shirtTail +
+                ", price=" + price +
+                ", quantity=" + quantity +
+                ", weight=" + weight +
+                ", version=" + version +
+                ", descriptionDetail='" + descriptionDetail + '\'' +
+                ", promotionProductList=" + promotionProductList +
+                '}';
+    }
 }

@@ -23,9 +23,12 @@ import com.fpoly.ooc.service.interfaces.CartDetailService;
 import com.fpoly.ooc.service.interfaces.DeliveryNoteService;
 import com.fpoly.ooc.service.interfaces.EmailService;
 import com.fpoly.ooc.service.interfaces.PaymentService;
+import com.fpoly.ooc.service.interfaces.ProductDetailServiceI;
+import com.fpoly.ooc.service.interfaces.ProductServiceI;
 import com.fpoly.ooc.service.interfaces.TimeLineService;
 import com.fpoly.ooc.service.interfaces.VoucherService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -42,6 +45,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -84,6 +88,9 @@ public class ClientController {
 
     @Autowired
     private PaymentService paymentService;
+
+    @Autowired
+    private ProductDetailServiceI productDetailService;
 
     @GetMapping("/address")
     public ResponseEntity<?> getAll(@RequestParam("username") String username) {
@@ -255,6 +262,11 @@ public class ClientController {
                                                                 @RequestParam(value = "voucherCode", required = false) String voucherCode) {
         return ResponseEntity.ok(voucherService.getVoucherByUsernameAndVoucherCode(username,
                 voucherCode.trim().equals("") ? null : voucherCode));
+    }
+
+    @GetMapping("/isCheckQuantity")
+    public ResponseEntity<?> isCheckQuantity(@Param("id") Long productDetailId) throws NotFoundException {
+        return ResponseEntity.ok(productDetailService.isCheckQuantity(productDetailId));
     }
 
 }

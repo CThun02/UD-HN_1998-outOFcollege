@@ -344,10 +344,27 @@ const ProductDetails = (props) => {
       }
     }
     if (indexExist !== -1) {
-      productDetailCreate.quantity =
+      console.log("record?.quantity: ", record);
+      if (
         Number(quantity) +
-        Number(props.productDetailsCreate[indexExist].quantity);
-      props.productDetailsCreate?.splice(indexExist, 1);
+          Number(props.productDetailsCreate[indexExist].quantity) >
+        record?.quantity
+      ) {
+        notification.error({
+          message: "Thông báo",
+          description: `Số lượng sản phẩm ${
+            productDetailCreate.quantity > 100
+              ? "thêm tối đa 100"
+              : "tồn không đủ"
+          }`,
+        });
+        return;
+      } else {
+        productDetailCreate.quantity =
+          Number(quantity) +
+          Number(props.productDetailsCreate[indexExist].quantity);
+        props.productDetailsCreate?.splice(indexExist, 1);
+      }
     }
     if (
       productDetailCreate.quantity > record.quantity ||

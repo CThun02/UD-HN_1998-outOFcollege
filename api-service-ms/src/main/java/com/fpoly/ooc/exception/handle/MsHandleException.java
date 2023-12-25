@@ -60,7 +60,7 @@ public class MsHandleException {
     }
 
     @ExceptionHandler({JsonProcessingException.class})
-    public ResponseEntity<Map<String, Object>> notFoundException(JsonProcessingException ex) {
+    public ResponseEntity<Map<String, Object>> jsonProcessingException(JsonProcessingException ex) {
         Map<String, Object> errors = new HashMap<>();
         errors.put("status", Const.HTTP_ERROR_CODE);
         errors.put("message", "Chuyển đỏi dữ liệu thất bại");

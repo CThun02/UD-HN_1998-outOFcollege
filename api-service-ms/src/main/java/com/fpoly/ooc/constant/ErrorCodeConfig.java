@@ -64,6 +64,7 @@ public class ErrorCodeConfig {
         errors.put("ERROR_BILL_NOT_FOUND", "Không tìm thấy hóa đơn");
         errors.put("USER_NOT_FOUND_BY_EMAIL", "Địa chỉ email không chính xác.");
         errors.put("OPERATION_ERROR", "Thao tác thất bại.");
+        errors.put("ERROR_BUY_PRODUCT_NOT_FOUND", "Mua sản phẩm thất bại.");
 
 
         // SEND_EMAIL_TEMPLATE

@@ -17,6 +17,7 @@ import com.fpoly.ooc.service.interfaces.ProductDetailServiceI;
 import com.fpoly.ooc.service.interfaces.TimeLineService;
 import jakarta.persistence.LockModeType;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.stereotype.Service;
@@ -26,7 +27,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
-
+@Slf4j
 public class BillDetailServiceImpl implements BillDetailService {
 
     @Autowired
@@ -80,11 +81,6 @@ public class BillDetailServiceImpl implements BillDetailService {
                         (request.getQuantity() - billDetail.getQuantity()));
             }
 
-            if (Objects.equals(billDetail.getQuantity(), request.getQuantity())) {
-                productDetail.setQuantity(productDetail.getQuantity() -
-                        (request.getQuantity() - billDetail.getQuantity()));
-            }
-
             productDetailService.update(productDetail);
             billDetail.setQuantity(request.getQuantity());
             savedBillDetail = billDetailRepo.save(billDetail);
@@ -101,6 +97,9 @@ public class BillDetailServiceImpl implements BillDetailService {
                         savedBillDetail = billDetailRepo.save(billDetailUpdate);
 
                         ProductDetail productDetailDb = productDetailService.findById(billDetailUpdate.getProductDetail().getId());
+                        if (productDetailDb.getQuantity() - request.getQuantity() < 0) {
+                            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BUY_QUANTITY_THAN_QUANTITY_IN_STORE));
+                        }
                         productDetailDb.setQuantity(productDetailDb.getQuantity() - request.getQuantity());
                         productDetailService.update(productDetailDb);
                         isCheck = Boolean.FALSE;

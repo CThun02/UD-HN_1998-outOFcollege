@@ -1,4 +1,4 @@
-﻿INSERT INTO product (product_code, product_name, status, created_at, created_by)
+﻿INSERT INTO product (product_code, product_name, status)
 VALUES ('P001', N'Áo sơ mi dài tay', 'ACTIVE'),
        ('P002', N'Áo sơ mi ngắn tay', 'ACTIVE'),
 	   ('P003', N'Áo sơ mi oxford', 'ACTIVE'),
@@ -8,83 +8,83 @@ VALUES ('P001', N'Áo sơ mi dài tay', 'ACTIVE'),
 	   ('P007', N'Áo sơ mi lụa', 'ACTIVE'),
 	   ('P008', N'Áo sơ mi nhung tăm', 'ACTIVE');
 
-insert into brand(brand_name, status, created_at, created_by)
-values  (N'Gucci','ACTIVE', GETDATE(), 'ADMIN'),
-		(N'Atino','ACTIVE', GETDATE(), 'ADMIN'),
-		(N'Owen','ACTIVE', GETDATE(), 'ADMIN'),
-		(N'Zara','ACTIVE', GETDATE(), 'ADMIN'),
-		(N'Uniqlo','ACTIVE', GETDATE(), 'ADMIN');
+insert into brand(brand_name, status)
+values  (N'Gucci','ACTIVE'),
+		(N'Atino','ACTIVE'),
+		(N'Owen','ACTIVE'),
+		(N'Zara','ACTIVE'),
+		(N'Uniqlo','ACTIVE');
 
-insert into category(category_name, status, created_at, created_by)
-values(N'Cổ điển', 'ACTIVE', GETDATE(), 'ADMIN'),
-(N'Denim','ACTIVE', GETDATE(), 'ADMIN'),
-(N'Oxford','ACTIVE', GETDATE(), 'ADMIN'),
-(N'Flennel','ACTIVE', GETDATE(), 'ADMIN'),
-(N'Len','ACTIVE', GETDATE(), 'ADMIN');
+insert into category(category_name, status)
+values(N'Cổ điển', 'ACTIVE'),
+(N'Denim','ACTIVE'),
+(N'Oxford','ACTIVE'),
+(N'Flennel','ACTIVE'),
+(N'Len','ACTIVE');
 
-insert into pattern(pattern_name, status, created_at, created_by)
-values(N'Họa tiết caro','ACTIVE', GETDATE(), 'ADMIN'),
-(N'Họa tiết hoa','ACTIVE', GETDATE(), 'ADMIN'),
-(N'Họa tiết chấm bi','ACTIVE', GETDATE(), 'ADMIN'),
-(N'Họa tiết sọc ngang','ACTIVE', GETDATE(), 'ADMIN'),
-(N'Họa tiết đối xứng','ACTIVE', GETDATE(), 'ADMIN');
+insert into pattern(pattern_name, status)
+values(N'Họa tiết caro','ACTIVE'),
+(N'Họa tiết hoa','ACTIVE'),
+(N'Họa tiết chấm bi','ACTIVE'),
+(N'Họa tiết sọc ngang','ACTIVE'),
+(N'Họa tiết đối xứng','ACTIVE');
 
 select * from form
-insert into form(form_name, status, created_at, created_by)
-values(N'Dáng áo ôm sát', 'ACTIVE', GETDATE(), 'ADMIN'),
-(N'Dáng áo thoải mái', 'ACTIVE', GETDATE(), 'ADMIN'),
-(N'Dáng áo rộng', 'ACTIVE', GETDATE(), 'ADMIN'),
-(N'Dáng áo ôm nhẹ', 'ACTIVE', GETDATE(), 'ADMIN'),
-(N'Dáng áo thể thao', 'ACTIVE', GETDATE(), 'ADMIN');
+insert into form(form_name, status)
+values(N'Dáng áo ôm sát', 'ACTIVE'),
+(N'Dáng áo thoải mái', 'ACTIVE'),
+(N'Dáng áo rộng', 'ACTIVE'),
+(N'Dáng áo ôm nhẹ', 'ACTIVE'),
+(N'Dáng áo thể thao', 'ACTIVE');
 
-insert into button_type(button_name, status, created_at, created_by)
-values(N'Nút áo bình thường ', 'ACTIVE', GETDATE(), 'ADMIN'),
-(N'Nút áo tròn', 'ACTIVE', GETDATE(), 'ADMIN'),
-(N'Nút áo kim loại', 'ACTIVE', GETDATE(), 'ADMIN'),
-(N'Nút áo màu sắc', 'ACTIVE', GETDATE(), 'ADMIN'),
-(N'Nút áo vuông', 'ACTIVE', GETDATE(), 'ADMIN');
+insert into button_type(button_name, status)
+values(N'Nút áo bình thường ', 'ACTIVE'),
+(N'Nút áo tròn', 'ACTIVE'),
+(N'Nút áo kim loại', 'ACTIVE'),
+(N'Nút áo màu sắc', 'ACTIVE'),
+(N'Nút áo vuông', 'ACTIVE');
 
-insert into material(material_name, status, created_at, created_by)
-values(N'Chất liệu cotton', 'ACTIVE', GETDATE(), 'ADMIN'),
-(N'Chất liệu linen', 'ACTIVE', GETDATE(), 'ADMIN'),
-(N'Chất liệu denim', 'ACTIVE', GETDATE(), 'ADMIN'),
-(N'Chất liệu flannel', 'ACTIVE', GETDATE(), 'ADMIN'),
-(N'Chất liệu silk', 'ACTIVE', GETDATE(), 'ADMIN');
+insert into material(material_name, status)
+values(N'Chất liệu cotton', 'ACTIVE'),
+(N'Chất liệu linen', 'ACTIVE'),
+(N'Chất liệu denim', 'ACTIVE'),
+(N'Chất liệu flannel', 'ACTIVE'),
+(N'Chất liệu silk', 'ACTIVE');
 
-insert into collar_type(collar_type_name, status, created_at, created_by)
-values(N'Cổ bẻ', 'ACTIVE', GETDATE(), 'ADMIN'),
-(N'Cổ tròn', 'ACTIVE', GETDATE(), 'ADMIN'),
-(N'Cổ veston', 'ACTIVE', GETDATE(), 'ADMIN'),
-(N'Cổ vát', 'ACTIVE', GETDATE(), 'ADMIN'),
-(N'Cổ truyền thống', 'ACTIVE', GETDATE(), 'ADMIN');
+insert into collar_type(collar_type_name, status)
+values(N'Cổ bẻ', 'ACTIVE'),
+(N'Cổ tròn', 'ACTIVE'),
+(N'Cổ veston', 'ACTIVE'),
+(N'Cổ vát', 'ACTIVE'),
+(N'Cổ truyền thống', 'ACTIVE');
 
-insert into sleeve_type (seleeve_name, status, created_at, created_by)
-values(N'Tay dài', 'ACTIVE', GETDATE(), 'ADMIN'),
-(N'Tay ngắn', 'ACTIVE', GETDATE(), 'ADMIN'),
-(N'Tay bo bản', 'ACTIVE', GETDATE(), 'ADMIN'),
-(N'Tay bồng', 'ACTIVE', GETDATE(), 'ADMIN'),
-(N'Tay cộc', 'ACTIVE', GETDATE(), 'ADMIN');
+insert into sleeve_type (seleeve_name, status)
+values(N'Tay dài', 'ACTIVE'),
+(N'Tay ngắn', 'ACTIVE'),
+(N'Tay bo bản', 'ACTIVE'),
+(N'Tay bồng', 'ACTIVE'),
+(N'Tay cộc', 'ACTIVE');
 
-insert into shirt_tail_type(shirt_tail_name, status, created_at, created_by)
-values(N'Đuôi áo cong', 'ACTIVE', GETDATE(), 'ADMIN'),
-(N'Đuôi áo thẳng', 'ACTIVE', GETDATE(), 'ADMIN'),
-(N'Đuôi áo cắt cúp', 'ACTIVE', GETDATE(), 'ADMIN'),
-(N'Đuôi áo dài', 'ACTIVE', GETDATE(), 'ADMIN'),
-(N'Đuôi áo bình thường', 'ACTIVE', GETDATE(), 'ADMIN');
+insert into shirt_tail_type(shirt_tail_name, status)
+values(N'Đuôi áo cong', 'ACTIVE'),
+(N'Đuôi áo thẳng', 'ACTIVE'),
+(N'Đuôi áo cắt cúp', 'ACTIVE'),
+(N'Đuôi áo dài', 'ACTIVE'),
+(N'Đuôi áo bình thường', 'ACTIVE');
 
-insert into size(size_name, status, created_at, created_by)
-values('S', 'ACTIVE', GETDATE(), 'ADMIN'),
-('M', 'ACTIVE', GETDATE(), 'ADMIN'),
-('L', 'ACTIVE', GETDATE(), 'ADMIN'),
-('XL', 'ACTIVE', GETDATE(), 'ADMIN'),
-('XXL', 'ACTIVE', GETDATE(), 'ADMIN');
+insert into size(size_name, status)
+values('S', 'ACTIVE'),
+('M', 'ACTIVE'),
+('L', 'ACTIVE'),
+('XL', 'ACTIVE'),
+('XXL', 'ACTIVE');
 
-insert into color(color_code, color_name, status, created_at, created_by)
-values('#007FFF',N'Xanh biển','ACTIVE', GETDATE(), 'ADMIN'),
-('#00FF00',N'Xanh lá','ACTIVE', GETDATE(), 'ADMIN'),
-('#FF0000',N'Đỏ','ACTIVE', GETDATE(), 'ADMIN'),
-('#FFFF00',N'Vàng','ACTIVE', GETDATE(), 'ADMIN'),
-('#FFA500',N'Cam','ACTIVE', GETDATE(), 'ADMIN');
+insert into color(color_code, color_name, status)
+values('#007FFF',N'Xanh biển','ACTIVE'),
+('#00FF00',N'Xanh lá','ACTIVE'),
+('#FF0000',N'Đỏ','ACTIVE'),
+('#FFFF00',N'Vàng','ACTIVE'),
+('#FFA500',N'Cam','ACTIVE');
 
 
 insert into product_detail(product_id, brand_id, category_id, pattern_id, form_id, button_id, material_id, collar_id, 
@@ -181,7 +181,8 @@ values('ROLE_ADMIN', 'ACTIVE'),
 		('ROLE_EMPLOYEE', 'ACTIVE');
 
 insert into account(username,full_name, role_id, dob, gender, phone_number, email, id_no, password, status)
-values('admin', 'ADMIN',1,'09-09-2000',1,'0987654321','kienptph26901', '01828312832','123', 'ACTIVE'),
-('usser', 'USER', 2,'09-09-2000',1,'0987654321','kienptph26901', '01828312852','123', 'ACTIVE'),
-('employee','EMPLOYEE', 3,'09-09-2000',1,'0987654321','kienptph26901', '01828382832','123', 'ACTIVE')
+values('admin', 'ADMIN',1,'09-09-2000',1,'0987654321','kienptph26901', '01828312832','$2a$12$nyIYiXASCmVPQHnCX13TuO9XfGBLHGT5b.np8PjapIbfi1CtAUc7G', 'ACTIVE'),
+('usser', 'USER', 2,'09-09-2000',1,'0987654321','kienptph26901', '01828312852','$2a$12$nyIYiXASCmVPQHnCX13TuO9XfGBLHGT5b.np8PjapIbfi1CtAUc7G', 'ACTIVE'),
+('employee','EMPLOYEE', 3,'09-09-2000',1,'0987654321','kienptph26901', '01828382832','$2a$12$nyIYiXASCmVPQHnCX13TuO9XfGBLHGT5b.np8PjapIbfi1CtAUc7G', 'ACTIVE')
+
 

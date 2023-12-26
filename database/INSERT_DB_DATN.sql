@@ -181,7 +181,8 @@ values('ROLE_ADMIN', 'ACTIVE'),
 		('ROLE_EMPLOYEE', 'ACTIVE');
 
 insert into account(username,full_name, role_id, dob, gender, phone_number, email, id_no, password, status)
-values('admin', 'ADMIN',1,'09-09-2000',1,'0987654321','kienptph26901', '01828312832','123', 'ACTIVE'),
-('usser', 'USER', 2,'09-09-2000',1,'0987654321','kienptph26901', '01828312852','123', 'ACTIVE'),
-('employee','EMPLOYEE', 3,'09-09-2000',1,'0987654321','kienptph26901', '01828382832','123', 'ACTIVE')
+values('admin', 'ADMIN',1,'09-09-2000',1,'0987654321','kienptph26901', '01828312832','$2a$12$nyIYiXASCmVPQHnCX13TuO9XfGBLHGT5b.np8PjapIbfi1CtAUc7G', 'ACTIVE'),
+('usser', 'USER', 2,'09-09-2000',1,'0987654321','kienptph26901', '01828312852','$2a$12$nyIYiXASCmVPQHnCX13TuO9XfGBLHGT5b.np8PjapIbfi1CtAUc7G', 'ACTIVE'),
+('employee','EMPLOYEE', 3,'09-09-2000',1,'0987654321','kienptph26901', '01828382832','$2a$12$nyIYiXASCmVPQHnCX13TuO9XfGBLHGT5b.np8PjapIbfi1CtAUc7G', 'ACTIVE')
+
 

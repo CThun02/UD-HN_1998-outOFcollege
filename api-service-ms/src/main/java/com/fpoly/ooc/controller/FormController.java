@@ -3,6 +3,7 @@ package com.fpoly.ooc.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.entity.CollarType;
 import com.fpoly.ooc.entity.Form;
+import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.request.form.FormRequest;
 import com.fpoly.ooc.service.interfaces.FormServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,12 +25,12 @@ public class FormController {
     }
 
     @PostMapping("")
-    public ResponseEntity<?> create(@RequestParam String categoryName) throws JsonProcessingException {
+    public ResponseEntity<?> create(@RequestParam String categoryName) throws JsonProcessingException, NotFoundException {
         Form form = Form.builder().formName(categoryName).build();
         return ResponseEntity.ok(service.create(form));
     }
     @PostMapping("create")
-    public ResponseEntity<?> create(@RequestBody Form form) throws JsonProcessingException {
+    public ResponseEntity<?> create(@RequestBody Form form) throws JsonProcessingException, NotFoundException {
         return ResponseEntity.ok(service.create(form));
     }
 
@@ -40,7 +41,7 @@ public class FormController {
     }
 
     @PutMapping("update/{id}")
-    public ResponseEntity<?> updateStatus(@RequestBody FormRequest request,@PathVariable Long id){
+    public ResponseEntity<?> updateStatus(@RequestBody FormRequest request,@PathVariable Long id) throws NotFoundException {
         return ResponseEntity.ok(service.updateStatus(request, id).getId());
     }
 

@@ -45,7 +45,7 @@ public class CartDetailServiceImpl implements CartDetailService {
     private PromotionService promotionService;
 
     @Override
-    public List<CartDetailDisplayResponse> getAllCart(String username) {
+    public List<CartDetailDisplayResponse> getAllCart(String username) throws NotFoundException {
         Account account = accountService.findLoginByUsername(username);
         if (account == null) {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.USER_NOT_FOUND));
@@ -94,7 +94,7 @@ public class CartDetailServiceImpl implements CartDetailService {
 
     @Transactional
     @Override
-    public Cart createCartDetail(CartRequest request) {
+    public Cart createCartDetail(CartRequest request) throws NotFoundException {
         Account account = accountService.findLoginByUsername(request.getUsername());
         if (account == null) {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.USER_NOT_FOUND));
@@ -134,7 +134,7 @@ public class CartDetailServiceImpl implements CartDetailService {
 
     @Transactional
     @Override
-    public Cart createCart(String username) {
+    public Cart createCart(String username) throws NotFoundException {
         Account account = accountService.findLoginByUsername(username);
         if (account == null) {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.USER_NOT_FOUND));
@@ -154,7 +154,7 @@ public class CartDetailServiceImpl implements CartDetailService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public CartDetail updateQuantity(Long cartDetailId, Integer quantity) {
+    public CartDetail updateQuantity(Long cartDetailId, Integer quantity) throws NotFoundException {
         CartDetail cartDetail = cartDetailRepo.findById(cartDetailId)
                 .orElseThrow(() -> new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND)));
         cartDetail.setQuantity(quantity);
@@ -163,7 +163,7 @@ public class CartDetailServiceImpl implements CartDetailService {
 
     @Transactional
     @Override
-    public CartDetail deleteProductDetailFromCart(Long cartDetailId) {
+    public CartDetail deleteProductDetailFromCart(Long cartDetailId) throws NotFoundException {
         CartDetail cartDetail = cartDetailRepo.findById(cartDetailId)
                 .orElseThrow(() -> new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND)));
         cartDetailRepo.deleteById(cartDetailId);

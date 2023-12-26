@@ -25,7 +25,7 @@ public class SleeveServiceImpl implements SleeveServiceI {
     private KafkaUtil kafkaUtil;
 
     @Override
-    public SleeveType create(SleeveType sleeveType) throws JsonProcessingException {
+    public SleeveType create(SleeveType sleeveType) throws JsonProcessingException, NotFoundException {
         SleeveType sleeveCheck = repo.findFirstBySleeveName(sleeveType.getSleeveName());
         if(sleeveCheck==null){
             return kafkaUtil.sendingObjectWithKafka(sleeveType, Const.TOPIC_SLEEVE);
@@ -42,7 +42,7 @@ public class SleeveServiceImpl implements SleeveServiceI {
             o.setStatus(sleeveType.getStatus());
             try {
                 return kafkaUtil.sendingObjectWithKafka(o, Const.TOPIC_SLEEVE);
-            } catch (JsonProcessingException e) {
+            } catch (JsonProcessingException | NotFoundException e) {
                 throw new RuntimeException(e);
             }
         }).orElse(null);
@@ -69,7 +69,7 @@ public class SleeveServiceImpl implements SleeveServiceI {
     }
 
     @Override
-    public SleeveType updateStatus(SleeveTypeRequest request, Long id) {
+    public SleeveType updateStatus(SleeveTypeRequest request, Long id) throws NotFoundException {
         SleeveType sleeveType = repo.findById(id).orElseThrow(() ->
                 new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND)));
         sleeveType.setStatus(request.getStatus());

@@ -5,6 +5,7 @@ import com.fpoly.ooc.dto.BillStatusDTO;
 import com.fpoly.ooc.dto.NotificationDTO;
 import com.fpoly.ooc.entity.Address;
 import com.fpoly.ooc.entity.Bill;
+import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.request.bill.BillRequest;
 import com.fpoly.ooc.request.product.ProductDetailRequest;
 import com.fpoly.ooc.responce.account.GetListCustomer;
@@ -27,7 +28,7 @@ import java.util.List;
 
 public interface BillService {
 
-    Bill createBill(BillRequest request) throws JsonProcessingException;
+    Bill createBill(BillRequest request) throws JsonProcessingException, NotFoundException;
 
     List<BillManagementResponse> getAllBillManagement(
             String billCode,
@@ -43,17 +44,17 @@ public interface BillService {
 
     CountQuantityBillResponse getCountFilterBill(String billType, LocalDateTime startDate, LocalDateTime endDate);
 
-    void deleteBill(Long id);
+    void deleteBill(Long id) throws NotFoundException;
 
     Bill getAllBillByCode(String billCode);
 
     List<GetListCustomer> getListCustomer();
 
-    Integer updateBillStatus(BillStatusDTO dto) throws JsonProcessingException;
+    Integer updateBillStatus(BillStatusDTO dto) throws JsonProcessingException, NotFoundException;
 
     List<Address> getListAddressByUserName(String username);
 
-    Bill findBillByBillId(Long id);
+    Bill findBillByBillId(Long id) throws NotFoundException;
 
     BillRevenueDisplay getBillRevenue(LocalDateTime dayFrom, LocalDateTime dayTo);
 
@@ -77,9 +78,9 @@ public interface BillService {
 
     BillReturnResponse getBillReturnByBillCode(String billCode);
 
-    Bill updateBill(Bill bill);
+    Bill updateBill(Bill bill) throws NotFoundException;
 
     List<NotificationDTO> findAllNotifications();
 
-    Bill updateBillReturn(Long billId, BigDecimal priceReturn, BigDecimal voucherPrice);
+    Bill updateBillReturn(Long billId, BigDecimal priceReturn, BigDecimal voucherPrice) throws NotFoundException;
 }

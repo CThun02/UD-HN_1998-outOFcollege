@@ -26,7 +26,7 @@ public class PatternServiceImpl implements PatternServiceI {
     private KafkaUtil kafkaUtil;
 
     @Override
-    public Pattern create(Pattern pattern) throws JsonProcessingException {
+    public Pattern create(Pattern pattern) throws JsonProcessingException, NotFoundException {
         Pattern patternCheck = repo.findFirstByPatternName(pattern.getPatternName());
         if (patternCheck==null){
             return kafkaUtil.sendingObjectWithKafka(pattern, Const.TOPIC_PATTERN);
@@ -42,7 +42,7 @@ public class PatternServiceImpl implements PatternServiceI {
 
             try {
                 return kafkaUtil.sendingObjectWithKafka(o, Const.TOPIC_PATTERN);
-            } catch (JsonProcessingException e) {
+            } catch (JsonProcessingException | NotFoundException e) {
                 throw new RuntimeException(e);
             }
         }).orElse(null);
@@ -75,7 +75,7 @@ public class PatternServiceImpl implements PatternServiceI {
     }
 
     @Override
-    public Pattern updateStatus(PatternRequest request, Long id) {
+    public Pattern updateStatus(PatternRequest request, Long id) throws NotFoundException {
         Pattern pattern = repo.findById(id).orElseThrow(() ->
                 new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND)));
         pattern.setStatus(request.getStatus());

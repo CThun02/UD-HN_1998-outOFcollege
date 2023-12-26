@@ -7,6 +7,7 @@ import com.fpoly.ooc.entity.Account;
 import com.fpoly.ooc.entity.Address;
 import com.fpoly.ooc.entity.AddressDetail;
 import com.fpoly.ooc.entity.Bill;
+import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.BillRepo;
 import com.fpoly.ooc.request.DeliveryNoteRequest;
 import com.fpoly.ooc.request.bill.BillRequest;
@@ -22,9 +23,12 @@ import com.fpoly.ooc.service.interfaces.CartDetailService;
 import com.fpoly.ooc.service.interfaces.DeliveryNoteService;
 import com.fpoly.ooc.service.interfaces.EmailService;
 import com.fpoly.ooc.service.interfaces.PaymentService;
+import com.fpoly.ooc.service.interfaces.ProductDetailServiceI;
+import com.fpoly.ooc.service.interfaces.ProductServiceI;
 import com.fpoly.ooc.service.interfaces.TimeLineService;
 import com.fpoly.ooc.service.interfaces.VoucherService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -41,6 +45,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -84,13 +89,16 @@ public class ClientController {
     @Autowired
     private PaymentService paymentService;
 
+    @Autowired
+    private ProductDetailServiceI productDetailService;
+
     @GetMapping("/address")
     public ResponseEntity<?> getAll(@RequestParam("username") String username) {
         return ResponseEntity.ok(addressService.getListAddress(username));
     }
 
     @PostMapping("/bill")
-    public ResponseEntity<?> createBill(@RequestBody(required = false) BillRequest request) throws JsonProcessingException {
+    public ResponseEntity<?> createBill(@RequestBody(required = false) BillRequest request) throws JsonProcessingException, NotFoundException {
         return ResponseEntity.ok(billService.createBill(request));
     }
 
@@ -105,7 +113,7 @@ public class ClientController {
     }
 
     @PutMapping("/createAddress")
-    public ResponseEntity<?> createAddress(@RequestBody Address address, @RequestParam String userName) {
+    public ResponseEntity<?> createAddress(@RequestBody Address address, @RequestParam String userName) throws NotFoundException {
         Address addressCreate = addressService.create(address);
         AddressDetail addressDetailCreate = AddressDetail.builder().accountAddress(Account.builder().username(userName).build())
                 .addressDetail(Address.builder().id(addressCreate.getId()).build()).build();
@@ -170,14 +178,14 @@ public class ClientController {
     }
 
     @GetMapping("/timeline/{billId}")
-    public ResponseEntity<?> timelineResponse(@PathVariable("billId") Long billId) {
+    public ResponseEntity<?> timelineResponse(@PathVariable("billId") Long billId) throws NotFoundException {
         return ResponseEntity.ok(timeLineService.getAllTimeLineByBillId(billId));
     }
 
     @PostMapping("/create-timeline/{id}")
     public ResponseEntity<?> createTimelineByBillId(
             @PathVariable("id") Long id,
-            @RequestBody(required = false) TimeLinerequest request) throws JsonProcessingException {
+            @RequestBody(required = false) TimeLinerequest request) throws JsonProcessingException, NotFoundException {
         Bill bill;
         bill = billRepo.findById(id).orElse(null);
         if (bill != null) {
@@ -190,7 +198,7 @@ public class ClientController {
 
 
     @PutMapping("/change-status-bill")
-    public ResponseEntity<?> updateBillStatus(@RequestBody BillStatusDTO dto) throws JsonProcessingException {
+    public ResponseEntity<?> updateBillStatus(@RequestBody BillStatusDTO dto) throws JsonProcessingException, NotFoundException {
         return ResponseEntity.ok(billService.updateBillStatus(dto));
     }
 
@@ -230,7 +238,7 @@ public class ClientController {
     }
 
     @GetMapping("/address/{id}")
-    public ResponseEntity<?> findByAddress(@PathVariable("id") Long id) {
+    public ResponseEntity<?> findByAddress(@PathVariable("id") Long id) throws NotFoundException {
         return ResponseEntity.ok(addressService.getOne(id));
     }
 
@@ -240,7 +248,7 @@ public class ClientController {
     }
 
     @GetMapping("/getTimelineClientByBillCode/{billCode}")
-    public ResponseEntity<?> getTest(@PathVariable("billCode") String billCode) {
+    public ResponseEntity<?> getTest(@PathVariable("billCode") String billCode) throws NotFoundException {
         return ResponseEntity.ok().body(timeLineService.getTimelineByBillCode(billCode));
     }
 
@@ -254,6 +262,11 @@ public class ClientController {
                                                                 @RequestParam(value = "voucherCode", required = false) String voucherCode) {
         return ResponseEntity.ok(voucherService.getVoucherByUsernameAndVoucherCode(username,
                 voucherCode.trim().equals("") ? null : voucherCode));
+    }
+
+    @GetMapping("/isCheckQuantity")
+    public ResponseEntity<?> isCheckQuantity(@Param("id") Long productDetailId) throws NotFoundException {
+        return ResponseEntity.ok(productDetailService.isCheckQuantity(productDetailId));
     }
 
 }

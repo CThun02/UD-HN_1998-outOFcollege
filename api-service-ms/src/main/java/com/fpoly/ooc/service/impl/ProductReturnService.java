@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.entity.Bill;
 import com.fpoly.ooc.entity.ProductDetail;
 import com.fpoly.ooc.entity.ProductReturn;
+import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.ProductReturnRepository;
 import com.fpoly.ooc.request.product.ProductReturnRequest;
 import com.fpoly.ooc.responce.product.ProductDetailDisplayResponse;
@@ -42,7 +43,7 @@ public class ProductReturnService implements ProductReturnServiceI {
             productDetail.setQuantity(productDetail.getQuantity() + request.getQuantity());
             try {
                 productDetailService.update(productDetail);
-            } catch (JsonProcessingException e) {
+            } catch (JsonProcessingException | NotFoundException e) {
                 e.printStackTrace();
             }
         }

@@ -2,6 +2,7 @@ package com.fpoly.ooc.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.entity.Brand;
+import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.request.brand.BrandRequest;
 import com.fpoly.ooc.service.interfaces.BrandServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,12 +24,12 @@ public class BrandController {
     }
 
     @PostMapping("")
-    public ResponseEntity<?> create(@RequestParam String brandName) throws JsonProcessingException {
+    public ResponseEntity<?> create(@RequestParam String brandName) throws JsonProcessingException, NotFoundException {
         Brand brand = Brand.builder().brandName(brandName).build();
         return ResponseEntity.ok(service.create(brand));
     }
     @PostMapping("create")
-    public ResponseEntity<?> create(@RequestBody Brand brand) throws JsonProcessingException {
+    public ResponseEntity<?> create(@RequestBody Brand brand) throws JsonProcessingException, NotFoundException {
         return ResponseEntity.ok(service.create(brand));
     }
 
@@ -37,7 +38,7 @@ public class BrandController {
         return ResponseEntity.ok(service.update(brand, id));
     }
     @PutMapping("update/{id}")
-    public ResponseEntity<?> updateStatus(@RequestBody BrandRequest request, @PathVariable Long id){
+    public ResponseEntity<?> updateStatus(@RequestBody BrandRequest request, @PathVariable Long id) throws NotFoundException {
         return ResponseEntity.ok(service.updateStatus(request, id).getId());
     }
 

@@ -113,7 +113,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Account update(AccountRequest request, String username) {
+    public Account update(AccountRequest request, String username) throws NotFoundException {
         Account account = accountRepository.findById(username).orElse(null);
         if (account == null) {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND));
@@ -130,7 +130,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public List<AddressDetail> getAddressDetailsByUsername(String username) {
+    public List<AddressDetail> getAddressDetailsByUsername(String username) throws NotFoundException {
         Account account = accountRepository.findById(username).orElse(null);
         if (account == null) {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.USER_NOT_FOUND));

@@ -1,5 +1,6 @@
 package com.fpoly.ooc.request.bill;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fpoly.ooc.dto.EmailDetails;
 import com.fpoly.ooc.request.payment.PaymentDetailRequest;
 import lombok.AllArgsConstructor;
@@ -52,7 +53,7 @@ public class BillRequest {
 
     private String phoneNumber;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     private LocalDateTime shipDate;
 
     private BigDecimal shipPrice;

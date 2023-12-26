@@ -28,7 +28,7 @@ public class VoucherHistoryServiceImpl implements VoucherHistoryService {
     private VoucherHistoryRepository voucherHistoryRepository;
 
     @Override
-    public VoucherHistory save(VoucherHistorySaveDTO dto) {
+    public VoucherHistory save(VoucherHistorySaveDTO dto) throws NotFoundException {
         BillService billService = new BillServiceImpl();
         if(voucherService.isCheckTimeUse(dto.getVoucherCode(), null)) {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.VOUCHER_END_OF_USE));

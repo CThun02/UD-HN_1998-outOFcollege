@@ -1,6 +1,7 @@
 package com.fpoly.ooc.controller;
 
 import com.fpoly.ooc.dto.VoucherAndPromotionConditionDTO;
+import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.request.voucher.DisplayVoucherRequest;
 import com.fpoly.ooc.request.voucher.VoucherRequest;
 import com.fpoly.ooc.service.interfaces.VoucherService;
@@ -36,23 +37,23 @@ public class VoucherController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> createVoucher(@Valid @RequestBody VoucherRequest request) {
+    public ResponseEntity<?> createVoucher(@Valid @RequestBody VoucherRequest request) throws NotFoundException {
 
         return ResponseEntity.ok().body(voucherService.saveOrUpdate(request));
     }
 
     @PutMapping("/update")
-    public ResponseEntity<?> updateVoucher(@Valid @RequestBody VoucherRequest request) {
+    public ResponseEntity<?> updateVoucher(@Valid @RequestBody VoucherRequest request) throws NotFoundException {
         return ResponseEntity.ok().body(voucherService.saveOrUpdate(request));
     }
 
     @PutMapping("/update/{code}")
-    public ResponseEntity<?> updateStatus(@PathVariable("code") String code) {
+    public ResponseEntity<?> updateStatus(@PathVariable("code") String code) throws NotFoundException {
         return ResponseEntity.ok().body(voucherService.updateStatus(code).getVoucherCode());
     }
 
     @GetMapping("/{code}")
-    public ResponseEntity<?> findByCode(@PathVariable("code") String code) {
+    public ResponseEntity<?> findByCode(@PathVariable("code") String code) throws NotFoundException {
 
         return ResponseEntity.ok().body(voucherService.findByVoucherCode(code));
     }

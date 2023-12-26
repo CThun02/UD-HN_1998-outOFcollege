@@ -2,6 +2,7 @@ package com.fpoly.ooc.controller;
 
 import com.fpoly.ooc.dto.VoucherHistorySaveDTO;
 import com.fpoly.ooc.entity.VoucherHistory;
+import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.service.interfaces.VoucherHistoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +16,7 @@ public class VoucherHistoryController {
     private VoucherHistoryService voucherHistoryService;
 
     @PostMapping("/create")
-    public ResponseEntity<?> addVoucherHistory(@RequestBody VoucherHistorySaveDTO dto) {
+    public ResponseEntity<?> addVoucherHistory(@RequestBody VoucherHistorySaveDTO dto) throws NotFoundException {
         return ResponseEntity.ok(voucherHistoryService.save(dto));
     }
 

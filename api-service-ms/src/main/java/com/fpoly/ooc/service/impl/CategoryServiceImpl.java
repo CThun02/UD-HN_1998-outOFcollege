@@ -26,7 +26,7 @@ public class CategoryServiceImpl implements CategoryServiceI {
     private KafkaUtil kafkaUtil;
 
     @Override
-    public Category create(Category category) throws JsonProcessingException {
+    public Category create(Category category) throws JsonProcessingException, NotFoundException {
         Category check = repo.findFirstByCategoryName(category.getCategoryName());
         if(check==null){
             return kafkaUtil.sendingObjectWithKafka(category, Const.TOPIC_CATEGORY);
@@ -41,7 +41,7 @@ public class CategoryServiceImpl implements CategoryServiceI {
             o.setCategoryName(category.getCategoryName());
             try {
                 return kafkaUtil.sendingObjectWithKafka(o, Const.TOPIC_CATEGORY);
-            } catch (JsonProcessingException e) {
+            } catch (JsonProcessingException | NotFoundException e) {
                 throw new RuntimeException(e);
             }
         }).orElse(null);
@@ -73,7 +73,7 @@ public class CategoryServiceImpl implements CategoryServiceI {
     }
 
     @Override
-    public Category updateStatus(CategoryRequest request, Long id) {
+    public Category updateStatus(CategoryRequest request, Long id) throws NotFoundException {
         Category category = repo.findById(id).orElseThrow(() ->
                 new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND)));
         category.setStatus(request.getStatus());

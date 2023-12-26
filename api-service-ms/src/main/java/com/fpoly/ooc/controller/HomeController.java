@@ -1,6 +1,7 @@
 package com.fpoly.ooc.controller;
 
 import com.fpoly.ooc.dto.ProductDetailsDTO;
+import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.request.product.ProductDetailCondition;
 import com.fpoly.ooc.request.productDetail.GetSizeAndColorRequest;
 import com.fpoly.ooc.service.interfaces.ProductDetailServiceI;
@@ -53,12 +54,12 @@ public class HomeController {
     }
 
     @PostMapping("/details-product")
-    public ResponseEntity<?> getProductDetail(@RequestBody GetSizeAndColorRequest req) {
+    public ResponseEntity<?> getProductDetail(@RequestBody GetSizeAndColorRequest req) throws NotFoundException {
         return ResponseEntity.ok(productDetailService.getProductDetailsShop(req));
     }
 
     @PostMapping("/colors-and-sizes")
-    public ResponseEntity<?> getSizesAndColors(@RequestBody GetSizeAndColorRequest req) {
+    public ResponseEntity<?> getSizesAndColors(@RequestBody GetSizeAndColorRequest req) throws NotFoundException {
         return ResponseEntity.ok(productDetailService.getColorAndSize(req));
     }
 

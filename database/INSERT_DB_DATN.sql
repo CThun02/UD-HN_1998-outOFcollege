@@ -1,4 +1,4 @@
-﻿INSERT INTO product (product_code, product_name, status, created_at, created_by)
+INSERT INTO product (product_code, product_name, status, created_at, created_by)
 VALUES ('P001', N'Áo sơ mi dài tay', 'ACTIVE'),
        ('P002', N'Áo sơ mi ngắn tay', 'ACTIVE'),
 	   ('P003', N'Áo sơ mi oxford', 'ACTIVE'),

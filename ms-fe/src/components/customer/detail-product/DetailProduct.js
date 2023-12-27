@@ -92,6 +92,7 @@ function DetailProduct({ setRenderHeader }) {
           `http://localhost:8080/api/client/filterProductDetailSellByIdCom`,
           {
             params: {
+              productId: productId,
               materialId: materialId,
               shirtTailId: shirtTailId,
               sleeveId: sleeveId,

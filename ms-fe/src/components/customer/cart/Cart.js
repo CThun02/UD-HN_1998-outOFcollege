@@ -793,7 +793,7 @@ const Cart = (props) => {
     } else {
       newData.map((e) => {
         axios
-          .get(baseUrl + "/isCheckQuantity?id=" + e?.data[0]?.id)
+          .get(baseUrl + "/isCheckQuantity/" + e?.data[0]?.id)
           .catch((err) => {
             notification.error({
               message: "Thông báo",
@@ -806,8 +806,8 @@ const Cart = (props) => {
       });
     }
 
-    // localStorage.setItem("checkout", JSON.stringify(newData));
-    // navigate("/ms-shop/checkout");
+    localStorage.setItem("checkout", JSON.stringify(newData));
+    navigate("/ms-shop/checkout");
   };
 
   const rowSelection = {

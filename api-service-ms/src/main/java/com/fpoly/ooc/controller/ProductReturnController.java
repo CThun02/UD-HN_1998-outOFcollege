@@ -37,7 +37,7 @@ public class ProductReturnController {
 
     @GetMapping("/getProductReturnByBillCode")
     public ResponseEntity<?> getProductReturnByBillCode(@RequestParam String billCode) {
-        return ResponseEntity.ok(service.getProductReturnByBillCode(billCode));
+        return ResponseEntity.ok(null);
     }
 
     @GetMapping("/getProductReturnDetailByProductDetailId")

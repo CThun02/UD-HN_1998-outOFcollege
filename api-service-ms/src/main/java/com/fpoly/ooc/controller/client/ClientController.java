@@ -264,8 +264,8 @@ public class ClientController {
                 voucherCode.trim().equals("") ? null : voucherCode));
     }
 
-    @GetMapping("/isCheckQuantity")
-    public ResponseEntity<?> isCheckQuantity(@Param("id") Long productDetailId) throws NotFoundException {
+    @GetMapping("/isCheckQuantity/{id}")
+    public ResponseEntity<?> isCheckQuantity(@PathVariable("id") Long productDetailId) throws NotFoundException {
         return ResponseEntity.ok(productDetailService.isCheckQuantity(productDetailId));
     }
 

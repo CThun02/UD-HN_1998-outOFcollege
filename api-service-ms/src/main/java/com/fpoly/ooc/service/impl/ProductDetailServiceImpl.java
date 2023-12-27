@@ -284,6 +284,14 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
     }
 
     @Override
+    public ProductDetail updateQuantityForBuy(ProductDetail productDetail) {
+        if (productDetail.getQuantity() >= 0 && productDetail.getStatus().equals(Const.STATUS_ACTIVE)) {
+            return repo.save(productDetail);
+        }
+        return null;
+    }
+
+    @Override
     public List<Long> findAllIdsResponseProductDetails(Long idPromotion) {
         return repo.findAllByIdPromotion(idPromotion);
     }

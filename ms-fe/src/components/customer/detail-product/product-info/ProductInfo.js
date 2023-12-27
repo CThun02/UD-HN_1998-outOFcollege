@@ -156,6 +156,15 @@ function ProductInfo({
       });
       return;
     }
+
+    if (colorsAndSizes?.quantity <= 0) {
+      notification.error({
+        message: "Thông báo",
+        description: "Số lượng không đủ",
+      });
+      return;
+    }
+
     if (data) {
       try {
         if (data) {
@@ -173,7 +182,11 @@ function ProductInfo({
         // localStorage.setItem('checkout', JSON.stringify(lstProductDetail));
         // navigate('/ms-shop/checkout');
       } catch (error) {
-        console.error(error);
+        notification.error({
+          message: "Đã xảy ra lỗi",
+          description: "Vui lòng thử lại sau ít phút",
+        });
+        return;
       }
     } else {
       lstProductDetail.push({ data: productDetails, quantity: quantity });
@@ -401,6 +414,7 @@ function ProductInfo({
               <button
                 className={`${styles.btn}`}
                 onClick={(e) => handleAddToCart(e)}
+                disabled={colorsAndSizes?.quantity <= 0}
               >
                 <FontAwesomeIcon
                   icon={faCartPlus}
@@ -415,6 +429,7 @@ function ProductInfo({
               <button
                 className={`${styles.btn} ${styles.shoppingNow}`}
                 onClick={(e) => handleByNow(e)}
+                disabled={colorsAndSizes?.quantity <= 0}
               >
                 <FontAwesomeIcon
                   icon={faCirclePlus}

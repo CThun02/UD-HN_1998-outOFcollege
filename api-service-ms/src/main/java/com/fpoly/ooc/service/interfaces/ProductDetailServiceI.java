@@ -42,4 +42,5 @@ public interface ProductDetailServiceI {
     Optional<ProductDetailShopResponse> getProductDetailsShop(GetSizeAndColorRequest req) throws NotFoundException;
 
     Boolean isCheckQuantity(Long productDetailId) throws NotFoundException;
+    ProductDetail updateQuantityForBuy(ProductDetail productDetail);
 }

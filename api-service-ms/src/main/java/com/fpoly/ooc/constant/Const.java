@@ -64,6 +64,7 @@ public class Const {
     public static final String ERROR_SERVICE = "ERROR_SERVICE";
     public static final String ERROR_BILL_NOT_FOUND = "ERROR_BILL_NOT_FOUND";
     public static final String ERROR_BUY_PRODUCT_NOT_FOUND = "ERROR_BUY_PRODUCT_NOT_FOUND";
+    public static final String ERROR_ADD_TO_CART_THAN_QUANTITY = "ERROR_ADD_TO_CART_THAN_QUANTITY";
 
     //kafka
     public static final String KAFKA_SERVER = "localhost:9092";

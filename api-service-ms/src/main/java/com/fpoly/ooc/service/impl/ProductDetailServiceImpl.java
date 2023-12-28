@@ -292,6 +292,17 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
     }
 
     @Override
+    public ProductDetail findProductDetailByIdAndStatus(Long id) throws NotFoundException {
+        ProductDetail productDetail = repo.findProductDetailByIdAndStatusAndQuantityGreaterThan(id, Const.STATUS_ACTIVE, 0);
+
+        if (Objects.nonNull(productDetail)) {
+            return productDetail;
+        }
+
+        throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND));
+    }
+
+    @Override
     public List<Long> findAllIdsResponseProductDetails(Long idPromotion) {
         return repo.findAllByIdPromotion(idPromotion);
     }

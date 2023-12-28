@@ -65,6 +65,7 @@ public class ErrorCodeConfig {
         errors.put("USER_NOT_FOUND_BY_EMAIL", "Địa chỉ email không chính xác.");
         errors.put("OPERATION_ERROR", "Thao tác thất bại.");
         errors.put("ERROR_BUY_PRODUCT_NOT_FOUND", "Mua sản phẩm thất bại.");
+        errors.put("ERROR_ADD_TO_CART_THAN_QUANTITY", "Vượt quá số lượng");
 
 
         // SEND_EMAIL_TEMPLATE

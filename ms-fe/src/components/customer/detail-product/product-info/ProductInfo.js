@@ -88,7 +88,8 @@ function ProductInfo({
             existingData?.productDetails[i].data[0].id === productDetails[0]?.id
           ) {
             if (
-              existingData.productDetails[i].quantity + quantity >
+              Number(existingData.productDetails[i].quantity) +
+                Number(quantity) >
               colorsAndSizes?.quantity
             ) {
               notification.warning({
@@ -98,8 +99,15 @@ function ProductInfo({
               });
               return;
             } else {
-              existingData.productDetails[i].quantity += quantity;
+              existingData.productDetails[i].quantity =
+                Number(existingData.productDetails[i].quantity) +
+                Number(quantity);
               productExists = true;
+              notification.success({
+                message: "Thông báo",
+                description: "Thêm thành công!",
+                duration: 2,
+              });
               break;
             }
           }
@@ -126,19 +134,23 @@ function ProductInfo({
           ],
         })
         .then((response) => {
-          console.log(response.data);
+          setRenderHeader(Math.random());
+          notification.success({
+            message: "Thông báo",
+            description: "Thêm thành công!",
+            duration: 2,
+          });
         })
         .catch((err) => {
-          console.log(err);
+          notification.error({
+            message: "Lỗi",
+            description:
+              "Tổng số sản phẩm có trong giỏ hàng và khi thêm vượt quá số lượng tồn!",
+            duration: 2,
+          });
+          return;
         });
     }
-
-    setRenderHeader(Math.random());
-    notification.success({
-      message: "Thông báo",
-      description: "Thêm thành công!",
-      duration: 2,
-    });
   };
 
   const handleByNow = async (e) => {

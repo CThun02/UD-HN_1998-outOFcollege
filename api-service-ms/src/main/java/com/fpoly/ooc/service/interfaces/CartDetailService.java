@@ -25,4 +25,6 @@ public interface CartDetailService {
 
     CartIndexResponse getCartIndexz(String username);
 
+    Boolean deleteProductInCartFromUser(String username, Long cartDetailId) throws NotFoundException;
+
 }

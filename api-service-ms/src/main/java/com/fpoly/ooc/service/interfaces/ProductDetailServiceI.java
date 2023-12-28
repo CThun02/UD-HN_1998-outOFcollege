@@ -43,4 +43,6 @@ public interface ProductDetailServiceI {
 
     Boolean isCheckQuantity(Long productDetailId) throws NotFoundException;
     ProductDetail updateQuantityForBuy(ProductDetail productDetail);
+
+    ProductDetail findProductDetailByIdAndStatus(Long id) throws NotFoundException;
 }

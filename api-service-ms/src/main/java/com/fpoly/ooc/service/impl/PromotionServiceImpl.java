@@ -16,6 +16,7 @@ import com.fpoly.ooc.service.interfaces.PromotionProductDetailService;
 import com.fpoly.ooc.service.interfaces.PromotionService;
 import com.fpoly.ooc.util.PageUltil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -233,6 +234,10 @@ public class PromotionServiceImpl implements PromotionService {
                 break;
             default:
                 throw new NotFoundException(ErrorCodeConfig.getMessage(Const.STATUS_INVALID), "status");
+        }
+
+        if (CollectionUtils.isEmpty(request.getProductDetailIds())) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_PRODUCT_DETAIL_NOT_EMPTY_IN_PROMOTION));
         }
 
         promotion.setId(

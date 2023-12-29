@@ -66,6 +66,7 @@ public class ErrorCodeConfig {
         errors.put("OPERATION_ERROR", "Thao tác thất bại.");
         errors.put("ERROR_BUY_PRODUCT_NOT_FOUND", "Mua sản phẩm thất bại.");
         errors.put("ERROR_ADD_TO_CART_THAN_QUANTITY", "Vượt quá số lượng");
+        errors.put("ERROR_PRODUCT_DETAIL_NOT_EMPTY_IN_PROMOTION", "Chọn sản phẩm trước khi tạo đợt giảm giá");
 
 
         // SEND_EMAIL_TEMPLATE

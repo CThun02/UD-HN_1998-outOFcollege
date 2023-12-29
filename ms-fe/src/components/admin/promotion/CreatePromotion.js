@@ -143,8 +143,6 @@ function CreatePromotion() {
         async function savePromotion() {
           const promotion = ref.current?.values;
 
-          console.log("ids: ", productsDetailsId);
-
           if (promotion.promotionId) {
             async function deleteProductDetail() {
               const dto = {
@@ -176,6 +174,15 @@ function CreatePromotion() {
 
           setIsLoading(true);
           if (promotion) {
+            if (productsDetailsId?.length <= 0) {
+              setIsLoading(false);
+              apiNotification.error({
+                message: "Lỗi",
+                description:
+                  "Vui lòng chọn sản phẩm trước khi tạo đợt giảm giá",
+              });
+              return;
+            }
             await axios
               .post(
                 baseUrl + "save",
@@ -189,8 +196,8 @@ function CreatePromotion() {
                   ),
                   promotionValue: isNaN(promotion?.promotionValue)
                     ? Number.parseInt(
-                      promotion?.promotionValue?.replace(/,/g, "")
-                    )
+                        promotion?.promotionValue?.replace(/,/g, "")
+                      )
                     : promotion?.promotionValue,
                   promotionId: promotion?.promotionId
                     ? promotion?.promotionId
@@ -414,7 +421,7 @@ function CreatePromotion() {
                                   status={
                                     (touched.promotionName &&
                                       errors.promotionName) ||
-                                      errorsServer?.promotionName
+                                    errorsServer?.promotionName
                                       ? "error"
                                       : "success"
                                   }
@@ -491,7 +498,7 @@ function CreatePromotion() {
                                   status={
                                     (touched.promotionValue &&
                                       errors.promotionValue) ||
-                                      errorsServer?.promotionValue
+                                    errorsServer?.promotionValue
                                       ? "error"
                                       : "success"
                                   }
@@ -540,7 +547,7 @@ function CreatePromotion() {
                                   }
                                   status={
                                     (touched.startDate && errors.startDate) ||
-                                      errorsServer?.startDate
+                                    errorsServer?.startDate
                                       ? "error"
                                       : "success"
                                   }
@@ -585,7 +592,7 @@ function CreatePromotion() {
                                   onBlur={handleBlur}
                                   status={
                                     (touched.endDate && errors.endDate) ||
-                                      errorsServer?.endDate
+                                    errorsServer?.endDate
                                       ? "error"
                                       : "success"
                                   }

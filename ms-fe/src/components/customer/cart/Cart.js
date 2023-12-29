@@ -834,6 +834,7 @@ const Cart = (props) => {
   };
 
   const getCartAPI = async () => {
+    setLoading(false);
     const data = await token;
 
     if (data) {
@@ -896,8 +897,11 @@ const Cart = (props) => {
   }, []);
 
   useEffect(() => {
-    getAllCart();
-    getCartAPI();
+    if (token) {
+      getCartAPI();
+    } else {
+      getAllCart();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [render]);
 

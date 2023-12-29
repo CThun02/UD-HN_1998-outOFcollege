@@ -16,7 +16,7 @@ import FollowOrder from "./follow-order/FollowOrder";
 
 function ClientPage() {
   const [render, setRender] = useState(0);
-  useEffect(() => { }, [render])
+  useEffect(() => {}, [render]);
   return (
     <Row>
       <Col span={24} className="h-100vh">
@@ -29,7 +29,10 @@ function ClientPage() {
             <Route path="home" element={<HomeClient />} />
             <Route path="about" element={<About />} />
             <Route path="contact" element={<Contact />} />
-            <Route path="checkout" element={<Checkout setRenderHeader={setRender} />} />
+            <Route
+              path="checkout"
+              element={<Checkout setRenderHeader={setRender} />}
+            />
             <Route path="cart" element={<Cart setRenderHeader={setRender} />} />
             <Route path="anything" element={<Shop />} />
             <Route path="follow-order" element={<FollowOrder />} />
@@ -41,7 +44,10 @@ function ClientPage() {
                 <Route index element={<Shop />} />
                 <Route path="detail/:id" element={<DetailProduct />} />
               </Route> */}
-              <Route path="detail/:id" element={<DetailProduct setRenderHeader={setRender} />} />
+              <Route
+                path="detail/:id"
+                element={<DetailProduct setRenderHeader={setRender} />}
+              />
             </Route>
             <Route
               path="*"

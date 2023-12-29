@@ -6,13 +6,14 @@ import Quantity from "../../../element/quantity/Quantity";
 import { faCartPlus, faCirclePlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button, Col, Modal, Rate, Row, Space, Tag, notification } from "antd";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import numeral from "numeral";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { now } from "moment";
 import { useEffect } from "react";
 import { getAuthToken } from "../../../../service/Token";
 import axios from "axios";
+import { NotificationContext } from "../../../element/notification/NotificationAuthen";
 
 const image = "/change-size/change-size.jpg";
 
@@ -31,6 +32,7 @@ function ProductInfo({
   const token = getAuthToken();
   const cartAPI = "http://localhost:8080/api/client/cart";
   const [isOpen, setIsOpen] = useState(false);
+  const { showSuccessNotification } = useContext(NotificationContext);
 
   const showModal = () => {
     setIsOpen(true);
@@ -103,11 +105,6 @@ function ProductInfo({
                 Number(existingData.productDetails[i].quantity) +
                 Number(quantity);
               productExists = true;
-              notification.success({
-                message: "Thông báo",
-                description: "Thêm thành công!",
-                duration: 2,
-              });
               break;
             }
           }
@@ -120,6 +117,12 @@ function ProductInfo({
           });
         }
 
+        // notification.success({
+        //   message: "Thông báo",
+        //   description: "Thêm thành công!",
+        //   duration: 2,
+        // });
+        showSuccessNotification("Thêm vào giỏ hàng thành công", "addToCart");
         localStorage.setItem("user", JSON.stringify(existingData));
       }
     } else {

@@ -21,8 +21,9 @@ import java.math.BigDecimal;
                 on p.id = pd.product_id
                     left join Bill_Detail bd on pd.id = bd.product_Detail_id
                     left join Bill bill on bd.bill_id = bill.id
-                group by p.product_name, p.id
-                having sum (pd.quantity) > 0;
+                group by p.product_name, p.id, p.created_at
+                having sum (pd.quantity) > 0
+                order by p.created_at desc
                 """,
         resultSetMapping = "Mapping.ProductPromotionResponse"
 )

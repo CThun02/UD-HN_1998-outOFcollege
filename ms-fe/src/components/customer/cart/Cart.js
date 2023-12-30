@@ -897,11 +897,14 @@ const Cart = (props) => {
   }, []);
 
   useEffect(() => {
-    if (token) {
-      getCartAPI();
-    } else {
-      getAllCart();
-    }
+    getAuthToken().then((data) => {
+      if (data) {
+        getCartAPI();
+      } else {
+        getAllCart();
+      }
+    });
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [render]);
 

@@ -18,13 +18,16 @@ import com.fpoly.ooc.responce.product.ProductImageResponse;
 import com.fpoly.ooc.responce.promotion.PromotionProductResponse;
 import com.fpoly.ooc.service.interfaces.AccountService;
 import com.fpoly.ooc.service.interfaces.CartDetailService;
+import com.fpoly.ooc.service.interfaces.ProductDetailServiceI;
 import com.fpoly.ooc.service.interfaces.PromotionService;
+import com.fpoly.ooc.util.CommonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class CartDetailServiceImpl implements CartDetailService {
@@ -43,6 +46,9 @@ public class CartDetailServiceImpl implements CartDetailService {
 
     @Autowired
     private PromotionService promotionService;
+
+    @Autowired
+    private ProductDetailServiceI productDetailService;
 
     @Override
     public List<CartDetailDisplayResponse> getAllCart(String username) throws NotFoundException {
@@ -102,7 +108,7 @@ public class CartDetailServiceImpl implements CartDetailService {
 
         Cart existingCart = cartRepo.findCartByAccount(account);
 
-        if (existingCart == null) {
+        if (Objects.isNull(existingCart)) {
             existingCart = this.createCart(account.getUsername());
         }
 
@@ -110,6 +116,13 @@ public class CartDetailServiceImpl implements CartDetailService {
             boolean found = false;
             for (CartDetail existingCartDetail : existingCart.getCartDetailList()) {
                 if (existingCartDetail.getProductDetail().getId().equals(cartDetailRequest.getProductDetailId())) {
+                    ProductDetail productDetail = productDetailService.findProductDetailByIdAndStatus(existingCartDetail.getProductDetail().getId());
+
+                    if (Objects.isNull(productDetail) ||
+                            existingCartDetail.getQuantity() + cartDetailRequest.getQuantity() > productDetail.getQuantity()) {
+                        throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_ADD_TO_CART_THAN_QUANTITY));
+                    }
+
                     existingCartDetail.setQuantity(existingCartDetail.getQuantity() + cartDetailRequest.getQuantity());
                     found = true;
                     break;
@@ -173,6 +186,24 @@ public class CartDetailServiceImpl implements CartDetailService {
     @Override
     public CartIndexResponse getCartIndexz(String username) {
         return cartRepo.getCartIndex(username);
+    }
+
+    @Override
+    public Boolean deleteProductInCartFromUser(String username, Long cartDetailId) throws NotFoundException {
+        Account account = accountService.findByUsername(username);
+
+        if (Objects.isNull(account)) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_SERVICE));
+        }
+
+        List<CartDetail> cartDetailList = cartDetailRepo.findAllCartDetailByUser(username, cartDetailId);
+        CartDetail cartDetail = CommonUtils.getOneElementsInArrays(cartDetailList);
+
+        if (Objects.nonNull(cartDetail)) {
+            cartDetailRepo.delete(cartDetail);
+        }
+
+        return null;
     }
 
 }

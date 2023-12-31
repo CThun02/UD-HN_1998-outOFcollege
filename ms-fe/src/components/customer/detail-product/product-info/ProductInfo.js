@@ -6,13 +6,14 @@ import Quantity from "../../../element/quantity/Quantity";
 import { faCartPlus, faCirclePlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button, Col, Modal, Rate, Row, Space, Tag, notification } from "antd";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import numeral from "numeral";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { now } from "moment";
 import { useEffect } from "react";
 import { getAuthToken } from "../../../../service/Token";
 import axios from "axios";
+import { NotificationContext } from "../../../element/notification/NotificationAuthen";
 
 const image = "/change-size/change-size.jpg";
 
@@ -31,6 +32,7 @@ function ProductInfo({
   const token = getAuthToken();
   const cartAPI = "http://localhost:8080/api/client/cart";
   const [isOpen, setIsOpen] = useState(false);
+  const { showSuccessNotification } = useContext(NotificationContext);
 
   const showModal = () => {
     setIsOpen(true);
@@ -88,7 +90,8 @@ function ProductInfo({
             existingData?.productDetails[i].data[0].id === productDetails[0]?.id
           ) {
             if (
-              existingData.productDetails[i].quantity + quantity >
+              Number(existingData.productDetails[i].quantity) +
+                Number(quantity) >
               colorsAndSizes?.quantity
             ) {
               notification.warning({
@@ -98,7 +101,9 @@ function ProductInfo({
               });
               return;
             } else {
-              existingData.productDetails[i].quantity += quantity;
+              existingData.productDetails[i].quantity =
+                Number(existingData.productDetails[i].quantity) +
+                Number(quantity);
               productExists = true;
               break;
             }
@@ -112,6 +117,12 @@ function ProductInfo({
           });
         }
 
+        // notification.success({
+        //   message: "Thông báo",
+        //   description: "Thêm thành công!",
+        //   duration: 2,
+        // });
+        showSuccessNotification("Thêm vào giỏ hàng thành công", "addToCart");
         localStorage.setItem("user", JSON.stringify(existingData));
       }
     } else {
@@ -126,19 +137,23 @@ function ProductInfo({
           ],
         })
         .then((response) => {
-          console.log(response.data);
+          setRenderHeader(Math.random());
+          notification.success({
+            message: "Thông báo",
+            description: "Thêm thành công!",
+            duration: 2,
+          });
         })
         .catch((err) => {
-          console.log(err);
+          notification.error({
+            message: "Lỗi",
+            description:
+              "Tổng số sản phẩm có trong giỏ hàng và khi thêm vượt quá số lượng tồn!",
+            duration: 2,
+          });
+          return;
         });
     }
-
-    setRenderHeader(Math.random());
-    notification.success({
-      message: "Thông báo",
-      description: "Thêm thành công!",
-      duration: 2,
-    });
   };
 
   const handleByNow = async (e) => {
@@ -156,6 +171,15 @@ function ProductInfo({
       });
       return;
     }
+
+    if (colorsAndSizes?.quantity <= 0) {
+      notification.error({
+        message: "Thông báo",
+        description: "Số lượng không đủ",
+      });
+      return;
+    }
+
     if (data) {
       try {
         if (data) {
@@ -173,7 +197,11 @@ function ProductInfo({
         // localStorage.setItem('checkout', JSON.stringify(lstProductDetail));
         // navigate('/ms-shop/checkout');
       } catch (error) {
-        console.error(error);
+        notification.error({
+          message: "Đã xảy ra lỗi",
+          description: "Vui lòng thử lại sau ít phút",
+        });
+        return;
       }
     } else {
       lstProductDetail.push({ data: productDetails, quantity: quantity });
@@ -401,6 +429,7 @@ function ProductInfo({
               <button
                 className={`${styles.btn}`}
                 onClick={(e) => handleAddToCart(e)}
+                disabled={colorsAndSizes?.quantity <= 0}
               >
                 <FontAwesomeIcon
                   icon={faCartPlus}
@@ -415,6 +444,7 @@ function ProductInfo({
               <button
                 className={`${styles.btn} ${styles.shoppingNow}`}
                 onClick={(e) => handleByNow(e)}
+                disabled={colorsAndSizes?.quantity <= 0}
               >
                 <FontAwesomeIcon
                   icon={faCirclePlus}

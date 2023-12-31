@@ -130,6 +130,11 @@ public class ClientController {
         return ResponseEntity.ok(cartDetailService.getCartIndexz(username));
     }
 
+    @GetMapping("/deleteCart/{user}/{cartDetailId}")
+    public ResponseEntity<?> deleteCartFromUser(@PathVariable("user") String user, @PathVariable("cartDetailId") Long cartDetailId) throws NotFoundException {
+        return ResponseEntity.ok(cartDetailService.deleteProductInCartFromUser(user, cartDetailId));
+    }
+
     @GetMapping("/filterProductDetailSellByIdCom")
     public ResponseEntity<?> filterProductDetailSellByIdCom(@RequestParam Optional<Long> productId,
                                                             @RequestParam Optional<Long> buttonId,
@@ -264,8 +269,8 @@ public class ClientController {
                 voucherCode.trim().equals("") ? null : voucherCode));
     }
 
-    @GetMapping("/isCheckQuantity")
-    public ResponseEntity<?> isCheckQuantity(@Param("id") Long productDetailId) throws NotFoundException {
+    @GetMapping("/isCheckQuantity/{id}")
+    public ResponseEntity<?> isCheckQuantity(@PathVariable("id") Long productDetailId) throws NotFoundException {
         return ResponseEntity.ok(productDetailService.isCheckQuantity(productDetailId));
     }
 

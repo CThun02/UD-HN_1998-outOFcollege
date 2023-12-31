@@ -67,4 +67,16 @@ public interface CartDetailRepo extends JpaRepository<CartDetail, Long> {
             "       AND pd.pattern.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE ")
     List<CartDetailResponse> getProductDetailId(@Param("id") Long productDetailId);
 
+    @Query("""
+            SELECT cartDetail FROM CartDetail cartDetail
+                INNER JOIN Cart cart ON cartDetail.cart.id = cart.id
+                INNER JOIN Account account ON account.username = cart.account.username
+                    WHERE cartDetail.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                    AND cart.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                    AND account.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                    AND account.username = ?1
+                    AND cartDetail.id = ?2
+        """)
+    List<CartDetail> findAllCartDetailByUser(String user, Long cartDetailId);
+
 }

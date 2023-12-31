@@ -91,7 +91,8 @@ const ProductDetails = (props) => {
                   marginRight: "10px",
                 }}
               >
-                {record.promotion.length !== 0 ? (
+                {record.promotion.length !== 0 &&
+                record?.promotion[0]?.promotionValue ? (
                   <Badge.Ribbon
                     text={`Giảm ${
                       record?.promotion[0].promotionValue

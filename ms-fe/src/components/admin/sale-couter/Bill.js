@@ -161,7 +161,8 @@ const Bill = () => {
                   marginRight: "10px",
                 }}
               >
-                {record.productDetail.promotion?.length > 0 ? (
+                {record?.productDetail?.promotion?.length > 0 &&
+                record?.productDetail?.promotion[0]?.promotionValue ? (
                   <Badge.Ribbon
                     text={`Giảm ${
                       record.productDetail.promotion[0].promotionValue

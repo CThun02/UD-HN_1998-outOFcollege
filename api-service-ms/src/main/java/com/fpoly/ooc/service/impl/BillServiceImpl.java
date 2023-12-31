@@ -171,7 +171,7 @@ public class BillServiceImpl implements BillService {
             }
 
             productDetail.setQuantity(productDetail.getQuantity() - billDetail.getQuantity());
-            productDetailService.update(productDetail);
+            productDetailService.updateQuantityForBuy(productDetail);
         }
 
         if (request.getPaymentDetailId() == 3) {

@@ -306,15 +306,31 @@ const Cart = (props) => {
   };
 
   const handleDeleteApi = (id) => {
-    axios
-      .delete(`${cartAPI}/${id}`)
-      .then((response) => {
-        setRender(Math.random());
-        props.setRenderHeader(Math.random());
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    console.log("token: ", token);
+    console.log("id: ", id);
+    getAuthToken().then((data) => {
+      if (data?.username) {
+        axios
+          .get(
+            "http://localhost:8080/api/client/deleteCart/" +
+              data?.username +
+              "/" +
+              id
+          )
+          .then((response) => {
+            notification.success({
+              message: "Thông báo",
+              description: "Xóa thành công thành công!",
+              duration: 2,
+            });
+            setRender(Math.random());
+            props.setRenderHeader(Math.random());
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
+    });
   };
 
   const columnsAPI = [
@@ -791,23 +807,25 @@ const Cart = (props) => {
       });
       return;
     } else {
-      newData.map((e) => {
-        axios
-          .get(baseUrl + "/isCheckQuantity?id=" + e?.data[0]?.id)
-          .catch((err) => {
-            notification.error({
-              message: "Thông báo",
-              description:
-                "Sản phẩm đã bán hết hoặc không tồn tại vui lòng thử lại sau",
-              duration: 2,
+      if (e?.data) {
+        newData.map((e) => {
+          axios
+            .get(baseUrl + "/isCheckQuantity/" + e?.data[0]?.id)
+            .catch((err) => {
+              notification.error({
+                message: "Thông báo",
+                description:
+                  "Sản phẩm đã bán hết hoặc không tồn tại vui lòng thử lại sau",
+                duration: 2,
+              });
+              return;
             });
-            return;
-          });
-      });
+        });
+      }
     }
 
-    // localStorage.setItem("checkout", JSON.stringify(newData));
-    // navigate("/ms-shop/checkout");
+    localStorage.setItem("checkout", JSON.stringify(newData));
+    navigate("/ms-shop/checkout");
   };
 
   const rowSelection = {
@@ -816,6 +834,7 @@ const Cart = (props) => {
   };
 
   const getCartAPI = async () => {
+    setLoading(false);
     const data = await token;
 
     if (data) {
@@ -878,8 +897,14 @@ const Cart = (props) => {
   }, []);
 
   useEffect(() => {
-    getAllCart();
-    getCartAPI();
+    getAuthToken().then((data) => {
+      if (data) {
+        getCartAPI();
+      } else {
+        getAllCart();
+      }
+    });
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [render]);
 

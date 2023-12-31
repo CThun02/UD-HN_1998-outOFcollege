@@ -57,7 +57,10 @@ function Quantity({ quantity, setQuantity, quantityProduct }) {
               className={`${styles.buttonCss} ${styles.buttonPLus} ${
                 quantity >= quantityProduct ? "" : styles.buttonHover
               }`}
-              disabled={quantity >= (quantityProduct ? quantityProduct : 99)}
+              disabled={
+                quantity >= (quantityProduct ? quantityProduct : 99) ||
+                quantityProduct <= 0
+              }
               onClick={() => handleSetValuePlus()}
             >
               +

@@ -278,9 +278,10 @@ const BillReturn = () => {
         const request = {
           productDetailId: productsReturns[index].productDetailId,
           billId: billInfo?.id,
-          reason: productsReturns[index].reason,
+          reason: productsReturns[index].reason?"PRODUCE":"OTHER",
           quantity: productsReturns[index].quantity,
           price: productsReturns[index].productPrice,
+          note: productsReturns[index].note
         };
         await axios
           .post(`http://localhost:8080/api/admin/product-return`, request, {
@@ -532,7 +533,8 @@ const BillReturn = () => {
                         ...response.data.billDetails[index],
                       };
                       productReturn.quantity = res.data[j].quantity;
-                      productReturn.reason = res.data[j].descriptionDetail;
+                      productReturn.reason = res.data[j].status;
+                      productReturn.note = res.data[j].descriptionDetail;
                       if (
                         productsReturns.every(
                           (item) =>
@@ -1031,6 +1033,10 @@ const BillReturn = () => {
                               <Radio value={"OTHER"}>Lý do khác</Radio>
                             </Radio.Group>
                           )}
+                        </Col>
+                        <Col span={24}>
+                          <span style={{ fontWeight: 600 }}>Mô tả <span style={{color:"red"}}>*</span></span><br />
+                          <TextArea readOnly={billInfo?.status === "ReturnS"} defaultValue={productsReturns[index].note} onChange={(event)=>{productsReturns[index].note = event.target.value}}/>
                         </Col>
                       </Row>
                       <Divider />

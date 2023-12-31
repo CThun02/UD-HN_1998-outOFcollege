@@ -2,6 +2,7 @@ package com.fpoly.ooc.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.entity.SleeveType;
+import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.request.sleevetype.SleeveTypeRequest;
 import com.fpoly.ooc.service.interfaces.SleeveServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,7 @@ public class SleeveController {
     }
 
     @PostMapping("create")
-    public ResponseEntity<?> create(@RequestBody SleeveType sleeveType) throws JsonProcessingException {
+    public ResponseEntity<?> create(@RequestBody SleeveType sleeveType) throws JsonProcessingException, NotFoundException {
         return ResponseEntity.ok(service.create(sleeveType));
     }
 
@@ -34,7 +35,7 @@ public class SleeveController {
     }
 
     @PutMapping("updateStatus/{id}")
-    public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestBody SleeveTypeRequest request) {
+    public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestBody SleeveTypeRequest request) throws NotFoundException {
         return ResponseEntity.ok(service.updateStatus(request, id).getId());
     }
 

@@ -2,6 +2,7 @@ package com.fpoly.ooc.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.entity.ButtonType;
+import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.request.buttontype.ButtonTypeRequest;
 import com.fpoly.ooc.service.interfaces.ButtonTypeServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,7 @@ public class ButtonTypeController {
     }
 
     @PostMapping("create")
-    public ResponseEntity<?> create(@RequestParam String buttonTypeName) throws JsonProcessingException {
+    public ResponseEntity<?> create(@RequestParam String buttonTypeName) throws JsonProcessingException, NotFoundException {
         ButtonType buttonType = ButtonType.builder().buttonName(buttonTypeName).build();
         return ResponseEntity.ok(service.create(buttonType));
     }
@@ -35,7 +36,7 @@ public class ButtonTypeController {
     }
 
     @PutMapping("updateStatus/{id}")
-    public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestBody ButtonTypeRequest request) {
+    public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestBody ButtonTypeRequest request) throws NotFoundException {
         return ResponseEntity.ok(service.updateStatus(request, id).getId());
     }
 

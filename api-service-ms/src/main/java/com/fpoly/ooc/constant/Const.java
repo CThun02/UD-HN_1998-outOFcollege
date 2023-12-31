@@ -57,6 +57,14 @@ public class Const {
     //ErrorCode
     public static final String HTTP_ERROR_CODE = "BAD_REQUEST";
 
+    public static final String ERROR_UPDATE_QUANTITY_PRODUCT_DETAIL = "ERROR_UPDATE_QUANTITY_PRODUCT_DETAIL";
+    public static final String ERROR_BUY_QUANTITY_THAN_QUANTITY_IN_STORE = "ERROR_BUY_QUANTITY_THAN_QUANTITY_IN_STORE";
+    public static final String ERROR_VOUCHER_USABLE = "ERROR_VOUCHER_USABLE";
+    public static final String ERROR_VOUCHER_CODE_NOT_FOUND = "ERROR_VOUCHER_CODE_NOT_FOUND";
+    public static final String ERROR_SERVICE = "ERROR_SERVICE";
+    public static final String ERROR_BILL_NOT_FOUND = "ERROR_BILL_NOT_FOUND";
+    public static final String ERROR_BUY_PRODUCT_NOT_FOUND = "ERROR_BUY_PRODUCT_NOT_FOUND";
+
     //kafka
     public static final String KAFKA_SERVER = "localhost:9092";
     public static final String KAFKA_GROUP_ID = "group-id";

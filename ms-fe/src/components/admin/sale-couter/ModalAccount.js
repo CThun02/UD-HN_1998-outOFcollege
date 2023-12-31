@@ -240,9 +240,9 @@ const ModalAccount = ({
               }}
             />
           </Col>
-          <Col span={12} style={{ textAlign: "end" }}>
+          {/* <Col span={12} style={{ textAlign: "end" }}>
             <Button size="large" type="primary" onClick={() => { setVisibleCreate(true) }}>Thêm khách hàng</Button>
-          </Col>
+          </Col> */}
           <Col span={24}>
             <Table
               columns={columns}

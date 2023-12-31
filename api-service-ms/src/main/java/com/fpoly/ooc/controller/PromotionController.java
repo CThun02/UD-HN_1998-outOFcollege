@@ -1,5 +1,6 @@
 package com.fpoly.ooc.controller;
 
+import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.request.promotion.PromotionRequest;
 import com.fpoly.ooc.service.interfaces.PromotionService;
 import org.apache.coyote.Response;
@@ -22,17 +23,17 @@ public class PromotionController {
     private PromotionService promotionService;
 
     @PostMapping("save")
-    public ResponseEntity<?> save(@RequestBody PromotionRequest request) {
+    public ResponseEntity<?> save(@RequestBody PromotionRequest request) throws NotFoundException {
         return ResponseEntity.ok(promotionService.saveOrUpdate(request));
     }
 
     @GetMapping("{code}")
-    public ResponseEntity<?> findByCode(@PathVariable("code") String code) {
+    public ResponseEntity<?> findByCode(@PathVariable("code") String code) throws NotFoundException {
         return ResponseEntity.ok(promotionService.findByIdProductDetail(code));
     }
 
     @GetMapping("update-status/{code}")
-    public ResponseEntity<?> updateStatus(@PathVariable("code") String code) {
+    public ResponseEntity<?> updateStatus(@PathVariable("code") String code) throws NotFoundException {
 
         return ResponseEntity.ok(promotionService.updateStatus(code).getPromotionCode());
     }

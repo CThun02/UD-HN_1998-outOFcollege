@@ -234,6 +234,9 @@ const ProductDetailsTable = (props) => {
       if (imgList[i].color.name === color) {
         imgList[i].imgs.splice(index, 1);
         imgList[i].files.splice(index, 1);
+        if(imgList[i].imgs.length<=0){
+          imgList.splice(i, 1);
+        }
         message.success("Xóa ảnh thành công!", 1);
         setRender(Math.random());
         break;

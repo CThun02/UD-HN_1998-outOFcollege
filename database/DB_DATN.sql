@@ -156,6 +156,7 @@ CREATE TABLE product_detail(
     shirt_tail_id       BIGINT FOREIGN KEY(shirt_tail_id) REFERENCES shirt_tail_type(id),
     price               DECIMAL,
 	weight				FLOAT,
+	version				BIGINT,
     quantity            INT,
     description_detail  NVARCHAR(MAX),
     status              VARCHAR(50),
@@ -380,6 +381,7 @@ CREATE TABLE voucher(
     limit_quantity      INT,
     private             VARCHAR(15),
     is_send_email       BIT,
+	version				BIGINT,
     status              VARCHAR(50),
     created_at          DATETIME,
     updated_at          DATETIME,
@@ -440,31 +442,26 @@ CREATE TABLE cart_detail(
 )
 
 CREATE TABLE product_return(
-	id					BIGINT IDENTITY PRIMARY KEY,
-    product_detail_id   BIGINT FOREIGN KEY(product_detail_id) REFERENCES product_detail(id),
-	total_price			money,
-	status              VARCHAR(50),
-    created_at          DATETIME,
-    updated_at          DATETIME,
-    created_by          NVARCHAR(50),
-    updated_by          NVARCHAR(50),
-    deleted_at          DATETIME 
-)
-
-CREATE TABLE product_reuturn_detail(
+    id                  BIGINT IDENTITY PRIMARY KEY,
     bill_id				BIGINT FOREIGN KEY(bill_id) REFERENCES bill(id),
-	product_return_id	BIGINT FOREIGN KEY(product_return_id) REFERENCES product_return(id),
+	product_detail_id   BIGINT FOREIGN KEY(product_detail_id) REFERENCES product_detail(id),
 	quantity			int,
 	price				money,
 	status              VARCHAR(50),
+	note				NVARCHAR(MAX),
 	created_at          DATETIME,
     updated_at          DATETIME,
     created_by          NVARCHAR(50),
     updated_by          NVARCHAR(50),
     deleted_at          DATETIME 
 )
-
 select * from product_return
 
 select * from product_detail where id = 11
+
+select * from delivery_note
+
+select * from bill
+
+
 

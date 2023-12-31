@@ -30,5 +30,5 @@ public class ProductReturnDetail extends BaseEntity{
     private Integer quantity;
 
     @Column(name="price")
-    private Integer price;
+    private BigDecimal price;
 }

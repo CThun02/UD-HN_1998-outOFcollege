@@ -2,29 +2,32 @@ package com.fpoly.ooc.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.constant.Const;
+import com.fpoly.ooc.constant.ErrorCodeConfig;
 import com.fpoly.ooc.entity.Bill;
 import com.fpoly.ooc.entity.BillDetail;
-import com.fpoly.ooc.entity.Product;
 import com.fpoly.ooc.entity.ProductDetail;
 import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.BillDetailRepo;
 import com.fpoly.ooc.request.bill.BillDetailRequest;
 import com.fpoly.ooc.responce.bill.BillInfoResponse;
-import com.fpoly.ooc.responce.bill.BillResponse;
 import com.fpoly.ooc.responce.pdf.PdfResponse;
 import com.fpoly.ooc.responce.timeline.TimelineProductResponse;
 import com.fpoly.ooc.service.interfaces.BillDetailService;
 import com.fpoly.ooc.service.interfaces.ProductDetailServiceI;
 import com.fpoly.ooc.service.interfaces.TimeLineService;
+import jakarta.persistence.LockModeType;
+import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 
 @Service
-
+@Slf4j
 public class BillDetailServiceImpl implements BillDetailService {
 
     @Autowired
@@ -39,8 +42,10 @@ public class BillDetailServiceImpl implements BillDetailService {
     @Autowired
     private TimeLineService timeLineService;
 
+    @Transactional(rollbackOn = Exception.class)
     @Override
-    public BillDetail createBillDetail(BillDetailRequest request) {
+    @Lock(LockModeType.OPTIMISTIC_FORCE_INCREMENT)
+    public BillDetail createBillDetail(BillDetailRequest request) throws JsonProcessingException, NotFoundException {
         BillDetail billDetail = BillDetail.builder().id(request.getBillDetailId())
                 .bill(Bill.builder().id(request.getBillId()).build())
                 .productDetail(ProductDetail.builder().id(request.getProductDetailId()).build())
@@ -53,27 +58,30 @@ public class BillDetailServiceImpl implements BillDetailService {
         if (request.getBillDetailId() != null) {
             billDetail = billDetailRepo.findById(request.getBillDetailId()).orElse(null);
 
+            if (Objects.isNull(billDetail)) {
+                throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_NOT_FOUND));
+            }
+
             ProductDetail productDetail = productDetailService.findById(request.getProductDetailId());
+            if (productDetail.getQuantity() <= 0) {
+                throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BUY_QUANTITY_THAN_QUANTITY_IN_STORE));
+            }
+
+            if (billDetail.getQuantity() - request.getQuantity() < 0) {
+                throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BUY_QUANTITY_THAN_QUANTITY_IN_STORE));
+            }
+
             if (billDetail.getQuantity() > request.getQuantity()) {
                 productDetail.setQuantity(productDetail.getQuantity() +
                         (billDetail.getQuantity()) - request.getQuantity());
-                try {
-                    productDetailService.update(productDetail);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
             }
 
             if (billDetail.getQuantity() < request.getQuantity()) {
                 productDetail.setQuantity(productDetail.getQuantity() -
                         (request.getQuantity() - billDetail.getQuantity()));
-                try {
-                    productDetailService.update(productDetail);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
             }
 
+            productDetailService.update(productDetail);
             billDetail.setQuantity(request.getQuantity());
             savedBillDetail = billDetailRepo.save(billDetail);
         } else {
@@ -81,27 +89,25 @@ public class BillDetailServiceImpl implements BillDetailService {
             if (existingBillDetail.isEmpty()) {
                 savedBillDetail = billDetailRepo.save(billDetail);
             } else {
-                Boolean check = true;
+                boolean isCheck = Boolean.TRUE;
                 for (BillDetail billDetailUpdate : existingBillDetail) {
-                    if (request.getProductDetailId() == billDetailUpdate.getProductDetail().getId()) {
+                    if (Objects.equals(request.getProductDetailId(), billDetailUpdate.getProductDetail().getId())) {
                         billDetailUpdate.setQuantity(billDetailUpdate.getQuantity() + request.getQuantity());
                         billDetailUpdate.setPrice(request.getPrice());
                         savedBillDetail = billDetailRepo.save(billDetailUpdate);
-                        check = false;
+
+                        ProductDetail productDetailDb = productDetailService.findById(billDetailUpdate.getProductDetail().getId());
+                        if (productDetailDb.getQuantity() - request.getQuantity() < 0) {
+                            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BUY_QUANTITY_THAN_QUANTITY_IN_STORE));
+                        }
+                        productDetailDb.setQuantity(productDetailDb.getQuantity() - request.getQuantity());
+                        productDetailService.update(productDetailDb);
+                        isCheck = Boolean.FALSE;
                         break;
                     }
                 }
 
-                if (check) {
-                    ProductDetail productDetail = productDetailService.findById(request.getProductDetailId());
-
-                    productDetail.setQuantity(productDetail.getQuantity() - request.getQuantity());
-                    try {
-                        productDetailService.update(productDetail);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
+                if (isCheck) {
                     savedBillDetail = billDetailRepo.save(billDetail);
                 }
             }
@@ -113,8 +119,9 @@ public class BillDetailServiceImpl implements BillDetailService {
         return savedBillDetail;
     }
 
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackOn = Exception.class)
     @Override
+    @Lock(LockModeType.OPTIMISTIC_FORCE_INCREMENT)
     public BillDetail updateBill(Long id, String status) {
         BillDetail billDetail = billDetailRepo.findById(id).orElse(null);
         if (billDetail == null) {
@@ -126,16 +133,16 @@ public class BillDetailServiceImpl implements BillDetailService {
     }
 
     @Override
-    public BillDetail deleteBillDetail(Long billId, Long billDetailId) {
+    public BillDetail deleteBillDetail(Long billId, Long billDetailId) throws NotFoundException {
         Bill bill = billService.findBillByBillId(billId);
         BillDetail billDetail = billDetailRepo.findById(billDetailId).orElse(null);
 
         ProductDetail productDetail = productDetailService.findById(billDetail.getProductDetail().getId());
         Integer quantityUpdayte = productDetail.getQuantity() + billDetail.getQuantity();
         productDetail.setQuantity(quantityUpdayte);
-        try{
+        try {
             productDetailService.update(productDetail);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -148,8 +155,9 @@ public class BillDetailServiceImpl implements BillDetailService {
         return billDetail;
     }
 
+    @Transactional(rollbackOn = RuntimeException.class)
     @Override
-    public BillDetail updateBillDetail(BillDetailRequest request) throws JsonProcessingException {
+    public BillDetail updateBillDetail(BillDetailRequest request) throws JsonProcessingException, NotFoundException {
         ProductDetail productDetail = productDetailService.getOne(request.getProductDetailId());
         productDetail.setQuantity(productDetail.getQuantity() - request.getQuantity());
         productDetailService.update(productDetail);
@@ -194,7 +202,7 @@ public class BillDetailServiceImpl implements BillDetailService {
     }
 
     @Override
-    public List<BillDetail> findBillDetailByBillCode(String billCode) {
+    public List<BillDetail> findBillDetailByBillCode(String billCode) throws NotFoundException {
         if (billCode == null) {
             throw new NotFoundException(Const.CODE_NOT_FOUND);
         }

@@ -1,8 +1,5 @@
 package com.fpoly.ooc.service.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fpoly.ooc.entity.Bill;
-import com.fpoly.ooc.entity.ProductDetail;
 import com.fpoly.ooc.entity.ProductReturn;
 import com.fpoly.ooc.repository.ProductReturnRepository;
 import com.fpoly.ooc.request.product.ProductReturnRequest;
@@ -12,7 +9,6 @@ import com.fpoly.ooc.service.interfaces.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +21,7 @@ public class ProductReturnService implements ProductReturnServiceI {
     ProductImageServiceI productImageService;
     VoucherHistoryService voucherHistoryService;
 
+    @Autowired
     public ProductReturnService(ProductReturnRepository repo, BillService billService, ProductDetailServiceI productDetailService, ProductImageServiceI productImageService, VoucherHistoryService voucherHistoryService) {
         this.repo = repo;
         this.billService = billService;

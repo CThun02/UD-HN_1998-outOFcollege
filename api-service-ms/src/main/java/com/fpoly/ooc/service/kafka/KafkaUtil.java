@@ -21,7 +21,7 @@ public class KafkaUtil {
     @Autowired
     private ObjectMapper objectMapper;
 
-    public <T> T sendingObjectWithKafka(T object, String topicName) throws JsonProcessingException {
+    public <T> T sendingObjectWithKafka(T object, String topicName) throws JsonProcessingException, NotFoundException {
         if (Objects.nonNull(object)) {
             String objectJson = objectMapper.writeValueAsString(object);
             kafkaTemplate.send(topicName, objectJson);

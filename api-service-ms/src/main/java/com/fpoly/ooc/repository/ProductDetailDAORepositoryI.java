@@ -17,7 +17,15 @@ import java.math.BigDecimal;
 import java.util.List;
 @Repository
 public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail, Long> {
-    @Query("SELECT DISTINCT pd.id AS id, pd.product AS product, pd.brand as brand, pd.category as category, pd.button AS button" +
+
+    @Query("""
+            SELECT new java.lang.Boolean((count(productDetail) > 0)) FROM ProductDetail productDetail
+            WHERE productDetail.id = ?1
+            AND productDetail.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+            AND productDetail.quantity > 0
+        """)
+    Boolean findProductDetailById(Long id);
+    @Query("SELECT pd.id AS id, pd.product AS product, pd.brand as brand, pd.category as category, pd.button AS button" +
             ", pd.material AS material, pd.collar AS collar, pd.sleeve AS sleeve" +
             ", pd.size AS size, pd.color AS color, pd.shirtTail AS shirtTail"+
             ", pd.price AS price, pd.weight as weight, pd.quantity AS quantity, pd.descriptionDetail AS descriptionDetail" +
@@ -29,7 +37,8 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
             "AND (pd.size.id = ?8 OR ?8 IS NULL) AND (pd.pattern.id = ?9 OR ?9 IS NULL)" +
             "AND (pd.form.id = ?10 OR ?10 IS NULL) AND (pd.brand.id = ?11 OR ?11 IS NULL)" +
             "AND (pd.category.id = ?12 OR ?12 IS NULL) AND ((pd.price >=?13 or ?13 IS NULL) " +
-            "AND (pd.price<=?14 or ?14 IS NULL))")
+            "AND (pd.price<=?14 or ?14 IS NULL)) " +
+            "ORDER BY pd.createdAt desc ")
     public List<ProductDetailResponse> filterProductDetailsByIdCom(Long productId, Long idButton, Long idMaterial,
                                                                    Long idShirtTail, Long idSleeve, Long idCollar,
                                                                    Long idColor, Long idSize, Long patternId, Long formId,

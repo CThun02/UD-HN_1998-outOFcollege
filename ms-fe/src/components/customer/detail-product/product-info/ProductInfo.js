@@ -87,9 +87,21 @@ function ProductInfo({
           if (
             existingData?.productDetails[i].data[0].id === productDetails[0]?.id
           ) {
-            existingData.productDetails[i].quantity += quantity;
-            productExists = true;
-            break;
+            if (
+              existingData.productDetails[i].quantity + quantity >
+              colorsAndSizes?.quantity
+            ) {
+              notification.warning({
+                message: "Thông báo",
+                description:
+                  "Tổng số sản phẩm chọn và trong giỏ hàng không được quá số lượng trong kho",
+              });
+              return;
+            } else {
+              existingData.productDetails[i].quantity += quantity;
+              productExists = true;
+              break;
+            }
           }
         }
 

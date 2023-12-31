@@ -5,6 +5,7 @@ import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.dto.VoucherAndPromotionConditionDTO;
 import com.fpoly.ooc.entity.Promotion;
 import com.fpoly.ooc.entity.Voucher;
+import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.responce.promotion.PromotionProductResponse;
 import com.fpoly.ooc.responce.voucher.VoucherResponse;
 import com.fpoly.ooc.service.interfaces.PromotionService;
@@ -90,8 +91,12 @@ public class MsJobService {
             promotionService.findAllPromotionProductResponse().forEach(e -> {
                 if (!(e.getStatus().equals(Const.STATUS_CANCEL))) {
                     String status = isCheckDateTime(e.getStartDate(), e.getEndDate());
-                    promotionService.updateStatus(e.getPromotionCode(),
-                            status == null ? e.getStatus() : status);
+                    try {
+                        promotionService.updateStatus(e.getPromotionCode(),
+                                status == null ? e.getStatus() : status);
+                    } catch (NotFoundException ex) {
+                        throw new RuntimeException(ex);
+                    }
                 }
             });
 

@@ -26,6 +26,7 @@ import com.fpoly.ooc.service.interfaces.PromotionProductDetailService;
 import com.fpoly.ooc.service.interfaces.SizeServiceI;
 import com.fpoly.ooc.service.kafka.KafkaUtil;
 import com.fpoly.ooc.util.CommonUtils;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -65,6 +66,7 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
     }
 
     @Override
+    @Transactional(rollbackOn = Exception.class)
     public ProductDetail create(ProductDetail productDetail) throws JsonProcessingException {
         if(productDetail.getQuantity() == 0){
             productDetail.setStatus(Const.STATUS_INACTIVE);
@@ -74,13 +76,13 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
     }
 
     @Override
-    public ProductDetail update(ProductDetail productDetail) throws JsonProcessingException {
+    public ProductDetail update(ProductDetail productDetail) throws JsonProcessingException, NotFoundException {
         ProductDetail productDetailtCheck = this.getOne(productDetail.getId());
         if(productDetail.getQuantity() == 0){
             productDetail.setStatus(Const.STATUS_INACTIVE);
         }
-        if (productDetailtCheck != null) {
-            productDetailtCheck = kafkaUtil.sendingObjectWithKafka(productDetail, Const.TOPIC_PRODUCT_DETAIL);
+        if (Objects.nonNull(productDetailtCheck)) {
+            kafkaUtil.sendingObjectWithKafka(productDetail, Const.TOPIC_PRODUCT_DETAIL);
         }
         return productDetailtCheck;
     }
@@ -133,7 +135,7 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
         return values;
     }
 
-    public ProductDetail findById(Long id) {
+    public ProductDetail findById(Long id) throws NotFoundException {
         ProductDetail productDetail = repo.findById(id).orElseThrow(() ->
                 new NotFoundException(ErrorCodeConfig.getMessage(Const.PRODUCT_DETAIL_NOT_FOUND)));
         return productDetail;
@@ -224,7 +226,7 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
     }
 
     @Override
-    public Optional<GetColorAndSizeAndQuantity> getColorAndSize(GetSizeAndColorRequest req) {
+    public Optional<GetColorAndSizeAndQuantity> getColorAndSize(GetSizeAndColorRequest req) throws NotFoundException {
         List<GetColorAndSizeAndQuantity> colorAndSizeListByReq = repo.findColorAndSize(req.getProductId(), req.getBrandId(), req.getCategoryId(),
                 req.getPatternId(), req.getFormId(), req.getButtonId(), req.getMaterialId(), req.getCollarId(), req.getSleeveId(),
                 req.getShirtTailId(), req.getColorId(), req.getSizeId());
@@ -253,7 +255,7 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
     }
 
     @Override
-    public Optional<ProductDetailShopResponse> getProductDetailsShop(GetSizeAndColorRequest request) {
+    public Optional<ProductDetailShopResponse> getProductDetailsShop(GetSizeAndColorRequest request) throws NotFoundException {
         List<ProductDetailShopResponse> res = repo.findProductDetailShopResponse(request.getProductId(), request.getBrandId(), request.getCategoryId(),
                 request.getPatternId(), request.getFormId(), request.getButtonId(), request.getMaterialId(), request.getCollarId(), request.getSleeveId(),
                 request.getShirtTailId());
@@ -269,6 +271,16 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
         productDetailShopResponse.setColorAndSizeAndQuantity(colorAndSize);
         productDetailShopResponse.setImages(images);
         return Optional.of(productDetailShopResponse);
+    }
+
+    @Override
+    public Boolean isCheckQuantity(Long productDetailId) throws NotFoundException {
+        Boolean isProductDetail = repo.findProductDetailById(productDetailId);
+        if (!isProductDetail) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BUY_PRODUCT_NOT_FOUND));
+        }
+
+        return true;
     }
 
     @Override

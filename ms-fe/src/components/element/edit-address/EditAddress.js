@@ -6,7 +6,6 @@ import axios from "axios";
 import moment from "moment";
 const EditAddress = ({
   isModalOpen,
-  handleAddressOk,
   handleAddressCancel,
   setRender,
   addressId,
@@ -228,7 +227,7 @@ const EditAddress = ({
       return;
     }
     console.log(`ối dồi ôi`, addressId)
-    if (addressId) {
+    if (addressId && billId) {
       await axios
         .put(`${CLIENTURL}/update-address/${addressId}`, formData)
         .then((response) => {
@@ -289,7 +288,7 @@ const EditAddress = ({
     <div>
       <Modal
         centered
-        title="Tạo mới địa chỉ"
+        title="Chỉnh sửa địa chỉ"
         open={isModalOpen}
         onOk={handleSubmit}
         onCancel={handleAddressCancel}

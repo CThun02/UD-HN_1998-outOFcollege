@@ -28,7 +28,7 @@ public class CollarServiceImpl implements CollarServiceI {
     private KafkaUtil kafkaUtil;
 
     @Override
-    public CollarType create(CollarType collarType) throws JsonProcessingException {
+    public CollarType create(CollarType collarType) throws JsonProcessingException, NotFoundException {
         CollarType collarCheck = repo.findFirstByCollarTypeName(collarType.getCollarTypeName());
         if(collarCheck==null){
             return kafkaUtil.sendingObjectWithKafka(collarType, Const.TOPIC_COLLAR);
@@ -44,7 +44,7 @@ public class CollarServiceImpl implements CollarServiceI {
             o.setCollarTypeName(collarType.getCollarTypeName());
             try {
                 return kafkaUtil.sendingObjectWithKafka(o, Const.TOPIC_COLLAR);
-            } catch (JsonProcessingException e) {
+            } catch (JsonProcessingException | NotFoundException e) {
                 throw new RuntimeException(e);
             }
         }).orElse(null);
@@ -72,7 +72,7 @@ public class CollarServiceImpl implements CollarServiceI {
     }
 
     @Override
-    public CollarType updateStatus(CollarRequest request, Long id) {
+    public CollarType updateStatus(CollarRequest request, Long id) throws NotFoundException {
         CollarType collarType = repo.findById(id).orElseThrow(() ->
                 new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND)));
         collarType.setStatus(request.getStatus());

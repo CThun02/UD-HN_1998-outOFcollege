@@ -2,6 +2,7 @@ package com.fpoly.ooc.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.entity.CollarType;
+import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.request.collar.CollarRequest;
 import com.fpoly.ooc.request.form.FormRequest;
 import com.fpoly.ooc.service.interfaces.CollarServiceI;
@@ -33,7 +34,7 @@ public class CollarController {
     }
 
     @PostMapping("create")
-    public ResponseEntity<?> create(@RequestBody CollarType collarType) throws JsonProcessingException {
+    public ResponseEntity<?> create(@RequestBody CollarType collarType) throws JsonProcessingException, NotFoundException {
         return ResponseEntity.ok(service.create(collarType));
     }
 
@@ -43,7 +44,7 @@ public class CollarController {
         return ResponseEntity.ok(service.update(collarType, id));
     }
     @PutMapping("update/{id}")
-    public ResponseEntity<?> updateStatus(@RequestBody CollarRequest request, @PathVariable Long id){
+    public ResponseEntity<?> updateStatus(@RequestBody CollarRequest request, @PathVariable Long id) throws NotFoundException {
         return ResponseEntity.ok(service.updateStatus(request, id).getId());
     }
     @DeleteMapping("delete/{id}")

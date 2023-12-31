@@ -5,6 +5,7 @@ import com.fpoly.ooc.dto.CredentialsDTO;
 import com.fpoly.ooc.dto.RePasswordRequest;
 import com.fpoly.ooc.dto.SignUpGoogleDTO;
 import com.fpoly.ooc.dto.UserDTO;
+import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.request.account.SignUpRequest;
 import com.fpoly.ooc.service.interfaces.AuthService;
 import lombok.AllArgsConstructor;
@@ -29,7 +30,7 @@ public class AuthController {
     private UserAuthenticationProvider userAuthenticationProvider;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody CredentialsDTO dto) {
+    public ResponseEntity<?> login(@RequestBody CredentialsDTO dto) throws NotFoundException {
         UserDTO userDto = authService.login(dto);
         userDto.setToken(userAuthenticationProvider.createToken(userDto.getUsername()));
         return ResponseEntity.ok(userDto);
@@ -48,7 +49,7 @@ public class AuthController {
     }
 
     @PostMapping("/rePassword")
-    public ResponseEntity<?> rePassword(@RequestBody RePasswordRequest rePasswordRequest) {
+    public ResponseEntity<?> rePassword(@RequestBody RePasswordRequest rePasswordRequest) throws NotFoundException {
         return ResponseEntity.ok(authService.forgotPassword(rePasswordRequest));
     }
 

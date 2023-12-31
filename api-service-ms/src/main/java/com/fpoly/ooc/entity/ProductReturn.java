@@ -22,6 +22,16 @@ public class ProductReturn extends BaseEntity{
     @JoinColumn(name = "product_detail_id")
     private ProductDetail productDetail;
 
-    @Column(name = "total_")
-    private BigDecimal totalPrice;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "bill_id")
+    private Bill bill;
+
+    @Column(name = "quantity")
+    private Integer quantity;
+
+    @Column(name = "price")
+    private BigDecimal price;
+
+    @Column(name = "note")
+    private String note;
 }

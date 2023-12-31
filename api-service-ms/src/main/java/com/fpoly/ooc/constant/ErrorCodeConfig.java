@@ -55,9 +55,16 @@ public class ErrorCodeConfig {
         errors.put("JWT_LOGIN_ERROR", "Tài khoản hoặc mật khẩu không chính xác");
         errors.put("PASSWORD_NOT_CORRECT", "Mật khẩu không chính xác");
         errors.put("ADDRESS_NOT_FOUND", "Địa chỉ không chính xác");
-        errors.put("ADD_ENTITY_FAIL", "Thêm thất bại.");
+        errors.put("ADD_ENTITY_FAIL", "Thao tác thất bại.");
+        errors.put("ERROR_SERVICE", "Thao tác thất bại");
+        errors.put("ERROR_UPDATE_QUANTITY_PRODUCT_DETAIL", "Số lượng sản phẩm không hợp lệ");
+        errors.put("ERROR_BUY_QUANTITY_THAN_QUANTITY_IN_STORE", "Số lượng trong kho không đủ");
+        errors.put("ERROR_VOUCHER_USABLE", "Phiếu giảm giá này không sử dụng được");
+        errors.put("ERROR_VOUCHER_CODE_NOT_FOUND", "Không tìm thấy phiếu giảm giá có mã là: %s");
+        errors.put("ERROR_BILL_NOT_FOUND", "Không tìm thấy hóa đơn");
         errors.put("USER_NOT_FOUND_BY_EMAIL", "Địa chỉ email không chính xác.");
         errors.put("OPERATION_ERROR", "Thao tác thất bại.");
+        errors.put("ERROR_BUY_PRODUCT_NOT_FOUND", "Mua sản phẩm thất bại.");
 
 
         // SEND_EMAIL_TEMPLATE

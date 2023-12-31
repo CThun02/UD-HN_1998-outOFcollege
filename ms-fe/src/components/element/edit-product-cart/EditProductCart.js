@@ -13,10 +13,10 @@ import Input from "antd/es/input/Input";
 import Modal from "antd/es/modal/Modal";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import styles from "./ProductDetails.module.css";
+import styles from "../../admin/product/ProductDetails.module.css";
 import { getAuthToken, getToken } from "../../../service/Token";
 
-const ProductDetails = (props) => {
+const EditProductCart = ({open, onCancel, render, billCode}) => {
   const api = "http://localhost:8080/api/admin/";
   const [products, setProducts] = useState([]);
   const [product, setProduct] = useState("");
@@ -51,7 +51,6 @@ const ProductDetails = (props) => {
   const [quantity, setQuantiy] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
-  const token = getAuthToken(true);
 
   const columns = [
     {
@@ -261,17 +260,12 @@ const ProductDetails = (props) => {
       key: "action",
       title: "Thao tác",
       dataIndex: "id",
-      fixed: "right",
-      width: 100,
       render: (text, record, index) => (
         <>
           <Modal
             title="Số lượng mua"
             centered
             open={modalSetQuantity[index]}
-            onOk={() => {
-              addProductDetail(record);
-            }}
             onCancel={() => handleCancelModalQuantity(index)}
             footer={null}
           >
@@ -283,15 +277,14 @@ const ProductDetails = (props) => {
             <div style={{ marginTop: "12px", textAlign: "center" }}>
               <Button
                 type="primary"
+                size="large"
                 onClick={() => {
-                  addProductDetail(record, index);
                 }}
               >
                 Xác nhận
               </Button>
             </div>
           </Modal>
-          {console.log(record.quantity)}
           {record.quantity <= 0 ? (
             <span style={{ color: "#ccc" }}>Hết hàng</span>
           ) : record.status === "INACTIVE" ? (
@@ -328,138 +321,8 @@ const ProductDetails = (props) => {
     setModalSetQuantity(visible);
   };
 
-  function addProductDetail(record, index) {
-    var indexExist = -1;
-    var productDetailCreate = {
-      productDetail: {},
-      quantity: quantity,
-      priceReduce: 0,
-    };
-    for (let i = 0; i < props.productDetailsCreate?.length; i++) {
-      if (props.productDetailsCreate[i].productDetail.id === record.id) {
-        indexExist = i;
-        break;
-      }
-    }
-    if (indexExist !== -1) {
-      if (
-        Number(quantity) +
-          Number(props.productDetailsCreate[indexExist].quantity) >
-        record?.quantity
-      ) {
-        notification.error({
-          message: "Thông báo",
-          description: `Số lượng sản phẩm ${
-            productDetailCreate.quantity > 100
-              ? "thêm tối đa 100"
-              : "tồn không đủ"
-          }`,
-        });
-        return;
-      } else {
-        productDetailCreate.quantity =
-          Number(quantity) +
-          Number(props.productDetailsCreate[indexExist].quantity);
-        props.productDetailsCreate?.splice(indexExist, 1);
-      }
-    }
-    if (
-      productDetailCreate.quantity > record.quantity ||
-      productDetailCreate.quantity > 100
-    ) {
-      notification.error({
-        message: "Thông báo",
-        description: `Số lượng sản phẩm ${
-          productDetailCreate.quantity > 100
-            ? "thêm tối đa 100"
-            : "tồn không đủ"
-        }`,
-      });
-    } else if (productDetailCreate.quantity <= 0) {
-      notification.error({
-        message: "Thông báo",
-        description: `Số lượng sản phẩm phải lớn hơn 0`,
-      });
-    } else {
-      productDetailCreate.productDetail = record;
-      productDetailCreate.priceReduce =
-        record.promotion.length !== 0
-          ? record.promotion[0].promotionMethod === "%"
-            ? (record.price *
-                (100 - Number(record.promotion[0].promotionValue))) /
-              100
-            : record.price - Number(record.promotion[0].promotionValue)
-          : record.price;
-      props.productDetailsCreate?.push(productDetailCreate);
-
-      handleCancelModalQuantity(index);
-
-      const data = token;
-
-      props.billId
-        ? axios
-            .post(
-              `http://localhost:8080/api/admin/bill-detail/create-bill-detail`,
-              {
-                billId: props.billId,
-                productDetailId: productDetailCreate.productDetail.id,
-                quantity: productDetailCreate.quantity,
-                price: productDetailCreate.priceReduce,
-              },
-              {
-                headers: {
-                  Authorization: `Bearer ${getToken(true)}`,
-                },
-              }
-            )
-            .then((response) => {
-              const values = {
-                note: `
-              ${productDetailCreate.productDetail.id} `,
-                status: "Update",
-                createdBy: data?.username + "_" + data?.fullName,
-              };
-              axios
-                .post(
-                  `http://localhost:8080/api/admin/timeline/${props.billId}`,
-                  values,
-                  {
-                    headers: {
-                      Authorization: `Bearer ${getToken(true)}`,
-                    },
-                  }
-                )
-                .then((response) => {})
-                .catch((error) => {});
-              notification.success({
-                message: "Thông báo",
-                description: "Cập nhật thành công!",
-                duration: 2,
-              });
-            })
-            .catch((error) => {
-              console.log(error);
-              const errorCode = error.response?.data;
-              let description = "";
-              if (errorCode?.status === 403) {
-                description = "Bạn không có quyền truy cập!";
-              }
-
-              if (errorCode?.status === 500) {
-                description = `${errorCode?.message}`;
-              }
-
-              if (errorCode?.status === "BAD_REQUEST") {
-                description = `${errorCode?.message}`;
-              }
-
-              notification.error({
-                message: "Lỗi",
-                description: description,
-              });
-            })
-        : props.action();
-    }
+  const addToBill = ()=>{
+    
   }
 
   function filter() {
@@ -739,7 +602,7 @@ const ProductDetails = (props) => {
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
-    props.render,
+    render,
     renderThis,
     maxPrice,
     product,
@@ -757,7 +620,17 @@ const ProductDetails = (props) => {
   ]);
 
   return (
-    <>
+    <Modal
+        title="Tìm kiếm sản phẩm"
+        style={{ top: "10px" }}
+        centered
+        open={open}
+        onCancel={
+          onCancel
+        }
+        footer={null}
+        width={"75%"}
+      >
       <div className={styles.productDetails}>
         <Row className={styles.productDetails__filter}>
           <Col span={4}>
@@ -1319,8 +1192,8 @@ const ProductDetails = (props) => {
           />
         </div>
       </div>
-    </>
+    </Modal>
   );
 };
 
-export default ProductDetails;
+export default EditProductCart;

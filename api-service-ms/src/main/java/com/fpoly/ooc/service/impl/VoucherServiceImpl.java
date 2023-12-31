@@ -73,7 +73,7 @@ public class VoucherServiceImpl implements VoucherService {
     @Transactional
     @Override
     @Async
-    public CompletableFuture<Voucher> saveOrUpdate(VoucherRequest voucherRequest) {
+    public CompletableFuture<Voucher> saveOrUpdate(VoucherRequest voucherRequest) throws NotFoundException {
         Voucher voucherDb = null;
         if(voucherRequest.getVoucherId() != null) {
             voucherDb = voucherRepository.findById(voucherRequest.getVoucherId()).orElse(null);
@@ -115,7 +115,7 @@ public class VoucherServiceImpl implements VoucherService {
     }
 
     @Override
-    public Voucher updateStatus(String code) {
+    public Voucher updateStatus(String code) throws NotFoundException {
         Voucher voucher = findVoucherByVoucherCode(code);
         voucher.setStatus(Const.STATUS_CANCEL);
         voucher.setDeletedAt(LocalDateTime.now());
@@ -164,7 +164,7 @@ public class VoucherServiceImpl implements VoucherService {
     }
 
     @Override
-    public VoucherRequest findByVoucherCode(String code) {
+    public VoucherRequest findByVoucherCode(String code) throws NotFoundException {
         return convertVoucher(findVoucherByVoucherCode(code));
     }
 
@@ -217,10 +217,21 @@ public class VoucherServiceImpl implements VoucherService {
     }
 
     @Override
-    public Voucher findVoucherByVoucherCode(String voucherCode) {
+    public Voucher findVoucherByVoucherCode(String voucherCode) throws NotFoundException {
         log.info("VoucherCode: " + voucherCode);
         return voucherRepository.findVoucherByVoucherCodeAndStatus(voucherCode, Const.STATUS_ACTIVE)
                 .orElseThrow(() -> new NotFoundException(ErrorCodeConfig.getFormatMessage(Const.CODE_NOT_FOUND)));
+    }
+
+    @Override
+    public Voucher isVoucherUsable(String voucherCode) {
+        Voucher voucher = voucherRepository.isCheckVoucherUsable(voucherCode, LocalDateTime.now());
+
+        if (Objects.nonNull(voucher)) {
+            return voucher;
+        }
+
+        return null;
     }
 
     @Override
@@ -289,7 +300,7 @@ public class VoucherServiceImpl implements VoucherService {
         return voucherRepository.findVoucherByVoucherCode(code).orElse(null);
     }
 
-    private Voucher convertVoucherRequest(VoucherRequest request, Voucher voucherDb) {
+    private Voucher convertVoucherRequest(VoucherRequest request, Voucher voucherDb) throws NotFoundException {
         Voucher voucher = new Voucher();
 
         if (request.getVoucherName().equalsIgnoreCase(request.getVoucherNameCurrent())) {

@@ -3,6 +3,7 @@ package com.fpoly.ooc.service.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.entity.Product;
+import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.ProductDAORepositoryI;
 import com.fpoly.ooc.request.product.ProductDetailRequest;
 import com.fpoly.ooc.responce.product.*;
@@ -46,7 +47,7 @@ public class ProductServiceImpl implements ProductServiceI {
     }
 
     @Override
-    public Product update(Product product) throws JsonProcessingException {
+    public Product update(Product product) throws JsonProcessingException, NotFoundException {
         Product productCheck = this.getOne(product.getId());
         if(productCheck != null){
             productCheck = kafkaUtil.sendingObjectWithKafka(product, Const.TOPIC_PRODUCT);

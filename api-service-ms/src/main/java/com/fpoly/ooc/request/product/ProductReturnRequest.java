@@ -21,8 +21,12 @@ public class ProductReturnRequest {
     private Integer quantity;
     private String reason;
     private BigDecimal price;
+    private String note;
 
     public ProductReturn dto(){
-        return null;
+        ProductReturn productReturn = ProductReturn.builder().productDetail(ProductDetail.builder().id(productDetailId).build())
+                .bill(Bill.builder().id(billId).build()).quantity(quantity).price(price).note(note).build();
+        productReturn.setStatus(reason);
+        return productReturn;
     }
 }

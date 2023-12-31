@@ -15,6 +15,8 @@ import { useNavigate } from "react-router-dom";
 import { getAuthToken } from "../../../service/Token";
 import axios from "axios";
 
+const baseUrl = "http://localhost:8080/api/client";
+
 const Cart = (props) => {
   const navigate = useNavigate();
   const [productDetails, setProductDetails] = useState(null);
@@ -761,6 +763,8 @@ const Cart = (props) => {
   };
 
   const addSelectedToData = (e) => {
+    console.log("addToCheckout: " + e);
+
     e.preventDefault();
     let newData = [];
     if (carts.length === 0) {
@@ -786,10 +790,24 @@ const Cart = (props) => {
         duration: 2,
       });
       return;
+    } else {
+      newData.map((e) => {
+        axios
+          .get(baseUrl + "/isCheckQuantity?id=" + e?.data[0]?.id)
+          .catch((err) => {
+            notification.error({
+              message: "Thông báo",
+              description:
+                "Sản phẩm đã bán hết hoặc không tồn tại vui lòng thử lại sau",
+              duration: 2,
+            });
+            return;
+          });
+      });
     }
 
-    localStorage.setItem("checkout", JSON.stringify(newData));
-    navigate("/ms-shop/checkout");
+    // localStorage.setItem("checkout", JSON.stringify(newData));
+    // navigate("/ms-shop/checkout");
   };
 
   const rowSelection = {

@@ -93,6 +93,17 @@ const Bill = () => {
   const updateQuantity = (record, index, value) => {
     let cart = JSON.parse(localStorage.getItem(cartId));
     let productDetails = cart.productDetails;
+
+    if (!/^\d+$/.test(value)) {
+      notification.warning({
+        message: "Thông báo",
+        description: "Số lượng phải là số nguyên dương",
+        duration: 1,
+      });
+      setRendered(Math.random());
+      return;
+    }
+
     if (value > 99) {
       notification.warning({
         message: "Thông báo",
@@ -1237,7 +1248,7 @@ const Bill = () => {
             } catch (error) {
               const validationErrors = {};
               error.inner.forEach((err) => {
-                validationErrors[err.path] = err.message;
+                validationErrors[err?.path] = err.message;
               });
               setErrors(validationErrors);
               hasError = true;
@@ -1281,7 +1292,7 @@ const Bill = () => {
 
             notification.success({
               message: "Thông báo",
-              description: "Thanh toán thành công",
+              description: "Thao tác thành công",
               duration: 2,
             });
             navigate(`/api/admin/order`);

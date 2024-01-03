@@ -55,7 +55,6 @@ public class MsHandleException {
         errors.put("status", Const.HTTP_ERROR_CODE);
         errors.put("message", ex.getMessage());
         errors.put(ex.getField(), ex.getMessage());
-
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 

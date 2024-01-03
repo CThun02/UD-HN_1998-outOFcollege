@@ -59,6 +59,8 @@ public class Const {
 
     public static final String ERROR_UPDATE_QUANTITY_PRODUCT_DETAIL = "ERROR_UPDATE_QUANTITY_PRODUCT_DETAIL";
     public static final String ERROR_BUY_QUANTITY_THAN_QUANTITY_IN_STORE = "ERROR_BUY_QUANTITY_THAN_QUANTITY_IN_STORE";
+    public static final String ERROR_BUY_PRICE_THAN_FIVE_MILLION = "ERROR_BUY_PRICE_THAN_FIVE_MILLION";
+    public static final String ERROR_BILL_THAN_FIVE_MILLION = "ERROR_BILL_THAN_FIVE_MILLION";
     public static final String ERROR_VOUCHER_USABLE = "ERROR_VOUCHER_USABLE";
     public static final String ERROR_VOUCHER_CODE_NOT_FOUND = "ERROR_VOUCHER_CODE_NOT_FOUND";
     public static final String ERROR_SERVICE = "ERROR_SERVICE";
@@ -66,6 +68,7 @@ public class Const {
     public static final String ERROR_BUY_PRODUCT_NOT_FOUND = "ERROR_BUY_PRODUCT_NOT_FOUND";
     public static final String ERROR_ADD_TO_CART_THAN_QUANTITY = "ERROR_ADD_TO_CART_THAN_QUANTITY";
     public static final String ERROR_PRODUCT_DETAIL_NOT_EMPTY_IN_PROMOTION = "ERROR_PRODUCT_DETAIL_NOT_EMPTY_IN_PROMOTION";
+    public static final String ERROR_QUANTITY_INVALID = "ERROR_QUANTITY_INVALID";
 
     //kafka
     public static final String KAFKA_SERVER = "localhost:9092";

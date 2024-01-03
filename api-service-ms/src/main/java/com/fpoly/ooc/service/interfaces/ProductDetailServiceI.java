@@ -2,17 +2,21 @@ package com.fpoly.ooc.service.interfaces;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.dto.ProductDetailsDTO;
+import com.fpoly.ooc.entity.Color;
 import com.fpoly.ooc.entity.ProductDetail;
+import com.fpoly.ooc.entity.Size;
 import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.request.product.ProductDetailCondition;
 import com.fpoly.ooc.request.product.ProductDetailRequest;
 import com.fpoly.ooc.request.productDetail.GetSizeAndColorRequest;
 import com.fpoly.ooc.responce.product.ProductDetailDisplayResponse;
 import com.fpoly.ooc.responce.product.ProductDetailResponse;
+import com.fpoly.ooc.responce.product.ProductDetailSellResponse;
 import com.fpoly.ooc.responce.productdetail.GetColorAndSizeAndQuantity;
 import com.fpoly.ooc.responce.productdetail.ProductDetailShop;
 import com.fpoly.ooc.responce.productdetail.ProductDetailShopResponse;
 import com.fpoly.ooc.responce.productdetail.ProductsDetailsResponse;
+import com.fpoly.ooc.responce.component.component;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -45,4 +49,7 @@ public interface ProductDetailServiceI {
     ProductDetail updateQuantityForBuy(ProductDetail productDetail);
 
     ProductDetail findProductDetailByIdAndStatus(Long id) throws NotFoundException;
+
+    List<component> getColorProductDetailEdit(Long productDetailId, Long sizeId);
+    List<component> getSizeProductDetailEdit(Long productDetailId, Long colorId);
 }

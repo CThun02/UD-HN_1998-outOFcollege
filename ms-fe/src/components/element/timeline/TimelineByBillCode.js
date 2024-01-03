@@ -1,4 +1,4 @@
-import { Button, Carousel, Col, Row, Space } from "antd";
+import { Button, Carousel, Col, Modal, Row, Space, notification } from "antd";
 import React from "react";
 import styles from "./Timeline.module.css";
 import { useParams } from "react-router-dom";
@@ -10,6 +10,7 @@ import { FaRegFileAlt, FaTimes, FaTruck } from "react-icons/fa";
 import { CheckCircleOutlined, DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import SockJs from "../../../service/SockJs";
 import EditAddress from "../edit-address/EditAddress";
+import EditProductsCart from "../edit-product-cart/EditProductsCart";
 import EditProductCart from "../edit-product-cart/EditProductCart";
 
 const TimelineByBillCode = () => {
@@ -20,6 +21,46 @@ const TimelineByBillCode = () => {
   const [openEditAddress, setOpenEditAddress] = useState(false);
   const [render, setRender] = useState(null);
   const [openCartEdit, setOpenCartEdit] = useState(false);
+  const [openProductEdit, setOpenProductEdit] = useState([]);
+  const [loadingButton, setLoadingButton] = useState(false);
+
+  const handleShowModalProductEdit= (index) => {
+    const visible = [...openProductEdit];
+    visible[index] = true;
+    setOpenProductEdit(visible);
+  };
+
+  const handleCancelModalProductEdit= (index) => {
+    const visible = [...openProductEdit];
+    visible[index] = false;
+    setOpenProductEdit(visible);
+  };
+
+  const deleteBillDetail=(bdId, bId)=>{
+    setLoadingButton(true);
+    Modal.confirm({
+      title:"Xác nhận xóa",
+      message:"Xác nhận xóa sản phẩm",
+      onOk:()=>{
+        axios.delete("http://localhost:8080/api/client/deleteBD?bdId="+bdId+"&bId="+bId).then(res=>{
+          notification.success({
+            message:"Thông báo",
+            description:"Xóa thành công sản phẩm",
+          })
+          setRender(Math.random())
+          setLoadingButton(false);
+        }).catch(error=>{
+          const message = error?.response?.data?.message;
+          notification.error({
+            message:"Thông báo",
+            description: message,
+          })
+        });
+      }
+    })
+    
+  }
+
 
   useEffect(() => {
     axios
@@ -40,12 +81,10 @@ const TimelineByBillCode = () => {
           }
         }
         setTimelineDisplay(timelinesPush);
-        console.log(response.data);
       })
       .catch((error) => {
-        console.log(error);
+        console.log(error)
       });
-    console.log(timelines);
   }, [render]);
 
   return (
@@ -58,7 +97,6 @@ const TimelineByBillCode = () => {
         <div className={styles.width}>
           <div className={styles.followingContent}>
             {/* timeline */}
-            {console.log(timelineDisplay)}
             <div style={{ overflowX: "scroll", height: "50%" }}>
               <div style={{ width: "fit-content" }}>
                 <Timeline minEvents={6} placeholder>
@@ -128,18 +166,30 @@ const TimelineByBillCode = () => {
               </div>
             </div>
             {/* Thông tin sản phẩm */}
-            <EditProductCart billCode={billCode} open={openCartEdit} onCancel={()=>setOpenCartEdit(false)}/>
+            <EditProductsCart billCode={billCode} setLoadingButtonTimeline={setLoadingButton} renderTimeline={render} open={openCartEdit} render={setRender} onCancel={()=>setOpenCartEdit(false)}/>
             <Space direction="vertical" size={16} style={{ width: "100%" }}>
-              {timelines?.lstProduct?.map((timeline) => {
-                return (
-                  <Row style={{ margin: 0 }}>
-                    {timelines?.lstTimeline?.length >1 ? null :(
-                      <Col span={24} style={{marginBottom:"24px"}}>
-                      <Button onClick={()=>setOpenCartEdit(true)} className={styles.btnEditCart}>
+            {timelines?.lstTimeline?.length >1 ? null :(
+                      <div  style={{marginBottom:"24px"}}>
+                      <Button onClick={()=>setOpenCartEdit(true)} 
+                        loading={loadingButton}
+                        className={styles.btnEditCart}>
                         <EditOutlined /> Thêm sản phẩm
                       </Button>
-                    </Col>
+                    </div>
                      )}
+              {timelines?.lstProduct?.map((timeline, index) => {
+                return (
+                  <Row style={{ margin: 0 }}>
+                    <EditProductCart 
+                      onCancel={()=>{handleCancelModalProductEdit(index)}} 
+                      open={openProductEdit[index]} 
+                      productDetailId={timeline?.productDetailId} 
+                      render={setRender}
+                      quantityBuy={timeline.quantity}
+                      setLoadingButtonTimeline={setLoadingButton} 
+                      renderTimeline={render}
+                      billDetailId={timeline?.billDetailId}
+                    />
                     <Col span={3}>
                       <Carousel style={{ maxWidth: "300px" }} autoplay>
                         {timeline.productImageResponses &&
@@ -254,13 +304,19 @@ const TimelineByBillCode = () => {
                         {timelines?.lstTimeline?.length >1 ? null :(
                       <Row>
                           <Col span={12}>
-                          <Button onClick={()=>setOpenEditAddress(true)} className={styles.product_tableButtonCreate}>
+                          <Button 
+                          loading={loadingButton}
+                          onClick={()=>handleShowModalProductEdit(index)} 
+                          className={styles.product_tableButtonCreate}>
                             <EditOutlined />
                           </Button>
                           </Col>
                           <Col span={12}>
-                          <Button disabled={timelines?.lstProduct?.length ===1 } onClick={()=>setOpenEditAddress(true)} className={styles.product_tableButtonCreate}>
-                            <DeleteOutlined />
+                          <Button disabled={timelines?.lstProduct?.length ===1 } 
+                          loading={loadingButton}
+                          onClick={()=>deleteBillDetail(timeline?.billDetailId, timeline?.billId)} 
+                          className={styles.product_tableButtonCreate}>
+                            <DeleteOutlined/>
                           </Button>
                           </Col>
                       </Row>
@@ -385,7 +441,10 @@ const TimelineByBillCode = () => {
                     </Col>
                     {timelines?.lstTimeline?.length >1 ? null :(
                       <Col span={2}>
-                      <Button onClick={()=>setOpenEditAddress(true)} className={styles.product_tableButtonCreate}>
+                      <Button
+                      loading={loadingButton}
+                      onClick={()=>setOpenEditAddress(true)} 
+                      className={styles.product_tableButtonCreate}>
                         <EditOutlined />
                       </Button>
                       </Col>

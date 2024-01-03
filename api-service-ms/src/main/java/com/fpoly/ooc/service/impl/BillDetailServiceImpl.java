@@ -9,6 +9,7 @@ import com.fpoly.ooc.entity.ProductDetail;
 import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.BillDetailRepo;
 import com.fpoly.ooc.request.bill.BillDetailRequest;
+import com.fpoly.ooc.request.product.ProductDetailRequest;
 import com.fpoly.ooc.responce.bill.BillInfoResponse;
 import com.fpoly.ooc.responce.pdf.PdfResponse;
 import com.fpoly.ooc.responce.timeline.TimelineProductResponse;
@@ -41,6 +42,134 @@ public class BillDetailServiceImpl implements BillDetailService {
 
     @Autowired
     private TimeLineService timeLineService;
+
+
+    //@Author: Nguyễn Công Thuần
+    @Transactional(rollbackOn = RuntimeException.class)
+    @Override
+    public BillDetail createBillDetail(ProductDetailRequest request, String billCode) throws NotFoundException {
+        //Request đối tượng thêm mới gửi xuống bao gồm: Số lượng thêm, giá hiện tại mua, id sản phẩm chi tiết
+        Integer quantityAdd = request.getQuantity();
+        BigDecimal price = request.getPrice();
+        //Tìm hóa đơn đang chỉnh sửa
+        Bill bill = billService.findBillByBillCode(billCode);
+
+        BillDetail billDetail = BillDetail.builder().id(null)
+                .bill(bill)
+                .productDetail(ProductDetail.builder().id(request.getId()).build())
+                .price(price)
+                .quantity(quantityAdd)
+                .build();
+        //Tìm sản phẩm  tồn tại trong hóa đơn
+        List<BillDetail> billDetails = billDetailRepo.findBillDetailsByProductDetailIdAndBillCode(request.getId(), billCode);
+        //Tìm sản phẩm trong cửa hàng
+        ProductDetail productDetail = productDetailService.getOne(request.getId());
+        //kiểm tra điều kiện thỏa mãn hóa đơn với: quantityAdd là số lượng  thêm, giá
+        //productDetail: sản phẩm mới thêm, price: giá sản phẩm mới thêm hiện tại(có thể có khuyến  mại giảm giá),
+        //bill: hóa đơn chỉnh
+        this.validateBill(quantityAdd, productDetail, price, bill);
+        //Thỏa mãn tất cả điều kiện
+        //Nếu sản phẩm tồn tại trong hóa đơn
+        if(!billDetails.isEmpty()){
+            //Kiểm tra giá sản phẩm(Ví dụ:Kết thúc khuyến mại), nếu giá không bằng nhau sẽ tạo hóa đơn chi tiết mới,
+            //nếu bằng chỉnh sửa lại hóa đơn chi tiết cũ
+            for (int i = 0; i < billDetails.size(); i++) {
+                if(billDetails.get(i).getPrice().equals(price)){
+                    billDetail = billDetails.get(i);
+                    billDetail.setQuantity(billDetail.getQuantity()+quantityAdd);
+                    billDetail.setPrice(price);
+                    break;
+                }
+            }
+        }
+        productDetail.setQuantity(productDetail.getQuantity()-quantityAdd);
+        this.saveOrUpdateBillDetail(billDetail, bill, productDetail);
+        return billDetail;
+    }
+
+    //@Author: Nguyễn Công Thuần
+    @Transactional(rollbackOn = RuntimeException.class)
+    @Override
+    public BillDetail updateBillDetail(ProductDetailRequest request, Long billDetailId) throws NotFoundException {
+        if(request.getQuantity()<0){
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_QUANTITY_INVALID));
+        }
+        BillDetail billDetail = billDetailRepo.findById(billDetailId).orElse(null);
+        //Tìm hóa đơn đang chỉnh sửa
+        Bill bill = billDetail.getBill();
+        ProductDetail productDetail = productDetailService.getOne(request.getId());
+        //Request đối tượng thêm mới gửi xuống bao gồm: Số lượng thêm, giá hiện tại mua, id sản phẩm chi tiết
+
+        Integer quantityUpdate = request.getQuantity();
+        BigDecimal price = request.getPrice();
+        //Nếu là sản phẩm cũ => có thể  tăng giảm số lượng sản phẩm
+        if(billDetail.getProductDetail().getId().equals(request.getId())){
+            if(billDetail.getQuantity()<request.getQuantity()){
+                this.validateBill(request.getQuantity()-billDetail.getQuantity(), productDetail, price, bill);
+            }
+            productDetail.setQuantity(productDetail.getQuantity()+(billDetail.getQuantity() - quantityUpdate));
+        }
+        //Nếu là sản phẩm mới => trừ thẳng số  lượng sản phẩm, hoàn số lương sản phẩm cũ
+        else{
+            ProductDetail productDetailOld = billDetail.getProductDetail();
+            if(quantityUpdate> productDetail.getQuantity()){
+                throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BUY_QUANTITY_THAN_QUANTITY_IN_STORE));
+            }else if(price.multiply(BigDecimal.valueOf(quantityUpdate)).compareTo(BigDecimal.valueOf(5000000))>0){
+                throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BUY_PRICE_THAN_FIVE_MILLION));
+            }
+            productDetailOld.setQuantity(productDetailOld.getQuantity() + billDetail.getQuantity());
+            try{
+                productDetailService.update(productDetailOld);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+            productDetail.setQuantity(productDetail.getQuantity()-request.getQuantity());
+        }
+        billDetail = BillDetail.builder().id(billDetailId)
+                .bill(bill)
+                .productDetail(productDetail)
+                .price(request.getPrice())
+                .quantity(request.getQuantity())
+                .build();
+        this.saveOrUpdateBillDetail(billDetail, bill, productDetail);
+        return billDetail;
+    }
+
+    //@Author: Nguyễn Công Thuần
+    private void saveOrUpdateBillDetail(BillDetail billDetail, Bill bill, ProductDetail productDetail) throws NotFoundException {
+        billDetailRepo.save(billDetail);
+        //Đặt lại giá cho hóa đơn
+        BigDecimal priceBillUpdate = billDetailRepo.getTotalPriceByBillCode(bill.getBillCode());
+        bill.setPrice(priceBillUpdate);
+        billService.updateBill(bill);
+        try {
+            productDetailService.update(productDetail);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //@Author: Nguyễn Công Thuần
+    //kiểm tra điều kiện thỏa mãn hóa đơn với: quantityAdd là số lượng  thêm, giá
+    //productDetail: sản phẩm mới thêm, price: giá sản phẩm mới thêm hiện tại(có thể có khuyến  mại giảm giá),
+    private void validateBill(int quantityAdd, ProductDetail productDetail, BigDecimal price, Bill bill) throws NotFoundException {
+        //Nếu số lượng mua lớn hơn số lượng tồn
+        if (quantityAdd > productDetail.getQuantity() ) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BUY_QUANTITY_THAN_QUANTITY_IN_STORE));
+        }
+        //Nếu tổng giá mua lớn hơn 5 triệu
+        else if(price.multiply(BigDecimal.valueOf(quantityAdd)).compareTo(BigDecimal.valueOf(5000000))>0){
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BUY_PRICE_THAN_FIVE_MILLION));
+        }
+        //Nếu nếu số lượng mua bé hơn hoặc bằng 0
+        else if(quantityAdd <= 0){
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_QUANTITY_INVALID));
+        }
+        //Nếu giá mua cộng với giá tại hóa đơn lớn hơn 5 triệu
+        else if(price.multiply(BigDecimal.valueOf(quantityAdd)).add(bill.getPriceReduce()).compareTo(BigDecimal.valueOf(5000000))>0){
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_THAN_FIVE_MILLION));
+        }
+    }
 
     @Transactional(rollbackOn = Exception.class)
     @Override
@@ -136,7 +265,6 @@ public class BillDetailServiceImpl implements BillDetailService {
     public BillDetail deleteBillDetail(Long billId, Long billDetailId) throws NotFoundException {
         Bill bill = billService.findBillByBillId(billId);
         BillDetail billDetail = billDetailRepo.findById(billDetailId).orElse(null);
-
         ProductDetail productDetail = productDetailService.findById(billDetail.getProductDetail().getId());
         Integer quantityUpdayte = productDetail.getQuantity() + billDetail.getQuantity();
         productDetail.setQuantity(quantityUpdayte);
@@ -208,5 +336,6 @@ public class BillDetailServiceImpl implements BillDetailService {
         }
         return billDetailRepo.findBillDetailByBill_BillCode(billCode);
     }
+
 
 }

@@ -14,6 +14,7 @@ import {
   Radio,
   Table,
   Tooltip,
+  message,
 } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import SpanBorder from "../sale-couter/SpanBorder";
@@ -161,7 +162,7 @@ const BillReturn = () => {
       key: "total",
       title: "Tổng tiền",
       render: (_, record) => {
-        return record.productPrice?.toLocaleString("vi-VN", {
+        return (record.productPrice* record.quantity)?.toLocaleString("vi-VN", {
           style: "currency",
           currency: "VND",
         });
@@ -182,16 +183,14 @@ const BillReturn = () => {
             >
               <Input
                 value={quantity}
-                type={"number"}
                 onChange={(e) => {
-                  if (
-                    Math.abs(Number(e.target.value)) >
-                      Number(record.quantity) ||
-                    Number(e.target.value) === 0
-                  ) {
-                    setQuantity(1);
-                  } else {
-                    setQuantity(e.target.value);
+                  var checkQuantity = e.target.value.replace(/[^\d]/g, "");
+                  setQuantity(checkQuantity);
+                  if(checkQuantity>record.quantity){
+                    notification.error({
+                      message:"Thông báo",
+                      description:"Vượt quá số lượng có thể hoàn trả!"
+                    });
                   }
                 }}
               />
@@ -201,6 +200,7 @@ const BillReturn = () => {
                     onClick={() => {
                       reloadProduct(index, record);
                     }}
+                    disabled={quantity<0 || quantity>record.quantity}
                     type="primary"
                     size="large"
                   >
@@ -278,9 +278,10 @@ const BillReturn = () => {
         const request = {
           productDetailId: productsReturns[index].productDetailId,
           billId: billInfo?.id,
-          reason: productsReturns[index].reason,
+          reason: productsReturns[index].reason?"PRODUCE":"OTHER",
           quantity: productsReturns[index].quantity,
           price: productsReturns[index].productPrice,
+          note: productsReturns[index].note
         };
         await axios
           .post(`http://localhost:8080/api/admin/product-return`, request, {
@@ -532,7 +533,8 @@ const BillReturn = () => {
                         ...response.data.billDetails[index],
                       };
                       productReturn.quantity = res.data[j].quantity;
-                      productReturn.reason = res.data[j].descriptionDetail;
+                      productReturn.reason = res.data[j].status;
+                      productReturn.note = res.data[j].descriptionDetail;
                       if (
                         productsReturns.every(
                           (item) =>
@@ -1031,6 +1033,10 @@ const BillReturn = () => {
                               <Radio value={"OTHER"}>Lý do khác</Radio>
                             </Radio.Group>
                           )}
+                        </Col>
+                        <Col span={24}>
+                          <span style={{ fontWeight: 600 }}>Mô tả <span style={{color:"red"}}>*</span></span><br />
+                          <TextArea readOnly={billInfo?.status === "ReturnS"} defaultValue={productsReturns[index].note} onChange={(event)=>{productsReturns[index].note = event.target.value}}/>
                         </Col>
                       </Row>
                       <Divider />

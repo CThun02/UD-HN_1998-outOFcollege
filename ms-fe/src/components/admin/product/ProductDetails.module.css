@@ -2,6 +2,36 @@
   overflow: auto;
 }
 
+.colorSelect{
+  width: 46px !important;
+  height: 46px !important;
+  margin: 4px;
+  border: 1px solid black;
+  transition: 0.3s linear;
+}
+
+.sizeSelect{
+  background-color: rgb(2, 132, 199);
+  color: white;
+  transition: 0.3s linear;
+}
+
+.colorSelectHover:hover{
+  cursor: pointer;
+  width: 46px !important;
+  height: 46px !important;
+  margin: 4px;
+  border: 1px solid black;
+  transition: 0.3s linear;
+}
+
+.sizeSelectHover:hover{
+  cursor: pointer;
+  background-color: rgb(2, 132, 199);
+  color: white;
+  transition: 0.3s linear;
+}
+
 .optionColor {
   display: flex;
   align-items: center;

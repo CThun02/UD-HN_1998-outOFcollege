@@ -14,16 +14,14 @@ import com.fpoly.ooc.request.product.ProductDetailRequest;
 import com.fpoly.ooc.request.productDetail.GetSizeAndColorRequest;
 import com.fpoly.ooc.responce.product.ProductDetailDisplayResponse;
 import com.fpoly.ooc.responce.product.ProductDetailResponse;
+import com.fpoly.ooc.responce.product.ProductDetailSellResponse;
 import com.fpoly.ooc.responce.product.ProductImageResponse;
 import com.fpoly.ooc.responce.productdetail.GetColorAndSizeAndQuantity;
 import com.fpoly.ooc.responce.productdetail.ProductDetailShop;
 import com.fpoly.ooc.responce.productdetail.ProductDetailShopResponse;
 import com.fpoly.ooc.responce.productdetail.ProductsDetailsResponse;
-import com.fpoly.ooc.service.interfaces.ColorServiceI;
-import com.fpoly.ooc.service.interfaces.ProductDetailServiceI;
-import com.fpoly.ooc.service.interfaces.ProductImageServiceI;
-import com.fpoly.ooc.service.interfaces.PromotionProductDetailService;
-import com.fpoly.ooc.service.interfaces.SizeServiceI;
+import com.fpoly.ooc.responce.component.component;
+import com.fpoly.ooc.service.interfaces.*;
 import com.fpoly.ooc.service.kafka.KafkaUtil;
 import com.fpoly.ooc.util.CommonUtils;
 import jakarta.transaction.Transactional;
@@ -32,6 +30,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -300,6 +299,26 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
         }
 
         throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND));
+    }
+
+    @Override
+    public List<component> getColorProductDetailEdit(Long productDetailId, Long sizeId) {
+        ProductDetail productDetail = this.getOne(productDetailId);
+        List<component> colors= productDetail!=null? repo.getColorProductDetailEdit(productDetail.getProduct().getId(), productDetail.getButton().getId(),
+                productDetail.getMaterial().getId(), productDetail.getShirtTail().getId(), productDetail.getSleeve().getId(),
+                productDetail.getCollar().getId(), sizeId, productDetail.getPattern().getId(), productDetail.getForm().getId(),
+                productDetail.getBrand().getId(), productDetail.getCategory().getId()):null;
+        return colors;
+    }
+
+    @Override
+    public List<component> getSizeProductDetailEdit(Long productDetailId, Long colorId) {
+        ProductDetail productDetail = this.getOne(productDetailId);
+        List<component> sizes= productDetail!=null? repo.getSizeProductDetailEdit(productDetail.getProduct().getId(), productDetail.getButton().getId(),
+                productDetail.getMaterial().getId(), productDetail.getShirtTail().getId(), productDetail.getSleeve().getId(),
+                productDetail.getCollar().getId(), colorId, productDetail.getPattern().getId(), productDetail.getForm().getId(),
+                productDetail.getBrand().getId(), productDetail.getCategory().getId()):null;
+        return sizes;
     }
 
     @Override

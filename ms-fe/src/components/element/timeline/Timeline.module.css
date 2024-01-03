@@ -28,7 +28,38 @@
 }
 
 .followingContent {
+  background-color: #fff;
   border: 1px solid #ccc;
   padding: 15px 20px;
   border-radius: 6px;
+}
+
+.product_tableButtonCreate {
+  font-size: 20px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid #edf2f9;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  float: right;
+  margin-right: 20px;
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+}
+
+.btnEditCart{
+  font-size: 20px;
+  border-radius: 8px;
+  border: 1px solid #edf2f9;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  float: right;
+  margin-right: 20px;
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+}
+
+.product_tableButtonCreate:hover, .btnEditCart:hover {
+  background-color: #edf2f9;
 }

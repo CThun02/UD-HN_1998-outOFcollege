@@ -3,8 +3,10 @@ package com.fpoly.ooc.service.interfaces;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.entity.BillDetail;
+import com.fpoly.ooc.entity.ProductDetail;
 import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.request.bill.BillDetailRequest;
+import com.fpoly.ooc.request.product.ProductDetailRequest;
 import com.fpoly.ooc.responce.pdf.PdfResponse;
 
 import java.util.List;
@@ -25,4 +27,7 @@ public interface BillDetailService {
 
     List<BillDetail> findBillDetailByBillCode(String billCode) throws NotFoundException;
 
+    BillDetail createBillDetail(ProductDetailRequest request, String billCode) throws NotFoundException, JsonProcessingException;
+
+    BillDetail updateBillDetail(ProductDetailRequest request, Long billDetailId) throws NotFoundException, JsonProcessingException;
 }

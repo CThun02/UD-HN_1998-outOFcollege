@@ -13,10 +13,10 @@ import Input from "antd/es/input/Input";
 import Modal from "antd/es/modal/Modal";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import styles from "./ProductDetails.module.css";
+import styles from "../../admin/product/ProductDetails.module.css";
 import { getAuthToken, getToken } from "../../../service/Token";
 
-const ProductDetails = (props) => {
+const EditProductsCart = ({open, onCancel, render, billCode, setLoadingButtonTimeline, renderTimeline}) => {
   const api = "http://localhost:8080/api/admin/";
   const [products, setProducts] = useState([]);
   const [product, setProduct] = useState("");
@@ -51,7 +51,8 @@ const ProductDetails = (props) => {
   const [quantity, setQuantiy] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
-  const token = getAuthToken(true);
+  const [error, setError] = useState("");
+  const [loadingButton, setLoadingButton] = useState(false);
 
   const columns = [
     {
@@ -91,8 +92,7 @@ const ProductDetails = (props) => {
                   marginRight: "10px",
                 }}
               >
-                {record.promotion.length !== 0 &&
-                record?.promotion[0]?.promotionValue ? (
+                {record.promotion.length !== 0 ? (
                   <Badge.Ribbon
                     text={`Giảm ${
                       record?.promotion[0].promotionValue
@@ -262,37 +262,208 @@ const ProductDetails = (props) => {
       key: "action",
       title: "Thao tác",
       dataIndex: "id",
-      fixed: "right",
-      width: 100,
       render: (text, record, index) => (
         <>
           <Modal
             title="Số lượng mua"
             centered
             open={modalSetQuantity[index]}
-            onOk={() => {
-              addProductDetail(record);
-            }}
             onCancel={() => handleCancelModalQuantity(index)}
             footer={null}
           >
+            <Row>
+              <Col span={8}>
+                <div
+                  style={{
+                    marginTop: "10px",
+                    marginRight: "10px",
+                  }}
+                >
+                  {record.promotion.length !== 0 ? (
+                    <Badge.Ribbon
+                      text={`Giảm ${
+                        record?.promotion[0].promotionValue
+                          ? record.promotion[0].promotionMethod === "%"
+                            ? record.promotion[0].promotionValue +
+                              " " +
+                              record.promotion[0].promotionMethod
+                            : record.promotion[0].promotionValue.toLocaleString(
+                                "vi-VN",
+                                {
+                                  style: "currency",
+                                  currency: "VND",
+                                }
+                              )
+                          : null
+                      }`}
+                      color="red"
+                    >
+                      <Carousel style={{ maxWidth: "300px" }} autoplay>
+                        {record.productImageResponse &&
+                          record.productImageResponse.map((item) => {
+                            return (
+                              <img
+                                key={item.id}
+                                style={{ width: "100%", marginTop: "10px" }}
+                                alt=""
+                                src={item.path}
+                              />
+                            );
+                          })}
+                      </Carousel>
+                    </Badge.Ribbon>
+                  ) : (
+                    <Carousel style={{ maxWidth: "300px" }} autoplay>
+                      {record.productImageResponse &&
+                        record.productImageResponse.map((item) => {
+                          return (
+                            <img
+                              key={item.id}
+                              style={{ width: "100%", marginTop: "10px" }}
+                              alt=""
+                              src={item.path}
+                            />
+                          );
+                        })}
+                    </Carousel>
+                  )}
+                </div>
+              </Col>
+              <Col span={16}>
+              <div
+                className="m-5"
+                style={{
+                  textAlign: "start",
+                  height: "100%",
+                  justifyContent: "center",
+                }}
+              >
+                <span style={{ fontWeight: "500" }}>
+                  {record.product.productName +
+                    "-" +
+                    record.brand.brandName +
+                    "-" +
+                    record.category.categoryName +
+                    "-" +
+                    record.button.buttonName +
+                    "-" +
+                    record.material.materialName +
+                    "-" +
+                    record.collar.collarTypeName +
+                    "-" +
+                    record.sleeve.sleeveName +
+                    "-" +
+                    record.shirtTail.shirtTailTypeName +
+                    "-" +
+                    record.pattern.patternName +
+                    "-" +
+                    record.form.formName}
+                </span>
+                <br />
+                <div className={styles.optionColor}>
+                  <b>Màu sắc: </b>
+                  <span
+                    style={{
+                      backgroundColor: record.color.colorCode,
+                      marginLeft: "8px",
+                    }}
+                  ></span>
+                  {record.color.colorName}
+                </div>
+                <b>Kích cỡ: </b>
+                <span
+                  style={{
+                    marginLeft: "8px",
+                  }}
+                >
+                  {record.size.sizeName}
+                </span>
+                <br/>
+                <b>Số lượng: </b>
+                <span
+                  style={{
+                    marginLeft: "8px",
+                  }}
+                >
+                  {record.quantity}
+                </span>
+                <br/>
+                <b>Đơn giá: </b>
+                <span
+                  style={{
+                    marginLeft: "8px",
+                  }}
+                >
+                  {record.promotion.length !== 0
+                    ? record.promotion[0].promotionMethod === "%"
+                      ? (
+                          (record.price *
+                            (100 - Number(record.promotion[0].promotionValue))) /
+                          100
+                        ).toLocaleString("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                        })
+                      : (
+                          record.price - Number(record.promotion[0].promotionValue)
+                        ).toLocaleString("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                        })
+                    : record.price.toLocaleString("vi-VN", {
+                        style: "currency",
+                        currency: "VND",
+                      })}
+                </span>
+                <br/>
+                <b>thành tiền: </b>
+                <span
+                  style={{
+                    marginLeft: "8px",
+                  }}
+                >
+                  {((record.promotion.length !== 0
+                    ? record.promotion[0].promotionMethod === "%"
+                      ?(record.price *
+                            (100 - Number(record.promotion[0].promotionValue))) /
+                          100
+                          :
+                          record.price - Number(record.promotion[0].promotionValue)
+                        : record.price)*quantity).toLocaleString("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                        })}
+                </span>
+              </div>
+              </Col>
+            </Row>
             <Input
               type={"number"}
-              defaultValue={1}
-              onChange={(event) => handleChangeQuantity(event.target.value)}
+              value={quantity}
+              onChange={(event) => handleChangeQuantity(event.target.value, record)}
+              onBlur={(event)=>{
+                if(error!==""){
+                  setQuantiy(1);
+                }else{
+                  setQuantiy(event.target.value)
+                }
+                setError("")
+              }
+              }
             />
+            <span style={{color:"red"}}>{error}</span>
             <div style={{ marginTop: "12px", textAlign: "center" }}>
               <Button
                 type="primary"
-                onClick={() => {
-                  addProductDetail(record, index);
-                }}
+                size="large"
+                disabled={error !== ""}
+                onClick={() => { addToBill(record, index)}}
+                loading={loadingButton}
               >
                 Xác nhận
               </Button>
             </div>
           </Modal>
-          {console.log(record.quantity)}
           {record.quantity <= 0 ? (
             <span style={{ color: "#ccc" }}>Hết hàng</span>
           ) : record.status === "INACTIVE" ? (
@@ -303,6 +474,7 @@ const ProductDetails = (props) => {
               onClick={() => {
                 handleShowModalQuantity(index);
               }}
+              loading={loadingButton}
             >
               Chọn
             </Button>
@@ -313,8 +485,27 @@ const ProductDetails = (props) => {
   ];
   //functions
 
-  function handleChangeQuantity(quantity) {
-    setQuantiy(quantity);
+  function handleChangeQuantity(quantity, record) {
+    const price = record?.promotion?.length !== 0
+      ? record.promotion[0].promotionMethod === "%"
+        ? (record.price *
+              (100 - Number(record.promotion[0].promotionValue))) /
+            100
+        : 
+        record.price - Number(record.promotion[0].promotionValue)
+      : record.price
+    if(quantity<=100){
+      setQuantiy(quantity)
+    }
+    if(quantity > record.quantity){
+      setError("Số lượng tồn không đủ")
+    }else if(quantity<=0){
+      setError("Số lượng mua lớn hơn phải lớn hơn 0")
+    }else if(quantity * price > 5000000){
+      setError("Vui lòng liên hệ cửa hàng để mua nhiều sản phẩm  có giá trị lớn hơn 5.000.000đ")
+    }else{
+      setError("")
+    }
   }
 
   const handleShowModalQuantity = (index) => {
@@ -329,138 +520,36 @@ const ProductDetails = (props) => {
     setModalSetQuantity(visible);
   };
 
-  function addProductDetail(record, index) {
-    var indexExist = -1;
-    var productDetailCreate = {
-      productDetail: {},
-      quantity: quantity,
-      priceReduce: 0,
-    };
-    for (let i = 0; i < props.productDetailsCreate?.length; i++) {
-      if (props.productDetailsCreate[i].productDetail.id === record.id) {
-        indexExist = i;
-        break;
-      }
-    }
-    if (indexExist !== -1) {
-      if (
-        Number(quantity) +
-          Number(props.productDetailsCreate[indexExist].quantity) >
-        record?.quantity
-      ) {
-        notification.error({
-          message: "Thông báo",
-          description: `Số lượng sản phẩm ${
-            productDetailCreate.quantity > 100
-              ? "thêm tối đa 100"
-              : "tồn không đủ"
-          }`,
-        });
-        return;
-      } else {
-        productDetailCreate.quantity =
-          Number(quantity) +
-          Number(props.productDetailsCreate[indexExist].quantity);
-        props.productDetailsCreate?.splice(indexExist, 1);
-      }
-    }
-    if (
-      productDetailCreate.quantity > record.quantity ||
-      productDetailCreate.quantity > 100
-    ) {
-      notification.error({
-        message: "Thông báo",
-        description: `Số lượng sản phẩm ${
-          productDetailCreate.quantity > 100
-            ? "thêm tối đa 100"
-            : "tồn không đủ"
-        }`,
-      });
-    } else if (productDetailCreate.quantity <= 0) {
-      notification.error({
-        message: "Thông báo",
-        description: `Số lượng sản phẩm phải lớn hơn 0`,
-      });
-    } else {
-      productDetailCreate.productDetail = record;
-      productDetailCreate.priceReduce =
-        record.promotion.length !== 0
-          ? record.promotion[0].promotionMethod === "%"
-            ? (record.price *
-                (100 - Number(record.promotion[0].promotionValue))) /
-              100
-            : record.price - Number(record.promotion[0].promotionValue)
-          : record.price;
-      props.productDetailsCreate?.push(productDetailCreate);
-
+  const addToBill = (productDetail, index)=>{
+    setLoadingButton(true);
+    setLoadingButtonTimeline(true)
+    const price = productDetail.promotion.length !== 0
+      ? productDetail.promotion[0].promotionMethod === "%"
+        ? (productDetail.price *
+              (100 - Number(productDetail.promotion[0].promotionValue))) /
+            100
+        : 
+        productDetail.price - Number(productDetail.promotion[0].promotionValue)
+      : productDetail.price
+    axios.post("http://localhost:8080/api/client/addToBill/"+billCode, {
+      id: productDetail?.id,
+      quantity:quantity,
+      price: price,
+    }).then(res=>{
+      notification.success({message:"Thông báo", description:"Thêm mới sản phẩm  thành công!"})
+      render(Math.random)
       handleCancelModalQuantity(index);
-
-      const data = token;
-
-      props.billId
-        ? axios
-            .post(
-              `http://localhost:8080/api/admin/bill-detail/create-bill-detail`,
-              {
-                billId: props.billId,
-                productDetailId: productDetailCreate.productDetail.id,
-                quantity: productDetailCreate.quantity,
-                price: productDetailCreate.priceReduce,
-              },
-              {
-                headers: {
-                  Authorization: `Bearer ${getToken(true)}`,
-                },
-              }
-            )
-            .then((response) => {
-              const values = {
-                note: `
-              ${productDetailCreate.productDetail.id} `,
-                status: "Update",
-                createdBy: data?.username + "_" + data?.fullName,
-              };
-              axios
-                .post(
-                  `http://localhost:8080/api/admin/timeline/${props.billId}`,
-                  values,
-                  {
-                    headers: {
-                      Authorization: `Bearer ${getToken(true)}`,
-                    },
-                  }
-                )
-                .then((response) => {})
-                .catch((error) => {});
-              notification.success({
-                message: "Thông báo",
-                description: "Cập nhật thành công!",
-                duration: 2,
-              });
-            })
-            .catch((error) => {
-              console.log(error);
-              const errorCode = error.response?.data;
-              let description = "";
-              if (errorCode?.status === 403) {
-                description = "Bạn không có quyền truy cập!";
-              }
-
-              if (errorCode?.status === 500) {
-                description = `${errorCode?.message}`;
-              }
-
-              if (errorCode?.status === "BAD_REQUEST") {
-                description = `${errorCode?.message}`;
-              }
-
-              notification.error({
-                message: "Lỗi",
-                description: description,
-              });
-            })
-        : props.action();
-    }
+      setLoadingButton(false)
+      setLoadingButtonTimeline(false);
+      setRenderThis(Math.random)
+    }).catch((error)=>{
+        notification.error({
+          message:"Thông báo",
+          description:error?.response?.data?.message,
+        })
+        setLoadingButton(false)
+        setLoadingButtonTimeline(false);
+    })
   }
 
   function filter() {
@@ -507,13 +596,15 @@ const ProductDetails = (props) => {
         setLoading(false);
       })
       .catch((error) => {
-        const status = error.response.status;
+        
+        const status = error?.response?.status;
         if (status === 403) {
           notification.error({
             message: "Thông báo",
             description: "Bạn không có quyền truy cập!",
           });
         }
+        
       });
     setTimeout(() => {
       setLoading(false);
@@ -740,7 +831,7 @@ const ProductDetails = (props) => {
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
-    props.render,
+    renderTimeline,
     renderThis,
     maxPrice,
     product,
@@ -758,7 +849,17 @@ const ProductDetails = (props) => {
   ]);
 
   return (
-    <>
+    <Modal
+        title="Tìm kiếm sản phẩm"
+        style={{ top: "10px" }}
+        centered
+        open={open}
+        onCancel={
+          onCancel
+        }
+        footer={null}
+        width={"75%"}
+      >
       <div className={styles.productDetails}>
         <Row className={styles.productDetails__filter}>
           <Col span={4}>
@@ -1320,8 +1421,8 @@ const ProductDetails = (props) => {
           />
         </div>
       </div>
-    </>
+    </Modal>
   );
 };
 
-export default ProductDetails;
+export default EditProductsCart;

@@ -103,6 +103,7 @@ public class TimeLineServiceImpl implements TimeLineService {
 
         if (deliveryNote != null) {
             TimelineCustomInfo timelineCustomInfo = TimelineCustomInfo.builder()
+                    .addressId(deliveryNote.getAddress().getId())
                     .fullName(deliveryNote.getName())
                     .phoneNumber(deliveryNote.getPhoneNumber())
                     .orderDate(bill.getCreatedAt())
@@ -111,6 +112,9 @@ public class TimeLineServiceImpl implements TimeLineService {
                     .ward(deliveryNote.getAddress().getWard())
                     .district(deliveryNote.getAddress().getDistrict())
                     .city(deliveryNote.getAddress().getCity())
+                    .priceShip(deliveryNote.getShipPrice())
+                    .dateShip(deliveryNote.getShipDate())
+                    .totalPrice(bill.getPrice())
                     .build();
             timelineClientResponse.setTimelineCustomInfo(timelineCustomInfo);
         }

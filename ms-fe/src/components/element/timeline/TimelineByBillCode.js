@@ -1,4 +1,4 @@
-import { Carousel, Col, Row, Space } from "antd";
+import { Button, Carousel, Col, Modal, Row, Space, notification } from "antd";
 import React from "react";
 import styles from "./Timeline.module.css";
 import { useParams } from "react-router-dom";
@@ -7,14 +7,60 @@ import { useEffect } from "react";
 import axios from "axios";
 import { Timeline, TimelineEvent } from "@mailtop/horizontal-timeline";
 import { FaRegFileAlt, FaTimes, FaTruck } from "react-icons/fa";
-import { CheckCircleOutlined } from "@ant-design/icons";
+import { CheckCircleOutlined, DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import SockJs from "../../../service/SockJs";
+import EditAddress from "../edit-address/EditAddress";
+import EditProductsCart from "../edit-product-cart/EditProductsCart";
+import EditProductCart from "../edit-product-cart/EditProductCart";
 
 const TimelineByBillCode = () => {
   const { billCode } = useParams();
   const [loading, setLoading] = useState(true);
   const [timelines, setTimelines] = useState([]);
   const [timelineDisplay, setTimelineDisplay] = useState([]);
+  const [openEditAddress, setOpenEditAddress] = useState(false);
+  const [render, setRender] = useState(null);
+  const [openCartEdit, setOpenCartEdit] = useState(false);
+  const [openProductEdit, setOpenProductEdit] = useState([]);
+  const [loadingButton, setLoadingButton] = useState(false);
+
+  const handleShowModalProductEdit= (index) => {
+    const visible = [...openProductEdit];
+    visible[index] = true;
+    setOpenProductEdit(visible);
+  };
+
+  const handleCancelModalProductEdit= (index) => {
+    const visible = [...openProductEdit];
+    visible[index] = false;
+    setOpenProductEdit(visible);
+  };
+
+  const deleteBillDetail=(bdId, bId)=>{
+    setLoadingButton(true);
+    Modal.confirm({
+      title:"Xác nhận xóa",
+      message:"Xác nhận xóa sản phẩm",
+      onOk:()=>{
+        axios.delete("http://localhost:8080/api/client/deleteBD?bdId="+bdId+"&bId="+bId).then(res=>{
+          notification.success({
+            message:"Thông báo",
+            description:"Xóa thành công sản phẩm",
+          })
+          setRender(Math.random())
+          setLoadingButton(false);
+        }).catch(error=>{
+          const message = error?.response?.data?.message;
+          notification.error({
+            message:"Thông báo",
+            description: message,
+          })
+        });
+      }
+    })
+    
+  }
+
 
   useEffect(() => {
     axios
@@ -35,13 +81,11 @@ const TimelineByBillCode = () => {
           }
         }
         setTimelineDisplay(timelinesPush);
-        console.log(response.data);
       })
       .catch((error) => {
-        console.log(error);
+        console.log(error)
       });
-    console.log(timelines);
-  }, []);
+  }, [render]);
 
   return (
     <div className={styles.content} style={{ margin: "100px 0" }}>
@@ -53,7 +97,6 @@ const TimelineByBillCode = () => {
         <div className={styles.width}>
           <div className={styles.followingContent}>
             {/* timeline */}
-            {console.log(timelineDisplay)}
             <div style={{ overflowX: "scroll", height: "50%" }}>
               <div style={{ width: "fit-content" }}>
                 <Timeline minEvents={6} placeholder>
@@ -123,10 +166,30 @@ const TimelineByBillCode = () => {
               </div>
             </div>
             {/* Thông tin sản phẩm */}
+            <EditProductsCart billCode={billCode} setLoadingButtonTimeline={setLoadingButton} renderTimeline={render} open={openCartEdit} render={setRender} onCancel={()=>setOpenCartEdit(false)}/>
             <Space direction="vertical" size={16} style={{ width: "100%" }}>
-              {timelines?.lstProduct?.map((timeline) => {
+            {timelines?.lstTimeline?.length >1 ? null :(
+                      <div  style={{marginBottom:"24px"}}>
+                      <Button onClick={()=>setOpenCartEdit(true)} 
+                        loading={loadingButton}
+                        className={styles.btnEditCart}>
+                        <EditOutlined /> Thêm sản phẩm
+                      </Button>
+                    </div>
+                     )}
+              {timelines?.lstProduct?.map((timeline, index) => {
                 return (
                   <Row style={{ margin: 0 }}>
+                    <EditProductCart 
+                      onCancel={()=>{handleCancelModalProductEdit(index)}} 
+                      open={openProductEdit[index]} 
+                      productDetailId={timeline?.productDetailId} 
+                      render={setRender}
+                      quantityBuy={timeline.quantity}
+                      setLoadingButtonTimeline={setLoadingButton} 
+                      renderTimeline={render}
+                      billDetailId={timeline?.billDetailId}
+                    />
                     <Col span={3}>
                       <Carousel style={{ maxWidth: "300px" }} autoplay>
                         {timeline.productImageResponses &&
@@ -211,6 +274,20 @@ const TimelineByBillCode = () => {
                               >
                                 {timeline.quantity}
                               </span>
+                              <br />
+                              <span
+                                style={{
+                                  fontSize: "1rem",
+                                  color: "#ee4d2d",
+                                }}
+                              >
+                                {(
+                                  timeline.productPrice * timeline.quantity
+                                ).toLocaleString("vi-VN", {
+                                  style: "currency",
+                                  currency: "VND",
+                                })}
+                              </span>
                             </div>
                           </Col>
                         </Row>
@@ -221,22 +298,31 @@ const TimelineByBillCode = () => {
                       style={{
                         display: "flex",
                         justifyContent: "flex-end",
+                        alignItems:"center"
                       }}
                     >
-                      <span
-                        style={{
-                          fontSize: "1.25rem",
-                          color: "#ee4d2d",
-                        }}
-                      >
-                        {(
-                          timeline.productPrice * timeline.quantity
-                        ).toLocaleString("vi-VN", {
-                          style: "currency",
-                          currency: "VND",
-                        })}
-                      </span>
+                        {timelines?.lstTimeline?.length >1 ? null :(
+                      <Row>
+                          <Col span={12}>
+                          <Button 
+                          loading={loadingButton}
+                          onClick={()=>handleShowModalProductEdit(index)} 
+                          className={styles.product_tableButtonCreate}>
+                            <EditOutlined />
+                          </Button>
+                          </Col>
+                          <Col span={12}>
+                          <Button disabled={timelines?.lstProduct?.length ===1 } 
+                          loading={loadingButton}
+                          onClick={()=>deleteBillDetail(timeline?.billDetailId, timeline?.billId)} 
+                          className={styles.product_tableButtonCreate}>
+                            <DeleteOutlined/>
+                          </Button>
+                          </Col>
+                      </Row>
+                        )}
                     </Col>
+                    
                   </Row>
                 );
               })}
@@ -250,36 +336,47 @@ const TimelineByBillCode = () => {
                   marginTop: 50,
                 }}
               >
-                <div style={{ width: "40%" }}>
+                <EditAddress 
+                  isModalOpen={openEditAddress} 
+                  handleAddressCancel={()=>setOpenEditAddress(false)} 
+                  totalPrice={timelines?.timelineCustomInfo?.totalPrice} 
+                  addressId={timelines?.timelineCustomInfo?.addressId} 
+                  setRender={setRender}
+                  billId={timelines?.lstTimeline[0]?.billId}
+                />
+                <div style={{ width: "44%" }}>
                   <Row>
-                    <Col span={12} style={{ fontWeight: 500 }}>
+                    <h3>Thông tin khách hàng</h3>
+                    <Col span={22}>
+                    <Row>
+                    <Col span={8} style={{ fontWeight: 500 }}>
                       Tên khách hàng
                     </Col>
-                    <Col span={12}>
+                    <Col span={16}>
                       {timelines?.timelineCustomInfo?.fullName}
                     </Col>
-                    <Col span={12} style={{ fontWeight: 500 }}>
+                    <Col span={8} style={{ fontWeight: 500 }}>
                       Số điện thoại
                     </Col>
-                    <Col span={12}>
+                    <Col span={16}>
                       {timelines?.timelineCustomInfo?.phoneNumber}
                     </Col>
-                    <Col span={12} style={{ fontWeight: 500 }}>
+                    <Col span={8} style={{ fontWeight: 500 }}>
                       Ngày đặt hàng
                     </Col>
-                    <Col span={12}>
+                    <Col span={16}>
                       {timelines?.timelineCustomInfo?.orderDate}
                     </Col>
-                    <Col span={12} style={{ fontWeight: 500 }}>
+                    <Col span={8} style={{ fontWeight: 500 }}>
                       Ngày nhận hàng
                     </Col>
-                    <Col span={12}>
+                    <Col span={16}>
                       {timelines?.timelineCustomInfo?.dateOfReceipt ?? "__"}
                     </Col>
-                    <Col span={12} style={{ fontWeight: 500 }}>
+                    <Col span={8} style={{ fontWeight: 500 }}>
                       Địa chỉ
                     </Col>
-                    <Col span={12}>
+                    <Col span={16}>
                       {`${timelines?.timelineCustomInfo?.addressDetail} 
                                         ${timelines?.timelineCustomInfo?.ward.substring(
                                           0,
@@ -300,7 +397,60 @@ const TimelineByBillCode = () => {
                                           )
                                         )}`}
                     </Col>
+                    <Col span={8} style={{ fontWeight: 500 }}>
+                      Giá vận chuyển
+                    </Col>
+                    <Col span={16}>
+                      {timelines?.timelineCustomInfo?.priceShip?.toLocaleString("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                        }) ?? "__"}
+                    </Col>
+                    <Col span={8} style={{ fontWeight: 500 }}>
+                      Ngày nhận hàng dự kiến
+                    </Col>
+                    <Col span={16}>
+                      {timelines?.timelineCustomInfo?.dateShip ?? "__"}
+                    </Col>
+                    <Col span={24} style={{marginTop:"20px", textAlign:"end"}}>
+                    <span
+                          style={{
+                            fontSize: "1.25rem",
+                            fontWeight:"500",
+                            marginRight:"8px"
+                          }}
+                        >
+                          Tổng tiền: 
+                        </span>
+                      <span
+                          style={{
+                            fontSize: "1.25rem",
+                            color: "#ee4d2d",
+                            fontWeight:"500"
+                          }}
+                        >
+                          {(
+                            timelines?.timelineCustomInfo?.totalPrice +timelines?.timelineCustomInfo?.priceShip
+                          ).toLocaleString("vi-VN", {
+                            style: "currency",
+                            currency: "VND",
+                          })}
+                        </span>
+                    </Col>
                   </Row>
+                    </Col>
+                    {timelines?.lstTimeline?.length >1 ? null :(
+                      <Col span={2}>
+                      <Button
+                      loading={loadingButton}
+                      onClick={()=>setOpenEditAddress(true)} 
+                      className={styles.product_tableButtonCreate}>
+                        <EditOutlined />
+                      </Button>
+                      </Col>
+                    )}
+                  </Row>
+                  
                 </div>
               </div>
             ) : (

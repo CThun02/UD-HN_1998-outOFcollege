@@ -31,15 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -274,4 +266,40 @@ public class ClientController {
         return ResponseEntity.ok(productDetailService.isCheckQuantity(productDetailId));
     }
 
+    @GetMapping("/getColorProductDetailEdit")
+    public ResponseEntity<?> getColorProductDetailEdit(@RequestParam("id") Long productDetailId,
+                                                       @RequestParam("sizeId") Optional<Long> sizeId) {
+        return ResponseEntity.ok(productDetailService.getColorProductDetailEdit(productDetailId, sizeId.orElse(null)));
+    }
+
+    @GetMapping("/getSizeProductDetailEdit")
+    public ResponseEntity<?> getSizeProductDetailEdit(@RequestParam("id") Long productDetailId,
+                                                      @RequestParam("colorId") Optional<Long> colorId){
+        return ResponseEntity.ok(productDetailService.getSizeProductDetailEdit(productDetailId, colorId.orElse(null)));
+    }
+
+    @GetMapping("/getProductDetailEdit")
+    public ResponseEntity<?> getProductDetailEdit(@RequestParam("id") Long productDetailId,
+                                                  @RequestParam("colorId") Long colorId,
+                                                  @RequestParam("sizeId") Long sizeId){
+        return ResponseEntity.ok(billService.getProductDetailSellInStoreByPdIdAndColorAndSize(productDetailId, colorId, sizeId));
+    }
+
+    @PostMapping("/addToBill/{billCode}")
+    public ResponseEntity<?> addToBill(@PathVariable("billCode") String billCode, @RequestBody ProductDetailRequest request) throws NotFoundException, JsonProcessingException {
+        billDetailService.createBillDetail(request, billCode);
+        return ResponseEntity.ok("ok");
+    }
+
+    @PutMapping("/updateBill/{billDetailId}")
+    public ResponseEntity<?> updateBill(@PathVariable("billDetailId")  Long billDetailId, @RequestBody ProductDetailRequest request) throws NotFoundException, JsonProcessingException {
+        billDetailService.updateBillDetail(request, billDetailId);
+        return ResponseEntity.ok("ok");
+    }
+
+    @DeleteMapping("/deleteBD")
+    public ResponseEntity<?> deleteBD(@RequestParam("bdId") Long bdId, @RequestParam("bId") Long bId) throws NotFoundException, JsonProcessingException {
+        billDetailService.deleteBillDetail(bId, bdId);
+        return ResponseEntity.ok("ok");
+    }
 }

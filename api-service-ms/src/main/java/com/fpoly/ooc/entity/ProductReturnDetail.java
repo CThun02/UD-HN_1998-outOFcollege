@@ -11,27 +11,24 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "product_return")
-public class ProductReturn extends BaseEntity{
+@Table(name = "product_return_detail")
+public class ProductReturnDetail extends BaseEntity{
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_detail_id")
-    private ProductDetail productDetail;
+    @JoinColumn(name = "product_return_id")
+    private ProductReturn productReturn;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bill_id")
     private Bill bill;
 
-    @Column(name = "quantity")
+    @Column(name="quantity")
     private Integer quantity;
 
-    @Column(name = "price")
+    @Column(name="price")
     private BigDecimal price;
-
-    @Column(name = "note")
-    private String note;
 }

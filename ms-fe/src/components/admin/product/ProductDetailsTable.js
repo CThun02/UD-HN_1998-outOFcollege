@@ -133,7 +133,7 @@ const ProductDetailsTable = (props) => {
     return uniQueProductDetails;
   }
 
-  function createImgageDetail(productDetail) {
+  async function createImgageDetail(productDetail) {
     for (let object of imgList) {
       if (Number(object.color.id) === Number(productDetail.colorId)) {
         for (let i = 0; i < object.imgs.length; i++) {
@@ -143,7 +143,7 @@ const ProductDetailsTable = (props) => {
             saveImage,
             `products/${product.productName}/${object.color.name}/${filename}`
           );
-          uploadBytes(imgRef, object.files[i])
+          await uploadBytes(imgRef, object.files[i])
             .then(() => {
               return getDownloadURL(imgRef);
             })
@@ -234,6 +234,9 @@ const ProductDetailsTable = (props) => {
       if (imgList[i].color.name === color) {
         imgList[i].imgs.splice(index, 1);
         imgList[i].files.splice(index, 1);
+        if(imgList[i].imgs.length<=0){
+          imgList.splice(i, 1);
+        }
         message.success("Xóa ảnh thành công!", 1);
         setRender(Math.random());
         break;

@@ -15,11 +15,9 @@ public interface ProductReturnRepository extends JpaRepository<ProductReturn, Lo
             "pr.productDetail.button AS button, pr.productDetail.pattern as pattern, pr.productDetail.form as form " +
             ", pr.productDetail.material AS material, pr.productDetail.collar AS collar, pr.productDetail.sleeve AS sleeve" +
             ", pr.productDetail.size AS size, pr.productDetail.color AS color, pr.productDetail.shirtTail AS shirtTail" +
-            ", sum(pr.price) AS price, pr.productDetail.weight as weight, sum(pr.quantity) AS quantity, " +
-            "  pr.productDetail.descriptionDetail AS descriptionDetail" +
-            " FROM ProductReturn pr where (?1 is null or pr.createdAt >= ?1) and (?2 is null or pr.createdAt <=?2) and pr.reason=?3 " +
-            "group by  id, product, brand, category, button, pattern, form, material, collar, sleeve, size, color, shirtTail, weight," +
-            "descriptionDetail")
+            ", sum(pr.price) AS price, pr.productDetail.weight as weight, sum(pr.quantity) AS quantity" +
+            " FROM ProductReturn pr where (?1 is null or pr.createdAt >= ?1) and (?2 is null or pr.createdAt <=?2) and pr.status=?3 " +
+            "group by  id, product, brand, category, button, pattern, form, material, collar, sleeve, size, color, shirtTail, weight")
     public List<ProductDetailResponse> getProductReturnByDateAndReason(LocalDateTime day, LocalDateTime dayTo, String reason);
 
     @Query("SELECT pr.productDetail.id AS id, pr.productDetail.product AS product, pr.productDetail.brand as brand, pr.productDetail.category as category,  " +
@@ -27,10 +25,10 @@ public interface ProductReturnRepository extends JpaRepository<ProductReturn, Lo
             ", pr.productDetail.material AS material, pr.productDetail.collar AS collar, pr.productDetail.sleeve AS sleeve" +
             ", pr.productDetail.size AS size, pr.productDetail.color AS color, pr.productDetail.shirtTail AS shirtTail" +
             ", pr.price AS price, pr.productDetail.weight as weight, sum(pr.quantity) AS quantity, " +
-            "  pr.reason AS descriptionDetail" +
+            "  pr.status AS status, pr.note as descriptionDetail" +
             " FROM ProductReturn pr join Bill b on pr.bill.id = b.id where b.billCode=?1 " +
             "group by  id, product, brand, category, button, pattern, form, material, collar, sleeve, size, color, shirtTail, price, weight," +
-            "descriptionDetail")
+            "status, descriptionDetail")
     public List<ProductDetailResponse> getProductReturnByBillCode(String billCode);
 
     @Query("SELECT pr.productDetail.id AS id, pr.productDetail.product AS product, pr.productDetail.brand as brand, pr.productDetail.category as category,  " +
@@ -38,9 +36,9 @@ public interface ProductReturnRepository extends JpaRepository<ProductReturn, Lo
             ", pr.productDetail.material AS material, pr.productDetail.collar AS collar, pr.productDetail.sleeve AS sleeve" +
             ", pr.productDetail.size AS size, pr.productDetail.color AS color, pr.productDetail.shirtTail AS shirtTail" +
             ", pr.price AS price, pr.productDetail.weight as weight, pr.quantity AS quantity, " +
-            "  pr.reason AS status, tl.note as descriptionDetail" +
+            "  pr.status AS status, pr.note as descriptionDetail" +
             " FROM ProductReturn pr join Bill b on pr.bill.id = b.id " +
-            " join Timeline tl on b.id = tl.bill.id where pr.productDetail.id=?1 and pr.reason like ?2 and " +
+            " join Timeline tl on b.id = tl.bill.id where pr.productDetail.id=?1 and pr.status like ?2 and " +
             "((tl.status = '4' and b.symbol like 'Received') or (tl.status = '6' and b.symbol like 'Shipping'))")
     public List<ProductDetailResponse> getProductReturnDetailByProductDetailId(Long productDetailId, String reason);
 }

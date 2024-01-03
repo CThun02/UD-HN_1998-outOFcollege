@@ -441,47 +441,27 @@ CREATE TABLE cart_detail(
     deleted_at          DATETIME    
 )
 
-CREATE TABLE favorites_list(
-    id                  BIGINT IDENTITY PRIMARY KEY,
-    account_id          VARCHAR(100) FOREIGN KEY(account_id) REFERENCES account(username),
-    status              VARCHAR(50),
-    created_at          DATETIME,
-    updated_at          DATETIME,
-    created_by          NVARCHAR(50),
-    updated_by          NVARCHAR(50),
-    deleted_at          DATETIME   
-) 
-
-CREATE TABLE favorites_list_detail(
-    id                  BIGINT IDENTITY PRIMARY KEY,
-    favorite_list_id    BIGINT FOREIGN KEY(favorite_list_id) REFERENCES favorites_list(id),
-    product_detail_id   BIGINT FOREIGN KEY(product_detail_id) REFERENCES product_detail(id),
-    status              VARCHAR(50),
-    created_at          DATETIME,
-    updated_at          DATETIME,
-    created_by          NVARCHAR(50),
-    updated_by          NVARCHAR(50),
-    deleted_at          DATETIME    
-)
-
 CREATE TABLE product_return(
-	id					BIGINT IDENTITY PRIMARY KEY,
-    product_detail_id   BIGINT FOREIGN KEY(product_detail_id) REFERENCES product_detail(id),
+    id                  BIGINT IDENTITY PRIMARY KEY,
     bill_id				BIGINT FOREIGN KEY(bill_id) REFERENCES bill(id),
-	reason				VARCHAR(50),
+	product_detail_id   BIGINT FOREIGN KEY(product_detail_id) REFERENCES product_detail(id),
 	quantity			int,
 	price				money,
 	status              VARCHAR(50),
-    created_at          DATETIME,
+	note				NVARCHAR(MAX),
+	created_at          DATETIME,
     updated_at          DATETIME,
     created_by          NVARCHAR(50),
     updated_by          NVARCHAR(50),
     deleted_at          DATETIME 
 )
-
-
-
 select * from product_return
 
 select * from product_detail where id = 11
+
+select * from delivery_note
+
+select * from bill
+
+
 

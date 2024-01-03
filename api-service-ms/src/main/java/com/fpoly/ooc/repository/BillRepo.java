@@ -21,7 +21,7 @@ import java.util.List;
 public interface BillRepo extends JpaRepository<Bill, Long> {
 
     @Query("SELECT new com.fpoly.ooc.responce.account.GetListCustomer(a.username, a.fullName, a.numberPhone, " +
-            "   a.email, a.gender,a.status ) " +
+            "   a.email, a.gender,a.status) " +
             "FROM Account a " +
             "where a.role.id = 2")
     List<GetListCustomer> getListCustomer();
@@ -33,7 +33,8 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
 
     Bill findBillByBillCode(String billCode);
 
-    @Query("SELECT sum(b.priceReduce) from Bill b where (b.billType like ?1 or ?1 is null) AND b.status <> 'CANCEL' AND " +
+    @Query("SELECT sum(b.priceReduce) from Bill b where (b.billType like ?1 or ?1 is null) AND b.status not like 'CANCEL'" +
+            "  AND b.status not like 'ReturnS' AND " +
             "(?2 IS NULL OR b.createdAt >= ?2) AND (?3 IS NULL OR b.createdAt <= ?3)")
     Double getRevenueInStoreOnlineCompare(String type, LocalDateTime day, LocalDateTime dayTo);
 
@@ -41,7 +42,7 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
             "((:dayParam IS NULL OR DAY(b.createdAt) >= :dayParam) and (:dayTo is null or DAY(b.createdAt) <= :dayTo)) AND " +
             "((:monthParam IS NULL OR MONTH(b.createdAt) >= :monthParam) and (:monthTo is null or MONTH(b.createdAt) <= :monthTo)) AND " +
             "((:yearParam IS NULL OR YEAR(b.createdAt) >= :yearParam) and (:yearTo is null or YEAR(b.createdAt) <= :yearTo)) " +
-            "AND b.status <> 'CANCEL' " +
+            "AND b.status not like 'CANCEL' and b.status not like 'ReturnS'" +
             "AND (b.billType like :billType or :billType is null)")
     Double getRevenueByTime(@Param("dayParam") Integer day,
                             @Param("monthParam") Integer month,
@@ -104,7 +105,6 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
             @Param("billType") String billType
     );
 
-
     @Modifying
     @Query("UPDATE Bill b SET b.status = :status, b.amountPaid = :amountPaid WHERE b.id = :id")
     Integer update(@Param("status") String status,
@@ -124,7 +124,6 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
             "JOIN ProductDetail pd ON pd.id = bd.productDetail.id " +
             "WHERE (bd.bill.id = ?1 or ?1 is null)")
     List<ProductDetailResponse> getProductDetailByBillId(Long id);
-
 
     @Query("Select b.id as id, b.billCode as billCode, a.fullName as customerName, a.username as userName, " +
             "b.completionDate as completionDate, b.price as price, b.priceReduce as priceReduce, b.amountPaid as amountPaid," +

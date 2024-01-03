@@ -83,4 +83,9 @@ public interface BillService {
     List<NotificationDTO> findAllNotifications();
 
     Bill updateBillReturn(Long billId, BigDecimal priceReturn, BigDecimal voucherPrice) throws NotFoundException;
+
+    ProductDetailSellResponse getProductDetailSellInStoreByPdId(Long productDetailId);
+
+    ProductDetailSellResponse getProductDetailSellInStoreByPdIdAndColorAndSize(Long productDetailId,Long colorId, Long sizeId);
+
 }

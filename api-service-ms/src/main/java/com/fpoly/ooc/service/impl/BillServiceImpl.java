@@ -473,6 +473,28 @@ public class BillServiceImpl implements BillService {
         return productDetailSellResponses;
     }
 
+
+
+    @Override
+    public ProductDetailSellResponse getProductDetailSellInStoreByPdId(Long productDetailId) {
+        ProductDetailDisplayResponse productDetailResponse = productDetailService.getOnePDDisplayById(productDetailId);
+        ProductDetailSellResponse productDetailSellResponse = new ProductDetailSellResponse(productDetailResponse);
+        productDetailSellResponse.setPromotion(promotionService.getPromotionByProductDetailId(productDetailId, "ACTIVE"));
+        return productDetailSellResponse;
+    }
+
+    @Override
+    public ProductDetailSellResponse getProductDetailSellInStoreByPdIdAndColorAndSize(Long id, Long colorId, Long sizeId) {
+        ProductDetailDisplayResponse productDetail = productDetailService.getOnePDDisplayById(id);
+        ProductDetailRequest request = ProductDetailRequest.builder().productId(productDetail.getProduct().getId())
+                .brandId(productDetail.getBrand().getId()).buttonId(productDetail.getButton().getId()).categoryId(productDetail.getCategory().getId())
+                .collarId(productDetail.getCollar().getId()).formId(productDetail.getForm().getId()).patternId(productDetail.getPattern().getId())
+                .materialId(productDetail.getMaterial().getId()).shirtTailId(productDetail.getShirtTail().getId()).sleeveId(productDetail.getSleeve().getId())
+                .colorId(colorId).sizeId(sizeId).build();
+        ProductDetailSellResponse response = this.getProductDetailSellInStore(request, null, null).get(0);
+        return response;
+    }
+
     @Override
     public List<BillReturnRequestResponse> getReturnRequestByStatus(String status) {
         return billRepo.getReturnRequestByStatus(status);

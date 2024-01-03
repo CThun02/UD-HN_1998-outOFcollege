@@ -201,7 +201,7 @@ const BillManagement = () => {
         return (
           <Link
             to={
-              filterStatus === "ReturnS"
+              record.status === "ReturnS"
                 ? `/api/admin/return/return-bill/${record.billCode}/bill`
                 : `/api/admin/counter-sales/${record.billId}/timeline`
             }

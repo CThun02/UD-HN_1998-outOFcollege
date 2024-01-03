@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
@@ -15,6 +16,8 @@ import java.time.LocalDateTime;
 @Setter
 @Builder
 public class TimelineCustomInfo {
+
+    private Long addressId;
 
     private String fullName;
 
@@ -33,5 +36,12 @@ public class TimelineCustomInfo {
     private String district;
 
     private String city;
+
+    private BigDecimal priceShip;
+
+    @JsonFormat(pattern = "HH:mm:ss dd/MM/yyyy")
+    private LocalDateTime dateShip;
+
+    private BigDecimal totalPrice;
 
 }

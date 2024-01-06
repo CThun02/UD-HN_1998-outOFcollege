@@ -2,6 +2,7 @@ package com.fpoly.ooc.service.interfaces;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.dto.ProductDetailsDTO;
+import com.fpoly.ooc.dto.UpdateQuantityProductDetailDTO;
 import com.fpoly.ooc.entity.Color;
 import com.fpoly.ooc.entity.ProductDetail;
 import com.fpoly.ooc.entity.Size;
@@ -52,4 +53,6 @@ public interface ProductDetailServiceI {
 
     List<component> getColorProductDetailEdit(Long productDetailId, Long sizeId);
     List<component> getSizeProductDetailEdit(Long productDetailId, Long colorId);
+
+    ProductDetail updateQuantityProductDetail(UpdateQuantityProductDetailDTO req) throws NotFoundException, JsonProcessingException;
 }

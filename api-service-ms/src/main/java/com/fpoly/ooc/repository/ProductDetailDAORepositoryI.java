@@ -379,4 +379,6 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
                                 Long shirtId);
 
     ProductDetail findProductDetailByIdAndStatusAndQuantityGreaterThan(Long id, String status, Integer quantity);
+
+    ProductDetail findProductDetailByIdAndStatus(Long id, String status);
 }

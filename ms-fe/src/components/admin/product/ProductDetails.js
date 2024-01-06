@@ -15,6 +15,10 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import styles from "./ProductDetails.module.css";
 import { getAuthToken, getToken } from "../../../service/Token";
+import SockJs from "../../../service/SockJs";
+
+const baseUrl =
+  "http://localhost:8080/api/admin/product/updateQuantityProductDetail";
 
 const ProductDetails = (props) => {
   const api = "http://localhost:8080/api/admin/";
@@ -41,7 +45,7 @@ const ProductDetails = (props) => {
   const [materials, setMaterials] = useState(null);
   const [sleeves, setSleeves] = useState(null);
   const [shirtTails, setshirtTails] = useState(null);
-  const [productDetails, setProductDetails] = useState([]);
+  // const [productDetails, setProductDetails] = useState([]);
   const [loading, setLoading] = useState(true);
   const [renderThis, setRenderThis] = useState(null);
   const [patterns, setPatterns] = useState(null);
@@ -57,7 +61,7 @@ const ProductDetails = (props) => {
     {
       key: "stt",
       dataIndex: "index",
-      title: "#",
+      title: "STT",
       width: 70,
       render: (text, record, index) => {
         return (
@@ -292,7 +296,6 @@ const ProductDetails = (props) => {
               </Button>
             </div>
           </Modal>
-          {console.log(record.quantity)}
           {record.quantity <= 0 ? (
             <span style={{ color: "#ccc" }}>Hết hàng</span>
           ) : record.status === "INACTIVE" ? (
@@ -397,69 +400,101 @@ const ProductDetails = (props) => {
 
       const data = token;
 
-      props.billId
-        ? axios
-            .post(
-              `http://localhost:8080/api/admin/bill-detail/create-bill-detail`,
-              {
-                billId: props.billId,
-                productDetailId: productDetailCreate.productDetail.id,
-                quantity: productDetailCreate.quantity,
-                price: productDetailCreate.priceReduce,
-              },
-              {
-                headers: {
-                  Authorization: `Bearer ${getToken(true)}`,
-                },
-              }
-            )
-            .then((response) => {
-              const values = {
-                note: `
-              ${productDetailCreate.productDetail.id} `,
-                status: "Update",
-                createdBy: data?.username + "_" + data?.fullName,
-              };
-              axios
+      axios
+        .post(
+          baseUrl,
+          {
+            productDetail: record,
+            quantityCurrent: quantity,
+            request: {
+              brandId: brand,
+              categoryId: category,
+              buttonId: button,
+              materialId: material,
+              shirtTailId: shirtTail,
+              sleeveId: sleeve,
+              collarId: collar,
+              colorId: color,
+              sizeId: size,
+              patternId: pattern,
+              formId: form,
+            },
+            minPrice: price[0],
+            maxPrice: price[1],
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${getToken(true)}`,
+            },
+          }
+        )
+        .then(() => {
+          props.billId
+            ? axios
                 .post(
-                  `http://localhost:8080/api/admin/timeline/${props.billId}`,
-                  values,
+                  `http://localhost:8080/api/admin/bill-detail/create-bill-detail`,
+                  {
+                    billId: props.billId,
+                    productDetailId: productDetailCreate.productDetail.id,
+                    quantity: productDetailCreate.quantity,
+                    price: productDetailCreate.priceReduce,
+                  },
                   {
                     headers: {
                       Authorization: `Bearer ${getToken(true)}`,
                     },
                   }
                 )
-                .then((response) => {})
-                .catch((error) => {});
-              notification.success({
-                message: "Thông báo",
-                description: "Cập nhật thành công!",
-                duration: 2,
-              });
-            })
-            .catch((error) => {
-              console.log(error);
-              const errorCode = error.response?.data;
-              let description = "";
-              if (errorCode?.status === 403) {
-                description = "Bạn không có quyền truy cập!";
-              }
+                .then((response) => {
+                  const values = {
+                    note: `
+              ${productDetailCreate.productDetail.id} `,
+                    status: "Update",
+                    createdBy: data?.username + "_" + data?.fullName,
+                  };
+                  axios
+                    .post(
+                      `http://localhost:8080/api/admin/timeline/${props.billId}`,
+                      values,
+                      {
+                        headers: {
+                          Authorization: `Bearer ${getToken(true)}`,
+                        },
+                      }
+                    )
+                    .then((response) => {})
+                    .catch((error) => {});
+                  notification.success({
+                    message: "Thông báo",
+                    description: "Cập nhật thành công!",
+                    duration: 2,
+                  });
+                })
+                .catch((error) => {
+                  const errorCode = error.response?.data;
+                  let description = "";
+                  if (errorCode?.status === 403) {
+                    description = "Bạn không có quyền truy cập!";
+                  }
 
-              if (errorCode?.status === 500) {
-                description = `${errorCode?.message}`;
-              }
+                  if (errorCode?.status === 500) {
+                    description = `${errorCode?.message}`;
+                  }
 
-              if (errorCode?.status === "BAD_REQUEST") {
-                description = `${errorCode?.message}`;
-              }
+                  if (errorCode?.status === "BAD_REQUEST") {
+                    description = `${errorCode?.message}`;
+                  }
 
-              notification.error({
-                message: "Lỗi",
-                description: description,
-              });
-            })
-        : props.action();
+                  notification.error({
+                    message: "Lỗi",
+                    description: description,
+                  });
+                })
+            : props.action();
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     }
   }
 
@@ -503,11 +538,11 @@ const ProductDetails = (props) => {
         }
       )
       .then((response) => {
-        setProductDetails(response.data);
+        props.setProductDetails(response?.data);
         setLoading(false);
       })
       .catch((error) => {
-        const status = error.response.status;
+        const status = error?.response?.status;
         if (status === 403) {
           notification.error({
             message: "Thông báo",
@@ -759,6 +794,11 @@ const ProductDetails = (props) => {
 
   return (
     <>
+      <SockJs
+        connectTo={"billOrder-topic"}
+        setValues={props?.setProductDetails}
+      />
+
       <div className={styles.productDetails}>
         <Row className={styles.productDetails__filter}>
           <Col span={4}>
@@ -1310,8 +1350,8 @@ const ProductDetails = (props) => {
             scroll={{ y: 360 }}
             columns={columns}
             dataSource={
-              productDetails &&
-              productDetails.map((record, index) => ({
+              props.productDetails &&
+              props.productDetails.map((record, index) => ({
                 ...record,
                 key: record.id,
               }))

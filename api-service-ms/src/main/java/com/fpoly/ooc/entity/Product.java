@@ -64,7 +64,7 @@ public class Product extends BaseEntity {
 
     @Column(name = "description")
     private String description;
-
-    @Column(name = "status")
-    private String status;
+//
+//    @Column(name = "status")
+//    private String status;
 }

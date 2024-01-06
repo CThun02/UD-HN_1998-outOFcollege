@@ -168,7 +168,8 @@ const TimelineByBillCode = () => {
             {/* Thông tin sản phẩm */}
             <EditProductsCart billCode={billCode} setLoadingButtonTimeline={setLoadingButton} renderTimeline={render} open={openCartEdit} render={setRender} onCancel={()=>setOpenCartEdit(false)}/>
             <Space direction="vertical" size={16} style={{ width: "100%" }}>
-            {timelines?.lstTimeline?.length >1 ? null :(
+              {console.log(timelines)}
+            {timelines?.lstTimeline?.length >1 || timelines?.timelineCustomInfo?.status === 'Paid' ? null :(
                       <div  style={{marginBottom:"24px"}}>
                       <Button onClick={()=>setOpenCartEdit(true)} 
                         loading={loadingButton}
@@ -275,6 +276,20 @@ const TimelineByBillCode = () => {
                                 {timeline.quantity}
                               </span>
                               <br />
+                              <b>Đơn giá: </b>
+                              <span
+                                style={{
+                                  marginLeft: "8px",
+                                }}
+                              >
+                                {(
+                                  timeline.productPrice 
+                                ).toLocaleString("vi-VN", {
+                                  style: "currency",
+                                  currency: "VND",
+                                })}
+                              </span>
+                              <br />
                               <span
                                 style={{
                                   fontSize: "1rem",
@@ -345,8 +360,8 @@ const TimelineByBillCode = () => {
                   billId={timelines?.lstTimeline[0]?.billId}
                 />
                 <div style={{ width: "44%" }}>
+                  <h2>Thông tin đơn hàng</h2>
                   <Row>
-                    <h3>Thông tin khách hàng</h3>
                     <Col span={22}>
                     <Row>
                     <Col span={8} style={{ fontWeight: 500 }}>
@@ -398,44 +413,80 @@ const TimelineByBillCode = () => {
                                         )}`}
                     </Col>
                     <Col span={8} style={{ fontWeight: 500 }}>
-                      Giá vận chuyển
-                    </Col>
-                    <Col span={16}>
-                      {timelines?.timelineCustomInfo?.priceShip?.toLocaleString("vi-VN", {
-                          style: "currency",
-                          currency: "VND",
-                        }) ?? "__"}
-                    </Col>
-                    <Col span={8} style={{ fontWeight: 500 }}>
                       Ngày nhận hàng dự kiến
                     </Col>
                     <Col span={16}>
                       {timelines?.timelineCustomInfo?.dateShip ?? "__"}
                     </Col>
-                    <Col span={24} style={{marginTop:"20px", textAlign:"end"}}>
-                    <span
+                    <Col span={24} style={{marginTop:"20px"}}>
+                      <Row>
+                      <Col span={18} offset={6}>
+                        <h2>Thông tin thanh toán</h2>
+                      </Col>
+                      <Col  style={{ fontWeight: 500 }} span={6} offset={6}>
+                          Thành tiền:
+                        </Col>
+                        <Col span={12}>
+                        <p style={{marginLeft:"25%"}}>
+                          {(
+                              timelines?.timelineCustomInfo?.totalPrice
+                            ).toLocaleString("vi-VN", {
+                              style: "currency",
+                              currency: "VND",
+                            })}
+                        </p>
+                        </Col>
+                        <Col  style={{ fontWeight: 500 }} span={6} offset={6}>
+                          Giảm giá:
+                        </Col>
+                        <Col span={12}>
+                        <p style={{marginLeft:"25%"}}>
+                          {(
+                              timelines?.timelineCustomInfo?.priceReduce
+                            ).toLocaleString("vi-VN", {
+                              style: "currency",
+                              currency: "VND",
+                            })}
+                        </p>
+                        </Col>
+                      <Col  style={{ fontWeight: 500 }} span={6} offset={6}>
+                          Phí vận chuyển:
+                        </Col>
+                        <Col span={12}>
+                        <p style={{marginLeft:"25%"}}>
+                          {(
+                              timelines?.timelineCustomInfo?.priceShip
+                            ).toLocaleString("vi-VN", {
+                              style: "currency",
+                              currency: "VND",
+                            })}
+                        </p>
+                        </Col>
+                        <Col span={6} offset={6}
                           style={{
                             fontSize: "1.25rem",
                             fontWeight:"500",
-                            marginRight:"8px"
                           }}
                         >
                           Tổng tiền: 
-                        </span>
-                      <span
+                        </Col>
+                        <Col span={12}
                           style={{
                             fontSize: "1.25rem",
                             color: "#ee4d2d",
                             fontWeight:"500"
                           }}
                         >
+                        <p style={{marginLeft:"25%", textAlign:"start"}}>
                           {(
-                            timelines?.timelineCustomInfo?.totalPrice +timelines?.timelineCustomInfo?.priceShip
-                          ).toLocaleString("vi-VN", {
-                            style: "currency",
-                            currency: "VND",
-                          })}
-                        </span>
+                              timelines?.timelineCustomInfo?.pricePaid +timelines?.timelineCustomInfo?.priceShip
+                            ).toLocaleString("vi-VN", {
+                              style: "currency",
+                              currency: "VND",
+                            })}
+                        </p>
+                        </Col>
+                      </Row>
                     </Col>
                   </Row>
                     </Col>

@@ -296,37 +296,21 @@ const StatisticalIndex = ({ isAdmin }) => {
       return;
     }
     setIsLoading(true);
-    var yearFrom = dateValueFrom.substring(0, 4);
-    var yearTo = dateValueTo.substring(0, 4);
+    var dateFrom = new Date(dateValueFrom);
+    var dateTo = new Date(dateValueTo);
     var monthFrom = "";
     var monthTo = "";
     var dayFrom = "";
     var dayTo = "";
 
     if (dateCompare === "month" || dateCompare === "date") {
-      monthFrom = dateValueFrom.substring(
-        dateValueFrom.indexOf("-") + 1,
-        dateValueFrom.indexOf("-") + 3
-      );
-      monthTo = dateValueTo.substring(
-        dateValueTo.indexOf("-") + 1,
-        dateValueTo.indexOf("-") + 3
-      );
+      monthFrom = dateFrom.getMonth()+1;
+      monthTo = dateTo.getMonth()+1;
     }
     if (dateCompare === "date") {
-      dayFrom = dateValueFrom.substring(dateValueFrom.lastIndexOf("-") + 1);
-      dayTo = dateValueTo.substring(dateValueTo.lastIndexOf("-") + 1);
+      dayFrom = dateFrom.getDay();
+      dayTo = dateTo.getDay();
     }
-    var dateFrom = new Date(
-      yearFrom,
-      monthFrom === "" ? 0 : monthFrom,
-      dayFrom === "" ? 1 : dayFrom
-    );
-    var dateTo = new Date(
-      yearTo,
-      monthTo === "" ? 0 : monthTo,
-      dayTo === "" ? 1 : dayTo
-    );
     if (dateFrom.getTime() >= dateTo.getTime()) {
       notification.error({
         message: "Thông báo",
@@ -341,9 +325,9 @@ const StatisticalIndex = ({ isAdmin }) => {
           "&monthFrom=" +
           monthFrom +
           "&yearFrom=" +
-          yearFrom +
+          dateFrom.getFullYear() +
           "&yearTo=" +
-          yearTo +
+          dateTo.getFullYear() +
           "&monthTo=" +
           monthTo +
           "&dayTo=" +
@@ -637,6 +621,13 @@ const StatisticalIndex = ({ isAdmin }) => {
                   style={{ marginTop: "8px" }}
                   title="Số lượng sản phẩm bán được"
                   value={totalQuantity}
+                />
+              </Col>
+              <Col span={8}>
+                <Statistic
+                  style={{ marginTop: "8px" }}
+                  title="Đơn hàng hoàn trả"
+                  value={billRevenue.billSell || 0}
                 />
               </Col>
               <Col span={24}>

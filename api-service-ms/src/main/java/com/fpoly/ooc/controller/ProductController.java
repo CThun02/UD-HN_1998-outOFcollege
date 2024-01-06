@@ -1,8 +1,10 @@
 package com.fpoly.ooc.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fpoly.ooc.common.SimpleSendProductDetail;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.dto.ProductDetailsDTO;
+import com.fpoly.ooc.dto.UpdateQuantityProductDetailDTO;
 import com.fpoly.ooc.entity.*;
 import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.ProductDetailDAORepositoryI;
@@ -29,6 +31,7 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @RestController
@@ -38,12 +41,15 @@ public class ProductController {
     private ProductServiceI service;
     private ProductDetailServiceI productDetailService;
     private ProductImageServiceI productImageService;
+    private SimpleSendProductDetail simpleSendProductDetail;
 
     @Autowired
-    public ProductController(ProductServiceI service, ProductDetailServiceI productDetailService, ProductImageServiceI productImageService) {
+    public ProductController(ProductServiceI service, ProductDetailServiceI productDetailService, ProductImageServiceI productImageService,
+                             SimpleSendProductDetail simpleSendProductDetail) {
         this.service = service;
         this.productDetailService = productDetailService;
         this.productImageService = productImageService;
+        this.simpleSendProductDetail = simpleSendProductDetail;
     }
 
     @GetMapping("/getproductfilterByCom")
@@ -210,5 +216,16 @@ public class ProductController {
         ProductImage productImage = productImageService.getOne(id);
         productImageService.delete(productImage);
         return ResponseEntity.ok("ok");
+    }
+
+    @PostMapping("/updateQuantityProductDetail")
+    public ResponseEntity<?> updateQuantityProductDetail(@RequestBody UpdateQuantityProductDetailDTO req) throws NotFoundException, JsonProcessingException {
+        ProductDetail productDetail = productDetailService.updateQuantityProductDetail(req);
+        if (Objects.nonNull(productDetail) && Objects.nonNull(req)) {
+            simpleSendProductDetail.updateQuantityRealtime(req);
+            return ResponseEntity.ok(Boolean.TRUE);
+
+        }
+        return ResponseEntity.ok(Boolean.FALSE);
     }
 }

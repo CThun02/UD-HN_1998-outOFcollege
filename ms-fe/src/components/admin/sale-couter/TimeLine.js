@@ -851,18 +851,20 @@ const BillTimeLine = (addId) => {
                   <Col span={14}>
                     <span>
                       {billInfo?.lstPaymentDetail?.length >= 1
-                        ? billInfo?.lstPaymentDetail[0]?.paymentName ===
-                          "Credit Card"
-                          ? numeral(
-                              billInfo?.lstPaymentDetail[0]?.price
-                            ).format("0,0") +
-                            " đ " +
-                            "(Chuyển khoản)"
-                          : numeral(
-                              billInfo?.lstPaymentDetail[0]?.price
-                            ).format("0,0") +
-                            " đ " +
-                            "(Tiền mặt)"
+                        ? billInfo?.lstPaymentDetail?.price > 0
+                          ? billInfo?.lstPaymentDetail[0]?.paymentName ===
+                            "Credit Card"
+                            ? numeral(
+                                billInfo?.lstPaymentDetail[0]?.price
+                              ).format("0,0") +
+                              " đ " +
+                              "(Chuyển khoản)"
+                            : numeral(
+                                billInfo?.lstPaymentDetail[0]?.price
+                              ).format("0,0") +
+                              " đ " +
+                              "(Tiền mặt)"
+                          : "Khách chưa thanh toán"
                         : null}
                     </span>
                     {billInfo?.lstPaymentDetail?.length > 1 && <span> | </span>}
@@ -893,19 +895,26 @@ const BillTimeLine = (addId) => {
                   <Col span={14}>
                     <span>
                       {billInfo?.lstPaymentDetail?.length === 2 &&
-                        (
-                          billInfo?.lstPaymentDetail[0]?.price +
+                        (billInfo?.lstPaymentDetail[0]?.price +
                           billInfo?.lstPaymentDetail[1]?.price -
-                          billInfo?.totalPrice
+                          billInfo?.totalPrice >
+                        0
+                          ? billInfo?.lstPaymentDetail[0]?.price +
+                            billInfo?.lstPaymentDetail[1]?.price -
+                            billInfo?.totalPrice
+                          : 0
                         ).toLocaleString("vi-VN", {
                           style: "currency",
                           currency: "VND",
                         })}
 
                       {billInfo?.lstPaymentDetail?.length === 1 &&
-                        (
-                          billInfo?.lstPaymentDetail[0]?.price -
-                          billInfo?.totalPrice
+                        (billInfo?.lstPaymentDetail[0]?.price -
+                          billInfo?.totalPrice >
+                        0
+                          ? billInfo?.lstPaymentDetail[0]?.price -
+                            billInfo?.totalPrice
+                          : 0
                         ).toLocaleString("vi-VN", {
                           style: "currency",
                           currency: "VND",

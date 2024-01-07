@@ -398,7 +398,10 @@ const Checkout = ({ setRenderHeader }) => {
       paymentDetailId: formData.paymentDetailId,
       billType: "Online",
       symbol: "Shipping",
-      status: formData.paymentDetailId === 2 ? "Paid" : "Unpaid",
+      // status: formData.paymentDetailId === 2 ? "Paid" : "Unpaid",
+      status: "wait_for_confirm",
+      paymentInDelivery: formData.paymentDetailId === 2 ? true : false,
+      priceAmountCast: formData.paymentDetailId === 1 ? 0 : null,
       accountId: dataToken ? dataToken.username : null,
       note: formData.note,
       lstBillDetailRequest: formData.lstBillDetailRequest,
@@ -734,7 +737,7 @@ const Checkout = ({ setRenderHeader }) => {
               })
               .then((response) => {
                 window.location.href = `${response.data}`;
-                console.log('response: ', response)
+                console.log("response: ", response);
                 //notifications
               })
               .catch((error) => {

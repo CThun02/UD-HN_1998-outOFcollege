@@ -109,4 +109,12 @@ public interface VoucherRepository extends JpaRepository<Voucher, Long> {
         """)
     Voucher isCheckVoucherUsable(String code, LocalDateTime currentDate);
 
+
+    @Query("""
+            SELECT voucher FROM Voucher voucher
+            WHERE voucher.voucherCode = ?1
+            AND ?2 BETWEEN voucher.startDate AND voucher.endDate
+        """)
+    Voucher findVoucherByVoucherCodeAndTimeOrder(String code, LocalDateTime timeOrder);
+
 }

@@ -12,6 +12,7 @@ import jakarta.persistence.NamedNativeQuery;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.SqlResultSetMapping;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -103,7 +104,7 @@ public class Voucher extends BaseEntity{
     @Column(name = "private")
     private String objectUse;
 
-    @Column(name = "version")
+//    @Version
     private Long version;
 
     @Column(name = "is_send_email")

@@ -220,11 +220,14 @@ public class ProductController {
 
     @PostMapping("/updateQuantityProductDetail")
     public ResponseEntity<?> updateQuantityProductDetail(@RequestBody UpdateQuantityProductDetailDTO req) throws NotFoundException, JsonProcessingException {
+        if (Objects.nonNull(req) && req.getIsEditProductTimeLine()) {
+            return ResponseEntity.ok(Boolean.FALSE);
+        }
+
         ProductDetail productDetail = productDetailService.updateQuantityProductDetail(req);
         if (Objects.nonNull(productDetail) && Objects.nonNull(req)) {
             simpleSendProductDetail.updateQuantityRealtime(req);
             return ResponseEntity.ok(Boolean.TRUE);
-
         }
         return ResponseEntity.ok(Boolean.FALSE);
     }

@@ -971,25 +971,25 @@ const Bill = () => {
     if (productDetails?.length < 0) {
       return;
     }
-    for (let index = 0; index < productDetails?.length; index++) {
-      var productDetailId = productDetails[index].productDetail.id;
-      axios
-        .get(
-          "http://localhost:8080/api/admin/product/getproductdetailbyidpd?productDetailId=" +
-            productDetailId,
-          {
-            headers: {
-              Authorization: `Bearer ${getToken(true)}`,
-            },
-          }
-        )
-        .then((res) => {
-          if (res?.data?.quantity <= 0) {
-            cart.productDetails = productDetails.splice(index, 1);
-            localStorage.setItem(cartId, JSON.stringify(cart));
-          }
-        });
-    }
+    // for (let index = 0; index < productDetails?.length; index++) {
+    //   var productDetailId = productDetails[index].productDetail.id;
+    //   axios
+    //     .get(
+    //       "http://localhost:8080/api/admin/product/getproductdetailbyidpd?productDetailId=" +
+    //         productDetailId,
+    //       {
+    //         headers: {
+    //           Authorization: `Bearer ${getToken(true)}`,
+    //         },
+    //       }
+    //     )
+    //     .then((res) => {
+    //       if (res?.data?.quantity <= 0) {
+    //         cart.productDetails = productDetails.splice(index, 1);
+    //         localStorage.setItem(cartId, JSON.stringify(cart));
+    //       }
+    //     });
+    // }
     setProductDetails(productDetails);
     setAccount(cart?.account);
   };

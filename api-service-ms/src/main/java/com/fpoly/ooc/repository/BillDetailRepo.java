@@ -26,7 +26,8 @@ public interface BillDetailRepo extends JpaRepository<BillDetail, Long> {
 
     List<BillDetail> findBillDetailByBill_Id(Long id);
 
-    @Query("SELECT sum(bd.price * bd.quantity) from BillDetail bd where bd.bill.billCode " +
+    @Query("SELECT sum(bd.price * bd.quantity) from BillDetail bd inner join Bill bill on bd.bill.id = bill.id " +
+            "where bill.billCode " +
             "like ?1 and (bd.status is null or (bd.status not like 'CANCEL' " +
             "and bd.status not like 'RETURNS' ))")
     BigDecimal getTotalPriceByBillCode(String billCode);

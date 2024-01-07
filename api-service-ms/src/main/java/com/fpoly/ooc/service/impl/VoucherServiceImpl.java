@@ -453,5 +453,11 @@ public class VoucherServiceImpl implements VoucherService {
         return voucherRepository.getVoucherByUsernameAndVoucherCode(username,voucherCode);
     }
 
+    @Override
+    public Voucher findVoucherByTimeOrderBill(String voucherCode, LocalDateTime timeOrder) {
+        Voucher voucher = voucherRepository.findVoucherByVoucherCodeAndTimeOrder(voucherCode, timeOrder);
+        return Objects.nonNull(voucher) ? voucher : null;
+    }
+
 
 }

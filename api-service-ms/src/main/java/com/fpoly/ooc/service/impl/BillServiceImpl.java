@@ -570,29 +570,42 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
+    @Transactional(rollbackOn = Exception.class)
     public Bill updateBill(Bill bill) throws NotFoundException {
+        if (Objects.isNull(bill)) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_NOT_FOUND));
+        }
+
         VoucherHistory voucherHistory = voucherHistoryService.findHistoryByBillCode(bill.getBillCode());
         Double price = bigDecimalConvertDouble(bill.getPrice());
         Double priceReduce = 0d;
         if (voucherHistory != null) {
-            Voucher voucher = voucherService.findVoucherByVoucherCode(voucherHistory.getVoucherCode());
-            Double condition = voucher == null ? 0d : bigDecimalConvertDouble(voucher.getVoucherCondition());
-            if (price > condition && voucher != null) {
-                if (voucher.getVoucherMethod().equals("%")) {
-                    Double voucherValue = bigDecimalConvertDouble(voucher.getVoucherValue());
-                    priceReduce = price * voucherValue / 100;
-                    if (priceReduce > bigDecimalConvertDouble(voucher.getVoucherValueMax())) {
-                        priceReduce = bigDecimalConvertDouble(voucher.getVoucherValueMax());
+            Voucher voucher = voucherService.findVoucherByTimeOrderBill(voucherHistory.getVoucherCode(), bill.getCreatedAt());
+
+            if (Objects.nonNull(voucher) && Objects.nonNull(price)) {
+                Double condition = bigDecimalConvertDouble(voucher.getVoucherCondition());
+                if (Objects.nonNull(condition) && price > condition) {
+                    if (("%").equals(voucher.getVoucherMethod())) {
+                        Double voucherValue = bigDecimalConvertDouble(voucher.getVoucherValue());
+                        priceReduce = Objects.nonNull(voucherValue) ? price * voucherValue / 100 : 0d;
+                        if (priceReduce > bigDecimalConvertDouble(voucher.getVoucherValueMax())) {
+                            priceReduce = bigDecimalConvertDouble(voucher.getVoucherValueMax());
+                        }
+                    } else if (("VND").equalsIgnoreCase(voucher.getVoucherMethod())) {
+                        priceReduce = bigDecimalConvertDouble(voucher.getVoucherValue());
                     }
-                } else if (voucher.getVoucherMethod().equalsIgnoreCase("VND")) {
-                    priceReduce = bigDecimalConvertDouble(voucher.getVoucherValue());
                 }
             }
         }
-        price = bigDecimalConvertDouble(bill.getPrice()) - priceReduce;
-        bill.setPrice(bill.getPrice());
-        bill.setPriceReduce(new BigDecimal(price));
-        return billRepo.save(bill);
+
+        if (Objects.nonNull(bill.getPrice()) && Objects.nonNull(priceReduce)) {
+            price = bigDecimalConvertDouble(bill.getPrice()) - priceReduce;
+            bill.setPrice(bill.getPrice());
+            bill.setPriceReduce(new BigDecimal(price));
+            return billRepo.save(bill);
+        }
+
+        return null;
     }
 
     private Double bigDecimalConvertDouble(BigDecimal value) {

@@ -9,6 +9,7 @@ import com.fpoly.ooc.responce.voucher.VoucherAccountResponse;
 import com.fpoly.ooc.responce.voucher.VoucherResponse;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -49,5 +50,7 @@ public interface VoucherService {
     VoucherResponse autoFillVoucher(DisplayVoucherRequest request);
     
     List<VoucherAccountResponse> getVoucherByUsernameAndVoucherCode(String username, String voucherCode);
+
+    Voucher findVoucherByTimeOrderBill(String voucherCode, LocalDateTime timeOrder);
 
 }

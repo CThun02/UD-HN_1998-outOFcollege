@@ -173,7 +173,7 @@ public class BillDetailServiceImpl implements BillDetailService {
 
     @Transactional(rollbackOn = Exception.class)
     @Override
-    @Lock(LockModeType.OPTIMISTIC_FORCE_INCREMENT)
+//    @Lock(LockModeType.OPTIMISTIC_FORCE_INCREMENT)
     public BillDetail createBillDetail(BillDetailRequest request) throws JsonProcessingException, NotFoundException {
         BillDetail billDetail = BillDetail.builder().id(request.getBillDetailId())
                 .bill(Bill.builder().id(request.getBillId()).build())
@@ -196,10 +196,6 @@ public class BillDetailServiceImpl implements BillDetailService {
                 throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BUY_QUANTITY_THAN_QUANTITY_IN_STORE));
             }
 
-            if (billDetail.getQuantity() - request.getQuantity() < 0) {
-                throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BUY_QUANTITY_THAN_QUANTITY_IN_STORE));
-            }
-
             if (billDetail.getQuantity() > request.getQuantity()) {
                 productDetail.setQuantity(productDetail.getQuantity() +
                         (billDetail.getQuantity()) - request.getQuantity());
@@ -208,6 +204,10 @@ public class BillDetailServiceImpl implements BillDetailService {
             if (billDetail.getQuantity() < request.getQuantity()) {
                 productDetail.setQuantity(productDetail.getQuantity() -
                         (request.getQuantity() - billDetail.getQuantity()));
+            }
+
+            if (productDetail.getQuantity() < 0) {
+                throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BUY_QUANTITY_THAN_QUANTITY_IN_STORE));
             }
 
             productDetailService.update(productDetail);
@@ -250,7 +250,7 @@ public class BillDetailServiceImpl implements BillDetailService {
 
     @Transactional(rollbackOn = Exception.class)
     @Override
-    @Lock(LockModeType.OPTIMISTIC_FORCE_INCREMENT)
+//    @Lock(LockModeType.OPTIMISTIC_FORCE_INCREMENT)
     public BillDetail updateBill(Long id, String status) {
         BillDetail billDetail = billDetailRepo.findById(id).orElse(null);
         if (billDetail == null) {
@@ -262,16 +262,22 @@ public class BillDetailServiceImpl implements BillDetailService {
     }
 
     @Override
+    @Transactional(rollbackOn = Exception.class)
     public BillDetail deleteBillDetail(Long billId, Long billDetailId) throws NotFoundException {
         Bill bill = billService.findBillByBillId(billId);
         BillDetail billDetail = billDetailRepo.findById(billDetailId).orElse(null);
+
+        if (Objects.isNull(billDetail)) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_NOT_FOUND));
+        }
+
         ProductDetail productDetail = productDetailService.findById(billDetail.getProductDetail().getId());
         Integer quantityUpdayte = productDetail.getQuantity() + billDetail.getQuantity();
         productDetail.setQuantity(quantityUpdayte);
         try {
             productDetailService.update(productDetail);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_QUANTITY_INVALID));
         }
 
         billDetailRepo.deleteById(billDetailId);

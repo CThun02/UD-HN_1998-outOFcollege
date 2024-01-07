@@ -5,7 +5,14 @@ import ProductDetails from "../product/ProductDetails";
 import { now } from "moment";
 import SockJs from "../../../service/SockJs";
 
-const ModalProduct = ({ visible, onCancel, cartId, render, billId }) => {
+const ModalProduct = ({
+  visible,
+  onCancel,
+  cartId,
+  render,
+  billId,
+  isEditProductTimeLine,
+}) => {
   const [productDetails, setProductDetails] = useState([]);
 
   var cart = JSON.parse(localStorage.getItem(cartId));
@@ -75,6 +82,8 @@ const ModalProduct = ({ visible, onCancel, cartId, render, billId }) => {
           billId={billId}
           productDetails={productDetails}
           setProductDetails={setProductDetails}
+          render={render}
+          isEditProductTimeLine={isEditProductTimeLine}
         />
       </Modal>
     </>

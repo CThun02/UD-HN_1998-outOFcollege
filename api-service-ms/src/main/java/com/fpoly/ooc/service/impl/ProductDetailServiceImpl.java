@@ -83,6 +83,7 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
             productDetail.setStatus(Const.STATUS_INACTIVE);
         }
         if (Objects.nonNull(productDetailtCheck)) {
+            log.error("productDetail: " + productDetail);
             kafkaUtil.sendingObjectWithKafka(productDetail, Const.TOPIC_PRODUCT_DETAIL);
         }
         return productDetailtCheck;

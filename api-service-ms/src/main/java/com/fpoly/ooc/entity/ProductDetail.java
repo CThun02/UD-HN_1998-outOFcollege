@@ -1,5 +1,6 @@
 package com.fpoly.ooc.entity;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -459,7 +460,7 @@ public class ProductDetail extends BaseEntity {
     @Column(name = "weight")
     private Float weight;
 
-    @Column(name = "version")
+//    @Version
     private Long version;
 
     @Column(name = "description_detail")
@@ -467,6 +468,7 @@ public class ProductDetail extends BaseEntity {
 
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @OneToMany(mappedBy = "productDetailId")
+    @JsonIgnore
     private List<PromotionProduct> promotionProductList;
 
     @Override

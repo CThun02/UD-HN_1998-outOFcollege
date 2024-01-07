@@ -49,6 +49,18 @@ public class SimpleSendProductDetail {
     private BillService billService;
 
     public void updateQuantityRealtime(UpdateQuantityProductDetailDTO dto) throws NotFoundException, JsonProcessingException {
+        if (Objects.isNull(dto) || Objects.isNull(dto.getProductDetail())) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_SERVICE));
+        }
+
+        if (Objects.isNull(dto.getProductDetail().getProduct()) || Objects.isNull(dto.getProductDetail().getBrand()) ||
+                Objects.isNull(dto.getProductDetail().getCategory()) || Objects.isNull(dto.getProductDetail().getPattern()) ||
+                Objects.isNull(dto.getProductDetail().getForm()) || Objects.isNull(dto.getProductDetail().getButton()) ||
+                Objects.isNull(dto.getProductDetail().getMaterial()) || Objects.isNull(dto.getProductDetail().getCollar()) ||
+                Objects.isNull(dto.getProductDetail().getSleeve()) || Objects.isNull(dto.getProductDetail().getShirtTail())) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_SERVICE));
+        }
+
         List<ProductDetailShopResponse> response = productDetailDAORepositoryI.findProductDetailShopResponse(dto.getProductDetail().getProduct().getId(), dto.getProductDetail().getBrand().getId(),
                 dto.getProductDetail().getCategory().getId(), dto.getProductDetail().getPattern().getId(), dto.getProductDetail().getForm().getId(),
                 dto.getProductDetail().getButton().getId(), dto.getProductDetail().getMaterial().getId(), dto.getProductDetail().getCollar().getId(), dto.getProductDetail().getSleeve().getId(),

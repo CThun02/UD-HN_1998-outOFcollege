@@ -12,6 +12,7 @@ public class UpdateQuantityProductDetailDTO {
     private ProductDetail productDetail;
     private Integer quantityCurrent;
     private Integer quantityUpdate;
+    private Boolean isEditProductTimeLine;
 
     // TODO: return list filter
     private ProductDetailRequest request;

@@ -118,6 +118,10 @@ public class BillServiceImpl implements BillService {
         Account accountBuilder = null;
         Boolean isUser = Boolean.FALSE;
 
+        if (Objects.isNull(request)) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_SERVICE));
+        }
+
         if (Objects.nonNull(request.getAccountId())) {
             isUser = Boolean.TRUE;
             accountBuilder = accountService.findByUsername(request.getAccountId());
@@ -174,26 +178,27 @@ public class BillServiceImpl implements BillService {
             productDetailService.updateQuantityForBuy(productDetail);
         }
 
+        String statusPaymentDetail = request.getPaymentInDelivery() ? "Unpaid" : "Paid";
         if (request.getPaymentDetailId() == 3) {
-            PaymentDetail paymentDetailLan1Nd = PaymentDetail.builder()
-                    .bill(bill)
-                    .payment(Payment.builder().id(1L).build())
-                    .price(request.getPriceAmount())
-                    .build();
+            PaymentDetail paymentDetailLan1Nd = new PaymentDetail();
+            paymentDetailLan1Nd.setBill(bill);
+            paymentDetailLan1Nd.setPayment(Payment.builder().id(1L).build());
+            paymentDetailLan1Nd.setPrice(request.getPriceAmountCast());
+            paymentDetailLan1Nd.setStatus(statusPaymentDetail);
             paymentDetailRepo.save(paymentDetailLan1Nd);
 
-            PaymentDetail paymentDetail2Nd = PaymentDetail.builder()
-                    .bill(bill)
-                    .payment(Payment.builder().id(2L).build())
-                    .price(bill.getPriceReduce().subtract(request.getPriceAmount()))
-                    .build();
+            PaymentDetail paymentDetail2Nd = new PaymentDetail();
+            paymentDetail2Nd.setBill(bill);
+            paymentDetail2Nd.setPayment(Payment.builder().id(2L).build());
+            paymentDetail2Nd.setPrice(request.getPriceAmountATM());
+            paymentDetail2Nd.setStatus(statusPaymentDetail);
             paymentDetailRepo.save(paymentDetail2Nd);
         } else {
-            PaymentDetail paymentDetail = PaymentDetail.builder()
-                    .bill(bill)
-                    .payment(Payment.builder().id(request.getPaymentDetailId()).build())
-                    .price(request.getPrice())
-                    .build();
+            PaymentDetail paymentDetail = new PaymentDetail();
+            paymentDetail.setBill(bill);
+            paymentDetail.setPayment(Payment.builder().id(request.getPaymentDetailId()).build());
+            paymentDetail.setPrice(request.getPaymentDetailId() == 1 ? request.getPriceAmountCast() : request.getPriceAmountATM());
+            paymentDetail.setStatus(statusPaymentDetail);
             paymentDetailRepo.save(paymentDetail);
         }
 

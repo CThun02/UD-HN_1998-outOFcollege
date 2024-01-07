@@ -19,6 +19,7 @@ import com.fpoly.ooc.service.interfaces.TimeLineService;
 import jakarta.persistence.LockModeType;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.stereotype.Service;
@@ -315,14 +316,22 @@ public class BillDetailServiceImpl implements BillDetailService {
     }
 
     @Override
-    public PdfResponse pdfResponse(String billCode) {
+    public PdfResponse pdfResponse(String billCode) throws NotFoundException {
+        if (StringUtils.isBlank(billCode)) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_NOT_FOUND));
+        }
+
         Bill bill = billService.findBillByBillCode(billCode);
+        if (Objects.isNull(bill)) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_NOT_FOUND));
+        }
         BillInfoResponse response = timeLineService.getBillInfoByBillId(bill.getId());
         List<TimelineProductResponse> lstProductDT = billDetailRepo.lstProductDT(billCode);
 
         PdfResponse pdfResponse = PdfResponse.builder()
                 .billCode(billCode)
-                .BillCreatedAt(response.getCreatedDate())
+                .billUpdateBy(bill.getUpdatedBy())
+                .billCreatedAt(response.getCreatedDate())
                 .billCreatedBy(bill.getCreatedBy())
                 .totalPrice(response.getTotalPrice())
                 .shippingFee(response.getShipPrice())

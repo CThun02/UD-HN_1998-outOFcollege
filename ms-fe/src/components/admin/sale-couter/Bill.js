@@ -58,6 +58,7 @@ const Bill = () => {
   const [modalAccountVisible, setModalAccountVisible] = useState([]);
   const [modalQRScanOpen, setModalQRScanOpen] = useState(false);
   const [price, setPrice] = useState("");
+  const [priceATM, setPriceATM] = useState(0);
   function getCart() {
     initialItems = [];
     var checkEmpty = 0;
@@ -159,6 +160,7 @@ const Bill = () => {
               patternId: "",
               formId: "",
             },
+            isEditProductTimeLine: false,
           },
           {
             headers: {
@@ -507,6 +509,7 @@ const Bill = () => {
                 patternId: "",
                 formId: "",
               },
+              isEditProductTimeLine: false,
             },
             {
               headers: {
@@ -911,6 +914,7 @@ const Bill = () => {
                   patternId: "",
                   formId: "",
                 },
+                isEditProductTimeLine: false,
               },
               {
                 headers: {
@@ -1182,6 +1186,7 @@ const Bill = () => {
   const [errors, setErrors] = useState({});
 
   const handleCreateBill = (index) => {
+    let isError = false;
     const bill = {
       billCode: activeKey,
       accountId: account?.username,
@@ -1197,10 +1202,12 @@ const Bill = () => {
       billType: "In-Store",
       symbol: typeShipping[index] ? "Shipping" : symbol,
       status: typeShipping[index]
-        ? "Unpaid"
+        ? "wait_for_delivery"
         : !typeShipping[index] && switchChange[index]
-        ? "Paid"
+        ? "wait_for_delivery"
         : "Complete",
+      paymentInDelivery: typeShipping[index] ? typeShipping[index] : false,
+      priceAmountATM: priceATM ? priceATM.replace(/[,]/g, "") : null,
       note: note,
       paymentDetailId: Number(selectedOption),
       lstBillDetailRequest: [],
@@ -1212,10 +1219,15 @@ const Bill = () => {
           : null,
       phoneNumber: selectedAddress?.numberPhone,
       voucherCode: voucherAdd?.voucherCode ?? null,
-      createdBy: "user3",
-      priceAmount: Number(selectedOption) === 3 ? amountPaid : null,
+      // createdBy: token,
+      priceAmountCast:
+        Number(selectedOption) !== 2
+          ? price
+            ? price.replace(/[,]/g, "")
+            : null
+          : null,
       emailDetails: {
-        recipient: selectedAddress.email ? [selectedAddress.email] : [email],
+        recipient: selectedAddress?.email ? [selectedAddress?.email] : [email],
         messageBody: `<body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: Arial, sans-serif;">
             <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="width: 100%; max-width:720px; margin: 0 auto;">
                 <tr>
@@ -1342,36 +1354,84 @@ const Bill = () => {
     });
     if (Number(selectedOption) === 3) {
       if (remainAmount === -1) {
+        isError = true;
         setInputError("Bạn chưa nhập tiền");
       } else {
         setInputError("");
       }
 
       if (transactionCode.trim().length === 0) {
+        isError = true;
         setTransactionError("Mã giao dịch không được để trống");
       } else {
         setTransactionError("");
       }
 
-      if (inputError && transactionError) {
+      if (priceATM) {
+        if (!priceATM?.replace(/[^\d.]/g, "")) {
+          isError = true;
+          setPriceATMError("Sai định dạng");
+        } else {
+          if (
+            Number(priceATM?.replace(/[,]/g, "") + remainAmount) < totalPrice
+          ) {
+            isError = true;
+            setPriceATMError("Số tiền không đủ");
+          }
+        }
+      } else {
+        isError = true;
+        setPriceATMError("Vui lòng nhập số tiền cần thanh toán");
+      }
+
+      if (inputError && transactionError && setPriceATMError) {
         return;
       }
     }
 
     if (productDetails?.length <= 0) {
+      isError = true;
       return notification.error({
         message: "Thông báo",
         description: "Không có sản phẩm nào trong giỏ hàng.",
         duration: 2,
       });
-    } else if (
+    }
+
+    if (
       Number(selectedOption) === 1 &&
       ((remainAmount < 0 && !typeShipping[index]) || isNaN(remainAmount))
     ) {
-      return setInputError("Tiền không đủ");
-    } else if (Number(selectedOption) === 3 && transactionCode.trim() === "") {
-      return setTransactionError("Mã giao dịch không được để trống");
-    } else {
+      isError = true;
+      return setInputError("Nhập đủ số tiền cần thanh toán");
+    }
+
+    if (Number(selectedOption) === 3 || Number(selectedOption) === 2) {
+      if (Number(selectedOption) === 2) {
+        if (priceATM) {
+          if (!priceATM.replace(/[^\d.]/g, "")) {
+            isError = true;
+            setPriceATMError("Sai định dạng");
+          } else {
+            const priceATMStr = priceATM.replace(/[,]/g, "");
+            if (Number(priceATMStr) < totalPrice) {
+              isError = true;
+              setPriceATMError("Số tiền không đủ");
+            } else {
+              setPriceATMError("");
+            }
+          }
+        } else {
+          isError = true;
+          setPriceATMError("Vui lòng nhập số tiền cần thanh toán");
+        }
+        if (transactionCode.trim() === "") {
+          isError = true;
+          return setTransactionError("Mã giao dịch không được để trống");
+        }
+      }
+    }
+    if (!isError) {
       for (let i = 0; i < productDetails?.length; i++) {
         const billDetail = {
           productDetailId: productDetails[i].productDetail.id,
@@ -1469,6 +1529,7 @@ const Bill = () => {
 
   const [inputError, setInputError] = useState("");
   const [transactionError, setTransactionError] = useState("");
+  const [priceATMError, setPriceATMError] = useState("");
 
   const handleChangeInput = (inputValue, index) => {
     setAmountPaid(inputValue);
@@ -1480,7 +1541,7 @@ const Bill = () => {
     }
     setRemainAmount(calculatedValue);
     numeral(inputValue).format("0,0");
-    if (calculatedValue < 0 && selectedOption !== "3") {
+    if (calculatedValue < 0 && selectedOption === "1") {
       setInputError("Số tiền không đủ");
     } else {
       setInputError("");
@@ -1573,6 +1634,7 @@ const Bill = () => {
                         onCancel={() => handleCancel(index)}
                         cartId={cartId}
                         render={setRendered}
+                        isEditProductTimeLine={false}
                       />
                     </Col>
                   </Row>
@@ -1583,7 +1645,7 @@ const Bill = () => {
                   <Table
                     dataSource={
                       productDetails &&
-                      productDetails.map((record, index) => ({
+                      productDetails?.map((record, index) => ({
                         ...record,
                         key: record.id,
                       }))
@@ -1661,7 +1723,7 @@ const Bill = () => {
                         handleCancel={() => handleCancelAddress(index)}
                         cartId={cartId}
                         render={setRendered}
-                        address={address.accountAddress}
+                        address={address?.accountAddress}
                         selectedAddress={setSelectedAddress}
                         username={account?.username}
                       />
@@ -2096,6 +2158,28 @@ const Bill = () => {
                         {Number(selectedOption) === 2 ||
                         Number(selectedOption) === 3 ? (
                           <>
+                            <Input
+                              value={priceATM}
+                              placeholder="Nhập số tiền khách chuyển ATM"
+                              size="large"
+                              onChange={(e) => {
+                                handleChangeInput(
+                                  e.target.value.replace(/\D/g, ""),
+                                  index
+                                );
+                                setPriceATM(
+                                  numeral(
+                                    e.target.value.replace(/\D/g, "")
+                                  ).format("0,0")
+                                );
+                              }}
+                              style={{ margin: "10px 0", width: "380px" }}
+                              className={styles.input_noneBorder}
+                            />
+                            <span style={{ fontSize: "16px", color: "red" }}>
+                              {priceATMError}
+                            </span>
+
                             <Input
                               placeholder="Nhập mã giao dịch"
                               size="large"

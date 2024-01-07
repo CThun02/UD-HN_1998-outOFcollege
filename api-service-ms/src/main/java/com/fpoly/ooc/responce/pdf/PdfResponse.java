@@ -16,11 +16,13 @@ import java.util.List;
 public class PdfResponse {
 
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm")
-    private LocalDateTime BillCreatedAt;
+    private LocalDateTime billCreatedAt;
 
     private String billCode;
 
     private String billCreatedBy;
+
+    private String billUpdateBy;
 
     private BigDecimal totalPrice;
 

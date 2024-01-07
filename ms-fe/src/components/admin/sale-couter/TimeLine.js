@@ -850,7 +850,37 @@ const BillTimeLine = (addId) => {
                   </Col>
                   <Col span={14}>
                     <span>
-                      {numeral(billInfo?.amountPaid).format("0,0") + "đ"}
+                      {billInfo?.lstPaymentDetail?.length >= 1
+                        ? billInfo?.lstPaymentDetail[0]?.paymentName ===
+                          "Credit Card"
+                          ? numeral(
+                              billInfo?.lstPaymentDetail[0]?.price
+                            ).format("0,0") +
+                            " đ " +
+                            "(Chuyển khoản)"
+                          : numeral(
+                              billInfo?.lstPaymentDetail[0]?.price
+                            ).format("0,0") +
+                            " đ " +
+                            "(Tiền mặt)"
+                        : null}
+                    </span>
+                    {billInfo?.lstPaymentDetail?.length > 1 && <span> | </span>}
+                    <span>
+                      {billInfo?.lstPaymentDetail?.length === 2
+                        ? billInfo?.lstPaymentDetail[1]?.paymentName ===
+                          "Credit Card"
+                          ? numeral(
+                              billInfo?.lstPaymentDetail[1]?.price
+                            ).format("0,0") +
+                            " đ " +
+                            "(Chuyển khoản)"
+                          : numeral(
+                              billInfo?.lstPaymentDetail[1]?.price
+                            ).format("0,0") +
+                            " đ " +
+                            "(Tiền mặt)"
+                        : null}
                     </span>
                   </Col>
                 </Row>
@@ -862,14 +892,32 @@ const BillTimeLine = (addId) => {
                   </Col>
                   <Col span={14}>
                     <span>
-                      {(billInfo?.amountPaid > 0
+                      {billInfo?.lstPaymentDetail?.length === 2 &&
+                        (
+                          billInfo?.lstPaymentDetail[0]?.price +
+                          billInfo?.lstPaymentDetail[1]?.price -
+                          billInfo?.totalPrice
+                        ).toLocaleString("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                        })}
+
+                      {billInfo?.lstPaymentDetail?.length === 1 &&
+                        (
+                          billInfo?.lstPaymentDetail[0]?.price -
+                          billInfo?.totalPrice
+                        ).toLocaleString("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                        })}
+                      {/* {(billInfo?.amountPaid > 0
                         ? billInfo?.amountPaid -
                           (billInfo?.priceReduce + billInfo?.shipPrice)
                         : 0
                       ).toLocaleString("vi-VN", {
                         style: "currency",
                         currency: "VND",
-                      })}
+                      })} */}
                     </span>
                   </Col>
                 </Row>

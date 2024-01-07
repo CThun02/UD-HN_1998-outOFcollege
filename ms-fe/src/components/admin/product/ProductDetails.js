@@ -421,7 +421,7 @@ const ProductDetails = (props) => {
             },
             minPrice: price[0],
             maxPrice: price[1],
-            isEditProductTimeLine: props?.isEditProductTimeLine,
+            isEditProductTimeLine: props?.isEditProductTimeLine ? props?.isEditProductTimeLine : false ,
           },
           {
             headers: {

@@ -1353,6 +1353,16 @@ const Bill = () => {
       ward: Yup.string().required("Phường/xã không được để trống"),
       email: Yup.string().email("Địa chỉ email không hợp lệ"),
     });
+
+    if (Number(selectedOption) === 1) {
+      const priced = Number(price?.replace(",", ""));
+      if (priced < voucherPrice()) {
+        isError = true;
+        setInputError("Vui lòng nhập số tiền cần thanh toán");
+        return;
+      }
+    }
+
     if (Number(selectedOption) === 3) {
       if (remainAmount === -1) {
         isError = true;
@@ -1513,7 +1523,7 @@ const Bill = () => {
               duration: 2,
             });
             navigate(`/api/admin/order`);
-            remove(activeKey);
+            // remove(activeKey);
           } catch (error) {
             const status = error?.response?.status;
             if (status === 403) {

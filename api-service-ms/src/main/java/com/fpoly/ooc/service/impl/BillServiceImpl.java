@@ -156,8 +156,10 @@ public class BillServiceImpl implements BillService {
                 throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_SERVICE));
             }
 
-            if (productDetail.getQuantity() - billDetailRequest.getQuantity() < 0) {
-                throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BUY_QUANTITY_THAN_QUANTITY_IN_STORE));
+            if (Objects.nonNull(request.getIsSellingAdmin()) && !request.getIsSellingAdmin()) {
+                if (productDetail.getQuantity() - billDetailRequest.getQuantity() < 0) {
+                    throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BUY_QUANTITY_THAN_QUANTITY_IN_STORE));
+                }
             }
 
             BillDetail billDetail = BillDetail.builder()
@@ -174,8 +176,10 @@ public class BillServiceImpl implements BillService {
                 throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_SERVICE));
             }
 
-            productDetail.setQuantity(productDetail.getQuantity() - billDetail.getQuantity());
-            productDetailService.updateQuantityForBuy(productDetail);
+            if (Objects.nonNull(request.getIsSellingAdmin()) && !request.getIsSellingAdmin()) {
+                productDetail.setQuantity(productDetail.getQuantity() - billDetail.getQuantity());
+                productDetailService.updateQuantityForBuy(productDetail);
+            }
         }
 
         String statusPaymentDetail = request.getPaymentInDelivery() ? "Unpaid" : "Paid";

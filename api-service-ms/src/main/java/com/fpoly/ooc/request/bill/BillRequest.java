@@ -77,4 +77,6 @@ public class BillRequest {
     private BigDecimal priceAmountATM;
     
     private Boolean paymentInDelivery;
+
+    private Boolean isSellingAdmin;
 }

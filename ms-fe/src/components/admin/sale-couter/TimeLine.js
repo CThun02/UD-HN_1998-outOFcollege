@@ -851,7 +851,7 @@ const BillTimeLine = (addId) => {
                   <Col span={14}>
                     <span>
                       {billInfo?.lstPaymentDetail?.length >= 1
-                        ? billInfo?.lstPaymentDetail?.price > 0
+                        ? billInfo?.lstPaymentDetail[0]?.price > 0
                           ? billInfo?.lstPaymentDetail[0]?.paymentName ===
                             "Credit Card"
                             ? numeral(

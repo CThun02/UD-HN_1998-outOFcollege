@@ -1208,6 +1208,7 @@ const Bill = () => {
         : "Complete",
       paymentInDelivery: typeShipping[index] ? typeShipping[index] : false,
       priceAmountATM: priceATM ? priceATM.replace(/[,]/g, "") : null,
+      isSellingAdmin: true,
       note: note,
       paymentDetailId: Number(selectedOption),
       lstBillDetailRequest: [],

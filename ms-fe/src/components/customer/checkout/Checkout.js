@@ -402,6 +402,7 @@ const Checkout = ({ setRenderHeader }) => {
       status: "wait_for_confirm",
       paymentInDelivery: formData.paymentDetailId === 2 ? true : false,
       priceAmountCast: formData.paymentDetailId === 1 ? 0 : null,
+      isSellingAdmin: false,
       accountId: dataToken ? dataToken.username : null,
       note: formData.note,
       lstBillDetailRequest: formData.lstBillDetailRequest,

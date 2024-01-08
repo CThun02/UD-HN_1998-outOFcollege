@@ -11,9 +11,13 @@ import com.fpoly.ooc.repository.BillDetailRepo;
 import com.fpoly.ooc.request.bill.BillDetailRequest;
 import com.fpoly.ooc.request.product.ProductDetailRequest;
 import com.fpoly.ooc.responce.bill.BillInfoResponse;
+import com.fpoly.ooc.responce.deliveryNote.DeliveryNoteResponse;
+import com.fpoly.ooc.responce.payment.PaymentDetailResponse;
 import com.fpoly.ooc.responce.pdf.PdfResponse;
 import com.fpoly.ooc.responce.timeline.TimelineProductResponse;
 import com.fpoly.ooc.service.interfaces.BillDetailService;
+import com.fpoly.ooc.service.interfaces.DeliveryNoteService;
+import com.fpoly.ooc.service.interfaces.PaymentService;
 import com.fpoly.ooc.service.interfaces.ProductDetailServiceI;
 import com.fpoly.ooc.service.interfaces.TimeLineService;
 import jakarta.persistence.LockModeType;
@@ -43,6 +47,12 @@ public class BillDetailServiceImpl implements BillDetailService {
 
     @Autowired
     private TimeLineService timeLineService;
+
+    @Autowired
+    private PaymentService paymentService;
+
+    @Autowired
+    private DeliveryNoteService deliveryNoteService;
 
 
     //@Author: Nguyễn Công Thuần
@@ -327,18 +337,31 @@ public class BillDetailServiceImpl implements BillDetailService {
         }
         BillInfoResponse response = timeLineService.getBillInfoByBillId(bill.getId());
         List<TimelineProductResponse> lstProductDT = billDetailRepo.lstProductDT(billCode);
+        List<PaymentDetailResponse> lstPaymentDetail = paymentService.findPaymentDetailByBillId(bill.getId());
+        DeliveryNoteResponse deliveryNote = deliveryNoteService.getOne(billCode);
+
+        String[] createdBy = bill.getCreatedBy().split("_");
+        String[] city = deliveryNote.getCity().split("\\|");
+        String[] district = deliveryNote.getDistrict().split("\\|");
+        String[] ward = deliveryNote.getWard().split("\\|");
+
+        deliveryNote.setCity(city[0]);
+        deliveryNote.setDistrict(district[0]);
+        deliveryNote.setWard(ward[0]);
 
         PdfResponse pdfResponse = PdfResponse.builder()
                 .billCode(billCode)
                 .billUpdateBy(bill.getUpdatedBy())
                 .billCreatedAt(response.getCreatedDate())
-                .billCreatedBy(bill.getCreatedBy())
+                .billCreatedBy(createdBy[1])
                 .totalPrice(response.getTotalPrice())
                 .shippingFee(response.getShipPrice())
                 .amountPaid(response.getAmountPaid())
                 .voucherPrice(response.getVoucherPrice())
                 .priceReduce(response.getPriceReduce())
                 .lstProductDetail(lstProductDT)
+                .lstPaymentDetail(lstPaymentDetail)
+                .deliveryNote(deliveryNote)
                 .build();
 
         return pdfResponse;

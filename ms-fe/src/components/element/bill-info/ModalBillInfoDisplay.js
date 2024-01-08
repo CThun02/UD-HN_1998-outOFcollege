@@ -351,19 +351,70 @@ const ModalBillInfoDisplay = ({ open, cancel, billCode }) => {
                       width: "98%",
                     }}
                   ></div>
-                  <div className={style.sideBuy}>
-                    <div className={style.title}>
-                      <Space direction="vertical" size={14}>
-                        <span>Họ tên người mua hàng </span>
-                        <span>Địa chỉ </span>
-                        <span>Số điện thoại </span>
-                        <span>Hình thức thanh toán </span>
-                      </Space>
+                  <div>
+                    <div className={style.sideBuy}>
+                      <div className={style.title}>
+                        <Space direction="vertical" size={14}>
+                          <span>Họ tên người mua hàng </span>
+                          <span>Địa chỉ </span>
+                          <span>Số điện thoại </span>
+                          <span>Hình thức thanh toán </span>
+                        </Space>
+                      </div>
+
+                      <div className={style.content}>
+                        <Space direction="vertical" size={14}>
+                          <span className={style.spacing}>
+                            :{" "}
+                            <span className={style.cssText}>
+                              {bill?.billCreatedBy
+                                ? bill?.billCreatedBy === "CLIENT"
+                                  ? "Khách lẻ"
+                                  : bill?.billCreatedBy
+                                : null}
+                            </span>
+                          </span>
+                          <span className={style.spacing}>
+                            :{" "}
+                            <span className={style.cssText}>
+                              {bill?.deliveryNote
+                                ? bill?.deliveryNote?.ward +
+                                  ", " +
+                                  bill?.deliveryNote?.district +
+                                  ", " +
+                                  bill?.deliveryNote?.city
+                                : null}
+                            </span>
+                          </span>
+                          <span className={style.spacing}>
+                            :{" "}
+                            <span className={style.cssText}>
+                              {bill?.deliveryNote
+                                ? bill?.deliveryNote?.phoneNumber
+                                : null}
+                            </span>
+                          </span>
+                          <span>
+                            :{" "}
+                            <span className={style.cssText}>
+                              {bill?.lstPaymentDetail?.length === 1
+                                ? bill?.lstPaymentDetail[0]?.paymentName ===
+                                  "Cash"
+                                  ? "Tiền mặt"
+                                  : "Chuyển khoản"
+                                : bill?.lstPaymentDetail?.length === 2
+                                ? "Chuyển khoản, tiền mặt"
+                                : null}
+                            </span>
+                          </span>
+                        </Space>
+                      </div>
                     </div>
                   </div>
                   <table className={style.none}>
                     <tr>
                       <th style={{ width: "50%" }}>Sản phẩm</th>
+                      <th>Đơn vị tính</th>
                       <th>Đơn giá</th>
                       <th>Số lượng</th>
                       <th>Thành tiền</th>
@@ -402,6 +453,7 @@ const ModalBillInfoDisplay = ({ open, cancel, billCode }) => {
                                   "-" +
                                   item?.productSize}
                               </td>
+                              <td>Cái</td>
                               <td>
                                 <span className={style.cssText}>
                                   {item?.productPrice?.toLocaleString("vi-VN", {

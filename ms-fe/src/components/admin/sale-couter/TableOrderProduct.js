@@ -182,15 +182,24 @@ function TableOrderProduct({
       render: (text, record, index) => {
         return (
           <div style={{ textAlign: "center" }}>
-            {record?.productDetail?.promotionValue ? (
-              <span style={{ color: "#ccc" }}>
-                <strike>
-                  {record?.productDetail?.price?.toLocaleString("vi-VN", {
+            {record?.productDetail?.promotion.length > 0 ? (
+              <>
+                <span style={{ color: "#ccc" }}>
+                  <strike>
+                    {record?.productDetail?.price?.toLocaleString("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    })}
+                  </strike>
+                </span>
+                <span> </span>
+                <span>
+                  {record?.priceReduce?.toLocaleString("vi-VN", {
                     style: "currency",
                     currency: "VND",
                   })}
-                </strike>
-              </span>
+                </span>
+              </>
             ) : (
               <span>
                 {record?.productDetail?.price?.toLocaleString("vi-VN", {
@@ -256,7 +265,9 @@ function TableOrderProduct({
     },
   ];
 
-  useEffect(() => {}, [productDetails, cartId, bool]);
+  useEffect(() => {
+    console.log("productDetails: ", productDetails);
+  }, [productDetails, cartId, bool]);
 
   return (
     <div>

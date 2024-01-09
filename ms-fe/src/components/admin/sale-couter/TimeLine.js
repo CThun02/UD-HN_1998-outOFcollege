@@ -439,7 +439,12 @@ const BillTimeLine = (addId) => {
               updateQUantityBillDetail(record, e?.target?.value, index)
             }
             disabled={
-              Number(timlinesDisplay[timlinesDisplay?.length - 1]?.status) !== 1
+              Number(timlinesDisplay[timlinesDisplay?.length - 1]?.status) !==
+                1 ||
+              billInfo?.lstPaymentDetail?.length === 1 ||
+              billInfo?.lstPaymentDetail?.length === 2
+                ? billInfo?.lstPaymentDetail[0].status === "Paid"
+                : false
             }
           />
         );
@@ -952,6 +957,12 @@ const BillTimeLine = (addId) => {
                 <Button
                   type="primary"
                   onClick={() => setIsOpenModalProduct(true)}
+                  disabled={
+                    billInfo?.lstPaymentDetail?.length === 1 ||
+                    billInfo?.lstPaymentDetail?.length === 2
+                      ? billInfo?.lstPaymentDetail[0].status === "Paid"
+                      : false
+                  }
                 >
                   Thêm sản phẩm
                 </Button>

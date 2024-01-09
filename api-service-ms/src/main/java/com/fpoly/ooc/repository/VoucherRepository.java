@@ -101,10 +101,9 @@ public interface VoucherRepository extends JpaRepository<Voucher, Long> {
 
     @Query("""
             SELECT voucher FROM Voucher voucher
-            WHERE voucher.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
-            AND voucher.limitQuantity >= 0
-            AND ?2 >= voucher.startDate
-            AND ?2 <= voucher.endDate
+            WHERE voucher.status NOT IN (com.fpoly.ooc.constant.Const.STATUS_UPCOMING, com.fpoly.ooc.constant.Const.STATUS_CANCEL)
+            AND voucher.limitQuantity > 0
+            AND ?2 BETWEEN voucher.startDate AND voucher.endDate
             AND voucher.voucherCode = ?1
         """)
     Voucher isCheckVoucherUsable(String code, LocalDateTime currentDate);

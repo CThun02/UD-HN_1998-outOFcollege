@@ -47,6 +47,7 @@ import FormUsingVoucher from "../../element/voucher/FormUsingVoucher";
 import numeral from "numeral";
 import SearchNameOrCodeVoucher from "../../element/voucher/SearchNameOrCodeVoucher";
 import { getToken } from "../../../service/Token";
+import TableOrderProduct from "./TableOrderProduct";
 
 const urlAutofillVoucher = "http://localhost:8080/api/client/autoFillVoucher";
 const baseUrl =
@@ -54,10 +55,12 @@ const baseUrl =
 
 const Bill = () => {
   var initialItems = [];
+  const [boolean, setBoolean] = useState(true);
   const [modalVisible, setModalVisible] = useState([]);
   const [modalAccountVisible, setModalAccountVisible] = useState([]);
   const [modalQRScanOpen, setModalQRScanOpen] = useState(false);
   const [price, setPrice] = useState("");
+  const [priceATM, setPriceATM] = useState(0);
   function getCart() {
     initialItems = [];
     var checkEmpty = 0;
@@ -159,6 +162,7 @@ const Bill = () => {
               patternId: "",
               formId: "",
             },
+            isEditProductTimeLine: false,
           },
           {
             headers: {
@@ -180,241 +184,241 @@ const Bill = () => {
     }
   };
 
-  const columns = [
-    {
-      title: "STT",
-      dataIndex: "index",
-      key: "stt",
-      width: 70,
-      render: (text, record, index) => {
-        return index + 1;
-      },
-    },
-    {
-      key: "product",
-      datatIndex: "product",
-      title: "Sản phẩm",
-      width: "50%",
-      render: (text, record, index) => {
-        return (
-          <Row style={{ width: "100%" }}>
-            <Col span={6} style={{ height: "100%" }}>
-              <div
-                style={{
-                  marginTop: "10px",
-                  marginRight: "10px",
-                }}
-              >
-                {record?.productDetail?.promotion?.length > 0 &&
-                record?.productDetail?.promotion[0]?.promotionValue ? (
-                  <Badge.Ribbon
-                    text={`Giảm ${
-                      record.productDetail.promotion[0].promotionValue
-                        ? record.productDetail.promotion[0].promotionMethod ===
-                          "%"
-                          ? record.productDetail.promotion[0].promotionValue +
-                            " " +
-                            record.productDetail.promotion[0].promotionMethod
-                          : record.productDetail.promotion[0].promotionValue.toLocaleString(
-                              "vi-VN",
-                              {
-                                style: "currency",
-                                currency: "VND",
-                              }
-                            )
-                        : null
-                    }`}
-                    color="red"
-                  >
-                    <Carousel style={{ maxWidth: "300px" }} autoplay>
-                      {record.productDetail.productImageResponse &&
-                        record.productDetail.productImageResponse.map(
-                          (item) => {
-                            return (
-                              <img
-                                key={item.id}
-                                style={{ width: "100%", marginTop: "10px" }}
-                                alt=""
-                                src={item.path}
-                              />
-                            );
-                          }
-                        )}
-                    </Carousel>
-                  </Badge.Ribbon>
-                ) : (
-                  <Carousel style={{ maxWidth: "300px" }} autoplay>
-                    {record?.productDetail?.productImageResponse &&
-                      record?.productDetail?.productImageResponse.map(
-                        (item) => {
-                          return (
-                            <img
-                              key={item.id}
-                              style={{ width: "100%", marginTop: "10px" }}
-                              alt=""
-                              src={item.path}
-                            />
-                          );
-                        }
-                      )}
-                  </Carousel>
-                )}
-              </div>
-            </Col>
-            <Col span={18} style={{ height: "100%" }}>
-              <div
-                className="m-5"
-                style={{
-                  textAlign: "start",
-                  height: "100%",
-                  justifyContent: "center",
-                }}
-              >
-                <span style={{ fontWeight: "500" }}>
-                  {record?.productDetail?.product?.productName +
-                    "-" +
-                    record?.productDetail?.brand?.brandName +
-                    "-" +
-                    record?.productDetail?.category?.categoryName +
-                    "-" +
-                    record?.productDetail?.button?.buttonName +
-                    "-" +
-                    record?.productDetail?.material?.materialName +
-                    "-" +
-                    record?.productDetail?.collar?.collarTypeName +
-                    "-" +
-                    record?.productDetail?.sleeve?.sleeveName +
-                    "-" +
-                    record?.productDetail?.shirtTail?.shirtTailTypeName +
-                    "-" +
-                    record?.productDetail?.pattern?.patternName +
-                    "-" +
-                    record?.productDetail?.form?.formName}
-                </span>
-                <br />
-                <div className={styles.optionColor}>
-                  <b>Màu sắc: </b>
-                  <span
-                    style={{
-                      backgroundColor: record?.productDetail?.color?.colorCode,
-                      marginLeft: "8px",
-                    }}
-                  ></span>
-                  {record?.productDetail?.color?.colorName}
-                </div>
-                <br />
-                <b>Kích cỡ: </b>
-                <span
-                  style={{
-                    marginLeft: "8px",
-                  }}
-                >
-                  {record?.productDetail?.size?.sizeName}
-                </span>
-              </div>
-            </Col>
-          </Row>
-        );
-      },
-    },
-    {
-      title: "Số lượng",
-      dataIndex: "quantity",
-      key: "quantity",
-      render: (text, record, index) => {
-        return (
-          <InputNumber
-            min={1}
-            max={record?.quantity >= record?.productDetail?.quantity}
-            value={record?.quantity}
-            onBlur={(event) =>
-              updateQuantity(record, index, event.target.value)
-            }
-          />
-        );
-      },
-    },
-    {
-      title: "Đơn giá",
-      dataIndex: "price",
-      key: "price",
+  // const columns = [
+  //   {
+  //     title: "STT",
+  //     dataIndex: "index",
+  //     key: "stt",
+  //     width: 70,
+  //     render: (text, record, index) => {
+  //       return index + 1;
+  //     },
+  //   },
+  //   {
+  //     key: "product",
+  //     datatIndex: "product",
+  //     title: "Sản phẩm",
+  //     width: "50%",
+  //     render: (text, record, index) => {
+  //       return (
+  //         <Row style={{ width: "100%" }}>
+  //           <Col span={6} style={{ height: "100%" }}>
+  //             <div
+  //               style={{
+  //                 marginTop: "10px",
+  //                 marginRight: "10px",
+  //               }}
+  //             >
+  //               {record?.productDetail?.promotion?.length > 0 &&
+  //               record?.productDetail?.promotion[0]?.promotionValue ? (
+  //                 <Badge.Ribbon
+  //                   text={`Giảm ${
+  //                     record.productDetail.promotion[0].promotionValue
+  //                       ? record.productDetail.promotion[0].promotionMethod ===
+  //                         "%"
+  //                         ? record.productDetail.promotion[0].promotionValue +
+  //                           " " +
+  //                           record.productDetail.promotion[0].promotionMethod
+  //                         : record.productDetail.promotion[0].promotionValue.toLocaleString(
+  //                             "vi-VN",
+  //                             {
+  //                               style: "currency",
+  //                               currency: "VND",
+  //                             }
+  //                           )
+  //                       : null
+  //                   }`}
+  //                   color="red"
+  //                 >
+  //                   <Carousel style={{ maxWidth: "300px" }} autoplay>
+  //                     {record.productDetail.productImageResponse &&
+  //                       record.productDetail.productImageResponse.map(
+  //                         (item) => {
+  //                           return (
+  //                             <img
+  //                               key={item.id}
+  //                               style={{ width: "100%", marginTop: "10px" }}
+  //                               alt=""
+  //                               src={item.path}
+  //                             />
+  //                           );
+  //                         }
+  //                       )}
+  //                   </Carousel>
+  //                 </Badge.Ribbon>
+  //               ) : (
+  //                 <Carousel style={{ maxWidth: "300px" }} autoplay>
+  //                   {record?.productDetail?.productImageResponse &&
+  //                     record?.productDetail?.productImageResponse.map(
+  //                       (item) => {
+  //                         return (
+  //                           <img
+  //                             key={item.id}
+  //                             style={{ width: "100%", marginTop: "10px" }}
+  //                             alt=""
+  //                             src={item.path}
+  //                           />
+  //                         );
+  //                       }
+  //                     )}
+  //                 </Carousel>
+  //               )}
+  //             </div>
+  //           </Col>
+  //           <Col span={18} style={{ height: "100%" }}>
+  //             <div
+  //               className="m-5"
+  //               style={{
+  //                 textAlign: "start",
+  //                 height: "100%",
+  //                 justifyContent: "center",
+  //               }}
+  //             >
+  //               <span style={{ fontWeight: "500" }}>
+  //                 {record?.productDetail?.product?.productName +
+  //                   "-" +
+  //                   record?.productDetail?.brand?.brandName +
+  //                   "-" +
+  //                   record?.productDetail?.category?.categoryName +
+  //                   "-" +
+  //                   record?.productDetail?.button?.buttonName +
+  //                   "-" +
+  //                   record?.productDetail?.material?.materialName +
+  //                   "-" +
+  //                   record?.productDetail?.collar?.collarTypeName +
+  //                   "-" +
+  //                   record?.productDetail?.sleeve?.sleeveName +
+  //                   "-" +
+  //                   record?.productDetail?.shirtTail?.shirtTailTypeName +
+  //                   "-" +
+  //                   record?.productDetail?.pattern?.patternName +
+  //                   "-" +
+  //                   record?.productDetail?.form?.formName}
+  //               </span>
+  //               <br />
+  //               <div className={styles.optionColor}>
+  //                 <b>Màu sắc: </b>
+  //                 <span
+  //                   style={{
+  //                     backgroundColor: record?.productDetail?.color?.colorCode,
+  //                     marginLeft: "8px",
+  //                   }}
+  //                 ></span>
+  //                 {record?.productDetail?.color?.colorName}
+  //               </div>
+  //               <br />
+  //               <b>Kích cỡ: </b>
+  //               <span
+  //                 style={{
+  //                   marginLeft: "8px",
+  //                 }}
+  //               >
+  //                 {record?.productDetail?.size?.sizeName}
+  //               </span>
+  //             </div>
+  //           </Col>
+  //         </Row>
+  //       );
+  //     },
+  //   },
+  //   {
+  //     title: "Số lượng",
+  //     dataIndex: "quantity",
+  //     key: "quantity",
+  //     render: (text, record, index) => {
+  //       return (
+  //         <InputNumber
+  //           min={1}
+  //           max={record?.quantity >= record?.productDetail?.quantity}
+  //           value={record?.quantity}
+  //           onBlur={(event) =>
+  //             updateQuantity(record, index, event.target.value)
+  //           }
+  //         />
+  //       );
+  //     },
+  //   },
+  //   {
+  //     title: "Đơn giá",
+  //     dataIndex: "price",
+  //     key: "price",
 
-      render: (text, record, index) => {
-        return (
-          <div style={{ textAlign: "center" }}>
-            {record?.productDetail?.promotionValue ? (
-              <span style={{ color: "#ccc" }}>
-                <strike>
-                  {record?.productDetail?.price?.toLocaleString("vi-VN", {
-                    style: "currency",
-                    currency: "VND",
-                  })}
-                </strike>
-              </span>
-            ) : (
-              <span>
-                {record?.productDetail?.price?.toLocaleString("vi-VN", {
-                  style: "currency",
-                  currency: "VND",
-                })}
-              </span>
-            )}
-            <br />
-            <span>
-              {record?.productDetail?.promotionValue
-                ? record?.productDetail?.promotionMethod === "%"
-                  ? (
-                      (record?.productDetail?.price *
-                        (100 - Number(record?.productDetail?.promotionValue))) /
-                      100
-                    )?.toLocaleString("vi-VN", {
-                      style: "currency",
-                      currency: "VND",
-                    })
-                  : (
-                      record?.productDetail?.price -
-                      Number(record?.productDetail?.promotionValue)
-                    )?.toLocaleString("vi-VN", {
-                      style: "currency",
-                      currency: "VND",
-                    })
-                : null}
-            </span>
-          </div>
-        );
-      },
-    },
-    {
-      title: "Thành tiền",
-      dataIndex: "totalPrice",
-      key: "totalPrice",
-      render: (text, record, index) => {
-        return (
-          <span>
-            {(record?.priceReduce * record?.quantity)?.toLocaleString("vi-VN", {
-              style: "currency",
-              currency: "VND",
-            })}
-          </span>
-        );
-      },
-    },
-    {
-      title: "Thao tác",
-      key: "action",
-      render: (text, record, index) => (
-        <Space size="middle">
-          <Button
-            icon={<DeleteOutlined />}
-            danger
-            href="#1"
-            key={record.key}
-            onClick={() => handleDeleteProduct(record, index)}
-          ></Button>
-        </Space>
-      ),
-    },
-  ];
+  //     render: (text, record, index) => {
+  //       return (
+  //         <div style={{ textAlign: "center" }}>
+  //           {record?.productDetail?.promotionValue ? (
+  //             <span style={{ color: "#ccc" }}>
+  //               <strike>
+  //                 {record?.productDetail?.price?.toLocaleString("vi-VN", {
+  //                   style: "currency",
+  //                   currency: "VND",
+  //                 })}
+  //               </strike>
+  //             </span>
+  //           ) : (
+  //             <span>
+  //               {record?.productDetail?.price?.toLocaleString("vi-VN", {
+  //                 style: "currency",
+  //                 currency: "VND",
+  //               })}
+  //             </span>
+  //           )}
+  //           <br />
+  //           <span>
+  //             {record?.productDetail?.promotionValue
+  //               ? record?.productDetail?.promotionMethod === "%"
+  //                 ? (
+  //                     (record?.productDetail?.price *
+  //                       (100 - Number(record?.productDetail?.promotionValue))) /
+  //                     100
+  //                   )?.toLocaleString("vi-VN", {
+  //                     style: "currency",
+  //                     currency: "VND",
+  //                   })
+  //                 : (
+  //                     record?.productDetail?.price -
+  //                     Number(record?.productDetail?.promotionValue)
+  //                   )?.toLocaleString("vi-VN", {
+  //                     style: "currency",
+  //                     currency: "VND",
+  //                   })
+  //               : null}
+  //           </span>
+  //         </div>
+  //       );
+  //     },
+  //   },
+  //   {
+  //     title: "Thành tiền",
+  //     dataIndex: "totalPrice",
+  //     key: "totalPrice",
+  //     render: (text, record, index) => {
+  //       return (
+  //         <span>
+  //           {(record?.priceReduce * record?.quantity)?.toLocaleString("vi-VN", {
+  //             style: "currency",
+  //             currency: "VND",
+  //           })}
+  //         </span>
+  //       );
+  //     },
+  //   },
+  //   {
+  //     title: "Thao tác",
+  //     key: "action",
+  //     render: (text, record, index) => (
+  //       <Space size="middle">
+  //         <Button
+  //           icon={<DeleteOutlined />}
+  //           danger
+  //           href="#1"
+  //           key={record.key}
+  //           onClick={() => handleDeleteProduct(record, index)}
+  //         ></Button>
+  //       </Space>
+  //     ),
+  //   },
+  // ];
 
   const options = [
     {
@@ -507,6 +511,7 @@ const Bill = () => {
                 patternId: "",
                 formId: "",
               },
+              isEditProductTimeLine: false,
             },
             {
               headers: {
@@ -709,21 +714,21 @@ const Bill = () => {
   }, 0);
 
   const voucherPrice = () => {
-    let result = totalPrice;
+    let result = 0;
 
-    if (voucherAdd && voucherAdd.voucherMethod === "vnd") {
-      if (result >= (voucherAdd.voucherCondition ?? 0)) {
-        result -= voucherAdd.voucherValue ?? 0;
+    if (voucherAdd) {
+      if (voucherAdd.voucherMethod === "vnd") {
+        if (totalPrice >= (voucherAdd.voucherCondition ?? 0)) {
+          result = voucherAdd.voucherValue ?? 0;
+        }
+      } else {
+        if (totalPrice >= voucherAdd.voucherCondition) {
+          const discountPercent = voucherAdd.voucherValue ?? 0;
+          const maxDiscount = voucherAdd.voucherValueMax ?? 0;
+          let discount = (totalPrice * discountPercent) / 100;
+          result = Math.min(discount, maxDiscount);
+        }
       }
-    } else if (voucherAdd && voucherAdd.voucherMethod === "%") {
-      if (result >= voucherAdd.voucherCondition) {
-        const discountPercent = voucherAdd.voucherValue ?? 0;
-        const maxDiscount = voucherAdd.voucherValueMax ?? 0;
-        let discount = (totalPrice * discountPercent) / 100;
-        result -= Math.min(discount, maxDiscount);
-      }
-    } else {
-      result = totalPrice;
     }
 
     return result >= 0 ? result : 0;
@@ -880,7 +885,29 @@ const Bill = () => {
   };
 
   // xóa tab
-  const remove = (targetKey) => {
+  const remove = (targetKey, isUpdate) => {
+    if (isUpdate) {
+      let newActiveKey = activeKey;
+      localStorage.removeItem(targetKey);
+      let lastIndex = -1;
+      items.forEach((item, i) => {
+        if (item.key === targetKey) {
+          lastIndex = i - 1;
+        }
+      });
+      const newPanes = items.filter((item) => item.key !== targetKey);
+      if (newPanes.length && newActiveKey === targetKey) {
+        if (lastIndex >= 0) {
+          newActiveKey = newPanes[lastIndex].key;
+        } else {
+          newActiveKey = newPanes[0].key;
+        }
+      }
+      setCartId(newActiveKey);
+      setItems(newPanes);
+      setActiveKey(newActiveKey);
+      return;
+    }
     Modal.confirm({
       title: "Xóa hóa đơn",
       content: "Bạn có chắc chắn muốn xóa hóa đơn này không?",
@@ -911,6 +938,7 @@ const Bill = () => {
                   patternId: "",
                   formId: "",
                 },
+                isEditProductTimeLine: false,
               },
               {
                 headers: {
@@ -1182,25 +1210,30 @@ const Bill = () => {
   const [errors, setErrors] = useState({});
 
   const handleCreateBill = (index) => {
+    let isError = false;
     const bill = {
       billCode: activeKey,
       accountId: account?.username,
       price: totalPrice,
       priceReduce: voucherPrice(),
-      amountPaid: typeShipping[index]
-        ? 0
-        : Number(selectedOption) === 2
-        ? voucherPrice() + shippingFee
-        : Number(selectedOption) === 3
-        ? voucherPrice() + shippingFee
-        : amountPaid,
+      // amountPaid: typeShipping[index]
+      //   ? 0
+      //   : Number(selectedOption) === 2
+      //   ? voucherPrice() + shippingFee
+      //   : Number(selectedOption) === 3
+      //   ? voucherPrice() + shippingFee
+      //   : amountPaid,
+      amountPaid: totalPrice - voucherPrice() + (shippingFee ? shippingFee : 0),
       billType: "In-Store",
       symbol: typeShipping[index] ? "Shipping" : symbol,
       status: typeShipping[index]
-        ? "Unpaid"
+        ? "wait_for_delivery"
         : !typeShipping[index] && switchChange[index]
-        ? "Paid"
+        ? "wait_for_delivery"
         : "Complete",
+      paymentInDelivery: typeShipping[index] ? typeShipping[index] : false,
+      priceAmountATM: priceATM ? priceATM.replace(/[,]/g, "") : null,
+      isSellingAdmin: true,
       note: note,
       paymentDetailId: Number(selectedOption),
       lstBillDetailRequest: [],
@@ -1212,10 +1245,15 @@ const Bill = () => {
           : null,
       phoneNumber: selectedAddress?.numberPhone,
       voucherCode: voucherAdd?.voucherCode ?? null,
-      createdBy: "user3",
-      priceAmount: Number(selectedOption) === 3 ? amountPaid : null,
+      // createdBy: token,
+      priceAmountCast:
+        Number(selectedOption) !== 2
+          ? price
+            ? price.replace(/[,]/g, "")
+            : null
+          : null,
       emailDetails: {
-        recipient: selectedAddress.email ? [selectedAddress.email] : [email],
+        recipient: selectedAddress?.email ? [selectedAddress?.email] : [email],
         messageBody: `<body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: Arial, sans-serif;">
             <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="width: 100%; max-width:720px; margin: 0 auto;">
                 <tr>
@@ -1340,38 +1378,95 @@ const Bill = () => {
       ward: Yup.string().required("Phường/xã không được để trống"),
       email: Yup.string().email("Địa chỉ email không hợp lệ"),
     });
+
+    if (Number(selectedOption) === 1) {
+      const priced = Number(price?.replace(",", ""));
+      if (priced < voucherPrice()) {
+        isError = true;
+        setInputError("Vui lòng nhập số tiền cần thanh toán");
+        return;
+      }
+    }
+
     if (Number(selectedOption) === 3) {
       if (remainAmount === -1) {
+        isError = true;
         setInputError("Bạn chưa nhập tiền");
       } else {
         setInputError("");
       }
 
       if (transactionCode.trim().length === 0) {
+        isError = true;
         setTransactionError("Mã giao dịch không được để trống");
       } else {
         setTransactionError("");
       }
 
-      if (inputError && transactionError) {
+      if (priceATM) {
+        if (!priceATM?.replace(/[^\d.]/g, "")) {
+          isError = true;
+          setPriceATMError("Sai định dạng");
+        } else {
+          if (Number(priceATM?.replace(/[,]/g, "")) < remainAmount) {
+            isError = true;
+            setPriceATMError("Số tiền không đủ");
+          }
+        }
+      } else {
+        isError = true;
+        setPriceATMError("Vui lòng nhập số tiền cần thanh toán");
+      }
+
+      if (inputError && transactionError && setPriceATMError) {
         return;
       }
     }
 
     if (productDetails?.length <= 0) {
+      isError = true;
       return notification.error({
         message: "Thông báo",
         description: "Không có sản phẩm nào trong giỏ hàng.",
         duration: 2,
       });
-    } else if (
+    }
+
+    if (
       Number(selectedOption) === 1 &&
       ((remainAmount < 0 && !typeShipping[index]) || isNaN(remainAmount))
     ) {
-      return setInputError("Tiền không đủ");
-    } else if (Number(selectedOption) === 3 && transactionCode.trim() === "") {
-      return setTransactionError("Mã giao dịch không được để trống");
-    } else {
+      console.log("remainAmount: ", remainAmount);
+      isError = true;
+      return setInputError("Nhập đủ số tiền cần thanh toán");
+    }
+
+    if (Number(selectedOption) === 3 || Number(selectedOption) === 2) {
+      if (Number(selectedOption) === 2) {
+        if (priceATM) {
+          if (!priceATM.replace(/[^\d.]/g, "")) {
+            isError = true;
+            setPriceATMError("Sai định dạng");
+          } else {
+            const priceATMStr = priceATM.replace(/[,]/g, "");
+            if (Number(priceATMStr) < remainAmount) {
+              isError = true;
+              setPriceATMError("Số tiền không đủ");
+            } else {
+              setPriceATMError("");
+            }
+          }
+        } else {
+          isError = true;
+          setPriceATMError("Vui lòng nhập số tiền cần thanh toán");
+        }
+        if (transactionCode.trim() === "") {
+          isError = true;
+          return setTransactionError("Mã giao dịch không được để trống");
+        }
+      }
+    }
+    if (!isError) {
       for (let i = 0; i < productDetails?.length; i++) {
         const billDetail = {
           productDetailId: productDetails[i].productDetail.id,
@@ -1452,7 +1547,7 @@ const Bill = () => {
               duration: 2,
             });
             navigate(`/api/admin/order`);
-            remove(activeKey);
+            remove(activeKey, true);
           } catch (error) {
             const status = error?.response?.status;
             if (status === 403) {
@@ -1469,18 +1564,20 @@ const Bill = () => {
 
   const [inputError, setInputError] = useState("");
   const [transactionError, setTransactionError] = useState("");
+  const [priceATMError, setPriceATMError] = useState("");
 
   const handleChangeInput = (inputValue, index) => {
     setAmountPaid(inputValue);
     let calculatedValue = 0;
     if (switchChange[index]) {
-      calculatedValue = inputValue - voucherPrice() - shippingFee;
+      calculatedValue =
+        inputValue - (totalPrice - voucherPrice() + shippingFee);
     } else {
-      calculatedValue = inputValue - voucherPrice();
+      calculatedValue = inputValue - (totalPrice - voucherPrice());
     }
     setRemainAmount(calculatedValue);
     numeral(inputValue).format("0,0");
-    if (calculatedValue < 0 && selectedOption !== "3") {
+    if (calculatedValue < 0 && selectedOption === "1") {
       setInputError("Số tiền không đủ");
     } else {
       setInputError("");
@@ -1499,6 +1596,7 @@ const Bill = () => {
           const data = await res.data;
           setVoucherAdd(data);
         } catch (err) {
+          setVoucherAdd({});
           notification.error({
             message: "Lỗi",
             description: "Hệ thống xảy ra lỗi",
@@ -1508,7 +1606,7 @@ const Bill = () => {
       }
     }
     autoFillVoucher();
-  }, [totalPrice]);
+  }, [totalPrice, switchChange, typeShipping, selectedOption, price]);
 
   return (
     <>
@@ -1573,6 +1671,9 @@ const Bill = () => {
                         onCancel={() => handleCancel(index)}
                         cartId={cartId}
                         render={setRendered}
+                        isEditProductTimeLine={false}
+                        setBoolean={setBoolean}
+                        boolean={boolean}
                       />
                     </Col>
                   </Row>
@@ -1580,16 +1681,23 @@ const Bill = () => {
                     className={styles.blackDivider}
                     style={{ marginTop: "3px" }}
                   />
-                  <Table
+                  {/* <Table
                     dataSource={
                       productDetails &&
-                      productDetails.map((record, index) => ({
+                      productDetails?.map((record, index) => ({
                         ...record,
                         key: record.id,
                       }))
                     }
                     columns={columns}
                     pagination={false}
+                  /> */}
+                  <TableOrderProduct
+                    productDetails={productDetails}
+                    handleDeleteProduct={handleDeleteProduct}
+                    updateQuantity={updateQuantity}
+                    bool={boolean}
+                    cartId={cartId}
                   />
                 </div>
 
@@ -1661,7 +1769,7 @@ const Bill = () => {
                         handleCancel={() => handleCancelAddress(index)}
                         cartId={cartId}
                         render={setRendered}
-                        address={address.accountAddress}
+                        address={address?.accountAddress}
                         selectedAddress={setSelectedAddress}
                         username={account?.username}
                       />
@@ -1998,13 +2106,14 @@ const Bill = () => {
                                 fontSize: "16px",
                               }}
                             >
-                              {(voucherPrice() + shippingFee)?.toLocaleString(
-                                "vi-VN",
-                                {
-                                  style: "currency",
-                                  currency: "VND",
-                                }
-                              )}
+                              {(
+                                totalPrice -
+                                voucherPrice() +
+                                (shippingFee ? shippingFee : 0)
+                              )?.toLocaleString("vi-VN", {
+                                style: "currency",
+                                currency: "VND",
+                              })}
                             </span>
                           ) : (
                             <span
@@ -2013,10 +2122,13 @@ const Bill = () => {
                                 fontSize: " 16px",
                               }}
                             >
-                              {voucherPrice()?.toLocaleString("vi-VN", {
-                                style: "currency",
-                                currency: "VND",
-                              })}
+                              {(totalPrice - voucherPrice())?.toLocaleString(
+                                "vi-VN",
+                                {
+                                  style: "currency",
+                                  currency: "VND",
+                                }
+                              )}
                             </span>
                           )}
                         </Col>
@@ -2096,6 +2208,28 @@ const Bill = () => {
                         {Number(selectedOption) === 2 ||
                         Number(selectedOption) === 3 ? (
                           <>
+                            <Input
+                              value={priceATM}
+                              placeholder="Nhập số tiền khách chuyển ATM"
+                              size="large"
+                              onChange={(e) => {
+                                handleChangeInput(
+                                  e.target.value.replace(/\D/g, ""),
+                                  index
+                                );
+                                setPriceATM(
+                                  numeral(
+                                    e.target.value.replace(/\D/g, "")
+                                  ).format("0,0")
+                                );
+                              }}
+                              style={{ margin: "10px 0", width: "380px" }}
+                              className={styles.input_noneBorder}
+                            />
+                            <span style={{ fontSize: "16px", color: "red" }}>
+                              {priceATMError}
+                            </span>
+
                             <Input
                               placeholder="Nhập mã giao dịch"
                               size="large"

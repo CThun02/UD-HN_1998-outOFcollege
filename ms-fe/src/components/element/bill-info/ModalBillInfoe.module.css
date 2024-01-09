@@ -1,7 +1,66 @@
 .none {
+  padding-top: 20px;
   width: 100%;
 }
 
 .texxtLeft {
   text-align: left !important;
+}
+
+.padding {
+  height: 80px !important;
+}
+
+.customBr {
+  padding: 1px;
+}
+
+.br,
+.borderBottom,
+.customBr {
+  /* height: 2px; */
+  width: 100%;
+  background-color: #444141;
+}
+
+.br {
+  border-top: 2px dashed #fff;
+  margin: 10px 0;
+}
+
+.borderBottom {
+  border-bottom: 2px dashed #fff;
+}
+
+.flexEnd,
+.span {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.imageSize {
+  height: 70px;
+}
+
+.logo {
+  display: flex;
+  justify-content: center;
+  padding: 10px 0;
+  color: #111111;
+}
+
+.cssText {
+  color: #111111;
+  font-weight: 500;
+}
+
+.qr,
+.content,
+.title {
+  display: inline-block;
+}
+
+.content,
+.title {
+  padding: 8px 24px;
 }

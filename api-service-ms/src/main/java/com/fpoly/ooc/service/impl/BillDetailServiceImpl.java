@@ -11,14 +11,19 @@ import com.fpoly.ooc.repository.BillDetailRepo;
 import com.fpoly.ooc.request.bill.BillDetailRequest;
 import com.fpoly.ooc.request.product.ProductDetailRequest;
 import com.fpoly.ooc.responce.bill.BillInfoResponse;
+import com.fpoly.ooc.responce.deliveryNote.DeliveryNoteResponse;
+import com.fpoly.ooc.responce.payment.PaymentDetailResponse;
 import com.fpoly.ooc.responce.pdf.PdfResponse;
 import com.fpoly.ooc.responce.timeline.TimelineProductResponse;
 import com.fpoly.ooc.service.interfaces.BillDetailService;
+import com.fpoly.ooc.service.interfaces.DeliveryNoteService;
+import com.fpoly.ooc.service.interfaces.PaymentService;
 import com.fpoly.ooc.service.interfaces.ProductDetailServiceI;
 import com.fpoly.ooc.service.interfaces.TimeLineService;
 import jakarta.persistence.LockModeType;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.stereotype.Service;
@@ -42,6 +47,12 @@ public class BillDetailServiceImpl implements BillDetailService {
 
     @Autowired
     private TimeLineService timeLineService;
+
+    @Autowired
+    private PaymentService paymentService;
+
+    @Autowired
+    private DeliveryNoteService deliveryNoteService;
 
 
     //@Author: Nguyễn Công Thuần
@@ -315,21 +326,42 @@ public class BillDetailServiceImpl implements BillDetailService {
     }
 
     @Override
-    public PdfResponse pdfResponse(String billCode) {
+    public PdfResponse pdfResponse(String billCode) throws NotFoundException {
+        if (StringUtils.isBlank(billCode)) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_NOT_FOUND));
+        }
+
         Bill bill = billService.findBillByBillCode(billCode);
+        if (Objects.isNull(bill)) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_NOT_FOUND));
+        }
         BillInfoResponse response = timeLineService.getBillInfoByBillId(bill.getId());
         List<TimelineProductResponse> lstProductDT = billDetailRepo.lstProductDT(billCode);
+        List<PaymentDetailResponse> lstPaymentDetail = paymentService.findPaymentDetailByBillId(bill.getId());
+        DeliveryNoteResponse deliveryNote = deliveryNoteService.getOne(billCode);
+
+        String[] createdBy = bill.getCreatedBy().split("_");
+        String[] city = deliveryNote.getCity().split("\\|");
+        String[] district = deliveryNote.getDistrict().split("\\|");
+        String[] ward = deliveryNote.getWard().split("\\|");
+
+        deliveryNote.setCity(city[0]);
+        deliveryNote.setDistrict(district[0]);
+        deliveryNote.setWard(ward[0]);
 
         PdfResponse pdfResponse = PdfResponse.builder()
                 .billCode(billCode)
-                .BillCreatedAt(response.getCreatedDate())
-                .billCreatedBy(bill.getCreatedBy())
+                .billUpdateBy(bill.getUpdatedBy())
+                .billCreatedAt(response.getCreatedDate())
+                .billCreatedBy(createdBy[1])
                 .totalPrice(response.getTotalPrice())
                 .shippingFee(response.getShipPrice())
                 .amountPaid(response.getAmountPaid())
                 .voucherPrice(response.getVoucherPrice())
                 .priceReduce(response.getPriceReduce())
                 .lstProductDetail(lstProductDT)
+                .lstPaymentDetail(lstPaymentDetail)
+                .deliveryNote(deliveryNote)
                 .build();
 
         return pdfResponse;

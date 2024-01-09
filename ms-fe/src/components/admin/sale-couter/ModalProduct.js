@@ -12,6 +12,8 @@ const ModalProduct = ({
   render,
   billId,
   isEditProductTimeLine,
+  setBoolean,
+  boolean,
 }) => {
   const [productDetails, setProductDetails] = useState([]);
 
@@ -37,6 +39,7 @@ const ModalProduct = ({
       message: "Thông báo",
       description: "Thêm sản phẩm vào giỏ hàng thành công!",
     });
+    setBoolean(!boolean);
 
     // update quantity product
     // }

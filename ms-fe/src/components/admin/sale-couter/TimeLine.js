@@ -439,7 +439,12 @@ const BillTimeLine = (addId) => {
               updateQUantityBillDetail(record, e?.target?.value, index)
             }
             disabled={
-              Number(timlinesDisplay[timlinesDisplay?.length - 1]?.status) !== 1
+              Number(timlinesDisplay[timlinesDisplay?.length - 1]?.status) !==
+                1 ||
+              billInfo?.lstPaymentDetail?.length === 1 ||
+              billInfo?.lstPaymentDetail?.length === 2
+                ? billInfo?.lstPaymentDetail[0].status === "Paid"
+                : false
             }
           />
         );
@@ -850,7 +855,39 @@ const BillTimeLine = (addId) => {
                   </Col>
                   <Col span={14}>
                     <span>
-                      {numeral(billInfo?.amountPaid).format("0,0") + "đ"}
+                      {billInfo?.lstPaymentDetail?.length >= 1
+                        ? billInfo?.lstPaymentDetail[0]?.status === "Paid"
+                          ? billInfo?.lstPaymentDetail[0]?.paymentName ===
+                            "Credit Card"
+                            ? numeral(
+                                billInfo?.lstPaymentDetail[0]?.price
+                              ).format("0,0") +
+                              " đ " +
+                              "(Chuyển khoản)"
+                            : numeral(
+                                billInfo?.lstPaymentDetail[0]?.price
+                              ).format("0,0") +
+                              " đ " +
+                              "(Tiền mặt)"
+                          : "Thanh toán khi nhận hàng"
+                        : null}
+                    </span>
+                    {billInfo?.lstPaymentDetail?.length > 1 && <span> | </span>}
+                    <span>
+                      {billInfo?.lstPaymentDetail?.length === 2
+                        ? billInfo?.lstPaymentDetail[1]?.paymentName ===
+                          "Credit Card"
+                          ? numeral(
+                              billInfo?.lstPaymentDetail[1]?.price
+                            ).format("0,0") +
+                            " đ " +
+                            "(Chuyển khoản)"
+                          : numeral(
+                              billInfo?.lstPaymentDetail[1]?.price
+                            ).format("0,0") +
+                            " đ " +
+                            "(Tiền mặt)"
+                        : null}
                     </span>
                   </Col>
                 </Row>
@@ -862,14 +899,39 @@ const BillTimeLine = (addId) => {
                   </Col>
                   <Col span={14}>
                     <span>
-                      {(billInfo?.amountPaid > 0
+                      {billInfo?.lstPaymentDetail?.length === 2 &&
+                        (billInfo?.lstPaymentDetail[0]?.price +
+                          billInfo?.lstPaymentDetail[1]?.price -
+                          billInfo?.totalPrice >
+                        0
+                          ? billInfo?.lstPaymentDetail[0]?.price +
+                            billInfo?.lstPaymentDetail[1]?.price -
+                            billInfo?.totalPrice
+                          : 0
+                        ).toLocaleString("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                        })}
+
+                      {billInfo?.lstPaymentDetail?.length === 1 &&
+                        (billInfo?.lstPaymentDetail[0]?.price -
+                          billInfo?.totalPrice >
+                        0
+                          ? billInfo?.lstPaymentDetail[0]?.price -
+                            billInfo?.totalPrice
+                          : 0
+                        ).toLocaleString("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                        })}
+                      {/* {(billInfo?.amountPaid > 0
                         ? billInfo?.amountPaid -
                           (billInfo?.priceReduce + billInfo?.shipPrice)
                         : 0
                       ).toLocaleString("vi-VN", {
                         style: "currency",
                         currency: "VND",
-                      })}
+                      })} */}
                     </span>
                   </Col>
                 </Row>
@@ -895,6 +957,12 @@ const BillTimeLine = (addId) => {
                 <Button
                   type="primary"
                   onClick={() => setIsOpenModalProduct(true)}
+                  disabled={
+                    billInfo?.lstPaymentDetail?.length === 1 ||
+                    billInfo?.lstPaymentDetail?.length === 2
+                      ? billInfo?.lstPaymentDetail[0].status === "Paid"
+                      : false
+                  }
                 >
                   Thêm sản phẩm
                 </Button>
@@ -941,18 +1009,14 @@ const BillTimeLine = (addId) => {
             <span style={{ width: "200px", display: "inline-block" }}>
               Giảm giá:
             </span>
-            <span>{numeral(billInfo?.voucherPrice)?.format("0,0") + "đ"}</span>
+            <span>{numeral(billInfo?.priceReduce)?.format("0,0") + "đ"}</span>
           </span>
           <b className={styles.span}>
             <span style={{ width: "200px", display: "inline-block" }}>
               Tổng cộng:{" "}
             </span>
             <span style={{ fontSize: "16px", color: "#FF0000" }}>
-              {(
-                (billInfo?.priceReduce === billInfo?.voucherPrice
-                  ? billInfo?.priceReduce + (billInfo?.shipPrice ?? 0)
-                  : billInfo?.priceReduce + (billInfo?.shipPrice ?? 0)) ?? 0
-              )?.toLocaleString("vi-VN", {
+              {billInfo?.amountPaid?.toLocaleString("vi-VN", {
                 style: "currency",
                 currency: "VND",
               })}

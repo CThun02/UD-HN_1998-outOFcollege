@@ -88,4 +88,5 @@ public interface BillService {
 
     ProductDetailSellResponse getProductDetailSellInStoreByPdIdAndColorAndSize(Long productDetailId,Long colorId, Long sizeId);
 
+    Bill saveBill(Bill bill) throws NotFoundException;
 }

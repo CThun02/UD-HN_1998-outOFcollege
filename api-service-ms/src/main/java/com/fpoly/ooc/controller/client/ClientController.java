@@ -170,7 +170,7 @@ public class ClientController {
     }
 
     @GetMapping("/pdf/{billCode}")
-    public ResponseEntity<?> pdfResponse(@PathVariable("billCode") String billCode) {
+    public ResponseEntity<?> pdfResponse(@PathVariable("billCode") String billCode) throws NotFoundException {
         return ResponseEntity.ok(billDetailService.pdfResponse(billCode));
     }
 

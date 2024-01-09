@@ -346,40 +346,42 @@ const ProductDetails = (props) => {
       }
     }
     if (indexExist !== -1) {
-      if (
+      // if (
+      //   Number(quantity) +
+      //     Number(props.productDetailsCreate[indexExist].quantity) >
+      //   record?.quantity
+      // ) {
+      //   // notification.error({
+      //   //   message: "Thông báo",
+      //   //   description: `Số lượng sản phẩm ${
+      //   //     productDetailCreate.quantity > 100
+      //   //       ? "thêm tối đa 100"
+      //   //       : "tồn không đủ"
+      //   //   }`,
+      //   // });
+      //   return;
+      // } else {
+      productDetailCreate.quantity =
         Number(quantity) +
-          Number(props.productDetailsCreate[indexExist].quantity) >
-        record?.quantity
-      ) {
-        notification.error({
-          message: "Thông báo",
-          description: `Số lượng sản phẩm ${
-            productDetailCreate.quantity > 100
-              ? "thêm tối đa 100"
-              : "tồn không đủ"
-          }`,
-        });
-        return;
-      } else {
-        productDetailCreate.quantity =
-          Number(quantity) +
-          Number(props.productDetailsCreate[indexExist].quantity);
-        props.productDetailsCreate?.splice(indexExist, 1);
-      }
+        Number(props.productDetailsCreate[indexExist].quantity);
+      props.productDetailsCreate?.splice(indexExist, 1);
+      // }
     }
-    if (
-      productDetailCreate.quantity > record.quantity ||
-      productDetailCreate.quantity > 100
-    ) {
-      notification.error({
-        message: "Thông báo",
-        description: `Số lượng sản phẩm ${
-          productDetailCreate.quantity > 100
-            ? "thêm tối đa 100"
-            : "tồn không đủ"
-        }`,
-      });
-    } else if (productDetailCreate.quantity <= 0) {
+    // if (
+    //   productDetailCreate?.quantity > record?.quantity ||
+    //   productDetailCreate?.quantity > 100
+    // ) {
+    //   notification.error({
+    //     message: "Thông báo",
+    //     description: `Số lượng sản phẩm ${
+    //       productDetailCreate.quantity > 100
+    //         ? "thêm tối đa 100"
+    //         : "tồn không đủ"
+    //     }`,
+    //   });
+    // } else
+
+    if (productDetailCreate.quantity <= 0) {
       notification.error({
         message: "Thông báo",
         description: `Số lượng sản phẩm phải lớn hơn 0`,
@@ -421,7 +423,9 @@ const ProductDetails = (props) => {
             },
             minPrice: price[0],
             maxPrice: price[1],
-            isEditProductTimeLine: props?.isEditProductTimeLine,
+            isEditProductTimeLine: props?.isEditProductTimeLine
+              ? props?.isEditProductTimeLine
+              : false,
           },
           {
             headers: {

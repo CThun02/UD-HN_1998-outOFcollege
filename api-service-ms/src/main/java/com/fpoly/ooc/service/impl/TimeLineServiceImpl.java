@@ -129,6 +129,10 @@ public class TimeLineServiceImpl implements TimeLineService {
         if (bill == null) {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_NOT_FOUND));
         }
+
+        if (Objects.isNull(request)) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_SERVICE));
+        }
         Timeline timeline = new Timeline();
 
         Optional<Timeline> existingTimeline = Optional.empty();
@@ -161,9 +165,25 @@ public class TimeLineServiceImpl implements TimeLineService {
                     deliveryNote.setDateOfReceipt(LocalDateTime.now());
                 }
             } else {
+                String statusBill = null;
+                if ("1".equalsIgnoreCase(request.getStatus())) {
+                    statusBill = "wait_for_confirm";
+                } else if ("2".equalsIgnoreCase(request.getStatus())) {
+                    statusBill = "wait_for_delivery";
+                } else if ("3".equalsIgnoreCase(request.getStatus())) {
+                    statusBill = "delivering";
+                } else if ("Rollback".equalsIgnoreCase(request.getStatus())) {
+                    statusBill = "wait_for_confirm";
+                } else if ("0".equalsIgnoreCase(request.getStatus())) {
+                    statusBill = "Cancel";
+                } else {
+                    statusBill = "Complete";
+                }
+                bill.setStatus(statusBill);
                 timeline.setStatus(request.getStatus());
             }
             timeLineRepo.save(timeline);
+            billService.saveBill(bill);
         }
 
         Long count = timeLineRepo.getCountTimelineByBillId(billId);

@@ -505,6 +505,15 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
+    public Bill saveBill(Bill bill) throws NotFoundException {
+        if (Objects.isNull(bill)) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_NOT_FOUND));
+        }
+
+        return billRepo.save(bill);
+    }
+
+    @Override
     public List<BillReturnRequestResponse> getReturnRequestByStatus(String status) {
         return billRepo.getReturnRequestByStatus(status);
     }

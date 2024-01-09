@@ -205,7 +205,7 @@ public class BillServiceImpl implements BillService {
             PaymentDetail paymentDetail = new PaymentDetail();
             paymentDetail.setBill(bill);
             paymentDetail.setPayment(Payment.builder().id(request.getPaymentDetailId()).build());
-            paymentDetail.setPrice(request.getPaymentDetailId() == 1 ? request.getPriceAmountCast() : request.getPriceAmountATM());
+            paymentDetail.setPrice(request.getAmountPaid());
             paymentDetail.setStatus(statusPaymentDetail);
             paymentDetailRepo.save(paymentDetail);
         }

@@ -400,9 +400,11 @@ const Checkout = ({ setRenderHeader }) => {
       symbol: "Shipping",
       // status: formData.paymentDetailId === 2 ? "Paid" : "Unpaid",
       status: "wait_for_confirm",
-      paymentInDelivery: formData.paymentDetailId === 2 ? true : false,
+      paymentInDelivery: formData.paymentDetailId === 2 ? false : true,
       priceAmountCast: formData.paymentDetailId === 1 ? totalPrice : null,
+      priceAmountATM: totalPrice,
       isSellingAdmin: false,
+      amountPaid: totalPrice - voucherPrice() + (shippingFee ? shippingFee : 0),
       accountId: dataToken ? dataToken.username : null,
       note: formData.note,
       lstBillDetailRequest: formData.lstBillDetailRequest,
@@ -815,23 +817,24 @@ const Checkout = ({ setRenderHeader }) => {
   };
 
   const voucherPrice = () => {
-    let result = totalPrice;
+    let result = 0;
 
-    if (voucherAdd && voucherAdd.voucherMethod === "vnd") {
-      if (result >= (voucherAdd.voucherCondition ?? 0)) {
-        result -= voucherAdd.voucherValue;
+    if (voucherAdd) {
+      if (voucherAdd?.voucherMethod === "vnd") {
+        if (totalPrice >= (voucherAdd?.voucherCondition ?? 0)) {
+          result = voucherAdd?.voucherValue;
+        }
+      } else {
+        if (totalPrice >= voucherAdd?.voucherCondition) {
+          const discountPercent = voucherAdd?.voucherValue ?? 0;
+          const maxDiscount = voucherAdd?.voucherValueMax ?? 0;
+          let discount = (totalPrice * discountPercent) / 100;
+          result = Math.min(discount, maxDiscount);
+        }
       }
-    } else if (voucherAdd && voucherAdd.voucherMethod === "%") {
-      if (result >= voucherAdd.voucherCondition) {
-        const discountPercent = voucherAdd.voucherValue ?? 0;
-        const maxDiscount = voucherAdd.voucherValueMax ?? 0;
-        let discount = (totalPrice * discountPercent) / 100;
-        result -= Math.min(discount, maxDiscount);
-      }
-    } else {
-      result = totalPrice;
     }
 
+    console.log("Reduce: ", result);
     return result >= 0 ? result : 0;
   };
 
@@ -1579,13 +1582,21 @@ const Checkout = ({ setRenderHeader }) => {
                     Tổng cộng
                   </Col>
                   <Col span={6}>
-                    {(voucherPrice() < 0
+                    {(
+                      totalPrice -
+                      voucherPrice() +
+                      (shippingFee ? shippingFee : 0)
+                    )?.toLocaleString("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    })}
+                    {/* {(voucherPrice() < 0
                       ? shippingFee
                       : voucherPrice() + shippingFee
                     )?.toLocaleString("vi-VN", {
                       style: "currency",
                       currency: "VND",
-                    })}
+                    })} */}
                   </Col>
 
                   {voucherAdd.voucherId ? (

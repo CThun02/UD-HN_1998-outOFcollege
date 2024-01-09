@@ -712,21 +712,21 @@ const Bill = () => {
   }, 0);
 
   const voucherPrice = () => {
-    let result = totalPrice;
+    let result = 0;
 
-    if (voucherAdd && voucherAdd.voucherMethod === "vnd") {
-      if (result >= (voucherAdd.voucherCondition ?? 0)) {
-        result -= voucherAdd.voucherValue ?? 0;
+    if (voucherAdd) {
+      if (voucherAdd.voucherMethod === "vnd") {
+        if (totalPrice >= (voucherAdd.voucherCondition ?? 0)) {
+          result = voucherAdd.voucherValue ?? 0;
+        }
+      } else {
+        if (totalPrice >= voucherAdd.voucherCondition) {
+          const discountPercent = voucherAdd.voucherValue ?? 0;
+          const maxDiscount = voucherAdd.voucherValueMax ?? 0;
+          let discount = (totalPrice * discountPercent) / 100;
+          result = Math.min(discount, maxDiscount);
+        }
       }
-    } else if (voucherAdd && voucherAdd.voucherMethod === "%") {
-      if (result >= voucherAdd.voucherCondition) {
-        const discountPercent = voucherAdd.voucherValue ?? 0;
-        const maxDiscount = voucherAdd.voucherValueMax ?? 0;
-        let discount = (totalPrice * discountPercent) / 100;
-        result -= Math.min(discount, maxDiscount);
-      }
-    } else {
-      result = totalPrice;
     }
 
     return result >= 0 ? result : 0;
@@ -883,7 +883,29 @@ const Bill = () => {
   };
 
   // xóa tab
-  const remove = (targetKey) => {
+  const remove = (targetKey, isUpdate) => {
+    if (isUpdate) {
+      let newActiveKey = activeKey;
+      localStorage.removeItem(targetKey);
+      let lastIndex = -1;
+      items.forEach((item, i) => {
+        if (item.key === targetKey) {
+          lastIndex = i - 1;
+        }
+      });
+      const newPanes = items.filter((item) => item.key !== targetKey);
+      if (newPanes.length && newActiveKey === targetKey) {
+        if (lastIndex >= 0) {
+          newActiveKey = newPanes[lastIndex].key;
+        } else {
+          newActiveKey = newPanes[0].key;
+        }
+      }
+      setCartId(newActiveKey);
+      setItems(newPanes);
+      setActiveKey(newActiveKey);
+      return;
+    }
     Modal.confirm({
       title: "Xóa hóa đơn",
       content: "Bạn có chắc chắn muốn xóa hóa đơn này không?",
@@ -1192,13 +1214,14 @@ const Bill = () => {
       accountId: account?.username,
       price: totalPrice,
       priceReduce: voucherPrice(),
-      amountPaid: typeShipping[index]
-        ? 0
-        : Number(selectedOption) === 2
-        ? voucherPrice() + shippingFee
-        : Number(selectedOption) === 3
-        ? voucherPrice() + shippingFee
-        : amountPaid,
+      // amountPaid: typeShipping[index]
+      //   ? 0
+      //   : Number(selectedOption) === 2
+      //   ? voucherPrice() + shippingFee
+      //   : Number(selectedOption) === 3
+      //   ? voucherPrice() + shippingFee
+      //   : amountPaid,
+      amountPaid: totalPrice - voucherPrice() + (shippingFee ? shippingFee : 0),
       billType: "In-Store",
       symbol: typeShipping[index] ? "Shipping" : symbol,
       status: typeShipping[index]
@@ -1383,9 +1406,7 @@ const Bill = () => {
           isError = true;
           setPriceATMError("Sai định dạng");
         } else {
-          if (
-            Number(priceATM?.replace(/[,]/g, "") + remainAmount) < totalPrice
-          ) {
+          if (Number(priceATM?.replace(/[,]/g, "")) < remainAmount) {
             isError = true;
             setPriceATMError("Số tiền không đủ");
           }
@@ -1413,6 +1434,7 @@ const Bill = () => {
       Number(selectedOption) === 1 &&
       ((remainAmount < 0 && !typeShipping[index]) || isNaN(remainAmount))
     ) {
+      console.log("remainAmount: ", remainAmount);
       isError = true;
       return setInputError("Nhập đủ số tiền cần thanh toán");
     }
@@ -1425,7 +1447,7 @@ const Bill = () => {
             setPriceATMError("Sai định dạng");
           } else {
             const priceATMStr = priceATM.replace(/[,]/g, "");
-            if (Number(priceATMStr) < totalPrice) {
+            if (Number(priceATMStr) < remainAmount) {
               isError = true;
               setPriceATMError("Số tiền không đủ");
             } else {
@@ -1523,7 +1545,7 @@ const Bill = () => {
               duration: 2,
             });
             navigate(`/api/admin/order`);
-            // remove(activeKey);
+            remove(activeKey, true);
           } catch (error) {
             const status = error?.response?.status;
             if (status === 403) {
@@ -1546,9 +1568,10 @@ const Bill = () => {
     setAmountPaid(inputValue);
     let calculatedValue = 0;
     if (switchChange[index]) {
-      calculatedValue = inputValue - voucherPrice() - shippingFee;
+      calculatedValue =
+        inputValue - (totalPrice - voucherPrice() + shippingFee);
     } else {
-      calculatedValue = inputValue - voucherPrice();
+      calculatedValue = inputValue - (totalPrice - voucherPrice());
     }
     setRemainAmount(calculatedValue);
     numeral(inputValue).format("0,0");
@@ -2071,13 +2094,14 @@ const Bill = () => {
                                 fontSize: "16px",
                               }}
                             >
-                              {(voucherPrice() + shippingFee)?.toLocaleString(
-                                "vi-VN",
-                                {
-                                  style: "currency",
-                                  currency: "VND",
-                                }
-                              )}
+                              {(
+                                totalPrice -
+                                voucherPrice() +
+                                (shippingFee ? shippingFee : 0)
+                              )?.toLocaleString("vi-VN", {
+                                style: "currency",
+                                currency: "VND",
+                              })}
                             </span>
                           ) : (
                             <span
@@ -2086,10 +2110,13 @@ const Bill = () => {
                                 fontSize: " 16px",
                               }}
                             >
-                              {voucherPrice()?.toLocaleString("vi-VN", {
-                                style: "currency",
-                                currency: "VND",
-                              })}
+                              {(totalPrice - voucherPrice())?.toLocaleString(
+                                "vi-VN",
+                                {
+                                  style: "currency",
+                                  currency: "VND",
+                                }
+                              )}
                             </span>
                           )}
                         </Col>

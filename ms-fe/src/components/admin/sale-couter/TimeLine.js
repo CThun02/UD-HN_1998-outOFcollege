@@ -998,18 +998,14 @@ const BillTimeLine = (addId) => {
             <span style={{ width: "200px", display: "inline-block" }}>
               Giảm giá:
             </span>
-            <span>{numeral(billInfo?.voucherPrice)?.format("0,0") + "đ"}</span>
+            <span>{numeral(billInfo?.priceReduce)?.format("0,0") + "đ"}</span>
           </span>
           <b className={styles.span}>
             <span style={{ width: "200px", display: "inline-block" }}>
               Tổng cộng:{" "}
             </span>
             <span style={{ fontSize: "16px", color: "#FF0000" }}>
-              {(
-                (billInfo?.priceReduce === billInfo?.voucherPrice
-                  ? billInfo?.priceReduce + (billInfo?.shipPrice ?? 0)
-                  : billInfo?.priceReduce + (billInfo?.shipPrice ?? 0)) ?? 0
-              )?.toLocaleString("vi-VN", {
+              {billInfo?.amountPaid?.toLocaleString("vi-VN", {
                 style: "currency",
                 currency: "VND",
               })}

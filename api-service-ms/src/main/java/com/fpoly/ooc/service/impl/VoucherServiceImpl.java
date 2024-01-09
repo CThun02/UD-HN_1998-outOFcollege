@@ -224,8 +224,8 @@ public class VoucherServiceImpl implements VoucherService {
     }
 
     @Override
-    public Voucher isVoucherUsable(String voucherCode) {
-        Voucher voucher = voucherRepository.isCheckVoucherUsable(voucherCode, LocalDateTime.now());
+    public Voucher isVoucherUsable(String voucherCode, LocalDateTime dateTimeOrder) {
+        Voucher voucher = voucherRepository.isCheckVoucherUsable(voucherCode, dateTimeOrder);
 
         if (Objects.nonNull(voucher)) {
             return voucher;
@@ -241,6 +241,9 @@ public class VoucherServiceImpl implements VoucherService {
 
     @Override
     public Voucher updateVoucher(Voucher voucher) {
+        if (voucher.getLimitQuantity() <= 0) {
+            voucher.setStatus(Const.STATUS_INACTIVE);
+        }
         return voucherRepository.save(voucher);
     }
 

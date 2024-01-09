@@ -41,7 +41,7 @@ public interface VoucherService {
 
     Voucher findVoucherByVoucherCode(String voucherCode) throws NotFoundException;
 
-    Voucher isVoucherUsable(String voucherCode);
+    Voucher isVoucherUsable(String voucherCode, LocalDateTime dateTimeOrder);
 
     Boolean isCheckTimeUse(String voucherCode, String username);
 

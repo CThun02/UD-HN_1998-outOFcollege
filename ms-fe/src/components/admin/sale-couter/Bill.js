@@ -1596,6 +1596,7 @@ const Bill = () => {
           const data = await res.data;
           setVoucherAdd(data);
         } catch (err) {
+          setVoucherAdd({});
           notification.error({
             message: "Lỗi",
             description: "Hệ thống xảy ra lỗi",
@@ -1605,7 +1606,7 @@ const Bill = () => {
       }
     }
     autoFillVoucher();
-  }, [totalPrice]);
+  }, [totalPrice, switchChange, typeShipping, selectedOption, price]);
 
   return (
     <>

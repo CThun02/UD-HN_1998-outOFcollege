@@ -1,0 +1,9 @@
+.optionColor {
+  display: inline-block;
+}
+
+.optionColor span {
+  padding: 2px 12px;
+  border-radius: 50%;
+  margin-right: 8px;
+}

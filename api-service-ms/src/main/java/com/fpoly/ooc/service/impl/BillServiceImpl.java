@@ -226,7 +226,7 @@ public class BillServiceImpl implements BillService {
         }
 
         if (StringUtils.isNotBlank(request.getVoucherCode())) {
-            Voucher voucher = voucherService.isVoucherUsable(request.getVoucherCode());
+            Voucher voucher = voucherService.isVoucherUsable(request.getVoucherCode(), bill.getCreatedAt());
 
             if (Objects.isNull(voucher)) {
                 throw new NotFoundException(ErrorCodeConfig.getFormatMessage(Const.ERROR_VOUCHER_CODE_NOT_FOUND, request.getVoucherCode()));
@@ -235,6 +235,7 @@ public class BillServiceImpl implements BillService {
             if (voucher.getLimitQuantity() <= 0) {
                 throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_VOUCHER_USABLE));
             }
+
 
             voucher.setLimitQuantity(voucher.getLimitQuantity() - 1);
             voucherService.updateVoucher(voucher);

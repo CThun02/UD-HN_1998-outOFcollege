@@ -371,9 +371,6 @@ const BillManagement = () => {
             CarOutlined,
             CheckCircleOutlined,
             CloseCircleOutlined,
-            CheckCircleOutlined,
-            ClockCircleOutlined,
-            ClockCircleOutlined,
           ].map((Icon, i) => {
             const id = String(i + 1);
             return {
@@ -393,12 +390,6 @@ const BillManagement = () => {
                       ? countBill.complete
                       : id === "6"
                       ? countBill.cancel
-                      : id === "7"
-                      ? countBill?.paid
-                      : id === "8"
-                      ? countBill?.unpaid
-                      : id === "9"
-                      ? countBill.returnS
                       : null
                   }
                 >
@@ -416,12 +407,6 @@ const BillManagement = () => {
                       ? "Đã hoàn thành"
                       : id === "6"
                       ? "Đã hủy"
-                      : id === "7"
-                      ? "Đã thanh toán"
-                      : id === "8"
-                      ? "Chưa thanh toán"
-                      : id === "9"
-                      ? "Trả hàng"
                       : ""}
                   </span>
                 </Badge>
@@ -430,11 +415,11 @@ const BillManagement = () => {
                 id === "1"
                   ? ""
                   : id === "2"
-                  ? "Client"
+                  ? "wait_for_confirm"
                   : id === "3"
-                  ? "Confirmed"
+                  ? "wait_for_delivery"
                   : id === "4"
-                  ? "Shipping"
+                  ? "delivering"
                   : id === "5"
                   ? "Complete"
                   : id === "6"

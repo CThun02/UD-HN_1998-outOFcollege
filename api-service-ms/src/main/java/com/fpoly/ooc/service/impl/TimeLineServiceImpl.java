@@ -178,6 +178,7 @@ public class TimeLineServiceImpl implements TimeLineService {
                     statusBill = "Cancel";
                 } else {
                     statusBill = "Complete";
+                    paymentService.savePaymentDetail(billId);
                 }
                 bill.setStatus(statusBill);
                 timeline.setStatus(request.getStatus());

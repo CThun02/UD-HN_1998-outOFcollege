@@ -198,6 +198,10 @@ public class BillServiceImpl implements BillService {
             paymentDetail2Nd.setStatus(statusPaymentDetail);
             paymentDetailRepo.save(paymentDetail2Nd);
         } else {
+            if (!request.getIsSellingAdmin() && request.getPaymentDetailId() == 1) {
+                statusPaymentDetail = "Unpaid";
+            }
+
             PaymentDetail paymentDetail = new PaymentDetail();
             paymentDetail.setBill(bill);
             paymentDetail.setPayment(Payment.builder().id(request.getPaymentDetailId()).build());
@@ -287,13 +291,13 @@ public class BillServiceImpl implements BillService {
                         null, null, null, null, billType).size());
         countQuantityBillResponse
                 .setCountConfirmS(billRepo.getAllBillManagement(null, startDate, endDate,
-                        null, "Shipping", 2, null, billType).size());
+                        "wait_for_delivery", "Shipping", 2, null, billType).size());
         countQuantityBillResponse
                 .setCountConfirmW(billRepo.getAllBillManagement(null, startDate, endDate,
-                        null, null, null, "CLIENT", billType).size());
+                        "wait_for_confirm", null, null, null, billType).size());
         countQuantityBillResponse
                 .setShipping(billRepo.getAllBillManagement(null, startDate, endDate,
-                        null, "Shipping", 3, null, billType).size());
+                        "delivering", "Shipping", 3, null, billType).size());
         countQuantityBillResponse.setCancel(billRepo.getAllBillManagement(null, startDate, endDate,
                 "Cancel", null, null, null, billType).size());
         countQuantityBillResponse.setComplete(billRepo.getAllBillManagement(null, startDate, endDate,

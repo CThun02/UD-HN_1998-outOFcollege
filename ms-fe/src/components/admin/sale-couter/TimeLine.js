@@ -851,7 +851,7 @@ const BillTimeLine = (addId) => {
                   <Col span={14}>
                     <span>
                       {billInfo?.lstPaymentDetail?.length >= 1
-                        ? billInfo?.lstPaymentDetail[0]?.price > 0
+                        ? billInfo?.lstPaymentDetail[0]?.status === "Paid"
                           ? billInfo?.lstPaymentDetail[0]?.paymentName ===
                             "Credit Card"
                             ? numeral(
@@ -864,7 +864,7 @@ const BillTimeLine = (addId) => {
                               ).format("0,0") +
                               " đ " +
                               "(Tiền mặt)"
-                          : "Khách chưa thanh toán"
+                          : "Thanh toán khi nhận hàng"
                         : null}
                     </span>
                     {billInfo?.lstPaymentDetail?.length > 1 && <span> | </span>}

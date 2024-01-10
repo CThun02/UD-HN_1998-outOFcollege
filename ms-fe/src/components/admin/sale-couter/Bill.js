@@ -401,7 +401,10 @@ const Bill = () => {
           }
         )
         .then((response) => {
-          setDistricts(response.data.data);
+          const data = response?.data?.data?.filter(
+            (item) => item?.DistrictID !== 3451
+          );
+          setDistricts(data);
         })
         .catch((error) => {
           console.error(error);
@@ -1118,9 +1121,9 @@ const Bill = () => {
       sdt: Yup.string()
         .required("Số điện thoại không được để trống")
         .matches(/^[0-9]{10}$/, "Số điện thoại phải có đúng 10 chữ số"),
-      city: Yup.string().required("Tỉnh/thành phố không được để trống"),
-      district: Yup.string().required("Quận/huyện không được để trống"),
-      ward: Yup.string().required("Phường/xã không được để trống"),
+      city: Yup.string().required("Tỉnh/ thành phố không được để trống"),
+      district: Yup.string().required("Quận/ huyện không được để trống"),
+      ward: Yup.string().required("Phường/ xã không được để trống"),
       email: Yup.string().email("Địa chỉ email không hợp lệ"),
     });
 
@@ -1575,7 +1578,7 @@ const Bill = () => {
                         <Col span={8}>
                           <div className="m-5">
                             <span>
-                              <b style={{ color: "red" }}>*</b> Tỉnh/thành phố
+                              <b style={{ color: "red" }}>*</b> Tỉnh/ thành phố
                             </span>
                             <br />
                             <Select
@@ -1614,17 +1617,18 @@ const Bill = () => {
                         <Col span={8}>
                           <div className="m-5">
                             <span>
-                              <b style={{ color: "red" }}>*</b> Quận/huyện
+                              <b style={{ color: "red" }}>*</b> Quận/ huyện
                             </span>
                             <br />
                             <Select
                               style={{ width: "100%" }}
-                              onChange={(event) =>
+                              onChange={(event) => {
                                 handleDistrictChange(
                                   event?.substring(event.indexOf("|") + 1),
                                   event
-                                )
-                              }
+                                );
+                                console.log("data: ", event);
+                              }}
                               value={
                                 selectedAddress?.district
                                   ? selectedAddress?.district.substring(
@@ -1656,7 +1660,7 @@ const Bill = () => {
                         <Col span={8}>
                           <div className="m-5">
                             <span>
-                              <b style={{ color: "red" }}>*</b> Phường/xã
+                              <b style={{ color: "red" }}>*</b> Phường/ xã
                             </span>
                             <br />
                             <Select

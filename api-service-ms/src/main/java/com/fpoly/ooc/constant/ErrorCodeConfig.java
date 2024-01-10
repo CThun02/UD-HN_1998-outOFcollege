@@ -70,6 +70,8 @@ public class ErrorCodeConfig {
         errors.put("ERROR_BILL_THAN_FIVE_MILLION", "Hóa đơn vượt quá 5 triệu, vui lòng liên hệ cửa hàng để thực hiện!");
         errors.put("ERROR_BUY_PRICE_THAN_FIVE_MILLION", "Số lượng mua vượt quá 5 triệu, vui lòng liên hệ cửa hàng để thực hiện!");
         errors.put("ERROR_QUANTITY_INVALID", "Số lượng mua không hợp lệ!");
+        errors.put("ERROR_NOT_CANCEL_BILL_WHEN_NOT_STATUS_WAIT_FOR_CONFIRM", "Chỉ hủy hóa đơn khi đơn đang chờ xác nhận.");
+        errors.put("ERROR_NOT_CANCEL_BILL_WHEN_BILL_ALREADY", "Đơn hàng đã thanh toán không thể hủy.");
 
 
         // SEND_EMAIL_TEMPLATE

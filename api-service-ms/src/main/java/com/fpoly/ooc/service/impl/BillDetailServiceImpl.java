@@ -5,6 +5,7 @@ import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
 import com.fpoly.ooc.entity.Bill;
 import com.fpoly.ooc.entity.BillDetail;
+import com.fpoly.ooc.entity.DeliveryNote;
 import com.fpoly.ooc.entity.ProductDetail;
 import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.BillDetailRepo;
@@ -20,6 +21,7 @@ import com.fpoly.ooc.service.interfaces.DeliveryNoteService;
 import com.fpoly.ooc.service.interfaces.PaymentService;
 import com.fpoly.ooc.service.interfaces.ProductDetailServiceI;
 import com.fpoly.ooc.service.interfaces.TimeLineService;
+import com.fpoly.ooc.util.CommonUtils;
 import jakarta.persistence.LockModeType;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -253,8 +255,13 @@ public class BillDetailServiceImpl implements BillDetailService {
             }
         }
 
+        DeliveryNote deliveryNote = deliveryNoteService.getDeliveryNoteByBill_Id(bill.getId());
         BigDecimal priceBill = billDetailRepo.getTotalPriceByBillCode(bill.getBillCode());
         bill.setPrice(priceBill);
+        double priceBillAmount = CommonUtils.bigDecimalConvertDouble(priceBill)
+                + CommonUtils.bigDecimalConvertDouble(deliveryNote.getShipPrice())
+                - CommonUtils.bigDecimalConvertDouble(bill.getPriceReduce());
+        bill.setAmountPaid(new BigDecimal(priceBillAmount));
         billService.updateBill(bill);
         return savedBillDetail;
     }

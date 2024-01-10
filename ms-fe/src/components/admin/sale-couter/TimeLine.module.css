@@ -68,3 +68,30 @@
 .fixH6 {
   margin-left: -530px;
 }
+
+.elementDiv {
+  width: 80%;
+  padding: 6px 0;
+  color: #fff;
+  background-color: #1677ff;
+  text-align: center;
+  border-radius: 30px;
+  /* border: 1px solid #111111; */
+}
+
+.elementDiv span {
+  padding: 0 4px;
+}
+
+.padding {
+  padding: 6px 0;
+}
+
+.padding > span {
+  color: #111111;
+  font-weight: 500;
+}
+
+.size {
+  width: 100%;
+}

@@ -215,17 +215,14 @@ const ModalBillInfoDisplay = ({ open, cancel, billCode }) => {
                     </Text>
                     <Text>
                       Giảm giá:{" "}
-                      {bill?.amountPaid?.toLocaleString("vi-VN", {
+                      {bill?.priceReduce?.toLocaleString("vi-VN", {
                         style: "currency",
                         currency: "VND",
                       })}
                     </Text>
                     <Text>
                       Tổng cộng:{" "}
-                      {(
-                        bill?.amountPaid -
-                        (bill?.priceReduce + bill?.shippingFee)
-                      ).toLocaleString("vi-VN", {
+                      {bill?.amountPaid?.toLocaleString("vi-VN", {
                         style: "currency",
                         currency: "VND",
                       })}
@@ -283,12 +280,14 @@ const ModalBillInfoDisplay = ({ open, cancel, billCode }) => {
                       <strong>{`${moment(
                         bill?.billCreatedAt,
                         "DD/MM/YYYY HH:mm"
-                      ).date()}`}</strong>
+                      ).date()}`}</strong>{" "}
                       tháng{" "}
-                      <strong>{`${moment(
-                        bill?.billCreatedAt,
-                        "DD/MM/YYYY HH:mm"
-                      ).month()}`}</strong>{" "}
+                      <strong>{`${
+                        moment(
+                          bill?.billCreatedAt,
+                          "DD/MM/YYYY HH:mm"
+                        ).month() + 1
+                      }`}</strong>{" "}
                       năm{" "}
                       <strong>{`${moment(
                         bill?.billCreatedAt,
@@ -516,16 +515,13 @@ const ModalBillInfoDisplay = ({ open, cancel, billCode }) => {
                           })}
                         </span>
                         <span className={`${style.span} ${style.cssText}`}>
-                          {bill?.voucherPrice?.toLocaleString("vi-VN", {
+                          {bill?.priceReduce?.toLocaleString("vi-VN", {
                             style: "currency",
                             currency: "VND",
                           })}
                         </span>
                         <span className={`${style.span} ${style.cssText}`}>
-                          {(bill?.priceReduce === bill.voucherPrice
-                            ? bill?.shipPrice
-                            : bill?.priceReduce + bill?.shippingFee
-                          ).toLocaleString("vi-VN", {
+                          {bill?.amountPaid?.toLocaleString("vi-VN", {
                             style: "currency",
                             currency: "VND",
                           })}

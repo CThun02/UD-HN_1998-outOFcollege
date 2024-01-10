@@ -13,4 +13,6 @@ public interface PaymentService {
 
     PaymentDetail savePaymentDetail(Long billId) throws NotFoundException;
 
+    Boolean isBillAlreadyPaid(Long billId);
+
 }

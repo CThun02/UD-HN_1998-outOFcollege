@@ -17,4 +17,6 @@ public class TimeLinerequest {
 
     private String createdBy;
 
+    private Boolean paymentInDelivery;
+
 }

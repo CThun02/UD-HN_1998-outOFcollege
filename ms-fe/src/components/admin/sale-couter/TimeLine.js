@@ -426,6 +426,14 @@ const BillTimeLine = (addId) => {
       },
     },
     {
+      title: "Đơn vị tính",
+      dataIndex: "unitType",
+      key: "unitType",
+      render: () => {
+        return "Cái";
+      },
+    },
+    {
       title: "Số lượng",
       dataIndex: "quantity",
       key: "quantity",
@@ -461,7 +469,7 @@ const BillTimeLine = (addId) => {
       },
     },
     {
-      title: "Giá/ 1 sản phẩm",
+      title: "Giá",
       dataIndex: "productPrice",
       key: "productPrice",
       render: (price) => {

@@ -280,12 +280,14 @@ const ModalBillInfoDisplay = ({ open, cancel, billCode }) => {
                       <strong>{`${moment(
                         bill?.billCreatedAt,
                         "DD/MM/YYYY HH:mm"
-                      ).date()}`}</strong>
+                      ).date()}`}</strong>{" "}
                       tháng{" "}
-                      <strong>{`${moment(
-                        bill?.billCreatedAt,
-                        "DD/MM/YYYY HH:mm"
-                      ).month()}`}</strong>{" "}
+                      <strong>{`${
+                        moment(
+                          bill?.billCreatedAt,
+                          "DD/MM/YYYY HH:mm"
+                        ).month() + 1
+                      }`}</strong>{" "}
                       năm{" "}
                       <strong>{`${moment(
                         bill?.billCreatedAt,

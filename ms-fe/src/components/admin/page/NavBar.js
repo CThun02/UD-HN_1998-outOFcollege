@@ -55,9 +55,6 @@ const NavBar = () => {
         console.log("testMessage1");
         clearNotification();
       }
-      console.log("testMessage2: ", successMessage);
-      console.log("testMessage3: ", context);
-      console.log("testMessage2: ", isCheck);
     }
 
     notification();

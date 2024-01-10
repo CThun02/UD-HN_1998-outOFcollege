@@ -52,6 +52,7 @@ import com.fpoly.ooc.service.interfaces.VoucherAccountService;
 import com.fpoly.ooc.service.interfaces.VoucherHistoryService;
 import com.fpoly.ooc.service.interfaces.VoucherService;
 import com.fpoly.ooc.service.kafka.KafkaUtil;
+import com.fpoly.ooc.util.CommonUtils;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -198,14 +199,28 @@ public class BillServiceImpl implements BillService {
             paymentDetail2Nd.setStatus(statusPaymentDetail);
             paymentDetailRepo.save(paymentDetail2Nd);
         } else {
-            if (!request.getIsSellingAdmin() && request.getPaymentDetailId() == 1) {
-                statusPaymentDetail = "Unpaid";
+            PaymentDetail paymentDetail = new PaymentDetail();
+
+            if (!request.getIsSellingAdmin()) {
+                if (request.getPaymentDetailId() == 1) {
+                    statusPaymentDetail = "Unpaid";
+                    paymentDetail.setPrice(request.getAmountPaid());
+                }
+                if (request.getPaymentDetailId() == 2) {
+                    statusPaymentDetail = "Paid";
+                    paymentDetail.setPrice(request.getAmountPaid());
+                }
+            } else {
+                if(request.getPaymentDetailId() == 1) {
+                    paymentDetail.setPrice(request.getPriceAmountCast());
+                }
+                if(request.getPaymentDetailId() == 2) {
+                    paymentDetail.setPrice(request.getPriceAmountATM());
+                }
             }
 
-            PaymentDetail paymentDetail = new PaymentDetail();
             paymentDetail.setBill(bill);
             paymentDetail.setPayment(Payment.builder().id(request.getPaymentDetailId()).build());
-            paymentDetail.setPrice(request.getAmountPaid());
             paymentDetail.setStatus(statusPaymentDetail);
             paymentDetailRepo.save(paymentDetail);
         }
@@ -338,6 +353,10 @@ public class BillServiceImpl implements BillService {
     public Integer updateBillStatus(BillStatusDTO dto) throws JsonProcessingException, NotFoundException {
         log.warn("BillStatusDTORequest: " + dto);
 
+        if (Objects.isNull(dto)) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_NOT_FOUND));
+        }
+
         Bill bill = billRepo.findById(dto.getId()).orElse(null);
 
         if (Objects.isNull(bill)) {
@@ -355,9 +374,9 @@ public class BillServiceImpl implements BillService {
             VoucherHistory voucherHistory = voucherHistoryService.findHistoryByBillCode(bill.getBillCode());
             if (voucherHistory != null) {
                 VoucherAccount voucherAccount = voucherAccountService
-                        .findVoucherAccountByUsernameAndVoucherCode(bill.getAccount().getUsername(), voucherHistory.getVoucherCode());
+                        .findVoucherAccountByUsernameAndVoucherCode(Objects.nonNull(bill.getAccount()) ? bill.getAccount().getUsername() : null, voucherHistory.getVoucherCode());
                 Voucher voucher = null;
-                if (voucherAccount != null) {
+                if (Objects.nonNull(voucherAccount)) {
                     voucherAccount.setStatus(Const.STATUS_ACTIVE);
                     voucher = voucherAccount.getVoucherAccount();
                     voucherAccountService.updateStatus(voucherAccount);
@@ -600,44 +619,42 @@ public class BillServiceImpl implements BillService {
         }
 
         VoucherHistory voucherHistory = voucherHistoryService.findHistoryByBillCode(bill.getBillCode());
-        Double price = bigDecimalConvertDouble(bill.getPrice());
-        Double priceReduce = 0d;
+        double amountPrice = CommonUtils.bigDecimalConvertDouble(bill.getAmountPaid());
+        double price = CommonUtils.bigDecimalConvertDouble(bill.getPrice());
+        double priceReduce = 0d;
         if (voucherHistory != null) {
             Voucher voucher = voucherService.findVoucherByTimeOrderBill(voucherHistory.getVoucherCode(), bill.getCreatedAt());
 
-            if (Objects.nonNull(voucher) && Objects.nonNull(price)) {
-                Double condition = bigDecimalConvertDouble(voucher.getVoucherCondition());
-                if (Objects.nonNull(condition) && price > condition) {
+            if (Objects.nonNull(voucher)) {
+                Double condition = CommonUtils.bigDecimalConvertDouble(voucher.getVoucherCondition());
+                if (amountPrice > condition) {
                     if (("%").equals(voucher.getVoucherMethod())) {
-                        Double voucherValue = bigDecimalConvertDouble(voucher.getVoucherValue());
-                        priceReduce = Objects.nonNull(voucherValue) ? price * voucherValue / 100 : 0d;
-                        if (priceReduce > bigDecimalConvertDouble(voucher.getVoucherValueMax())) {
-                            priceReduce = bigDecimalConvertDouble(voucher.getVoucherValueMax());
+                        Double voucherValue = CommonUtils.bigDecimalConvertDouble(voucher.getVoucherValue());
+                        priceReduce = amountPrice * voucherValue / 100;
+                        if (priceReduce > CommonUtils.bigDecimalConvertDouble(voucher.getVoucherValueMax())) {
+                            priceReduce = CommonUtils.bigDecimalConvertDouble(voucher.getVoucherValueMax());
                         }
                     } else if (("VND").equalsIgnoreCase(voucher.getVoucherMethod())) {
-                        priceReduce = bigDecimalConvertDouble(voucher.getVoucherValue());
+                        priceReduce = CommonUtils.bigDecimalConvertDouble(voucher.getVoucherValue());
                     }
                 }
             }
         }
 
-        if (Objects.nonNull(bill.getPrice()) && Objects.nonNull(priceReduce)) {
-            price = bigDecimalConvertDouble(bill.getPrice()) - priceReduce;
-            bill.setPrice(bill.getPrice());
-            bill.setPriceReduce(new BigDecimal(price));
-            return billRepo.save(bill);
+        if (Objects.nonNull(bill.getPrice())) {
+            amountPrice = CommonUtils.bigDecimalConvertDouble(bill.getAmountPaid()) - priceReduce;
+            if (amountPrice > 0) {
+                bill.setAmountPaid(bill.getAmountPaid());
+                bill.setPriceReduce(new BigDecimal(priceReduce));
+                bill.setPrice(new BigDecimal(price));
+                return billRepo.save(bill);
+            }
         }
 
         return null;
     }
 
-    private Double bigDecimalConvertDouble(BigDecimal value) {
-        if (Objects.nonNull(value)) {
-            return Double.valueOf(String.valueOf(value));
-        }
 
-        return null;
-    }
 
     @Override
     public List<NotificationDTO> findAllNotifications() {

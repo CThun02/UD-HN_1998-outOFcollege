@@ -3,6 +3,7 @@ import {
   Carousel,
   Col,
   Divider,
+  Input,
   InputNumber,
   Row,
   Space,
@@ -61,13 +62,14 @@ const BillTimeLine = (addId) => {
   };
 
   // tạo mới timeline
-  const handleCreateTimeline = async (note, stauts, id) => {
+  const handleCreateTimeline = async (note, status, id, paymentInDelivery) => {
     const data = await token;
     const values = {
       timelineId: id,
       note: note,
-      status: stauts,
+      status: status,
       createdBy: data?.username + "_" + data?.fullName,
+      paymentInDelivery: paymentInDelivery === "Unpaid" ? true : false,
     };
     await axios
       .post(`http://localhost:8080/api/admin/timeline/${billId}`, values, {
@@ -125,9 +127,26 @@ const BillTimeLine = (addId) => {
   };
 
   const handleRollback = (note) => {
-    handleCreateTimeline(noteTimeline, `2Cancel`, timelineId);
+    let paymentInDelivery = null;
+    if (billInfo?.lstPaymentDetail.length > 0) {
+      if (billInfo?.lstPaymentDetail?.length === 1) {
+        paymentInDelivery = billInfo?.lstPaymentDetail[0].status === "Paid";
+      }
+
+      if (billInfo?.lstPaymentDetail?.length === 2) {
+        paymentInDelivery =
+          billInfo?.lstPaymentDetail[0].status === "Paid" &&
+          billInfo?.lstPaymentDetail[1].status === "Paid";
+      }
+    }
+    handleCreateTimeline(
+      noteTimeline,
+      `2Cancel`,
+      timelineId,
+      paymentInDelivery
+    );
     setTimeout(() => {
-      handleCreateTimeline(note, `Rollback`, null);
+      handleCreateTimeline(note, `Rollback`, null, paymentInDelivery);
     }, 1000);
     setIsModalConfirm(false);
   };
@@ -290,6 +309,18 @@ const BillTimeLine = (addId) => {
         }
       )
       .then((response) => {
+        let paymentInDelivery = null;
+        if (billInfo?.lstPaymentDetail.length > 0) {
+          if (billInfo?.lstPaymentDetail?.length === 1) {
+            paymentInDelivery = billInfo?.lstPaymentDetail[0].status === "Paid";
+          }
+
+          if (billInfo?.lstPaymentDetail?.length === 2) {
+            paymentInDelivery =
+              billInfo?.lstPaymentDetail[0].status === "Paid" &&
+              billInfo?.lstPaymentDetail[1].status === "Paid";
+          }
+        }
         notification.success({
           message: "Thông báo",
           description: "Cập nhật thành công",
@@ -302,7 +333,8 @@ const BillTimeLine = (addId) => {
               : Math.abs(Number(quantityOld) - Number(value))
           } `,
           "Update",
-          null
+          null,
+          paymentInDelivery
         );
         setRender(Math.random());
       })
@@ -733,82 +765,89 @@ const BillTimeLine = (addId) => {
         <Row>
           <Col span={12}>
             <Row>
-              <Col span={12}>
+              <Col span={12} className={styles.padding}>
                 <span>Mã đơn hàng</span>
               </Col>
               <Col span={12}>
-                <SpanBorder child={billInfo?.billCode} color={"#1677ff"} />
+                <div className={`${styles.elementDiv}`}>
+                  <span>{billInfo?.billCode}</span>
+                </div>
               </Col>
             </Row>
             <Row>
-              <Col span={12}>
+              <Col span={12} className={styles.padding}>
                 <span>Hình thức mua hàng</span>
               </Col>
               <Col span={12}>
-                <SpanBorder
-                  child={
-                    billInfo?.billType === "In-Store"
+                <div className={`${styles.elementDiv}`}>
+                  <span>
+                    {billInfo?.billType === "In-Store"
                       ? "Tại quầy"
-                      : "Trực tuyến"
-                  }
-                  color={"#1677ff"}
-                />
+                      : "Trực tuyến"}
+                  </span>
+                </div>
               </Col>
             </Row>
             <Row>
-              <Col span={12}>
+              <Col span={12} className={styles.padding}>
                 <span>Ngày mua hàng</span>
               </Col>
               <Col span={12}>
-                <SpanBorder child={billInfo?.createdDate} color={"#1677ff"} />
+                <div className={`${styles.elementDiv}`}>
+                  <span>{billInfo?.createdDate}</span>
+                </div>
               </Col>
             </Row>
             <Row>
-              <Col span={12}>
+              <Col span={12} className={styles.padding}>
                 <span>Mã giao dịch</span>
               </Col>
               <Col span={12}>
-                <SpanBorder
-                  child={billInfo?.transaction || "__"}
-                  color={"#1677ff"}
-                />
+                <div className={`${styles.elementDiv}`}>
+                  <span>
+                    {billInfo?.transaction || "Không có mã giao dịch"}
+                  </span>
+                </div>
               </Col>
             </Row>
             <Row>
-              <Col span={12}>
+              <Col span={12} className={styles.padding}>
                 <span>Phương thức thanh toán</span>
               </Col>
               <Col span={12}>
-                <SpanBorder
-                  child={
-                    (billInfo?.lstPaymentDetail?.length > 1
+                <div className={`${styles.elementDiv}`}>
+                  <span>
+                    {(billInfo?.lstPaymentDetail?.length > 1
                       ? "Tiền mặt + Chuyển khoản"
                       : billInfo?.lstPaymentDetail?.length === 1
                       ? billInfo?.lstPaymentDetail[0].paymentName === "Cash"
                         ? "Tiền mặt"
                         : "Chuyển khoản"
-                      : "") || "__"
-                  }
-                  color={"#1677ff"}
-                />
+                      : "") || "__"}
+                  </span>
+                </div>
               </Col>
             </Row>
             {billInfo?.symbol === "Shipping" && (
               <>
                 <Row>
-                  <Col span={12}>
+                  <Col span={12} className={styles.padding}>
                     <span>Hình thức giao hàng </span>
                   </Col>
                   <Col span={12}>
-                    <SpanBorder child={"Giao hàng tại nhà"} color={"gray"} />
+                    <div className={`${styles.elementDiv}`}>
+                      <span>{"Giao hàng tại nhà"}</span>
+                    </div>
                   </Col>
                 </Row>
                 <Row>
-                  <Col span={12}>
+                  <Col span={12} className={styles.padding}>
                     <span>Ngày nhận hàng dự kiến</span>
                   </Col>
                   <Col span={12}>
-                    <span>{billInfo?.shipDate || "__"}</span>
+                    <div className={`${styles.elementDiv}`}>
+                      <span>{billInfo?.shipDate || "<Không có dữ liệu>"}</span>
+                    </div>
                   </Col>
                 </Row>
               </>
@@ -818,37 +857,44 @@ const BillTimeLine = (addId) => {
             <Row>
               <Col span={24}>
                 <Row>
-                  <Col span={10}>
+                  <Col span={10} className={styles.padding}>
                     <h6>Tên khách hàng</h6>
                   </Col>
                   <Col span={14}>
-                    <span>
-                      {billInfo?.fullName
-                        ? billInfo?.fullName
-                        : billInfo.accountName}
-                    </span>
+                    <div className={`${styles.elementDiv} ${styles.size}`}>
+                      <span>
+                        {billInfo?.billType !== "In-Store"
+                          ? billInfo?.fullName
+                            ? billInfo?.fullName
+                            : billInfo?.accountName
+                          : "Khách hàng mua tại quầy"}
+                      </span>
+                    </div>
                   </Col>
                 </Row>
               </Col>
               <Col span={24}>
                 <Row>
-                  <Col span={10}>
-                    <span>Số diện thoại</span>
+                  <Col span={10} className={styles.padding}>
+                    <span>Số điện thoại</span>
                   </Col>
                   <Col span={14}>
-                    <span>{billInfo?.phoneNumber || "__"}</span>
+                    <div className={`${styles.elementDiv} ${styles.size}`}>
+                      <span>{billInfo?.phoneNumber || "Không có dữ liệu"}</span>
+                    </div>
                   </Col>
                 </Row>
               </Col>
               <Col span={24}>
                 <Row>
-                  <Col span={10}>
+                  <Col span={10} className={styles.padding}>
                     <span>Địa chỉ</span>
                   </Col>
                   <Col span={14}>
-                    <span>
-                      {billInfo?.ward
-                        ? `${billInfo?.addressDetail ?? ""} 
+                    <div className={`${styles.elementDiv} ${styles.size}`}>
+                      <span>
+                        {billInfo?.ward
+                          ? `${billInfo?.addressDetail ?? ""} 
                                         ${billInfo?.ward?.substring(
                                           0,
                                           billInfo?.ward?.indexOf("|")
@@ -861,96 +907,95 @@ const BillTimeLine = (addId) => {
                                           0,
                                           billInfo?.city?.indexOf("|")
                                         )}`
-                        : "__"}
-                    </span>
+                          : "Không có dữ liệu"}
+                      </span>
+                    </div>
                   </Col>
                 </Row>
               </Col>
               <Col span={24}>
                 <Row>
-                  <Col span={10}>
+                  <Col span={10} className={styles.padding}>
                     <span>Số tiền khách trả</span>
                   </Col>
                   <Col span={14}>
-                    <span>
-                      {billInfo?.lstPaymentDetail?.length >= 1
-                        ? billInfo?.lstPaymentDetail[0]?.status === "Paid"
-                          ? billInfo?.lstPaymentDetail[0]?.paymentName ===
+                    <div className={`${styles.elementDiv} ${styles.size}`}>
+                      <span>
+                        {billInfo?.lstPaymentDetail?.length >= 1
+                          ? billInfo?.lstPaymentDetail[0]?.status === "Paid"
+                            ? billInfo?.lstPaymentDetail[0]?.paymentName ===
+                              "Credit Card"
+                              ? numeral(
+                                  billInfo?.lstPaymentDetail[0]?.price
+                                ).format("0,0") +
+                                " đ " +
+                                "(Chuyển khoản)"
+                              : numeral(
+                                  billInfo?.lstPaymentDetail[0]?.price
+                                ).format("0,0") +
+                                " đ " +
+                                "(Tiền mặt)"
+                            : "Thanh toán khi nhận hàng"
+                          : null}
+                      </span>
+                      {billInfo?.lstPaymentDetail?.length > 1 && (
+                        <span> | </span>
+                      )}
+                      <span>
+                        {billInfo?.lstPaymentDetail?.length === 2
+                          ? billInfo?.lstPaymentDetail[1]?.paymentName ===
                             "Credit Card"
                             ? numeral(
-                                billInfo?.lstPaymentDetail[0]?.price
+                                billInfo?.lstPaymentDetail[1]?.price
                               ).format("0,0") +
                               " đ " +
                               "(Chuyển khoản)"
                             : numeral(
-                                billInfo?.lstPaymentDetail[0]?.price
+                                billInfo?.lstPaymentDetail[1]?.price
                               ).format("0,0") +
                               " đ " +
                               "(Tiền mặt)"
-                          : "Thanh toán khi nhận hàng"
-                        : null}
-                    </span>
-                    {billInfo?.lstPaymentDetail?.length > 1 && <span> | </span>}
-                    <span>
-                      {billInfo?.lstPaymentDetail?.length === 2
-                        ? billInfo?.lstPaymentDetail[1]?.paymentName ===
-                          "Credit Card"
-                          ? numeral(
-                              billInfo?.lstPaymentDetail[1]?.price
-                            ).format("0,0") +
-                            " đ " +
-                            "(Chuyển khoản)"
-                          : numeral(
-                              billInfo?.lstPaymentDetail[1]?.price
-                            ).format("0,0") +
-                            " đ " +
-                            "(Tiền mặt)"
-                        : null}
-                    </span>
+                          : null}
+                      </span>
+                    </div>
                   </Col>
                 </Row>
               </Col>
               <Col span={24}>
                 <Row>
-                  <Col span={10}>
+                  <Col span={10} className={styles.padding}>
                     <span>Tiền thừa</span>
                   </Col>
                   <Col span={14}>
-                    <span>
-                      {billInfo?.lstPaymentDetail?.length === 2 &&
-                        (billInfo?.lstPaymentDetail[0]?.price +
-                          billInfo?.lstPaymentDetail[1]?.price -
-                          billInfo?.amountPaid >
-                        0
-                          ? billInfo?.lstPaymentDetail[0]?.price +
+                    <div className={`${styles.elementDiv} ${styles.size}`}>
+                      <span>
+                        {billInfo?.lstPaymentDetail?.length === 2 &&
+                          (billInfo?.lstPaymentDetail[0]?.price +
                             billInfo?.lstPaymentDetail[1]?.price -
-                            billInfo?.amountPaid
-                          : 0
-                        ).toLocaleString("vi-VN", {
-                          style: "currency",
-                          currency: "VND",
-                        })}
+                            billInfo?.amountPaid >
+                          0
+                            ? billInfo?.lstPaymentDetail[0]?.price +
+                              billInfo?.lstPaymentDetail[1]?.price -
+                              billInfo?.amountPaid
+                            : 0
+                          ).toLocaleString("vi-VN", {
+                            style: "currency",
+                            currency: "VND",
+                          })}
 
-                      {billInfo?.lstPaymentDetail?.length === 1 &&
-                        (billInfo?.lstPaymentDetail[0]?.price -
-                          billInfo?.amountPaid >
-                        0
-                          ? billInfo?.lstPaymentDetail[0]?.price -
-                            billInfo?.amountPaid
-                          : 0
-                        ).toLocaleString("vi-VN", {
-                          style: "currency",
-                          currency: "VND",
-                        })}
-                      {/* {(billInfo?.amountPaid > 0
-                        ? billInfo?.amountPaid -
-                          (billInfo?.priceReduce + billInfo?.shipPrice)
-                        : 0
-                      ).toLocaleString("vi-VN", {
-                        style: "currency",
-                        currency: "VND",
-                      })} */}
-                    </span>
+                        {billInfo?.lstPaymentDetail?.length === 1 &&
+                          (billInfo?.lstPaymentDetail[0]?.price -
+                            billInfo?.amountPaid >
+                          0
+                            ? billInfo?.lstPaymentDetail[0]?.price -
+                              billInfo?.amountPaid
+                            : "Không có tiền thừa"
+                          ).toLocaleString("vi-VN", {
+                            style: "currency",
+                            currency: "VND",
+                          })}
+                      </span>
+                    </div>
                   </Col>
                 </Row>
               </Col>
@@ -1012,19 +1057,48 @@ const BillTimeLine = (addId) => {
         />
         <div className={styles.timeLineEnd}>
           <span className={styles.span}>
-            <span style={{ width: "198px", display: "inline-block" }}>
+            <span
+              style={{
+                width: "198px",
+                display: "inline-block",
+                color: "#111111",
+                fontWeight: "500",
+              }}
+            >
               Thành tiền:
             </span>
             <span>{numeral(billInfo?.totalPrice).format("0,0") + "đ"}</span>
           </span>
           <span className={styles.span}>
-            <span style={{ width: "198px", display: "inline-block" }}>
+            <span
+              style={{
+                width: "198px",
+                display: "inline-block",
+                color: "#111111",
+                fontWeight: "500",
+              }}
+            >
               Giá vận chuyển:
             </span>
-            <span>{numeral(billInfo?.shipPrice).format("0,0") + "đ"}</span>
+            <span>
+              <Input
+                placeholder="Giá vận chuyển"
+                style={{ width: "30%" }}
+                value={numeral(billInfo?.shipPrice).format("0,0")}
+              />
+            </span>
+
+            {/* <span>{numeral(billInfo?.shipPrice).format("0,0") + "đ"}</span> */}
           </span>
           <span className={styles.span}>
-            <span style={{ width: "200px", display: "inline-block" }}>
+            <span
+              style={{
+                width: "200px",
+                display: "inline-block",
+                color: "#111111",
+                fontWeight: "500",
+              }}
+            >
               Giảm giá:
             </span>
             <span>{numeral(billInfo?.priceReduce)?.format("0,0") + "đ"}</span>

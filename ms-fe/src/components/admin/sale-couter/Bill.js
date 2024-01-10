@@ -994,12 +994,12 @@ const Bill = () => {
       phoneNumber: selectedAddress?.numberPhone,
       voucherCode: voucherAdd?.voucherCode ?? null,
       // createdBy: token,
-      priceAmountCast:
-        Number(selectedOption) !== 2
-          ? price
-            ? price.replace(/[,]/g, "")
-            : null
-          : null,
+      priceAmountCast: price ? price.replace(/[,]/g, "") : null,
+      // Number(selectedOption) !== 2
+      //   ? price
+      //     ? price.replace(/[,]/g, "")
+      //     : null
+      //   : null,
       emailDetails: {
         recipient: selectedAddress?.email ? [selectedAddress?.email] : [email],
         messageBody: `<body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: Arial, sans-serif;">
@@ -1126,11 +1126,18 @@ const Bill = () => {
       ward: Yup.string().required("Phường/ xã không được để trống"),
       email: Yup.string().email("Địa chỉ email không hợp lệ"),
     });
-
+    let calculatedValue = 0;
+    if (switchChange[index]) {
+      calculatedValue = totalPrice - voucherPrice() + shippingFee;
+    } else {
+      calculatedValue = totalPrice - voucherPrice();
+    }
+    const customerAmountPay =
+      totalPrice - voucherPrice() + (shippingFee ? shippingFee : 0);
     if (!typeShipping[index]) {
       if (Number(selectedOption) === 1) {
         const priced = Number(price?.replace(",", ""));
-        if (priced < voucherPrice()) {
+        if (priced < customerAmountPay) {
           isError = true;
           setInputError("Vui lòng nhập số tiền cần thanh toán");
           return;
@@ -1181,13 +1188,13 @@ const Bill = () => {
         });
       }
 
-      if (
-        Number(selectedOption) === 1 &&
-        ((remainAmount < 0 && !typeShipping[index]) || isNaN(remainAmount))
-      ) {
-        console.log("remainAmount: ", remainAmount);
-        isError = true;
-        return setInputError("Nhập đủ số tiền cần thanh toán");
+      if (Number(selectedOption) === 1) {
+        const priceNumber = Number(price.replace(",", ""));
+        if (priceNumber < Number(calculatedValue)) {
+          console.log("remainAmount: ", remainAmount);
+          isError = true;
+          return setInputError("Nhập đủ số tiền cần thanh toán");
+        }
       }
 
       if (Number(selectedOption) === 3 || Number(selectedOption) === 2) {
@@ -1216,6 +1223,21 @@ const Bill = () => {
         }
       }
     }
+
+    if (switchChange[index])
+      if (/^[+]?\d*\.?\d+$/.test(shippingFee)) {
+        if (shippingFee < 10000) {
+          isError = true;
+          setShippingFeeError("Số tiền vận chuyển quá nhỏ");
+        } else if (shippingFee > 1000000) {
+          isError = true;
+          setShippingFeeError("Số tiền vận chuyển quá lớn");
+        } else {
+          isError = false;
+          setShippingFeeError("");
+        }
+      }
+
     if (!isError) {
       for (let i = 0; i < productDetails?.length; i++) {
         const billDetail = {
@@ -1317,6 +1339,9 @@ const Bill = () => {
   const [priceATMError, setPriceATMError] = useState("");
 
   const handleChangeInput = (inputValue, index) => {
+    const totalPrice = productDetails?.reduce((total, product) => {
+      return total + product.priceReduce * product.quantity;
+    }, 0);
     setAmountPaid(inputValue);
     let calculatedValue = 0;
     if (switchChange[index]) {
@@ -1333,6 +1358,23 @@ const Bill = () => {
       setInputError("");
       setTransactionError("");
     }
+  };
+
+  const [shippingFeeError, setShippingFeeError] = useState("");
+  const handleChangeShippingFee = (value, index) => {
+    if (switchChange[index])
+      if (/^[+]?\d*\.?\d+$/.test(value)) {
+        const replaceValue = value.replace(",", "");
+        const data = Number(replaceValue);
+        if (data < 10000) {
+          setShippingFeeError("Số tiền vận chuyển quá nhỏ");
+        } else if (data > 1000000) {
+          setShippingFeeError("Số tiền vận chuyển quá lớn");
+        } else {
+          setShippingFeeError("");
+        }
+        setShippingFee(data);
+      }
   };
 
   useEffect(() => {
@@ -1748,7 +1790,7 @@ const Bill = () => {
                       </Button>
 
                       <Row style={{ marginTop: "10px" }}>
-                        <Col span={16}>
+                        <Col span={12}>
                           {" "}
                           <span
                             style={{
@@ -1759,7 +1801,7 @@ const Bill = () => {
                             Thành tiền
                           </span>
                         </Col>
-                        <Col span={8}>
+                        <Col span={12}>
                           <span
                             style={{
                               fontSize: "16px",
@@ -1771,7 +1813,7 @@ const Bill = () => {
                             })}
                           </span>
                         </Col>
-                        <Col span={16}>
+                        <Col span={12}>
                           <span
                             style={{
                               fontSize: "16px",
@@ -1782,7 +1824,7 @@ const Bill = () => {
                             Giảm giá
                           </span>
                         </Col>
-                        <Col span={8}>
+                        <Col span={12}>
                           <span
                             style={{
                               fontSize: "16px",
@@ -1800,23 +1842,11 @@ const Bill = () => {
                                 : voucherAdd?.voucherValue + "%"
                               : "0đ"}
                           </span>
-                          {voucherAdd.voucherId ? (
-                            <bttuon
-                              style={{
-                                marginLeft: "20px",
-                                color: "green",
-                                cursor: "pointer",
-                              }}
-                              onClick={() => setVoucherAdd({})}
-                            >
-                              ❌
-                            </bttuon>
-                          ) : null}
                         </Col>
 
                         {switchChange[index] && shippingFee && (
                           <>
-                            <Col span={16}>
+                            <Col span={12}>
                               <span
                                 style={{
                                   fontSize: "16px",
@@ -1826,21 +1856,35 @@ const Bill = () => {
                                 Phí vận chuyển
                               </span>
                             </Col>
-                            <Col span={8}>
-                              <span
-                                style={{
-                                  fontSize: "16px",
+                            <Col span={12}>
+                              <Input
+                                placeholder="Số tiền vận chuyển"
+                                className={styles.input_noneBorder}
+                                value={numeral(shippingFee).format("0,0")}
+                                onChange={(e) => {
+                                  handleChangeShippingFee(
+                                    e.target.value.replace(/\D/g, ""),
+                                    index
+                                  );
                                 }}
-                              >
-                                {shippingFee?.toLocaleString("vi-VN", {
-                                  style: "currency",
-                                  currency: "VND",
-                                })}
+                              />
+                              {inputError && (
+                                <span
+                                  style={{
+                                    width: "200%",
+                                    color: "red",
+                                  }}
+                                >
+                                  {shippingFeeError}
+                                </span>
+                              )}
+                              <span style={{ fontSize: "16px", color: "red" }}>
+                                {shippingFeeError}
                               </span>
                             </Col>
                           </>
                         )}
-                        <Col span={16}>
+                        <Col span={12}>
                           <span
                             style={{
                               fontSize: "16px",
@@ -1849,7 +1893,7 @@ const Bill = () => {
                             Tổng cộng
                           </span>
                         </Col>
-                        <Col span={8}>
+                        <Col span={12}>
                           {switchChange[index] ? (
                             <span
                               style={{
@@ -1887,7 +1931,7 @@ const Bill = () => {
                           !typeShipping[index]) ||
                         Number(selectedOption) === 3 ? (
                           <>
-                            <Col span={8} style={{ marginTop: "8px" }}>
+                            <Col span={12} style={{ marginTop: "8px" }}>
                               <span
                                 style={{
                                   fontSize: "16px",
@@ -1898,7 +1942,7 @@ const Bill = () => {
                                 Số tiền khách trả
                               </span>
                             </Col>
-                            <Col span={16}>
+                            <Col span={12}>
                               <Input
                                 className={styles.input_noneBorder}
                                 value={price}
@@ -1932,14 +1976,14 @@ const Bill = () => {
                           <Col span={24}>
                             {remainAmount > 0 && (
                               <Row style={{ marginTop: "8px" }}>
-                                <Col span={16}>
+                                <Col span={12}>
                                   <span
                                     style={{ fontSize: "16px", width: "200%" }}
                                   >
                                     Tiền thừa
                                   </span>
                                 </Col>
-                                <Col span={8}>
+                                <Col span={12}>
                                   <span
                                     style={{
                                       fontSize: "16px",

@@ -45,8 +45,8 @@ public class VoucherHistoryServiceImpl implements VoucherHistoryService {
     }
 
     @Override
-    public VoucherHistory findHistoryByBillCode(String billCode) {
-        return voucherHistoryRepository.findVoucherHistoryByBill_BillCode(billCode);
+    public VoucherHistory findHistoryByBillCodeAndStatus(String billCode, String status) {
+        return voucherHistoryRepository.findVoucherHistoryByBill_BillCodeAndStatus(billCode, status);
     }
 
     @Override

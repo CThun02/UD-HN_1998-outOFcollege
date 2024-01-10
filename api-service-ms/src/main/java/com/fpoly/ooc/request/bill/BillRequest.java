@@ -72,5 +72,11 @@ public class BillRequest {
 
     private EmailDetails emailDetails;
 
-    private BigDecimal priceAmount;
+    private BigDecimal priceAmountCast;
+
+    private BigDecimal priceAmountATM;
+    
+    private Boolean paymentInDelivery;
+
+    private Boolean isSellingAdmin;
 }

@@ -13,4 +13,5 @@ public class PaymentDetailResponse {
     private Long id;
     private String paymentName;
     private BigDecimal price;
+    private String status;
 }

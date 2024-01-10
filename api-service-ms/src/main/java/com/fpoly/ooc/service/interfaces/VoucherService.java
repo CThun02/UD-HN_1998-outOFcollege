@@ -9,6 +9,7 @@ import com.fpoly.ooc.responce.voucher.VoucherAccountResponse;
 import com.fpoly.ooc.responce.voucher.VoucherResponse;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -40,7 +41,7 @@ public interface VoucherService {
 
     Voucher findVoucherByVoucherCode(String voucherCode) throws NotFoundException;
 
-    Voucher isVoucherUsable(String voucherCode);
+    Voucher isVoucherUsable(String voucherCode, LocalDateTime dateTimeOrder);
 
     Boolean isCheckTimeUse(String voucherCode, String username);
 
@@ -51,5 +52,7 @@ public interface VoucherService {
     List<VoucherAccountResponse> getVoucherByUsernameAndVoucherCode(String username, String voucherCode);
 
     BigDecimal priceReduceByVoucherAndBillPrice(Voucher voucher, BigDecimal billPrice);
+
+    Voucher findVoucherByTimeOrderBill(String voucherCode, LocalDateTime timeOrder);
 
 }

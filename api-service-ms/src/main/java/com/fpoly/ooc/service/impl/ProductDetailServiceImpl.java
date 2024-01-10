@@ -3,9 +3,11 @@ package com.fpoly.ooc.service.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fpoly.ooc.common.Commons;
+import com.fpoly.ooc.common.SimpleSendProductDetail;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
 import com.fpoly.ooc.dto.ProductDetailsDTO;
+import com.fpoly.ooc.dto.UpdateQuantityProductDetailDTO;
 import com.fpoly.ooc.entity.*;
 import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.ProductDetailDAORepositoryI;
@@ -81,6 +83,7 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
             productDetail.setStatus(Const.STATUS_INACTIVE);
         }
         if (Objects.nonNull(productDetailtCheck)) {
+            log.error("productDetail: " + productDetail);
             kafkaUtil.sendingObjectWithKafka(productDetail, Const.TOPIC_PRODUCT_DETAIL);
         }
         return productDetailtCheck;
@@ -99,7 +102,7 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
 
     @Override
     public ProductDetail getOne(Long id) {
-        return repo.findById(id).orElse(null);
+        return repo.findProductDetailByIdAndStatus(id, Const.STATUS_ACTIVE);
     }
 
     @Override
@@ -139,7 +142,6 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
                 new NotFoundException(ErrorCodeConfig.getMessage(Const.PRODUCT_DETAIL_NOT_FOUND)));
         return productDetail;
     }
-
     @Override
     public BigDecimal getMaxPricePDByProductId(Long productId) {
         return repo.getMaxPricePDByProductId(productId);
@@ -319,6 +321,46 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
                 productDetail.getCollar().getId(), colorId, productDetail.getPattern().getId(), productDetail.getForm().getId(),
                 productDetail.getBrand().getId(), productDetail.getCategory().getId()):null;
         return sizes;
+    }
+
+    @Override
+    @Transactional(rollbackOn = Exception.class)
+    public ProductDetail updateQuantityProductDetail(UpdateQuantityProductDetailDTO req) throws NotFoundException, JsonProcessingException {
+
+        if (Objects.isNull(req)) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_SERVICE));
+        }
+
+        if (Objects.isNull(req.getProductDetail())) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.PRODUCT_DETAIL_NOT_FOUND));
+        }
+
+        if (Objects.nonNull(req.getQuantityCurrent()) && req.getQuantityCurrent() <= 0) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.LIMIT_QUANTITY_LESS_ZERO));
+        }
+
+        ProductDetail getOneProduct = getOne(req.getProductDetail().getId());
+        if (Objects.isNull(getOneProduct)) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.PRODUCT_DETAIL_NOT_FOUND));
+        }
+
+        int quantityUpdate = -1;
+        if (Objects.isNull(req.getQuantityUpdate())) {
+            getOneProduct.setQuantity(getOneProduct.getQuantity() - req.getQuantityCurrent());
+        } else {
+            if (req.getQuantityCurrent() > req.getQuantityUpdate()) {
+                quantityUpdate = req.getQuantityCurrent() - req.getQuantityUpdate();
+                getOneProduct.setQuantity(getOneProduct.getQuantity() + quantityUpdate);
+            } else {
+                quantityUpdate = req.getQuantityUpdate() - req.getQuantityCurrent();
+                if (getOneProduct.getQuantity() - quantityUpdate < 0) {
+                    throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BUY_QUANTITY_THAN_QUANTITY_IN_STORE));
+                }
+                getOneProduct.setQuantity(getOneProduct.getQuantity() - quantityUpdate);
+            }
+        }
+
+        return repo.save(getOneProduct);
     }
 
     @Override

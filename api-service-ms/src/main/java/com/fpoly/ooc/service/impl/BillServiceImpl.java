@@ -27,6 +27,7 @@ import com.fpoly.ooc.request.bill.BillDetailRequest;
 import com.fpoly.ooc.request.bill.BillRequest;
 import com.fpoly.ooc.request.product.ProductDetailRequest;
 import com.fpoly.ooc.request.voucher.DisplayVoucherRequest;
+import com.fpoly.ooc.request.voucher.VoucherRequest;
 import com.fpoly.ooc.responce.account.GetListCustomer;
 import com.fpoly.ooc.responce.bill.BillGrowthResponse;
 import com.fpoly.ooc.responce.bill.BillLineChartResponse;
@@ -121,6 +122,10 @@ public class BillServiceImpl implements BillService {
         Account accountBuilder = null;
         Boolean isUser = Boolean.FALSE;
 
+        if (Objects.isNull(request)) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_SERVICE));
+        }
+
         if (Objects.nonNull(request.getAccountId())) {
             isUser = Boolean.TRUE;
             accountBuilder = accountService.findByUsername(request.getAccountId());
@@ -155,8 +160,10 @@ public class BillServiceImpl implements BillService {
                 throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_SERVICE));
             }
 
-            if (productDetail.getQuantity() - billDetailRequest.getQuantity() < 0) {
-                throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BUY_QUANTITY_THAN_QUANTITY_IN_STORE));
+            if (Objects.nonNull(request.getIsSellingAdmin()) && !request.getIsSellingAdmin()) {
+                if (productDetail.getQuantity() - billDetailRequest.getQuantity() < 0) {
+                    throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BUY_QUANTITY_THAN_QUANTITY_IN_STORE));
+                }
             }
 
             BillDetail billDetail = BillDetail.builder()
@@ -173,30 +180,37 @@ public class BillServiceImpl implements BillService {
                 throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_SERVICE));
             }
 
-            productDetail.setQuantity(productDetail.getQuantity() - billDetail.getQuantity());
-            productDetailService.updateQuantityForBuy(productDetail);
+            if (Objects.nonNull(request.getIsSellingAdmin()) && !request.getIsSellingAdmin()) {
+                productDetail.setQuantity(productDetail.getQuantity() - billDetail.getQuantity());
+                productDetailService.updateQuantityForBuy(productDetail);
+            }
         }
 
+        String statusPaymentDetail = request.getPaymentInDelivery() ? "Unpaid" : "Paid";
         if (request.getPaymentDetailId() == 3) {
-            PaymentDetail paymentDetailLan1Nd = PaymentDetail.builder()
-                    .bill(bill)
-                    .payment(Payment.builder().id(1L).build())
-                    .price(request.getPriceAmount())
-                    .build();
+            PaymentDetail paymentDetailLan1Nd = new PaymentDetail();
+            paymentDetailLan1Nd.setBill(bill);
+            paymentDetailLan1Nd.setPayment(Payment.builder().id(1L).build());
+            paymentDetailLan1Nd.setPrice(request.getPriceAmountCast());
+            paymentDetailLan1Nd.setStatus(statusPaymentDetail);
             paymentDetailRepo.save(paymentDetailLan1Nd);
 
-            PaymentDetail paymentDetail2Nd = PaymentDetail.builder()
-                    .bill(bill)
-                    .payment(Payment.builder().id(2L).build())
-                    .price(bill.getPriceReduce().subtract(request.getPriceAmount()))
-                    .build();
+            PaymentDetail paymentDetail2Nd = new PaymentDetail();
+            paymentDetail2Nd.setBill(bill);
+            paymentDetail2Nd.setPayment(Payment.builder().id(2L).build());
+            paymentDetail2Nd.setPrice(request.getPriceAmountATM());
+            paymentDetail2Nd.setStatus(statusPaymentDetail);
             paymentDetailRepo.save(paymentDetail2Nd);
         } else {
-            PaymentDetail paymentDetail = PaymentDetail.builder()
-                    .bill(bill)
-                    .payment(Payment.builder().id(request.getPaymentDetailId()).build())
-                    .price(request.getPrice())
-                    .build();
+            if (!request.getIsSellingAdmin() && request.getPaymentDetailId() == 1) {
+                statusPaymentDetail = "Unpaid";
+            }
+
+            PaymentDetail paymentDetail = new PaymentDetail();
+            paymentDetail.setBill(bill);
+            paymentDetail.setPayment(Payment.builder().id(request.getPaymentDetailId()).build());
+            paymentDetail.setPrice(request.getAmountPaid());
+            paymentDetail.setStatus(statusPaymentDetail);
             paymentDetailRepo.save(paymentDetail);
         }
 
@@ -216,7 +230,7 @@ public class BillServiceImpl implements BillService {
         }
 
         if (StringUtils.isNotBlank(request.getVoucherCode())) {
-            Voucher voucher = voucherService.isVoucherUsable(request.getVoucherCode());
+            Voucher voucher = voucherService.isVoucherUsable(request.getVoucherCode(), bill.getCreatedAt());
 
             if (Objects.isNull(voucher)) {
                 throw new NotFoundException(ErrorCodeConfig.getFormatMessage(Const.ERROR_VOUCHER_CODE_NOT_FOUND, request.getVoucherCode()));
@@ -225,6 +239,7 @@ public class BillServiceImpl implements BillService {
             if (voucher.getLimitQuantity() <= 0) {
                 throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_VOUCHER_USABLE));
             }
+
 
             voucher.setLimitQuantity(voucher.getLimitQuantity() - 1);
             voucherService.updateVoucher(voucher);
@@ -281,13 +296,13 @@ public class BillServiceImpl implements BillService {
                         null, null, null, null, billType).size());
         countQuantityBillResponse
                 .setCountConfirmS(billRepo.getAllBillManagement(null, startDate, endDate,
-                        null, "Shipping", 2, null, billType).size());
+                        "wait_for_delivery", "Shipping", 2, null, billType).size());
         countQuantityBillResponse
                 .setCountConfirmW(billRepo.getAllBillManagement(null, startDate, endDate,
-                        null, null, null, "CLIENT", billType).size());
+                        "wait_for_confirm", null, null, null, billType).size());
         countQuantityBillResponse
                 .setShipping(billRepo.getAllBillManagement(null, startDate, endDate,
-                        null, "Shipping", 3, null, billType).size());
+                        "delivering", "Shipping", 3, null, billType).size());
         countQuantityBillResponse.setCancel(billRepo.getAllBillManagement(null, startDate, endDate,
                 "Cancel", null, null, null, billType).size());
         countQuantityBillResponse.setComplete(billRepo.getAllBillManagement(null, startDate, endDate,
@@ -341,7 +356,7 @@ public class BillServiceImpl implements BillService {
 
         billRepo.save(bill);
         if (dto.getStatus().equals("Cancel")) {
-            VoucherHistory voucherHistory = voucherHistoryService.findHistoryByBillCode(bill.getBillCode());
+            VoucherHistory voucherHistory = voucherHistoryService.findHistoryByBillCodeAndStatus(bill.getBillCode(), "ACTIVE");
             if (voucherHistory != null) {
                 VoucherAccount voucherAccount = voucherAccountService
                         .findVoucherAccountByUsernameAndVoucherCode(bill.getAccount().getUsername(), voucherHistory.getVoucherCode());
@@ -499,6 +514,15 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
+    public Bill saveBill(Bill bill) throws NotFoundException {
+        if (Objects.isNull(bill)) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_NOT_FOUND));
+        }
+
+        return billRepo.save(bill);
+    }
+
+    @Override
     public List<BillReturnRequestResponse> getReturnRequestByStatus(String status) {
         return billRepo.getReturnRequestByStatus(status);
     }
@@ -573,8 +597,13 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
+    @Transactional(rollbackOn = Exception.class)
     public Bill updateBill(Bill bill) throws NotFoundException {
-        VoucherHistory voucherHistory = voucherHistoryService.findHistoryByBillCode(bill.getBillCode());
+        if (Objects.isNull(bill)) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_NOT_FOUND));
+        }
+
+        VoucherHistory voucherHistory = voucherHistoryService.findHistoryByBillCodeAndStatus(bill.getBillCode(), "ACTIVE");
         BigDecimal price = bill.getPrice();
         BigDecimal priceReduce = BigDecimal.ZERO;
         if (voucherHistory != null) {
@@ -599,14 +628,29 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
-    public Bill updateBillReturn(Long billId, BigDecimal priceReturn, BigDecimal voucherPrice) throws NotFoundException {
+    public Bill updateBillReturn(Long billId, BigDecimal priceReturn, BigDecimal voucherPrice, String newVoucher) throws NotFoundException {
         Bill bill = this.findBillByBillId(billId);
-        bill.setPriceReduce(bill.getPriceReduce().subtract(priceReturn));
+        DeliveryNote deliveryNote = deliveryNoteService.getDeliveryNoteByBill_Id(billId);
+        bill.setAmountPaid(bill.getAmountPaid().subtract(priceReturn).add(Objects.isNull(deliveryNote)?BigDecimal.ZERO:deliveryNote.getShipPrice()));
+        bill.setPriceReduce(voucherPrice);
         bill.setStatus("ReturnS");
-        VoucherHistory voucherHistory = voucherHistoryService.findHistoryByBillCode(bill.getBillCode());
-        if(voucherHistory != null){
-            voucherHistory.setPriceReduce(voucherPrice);
-            voucherHistoryService.saveVoucherHistory(voucherHistory);
+        VoucherHistory voucherHistory = voucherHistoryService.findHistoryByBillCodeAndStatus(bill.getBillCode(), "ACTIVE");
+        if(Objects.isNull(newVoucher)){
+            if(voucherHistory != null){
+                voucherHistory.setPriceReduce(voucherPrice);
+                voucherHistoryService.saveVoucherHistory(voucherHistory);
+            }
+        }else{
+            if(voucherHistory !=null){
+                voucherHistory.setStatus(Const.STATUS_INACTIVE);
+                voucherHistoryService.saveVoucherHistory(voucherHistory);
+            }
+            VoucherRequest voucher = voucherService.findByVoucherCode(newVoucher);
+            if(!Objects.isNull(voucher)){
+                voucherHistoryService.saveVoucherHistory(new VoucherHistory(null, newVoucher, voucherPrice, bill));
+                voucher.setLimitQuantity(voucher.getLimitQuantity()-1);
+                voucherService.saveOrUpdate(voucher);
+            }
         }
         return billRepo.save(bill);
     }

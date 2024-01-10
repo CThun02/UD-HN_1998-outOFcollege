@@ -1,5 +1,6 @@
 package com.fpoly.ooc.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -57,6 +58,7 @@ public class Promotion extends BaseEntity {
     private BigDecimal promotionCondition;
 
     @OneToMany(mappedBy = "promotion")
+    @JsonIgnore
     private List<PromotionProduct> promotionProductList;
 
 }

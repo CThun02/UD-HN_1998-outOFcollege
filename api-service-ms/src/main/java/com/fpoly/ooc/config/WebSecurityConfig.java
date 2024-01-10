@@ -39,8 +39,8 @@ public class WebSecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/admin/account/**").hasAnyRole("EMPLOYEE", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/admin/account/**").hasAnyRole("EMPLOYEE", "ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/admin/account/**").hasAnyRole("EMPLOYEE", "ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/admin/account/**").hasAnyRole("EMPLOYEE", "ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/admin/bill/**").hasAnyRole("EMPLOYEE", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/admin/account/**", "/api/admin/bill-detail/**").hasAnyRole("EMPLOYEE", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/admin/bill/**", "/api/admin/bill-detail/**").hasAnyRole("EMPLOYEE", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/admin/bill/**").hasAnyRole("EMPLOYEE", "ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/admin/bill/**").hasAnyRole("EMPLOYEE", "ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/admin/bill/**").hasAnyRole("EMPLOYEE", "ADMIN")
@@ -57,7 +57,7 @@ public class WebSecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/admin/vouchers/").hasAnyRole("EMPLOYEE", "ADMIN")
                         .requestMatchers( "/api/admin/delivery-note").hasAnyRole("EMPLOYEE", "ADMIN")
                         .requestMatchers("/api/admin/timeline/**").permitAll()
-                        .requestMatchers("/api/admin/address/**").permitAll()
+                        .requestMatchers("/api/admin/address/**", "/api/admin/product/updateQuantityProductDetail").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().permitAll());
         return http.build();

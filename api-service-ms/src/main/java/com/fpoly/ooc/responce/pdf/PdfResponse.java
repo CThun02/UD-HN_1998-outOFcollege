@@ -1,6 +1,8 @@
 package com.fpoly.ooc.responce.pdf;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fpoly.ooc.responce.deliveryNote.DeliveryNoteResponse;
+import com.fpoly.ooc.responce.payment.PaymentDetailResponse;
 import com.fpoly.ooc.responce.timeline.TimelineProductResponse;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,11 +18,13 @@ import java.util.List;
 public class PdfResponse {
 
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm")
-    private LocalDateTime BillCreatedAt;
+    private LocalDateTime billCreatedAt;
 
     private String billCode;
 
     private String billCreatedBy;
+
+    private String billUpdateBy;
 
     private BigDecimal totalPrice;
 
@@ -33,5 +37,9 @@ public class PdfResponse {
     private BigDecimal priceReduce;
 
     private List<TimelineProductResponse> lstProductDetail;
+
+    private List<PaymentDetailResponse> lstPaymentDetail;
+
+    private DeliveryNoteResponse deliveryNote;
 
 }

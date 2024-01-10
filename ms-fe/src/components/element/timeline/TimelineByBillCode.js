@@ -7,7 +7,11 @@ import { useEffect } from "react";
 import axios from "axios";
 import { Timeline, TimelineEvent } from "@mailtop/horizontal-timeline";
 import { FaRegFileAlt, FaTimes, FaTruck } from "react-icons/fa";
-import { CheckCircleOutlined, DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import {
+  CheckCircleOutlined,
+  DeleteOutlined,
+  EditOutlined,
+} from "@ant-design/icons";
 import SockJs from "../../../service/SockJs";
 import EditAddress from "../edit-address/EditAddress";
 import EditProductsCart from "../edit-product-cart/EditProductsCart";
@@ -24,43 +28,49 @@ const TimelineByBillCode = () => {
   const [openProductEdit, setOpenProductEdit] = useState([]);
   const [loadingButton, setLoadingButton] = useState(false);
 
-  const handleShowModalProductEdit= (index) => {
+  const handleShowModalProductEdit = (index) => {
     const visible = [...openProductEdit];
     visible[index] = true;
     setOpenProductEdit(visible);
   };
 
-  const handleCancelModalProductEdit= (index) => {
+  const handleCancelModalProductEdit = (index) => {
     const visible = [...openProductEdit];
     visible[index] = false;
     setOpenProductEdit(visible);
   };
 
-  const deleteBillDetail=(bdId, bId)=>{
+  const deleteBillDetail = (bdId, bId) => {
     setLoadingButton(true);
     Modal.confirm({
-      title:"Xác nhận xóa",
-      message:"Xác nhận xóa sản phẩm",
-      onOk:()=>{
-        axios.delete("http://localhost:8080/api/client/deleteBD?bdId="+bdId+"&bId="+bId).then(res=>{
-          notification.success({
-            message:"Thông báo",
-            description:"Xóa thành công sản phẩm",
+      title: "Xác nhận xóa",
+      message: "Xác nhận xóa sản phẩm",
+      onOk: () => {
+        axios
+          .delete(
+            "http://localhost:8080/api/client/deleteBD?bdId=" +
+              bdId +
+              "&bId=" +
+              bId
+          )
+          .then((res) => {
+            notification.success({
+              message: "Thông báo",
+              description: "Xóa thành công sản phẩm",
+            });
+            setRender(Math.random());
+            setLoadingButton(false);
           })
-          setRender(Math.random())
-          setLoadingButton(false);
-        }).catch(error=>{
-          const message = error?.response?.data?.message;
-          notification.error({
-            message:"Thông báo",
-            description: message,
-          })
-        });
-      }
-    })
-    
-  }
-
+          .catch((error) => {
+            const message = error?.response?.data?.message;
+            notification.error({
+              message: "Thông báo",
+              description: message,
+            });
+          });
+      },
+    });
+  };
 
   useEffect(() => {
     axios
@@ -83,7 +93,7 @@ const TimelineByBillCode = () => {
         setTimelineDisplay(timelinesPush);
       })
       .catch((error) => {
-        console.log(error)
+        console.log(error);
       });
   }, [render]);
 
@@ -166,18 +176,28 @@ const TimelineByBillCode = () => {
               </div>
             </div>
             {/* Thông tin sản phẩm */}
-            <EditProductsCart billCode={billCode} setLoadingButtonTimeline={setLoadingButton} renderTimeline={render} open={openCartEdit} render={setRender} onCancel={()=>setOpenCartEdit(false)}/>
+            <EditProductsCart
+              billCode={billCode}
+              setLoadingButtonTimeline={setLoadingButton}
+              renderTimeline={render}
+              open={openCartEdit}
+              render={setRender}
+              onCancel={() => setOpenCartEdit(false)}
+            />
             <Space direction="vertical" size={16} style={{ width: "100%" }}>
               {console.log(timelines)}
-            {timelines?.lstTimeline?.length >1 || timelines?.timelineCustomInfo?.status === 'Paid' ? null :(
-                      <div  style={{marginBottom:"24px"}}>
-                      <Button onClick={()=>setOpenCartEdit(true)} 
-                        loading={loadingButton}
-                        className={styles.btnEditCart}>
-                        <EditOutlined /> Thêm sản phẩm
-                      </Button>
-                    </div>
-                     )}
+              {timelines?.lstTimeline?.length > 1 ||
+              timelines?.timelineCustomInfo?.status === "Paid" ? null : (
+                <div style={{ marginBottom: "24px" }}>
+                  <Button
+                    onClick={() => setOpenCartEdit(true)}
+                    loading={loadingButton}
+                    className={styles.btnEditCart}
+                  >
+                    <EditOutlined /> Thêm sản phẩm
+                  </Button>
+                </div>
+              )}
               {timelines?.lstProduct?.map((timeline, index) => {
                 return (
                   <Row style={{ margin: 0 }}>
@@ -190,7 +210,7 @@ const TimelineByBillCode = () => {
                       productDetailId={timeline?.productDetailId} 
                       render={setRender}
                       quantityBuy={timeline.quantity}
-                      setLoadingButtonTimeline={setLoadingButton} 
+                      setLoadingButtonTimeline={setLoadingButton}
                       renderTimeline={render}
                       billDetailId={timeline?.billDetailId}
                     />
@@ -285,9 +305,7 @@ const TimelineByBillCode = () => {
                                   marginLeft: "8px",
                                 }}
                               >
-                                {(
-                                  timeline.productPrice 
-                                ).toLocaleString("vi-VN", {
+                                {timeline.productPrice.toLocaleString("vi-VN", {
                                   style: "currency",
                                   currency: "VND",
                                 })}
@@ -316,31 +334,38 @@ const TimelineByBillCode = () => {
                       style={{
                         display: "flex",
                         justifyContent: "flex-end",
-                        alignItems:"center"
+                        alignItems: "center",
                       }}
                     >
                         {timelines?.lstTimeline?.length >1  || timelines?.timelineCustomInfo?.status === 'Paid'  ? null :(
                       <Row>
                           <Col span={12}>
-                          <Button 
-                          loading={loadingButton}
-                          onClick={()=>handleShowModalProductEdit(index)} 
-                          className={styles.product_tableButtonCreate}>
-                            <EditOutlined />
-                          </Button>
+                            <Button
+                              loading={loadingButton}
+                              onClick={() => handleShowModalProductEdit(index)}
+                              className={styles.product_tableButtonCreate}
+                            >
+                              <EditOutlined />
+                            </Button>
                           </Col>
                           <Col span={12}>
-                          <Button disabled={timelines?.lstProduct?.length ===1 } 
-                          loading={loadingButton}
-                          onClick={()=>deleteBillDetail(timeline?.billDetailId, timeline?.billId)} 
-                          className={styles.product_tableButtonCreate}>
-                            <DeleteOutlined/>
-                          </Button>
+                            <Button
+                              disabled={timelines?.lstProduct?.length === 1}
+                              loading={loadingButton}
+                              onClick={() =>
+                                deleteBillDetail(
+                                  timeline?.billDetailId,
+                                  timeline?.billId
+                                )
+                              }
+                              className={styles.product_tableButtonCreate}
+                            >
+                              <DeleteOutlined />
+                            </Button>
                           </Col>
-                      </Row>
-                        )}
+                        </Row>
+                      )}
                     </Col>
-                    
                   </Row>
                 );
               })}
@@ -354,11 +379,11 @@ const TimelineByBillCode = () => {
                   marginTop: 50,
                 }}
               >
-                <EditAddress 
-                  isModalOpen={openEditAddress} 
-                  handleAddressCancel={()=>setOpenEditAddress(false)} 
-                  totalPrice={timelines?.timelineCustomInfo?.totalPrice} 
-                  addressId={timelines?.timelineCustomInfo?.addressId} 
+                <EditAddress
+                  isModalOpen={openEditAddress}
+                  handleAddressCancel={() => setOpenEditAddress(false)}
+                  totalPrice={timelines?.timelineCustomInfo?.totalPrice}
+                  addressId={timelines?.timelineCustomInfo?.addressId}
                   setRender={setRender}
                   billId={timelines?.lstTimeline[0]?.billId}
                 />
@@ -366,36 +391,36 @@ const TimelineByBillCode = () => {
                   <h2>Thông tin đơn hàng</h2>
                   <Row>
                     <Col span={22}>
-                    <Row>
-                    <Col span={8} style={{ fontWeight: 500 }}>
-                      Tên khách hàng
-                    </Col>
-                    <Col span={16}>
-                      {timelines?.timelineCustomInfo?.fullName}
-                    </Col>
-                    <Col span={8} style={{ fontWeight: 500 }}>
-                      Số điện thoại
-                    </Col>
-                    <Col span={16}>
-                      {timelines?.timelineCustomInfo?.phoneNumber}
-                    </Col>
-                    <Col span={8} style={{ fontWeight: 500 }}>
-                      Ngày đặt hàng
-                    </Col>
-                    <Col span={16}>
-                      {timelines?.timelineCustomInfo?.orderDate}
-                    </Col>
-                    <Col span={8} style={{ fontWeight: 500 }}>
-                      Ngày nhận hàng
-                    </Col>
-                    <Col span={16}>
-                      {timelines?.timelineCustomInfo?.dateOfReceipt ?? "__"}
-                    </Col>
-                    <Col span={8} style={{ fontWeight: 500 }}>
-                      Địa chỉ
-                    </Col>
-                    <Col span={16}>
-                      {`${timelines?.timelineCustomInfo?.addressDetail} 
+                      <Row>
+                        <Col span={8} style={{ fontWeight: 500 }}>
+                          Tên khách hàng
+                        </Col>
+                        <Col span={16}>
+                          {timelines?.timelineCustomInfo?.fullName}
+                        </Col>
+                        <Col span={8} style={{ fontWeight: 500 }}>
+                          Số điện thoại
+                        </Col>
+                        <Col span={16}>
+                          {timelines?.timelineCustomInfo?.phoneNumber}
+                        </Col>
+                        <Col span={8} style={{ fontWeight: 500 }}>
+                          Ngày đặt hàng
+                        </Col>
+                        <Col span={16}>
+                          {timelines?.timelineCustomInfo?.orderDate}
+                        </Col>
+                        <Col span={8} style={{ fontWeight: 500 }}>
+                          Ngày nhận hàng
+                        </Col>
+                        <Col span={16}>
+                          {timelines?.timelineCustomInfo?.dateOfReceipt ?? "__"}
+                        </Col>
+                        <Col span={8} style={{ fontWeight: 500 }}>
+                          Địa chỉ
+                        </Col>
+                        <Col span={16}>
+                          {`${timelines?.timelineCustomInfo?.addressDetail} 
                                         ${timelines?.timelineCustomInfo?.ward.substring(
                                           0,
                                           timelines?.timelineCustomInfo?.ward.indexOf(
@@ -414,97 +439,121 @@ const TimelineByBillCode = () => {
                                             "|"
                                           )
                                         )}`}
-                    </Col>
-                    <Col span={8} style={{ fontWeight: 500 }}>
-                      Ngày nhận hàng dự kiến
-                    </Col>
-                    <Col span={16}>
-                      {timelines?.timelineCustomInfo?.dateShip ?? "__"}
-                    </Col>
-                    <Col span={24} style={{marginTop:"20px"}}>
-                      <Row>
-                      <Col span={18} offset={6}>
-                        <h2>Thông tin thanh toán</h2>
-                      </Col>
-                      <Col  style={{ fontWeight: 500 }} span={6} offset={6}>
-                          Thành tiền:
                         </Col>
-                        <Col span={12}>
-                        <p style={{marginLeft:"25%"}}>
-                          {(
-                              timelines?.timelineCustomInfo?.totalPrice
-                            ).toLocaleString("vi-VN", {
-                              style: "currency",
-                              currency: "VND",
-                            })}
-                        </p>
+                        <Col span={8} style={{ fontWeight: 500 }}>
+                          Ngày nhận hàng dự kiến
                         </Col>
-                        <Col  style={{ fontWeight: 500 }} span={6} offset={6}>
-                          Giảm giá:
+                        <Col span={16}>
+                          {timelines?.timelineCustomInfo?.dateShip ?? "__"}
                         </Col>
-                        <Col span={12}>
-                        <p style={{marginLeft:"25%"}}>
-                          {(
-                              timelines?.timelineCustomInfo?.priceReduce
-                            ).toLocaleString("vi-VN", {
-                              style: "currency",
-                              currency: "VND",
-                            })}
-                        </p>
-                        </Col>
-                      <Col  style={{ fontWeight: 500 }} span={6} offset={6}>
-                          Phí vận chuyển:
-                        </Col>
-                        <Col span={12}>
-                        <p style={{marginLeft:"25%"}}>
-                          {(
-                              timelines?.timelineCustomInfo?.priceShip
-                            ).toLocaleString("vi-VN", {
-                              style: "currency",
-                              currency: "VND",
-                            })}
-                        </p>
-                        </Col>
-                        <Col span={6} offset={6}
-                          style={{
-                            fontSize: "1.25rem",
-                            fontWeight:"500",
-                          }}
-                        >
-                          Tổng tiền: 
-                        </Col>
-                        <Col span={12}
-                          style={{
-                            fontSize: "1.25rem",
-                            color: "#ee4d2d",
-                            fontWeight:"500"
-                          }}
-                        >
-                        <p style={{marginLeft:"25%", textAlign:"start"}}>
-                          {(
-                              timelines?.timelineCustomInfo?.pricePaid +timelines?.timelineCustomInfo?.priceShip
-                            ).toLocaleString("vi-VN", {
-                              style: "currency",
-                              currency: "VND",
-                            })}
-                        </p>
+                        <Col span={24} style={{ marginTop: "20px" }}>
+                          <Row>
+                            <Col span={18} offset={6}>
+                              <h2>Thông tin thanh toán</h2>
+                            </Col>
+                            <Col
+                              style={{ fontWeight: 500 }}
+                              span={6}
+                              offset={6}
+                            >
+                              Thành tiền:
+                            </Col>
+                            <Col span={12}>
+                              <p style={{ marginLeft: "25%" }}>
+                                {(timelines?.timelineCustomInfo?.totalPrice).toLocaleString(
+                                  "vi-VN",
+                                  {
+                                    style: "currency",
+                                    currency: "VND",
+                                  }
+                                )}
+                              </p>
+                            </Col>
+                            <Col
+                              style={{ fontWeight: 500 }}
+                              span={6}
+                              offset={6}
+                            >
+                              Giảm giá:
+                            </Col>
+                            <Col span={12}>
+                              <p style={{ marginLeft: "25%" }}>
+                                {timelines?.timelineCustomInfo?.priceReduce?.toLocaleString(
+                                  "vi-VN",
+                                  {
+                                    style: "currency",
+                                    currency: "VND",
+                                  }
+                                )}
+                              </p>
+                            </Col>
+                            <Col
+                              style={{ fontWeight: 500 }}
+                              span={6}
+                              offset={6}
+                            >
+                              Phí vận chuyển:
+                            </Col>
+                            <Col span={12}>
+                              <p style={{ marginLeft: "25%" }}>
+                                {(timelines?.timelineCustomInfo?.priceShip).toLocaleString(
+                                  "vi-VN",
+                                  {
+                                    style: "currency",
+                                    currency: "VND",
+                                  }
+                                )}
+                              </p>
+                            </Col>
+                            <Col
+                              span={6}
+                              offset={6}
+                              style={{
+                                fontSize: "1.25rem",
+                                fontWeight: "500",
+                              }}
+                            >
+                              Tổng tiền:
+                            </Col>
+                            <Col
+                              span={12}
+                              style={{
+                                fontSize: "1.25rem",
+                                color: "#ee4d2d",
+                                fontWeight: "500",
+                              }}
+                            >
+                              <p
+                                style={{
+                                  marginLeft: "25%",
+                                  textAlign: "start",
+                                }}
+                              >
+                                {(
+                                  timelines?.timelineCustomInfo?.pricePaid +
+                                  timelines?.timelineCustomInfo?.priceShip
+                                ).toLocaleString("vi-VN", {
+                                  style: "currency",
+                                  currency: "VND",
+                                })}
+                              </p>
+                            </Col>
+                          </Row>
                         </Col>
                       </Row>
                     </Col>
-                  </Row>
-                    </Col>
                     {timelines?.lstTimeline?.length >1  || timelines?.timelineCustomInfo?.status === 'Paid'  ? null :(
                       <Col span={2}>
-                      <Button
-                      loading={loadingButton}
-                      onClick={()=>setOpenEditAddress(true)} 
-                      className={styles.product_tableButtonCreate}>
-                        <EditOutlined />
-                      </Button>
+                        <Button
+                          loading={loadingButton}
+                          onClick={() => setOpenEditAddress(true)}
+                          className={styles.product_tableButtonCreate}
+                        >
+                          <EditOutlined />
+                        </Button>
                       </Col>
                     )}
                   </Row>
-                  
                 </div>
               </div>
             ) : (

@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface VoucherHistoryRepository extends JpaRepository<VoucherHistory, Long> {
-    public VoucherHistory findVoucherHistoryByBill_BillCode(String billCode);
+    public VoucherHistory findVoucherHistoryByBill_BillCodeAndStatus(String billCode, String status);
 }

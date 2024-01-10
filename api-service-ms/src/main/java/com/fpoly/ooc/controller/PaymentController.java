@@ -137,8 +137,8 @@ public class PaymentController {
             Bill bill = billRepo.findById(billId).orElseThrow(() -> new NotFoundException("Bill id không tồn tại"));
             TimelineClientResponse timelineResponse = timeLineService.getTimelineByBillCode(bill.getBillCode());
             bill.setTransactionCode(transactionNo);
-            bill.setAmountPaid(new BigDecimal(amount).divide(BigDecimal.valueOf(100L)));
-            bill.setStatus("Paid");
+//            bill.setAmountPaid(new BigDecimal(amount).divide(BigDecimal.valueOf(100L)));
+            bill.setStatus("wait_for_confirm");
             billRepo.save(bill);
             StringBuilder stringBuilder = new StringBuilder();
             BigDecimal totalPrice = BigDecimal.ZERO;

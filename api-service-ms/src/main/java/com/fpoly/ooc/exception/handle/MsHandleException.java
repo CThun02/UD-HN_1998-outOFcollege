@@ -58,23 +58,23 @@ public class MsHandleException {
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler({JsonProcessingException.class})
-    public ResponseEntity<Map<String, Object>> jsonProcessingException(JsonProcessingException ex) {
-        Map<String, Object> errors = new HashMap<>();
-        errors.put("status", Const.HTTP_ERROR_CODE);
-        errors.put("message", "Chuyển đỏi dữ liệu thất bại");
+//    @ExceptionHandler({JsonProcessingException.class})
+//    public ResponseEntity<Map<String, Object>> jsonProcessingException(JsonProcessingException ex) {
+//        Map<String, Object> errors = new HashMap<>();
+//        errors.put("status", Const.HTTP_ERROR_CODE);
+//        errors.put("message", "Chuyển đỏi dữ liệu thất bại");
+//
+//        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+//    }
 
-        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler({InvalidDefinitionException.class})
-    public ResponseEntity<Map<String, Object>> invalidDefinitionException(InvalidDefinitionException ex) {
-        Map<String, Object> errors = new HashMap<>();
-        errors.put("status", Const.HTTP_ERROR_CODE);
-        errors.put("message", "Chuyển đổi dữ liệu thất bại");
-
-        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
-    }
+//    @ExceptionHandler({InvalidDefinitionException.class})
+//    public ResponseEntity<Map<String, Object>> invalidDefinitionException(InvalidDefinitionException ex) {
+//        Map<String, Object> errors = new HashMap<>();
+//        errors.put("status", Const.HTTP_ERROR_CODE);
+//        errors.put("message", "Chuyển đổi dữ liệu thất bại");
+//
+//        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+//    }
 
     @ExceptionHandler
     public ResponseEntity<ErrorMessageResponse> dateTimeParseException(DateTimeParseException ex) {

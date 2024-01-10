@@ -10,7 +10,7 @@ public interface VoucherHistoryService {
 
     VoucherHistory save(VoucherHistorySaveDTO dto) throws NotFoundException;
 
-    VoucherHistory findHistoryByBillCode(String billCode);
+    VoucherHistory findHistoryByBillCodeAndStatus(String billCode, String status);
 
     VoucherHistory saveVoucherHistory(VoucherHistory voucherHistory);
 

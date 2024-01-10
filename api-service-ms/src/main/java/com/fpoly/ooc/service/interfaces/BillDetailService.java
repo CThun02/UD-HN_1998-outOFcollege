@@ -23,7 +23,7 @@ public interface BillDetailService {
 
     void deleteBill(Long id);
 
-    PdfResponse pdfResponse(String billCode);
+    PdfResponse pdfResponse(String billCode) throws NotFoundException;
 
     List<BillDetail> findBillDetailByBillCode(String billCode) throws NotFoundException;
 

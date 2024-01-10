@@ -266,7 +266,10 @@ function TableOrderProduct({
   ];
 
   useEffect(() => {
-    console.log("productDetails: ", productDetails);
+    console.log("productDetails: ", Object.keys(localStorage));
+    var cart = JSON.parse(localStorage.getItem(cartId));
+    var product = cart?.productDetails;
+    console.log("product: ", product);
   }, [productDetails, cartId, bool]);
 
   return (

@@ -430,6 +430,14 @@ const BillTimeLine = (addId) => {
       dataIndex: "quantity",
       key: "quantity",
       render: (text, record, index) => {
+        let conditionDisable = false;
+
+        if (
+          billInfo?.status !== "wait_for_confirm" ||
+          billInfo?.lstPaymentDetail[0]?.status === "Paid"
+        ) {
+          conditionDisable = true;
+        }
         return (
           <InputNumber
             min={1}
@@ -439,12 +447,14 @@ const BillTimeLine = (addId) => {
               updateQUantityBillDetail(record, e?.target?.value, index)
             }
             disabled={
-              Number(timlinesDisplay[timlinesDisplay?.length - 1]?.status) !==
-                1 ||
-              billInfo?.lstPaymentDetail?.length === 1 ||
-              billInfo?.lstPaymentDetail?.length === 2
-                ? billInfo?.lstPaymentDetail[0].status === "Paid"
-                : false
+              // billInfo?.status !== "wait_for_confirm" ||
+              // Number(timlinesDisplay[timlinesDisplay?.length - 1]?.status) !==
+              //   1 ||
+              // billInfo?.lstPaymentDetail?.length === 1 ||
+              // billInfo?.lstPaymentDetail?.length === 2
+              //   ? billInfo?.lstPaymentDetail[0]?.status === "Paid"
+              //   : false
+              conditionDisable
             }
           />
         );
@@ -902,11 +912,11 @@ const BillTimeLine = (addId) => {
                       {billInfo?.lstPaymentDetail?.length === 2 &&
                         (billInfo?.lstPaymentDetail[0]?.price +
                           billInfo?.lstPaymentDetail[1]?.price -
-                          billInfo?.totalPrice >
+                          billInfo?.amountPaid >
                         0
                           ? billInfo?.lstPaymentDetail[0]?.price +
                             billInfo?.lstPaymentDetail[1]?.price -
-                            billInfo?.totalPrice
+                            billInfo?.amountPaid
                           : 0
                         ).toLocaleString("vi-VN", {
                           style: "currency",
@@ -915,10 +925,10 @@ const BillTimeLine = (addId) => {
 
                       {billInfo?.lstPaymentDetail?.length === 1 &&
                         (billInfo?.lstPaymentDetail[0]?.price -
-                          billInfo?.totalPrice >
+                          billInfo?.amountPaid >
                         0
                           ? billInfo?.lstPaymentDetail[0]?.price -
-                            billInfo?.totalPrice
+                            billInfo?.amountPaid
                           : 0
                         ).toLocaleString("vi-VN", {
                           style: "currency",

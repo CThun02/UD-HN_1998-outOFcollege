@@ -184,242 +184,6 @@ const Bill = () => {
     }
   };
 
-  // const columns = [
-  //   {
-  //     title: "STT",
-  //     dataIndex: "index",
-  //     key: "stt",
-  //     width: 70,
-  //     render: (text, record, index) => {
-  //       return index + 1;
-  //     },
-  //   },
-  //   {
-  //     key: "product",
-  //     datatIndex: "product",
-  //     title: "Sản phẩm",
-  //     width: "50%",
-  //     render: (text, record, index) => {
-  //       return (
-  //         <Row style={{ width: "100%" }}>
-  //           <Col span={6} style={{ height: "100%" }}>
-  //             <div
-  //               style={{
-  //                 marginTop: "10px",
-  //                 marginRight: "10px",
-  //               }}
-  //             >
-  //               {record?.productDetail?.promotion?.length > 0 &&
-  //               record?.productDetail?.promotion[0]?.promotionValue ? (
-  //                 <Badge.Ribbon
-  //                   text={`Giảm ${
-  //                     record.productDetail.promotion[0].promotionValue
-  //                       ? record.productDetail.promotion[0].promotionMethod ===
-  //                         "%"
-  //                         ? record.productDetail.promotion[0].promotionValue +
-  //                           " " +
-  //                           record.productDetail.promotion[0].promotionMethod
-  //                         : record.productDetail.promotion[0].promotionValue.toLocaleString(
-  //                             "vi-VN",
-  //                             {
-  //                               style: "currency",
-  //                               currency: "VND",
-  //                             }
-  //                           )
-  //                       : null
-  //                   }`}
-  //                   color="red"
-  //                 >
-  //                   <Carousel style={{ maxWidth: "300px" }} autoplay>
-  //                     {record.productDetail.productImageResponse &&
-  //                       record.productDetail.productImageResponse.map(
-  //                         (item) => {
-  //                           return (
-  //                             <img
-  //                               key={item.id}
-  //                               style={{ width: "100%", marginTop: "10px" }}
-  //                               alt=""
-  //                               src={item.path}
-  //                             />
-  //                           );
-  //                         }
-  //                       )}
-  //                   </Carousel>
-  //                 </Badge.Ribbon>
-  //               ) : (
-  //                 <Carousel style={{ maxWidth: "300px" }} autoplay>
-  //                   {record?.productDetail?.productImageResponse &&
-  //                     record?.productDetail?.productImageResponse.map(
-  //                       (item) => {
-  //                         return (
-  //                           <img
-  //                             key={item.id}
-  //                             style={{ width: "100%", marginTop: "10px" }}
-  //                             alt=""
-  //                             src={item.path}
-  //                           />
-  //                         );
-  //                       }
-  //                     )}
-  //                 </Carousel>
-  //               )}
-  //             </div>
-  //           </Col>
-  //           <Col span={18} style={{ height: "100%" }}>
-  //             <div
-  //               className="m-5"
-  //               style={{
-  //                 textAlign: "start",
-  //                 height: "100%",
-  //                 justifyContent: "center",
-  //               }}
-  //             >
-  //               <span style={{ fontWeight: "500" }}>
-  //                 {record?.productDetail?.product?.productName +
-  //                   "-" +
-  //                   record?.productDetail?.brand?.brandName +
-  //                   "-" +
-  //                   record?.productDetail?.category?.categoryName +
-  //                   "-" +
-  //                   record?.productDetail?.button?.buttonName +
-  //                   "-" +
-  //                   record?.productDetail?.material?.materialName +
-  //                   "-" +
-  //                   record?.productDetail?.collar?.collarTypeName +
-  //                   "-" +
-  //                   record?.productDetail?.sleeve?.sleeveName +
-  //                   "-" +
-  //                   record?.productDetail?.shirtTail?.shirtTailTypeName +
-  //                   "-" +
-  //                   record?.productDetail?.pattern?.patternName +
-  //                   "-" +
-  //                   record?.productDetail?.form?.formName}
-  //               </span>
-  //               <br />
-  //               <div className={styles.optionColor}>
-  //                 <b>Màu sắc: </b>
-  //                 <span
-  //                   style={{
-  //                     backgroundColor: record?.productDetail?.color?.colorCode,
-  //                     marginLeft: "8px",
-  //                   }}
-  //                 ></span>
-  //                 {record?.productDetail?.color?.colorName}
-  //               </div>
-  //               <br />
-  //               <b>Kích cỡ: </b>
-  //               <span
-  //                 style={{
-  //                   marginLeft: "8px",
-  //                 }}
-  //               >
-  //                 {record?.productDetail?.size?.sizeName}
-  //               </span>
-  //             </div>
-  //           </Col>
-  //         </Row>
-  //       );
-  //     },
-  //   },
-  //   {
-  //     title: "Số lượng",
-  //     dataIndex: "quantity",
-  //     key: "quantity",
-  //     render: (text, record, index) => {
-  //       return (
-  //         <InputNumber
-  //           min={1}
-  //           max={record?.quantity >= record?.productDetail?.quantity}
-  //           value={record?.quantity}
-  //           onBlur={(event) =>
-  //             updateQuantity(record, index, event.target.value)
-  //           }
-  //         />
-  //       );
-  //     },
-  //   },
-  //   {
-  //     title: "Đơn giá",
-  //     dataIndex: "price",
-  //     key: "price",
-
-  //     render: (text, record, index) => {
-  //       return (
-  //         <div style={{ textAlign: "center" }}>
-  //           {record?.productDetail?.promotionValue ? (
-  //             <span style={{ color: "#ccc" }}>
-  //               <strike>
-  //                 {record?.productDetail?.price?.toLocaleString("vi-VN", {
-  //                   style: "currency",
-  //                   currency: "VND",
-  //                 })}
-  //               </strike>
-  //             </span>
-  //           ) : (
-  //             <span>
-  //               {record?.productDetail?.price?.toLocaleString("vi-VN", {
-  //                 style: "currency",
-  //                 currency: "VND",
-  //               })}
-  //             </span>
-  //           )}
-  //           <br />
-  //           <span>
-  //             {record?.productDetail?.promotionValue
-  //               ? record?.productDetail?.promotionMethod === "%"
-  //                 ? (
-  //                     (record?.productDetail?.price *
-  //                       (100 - Number(record?.productDetail?.promotionValue))) /
-  //                     100
-  //                   )?.toLocaleString("vi-VN", {
-  //                     style: "currency",
-  //                     currency: "VND",
-  //                   })
-  //                 : (
-  //                     record?.productDetail?.price -
-  //                     Number(record?.productDetail?.promotionValue)
-  //                   )?.toLocaleString("vi-VN", {
-  //                     style: "currency",
-  //                     currency: "VND",
-  //                   })
-  //               : null}
-  //           </span>
-  //         </div>
-  //       );
-  //     },
-  //   },
-  //   {
-  //     title: "Thành tiền",
-  //     dataIndex: "totalPrice",
-  //     key: "totalPrice",
-  //     render: (text, record, index) => {
-  //       return (
-  //         <span>
-  //           {(record?.priceReduce * record?.quantity)?.toLocaleString("vi-VN", {
-  //             style: "currency",
-  //             currency: "VND",
-  //           })}
-  //         </span>
-  //       );
-  //     },
-  //   },
-  //   {
-  //     title: "Thao tác",
-  //     key: "action",
-  //     render: (text, record, index) => (
-  //       <Space size="middle">
-  //         <Button
-  //           icon={<DeleteOutlined />}
-  //           danger
-  //           href="#1"
-  //           key={record.key}
-  //           onClick={() => handleDeleteProduct(record, index)}
-  //         ></Button>
-  //       </Space>
-  //     ),
-  //   },
-  // ];
-
   const options = [
     {
       label: (
@@ -999,25 +763,6 @@ const Bill = () => {
     if (productDetails?.length < 0) {
       return;
     }
-    // for (let index = 0; index < productDetails?.length; index++) {
-    //   var productDetailId = productDetails[index].productDetail.id;
-    //   axios
-    //     .get(
-    //       "http://localhost:8080/api/admin/product/getproductdetailbyidpd?productDetailId=" +
-    //         productDetailId,
-    //       {
-    //         headers: {
-    //           Authorization: `Bearer ${getToken(true)}`,
-    //         },
-    //       }
-    //     )
-    //     .then((res) => {
-    //       if (res?.data?.quantity <= 0) {
-    //         cart.productDetails = productDetails.splice(index, 1);
-    //         localStorage.setItem(cartId, JSON.stringify(cart));
-    //       }
-    //     });
-    // }
     setProductDetails(productDetails);
     setAccount(cart?.account);
   };
@@ -1379,90 +1124,92 @@ const Bill = () => {
       email: Yup.string().email("Địa chỉ email không hợp lệ"),
     });
 
-    if (Number(selectedOption) === 1) {
-      const priced = Number(price?.replace(",", ""));
-      if (priced < voucherPrice()) {
-        isError = true;
-        setInputError("Vui lòng nhập số tiền cần thanh toán");
-        return;
-      }
-    }
-
-    if (Number(selectedOption) === 3) {
-      if (remainAmount === -1) {
-        isError = true;
-        setInputError("Bạn chưa nhập tiền");
-      } else {
-        setInputError("");
-      }
-
-      if (transactionCode.trim().length === 0) {
-        isError = true;
-        setTransactionError("Mã giao dịch không được để trống");
-      } else {
-        setTransactionError("");
-      }
-
-      if (priceATM) {
-        if (!priceATM?.replace(/[^\d.]/g, "")) {
+    if (!typeShipping[index]) {
+      if (Number(selectedOption) === 1) {
+        const priced = Number(price?.replace(",", ""));
+        if (priced < voucherPrice()) {
           isError = true;
-          setPriceATMError("Sai định dạng");
-        } else {
-          if (Number(priceATM?.replace(/[,]/g, "")) < remainAmount) {
-            isError = true;
-            setPriceATMError("Số tiền không đủ");
-          }
+          setInputError("Vui lòng nhập số tiền cần thanh toán");
+          return;
         }
-      } else {
-        isError = true;
-        setPriceATMError("Vui lòng nhập số tiền cần thanh toán");
       }
 
-      if (inputError && transactionError && setPriceATMError) {
-        return;
-      }
-    }
+      if (Number(selectedOption) === 3) {
+        if (remainAmount === -1) {
+          isError = true;
+          setInputError("Bạn chưa nhập tiền");
+        } else {
+          setInputError("");
+        }
 
-    if (productDetails?.length <= 0) {
-      isError = true;
-      return notification.error({
-        message: "Thông báo",
-        description: "Không có sản phẩm nào trong giỏ hàng.",
-        duration: 2,
-      });
-    }
+        if (transactionCode.trim().length === 0) {
+          isError = true;
+          setTransactionError("Mã giao dịch không được để trống");
+        } else {
+          setTransactionError("");
+        }
 
-    if (
-      Number(selectedOption) === 1 &&
-      ((remainAmount < 0 && !typeShipping[index]) || isNaN(remainAmount))
-    ) {
-      console.log("remainAmount: ", remainAmount);
-      isError = true;
-      return setInputError("Nhập đủ số tiền cần thanh toán");
-    }
-
-    if (Number(selectedOption) === 3 || Number(selectedOption) === 2) {
-      if (Number(selectedOption) === 2) {
         if (priceATM) {
-          if (!priceATM.replace(/[^\d.]/g, "")) {
+          if (!priceATM?.replace(/[^\d.]/g, "")) {
             isError = true;
             setPriceATMError("Sai định dạng");
           } else {
-            const priceATMStr = priceATM.replace(/[,]/g, "");
-            if (Number(priceATMStr) < remainAmount) {
+            if (Number(priceATM?.replace(/[,]/g, "")) < remainAmount) {
               isError = true;
               setPriceATMError("Số tiền không đủ");
-            } else {
-              setPriceATMError("");
             }
           }
         } else {
           isError = true;
           setPriceATMError("Vui lòng nhập số tiền cần thanh toán");
         }
-        if (transactionCode.trim() === "") {
-          isError = true;
-          return setTransactionError("Mã giao dịch không được để trống");
+
+        if (inputError && transactionError && setPriceATMError) {
+          return;
+        }
+      }
+
+      if (productDetails?.length <= 0) {
+        isError = true;
+        return notification.error({
+          message: "Thông báo",
+          description: "Không có sản phẩm nào trong giỏ hàng.",
+          duration: 2,
+        });
+      }
+
+      if (
+        Number(selectedOption) === 1 &&
+        ((remainAmount < 0 && !typeShipping[index]) || isNaN(remainAmount))
+      ) {
+        console.log("remainAmount: ", remainAmount);
+        isError = true;
+        return setInputError("Nhập đủ số tiền cần thanh toán");
+      }
+
+      if (Number(selectedOption) === 3 || Number(selectedOption) === 2) {
+        if (Number(selectedOption) === 2) {
+          if (priceATM) {
+            if (!priceATM.replace(/[^\d.]/g, "")) {
+              isError = true;
+              setPriceATMError("Sai định dạng");
+            } else {
+              const priceATMStr = priceATM.replace(/[,]/g, "");
+              if (Number(priceATMStr) < remainAmount) {
+                isError = true;
+                setPriceATMError("Số tiền không đủ");
+              } else {
+                setPriceATMError("");
+              }
+            }
+          } else {
+            isError = true;
+            setPriceATMError("Vui lòng nhập số tiền cần thanh toán");
+          }
+          if (transactionCode.trim() === "") {
+            isError = true;
+            return setTransactionError("Mã giao dịch không được để trống");
+          }
         }
       }
     }

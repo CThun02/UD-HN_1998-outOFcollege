@@ -44,4 +44,10 @@ public class TimelineCustomInfo {
 
     private BigDecimal totalPrice;
 
+    private BigDecimal priceReduce;
+
+    private BigDecimal pricePaid;
+
+    private String status;
+
 }

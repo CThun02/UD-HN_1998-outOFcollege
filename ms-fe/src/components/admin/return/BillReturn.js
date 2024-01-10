@@ -62,7 +62,7 @@ const BillReturn = () => {
       ? voucher?.voucherValueMax
       : ((billInfo?.price - totalPrice) * voucher?.voucherValue) / 100
     : 0;
-  var payAfterReturn = billInfo?.price - totalPrice - voucherPrice;
+  var payAfterReturn = billInfo?.price - voucherPrice;
 
   const handleShowModalProduct = (index, value) => {
     const newModalVisible = [...modalQuantityReturn];
@@ -278,7 +278,7 @@ const BillReturn = () => {
         const request = {
           productDetailId: productsReturns[index].productDetailId,
           billId: billInfo?.id,
-          reason: productsReturns[index].reason?"PRODUCE":"OTHER",
+          reason: productsReturns[index].reason==="OTHER"?"OTHER":"PRODUCE",
           quantity: productsReturns[index].quantity,
           price: productsReturns[index].productPrice,
           note: productsReturns[index].note
@@ -381,29 +381,31 @@ const BillReturn = () => {
   }
 
   function reloadProduct(index, record) {
-    let check = -1;
+    let quantityCheck=record.quantity;
     for (let index = 0; index < productsReturns.length; index++) {
       if (
         Number(record.billDetailId) ===
         Number(productsReturns[index].billDetailId)
       ) {
-        check = index;
-        break;
+        quantityCheck -= productsReturns[index].quantity;
       }
     }
-    if (check !== -1) {
-      productsReturns[check].quantity = quantity;
-    } else {
+    if(quantity>quantityCheck){
+      notification.error({
+        message: "Thông báo",
+        description: "Số lượng trả đã vượt quá số lượng mua",
+      })
+    }else{
       record.quantity = quantity;
       productsReturns.push(record);
+      notification.success({
+        message: "Thông báo",
+        description: "Chọn sản phẩm thành công",
+      });
+      handleShowModalProduct(index, false);
+      setQuantity(1);
+      setRender(Math.random());
     }
-    notification.success({
-      message: "Thông báo",
-      description: "Chọn sản phẩm thành công",
-    });
-    handleShowModalProduct(index, false);
-    setQuantity(1);
-    setRender(Math.random());
   }
 
   function deleteIfNoneReturned(index) {
@@ -519,29 +521,23 @@ const BillReturn = () => {
               );
               if (response?.data?.status === "ReturnS") {
                 setReturned("returned");
-                for (
-                  let index = 0;
-                  index < response.data.billDetails.length;
-                  index++
-                ) {
-                  for (let j = 0; j < res.data.length; j++) {
-                    if (
-                      res.data[j].id ===
-                      response.data.billDetails[index].productDetailId
-                    ) {
-                      let productReturn = {
-                        ...response.data.billDetails[index],
-                      };
-                      productReturn.quantity = res.data[j].quantity;
-                      productReturn.reason = res.data[j].status;
-                      productReturn.note = res.data[j].descriptionDetail;
+              if(productsReturns?.length===0){
+                  for (
+                    let index = 0;
+                    index < response.data.billDetails.length;
+                    index++
+                  ) {
+                    for (let j = 0; j < res.data.length; j++) {
                       if (
-                        productsReturns.every(
-                          (item) =>
-                            item.productDetailId !==
-                            productReturn.productDetailId
-                        )
+                        res.data[j].id ===
+                        response.data.billDetails[index].productDetailId
                       ) {
+                        let productReturn = {
+                          ...response.data.billDetails[index],
+                        };
+                        productReturn.quantity = res.data[j].quantity;
+                        productReturn.reason = res.data[j].status;
+                        productReturn.note = res.data[j].descriptionDetail;
                         productsReturns.push(productReturn);
                       }
                     }
@@ -1140,18 +1136,7 @@ const BillReturn = () => {
               </Col>
               <Col span={12} style={{ marginBottom: "10px" }}>
                 <span style={{ fontWeight: 600, color: "rgb(255, 77, 79)" }}>
-                  {totalPrice.toLocaleString("vi-VN", {
-                    style: "currency",
-                    currency: "VND",
-                  })}
-                </span>
-              </Col>
-              <Col span={12} style={{ marginBottom: "10px" }}>
-                <span style={{ fontWeight: 600 }}>Tổng giá gốc sau trả:</span>
-              </Col>
-              <Col span={12} style={{ marginBottom: "10px" }}>
-                <span style={{ fontWeight: 600, color: "rgb(255, 77, 79)" }}>
-                  {(billInfo?.price - totalPrice).toLocaleString("vi-VN", {
+                  {(totalPrice).toLocaleString("vi-VN", {
                     style: "currency",
                     currency: "VND",
                   })}
@@ -1195,6 +1180,14 @@ const BillReturn = () => {
                         currency: "VND",
                       })}
                 </span>
+                <br />
+                <div style={{border:"1px solid #ccc", borderRadius:"4px"}}>
+                {voucher
+                    ? voucher?.voucherCondition > billInfo?.price - totalPrice?
+                    <span style={{ fontWeight: 600, color: "rgb(63, 134, 0)" }}>Giảm giá mới: </span>:null:null
+
+                }
+                </div>
               </Col>
               <Col span={12} style={{ marginBottom: "10px" }}>
                 <span style={{ fontWeight: 600 }}>

@@ -1,6 +1,9 @@
 package com.fpoly.ooc.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fpoly.ooc.entity.ProductDetail;
 import com.fpoly.ooc.entity.ProductReturn;
+import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.ProductReturnRepository;
 import com.fpoly.ooc.request.product.ProductReturnRequest;
 import com.fpoly.ooc.responce.product.ProductDetailDisplayResponse;
@@ -33,6 +36,17 @@ public class ProductReturnService implements ProductReturnServiceI {
     @Override
     public ProductReturn create(ProductReturnRequest request) {
         ProductReturn productReturn = request.dto();
+        if(productReturn.getStatus().equals("OTHER")){
+            ProductDetail productDetail = productDetailService.getOne(request.getProductDetailId());
+            productDetail.setQuantity(productDetail.getQuantity() + request.getQuantity());
+            try {
+                productDetailService.update(productDetail);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            } catch (NotFoundException e) {
+                e.printStackTrace();
+            }
+        }
         return repo.save(productReturn);
     }
 
@@ -43,6 +57,8 @@ public class ProductReturnService implements ProductReturnServiceI {
         for (int i = 0; i < productDetailResponses.size(); i++) {
             ProductDetailDisplayResponse productDetailDisplayResponse = new ProductDetailDisplayResponse(productDetailResponses.get(i),
                     productImageService.getProductImageByProductDetailId(productDetailResponses.get(i).getId()));
+            productDetailDisplayResponse.setPrice(repo.sumPriceByPdId(productDetailResponses.get(i).getId(), reason));
+            productDetailDisplayResponse.setQuantity(repo.sumQuantityByPdId(productDetailResponses.get(i).getId(), reason));
             productDetailDisplayResponses.add(productDetailDisplayResponse);
         }
         return productDetailDisplayResponses;

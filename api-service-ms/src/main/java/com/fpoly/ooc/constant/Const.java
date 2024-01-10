@@ -69,6 +69,7 @@ public class Const {
     public static final String ERROR_ADD_TO_CART_THAN_QUANTITY = "ERROR_ADD_TO_CART_THAN_QUANTITY";
     public static final String ERROR_PRODUCT_DETAIL_NOT_EMPTY_IN_PROMOTION = "ERROR_PRODUCT_DETAIL_NOT_EMPTY_IN_PROMOTION";
     public static final String ERROR_QUANTITY_INVALID = "ERROR_QUANTITY_INVALID";
+    public static final String ERROR_BILL_PAID = "ERROR_BILL_PAID";
 
     //kafka
     public static final String KAFKA_SERVER = "localhost:9092";

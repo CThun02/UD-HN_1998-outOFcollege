@@ -70,6 +70,7 @@ public class ErrorCodeConfig {
         errors.put("ERROR_BILL_THAN_FIVE_MILLION", "Hóa đơn vượt quá 5 triệu, vui lòng liên hệ cửa hàng để thực hiện!");
         errors.put("ERROR_BUY_PRICE_THAN_FIVE_MILLION", "Số lượng mua vượt quá 5 triệu, vui lòng liên hệ cửa hàng để thực hiện!");
         errors.put("ERROR_QUANTITY_INVALID", "Số lượng mua không hợp lệ!");
+        errors.put("ERROR_BILL_PAID", "Hóa đơn đã thanh toán, không thể chỉnh sửa!");
 
 
         // SEND_EMAIL_TEMPLATE

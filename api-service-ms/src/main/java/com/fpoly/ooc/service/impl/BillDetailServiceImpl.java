@@ -154,7 +154,9 @@ public class BillDetailServiceImpl implements BillDetailService {
     //productDetail: sản phẩm mới thêm, price: giá sản phẩm mới thêm hiện tại(có thể có khuyến  mại giảm giá),
     private void validateBill(int quantityAdd, ProductDetail productDetail, BigDecimal price, Bill bill) throws NotFoundException {
         //Nếu số lượng mua lớn hơn số lượng tồn
-        if (quantityAdd > productDetail.getQuantity() ) {
+        if(bill.getStatus().equals("Paid")){
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_PAID));
+        }else if (quantityAdd > productDetail.getQuantity() ) {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BUY_QUANTITY_THAN_QUANTITY_IN_STORE));
         }
         //Nếu tổng giá mua lớn hơn 5 triệu

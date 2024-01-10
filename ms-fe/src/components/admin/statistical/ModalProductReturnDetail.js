@@ -128,7 +128,7 @@ const ModalProductReturnDetail = ({
             <br />
             <span style={{ fontWeight: "500" }}>Tổng trả: </span>
             <span>
-              {(record.price * record.quantity)?.toLocaleString("vi-VN", {
+              {(record.price)?.toLocaleString("vi-VN", {
                 style: "currency",
                 currency: "VND",
               })}
@@ -163,7 +163,7 @@ const ModalProductReturnDetail = ({
           console.log(err);
         });
     }
-  }, [productDetailId, reason]);
+  }, [productDetailId, reason, open]);
 
   return (
     <Modal
@@ -194,7 +194,7 @@ const ModalProductReturnDetail = ({
           data &&
           data.map((record, index) => ({
             ...record,
-            key: record.id,
+            key: index,
           }))
         }
         loading={loading}

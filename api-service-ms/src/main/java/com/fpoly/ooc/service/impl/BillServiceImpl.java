@@ -5,6 +5,7 @@ import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
 import com.fpoly.ooc.dto.BillStatusDTO;
 import com.fpoly.ooc.dto.NotificationDTO;
+import com.fpoly.ooc.dto.VoucherHistorySaveDTO;
 import com.fpoly.ooc.entity.Account;
 import com.fpoly.ooc.entity.Address;
 import com.fpoly.ooc.entity.Bill;
@@ -25,6 +26,7 @@ import com.fpoly.ooc.repository.TimeLineRepo;
 import com.fpoly.ooc.request.bill.BillDetailRequest;
 import com.fpoly.ooc.request.bill.BillRequest;
 import com.fpoly.ooc.request.product.ProductDetailRequest;
+import com.fpoly.ooc.request.voucher.DisplayVoucherRequest;
 import com.fpoly.ooc.responce.account.GetListCustomer;
 import com.fpoly.ooc.responce.bill.BillGrowthResponse;
 import com.fpoly.ooc.responce.bill.BillLineChartResponse;
@@ -42,6 +44,7 @@ import com.fpoly.ooc.responce.product.ProductDetailResponse;
 import com.fpoly.ooc.responce.product.ProductDetailSellResponse;
 import com.fpoly.ooc.responce.timeline.TimelineProductDisplayResponse;
 import com.fpoly.ooc.responce.timeline.TimelineProductResponse;
+import com.fpoly.ooc.responce.voucher.VoucherResponse;
 import com.fpoly.ooc.service.interfaces.AccountService;
 import com.fpoly.ooc.service.interfaces.BillService;
 import com.fpoly.ooc.service.interfaces.DeliveryNoteService;
@@ -572,36 +575,23 @@ public class BillServiceImpl implements BillService {
     @Override
     public Bill updateBill(Bill bill) throws NotFoundException {
         VoucherHistory voucherHistory = voucherHistoryService.findHistoryByBillCode(bill.getBillCode());
-        Double price = bigDecimalConvertDouble(bill.getPrice());
-        Double priceReduce = 0d;
+        BigDecimal price = bill.getPrice();
+        BigDecimal priceReduce = BigDecimal.ZERO;
         if (voucherHistory != null) {
-            Voucher voucher = voucherService.findVoucherByVoucherCode(voucherHistory.getVoucherCode());
-            Double condition = voucher == null ? 0d : bigDecimalConvertDouble(voucher.getVoucherCondition());
-            if (price > condition && voucher != null) {
-                if (voucher.getVoucherMethod().equals("%")) {
-                    Double voucherValue = bigDecimalConvertDouble(voucher.getVoucherValue());
-                    priceReduce = price * voucherValue / 100;
-                    if (priceReduce > bigDecimalConvertDouble(voucher.getVoucherValueMax())) {
-                        priceReduce = bigDecimalConvertDouble(voucher.getVoucherValueMax());
-                    }
-                } else if (voucher.getVoucherMethod().equalsIgnoreCase("VND")) {
-                    priceReduce = bigDecimalConvertDouble(voucher.getVoucherValue());
-                }
-            }
+            DisplayVoucherRequest request = new DisplayVoucherRequest();
+            request.setUsername(Objects.isNull(bill.getAccount())?null:bill.getAccount().getUsername());
+            request.setPriceBill(bill.getPrice());
+            VoucherResponse voucherResponse = voucherService.autoFillVoucher(request);
+            Voucher voucher = voucherService.findVoucherByVoucherCode(voucherResponse.getVoucherCode());
+            priceReduce = voucherService.priceReduceByVoucherAndBillPrice(voucher, price);
+            voucherHistoryService.saveVoucherHistory(new VoucherHistory(voucherHistory.getId(), voucher.getVoucherCode(), priceReduce, bill));
         }
-        price = bigDecimalConvertDouble(bill.getPrice()) - priceReduce;
+        price = bill.getPrice().subtract(priceReduce);
         bill.setPrice(bill.getPrice());
-        bill.setPriceReduce(new BigDecimal(price));
+        bill.setPriceReduce(price);
         return billRepo.save(bill);
     }
 
-    private Double bigDecimalConvertDouble(BigDecimal value) {
-        if (Objects.nonNull(value)) {
-            return Double.valueOf(String.valueOf(value));
-        }
-
-        return null;
-    }
 
     @Override
     public List<NotificationDTO> findAllNotifications() {

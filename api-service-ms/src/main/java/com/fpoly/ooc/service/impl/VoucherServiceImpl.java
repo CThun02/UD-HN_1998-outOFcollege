@@ -453,5 +453,21 @@ public class VoucherServiceImpl implements VoucherService {
         return voucherRepository.getVoucherByUsernameAndVoucherCode(username,voucherCode);
     }
 
+    @Override
+    public BigDecimal priceReduceByVoucherAndBillPrice(Voucher voucher, BigDecimal billPrice) {
+        BigDecimal priceReduce = BigDecimal.ZERO;
+        if(voucher != null){
+            if (voucher.getVoucherMethod().equals("%")) {
+                BigDecimal voucherValue = voucher.getVoucherValue();
+                priceReduce = billPrice.multiply(voucherValue).divide(BigDecimal.valueOf(100));
+                if (priceReduce.compareTo(voucher.getVoucherValueMax())>0) {
+                    priceReduce = voucher.getVoucherValueMax();
+                }
+            } else if (voucher.getVoucherMethod().equalsIgnoreCase("VND")) {
+                priceReduce = voucher.getVoucherValue();
+            }
+        }
+        return priceReduce;
+    }
 
 }

@@ -123,7 +123,14 @@ const ModalDetail = ({
       <Table
         columns={columns}
         dataSource={timelineDetail}
-        pagination={false}
+        pagination={{
+          showSizeChanger: true,
+          pageSizeOptions: [5, 10, 15, 20],
+          defaultPageSize: 5,
+          showLessItems: true,
+          style: { marginRight: "10px" },
+        }}
+        scroll={{y:500}}
       />
     </Modal>
   );

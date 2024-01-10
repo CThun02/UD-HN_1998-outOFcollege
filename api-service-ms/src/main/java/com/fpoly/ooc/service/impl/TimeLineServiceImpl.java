@@ -184,7 +184,7 @@ public class TimeLineServiceImpl implements TimeLineService {
             } else {
                 String statusBill = null;
                 switch (request.getStatus()) {
-                    case "1", "Rollback", "2Cancel":
+                    case "1", "Rollback", "2Cancel", "Delete":
                         statusBill = "wait_for_confirm";
                         break;
                     case "2":

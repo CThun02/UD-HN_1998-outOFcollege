@@ -618,6 +618,12 @@ public class BillServiceImpl implements BillService {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_NOT_FOUND));
         }
 
+        DeliveryNote deliveryNote = deliveryNoteService.getDeliveryNoteByBill_Id(bill.getId());
+        double priceBillAmount = CommonUtils.bigDecimalConvertDouble(bill.getPrice())
+                + CommonUtils.bigDecimalConvertDouble(deliveryNote.getShipPrice())
+                - CommonUtils.bigDecimalConvertDouble(bill.getPriceReduce());
+        bill.setAmountPaid(new BigDecimal(priceBillAmount));
+
         VoucherHistory voucherHistory = voucherHistoryService.findHistoryByBillCode(bill.getBillCode());
         double amountPrice = CommonUtils.bigDecimalConvertDouble(bill.getAmountPaid());
         double price = CommonUtils.bigDecimalConvertDouble(bill.getPrice());

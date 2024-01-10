@@ -21,11 +21,11 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
 
     @Query("""
             SELECT new java.lang.Boolean((count(productDetail) > 0)) FROM ProductDetail productDetail
-            WHERE productDetail.id = ?1
+            WHERE productDetail.id IN ?1
             AND productDetail.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
             AND productDetail.quantity > 0
         """)
-    Boolean findProductDetailById(Long id);
+    Boolean findProductDetailById(List<Long> id);
     @Query("SELECT pd.id AS id, pd.product AS product, pd.brand as brand, pd.category as category, pd.button AS button" +
             ", pd.material AS material, pd.collar AS collar, pd.sleeve AS sleeve" +
             ", pd.size AS size, pd.color AS color, pd.shirtTail AS shirtTail"+

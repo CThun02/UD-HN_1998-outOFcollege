@@ -306,8 +306,6 @@ const Cart = (props) => {
   };
 
   const handleDeleteApi = (id) => {
-    console.log("token: ", token);
-    console.log("id: ", id);
     getAuthToken().then((data) => {
       if (data?.username) {
         axios
@@ -779,8 +777,6 @@ const Cart = (props) => {
   };
 
   const addSelectedToData = (e) => {
-    console.log("addToCheckout: " + e);
-
     e.preventDefault();
     let newData = [];
     if (carts.length === 0) {
@@ -799,7 +795,7 @@ const Cart = (props) => {
       });
     }
 
-    if (newData.length === 0) {
+    if (newData?.length === 0) {
       notification.error({
         message: "Thông báo",
         description: "Bạn chưa chọn sản phẩm",
@@ -807,25 +803,22 @@ const Cart = (props) => {
       });
       return;
     } else {
-      if (e?.data) {
-        newData.map((e) => {
-          axios
-            .get(baseUrl + "/isCheckQuantity/" + e?.data[0]?.id)
-            .catch((err) => {
-              notification.error({
-                message: "Thông báo",
-                description:
-                  "Sản phẩm đã bán hết hoặc không tồn tại vui lòng thử lại sau",
-                duration: 2,
-              });
-              return;
-            });
+      axios
+        .get(baseUrl + "/isCheckQuantity/" + selectedRowKeys)
+        .then(() => {
+          localStorage.setItem("checkout", JSON.stringify(newData));
+          navigate("/ms-shop/checkout");
+        })
+        .catch((err) => {
+          notification.error({
+            message: "Thông báo",
+            description:
+              "Sản phẩm đã bán hết hoặc không tồn tại vui lòng thử lại sau",
+            duration: 2,
+          });
+          return;
         });
-      }
     }
-
-    localStorage.setItem("checkout", JSON.stringify(newData));
-    navigate("/ms-shop/checkout");
   };
 
   const rowSelection = {

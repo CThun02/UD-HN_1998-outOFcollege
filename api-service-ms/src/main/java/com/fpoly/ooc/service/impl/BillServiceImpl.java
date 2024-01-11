@@ -5,7 +5,6 @@ import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
 import com.fpoly.ooc.dto.BillStatusDTO;
 import com.fpoly.ooc.dto.NotificationDTO;
-import com.fpoly.ooc.dto.VoucherHistorySaveDTO;
 import com.fpoly.ooc.entity.Account;
 import com.fpoly.ooc.entity.Address;
 import com.fpoly.ooc.entity.Bill;
@@ -26,7 +25,6 @@ import com.fpoly.ooc.repository.TimeLineRepo;
 import com.fpoly.ooc.request.bill.BillDetailRequest;
 import com.fpoly.ooc.request.bill.BillRequest;
 import com.fpoly.ooc.request.product.ProductDetailRequest;
-import com.fpoly.ooc.request.voucher.DisplayVoucherRequest;
 import com.fpoly.ooc.request.voucher.VoucherRequest;
 import com.fpoly.ooc.responce.account.GetListCustomer;
 import com.fpoly.ooc.responce.bill.BillGrowthResponse;
@@ -45,7 +43,6 @@ import com.fpoly.ooc.responce.product.ProductDetailResponse;
 import com.fpoly.ooc.responce.product.ProductDetailSellResponse;
 import com.fpoly.ooc.responce.timeline.TimelineProductDisplayResponse;
 import com.fpoly.ooc.responce.timeline.TimelineProductResponse;
-import com.fpoly.ooc.responce.voucher.VoucherResponse;
 import com.fpoly.ooc.service.interfaces.AccountService;
 import com.fpoly.ooc.service.interfaces.BillService;
 import com.fpoly.ooc.service.interfaces.DeliveryNoteService;
@@ -391,7 +388,7 @@ public class BillServiceImpl implements BillService {
         }
 
         billRepo.save(bill);
-        if (dto.getStatus().equals("Cancel")) {
+        if (("Cancel").equals(dto.getStatus())) {
             VoucherHistory voucherHistory = voucherHistoryService.findHistoryByBillCodeAndStatus(bill.getBillCode(), "ACTIVE");
             if (voucherHistory != null) {
                 VoucherAccount voucherAccount = voucherAccountService
@@ -619,7 +616,6 @@ public class BillServiceImpl implements BillService {
             }
             lstProduct.add(productDisplayResponse);
         }
-        billReturnResponse.setBillDetails(lstProduct);
         if (billReturnResponse.getSymbol().equals("Shipping")) {
             DeliveryNote deliveryNote = deliveryNoteService.getDeliveryNoteByBill_Id(billResponse.getId());
             Address address = deliveryNote.getAddress();
@@ -631,6 +627,7 @@ public class BillServiceImpl implements BillService {
             billReturnResponse.setFullName(deliveryNote.getName());
             billReturnResponse.setShippingDate(deliveryNote.getShipDate());
         }
+        billReturnResponse.setBillDetails(lstProduct);
         return billReturnResponse;
     }
 
@@ -640,29 +637,50 @@ public class BillServiceImpl implements BillService {
         if (Objects.isNull(bill)) {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_NOT_FOUND));
         }
-        VoucherHistory voucherHistory = voucherHistoryService.findHistoryByBillCodeAndStatus(bill.getBillCode(), "ACTIVE");
-        BigDecimal price = bill.getPrice();
-        BigDecimal priceReduce = BigDecimal.ZERO;
+
         DeliveryNote deliveryNote = deliveryNoteService.getDeliveryNoteByBill_Id(bill.getId());
         double priceBillAmount = CommonUtils.bigDecimalConvertDouble(bill.getPrice())
                 + CommonUtils.bigDecimalConvertDouble(deliveryNote.getShipPrice())
                 - CommonUtils.bigDecimalConvertDouble(bill.getPriceReduce());
         bill.setAmountPaid(new BigDecimal(priceBillAmount));
+
+        VoucherHistory voucherHistory = voucherHistoryService.findHistoryByBillCodeAndStatus(bill.getBillCode(), "ACTIVE");
         double amountPrice = CommonUtils.bigDecimalConvertDouble(bill.getAmountPaid());
+        double price = CommonUtils.bigDecimalConvertDouble(bill.getPrice());
+        double priceReduce = 0d;
         if (voucherHistory != null) {
-            DisplayVoucherRequest request = new DisplayVoucherRequest();
-            request.setUsername(Objects.isNull(bill.getAccount())?null:bill.getAccount().getUsername());
-            request.setPriceBill(bill.getPrice());
-            VoucherResponse voucherResponse = voucherService.autoFillVoucher(request);
-            Voucher voucher = voucherService.findVoucherByVoucherCode(voucherResponse.getVoucherCode());
-            priceReduce = voucherService.priceReduceByVoucherAndBillPrice(voucher, price);
-            voucherHistoryService.saveVoucherHistory(new VoucherHistory(voucherHistory.getId(), voucher.getVoucherCode(), priceReduce, bill));
+            Voucher voucher = voucherService.findVoucherByTimeOrderBill(voucherHistory.getVoucherCode(), bill.getCreatedAt());
+
+            if (Objects.nonNull(voucher)) {
+                Double condition = CommonUtils.bigDecimalConvertDouble(voucher.getVoucherCondition());
+                if (amountPrice > condition) {
+                    if (("%").equals(voucher.getVoucherMethod())) {
+                        Double voucherValue = CommonUtils.bigDecimalConvertDouble(voucher.getVoucherValue());
+                        priceReduce = amountPrice * voucherValue / 100;
+                        if (priceReduce > CommonUtils.bigDecimalConvertDouble(voucher.getVoucherValueMax())) {
+                            priceReduce = CommonUtils.bigDecimalConvertDouble(voucher.getVoucherValueMax());
+                        }
+                    } else if (("VND").equalsIgnoreCase(voucher.getVoucherMethod())) {
+                        priceReduce = CommonUtils.bigDecimalConvertDouble(voucher.getVoucherValue());
+                    }
+                }
+            }
         }
-        price = bill.getPrice().subtract(priceReduce);
-        bill.setPrice(bill.getPrice());
-        bill.setPriceReduce(price);
-        return billRepo.save(bill);
+
+        if (Objects.nonNull(bill.getPrice())) {
+            amountPrice = CommonUtils.bigDecimalConvertDouble(bill.getAmountPaid()) - priceReduce;
+            if (amountPrice > 0) {
+                bill.setAmountPaid(bill.getAmountPaid());
+                bill.setPriceReduce(new BigDecimal(priceReduce));
+                bill.setPrice(new BigDecimal(price));
+                return billRepo.save(bill);
+            }
+        }
+
+        return null;
     }
+
+
 
     @Override
     public List<NotificationDTO> findAllNotifications() {

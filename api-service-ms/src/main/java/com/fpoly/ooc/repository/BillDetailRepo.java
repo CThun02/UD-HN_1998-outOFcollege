@@ -37,4 +37,8 @@ public interface BillDetailRepo extends JpaRepository<BillDetail, Long> {
     @Query("Select bd from BillDetail bd where bd.productDetail.id = ?1 and bd.bill.billCode like ?2")
     List<BillDetail> findBillDetailsByProductDetailIdAndBillCode(Long productDetailId, String billCode);
 
+
+    @Query("Select bd from BillDetail bd where bd.productDetail.id = ?1 and bd.bill.id like ?2 and bd.status not like 'ReturnS'")
+    List<BillDetail> findBillDetailsByProductDetailIdAndBillId(Long productDetailId,  Long billId);
+
 }

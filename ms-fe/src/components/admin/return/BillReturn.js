@@ -47,22 +47,15 @@ const BillReturn = () => {
   const [quantity, setQuantity] = useState(1);
   const [render, setRender] = useState(null);
   const [totalPrice, seTotalPrice] = useState(0);
-  const [returned, setReturned] = useState(false);
   const [note, setNote] = useState("");
   const [modalDetail, setModalDetail] = useState(false);
   const [isLoad, setIsLoad] = useState(0);
   const [voucher, setVoucher] = useState(null);
-  var voucherPrice = voucher
-    ? voucher?.voucherCondition > billInfo?.price - totalPrice
-      ? 0
-      : voucher?.voucherMethod === "vnd"
-      ? voucher?.voucherValue
-      : ((billInfo?.price - totalPrice) * voucher?.voucherValue) / 100 >
-        voucher?.voucherValueMax
-      ? voucher?.voucherValueMax
-      : ((billInfo?.price - totalPrice) * voucher?.voucherValue) / 100
-    : 0;
-  var payAfterReturn = billInfo?.price - totalPrice - voucherPrice;
+  const [voucherNewUse, setVoucherNewUse]= useState(null);
+  const [voucherPrice, setVoucherPrice]=useState(0);
+  const [payAfterReturn, setPayAfterReturn] = useState(0);
+  const [totalPricePaid, setTotalPricePaid] = useState(0);
+  const [customerPaidBillOld, setCustomerPaidBillOld] = useState(0);
 
   const handleShowModalProduct = (index, value) => {
     const newModalVisible = [...modalQuantityReturn];
@@ -195,7 +188,7 @@ const BillReturn = () => {
                 }}
               />
               <div style={{ marginTop: "8px", textAlign: "center" }}>
-                {!returned && !record.checkInPromotion && (
+                {billInfo?.status !=="ReturnS" && !record.checkInPromotion && (
                   <Button
                     onClick={() => {
                       reloadProduct(index, record);
@@ -222,7 +215,7 @@ const BillReturn = () => {
                 }}
                 type="primary"
                 size="large"
-                disabled={returned !== false || record.checkInPromotion}
+                disabled={billInfo?.status ==="ReturnS" || record.checkInPromotion}
                 icon={
                   record.checkInPromotion ? (
                     <CloseOutlined />
@@ -230,18 +223,49 @@ const BillReturn = () => {
                     <ReloadOutlined />
                   )
                 }
-              ></Button>
+              >{record?.billDetailStatus==="ReturnS"?"Trả hàng":""}</Button>
             </Tooltip>
           </>
         );
       },
     },
   ];
+
+  function newVoucher(totalPrice){
+    var priceBillAfterReturn = billInfo?.price - totalPrice;
+    var conditonUseVoucherOld = priceBillAfterReturn>=voucher?.voucherCondition?true:false;
+    if(!conditonUseVoucherOld){
+      axios.post(`http://localhost:8080/api/client/autoFillVoucher`
+            , {
+              usename: billInfo?.usename,
+              priceBill: priceBillAfterReturn,
+              voucherCodeOrName: null,
+            }).then(res=>{
+              setVoucherNewUse(res.data);
+              setTotalPricePaid(billInfo?.price -totalPrice - countPriceReduce(res.data, billInfo?.price))
+              setVoucherPrice(countPriceReduce(res.data, billInfo?.price))
+            }).catch(err=>{
+              console.log(err)
+            })
+    }else{
+      setVoucherNewUse(null);
+      setTotalPricePaid(priceBillAfterReturn - countPriceReduce(voucher, billInfo?.price));
+      setVoucherPrice(countPriceReduce(voucher, billInfo?.price))
+    }
+  }
+
   async function confirmReload(status) {
     const data = await token;
     if (note) {
       var productReturnString = "";
       for (let index = 0; index < productsReturns.length; index++) {
+        if(productsReturns[index]?.note===""){
+          notification.warning({
+            message: "Thông báo",
+            description: "Vui lòng nhập mô tả cho từng sản phẩm trả hàng!",
+          });
+          return;
+        }
         productReturnString +=
           " | Hoàn trả sản phẩm: " +
           productsReturns[index]?.productCode +
@@ -278,7 +302,7 @@ const BillReturn = () => {
         const request = {
           productDetailId: productsReturns[index].productDetailId,
           billId: billInfo?.id,
-          reason: productsReturns[index].reason?"PRODUCE":"OTHER",
+          reason: productsReturns[index].reason==="OTHER"?"OTHER":"PRODUCE",
           quantity: productsReturns[index].quantity,
           price: productsReturns[index].productPrice,
           note: productsReturns[index].note
@@ -304,12 +328,11 @@ const BillReturn = () => {
         message: "Thông báo",
         description: "Trả hàng thành công",
       });
-      var id = productsReturns.map((item) => item.billDetailId);
-      changeStatusBillDetail(id, "ReturnS");
       changeBillAfterReturn(
         billInfo?.id,
-        billInfo?.priceReduce - payAfterReturn,
-        voucherPrice
+        customerPaidBillOld - totalPricePaid,
+        voucherPrice,
+        voucherNewUse?.voucherCode
       );
       setRender(Math.random());
       productsReturns = [];
@@ -320,10 +343,10 @@ const BillReturn = () => {
       });
     }
   }
-  function changeBillAfterReturn(billId, priceReturn, voucherPrice) {
+  function changeBillAfterReturn(billId, priceReturn, voucherPrice, newVoucher) {
     axios
       .put(
-        `http://localhost:8080/api/admin/bill/updateBillReturn?billId=${billId}&priceReturn=${priceReturn}&voucherPrice=${voucherPrice}`,
+        `http://localhost:8080/api/admin/bill/updateBillReturn?billId=${billId}&priceReturn=${priceReturn}&voucherPrice=${voucherPrice}&newVoucherCode=${newVoucher?newVoucher:""}`,
         null,
         {
           headers: {
@@ -380,34 +403,53 @@ const BillReturn = () => {
       });
   }
 
+  function countPriceReduce(voucher, price){
+    var priceReduce= voucher
+      ? voucher?.voucherMethod === "vnd"
+        ? voucher?.voucherValue
+        : (price * voucher?.voucherValue) / 100 >
+          voucher?.voucherValueMax
+        ?voucher?.voucherValueMax:
+          (price * voucher?.voucherValue) /100
+      : 0
+    return priceReduce;
+  }
+
   function reloadProduct(index, record) {
-    let check = -1;
+    let quantityCheck=record.quantity;
     for (let index = 0; index < productsReturns.length; index++) {
       if (
         Number(record.billDetailId) ===
         Number(productsReturns[index].billDetailId)
       ) {
-        check = index;
-        break;
+        quantityCheck -= productsReturns[index].quantity;
       }
     }
-    if (check !== -1) {
-      productsReturns[check].quantity = quantity;
-    } else {
+    if(quantity>quantityCheck){
+      notification.error({
+        message: "Thông báo",
+        description: "Số lượng trả đã vượt quá số lượng mua",
+      })
+    }else{
       record.quantity = quantity;
+      record.note = "";
       productsReturns.push(record);
+      let totalPrice = productsReturns.reduce((sum, product) => sum + (product.productPrice*product.quantity), 0)
+      newVoucher(totalPrice);
+      notification.success({
+        message: "Thông báo",
+        description: "Chọn sản phẩm thành công",
+      });
+      handleShowModalProduct(index, false);
+      setQuantity(1);
+      setRender(Math.random());
     }
-    notification.success({
-      message: "Thông báo",
-      description: "Chọn sản phẩm thành công",
-    });
-    handleShowModalProduct(index, false);
-    setQuantity(1);
-    setRender(Math.random());
   }
 
   function deleteIfNoneReturned(index) {
     productsReturns.splice(index, 1);
+    let totalPrice = productsReturns.reduce((sum, product) => sum + (product.productPrice*product.quantity), 0)
+    newVoucher(totalPrice);
     setRender(Math.random());
     notification.success({
       message: "Thông báo",
@@ -461,46 +503,6 @@ const BillReturn = () => {
         searchBill();
       }
       axios
-        .get(
-          "http://localhost:8080/api/admin/voucher-history/getVoucherByBillCode?billCode=" +
-            billCode,
-          {
-            headers: {
-              Authorization: `Bearer ${getToken(true)}`,
-            },
-          }
-        )
-        .then((res) => {
-          if (res.data) {
-            axios
-              .get("http://localhost:8080/api/admin/vouchers/" + res.data, {
-                headers: {
-                  Authorization: `Bearer ${getToken(true)}`,
-                },
-              })
-              .then((res) => {
-                setVoucher(res.data);
-              })
-              .catch((err) => {
-                console.log(err);
-              });
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-      axios
-        .get(
-          "http://localhost:8080/api/admin/product-return/getProductReturnByBillCode?billCode=" +
-            billCode,
-          {
-            headers: {
-              Authorization: `Bearer ${getToken(true)}`,
-            },
-          }
-        )
-        .then((res) => {
-          axios
             .get(
               `http://localhost:8080/api/admin/bill/getBillReturnByBillCode?billCode=` +
                 billCode,
@@ -512,49 +514,63 @@ const BillReturn = () => {
             )
             .then((response) => {
               setBillInfor(response.data);
-              setReturned(
-                response.data.billDetails?.every(
-                  (item) => item.checkInPromotion === true
-                )
-              );
               if (response?.data?.status === "ReturnS") {
-                setReturned("returned");
-                for (
-                  let index = 0;
-                  index < response.data.billDetails.length;
-                  index++
-                ) {
-                  for (let j = 0; j < res.data.length; j++) {
-                    if (
-                      res.data[j].id ===
-                      response.data.billDetails[index].productDetailId
-                    ) {
-                      let productReturn = {
-                        ...response.data.billDetails[index],
-                      };
-                      productReturn.quantity = res.data[j].quantity;
-                      productReturn.reason = res.data[j].status;
-                      productReturn.note = res.data[j].descriptionDetail;
-                      if (
-                        productsReturns.every(
-                          (item) =>
-                            item.productDetailId !==
-                            productReturn.productDetailId
-                        )
-                      ) {
-                        productsReturns.push(productReturn);
+                productsReturns = response?.data?.billDetails.filter(item=> item.billDetailStatus==="ReturnS")
+                axios.get(`http://localhost:8080/api/admin/product-return/getProductReturnByBillCode?billCode=`+billCode,
+                {
+                  headers: {
+                    Authorization: `Bearer ${getToken(true)}`,
+                  },
+                })
+                  .then(res=>{
+                    for (let index = 0; index < res?.data?.length; index++) {
+                      for (let j = 0; j < productsReturns.length; j++) {
+                        if(res.data[index].id === productsReturns[j].productDetailId){
+                          productsReturns[j].reason = res.data[index].status;
+                          productsReturns[j].note = res.data[index].descriptionDetail;
+                        }
                       }
                     }
-                  }
-                }
+                  }).catch(err =>{
+                      console.log(err)
+                  })
               }
-              let total = 0;
+              var total = 0;
               for (let index = 0; index < productsReturns.length; index++) {
                 total +=
                   productsReturns[index].productPrice *
                   productsReturns[index].quantity;
               }
-
+              axios.get("http://localhost:8080/api/admin/voucher-history/getVoucherByBillCode?billCode="+billCode,
+                {
+                  headers: {
+                    Authorization: `Bearer ${getToken(true)}`,
+                  },
+                }).then(resVoucher => {
+                  let vouchers = resVoucher?.data;
+                  var voucherActive = vouchers?.filter(item=>item.status === "ACTIVE")[0]
+                  var voucherInActive = vouchers?.filter(item=>item.status === "INACTIVE")[0]
+                  var priceReduce = countPriceReduce(voucherActive, response?.data.price);
+                  if(response.data?.status ==="ReturnS"){
+                    if(resVoucher.data.length===1){
+                      setVoucher(voucherActive);
+                      setCustomerPaidBillOld(response.data?.price - priceReduce)
+                    }else{
+                      setVoucherNewUse(voucherActive);
+                      setVoucher(voucherInActive);
+                      setCustomerPaidBillOld(response.data?.price - countPriceReduce(voucherInActive, response?.data.price));
+                    }
+                    setTotalPricePaid(response.data?.price -total - response.data?.priceReduce);
+                  }else{
+                    setVoucher(voucherActive);
+                    setCustomerPaidBillOld(response.data?.price - priceReduce);
+                    if(total===0){
+                      setTotalPricePaid(response.data?.price - priceReduce);
+                    }
+                  }
+                }).catch(error=>{
+                  console.log(error)
+                })
               seTotalPrice(total);
               setIsLoad(1);
             })
@@ -567,18 +583,9 @@ const BillReturn = () => {
                 });
               }
             });
-        })
-        .catch((error) => {
-          const status = error?.response?.status;
-          if (status === 403) {
-            notification.error({
-              message: "Thông báo",
-              description: "Bạn không có quyền truy cập!",
-            });
-          }
-        });
+        
     }
-    if (isLoad === 0 && !returned) {
+    if (isLoad === 0) {
       productsReturns = [];
     }
   }, [billCode, modalQuantityReturn, render]);
@@ -822,7 +829,7 @@ const BillReturn = () => {
       <div style={{ marginBottom: "25px" }} className={styles.billReturn}>
         <h3 style={{ marginBottom: "25px" }}>Thông tin đơn hàng</h3>
         <div style={{ textAlign: "end", marginBottom: "10px" }}>
-          {returned === false && (
+          {billInfo?.status !=="ReturnS" && (
             <Button
               size="large"
               type="primary"
@@ -946,22 +953,6 @@ const BillReturn = () => {
                               {record.quantity}
                             </span>
                             <br />
-                            <b>Số lượng còn lại: </b>
-                            <span
-                              style={{
-                                marginLeft: "8px",
-                              }}
-                            >
-                              {
-                                console.log(productsReturns, record, billInfo?.billDetails.findIndex(item => item.productDetailId === record.id))
-                              }
-                              {
-                                billInfo?.billDetails?.findIndex(item => item.productDetailId === record.productDetailId)>=0?
-                                billInfo?.billDetails[billInfo?.billDetails?.findIndex(item => item.productDetailId === record.productDetailId)].quantity - record.quantity:
-                                record.quantity
-                              }
-                            </span>
-                            <br />
                             <b>Tổng giá hoàn trả: </b>
                             <span
                               style={{
@@ -986,7 +977,7 @@ const BillReturn = () => {
                               justifyContent: "center",
                             }}
                           >
-                            {returned === false && (
+                            {billInfo?.status !=="ReturnS" && (
                               <CloseCircleOutlined
                                 style={{
                                   cursor: "pointer",
@@ -999,7 +990,7 @@ const BillReturn = () => {
                           </div>
                         </Col>
                         <Col span={24}>
-                          {returned === false ? (
+                          {billInfo?.status !=="ReturnS" ? (
                             <Radio.Group
                               name="radiogroup"
                               key={index}
@@ -1036,7 +1027,13 @@ const BillReturn = () => {
                         </Col>
                         <Col span={24}>
                           <span style={{ fontWeight: 600 }}>Mô tả <span style={{color:"red"}}>*</span></span><br />
-                          <TextArea readOnly={billInfo?.status === "ReturnS"} defaultValue={productsReturns[index].note} onChange={(event)=>{productsReturns[index].note = event.target.value}}/>
+                          {
+                            billInfo?.status === "ReturnS"?(
+                              <span>{productsReturns[index].note}</span>
+                            ):(
+                              <TextArea readOnly={billInfo?.status === "ReturnS"}  onChange={(event)=>{productsReturns[index].note = event.target.value}}/>
+                            )
+                          }
                         </Col>
                       </Row>
                       <Divider />
@@ -1101,7 +1098,7 @@ const BillReturn = () => {
               <Col span={12} style={{ marginBottom: "10px" }}>
                 <span style={{ fontWeight: 600, color: "rgb(63, 134, 0)" }}>
                   {voucher
-                    ? voucher?.voucherCondition.toLocaleString("vi-VN", {
+                    ? voucher?.voucherCondition?.toLocaleString("vi-VN", {
                         style: "currency",
                         currency: "VND",
                       })
@@ -1111,47 +1108,26 @@ const BillReturn = () => {
                       })}
                 </span>
               </Col>
+              <Divider />
               <Col span={12} style={{ marginBottom: "10px" }}>
-                <span style={{ fontWeight: 600 }}>Tổng giá thanh toán:</span>
+                <span style={{ fontWeight: 600 }}>
+                  Tổng giá thanh toán sau trả:
+                </span>
               </Col>
               <Col span={12} style={{ marginBottom: "10px" }}>
                 <span style={{ fontWeight: 600, color: "rgb(63, 134, 0)" }}>
-                  {(
-                    billInfo?.price -
-                    (voucher
-                      ? voucher?.voucherCondition > billInfo?.price
-                        ? 0
-                        : voucher?.voucherMethod === "vnd"
-                        ? voucher?.voucherValue
-                        : (billInfo?.price * voucher?.voucherValue) / 100 >
-                          voucher?.voucherValueMax
-                        ? voucher?.voucherValueMax
-                        : (billInfo?.price * voucher?.voucherValue) / 100
-                      : 0)
-                  ).toLocaleString("vi-VN", {
+                  {(billInfo?.price - totalPrice)?.toLocaleString("vi-VN", {
                     style: "currency",
                     currency: "VND",
                   })}
                 </span>
               </Col>
-              <Divider />
               <Col span={12} style={{ marginBottom: "10px" }}>
                 <span style={{ fontWeight: 600 }}>Tổng giá trả:</span>
               </Col>
               <Col span={12} style={{ marginBottom: "10px" }}>
                 <span style={{ fontWeight: 600, color: "rgb(255, 77, 79)" }}>
-                  {totalPrice.toLocaleString("vi-VN", {
-                    style: "currency",
-                    currency: "VND",
-                  })}
-                </span>
-              </Col>
-              <Col span={12} style={{ marginBottom: "10px" }}>
-                <span style={{ fontWeight: 600 }}>Tổng giá gốc sau trả:</span>
-              </Col>
-              <Col span={12} style={{ marginBottom: "10px" }}>
-                <span style={{ fontWeight: 600, color: "rgb(255, 77, 79)" }}>
-                  {(billInfo?.price - totalPrice).toLocaleString("vi-VN", {
+                  {(totalPrice).toLocaleString("vi-VN", {
                     style: "currency",
                     currency: "VND",
                   })}
@@ -1195,58 +1171,97 @@ const BillReturn = () => {
                         currency: "VND",
                       })}
                 </span>
+                <br />
+              </Col>
+              {voucherNewUse
+                    ? voucherNewUse?
+                  <Col span={24} style={{border:"1px solid #ccc", borderRadius:"4px", marginBottom: "10px", padding:"8px" }}>
+                      <span style={{ fontWeight: 600, color: "rgb(63, 134, 0)" }}>Giảm giá mới:{"   "} {voucherNewUse?.voucherName}</span><br />
+                      <span style={{ fontWeight: 600, color: "rgb(63, 134, 0)" }}>Điều kiện giảm giá: {"   "}
+                      {voucherNewUse?.voucherCondition.toLocaleString("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                        })}</span><br />
+                      <span style={{ fontWeight: 600, color: "rgb(63, 134, 0)" }}>Giảm giá: {"   "}
+                      {voucherNewUse
+                    ? voucherNewUse?.voucherMethod === "vnd"
+                      ? voucherNewUse?.voucherValue.toLocaleString("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                        })
+                      : (billInfo?.price * voucherNewUse?.voucherValue) / 100 >
+                      voucherNewUse?.voucherValueMax
+                      ? voucherNewUse?.voucherValue +
+                        "% - Giảm tối đa: " +
+                        voucherNewUse?.voucherValueMax.toLocaleString("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                        })
+                      : voucherNewUse?.voucherValue +
+                        "% - Giảm: " +
+                        (
+                          (billInfo?.price * voucherNewUse?.voucherValue) /
+                          100
+                        ).toLocaleString("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                        })
+                    : (0).toLocaleString("vi-VN", {
+                        style: "currency",
+                        currency: "VND",
+                      })}</span>
+                  </Col>:null:null
+              }
+              <Col span={12} style={{ marginBottom: "10px" }}>
+                <span style={{ fontWeight: 600 }}>Thành tiền:</span>
               </Col>
               <Col span={12} style={{ marginBottom: "10px" }}>
-                <span style={{ fontWeight: 600 }}>
-                  Tổng giá thanh toán sau trả:
-                </span>
+                {totalPricePaid.toLocaleString("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                })}
+              </Col>
+              <Col span={12} style={{ marginBottom: "10px" }}>
+                <span style={{ fontWeight: 600 }}>Khách hàng đã thanh toán:</span>
               </Col>
               <Col span={12} style={{ marginBottom: "10px" }}>
                 <span style={{ fontWeight: 600, color: "rgb(63, 134, 0)" }}>
-                  {payAfterReturn.toLocaleString("vi-VN", {
+                  {(
+                    customerPaidBillOld
+                  )?.toLocaleString("vi-VN", {
                     style: "currency",
                     currency: "VND",
                   })}
                 </span>
-              </Col>
+                <br />
+                {
+                    billInfo?.shipPrice?
+                      <span style={{ fontWeight: 600, color: "rgb(63, 134, 0)" }}>
+                          ({billInfo?.shipPrice.toLocaleString("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                        })} Phí vận chuyển)
+                      </span>:null
+                  }
 
+              </Col>
               <Divider />
               <Col span={12} style={{ marginBottom: "10px" }}>
-                <span style={{ fontWeight: 600 }}>Tiền thừa trả khách:</span>
+                <span style={{ fontWeight: 600 }}>
+                {(customerPaidBillOld-totalPricePaid)<0?"Khách hàng cần bù: ": "Tiền thừa trả khách: "}</span>
               </Col>
               <Col span={12} style={{ marginBottom: "10px" }}>
-                {billInfo?.status === "ReturnS"
-                  ? (
-                      billInfo?.price -
-                      (voucher
-                        ? voucher?.voucherCondition > billInfo?.price
-                          ? 0
-                          : voucher?.voucherMethod === "vnd"
-                          ? voucher?.voucherValue
-                          : (billInfo?.price * voucher?.voucherValue) / 100 >
-                            voucher?.voucherValueMax
-                          ? voucher?.voucherValueMax
-                          : (billInfo?.price * voucher?.voucherValue) / 100
-                        : 0) -
-                      payAfterReturn
-                    ).toLocaleString("vi-VN", {
-                      style: "currency",
-                      currency: "VND",
-                    })
-                  : (billInfo?.priceReduce - payAfterReturn).toLocaleString(
-                      "vi-VN",
-                      {
-                        style: "currency",
-                        currency: "VND",
-                      }
-                    )}
+                {Math.abs(customerPaidBillOld-totalPricePaid).toLocaleString("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                        })}
               </Col>
               <Col span={24}>
                 <span style={{ fontWeight: 600 }}>
                   Mô tả <span style={{ color: "rgb(255, 77, 79)" }}>*</span>
                 </span>
                 <br />
-                {returned === false ? (
+                {billInfo?.status !== "ReturnS" ? (
                   <div>
                     <TextArea
                       onChange={(e) => {

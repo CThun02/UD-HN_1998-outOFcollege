@@ -132,7 +132,7 @@ const TimelineByBillCode = () => {
                             : CheckCircleOutlined
                         }
                         title={
-                          data.billType === "Online" &&
+                          (data.billType === "Online" || (data?.billType === "In-Store" && timelines?.timelineCustomInfo?.priceShip>0)) &&
                           timelines?.timelineCustomInfo ? (
                             <>
                               {data.status === "0" ? (
@@ -150,7 +150,7 @@ const TimelineByBillCode = () => {
                               ) : data.status === "5" ? (
                                 <h3>Yêu cầu trả hàng</h3>
                               ) : data.status === "6" ? (
-                                <h3>Trả hang thành công</h3>
+                                <h3>Trả hàng thành công</h3>
                               ) : (
                                 <h3>.</h3>
                               )}
@@ -201,12 +201,13 @@ const TimelineByBillCode = () => {
               {timelines?.lstProduct?.map((timeline, index) => {
                 return (
                   <Row style={{ margin: 0 }}>
-                    <EditProductCart
-                      onCancel={() => {
-                        handleCancelModalProductEdit(index);
-                      }}
-                      open={openProductEdit[index]}
-                      productDetailId={timeline?.productDetailId}
+                    <Col span={24} style={{marginBottom:"20px"}}>
+                      <h2>Thông tin mua hàng</h2>
+                    </Col>
+                    <EditProductCart 
+                      onCancel={()=>{handleCancelModalProductEdit(index)}} 
+                      open={openProductEdit[index]} 
+                      productDetailId={timeline?.productDetailId} 
                       render={setRender}
                       quantityBuy={timeline.quantity}
                       setLoadingButtonTimeline={setLoadingButton}
@@ -336,8 +337,8 @@ const TimelineByBillCode = () => {
                         alignItems: "center",
                       }}
                     >
-                      {timelines?.lstTimeline?.length > 1 ? null : (
-                        <Row>
+                        {timelines?.lstTimeline?.length >1  || timelines?.timelineCustomInfo?.status === 'Paid'  ? null :(
+                      <Row>
                           <Col span={12}>
                             <Button
                               loading={loadingButton}
@@ -541,7 +542,7 @@ const TimelineByBillCode = () => {
                         </Col>
                       </Row>
                     </Col>
-                    {timelines?.lstTimeline?.length > 1 ? null : (
+                    {timelines?.lstTimeline?.length >1  || timelines?.timelineCustomInfo?.status === 'Paid'  ? null :(
                       <Col span={2}>
                         <Button
                           loading={loadingButton}

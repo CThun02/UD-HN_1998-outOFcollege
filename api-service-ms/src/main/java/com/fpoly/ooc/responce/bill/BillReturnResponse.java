@@ -27,6 +27,8 @@ public class BillReturnResponse {
     private LocalDateTime conpletionDate;
     private BigDecimal price;
     private BigDecimal priceReduce;
+    private BigDecimal amountPaid;
+    private BigDecimal shipPrice;
     private String billType;
     private String symbol;
     @JsonFormat(pattern = "HH:mm:ss MM/dd/yyyy")
@@ -59,5 +61,7 @@ public class BillReturnResponse {
         this.phoneNumber = response.getNumberPhone();
         this.phoneNumberReceived = response.getNumberPhoneReceived();
         this.priceReduce = response.getPriceReduce();
+        this.amountPaid = response.getAmountPaid();
+        this.shipPrice = response.getShippingPrice();
     }
 }

@@ -22,8 +22,7 @@ public class VoucherHistoryController {
 
     @GetMapping("/getVoucherByBillCode")
     public ResponseEntity<?> getVoucherByBillCode(@RequestParam String billCode) {
-        VoucherHistory voucherHistory = voucherHistoryService.findHistoryByBillCode(billCode);
-        return ResponseEntity.ok(voucherHistory != null ?voucherHistory.getVoucherCode():null);
+        return ResponseEntity.ok(voucherHistoryService.findVoucherHistoryByBillCode(billCode));
     }
 
 }

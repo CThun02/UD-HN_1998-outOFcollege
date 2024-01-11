@@ -148,6 +148,11 @@ public class BillDetailServiceImpl implements BillDetailService {
         return billDetail;
     }
 
+    @Override
+    public List<BillDetail> findBillDetailsByPDIdAndBillId(Long pDId, Long billId) throws NotFoundException {
+        return billDetailRepo.findBillDetailsByProductDetailIdAndBillId(pDId, billId);
+    }
+
     //@Author: Nguyễn Công Thuần
     private void saveOrUpdateBillDetail(BillDetail billDetail, Bill bill, ProductDetail productDetail) throws NotFoundException {
         billDetailRepo.save(billDetail);
@@ -167,7 +172,9 @@ public class BillDetailServiceImpl implements BillDetailService {
     //productDetail: sản phẩm mới thêm, price: giá sản phẩm mới thêm hiện tại(có thể có khuyến  mại giảm giá),
     private void validateBill(int quantityAdd, ProductDetail productDetail, BigDecimal price, Bill bill) throws NotFoundException {
         //Nếu số lượng mua lớn hơn số lượng tồn
-        if (quantityAdd > productDetail.getQuantity() ) {
+        if(bill.getStatus().equals("Paid")){
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_PAID));
+        }else if (quantityAdd > productDetail.getQuantity() ) {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BUY_QUANTITY_THAN_QUANTITY_IN_STORE));
         }
         //Nếu tổng giá mua lớn hơn 5 triệu
@@ -320,6 +327,11 @@ public class BillDetailServiceImpl implements BillDetailService {
         billDetailRepo.save(billDetail);
 
         return billDetail;
+    }
+
+    @Override
+    public BillDetail saveOrUpdate(BillDetail billDetail) {
+        return billDetailRepo.save(billDetail);
     }
 
     @Override

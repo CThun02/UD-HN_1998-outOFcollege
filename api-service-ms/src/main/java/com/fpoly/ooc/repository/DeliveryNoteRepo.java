@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface DeliveryNoteRepo extends JpaRepository<DeliveryNote, Long> {
 
@@ -18,4 +20,11 @@ public interface DeliveryNoteRepo extends JpaRepository<DeliveryNote, Long> {
             "WHERE dn.bill.billCode = :billCode ")
     DeliveryNoteResponse getOne(@Param("billCode") String billCode);
 
+    @Query("""
+        SELECT deliveryNote FROM DeliveryNote deliveryNote
+            INNER JOIN Bill bill ON deliveryNote.bill.id = bill.id
+        WHERE bill.status IN ('wait_for_confirm', 'wait_for_delivery')
+        AND bill.id = ?1
+    """)
+    List<DeliveryNote> findAllDeliveryNoteByBillId(Long billId);
 }

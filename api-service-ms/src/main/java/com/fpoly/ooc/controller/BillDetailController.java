@@ -54,9 +54,9 @@ public class BillDetailController {
             dto.setRequest(req);
             dto.setProductDetail(productDetail);
             simpleSendProductDetail.updateQuantityRealtime(dto);
+            return ResponseEntity.ok("Success");
         }
-
-        return ResponseEntity.ok("ok");
+        return ResponseEntity.ok("false");
     }
 
     @PutMapping()

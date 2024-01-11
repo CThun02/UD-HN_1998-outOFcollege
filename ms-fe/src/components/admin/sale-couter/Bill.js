@@ -1572,7 +1572,7 @@ const Bill = () => {
                               <div className="m-5">
                                 <b style={{ color: "red" }}></b> Email
                                 <Input
-                                  placeholder="nhập email"
+                                  placeholder="Nhập email"
                                   value={selectedAddress?.email}
                                   onChange={(e) => setEmail(e.target.value)}
                                 />
@@ -1587,7 +1587,7 @@ const Bill = () => {
                               <div className="m-5">
                                 <b style={{ color: "red" }}>*</b> Họ và tên
                                 <Input
-                                  placeholder="nhập họ và tên"
+                                  placeholder="Nhập họ và tên"
                                   onChange={(e) => setFullname(e.target.value)}
                                   value={selectedAddress?.fullName}
                                 />
@@ -1602,7 +1602,7 @@ const Bill = () => {
                               <div className="m-5">
                                 <b style={{ color: "red" }}>*</b> Số điện thoại
                                 <Input
-                                  placeholder="nhập số điện thoại"
+                                  placeholder="Nhập số điện thoại"
                                   onChange={(e) =>
                                     setPhoneNumber(e.target.value)
                                   }

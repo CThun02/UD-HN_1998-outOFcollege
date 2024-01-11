@@ -255,13 +255,8 @@ public class BillDetailServiceImpl implements BillDetailService {
             }
         }
 
-        DeliveryNote deliveryNote = deliveryNoteService.getDeliveryNoteByBill_Id(bill.getId());
         BigDecimal priceBill = billDetailRepo.getTotalPriceByBillCode(bill.getBillCode());
         bill.setPrice(priceBill);
-        double priceBillAmount = CommonUtils.bigDecimalConvertDouble(priceBill)
-                + CommonUtils.bigDecimalConvertDouble(deliveryNote.getShipPrice())
-                - CommonUtils.bigDecimalConvertDouble(bill.getPriceReduce());
-        bill.setAmountPaid(new BigDecimal(priceBillAmount));
         billService.updateBill(bill);
         return savedBillDetail;
     }

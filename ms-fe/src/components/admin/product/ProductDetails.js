@@ -446,8 +446,7 @@ const ProductDetails = (props) => {
                 )
                 .then((response) => {
                   const values = {
-                    note: `
-              ${productDetailCreate.productDetail.id} `,
+                    note: `Thêm sản phẩm mới: ${productDetailCreate?.productDetail?.product?.productName} `,
                     status: "Update",
                     createdBy: data?.username + "_" + data?.fullName,
                   };

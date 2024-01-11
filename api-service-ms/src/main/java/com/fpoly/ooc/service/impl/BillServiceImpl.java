@@ -59,6 +59,7 @@ import com.fpoly.ooc.service.kafka.KafkaUtil;
 import com.fpoly.ooc.util.CommonUtils;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -367,10 +368,17 @@ public class BillServiceImpl implements BillService {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_NOT_FOUND));
         }
 
+        List<BillDetail> billDetailList = billDetailRepo.findBillDetailByBill_Id(bill.getId());
+
+        if (CollectionUtils.isEmpty(billDetailList)) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_NOT_FOUND));
+        }
+
         bill.setStatus(dto.getStatus());
         bill.setAmountPaid(dto.getAmountPaid());
-        if (dto.getTimelineStatus().equals("4")) {
+        if (("4").equals(dto.getTimelineStatus())) {
             bill.setCompletionDate(LocalDateTime.now());
+            billDetailList.forEach((el) -> el.setStatus("Complete"));
         }
 
         billRepo.save(bill);
@@ -390,7 +398,9 @@ public class BillServiceImpl implements BillService {
                 voucher.setLimitQuantity(voucher.getLimitQuantity() + 1);
                 voucherService.updateVoucher(voucher);
             }
+            billDetailList.forEach((el) -> el.setStatus("Cancel"));
         }
+        billDetailRepo.saveAll(billDetailList);
         kafkaUtil.sendingObjectWithKafka(dto, Const.TOPIC_TIME_LINE);
         return 1;
     }
@@ -624,6 +634,12 @@ public class BillServiceImpl implements BillService {
         VoucherHistory voucherHistory = voucherHistoryService.findHistoryByBillCodeAndStatus(bill.getBillCode(), "ACTIVE");
         BigDecimal price = bill.getPrice();
         BigDecimal priceReduce = BigDecimal.ZERO;
+        DeliveryNote deliveryNote = deliveryNoteService.getDeliveryNoteByBill_Id(bill.getId());
+        double priceBillAmount = CommonUtils.bigDecimalConvertDouble(bill.getPrice())
+                + CommonUtils.bigDecimalConvertDouble(deliveryNote.getShipPrice())
+                - CommonUtils.bigDecimalConvertDouble(bill.getPriceReduce());
+        bill.setAmountPaid(new BigDecimal(priceBillAmount));
+        double amountPrice = CommonUtils.bigDecimalConvertDouble(bill.getAmountPaid());
         if (voucherHistory != null) {
             DisplayVoucherRequest request = new DisplayVoucherRequest();
             request.setUsername(Objects.isNull(bill.getAccount())?null:bill.getAccount().getUsername());

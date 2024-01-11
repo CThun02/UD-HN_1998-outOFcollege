@@ -32,6 +32,7 @@ import { getAuthToken, getToken } from "../../../service/Token";
 import ModalBillInfoDisplay from "../../element/bill-info/ModalBillInfoDisplay";
 import ModalProduct from "./ModalProduct";
 import EditAddress from "../../element/edit-address/EditAddress";
+import InputCallAPI from "../../element/InputCallAPI";
 
 const BillTimeLine = (addId) => {
   const [isModalConfirm, setIsModalConfirm] = useState(false);
@@ -51,6 +52,7 @@ const BillTimeLine = (addId) => {
   const [bdId, setBdId] = useState(null);
   const [noteTimeline, setNoteTimeline] = useState(null);
   const [timelineId, setTimelineId] = useState(null);
+  const [shippingPrice, setShippingPrice] = useState(0);
 
   const handleOpen = () => {
     console.log(true);
@@ -257,7 +259,8 @@ const BillTimeLine = (addId) => {
         },
       })
       .then((response) => {
-        setBillInfo(response.data);
+        setBillInfo(response?.data);
+        setShippingPrice(numeral(response?.data?.shipPrice));
       })
       .catch((error) => {
         const status = error.response?.status;
@@ -327,10 +330,10 @@ const BillTimeLine = (addId) => {
           duration: 2,
         });
         handleCreateTimeline(
-          `Cập nhật sản phẩm: ${record.productCode} |  ${
-            Number(quantityOld) - Number(value) > 0
-              ? Number(quantityOld) - Number(value)
-              : Math.abs(Number(quantityOld) - Number(value))
+          `Cập nhật sản phẩm: ${record?.productName} |  ${
+            Number(value) > Number(quantityOld)
+              ? `Tăng ${Math.abs(Number(quantityOld) - Number(value))} số lượng`
+              : `Giảm ${Math.abs(Number(quantityOld) - Number(value))} số lượng`
           } `,
           "Update",
           null,
@@ -541,6 +544,10 @@ const BillTimeLine = (addId) => {
       },
     },
   ];
+
+  const handleChangeShippingPrice = (value) => {
+    setShippingPrice(value);
+  };
 
   return (
     <>
@@ -1078,17 +1085,41 @@ const BillTimeLine = (addId) => {
                 fontWeight: "500",
               }}
             >
-              Giá vận chuyển:
+              Phí vận chuyển:
             </span>
             <span>
-              <Input
+              {/* <Input
                 placeholder="Giá vận chuyển"
                 style={{ width: "30%" }}
-                value={numeral(billInfo?.shipPrice).format("0,0")}
+                value={numeral(shippingPrice).format("0,0")}
+                onChange={(e) => {
+                  handleChangeShippingPrice(e, e.target.value);
+                }}
+                onKeyDown={handleKeyDown} 
+              />
+                */}
+              <InputCallAPI
+                currentValue={numeral(shippingPrice).format("0,0")}
+                onChange={handleChangeShippingPrice}
+                isCallAPI={true}
+                url={
+                  "http://localhost:8080/api/admin/delivery-note/updateShippingPrice"
+                }
+                billId={billInfo?.billId}
+                currentPrice={billInfo?.shipPrice}
+                handleCreateTimeline={handleCreateTimeline}
+                billStatus={billInfo?.status}
+                isPaid={
+                  billInfo?.lstPaymentDetail?.length > 0 &&
+                  billInfo?.lstPaymentDetail?.length === 1
+                    ? billInfo?.lstPaymentDetail[0]?.status === "Paid"
+                    : billInfo?.lstPaymentDetail?.length === 2
+                    ? billInfo?.lstPaymentDetail[0]?.status === "Paid" &&
+                      billInfo?.lstPaymentDetail[1]?.status === "Paid"
+                    : false
+                }
               />
             </span>
-
-            {/* <span>{numeral(billInfo?.shipPrice).format("0,0") + "đ"}</span> */}
           </span>
           <span className={styles.span}>
             <span

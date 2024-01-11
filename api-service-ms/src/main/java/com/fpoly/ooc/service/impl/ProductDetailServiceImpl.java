@@ -275,7 +275,7 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
     }
 
     @Override
-    public Boolean isCheckQuantity(Long productDetailId) throws NotFoundException {
+    public Boolean isCheckQuantity(List<Long> productDetailId) throws NotFoundException {
         Boolean isProductDetail = repo.findProductDetailById(productDetailId);
         if (!isProductDetail) {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BUY_PRODUCT_NOT_FOUND));

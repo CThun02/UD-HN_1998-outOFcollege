@@ -3,6 +3,7 @@ package com.fpoly.ooc.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.common.SimpleSendProductDetail;
 import com.fpoly.ooc.constant.Const;
+import com.fpoly.ooc.constant.ErrorCodeConfig;
 import com.fpoly.ooc.dto.ProductDetailsDTO;
 import com.fpoly.ooc.dto.UpdateQuantityProductDetailDTO;
 import com.fpoly.ooc.entity.*;
@@ -220,12 +221,14 @@ public class ProductController {
 
     @PostMapping("/updateQuantityProductDetail")
     public ResponseEntity<?> updateQuantityProductDetail(@RequestBody UpdateQuantityProductDetailDTO req) throws NotFoundException, JsonProcessingException {
-        if (Objects.nonNull(req) && req.getIsEditProductTimeLine()) {
+        if (Objects.isNull(req)) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_SERVICE));
+        }
+        if (req.getIsEditProductTimeLine()) {
             return ResponseEntity.ok(Boolean.FALSE);
         }
-
         ProductDetail productDetail = productDetailService.updateQuantityProductDetail(req);
-        if (Objects.nonNull(productDetail) && Objects.nonNull(req)) {
+        if (Objects.nonNull(productDetail)) {
             simpleSendProductDetail.updateQuantityRealtime(req);
             return ResponseEntity.ok(Boolean.TRUE);
         }

@@ -262,7 +262,7 @@ public class ClientController {
     }
 
     @GetMapping("/isCheckQuantity/{id}")
-    public ResponseEntity<?> isCheckQuantity(@PathVariable("id") Long productDetailId) throws NotFoundException {
+    public ResponseEntity<?> isCheckQuantity(@PathVariable("id") List<Long> productDetailId) throws NotFoundException {
         return ResponseEntity.ok(productDetailService.isCheckQuantity(productDetailId));
     }
 

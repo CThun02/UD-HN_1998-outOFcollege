@@ -21,13 +21,6 @@ const ModalProduct = ({
   let productDetailsCreate = cart?.productDetails;
 
   function action() {
-    // var totalPrice = 0;
-    // for (let i = 0; i < productDetailsCreate?.length; i++) {
-    //   totalPrice += productDetailsCreate[i].priceReduce * productDetailsCreate[i].quantity;
-    // }
-    // if (totalPrice > 20000000) {
-    //   notifi()
-    // } else {
     cart = {
       productDetails: productDetailsCreate,
       timeStart: now(),
@@ -40,27 +33,7 @@ const ModalProduct = ({
       description: "Thêm sản phẩm vào giỏ hàng thành công!",
     });
     setBoolean(!boolean);
-
-    // update quantity product
-    // }
   }
-
-  // let notifi = () => {
-  //   notification.warning({
-  //     message: "Lỗi",
-  //     description: (
-  //       <span>
-  //         Tổng giá vượt quá{" "}
-  //         {(20000000).toLocaleString("vi-VN", {
-  //           style: "currency",
-  //           currency: "VND",
-  //         })}{" "}
-  //         <br /> Vui lòng liên hệ quản lý cửa hàng để hỗ trợ
-  //       </span>
-  //     ),
-  //     duration: 2,
-  //   });
-  // };
 
   return (
     <>

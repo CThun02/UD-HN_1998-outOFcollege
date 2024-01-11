@@ -49,7 +49,7 @@ public interface ProductReturnRepository extends JpaRepository<ProductReturn, Lo
             ", pr.productDetail.size AS size, pr.productDetail.color AS color, pr.productDetail.shirtTail AS shirtTail" +
             ", pr.price AS price, pr.productDetail.weight as weight, pr.quantity AS quantity, " +
             "  pr.status AS status, pr.note as descriptionDetail" +
-            " FROM ProductReturn pr join Bill b on pr.bill.id = b.id" +
+            " FROM ProductReturn pr join Bill b on pr.bill.id = b.id" +billserrve
             " where b.billCode=?1 ")
     public List<ProductDetailResponse> getProductReturnByBillCode(String billCode);
 

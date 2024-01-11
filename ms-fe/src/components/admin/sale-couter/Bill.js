@@ -1254,14 +1254,14 @@ const Bill = () => {
             isError = true;
           }
         } else {
-          if (!Number(price)) {
+          if (!price) {
             setInputError("Không được bỏ trống");
           } else {
             setInputError("");
             isError = false;
           }
 
-          if (!Number(priceATM)) {
+          if (!priceATM) {
             setPriceATMError("Không được bỏ trống");
           } else {
             setPriceATMError("");
@@ -2048,7 +2048,7 @@ const Bill = () => {
                                       color: "red",
                                     }}
                                   >
-                                    {remainAmount?.toLocaleString("vi-VN", {
+                                    {remainAmount.toLocaleString("vi-VN", {
                                       style: "currency",
                                       currency: "VND",
                                     })}

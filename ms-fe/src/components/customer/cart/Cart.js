@@ -293,16 +293,31 @@ const Cart = (props) => {
     },
   ];
 
+  const [timer, setTimer] = useState(null);
   const handleUpdateQuantityApi = (id, value) => {
-    axios
-      .put(`${cartAPI}?cartDetailId=${id}&quantity=${value}`)
-      .then((response) => {
-        setRender(response.data);
-        props.setRenderHeader(Math.random());
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    clearTimeout(timer);
+    const newTimer = setTimeout(() => {
+      axios
+        .put(`${cartAPI}?cartDetailId=${id}&quantity=${value}`)
+        .then((response) => {
+          notification.success({
+            message: "Thông báo",
+            description: "Cập nhật thành công",
+            duration: 2,
+          });
+          setRender(response.data);
+          props.setRenderHeader(Math.random());
+        })
+        .catch((error) => {
+          notification.error({
+            message: "Thông báo",
+            description: "Cập nhật thất bại",
+            duration: 2,
+          });
+          return;
+        });
+    }, 1000);
+    setTimer(newTimer);
   };
 
   const handleDeleteApi = (id) => {
@@ -803,8 +818,33 @@ const Cart = (props) => {
       });
       return;
     } else {
+      // let isError = false;
+      // let totalPrice = 0;
+      // for (var i = 0; i < newData?.length; i++) {
+      //   const quantity = newData[i]?.cartDetailResponse?.quantity;
+      //   const productPrice = newData[i]?.cartDetailResponse?.priceProductDetail;
+      //   totalPrice += quantity * productPrice;
+      //   if (totalPrice > 10000000) {
+      //     notification.error({
+      //       message: "Thông báo",
+      //       description: "Tổng giá trị đơn hàng tối đa là 10 triệu",
+      //       duration: 2,
+      //     });
+      //     isError = true;
+      //     break;
+      //   }
+      // }
+      const data = newData.map((e) => {
+        return {
+          quantity: e.cartDetailResponse.quantity,
+          price: e.cartDetailResponse.priceProductDetail,
+          productDetailId: e.cartDetailResponse.productDetailId,
+        };
+      });
+      console.log("data: ", data);
+      console.log("data: ", newData);
       axios
-        .get(baseUrl + "/isCheckQuantity/" + selectedRowKeys)
+        .post(baseUrl + "/isCheckQuantity", { quantityAndPriceList: data })
         .then(() => {
           localStorage.setItem("checkout", JSON.stringify(newData));
           navigate("/ms-shop/checkout");
@@ -868,7 +908,7 @@ const Cart = (props) => {
                     }
                   }
                 }
-                // localStorage.removeItem("user");
+                localStorage.removeItem("user");
               }
 
               axios.post(`${cartAPI} `, cart);

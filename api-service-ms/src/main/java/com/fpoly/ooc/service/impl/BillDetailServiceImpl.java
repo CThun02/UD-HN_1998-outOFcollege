@@ -72,6 +72,7 @@ public class BillDetailServiceImpl implements BillDetailService {
                 .productDetail(ProductDetail.builder().id(request.getId()).build())
                 .price(price)
                 .quantity(quantityAdd)
+                .status(Const.STATUS_ACTIVE)
                 .build();
         //Tìm sản phẩm  tồn tại trong hóa đơn
         List<BillDetail> billDetails = billDetailRepo.findBillDetailsByProductDetailIdAndBillCode(request.getId(), billCode);
@@ -187,7 +188,7 @@ public class BillDetailServiceImpl implements BillDetailService {
         }
         //Nếu giá mua cộng với giá tại hóa đơn lớn hơn 5 triệu
         else if(price.multiply(BigDecimal.valueOf(quantityAdd)).add(bill.getPriceReduce()).compareTo(BigDecimal.valueOf(5000000))>0){
-            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_THAN_FIVE_MILLION));
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_THAN_TEN_MILLION));
         }
     }
 
@@ -195,14 +196,26 @@ public class BillDetailServiceImpl implements BillDetailService {
     @Override
 //    @Lock(LockModeType.OPTIMISTIC_FORCE_INCREMENT)
     public BillDetail createBillDetail(BillDetailRequest request) throws JsonProcessingException, NotFoundException {
+
         BillDetail billDetail = BillDetail.builder().id(request.getBillDetailId())
                 .bill(Bill.builder().id(request.getBillId()).build())
                 .productDetail(ProductDetail.builder().id(request.getProductDetailId()).build())
                 .price(request.getPrice())
                 .quantity(request.getQuantity())
+                .status(Const.STATUS_ACTIVE)
                 .build();
         Bill bill = billService.findBillByBillId(request.getBillId());
         BillDetail savedBillDetail = null;
+
+        if (Objects.isNull(bill)) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_NOT_FOUND));
+        }
+        BigDecimal priceBill = billDetailRepo.getTotalPriceByBillCode(bill.getBillCode());
+        double maxPriceBillInOnline = CommonUtils.bigDecimalConvertDouble(priceBill);
+
+        if (maxPriceBillInOnline > 10000000 && "Online".equalsIgnoreCase(bill.getBillType())) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_THAN_TEN_MILLION));
+        }
 
         if (request.getBillDetailId() != null) {
             billDetail = billDetailRepo.findById(request.getBillDetailId()).orElse(null);
@@ -243,26 +256,40 @@ public class BillDetailServiceImpl implements BillDetailService {
                     if (Objects.equals(request.getProductDetailId(), billDetailUpdate.getProductDetail().getId())) {
                         billDetailUpdate.setQuantity(billDetailUpdate.getQuantity() + request.getQuantity());
                         billDetailUpdate.setPrice(request.getPrice());
-                        savedBillDetail = billDetailRepo.save(billDetailUpdate);
 
                         ProductDetail productDetailDb = productDetailService.findById(billDetailUpdate.getProductDetail().getId());
                         if (productDetailDb.getQuantity() - request.getQuantity() < 0) {
                             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BUY_QUANTITY_THAN_QUANTITY_IN_STORE));
                         }
                         productDetailDb.setQuantity(productDetailDb.getQuantity() - request.getQuantity());
+
+                        if(productDetailDb.getQuantity() < 0) {
+                            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BUY_QUANTITY_THAN_QUANTITY_IN_STORE));
+                        }
                         productDetailService.update(productDetailDb);
+                        savedBillDetail = billDetailRepo.save(billDetailUpdate);
                         isCheck = Boolean.FALSE;
                         break;
                     }
                 }
 
                 if (isCheck) {
+                    ProductDetail productDetailDb = productDetailService.findById(request.getProductDetailId());
+                    if (productDetailDb.getQuantity() - request.getQuantity() < 0) {
+                        throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BUY_QUANTITY_THAN_QUANTITY_IN_STORE));
+                    }
+                    productDetailDb.setQuantity(productDetailDb.getQuantity() - request.getQuantity());
+
+                    if(productDetailDb.getQuantity() < 0) {
+                        throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BUY_QUANTITY_THAN_QUANTITY_IN_STORE));
+                    }
+                    productDetailService.update(productDetailDb);
+
                     savedBillDetail = billDetailRepo.save(billDetail);
                 }
             }
         }
 
-        BigDecimal priceBill = billDetailRepo.getTotalPriceByBillCode(bill.getBillCode());
         bill.setPrice(priceBill);
         billService.updateBill(bill);
         return savedBillDetail;
@@ -282,8 +309,8 @@ public class BillDetailServiceImpl implements BillDetailService {
     }
 
     @Override
-    @Transactional(rollbackOn = Exception.class)
-    public BillDetail deleteBillDetail(Long billId, Long billDetailId) throws NotFoundException {
+//    @Transactional(rollbackOn = Exception.class)
+    public BillDetail deleteBillDetail(Long billId, Long billDetailId) throws NotFoundException, JsonProcessingException {
         Bill bill = billService.findBillByBillId(billId);
         BillDetail billDetail = billDetailRepo.findById(billDetailId).orElse(null);
 
@@ -292,15 +319,12 @@ public class BillDetailServiceImpl implements BillDetailService {
         }
 
         ProductDetail productDetail = productDetailService.findById(billDetail.getProductDetail().getId());
-        Integer quantityUpdayte = productDetail.getQuantity() + billDetail.getQuantity();
-        productDetail.setQuantity(quantityUpdayte);
-        try {
-            productDetailService.update(productDetail);
-        } catch (Exception e) {
-            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_QUANTITY_INVALID));
-        }
+        Integer quantityUpdate = productDetail.getQuantity() + billDetail.getQuantity();
+        productDetail.setQuantity(quantityUpdate);
 
-        billDetailRepo.deleteById(billDetailId);
+        productDetailService.update(productDetail);
+        billDetail.setStatus(Const.STATUS_INACTIVE);
+        billDetailRepo.deleteById(billDetail.getId());
 
         BigDecimal priceBill = billDetailRepo.getTotalPriceByBillCode(bill.getBillCode());
         bill.setPrice(priceBill);

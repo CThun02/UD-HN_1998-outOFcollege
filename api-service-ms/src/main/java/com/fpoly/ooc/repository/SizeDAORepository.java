@@ -16,7 +16,7 @@ public interface SizeDAORepository extends JpaRepository<Size, Long> {
     @Query("select distinct new com.fpoly.ooc.entity.Size(s.id, s.sizeName) from Size s " +
             "left join ProductDetail productDetail on s.id = productDetail.size.id " +
             "where s.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
-            "and productDetail.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and productDetail.quantity > 0 " +
             "and productDetail.brand.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
             "and productDetail.category.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
             "and productDetail.pattern.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +

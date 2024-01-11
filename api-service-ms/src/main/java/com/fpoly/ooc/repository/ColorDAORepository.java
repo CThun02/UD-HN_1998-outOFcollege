@@ -15,7 +15,7 @@ public interface ColorDAORepository extends JpaRepository<Color, Long> {
     @Query("select distinct new com.fpoly.ooc.entity.Color(color.id, color.colorCode, color.colorName) from Color color " +
             "left join ProductDetail productDetail on color.id = productDetail.color.id " +
             "where color.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
-            "and productDetail.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "and productDetail.quantity > 0 " +
             "and productDetail.brand.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
             "and productDetail.category.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
             "and productDetail.pattern.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +

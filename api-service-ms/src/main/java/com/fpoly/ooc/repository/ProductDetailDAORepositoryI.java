@@ -138,7 +138,7 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
                 LEFT JOIN ShirtTailType shirtTail ON shirtTail.id = pd.shirtTail.id
                 
                 WHERE
-                    pd.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
+                    pd.quantity >= 0
                     AND (pi is null or pi.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE)
                     AND (bd is null or bd.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE)
                     AND (pp is null or pp.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE)
@@ -156,7 +156,7 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
                     AND (shirtTail is null or shirtTail.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE)
                 GROUP BY pd.id, pt.id, br.id, category.id, pattern.id, form.id, button.id, material.id,
                 collar.id, sleeve.id, shirtTail.id, c.categoryName, pt.productName, br.brandName,
-                 pn.promotionMethod, pn.promotionValue, pd.price, pd.createdAt
+                 pn.promotionMethod, pn.promotionValue, pd.price, pd.createdAt, pd.quantity
                 ORDER BY COUNT(bd.id) DESC
                 LIMIT 4
             """)
@@ -187,8 +187,7 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
                 LEFT JOIN ShirtTailType shirtTail ON shirtTail.id = pd.shirtTail.id
                 
                 WHERE
-                    pd.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE
-                    AND (pi is null or pi.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE)
+                     (pi is null or pi.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE)
                     AND (bd is null or bd.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE)
                     AND (pp is null or pp.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE)
                     AND (pn is null or pn.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE)
@@ -257,7 +256,9 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
             "left join ShirtTailType shirtTail on shirtTail.id = productDetail.shirtTail.id " +
             "left join PromotionProduct promotionProduct on promotionProduct.productDetailId.id = productDetail.id " +
             "left join Promotion promotion on promotion.id = promotionProduct.promotion.id " +
-            "where productDetail.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "where " +
+//            "productDetail.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "productDetail.quantity >= 0 " +
             "and product.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
             "and brand.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
             "and category.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
@@ -306,7 +307,8 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
             "left join SleeveType sleeve on productDetail.sleeve.id = sleeve.id " +
             "left join ShirtTailType shirt on productDetail.shirtTail.id = shirt.id " +
             "where " +
-            "productDetail.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+//            "productDetail.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
+            "productDetail.quantity >= 0 " +
             "and color.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
             "and s.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
             "and b.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
@@ -378,7 +380,7 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
                                 Long sleeveId,
                                 Long shirtId);
 
-    ProductDetail findProductDetailByIdAndStatusAndQuantityGreaterThan(Long id, String status, Integer quantity);
+    ProductDetail findProductDetailById(Long id);
 
     ProductDetail findProductDetailByIdAndStatus(Long id, String status);
 }

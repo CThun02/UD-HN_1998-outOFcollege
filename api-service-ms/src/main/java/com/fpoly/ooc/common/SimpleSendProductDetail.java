@@ -92,26 +92,26 @@ public class SimpleSendProductDetail {
                 request.getShirtTailId(), request.getColorId(), request.getSizeId());
 
         GetColorAndSizeAndQuantity res = CommonUtils.getOneElementsInArrays(colorAndSizeListByReq);
-        if (Objects.isNull(res)) {
-            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND));
-        }
+        if (Objects.nonNull(res)) {
+            List<Long> productDetailsId =
+                    productDetailDAORepositoryI.productDetailsId(request.getProductId(), request.getBrandId(), request.getCategoryId(), request.getPatternId(),
+                            request.getFormId(), request.getButtonId(), request.getMaterialId(), request.getCollarId(), request.getSleeveId(),
+                            request.getShirtTailId(), request.getColorId(), request.getSizeId());
+            if (!CollectionUtils.isEmpty(productDetailsId)) {
+                res.setProductDetailsId(productDetailsId);
+            }
 
-        Optional<List<Color>> colors = colorServiceI.findColorsByProductId(request);
-        Optional<List<Size>> sizes = sizeServiceI.findSizesByProductId(request);
-        if (colors.isEmpty() || sizes.isEmpty()) {
-            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND));
+            Optional<List<Color>> colors = colorServiceI.findColorsByProductId(request);
+            Optional<List<Size>> sizes = sizeServiceI.findSizesByProductId(request);
+            if (colors.isPresent() && sizes.isPresent()) {
+                if (CollectionUtils.isNotEmpty(colors.get()) && CollectionUtils.isNotEmpty(sizes.get())) {
+                    res.setColors(colors.get());
+                    res.setSizes(sizes.get());
+                    String colorsAndSizes = objectMapper.writeValueAsString(res);
+                    template.convertAndSend("/topic/colorsAndSizes-topic", colorsAndSizes);
+                }
+            }
         }
-
-        List<Long> productDetailsId =
-                productDetailDAORepositoryI.productDetailsId(request.getProductId(), request.getBrandId(), request.getCategoryId(), request.getPatternId(),
-                        request.getFormId(), request.getButtonId(), request.getMaterialId(), request.getCollarId(), request.getSleeveId(),
-                        request.getShirtTailId(), request.getColorId(), request.getSizeId());
-        if (!CollectionUtils.isEmpty(productDetailsId)) {
-            res.setProductDetailsId(productDetailsId);
-        }
-        res.setColors(colors.get());
-        res.setSizes(sizes.get());
-
 
         ProductDetailShopResponse productDetailShopResponse = response.get(0);
         GetColorAndSizeAndQuantity colorAndSize = productDetailServiceI.getColorAndSize(request).orElseThrow();
@@ -128,7 +128,6 @@ public class SimpleSendProductDetail {
         }
 
         String productDetailsJson = objectMapper.writeValueAsString(productDetailShopResponse);
-        String colorsAndSizes = objectMapper.writeValueAsString(res);
         String productDetailsShopJson = objectMapper.writeValueAsString(productDetailDAORepositoryI.getAllProductDetailShop(
                 null, null, null, "", "", "", "", null,
                 null, null, null));
@@ -136,7 +135,6 @@ public class SimpleSendProductDetail {
         String newProductJson = objectMapper.writeValueAsString(productDetailDAORepositoryI.getNewProductDetail());
 
         template.convertAndSend("/topic/getOneProductDetail-topic", productDetailsJson);
-        template.convertAndSend("/topic/colorsAndSizes-topic", colorsAndSizes);
         template.convertAndSend("/topic/productDetailShop-topic", productDetailsShopJson);
         template.convertAndSend("/topic/bestSellingProduct-topic", bestSellingJson);
         template.convertAndSend("/topic/newProduct-topic", newProductJson);

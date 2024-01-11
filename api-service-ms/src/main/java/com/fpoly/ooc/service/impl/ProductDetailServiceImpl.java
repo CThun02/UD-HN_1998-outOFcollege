@@ -79,9 +79,15 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
     @Override
     public ProductDetail update(ProductDetail productDetail) throws JsonProcessingException, NotFoundException {
         ProductDetail productDetailtCheck = this.getOne(productDetail.getId());
-        if(productDetail.getQuantity() == 0){
-            productDetail.setStatus(Const.STATUS_INACTIVE);
+        String status = productDetail.getStatus();
+        if(productDetail.getQuantity() <= 0){
+            status = Const.STATUS_INACTIVE;
         }
+
+        if (productDetail.getQuantity() > 0) {
+            status = Const.STATUS_ACTIVE;
+        }
+        productDetail.setStatus(status);
         if (Objects.nonNull(productDetailtCheck)) {
             log.error("productDetail: " + productDetail);
             kafkaUtil.sendingObjectWithKafka(productDetail, Const.TOPIC_PRODUCT_DETAIL);
@@ -294,7 +300,10 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
 
     @Override
     public ProductDetail findProductDetailByIdAndStatus(Long id) throws NotFoundException {
-        ProductDetail productDetail = repo.findProductDetailByIdAndStatusAndQuantityGreaterThan(id, Const.STATUS_ACTIVE, 0);
+        if (Objects.isNull(id)) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND));
+        }
+        ProductDetail productDetail = repo.findProductDetailById(id);
 
         if (Objects.nonNull(productDetail)) {
             return productDetail;
@@ -358,6 +367,10 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
                 }
                 getOneProduct.setQuantity(getOneProduct.getQuantity() - quantityUpdate);
             }
+        }
+
+        if (getOneProduct.getQuantity() < 0) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BUY_QUANTITY_THAN_QUANTITY_IN_STORE));
         }
 
         return repo.save(getOneProduct);

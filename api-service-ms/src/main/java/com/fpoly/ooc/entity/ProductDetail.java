@@ -182,7 +182,8 @@ import java.util.List;
                             LEFT JOIN shirt_tail_type shirtTail ON shirtTail.id = pd.shirt_tail_id
 
                             WHERE
-                                pd.status = 'ACTIVE'
+                                --pd.status = 'ACTIVE'
+                                pd.quantity >= 0
                                 AND (pie.product_detail_id is null or pie.status = 'ACTIVE')
                                 AND pt.status = 'ACTIVE'
                                 AND c.status = 'ACTIVE'
@@ -207,7 +208,7 @@ import java.util.List;
                                 AND (?6 = '' OR cor.id IN (?10))
                                 AND (?7 = '' OR se.id IN (?11))
                             GROUP BY pt.id, br.id, cy.id, patt.id, f.id, button.id, mate.id, collar.id, sleeve.id, shirtTail.id,
-                             c.category_name, pt.product_name, br.brand_name
+                             c.category_name, pt.product_name, br.brand_name, pd.quantity
                 """, resultSetMapping = "Mapping.ProductDetailShop")
 
 @NamedNativeQuery(
@@ -285,7 +286,8 @@ import java.util.List;
                            left join promotion_product_detail promotionProduct on productDetail.id = promotionProduct.product_detail_id
                            left join promotion promotion on promotion.id = promotionProduct.promotion_id
                   where
-                    productDetail.status = 'ACTIVE'
+                    --productDetail.status = 'ACTIVE'
+                    productDetail.quantity >= 0
                     and color.status = 'ACTIVE'
                     and s.status = 'ACTIVE'
                     and b.status = 'ACTIVE'
@@ -310,7 +312,7 @@ import java.util.List;
                     and (?12 is null or s.id = ?12)
                     and product.id = ?1
                   group by promotion.promotion_value, promotion.promotion_method, product.id, cate.id,
-                           patt.id, b.id, form.id, button.id, mate.id, collar.id, sleeve.id, shirt.id
+                           patt.id, b.id, form.id, button.id, mate.id, collar.id, sleeve.id, shirt.id, productDetail.quantity
                 """,
         resultSetMapping = "Mapping.GetColorAndSizeAndQuantity"
 )

@@ -207,26 +207,14 @@ public class TimeLineServiceImpl implements TimeLineService {
                         paymentService.savePaymentDetail(billId);
                         break;
                 }
-//                if ("1".equalsIgnoreCase(request.getStatus())) {
-//                    statusBill = "wait_for_confirm";
-//                } else if ("2".equalsIgnoreCase(request.getStatus())) {
-//                    statusBill = "wait_for_delivery";
-//                } else if ("3".equalsIgnoreCase(request.getStatus())) {
-//                    statusBill = "delivering";
-//                } else if ("Rollback".equalsIgnoreCase(request.getStatus())) {
-//                    statusBill = "wait_for_confirm";
-//                } else if ("0".equalsIgnoreCase(request.getStatus())) {
-//                    statusBill = "Cancel";
-//                    rollbackQuantityWhenCancelBill(billId);
-//                } else {
-//                    statusBill = "Complete";
-//                    paymentService.savePaymentDetail(billId);
-//                }
-                bill.setStatus(StringUtils.isNotBlank(statusBill) ? statusBill : bill.getStatus());
+                if (!bill.getStatus().equalsIgnoreCase(statusBill)) {
+                    bill.setStatus(StringUtils.isNotBlank(statusBill) ? statusBill : bill.getStatus());
+                    billService.saveBill(bill);
+                }
                 timeline.setStatus(request.getStatus());
             }
             timeLineRepo.save(timeline);
-            billService.saveBill(bill);
+
         }
 
         Long count = timeLineRepo.getCountTimelineByBillId(billId);

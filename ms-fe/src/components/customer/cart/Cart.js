@@ -293,26 +293,31 @@ const Cart = (props) => {
     },
   ];
 
+  const [timer, setTimer] = useState(null);
   const handleUpdateQuantityApi = (id, value) => {
-    axios
-      .put(`${cartAPI}?cartDetailId=${id}&quantity=${value}`)
-      .then((response) => {
-        notification.success({
-          message: "Thông báo",
-          description: "Cập nhật thành công",
-          duration: 2,
+    clearTimeout(timer);
+    const newTimer = setTimeout(() => {
+      axios
+        .put(`${cartAPI}?cartDetailId=${id}&quantity=${value}`)
+        .then((response) => {
+          notification.success({
+            message: "Thông báo",
+            description: "Cập nhật thành công",
+            duration: 2,
+          });
+          setRender(response.data);
+          props.setRenderHeader(Math.random());
+        })
+        .catch((error) => {
+          notification.error({
+            message: "Thông báo",
+            description: "Cập nhật thất bại",
+            duration: 2,
+          });
+          return;
         });
-        setRender(response.data);
-        props.setRenderHeader(Math.random());
-      })
-      .catch((error) => {
-        notification.error({
-          message: "Thông báo",
-          description: "Cập nhật thất bại",
-          duration: 2,
-        });
-        return;
-      });
+    }, 1000);
+    setTimer(newTimer);
   };
 
   const handleDeleteApi = (id) => {

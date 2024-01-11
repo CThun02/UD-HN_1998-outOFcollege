@@ -204,6 +204,7 @@ public class TimeLineServiceImpl implements TimeLineService {
                         break;
                     default:
                         statusBill = "Complete";
+                        bill.setCompletionDate(LocalDateTime.now());
                         paymentService.savePaymentDetail(billId);
                         break;
                 }

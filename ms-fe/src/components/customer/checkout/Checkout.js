@@ -367,6 +367,20 @@ const Checkout = ({ setRenderHeader }) => {
             )[0];
             setAddress(response.data);
             if (addd) {
+              console.log("address: ", addd);
+              setFormData({
+                ...formData,
+                fullName: addd?.fullName,
+                phoneNumber: addd?.sdt,
+                email: addd?.email,
+                city: addd?.city?.substring(0, addd?.city.indexOf("|")),
+                district: addd?.district?.substring(
+                  0,
+                  addd?.district.indexOf("|")
+                ),
+                ward: addd?.ward?.substring(0, addd?.ward.indexOf("|")),
+                addressDetail: addd?.descriptionDetail,
+              });
               setDefaultAddress(addd);
               let district = addd.district?.substring(
                 1 + addd.district.indexOf("|")
@@ -727,9 +741,9 @@ const Checkout = ({ setRenderHeader }) => {
           );
           await axios.post("http://localhost:8080/api/client/delivery-note", {
             billId: response.data.id,
-            addressId: dataToken ? defaultAddress?.id : responseAddress.data.id,
-            name: dataToken ? defaultAddress?.fullName : formData.fullName,
-            phoneNumber: dataToken ? defaultAddress?.sdt : formData.phoneNumber,
+            addressId: responseAddress.data.id,
+            name: formData.fullName,
+            phoneNumber: formData.phoneNumber,
             shipDate: leadtime ?? null,
             shipPrice: shippingFee ?? null,
           });
@@ -859,16 +873,7 @@ const Checkout = ({ setRenderHeader }) => {
           });
       }
     };
-
-    // axios.get(`http://localhost:8080/api/client/pdf/${billCode}`)
-    //     .then((response) => {
-    //         setBill(response.data);
-    //     })
-    //     .catch((error) => {
-    //         console.log(error);
-    //     });
     getEmail();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -890,7 +895,6 @@ const Checkout = ({ setRenderHeader }) => {
       handleShippingOrderLeadtime(Number(district), ward);
       handleShippingFee(100, district, ward);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedDistrict, selectedWard, render]);
 
   return (
@@ -971,19 +975,13 @@ const Checkout = ({ setRenderHeader }) => {
                     <FloatingLabels
                       label="Họ tên"
                       zIndex={true}
-                      value={
-                        dataToken ? defaultAddress.fullName : formData.fullName
-                      }
+                      value={formData.fullName}
                     >
                       <Input
                         size="large"
                         name="fullName"
                         onChange={handleChange}
-                        value={
-                          dataToken
-                            ? defaultAddress.fullName
-                            : formData.fullName
-                        }
+                        value={formData.fullName}
                         allowClear
                       />
                       {error.fullName && (
@@ -995,17 +993,13 @@ const Checkout = ({ setRenderHeader }) => {
                     <FloatingLabels
                       label="Số điện thoại"
                       zIndex={true}
-                      value={
-                        dataToken ? defaultAddress.sdt : formData.phoneNumber
-                      }
+                      value={formData.phoneNumber}
                     >
                       <Input
                         size="large"
-                        name={`${dataToken ? "sdt" : "phoneNumber"}`}
+                        name={"phoneNumber"}
                         onChange={handleChange}
-                        value={
-                          dataToken ? defaultAddress.sdt : formData.phoneNumber
-                        }
+                        value={formData.phoneNumber}
                         allowClear
                       />
                       {error.phoneNumber && (
@@ -1019,7 +1013,7 @@ const Checkout = ({ setRenderHeader }) => {
                     <FloatingLabels
                       label="Tỉnh/thành phố"
                       zIndex={true}
-                      value={dataToken ? defaultAddress.city : formData.city}
+                      value={formData.city}
                     >
                       <Select
                         showSearch
@@ -1037,14 +1031,7 @@ const Checkout = ({ setRenderHeader }) => {
                             .localeCompare((optionB?.label ?? "").toLowerCase())
                         }
                         name="city"
-                        value={
-                          dataToken
-                            ? defaultAddress.city?.substring(
-                                0,
-                                defaultAddress.city.indexOf("|")
-                              )
-                            : formData.city
-                        }
+                        value={formData.city}
                         allowClear
                         onChange={(e) => {
                           handleProvincesChange(e);
@@ -1064,9 +1051,7 @@ const Checkout = ({ setRenderHeader }) => {
                     <FloatingLabels
                       label="Quận/huyện"
                       zIndex={true}
-                      value={
-                        dataToken ? defaultAddress.district : formData.district
-                      }
+                      value={formData.district}
                     >
                       <Select
                         showSearch
@@ -1074,14 +1059,7 @@ const Checkout = ({ setRenderHeader }) => {
                           height: 45,
                           width: 380,
                         }}
-                        value={
-                          dataToken
-                            ? defaultAddress?.district?.substring(
-                                0,
-                                defaultAddress.district.indexOf("|")
-                              )
-                            : formData.district
-                        }
+                        value={formData.district}
                         optionFilterProp="children"
                         filterOption={(input, option) =>
                           (option?.label ?? "").includes(input)
@@ -1108,7 +1086,7 @@ const Checkout = ({ setRenderHeader }) => {
                     <FloatingLabels
                       label="Phường xã"
                       zIndex={true}
-                      value={dataToken ? defaultAddress.ward : formData.ward}
+                      value={formData.ward}
                     >
                       <Select
                         showSearch
@@ -1116,14 +1094,7 @@ const Checkout = ({ setRenderHeader }) => {
                           height: 45,
                           width: 380,
                         }}
-                        value={
-                          dataToken
-                            ? defaultAddress.ward?.substring(
-                                0,
-                                defaultAddress.ward.indexOf("|")
-                              )
-                            : formData.ward
-                        }
+                        value={formData.ward}
                         optionFilterProp="children"
                         filterOption={(input, option) =>
                           (option?.label ?? "").includes(input)
@@ -1149,20 +1120,12 @@ const Checkout = ({ setRenderHeader }) => {
                     <FloatingLabels
                       label="Địa chỉ chi tiết"
                       zIndex={true}
-                      value={
-                        dataToken
-                          ? defaultAddress.descriptionDetail
-                          : formData.addressDetail
-                      }
+                      value={formData.addressDetail}
                     >
                       <Input
                         size="large"
                         name="addressDetail"
-                        value={
-                          dataToken
-                            ? defaultAddress.descriptionDetail
-                            : formData.addressDetail
-                        }
+                        value={formData.addressDetail}
                         onChange={handleChange}
                         allowClear
                       />

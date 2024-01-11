@@ -53,7 +53,7 @@ import java.util.List;
                              LEFT JOIN DATN_DB_MS.dbo.product_image productImage ON productImage.product_detail_id = productDetail.id
                     WHERE
                             lower(bill.bill_type) = lower('online')
-                      AND (bill.status != 'Completed')
+                      AND (bill.status = 'wait_for_confirm')
                       AND (productDetail.status is null or productDetail.status = 'ACTIVE')
                       AND (product.status is null or product.status = 'ACTIVE')
                       AND (brand.status is null or brand.status = 'ACTIVE')
@@ -63,7 +63,7 @@ import java.util.List;
                     GROUP BY bill.id, bill.created_at, timeline.status, product.product_name,
                              brand.brand_name, category.category_name, billDetail.quantity, billDetail.price,
                              productDetail.id
-                    HAVING (SELECT count(*) FROM DATN_DB_MS.dbo.time_line subTimeline where subTimeline.bill_id = bill.id) = 1
+                    --HAVING (SELECT count(*) FROM DATN_DB_MS.dbo.time_line subTimeline where subTimeline.bill_id = bill.id) = 1
                     ORDER BY bill.created_at DESC
                 """,
         resultSetMapping = "Mapping.findAllNotifications"

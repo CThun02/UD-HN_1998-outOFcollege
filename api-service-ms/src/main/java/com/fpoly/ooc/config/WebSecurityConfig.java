@@ -55,7 +55,7 @@ public class WebSecurityConfig {
                                 "api/admin/product/filterProductDetailByIdCom").hasAnyRole("EMPLOYEE", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/admin/promotion-product/").hasAnyRole("EMPLOYEE", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/admin/vouchers/").hasAnyRole("EMPLOYEE", "ADMIN")
-                        .requestMatchers( "/api/admin/delivery-note").hasAnyRole("EMPLOYEE", "ADMIN")
+                        .requestMatchers( "/api/admin/delivery-note/**").hasAnyRole("EMPLOYEE", "ADMIN")
                         .requestMatchers("/api/admin/timeline/**").permitAll()
                         .requestMatchers("/api/admin/address/**", "/api/admin/product/updateQuantityProductDetail").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")

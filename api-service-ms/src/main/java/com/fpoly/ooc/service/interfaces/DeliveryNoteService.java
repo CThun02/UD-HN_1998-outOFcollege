@@ -1,6 +1,8 @@
 package com.fpoly.ooc.service.interfaces;
 
+import com.fpoly.ooc.dto.UpdateShippingPriceDeliveryDTO;
 import com.fpoly.ooc.entity.DeliveryNote;
+import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.request.DeliveryNoteRequest;
 import com.fpoly.ooc.responce.deliveryNote.DeliveryNoteResponse;
 
@@ -16,5 +18,7 @@ public interface DeliveryNoteService {
     DeliveryNote updateShippingPrice(Long billId, BigDecimal price, LocalDateTime shipDate);
 
     DeliveryNoteResponse getOne(String billCode);
+
+    Boolean updateShippingPrice(UpdateShippingPriceDeliveryDTO dto) throws NotFoundException;
 
 }

@@ -319,10 +319,10 @@ public class TimeLineServiceImpl implements TimeLineService {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_NOT_CANCEL_BILL_WHEN_NOT_STATUS_WAIT_FOR_CONFIRM));
         }
 
-        Boolean isPaid = paymentService.isBillAlreadyPaid(billId);
-        if (isPaid) {
-            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_NOT_CANCEL_BILL_WHEN_BILL_ALREADY));
-        }
+//        Boolean isPaid = paymentService.isBillAlreadyPaid(billId);
+//        if (isPaid) {
+//            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_NOT_CANCEL_BILL_WHEN_BILL_ALREADY));
+//        }
 
         List<BillDetail> billDetailListByBillCode = billDetailRepo.findBillDetailByBill_BillCode(bill.getBillCode());
         if (CollectionUtils.isEmpty(billDetailListByBillCode)) {

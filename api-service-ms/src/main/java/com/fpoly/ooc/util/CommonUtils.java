@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 
@@ -50,6 +51,14 @@ public class CommonUtils {
         }
 
         return list.get(0);
+    }
+
+    public static Double bigDecimalConvertDouble(BigDecimal value) {
+        if (Objects.isNull(value)) {
+            return 0d;
+        }
+        return Double.valueOf(String.valueOf(value));
+
     }
 
 }

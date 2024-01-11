@@ -40,4 +40,15 @@ public class PaymentDetailServiceImpl implements PaymentService {
 
         return lstPaymentDetail.get(0);
     }
+
+    @Override
+    public Boolean isBillAlreadyPaid(Long billId) {
+        List<PaymentDetail> paymentDetailList = paymentDetailRepo.findAllByBillId(billId);
+        for (PaymentDetail paymentDetail: paymentDetailList) {
+            if (!"paid".equalsIgnoreCase(paymentDetail.getStatus())) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

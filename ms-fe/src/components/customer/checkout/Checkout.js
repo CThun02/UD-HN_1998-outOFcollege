@@ -394,7 +394,7 @@ const Checkout = ({ setRenderHeader }) => {
     const bill = {
       billCode: billCodeGen,
       price: totalPrice,
-      priceReduce: voucherPrice() === 0 ? totalPrice : voucherPrice(),
+      priceReduce: voucherPrice(),
       paymentDetailId: formData.paymentDetailId,
       billType: "Online",
       symbol: "Shipping",

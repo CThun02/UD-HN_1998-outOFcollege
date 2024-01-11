@@ -71,7 +71,7 @@ public class BillController {
     public ResponseEntity<?> updateBillReturn(@RequestParam Long billId, @RequestParam BigDecimal priceReturn,
                                               @RequestParam BigDecimal voucherPrice,
                                               @RequestParam String newVoucherCode) throws NotFoundException {
-        return ResponseEntity.ok(billService.updateBillReturn(billId, priceReturn, voucherPrice, newVoucherCode));
+        return ResponseEntity.ok(billService.updateBillReturn(billId, priceReturn, voucherPrice, newVoucherCode.equals("")?null:newVoucherCode));
     }
 
     @GetMapping("/filterProductDetailSellByIdCom")

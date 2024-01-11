@@ -56,6 +56,7 @@ import com.fpoly.ooc.service.interfaces.VoucherAccountService;
 import com.fpoly.ooc.service.interfaces.VoucherHistoryService;
 import com.fpoly.ooc.service.interfaces.VoucherService;
 import com.fpoly.ooc.service.kafka.KafkaUtil;
+import com.fpoly.ooc.util.CommonUtils;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -202,14 +203,28 @@ public class BillServiceImpl implements BillService {
             paymentDetail2Nd.setStatus(statusPaymentDetail);
             paymentDetailRepo.save(paymentDetail2Nd);
         } else {
-            if (!request.getIsSellingAdmin() && request.getPaymentDetailId() == 1) {
-                statusPaymentDetail = "Unpaid";
+            PaymentDetail paymentDetail = new PaymentDetail();
+
+            if (!request.getIsSellingAdmin()) {
+                if (request.getPaymentDetailId() == 1) {
+                    statusPaymentDetail = "Unpaid";
+                    paymentDetail.setPrice(request.getAmountPaid());
+                }
+                if (request.getPaymentDetailId() == 2) {
+                    statusPaymentDetail = "Paid";
+                    paymentDetail.setPrice(request.getAmountPaid());
+                }
+            } else {
+                if(request.getPaymentDetailId() == 1) {
+                    paymentDetail.setPrice(request.getPriceAmountCast());
+                }
+                if(request.getPaymentDetailId() == 2) {
+                    paymentDetail.setPrice(request.getPriceAmountATM());
+                }
             }
 
-            PaymentDetail paymentDetail = new PaymentDetail();
             paymentDetail.setBill(bill);
             paymentDetail.setPayment(Payment.builder().id(request.getPaymentDetailId()).build());
-            paymentDetail.setPrice(request.getAmountPaid());
             paymentDetail.setStatus(statusPaymentDetail);
             paymentDetailRepo.save(paymentDetail);
         }
@@ -342,6 +357,10 @@ public class BillServiceImpl implements BillService {
     public Integer updateBillStatus(BillStatusDTO dto) throws JsonProcessingException, NotFoundException {
         log.warn("BillStatusDTORequest: " + dto);
 
+        if (Objects.isNull(dto)) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_NOT_FOUND));
+        }
+
         Bill bill = billRepo.findById(dto.getId()).orElse(null);
 
         if (Objects.isNull(bill)) {
@@ -359,9 +378,9 @@ public class BillServiceImpl implements BillService {
             VoucherHistory voucherHistory = voucherHistoryService.findHistoryByBillCodeAndStatus(bill.getBillCode(), "ACTIVE");
             if (voucherHistory != null) {
                 VoucherAccount voucherAccount = voucherAccountService
-                        .findVoucherAccountByUsernameAndVoucherCode(bill.getAccount().getUsername(), voucherHistory.getVoucherCode());
+                        .findVoucherAccountByUsernameAndVoucherCode(Objects.nonNull(bill.getAccount()) ? bill.getAccount().getUsername() : null, voucherHistory.getVoucherCode());
                 Voucher voucher = null;
-                if (voucherAccount != null) {
+                if (Objects.nonNull(voucherAccount)) {
                     voucherAccount.setStatus(Const.STATUS_ACTIVE);
                     voucher = voucherAccount.getVoucherAccount();
                     voucherAccountService.updateStatus(voucherAccount);
@@ -581,6 +600,7 @@ public class BillServiceImpl implements BillService {
             }
             lstProduct.add(productDisplayResponse);
         }
+        billReturnResponse.setBillDetails(lstProduct);
         if (billReturnResponse.getSymbol().equals("Shipping")) {
             DeliveryNote deliveryNote = deliveryNoteService.getDeliveryNoteByBill_Id(billResponse.getId());
             Address address = deliveryNote.getAddress();
@@ -592,7 +612,6 @@ public class BillServiceImpl implements BillService {
             billReturnResponse.setFullName(deliveryNote.getName());
             billReturnResponse.setShippingDate(deliveryNote.getShipDate());
         }
-        billReturnResponse.setBillDetails(lstProduct);
         return billReturnResponse;
     }
 
@@ -602,7 +621,6 @@ public class BillServiceImpl implements BillService {
         if (Objects.isNull(bill)) {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_NOT_FOUND));
         }
-
         VoucherHistory voucherHistory = voucherHistoryService.findHistoryByBillCodeAndStatus(bill.getBillCode(), "ACTIVE");
         BigDecimal price = bill.getPrice();
         BigDecimal priceReduce = BigDecimal.ZERO;
@@ -620,7 +638,6 @@ public class BillServiceImpl implements BillService {
         bill.setPriceReduce(price);
         return billRepo.save(bill);
     }
-
 
     @Override
     public List<NotificationDTO> findAllNotifications() {
@@ -645,7 +662,12 @@ public class BillServiceImpl implements BillService {
                 voucherHistory.setStatus(Const.STATUS_INACTIVE);
                 voucherHistoryService.saveVoucherHistory(voucherHistory);
             }
-            VoucherRequest voucher = voucherService.findByVoucherCode(newVoucher);
+            VoucherRequest voucher = null;
+            try {
+                voucher = voucherService.findByVoucherCode(newVoucher);
+            } catch (NotFoundException e) {
+                e.printStackTrace();
+            }
             if(!Objects.isNull(voucher)){
                 voucherHistoryService.saveVoucherHistory(new VoucherHistory(null, newVoucher, voucherPrice, bill));
                 voucher.setLimitQuantity(voucher.getLimitQuantity()-1);

@@ -2,15 +2,21 @@ package com.fpoly.ooc.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fpoly.ooc.common.SimpleSendProductDetail;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
 import com.fpoly.ooc.dto.NotificationDTO;
+import com.fpoly.ooc.dto.UpdateQuantityProductDetailDTO;
 import com.fpoly.ooc.entity.Bill;
+import com.fpoly.ooc.entity.BillDetail;
 import com.fpoly.ooc.entity.DeliveryNote;
+import com.fpoly.ooc.entity.ProductDetail;
 import com.fpoly.ooc.entity.Timeline;
 import com.fpoly.ooc.entity.VoucherHistory;
 import com.fpoly.ooc.exception.NotFoundException;
+import com.fpoly.ooc.repository.BillDetailRepo;
 import com.fpoly.ooc.repository.TimeLineRepo;
+import com.fpoly.ooc.request.product.ProductDetailRequest;
 import com.fpoly.ooc.request.timeline.TimeLinerequest;
 import com.fpoly.ooc.responce.NotificationResponse;
 import com.fpoly.ooc.responce.bill.BillInfoResponse;
@@ -20,9 +26,18 @@ import com.fpoly.ooc.responce.timeline.TimelineCustomInfo;
 import com.fpoly.ooc.responce.timeline.TimelineProductDisplayResponse;
 import com.fpoly.ooc.responce.timeline.TimelineProductResponse;
 import com.fpoly.ooc.service.interfaces.*;
+import com.fpoly.ooc.service.interfaces.BillDetailService;
+import com.fpoly.ooc.service.interfaces.BillService;
+import com.fpoly.ooc.service.interfaces.DeliveryNoteService;
+import com.fpoly.ooc.service.interfaces.NotificationService;
+import com.fpoly.ooc.service.interfaces.PaymentService;
+import com.fpoly.ooc.service.interfaces.ProductDetailServiceI;
+import com.fpoly.ooc.service.interfaces.ProductImageServiceI;
+import com.fpoly.ooc.service.interfaces.TimeLineService;
 import com.fpoly.ooc.util.CommonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -65,6 +80,15 @@ public class TimeLineServiceImpl implements TimeLineService {
 
     @Autowired
     private PaymentService paymentService;
+
+    @Autowired
+    private BillDetailRepo billDetailRepo;
+
+    @Autowired
+    private ProductDetailServiceI productDetailServiceI;
+
+    @Autowired
+    private SimpleSendProductDetail simpleSendProductDetail;
 
     @Override
     public List<TimeLineResponse> getAllTimeLineByBillId(Long id) throws NotFoundException {
@@ -169,21 +193,46 @@ public class TimeLineServiceImpl implements TimeLineService {
                 }
             } else {
                 String statusBill = null;
-                if ("1".equalsIgnoreCase(request.getStatus())) {
-                    statusBill = "wait_for_confirm";
-                } else if ("2".equalsIgnoreCase(request.getStatus())) {
-                    statusBill = "wait_for_delivery";
-                } else if ("3".equalsIgnoreCase(request.getStatus())) {
-                    statusBill = "delivering";
-                } else if ("Rollback".equalsIgnoreCase(request.getStatus())) {
-                    statusBill = "wait_for_confirm";
-                } else if ("0".equalsIgnoreCase(request.getStatus())) {
-                    statusBill = "Cancel";
-                } else {
-                    statusBill = "Complete";
-                    paymentService.savePaymentDetail(billId);
+                switch (request.getStatus()) {
+                    case "1", "Rollback", "2Cancel":
+                        statusBill = "wait_for_confirm";
+                        break;
+                    case "2":
+                        statusBill = "wait_for_delivery";
+                        break;
+                    case "3":
+                        statusBill = "delivering";
+                        break;
+                    case "0":
+                        statusBill = "Cancel";
+                        rollbackQuantityWhenCancelBill(billId);
+                        break;
+                    case "Update":
+                        break;
+                    case "Cancel":
+                        statusBill = "Cancel";
+                        break;
+                    default:
+                        statusBill = "Complete";
+                        paymentService.savePaymentDetail(billId);
+                        break;
                 }
-                bill.setStatus(statusBill);
+//                if ("1".equalsIgnoreCase(request.getStatus())) {
+//                    statusBill = "wait_for_confirm";
+//                } else if ("2".equalsIgnoreCase(request.getStatus())) {
+//                    statusBill = "wait_for_delivery";
+//                } else if ("3".equalsIgnoreCase(request.getStatus())) {
+//                    statusBill = "delivering";
+//                } else if ("Rollback".equalsIgnoreCase(request.getStatus())) {
+//                    statusBill = "wait_for_confirm";
+//                } else if ("0".equalsIgnoreCase(request.getStatus())) {
+//                    statusBill = "Cancel";
+//                    rollbackQuantityWhenCancelBill(billId);
+//                } else {
+//                    statusBill = "Complete";
+//                    paymentService.savePaymentDetail(billId);
+//                }
+                bill.setStatus(StringUtils.isNotBlank(statusBill) ? statusBill : bill.getStatus());
                 timeline.setStatus(request.getStatus());
             }
             timeLineRepo.save(timeline);
@@ -266,4 +315,51 @@ public class TimeLineServiceImpl implements TimeLineService {
         return list;
     }
 
+    private void rollbackQuantityWhenCancelBill(Long billId) throws NotFoundException, JsonProcessingException {
+        if (Objects.isNull(billId)) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_NOT_FOUND));
+        }
+
+        Bill bill = billService.findBillByBillId(billId);
+        if (Objects.isNull(bill)) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_NOT_FOUND));
+        }
+
+        if (!("wait_for_confirm".equalsIgnoreCase(bill.getStatus()))) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_NOT_CANCEL_BILL_WHEN_NOT_STATUS_WAIT_FOR_CONFIRM));
+        }
+
+        Boolean isPaid = paymentService.isBillAlreadyPaid(billId);
+        if (isPaid) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_NOT_CANCEL_BILL_WHEN_BILL_ALREADY));
+        }
+
+        List<BillDetail> billDetailListByBillCode = billDetailRepo.findBillDetailByBill_BillCode(bill.getBillCode());
+        if (CollectionUtils.isEmpty(billDetailListByBillCode)) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_NOT_FOUND));
+        }
+
+        for (BillDetail billDetail: billDetailListByBillCode) {
+            if (Objects.isNull(billDetail)) {
+                throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_NOT_FOUND));
+            }
+
+            if (Objects.isNull(billDetail.getProductDetail())) {
+                throw new NotFoundException(ErrorCodeConfig.getMessage(Const.PRODUCT_DETAIL_NOT_FOUND));
+            }
+
+            ProductDetail productDetail = productDetailServiceI.getOne(billDetail.getProductDetail().getId());
+            if( Objects.isNull(productDetail)) {
+                throw new NotFoundException(ErrorCodeConfig.getMessage(Const.PRODUCT_DETAIL_NOT_FOUND));
+            }
+            productDetail.setQuantity(productDetail.getQuantity() + billDetail.getQuantity());
+
+            ProductDetailRequest req = new ProductDetailRequest();
+            UpdateQuantityProductDetailDTO dto = new UpdateQuantityProductDetailDTO();
+            dto.setRequest(req);
+            dto.setProductDetail(productDetail);
+            productDetailServiceI.create(productDetail);
+            simpleSendProductDetail.updateQuantityRealtime(dto);
+        }
+    }
 }

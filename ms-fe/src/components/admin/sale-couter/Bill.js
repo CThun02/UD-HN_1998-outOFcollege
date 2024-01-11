@@ -184,242 +184,6 @@ const Bill = () => {
     }
   };
 
-  // const columns = [
-  //   {
-  //     title: "STT",
-  //     dataIndex: "index",
-  //     key: "stt",
-  //     width: 70,
-  //     render: (text, record, index) => {
-  //       return index + 1;
-  //     },
-  //   },
-  //   {
-  //     key: "product",
-  //     datatIndex: "product",
-  //     title: "Sản phẩm",
-  //     width: "50%",
-  //     render: (text, record, index) => {
-  //       return (
-  //         <Row style={{ width: "100%" }}>
-  //           <Col span={6} style={{ height: "100%" }}>
-  //             <div
-  //               style={{
-  //                 marginTop: "10px",
-  //                 marginRight: "10px",
-  //               }}
-  //             >
-  //               {record?.productDetail?.promotion?.length > 0 &&
-  //               record?.productDetail?.promotion[0]?.promotionValue ? (
-  //                 <Badge.Ribbon
-  //                   text={`Giảm ${
-  //                     record.productDetail.promotion[0].promotionValue
-  //                       ? record.productDetail.promotion[0].promotionMethod ===
-  //                         "%"
-  //                         ? record.productDetail.promotion[0].promotionValue +
-  //                           " " +
-  //                           record.productDetail.promotion[0].promotionMethod
-  //                         : record.productDetail.promotion[0].promotionValue.toLocaleString(
-  //                             "vi-VN",
-  //                             {
-  //                               style: "currency",
-  //                               currency: "VND",
-  //                             }
-  //                           )
-  //                       : null
-  //                   }`}
-  //                   color="red"
-  //                 >
-  //                   <Carousel style={{ maxWidth: "300px" }} autoplay>
-  //                     {record.productDetail.productImageResponse &&
-  //                       record.productDetail.productImageResponse.map(
-  //                         (item) => {
-  //                           return (
-  //                             <img
-  //                               key={item.id}
-  //                               style={{ width: "100%", marginTop: "10px" }}
-  //                               alt=""
-  //                               src={item.path}
-  //                             />
-  //                           );
-  //                         }
-  //                       )}
-  //                   </Carousel>
-  //                 </Badge.Ribbon>
-  //               ) : (
-  //                 <Carousel style={{ maxWidth: "300px" }} autoplay>
-  //                   {record?.productDetail?.productImageResponse &&
-  //                     record?.productDetail?.productImageResponse.map(
-  //                       (item) => {
-  //                         return (
-  //                           <img
-  //                             key={item.id}
-  //                             style={{ width: "100%", marginTop: "10px" }}
-  //                             alt=""
-  //                             src={item.path}
-  //                           />
-  //                         );
-  //                       }
-  //                     )}
-  //                 </Carousel>
-  //               )}
-  //             </div>
-  //           </Col>
-  //           <Col span={18} style={{ height: "100%" }}>
-  //             <div
-  //               className="m-5"
-  //               style={{
-  //                 textAlign: "start",
-  //                 height: "100%",
-  //                 justifyContent: "center",
-  //               }}
-  //             >
-  //               <span style={{ fontWeight: "500" }}>
-  //                 {record?.productDetail?.product?.productName +
-  //                   "-" +
-  //                   record?.productDetail?.brand?.brandName +
-  //                   "-" +
-  //                   record?.productDetail?.category?.categoryName +
-  //                   "-" +
-  //                   record?.productDetail?.button?.buttonName +
-  //                   "-" +
-  //                   record?.productDetail?.material?.materialName +
-  //                   "-" +
-  //                   record?.productDetail?.collar?.collarTypeName +
-  //                   "-" +
-  //                   record?.productDetail?.sleeve?.sleeveName +
-  //                   "-" +
-  //                   record?.productDetail?.shirtTail?.shirtTailTypeName +
-  //                   "-" +
-  //                   record?.productDetail?.pattern?.patternName +
-  //                   "-" +
-  //                   record?.productDetail?.form?.formName}
-  //               </span>
-  //               <br />
-  //               <div className={styles.optionColor}>
-  //                 <b>Màu sắc: </b>
-  //                 <span
-  //                   style={{
-  //                     backgroundColor: record?.productDetail?.color?.colorCode,
-  //                     marginLeft: "8px",
-  //                   }}
-  //                 ></span>
-  //                 {record?.productDetail?.color?.colorName}
-  //               </div>
-  //               <br />
-  //               <b>Kích cỡ: </b>
-  //               <span
-  //                 style={{
-  //                   marginLeft: "8px",
-  //                 }}
-  //               >
-  //                 {record?.productDetail?.size?.sizeName}
-  //               </span>
-  //             </div>
-  //           </Col>
-  //         </Row>
-  //       );
-  //     },
-  //   },
-  //   {
-  //     title: "Số lượng",
-  //     dataIndex: "quantity",
-  //     key: "quantity",
-  //     render: (text, record, index) => {
-  //       return (
-  //         <InputNumber
-  //           min={1}
-  //           max={record?.quantity >= record?.productDetail?.quantity}
-  //           value={record?.quantity}
-  //           onBlur={(event) =>
-  //             updateQuantity(record, index, event.target.value)
-  //           }
-  //         />
-  //       );
-  //     },
-  //   },
-  //   {
-  //     title: "Đơn giá",
-  //     dataIndex: "price",
-  //     key: "price",
-
-  //     render: (text, record, index) => {
-  //       return (
-  //         <div style={{ textAlign: "center" }}>
-  //           {record?.productDetail?.promotionValue ? (
-  //             <span style={{ color: "#ccc" }}>
-  //               <strike>
-  //                 {record?.productDetail?.price?.toLocaleString("vi-VN", {
-  //                   style: "currency",
-  //                   currency: "VND",
-  //                 })}
-  //               </strike>
-  //             </span>
-  //           ) : (
-  //             <span>
-  //               {record?.productDetail?.price?.toLocaleString("vi-VN", {
-  //                 style: "currency",
-  //                 currency: "VND",
-  //               })}
-  //             </span>
-  //           )}
-  //           <br />
-  //           <span>
-  //             {record?.productDetail?.promotionValue
-  //               ? record?.productDetail?.promotionMethod === "%"
-  //                 ? (
-  //                     (record?.productDetail?.price *
-  //                       (100 - Number(record?.productDetail?.promotionValue))) /
-  //                     100
-  //                   )?.toLocaleString("vi-VN", {
-  //                     style: "currency",
-  //                     currency: "VND",
-  //                   })
-  //                 : (
-  //                     record?.productDetail?.price -
-  //                     Number(record?.productDetail?.promotionValue)
-  //                   )?.toLocaleString("vi-VN", {
-  //                     style: "currency",
-  //                     currency: "VND",
-  //                   })
-  //               : null}
-  //           </span>
-  //         </div>
-  //       );
-  //     },
-  //   },
-  //   {
-  //     title: "Thành tiền",
-  //     dataIndex: "totalPrice",
-  //     key: "totalPrice",
-  //     render: (text, record, index) => {
-  //       return (
-  //         <span>
-  //           {(record?.priceReduce * record?.quantity)?.toLocaleString("vi-VN", {
-  //             style: "currency",
-  //             currency: "VND",
-  //           })}
-  //         </span>
-  //       );
-  //     },
-  //   },
-  //   {
-  //     title: "Thao tác",
-  //     key: "action",
-  //     render: (text, record, index) => (
-  //       <Space size="middle">
-  //         <Button
-  //           icon={<DeleteOutlined />}
-  //           danger
-  //           href="#1"
-  //           key={record.key}
-  //           onClick={() => handleDeleteProduct(record, index)}
-  //         ></Button>
-  //       </Space>
-  //     ),
-  //   },
-  // ];
-
   const options = [
     {
       label: (
@@ -637,7 +401,10 @@ const Bill = () => {
           }
         )
         .then((response) => {
-          setDistricts(response.data.data);
+          const data = response?.data?.data?.filter(
+            (item) => item?.DistrictID !== 3451
+          );
+          setDistricts(data);
         })
         .catch((error) => {
           console.error(error);
@@ -999,25 +766,6 @@ const Bill = () => {
     if (productDetails?.length < 0) {
       return;
     }
-    // for (let index = 0; index < productDetails?.length; index++) {
-    //   var productDetailId = productDetails[index].productDetail.id;
-    //   axios
-    //     .get(
-    //       "http://localhost:8080/api/admin/product/getproductdetailbyidpd?productDetailId=" +
-    //         productDetailId,
-    //       {
-    //         headers: {
-    //           Authorization: `Bearer ${getToken(true)}`,
-    //         },
-    //       }
-    //     )
-    //     .then((res) => {
-    //       if (res?.data?.quantity <= 0) {
-    //         cart.productDetails = productDetails.splice(index, 1);
-    //         localStorage.setItem(cartId, JSON.stringify(cart));
-    //       }
-    //     });
-    // }
     setProductDetails(productDetails);
     setAccount(cart?.account);
   };
@@ -1246,12 +994,12 @@ const Bill = () => {
       phoneNumber: selectedAddress?.numberPhone,
       voucherCode: voucherAdd?.voucherCode ?? null,
       // createdBy: token,
-      priceAmountCast:
-        Number(selectedOption) !== 2
-          ? price
-            ? price.replace(/[,]/g, "")
-            : null
-          : null,
+      priceAmountCast: price ? price.replace(/[,]/g, "") : null,
+      // Number(selectedOption) !== 2
+      //   ? price
+      //     ? price.replace(/[,]/g, "")
+      //     : null
+      //   : null,
       emailDetails: {
         recipient: selectedAddress?.email ? [selectedAddress?.email] : [email],
         messageBody: `<body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: Arial, sans-serif;">
@@ -1373,99 +1121,123 @@ const Bill = () => {
       sdt: Yup.string()
         .required("Số điện thoại không được để trống")
         .matches(/^[0-9]{10}$/, "Số điện thoại phải có đúng 10 chữ số"),
-      city: Yup.string().required("Tỉnh/thành phố không được để trống"),
-      district: Yup.string().required("Quận/huyện không được để trống"),
-      ward: Yup.string().required("Phường/xã không được để trống"),
+      city: Yup.string().required("Tỉnh/ thành phố không được để trống"),
+      district: Yup.string().required("Quận/ huyện không được để trống"),
+      ward: Yup.string().required("Phường/ xã không được để trống"),
       email: Yup.string().email("Địa chỉ email không hợp lệ"),
     });
-
-    if (Number(selectedOption) === 1) {
-      const priced = Number(price?.replace(",", ""));
-      if (priced < voucherPrice()) {
-        isError = true;
-        setInputError("Vui lòng nhập số tiền cần thanh toán");
-        return;
-      }
+    let calculatedValue = 0;
+    if (switchChange[index]) {
+      calculatedValue = totalPrice - voucherPrice() + shippingFee;
+    } else {
+      calculatedValue = totalPrice - voucherPrice();
     }
-
-    if (Number(selectedOption) === 3) {
-      if (remainAmount === -1) {
-        isError = true;
-        setInputError("Bạn chưa nhập tiền");
-      } else {
-        setInputError("");
-      }
-
-      if (transactionCode.trim().length === 0) {
-        isError = true;
-        setTransactionError("Mã giao dịch không được để trống");
-      } else {
-        setTransactionError("");
-      }
-
-      if (priceATM) {
-        if (!priceATM?.replace(/[^\d.]/g, "")) {
+    const customerAmountPay =
+      totalPrice - voucherPrice() + (shippingFee ? shippingFee : 0);
+    if (!typeShipping[index]) {
+      if (Number(selectedOption) === 1) {
+        const priced = Number(price?.replace(",", ""));
+        if (priced < customerAmountPay) {
           isError = true;
-          setPriceATMError("Sai định dạng");
-        } else {
-          if (Number(priceATM?.replace(/[,]/g, "")) < remainAmount) {
-            isError = true;
-            setPriceATMError("Số tiền không đủ");
-          }
+          setInputError("Vui lòng nhập số tiền cần thanh toán");
+          return;
         }
-      } else {
-        isError = true;
-        setPriceATMError("Vui lòng nhập số tiền cần thanh toán");
       }
 
-      if (inputError && transactionError && setPriceATMError) {
-        return;
-      }
-    }
+      if (Number(selectedOption) === 3) {
+        if (remainAmount === -1) {
+          isError = true;
+          setInputError("Bạn chưa nhập tiền");
+        } else {
+          setInputError("");
+        }
 
-    if (productDetails?.length <= 0) {
-      isError = true;
-      return notification.error({
-        message: "Thông báo",
-        description: "Không có sản phẩm nào trong giỏ hàng.",
-        duration: 2,
-      });
-    }
+        if (transactionCode.trim().length === 0) {
+          isError = true;
+          setTransactionError("Mã giao dịch không được để trống");
+        } else {
+          setTransactionError("");
+        }
 
-    if (
-      Number(selectedOption) === 1 &&
-      ((remainAmount < 0 && !typeShipping[index]) || isNaN(remainAmount))
-    ) {
-      console.log("remainAmount: ", remainAmount);
-      isError = true;
-      return setInputError("Nhập đủ số tiền cần thanh toán");
-    }
-
-    if (Number(selectedOption) === 3 || Number(selectedOption) === 2) {
-      if (Number(selectedOption) === 2) {
         if (priceATM) {
-          if (!priceATM.replace(/[^\d.]/g, "")) {
+          if (!priceATM?.replace(/[^\d.]/g, "")) {
             isError = true;
             setPriceATMError("Sai định dạng");
           } else {
-            const priceATMStr = priceATM.replace(/[,]/g, "");
-            if (Number(priceATMStr) < remainAmount) {
+            if (Number(priceATM?.replace(/[,]/g, "")) < remainAmount) {
               isError = true;
               setPriceATMError("Số tiền không đủ");
-            } else {
-              setPriceATMError("");
             }
           }
         } else {
           isError = true;
           setPriceATMError("Vui lòng nhập số tiền cần thanh toán");
         }
-        if (transactionCode.trim() === "") {
+
+        if (inputError && transactionError && setPriceATMError) {
+          return;
+        }
+      }
+
+      if (productDetails?.length <= 0) {
+        isError = true;
+        return notification.error({
+          message: "Thông báo",
+          description: "Không có sản phẩm nào trong giỏ hàng.",
+          duration: 2,
+        });
+      }
+
+      if (Number(selectedOption) === 1) {
+        const priceNumber = Number(price.replace(",", ""));
+        if (priceNumber < Number(calculatedValue)) {
+          console.log("remainAmount: ", remainAmount);
           isError = true;
-          return setTransactionError("Mã giao dịch không được để trống");
+          return setInputError("Nhập đủ số tiền cần thanh toán");
+        }
+      }
+
+      if (Number(selectedOption) === 3 || Number(selectedOption) === 2) {
+        if (Number(selectedOption) === 2) {
+          if (priceATM) {
+            if (!priceATM.replace(/[^\d.]/g, "")) {
+              isError = true;
+              setPriceATMError("Sai định dạng");
+            } else {
+              const priceATMStr = priceATM.replace(/[,]/g, "");
+              if (Number(priceATMStr) < remainAmount) {
+                isError = true;
+                setPriceATMError("Số tiền không đủ");
+              } else {
+                setPriceATMError("");
+              }
+            }
+          } else {
+            isError = true;
+            setPriceATMError("Vui lòng nhập số tiền cần thanh toán");
+          }
+          if (transactionCode.trim() === "") {
+            isError = true;
+            return setTransactionError("Mã giao dịch không được để trống");
+          }
         }
       }
     }
+
+    if (switchChange[index])
+      if (/^[+]?\d*\.?\d+$/.test(shippingFee)) {
+        if (shippingFee < 10000) {
+          isError = true;
+          setShippingFeeError("Số tiền vận chuyển quá nhỏ");
+        } else if (shippingFee > 1000000) {
+          isError = true;
+          setShippingFeeError("Số tiền vận chuyển quá lớn");
+        } else {
+          isError = false;
+          setShippingFeeError("");
+        }
+      }
+
     if (!isError) {
       for (let i = 0; i < productDetails?.length; i++) {
         const billDetail = {
@@ -1567,6 +1339,9 @@ const Bill = () => {
   const [priceATMError, setPriceATMError] = useState("");
 
   const handleChangeInput = (inputValue, index) => {
+    const totalPrice = productDetails?.reduce((total, product) => {
+      return total + product.priceReduce * product.quantity;
+    }, 0);
     setAmountPaid(inputValue);
     let calculatedValue = 0;
     if (switchChange[index]) {
@@ -1583,6 +1358,23 @@ const Bill = () => {
       setInputError("");
       setTransactionError("");
     }
+  };
+
+  const [shippingFeeError, setShippingFeeError] = useState("");
+  const handleChangeShippingFee = (value, index) => {
+    if (switchChange[index])
+      if (/^[+]?\d*\.?\d+$/.test(value)) {
+        const replaceValue = value.replace(",", "");
+        const data = Number(replaceValue);
+        if (data < 10000) {
+          setShippingFeeError("Số tiền vận chuyển quá nhỏ");
+        } else if (data > 1000000) {
+          setShippingFeeError("Số tiền vận chuyển quá lớn");
+        } else {
+          setShippingFeeError("");
+        }
+        setShippingFee(data);
+      }
   };
 
   useEffect(() => {
@@ -1828,7 +1620,7 @@ const Bill = () => {
                         <Col span={8}>
                           <div className="m-5">
                             <span>
-                              <b style={{ color: "red" }}>*</b> Tỉnh/thành phố
+                              <b style={{ color: "red" }}>*</b> Tỉnh/ thành phố
                             </span>
                             <br />
                             <Select
@@ -1867,17 +1659,18 @@ const Bill = () => {
                         <Col span={8}>
                           <div className="m-5">
                             <span>
-                              <b style={{ color: "red" }}>*</b> Quận/huyện
+                              <b style={{ color: "red" }}>*</b> Quận/ huyện
                             </span>
                             <br />
                             <Select
                               style={{ width: "100%" }}
-                              onChange={(event) =>
+                              onChange={(event) => {
                                 handleDistrictChange(
                                   event?.substring(event.indexOf("|") + 1),
                                   event
-                                )
-                              }
+                                );
+                                console.log("data: ", event);
+                              }}
                               value={
                                 selectedAddress?.district
                                   ? selectedAddress?.district.substring(
@@ -1909,7 +1702,7 @@ const Bill = () => {
                         <Col span={8}>
                           <div className="m-5">
                             <span>
-                              <b style={{ color: "red" }}>*</b> Phường/xã
+                              <b style={{ color: "red" }}>*</b> Phường/ xã
                             </span>
                             <br />
                             <Select
@@ -1997,7 +1790,7 @@ const Bill = () => {
                       </Button>
 
                       <Row style={{ marginTop: "10px" }}>
-                        <Col span={16}>
+                        <Col span={12}>
                           {" "}
                           <span
                             style={{
@@ -2008,7 +1801,7 @@ const Bill = () => {
                             Thành tiền
                           </span>
                         </Col>
-                        <Col span={8}>
+                        <Col span={12}>
                           <span
                             style={{
                               fontSize: "16px",
@@ -2020,7 +1813,7 @@ const Bill = () => {
                             })}
                           </span>
                         </Col>
-                        <Col span={16}>
+                        <Col span={12}>
                           <span
                             style={{
                               fontSize: "16px",
@@ -2031,7 +1824,7 @@ const Bill = () => {
                             Giảm giá
                           </span>
                         </Col>
-                        <Col span={8}>
+                        <Col span={12}>
                           <span
                             style={{
                               fontSize: "16px",
@@ -2049,23 +1842,11 @@ const Bill = () => {
                                 : voucherAdd?.voucherValue + "%"
                               : "0đ"}
                           </span>
-                          {voucherAdd.voucherId ? (
-                            <bttuon
-                              style={{
-                                marginLeft: "20px",
-                                color: "green",
-                                cursor: "pointer",
-                              }}
-                              onClick={() => setVoucherAdd({})}
-                            >
-                              ❌
-                            </bttuon>
-                          ) : null}
                         </Col>
 
                         {switchChange[index] && shippingFee && (
                           <>
-                            <Col span={16}>
+                            <Col span={12}>
                               <span
                                 style={{
                                   fontSize: "16px",
@@ -2075,21 +1856,35 @@ const Bill = () => {
                                 Phí vận chuyển
                               </span>
                             </Col>
-                            <Col span={8}>
-                              <span
-                                style={{
-                                  fontSize: "16px",
+                            <Col span={12}>
+                              <Input
+                                placeholder="Số tiền vận chuyển"
+                                className={styles.input_noneBorder}
+                                value={numeral(shippingFee).format("0,0")}
+                                onChange={(e) => {
+                                  handleChangeShippingFee(
+                                    e.target.value.replace(/\D/g, ""),
+                                    index
+                                  );
                                 }}
-                              >
-                                {shippingFee?.toLocaleString("vi-VN", {
-                                  style: "currency",
-                                  currency: "VND",
-                                })}
+                              />
+                              {inputError && (
+                                <span
+                                  style={{
+                                    width: "200%",
+                                    color: "red",
+                                  }}
+                                >
+                                  {shippingFeeError}
+                                </span>
+                              )}
+                              <span style={{ fontSize: "16px", color: "red" }}>
+                                {shippingFeeError}
                               </span>
                             </Col>
                           </>
                         )}
-                        <Col span={16}>
+                        <Col span={12}>
                           <span
                             style={{
                               fontSize: "16px",
@@ -2098,7 +1893,7 @@ const Bill = () => {
                             Tổng cộng
                           </span>
                         </Col>
-                        <Col span={8}>
+                        <Col span={12}>
                           {switchChange[index] ? (
                             <span
                               style={{
@@ -2136,7 +1931,7 @@ const Bill = () => {
                           !typeShipping[index]) ||
                         Number(selectedOption) === 3 ? (
                           <>
-                            <Col span={8} style={{ marginTop: "8px" }}>
+                            <Col span={12} style={{ marginTop: "8px" }}>
                               <span
                                 style={{
                                   fontSize: "16px",
@@ -2147,7 +1942,7 @@ const Bill = () => {
                                 Số tiền khách trả
                               </span>
                             </Col>
-                            <Col span={16}>
+                            <Col span={12}>
                               <Input
                                 className={styles.input_noneBorder}
                                 value={price}
@@ -2181,14 +1976,14 @@ const Bill = () => {
                           <Col span={24}>
                             {remainAmount > 0 && (
                               <Row style={{ marginTop: "8px" }}>
-                                <Col span={16}>
+                                <Col span={12}>
                                   <span
                                     style={{ fontSize: "16px", width: "200%" }}
                                   >
                                     Tiền thừa
                                   </span>
                                 </Col>
-                                <Col span={8}>
+                                <Col span={12}>
                                   <span
                                     style={{
                                       fontSize: "16px",

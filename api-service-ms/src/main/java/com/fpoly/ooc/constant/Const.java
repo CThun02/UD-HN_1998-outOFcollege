@@ -70,6 +70,8 @@ public class Const {
     public static final String ERROR_PRODUCT_DETAIL_NOT_EMPTY_IN_PROMOTION = "ERROR_PRODUCT_DETAIL_NOT_EMPTY_IN_PROMOTION";
     public static final String ERROR_QUANTITY_INVALID = "ERROR_QUANTITY_INVALID";
     public static final String ERROR_BILL_PAID = "ERROR_BILL_PAID";
+    public static final String ERROR_NOT_CANCEL_BILL_WHEN_NOT_STATUS_WAIT_FOR_CONFIRM = "ERROR_NOT_CANCEL_BILL_WHEN_NOT_STATUS_WAIT_FOR_CONFIRM";
+    public static final String ERROR_NOT_CANCEL_BILL_WHEN_BILL_ALREADY = "ERROR_NOT_CANCEL_BILL_WHEN_BILL_ALREADY";
 
     //kafka
     public static final String KAFKA_SERVER = "localhost:9092";

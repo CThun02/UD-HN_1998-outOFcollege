@@ -55,4 +55,6 @@ public interface VoucherService {
 
     Voucher findVoucherByTimeOrderBill(String voucherCode, LocalDateTime timeOrder);
 
+    Voucher getVoucherByCode(String voucherCode);
+
 }

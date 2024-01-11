@@ -33,11 +33,11 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
 
     Bill findBillByBillCode(String billCode);
 
-    @Query("SELECT sum(b.priceReduce) from Bill b where (b.billType like ?1 or ?1 is null) AND b.status not like 'CANCEL'" +
+    @Query("SELECT sum(b.amountPaid) from Bill b where (b.billType like ?1 or ?1 is null) AND b.status not like 'CANCEL'" +
             " AND (?2 IS NULL OR b.createdAt >= ?2) AND (?3 IS NULL OR b.createdAt <= ?3)")
     Double getRevenueInStoreOnlineCompare(String type, LocalDateTime day, LocalDateTime dayTo);
 
-    @Query("SELECT sum(b.priceReduce) FROM Bill b WHERE " +
+    @Query("SELECT sum(b.amountPaid) FROM Bill b WHERE " +
             "((:dayParam IS NULL OR DAY(b.createdAt) >= :dayParam) and (:dayTo is null or DAY(b.createdAt) <= :dayTo)) AND " +
             "((:monthParam IS NULL OR MONTH(b.createdAt) >= :monthParam) and (:monthTo is null or MONTH(b.createdAt) <= :monthTo)) AND " +
             "((:yearParam IS NULL OR YEAR(b.createdAt) >= :yearParam) and (:yearTo is null or YEAR(b.createdAt) <= :yearTo)) " +
@@ -110,7 +110,7 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
                    @Param("amountPaid") BigDecimal amountPaid,
                    @Param("id") Long id);
 
-    @Query("SELECT COUNT(b) AS billSell, SUM(b.priceReduce) as grossRevenue FROM Bill b " +
+    @Query("SELECT COUNT(b) AS billSell, SUM(b.amountPaid) as grossRevenue FROM Bill b " +
             "WHERE (?1 IS NULL OR b.createdAt >= ?1) AND (?2 IS NULL OR b.createdAt <= ?2) and b.status not like 'CANCEL' ")
     BillRevenue getBillRevenue(LocalDateTime dayFrom, LocalDateTime dayTo);
 

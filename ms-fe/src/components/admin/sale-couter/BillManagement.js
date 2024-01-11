@@ -371,6 +371,7 @@ const BillManagement = () => {
             CarOutlined,
             CheckCircleOutlined,
             CloseCircleOutlined,
+            ClockCircleOutlined,
           ].map((Icon, i) => {
             const id = String(i + 1);
             return {
@@ -390,6 +391,8 @@ const BillManagement = () => {
                       ? countBill.complete
                       : id === "6"
                       ? countBill.cancel
+                      : id === "7"
+                      ? countBill.returnS
                       : null
                   }
                 >
@@ -407,6 +410,8 @@ const BillManagement = () => {
                       ? "Đã hoàn thành"
                       : id === "6"
                       ? "Đã hủy"
+                      : id === "7"
+                      ? "Trả hàng"
                       : ""}
                   </span>
                 </Badge>
@@ -425,10 +430,6 @@ const BillManagement = () => {
                   : id === "6"
                   ? "Cancel"
                   : id === "7"
-                  ? "Paid"
-                  : id === "8"
-                  ? "Unpaid"
-                  : id === "9"
                   ? "ReturnS"
                   : "",
               children: (

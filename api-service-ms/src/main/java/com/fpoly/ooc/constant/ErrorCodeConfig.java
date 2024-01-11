@@ -73,6 +73,7 @@ public class ErrorCodeConfig {
         errors.put("ERROR_NOT_CANCEL_BILL_WHEN_NOT_STATUS_WAIT_FOR_CONFIRM", "Chỉ hủy hóa đơn khi đơn đang chờ xác nhận.");
         errors.put("ERROR_NOT_CANCEL_BILL_WHEN_BILL_ALREADY", "Đơn hàng đã thanh toán không thể hủy.");
         errors.put("ERROR_SHIPPING_PRICE_NOT_EMPTY", "Phí vận chuyển được bỏ trống.");
+        errors.put("ERROR_MONEY_LESS_TOTAL_BILL", "Số tiền thanh toán không đủ");
 
 
         // SEND_EMAIL_TEMPLATE

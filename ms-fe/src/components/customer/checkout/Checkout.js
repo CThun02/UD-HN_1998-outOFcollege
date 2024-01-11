@@ -401,8 +401,12 @@ const Checkout = ({ setRenderHeader }) => {
       // status: formData.paymentDetailId === 2 ? "Paid" : "Unpaid",
       status: "wait_for_confirm",
       paymentInDelivery: formData.paymentDetailId === 2 ? false : true,
-      priceAmountCast: formData.paymentDetailId === 1 ? totalPrice : null,
-      priceAmountATM: totalPrice,
+      priceAmountCast:
+        formData.paymentDetailId === 1
+          ? totalPrice - voucherPrice() + (shippingFee ? shippingFee : 0)
+          : null,
+      priceAmountATM:
+        totalPrice - voucherPrice() + (shippingFee ? shippingFee : 0),
       isSellingAdmin: false,
       amountPaid: totalPrice - voucherPrice() + (shippingFee ? shippingFee : 0),
       accountId: dataToken ? dataToken.username : null,

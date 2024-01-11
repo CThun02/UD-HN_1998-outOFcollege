@@ -186,6 +186,11 @@ public class BillServiceImpl implements BillService {
 
         String statusPaymentDetail = request.getPaymentInDelivery() ? "Unpaid" : "Paid";
         if (request.getPaymentDetailId() == 3) {
+            if (CommonUtils.bigDecimalConvertDouble(request.getPriceAmountCast())
+                    + CommonUtils.bigDecimalConvertDouble(request.getPriceAmountATM())
+                    < CommonUtils.bigDecimalConvertDouble(request.getAmountPaid())) {
+                throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_MONEY_LESS_TOTAL_BILL));
+            }
             PaymentDetail paymentDetailLan1Nd = new PaymentDetail();
             paymentDetailLan1Nd.setBill(bill);
             paymentDetailLan1Nd.setPayment(Payment.builder().id(1L).build());
@@ -205,17 +210,21 @@ public class BillServiceImpl implements BillService {
             if (!request.getIsSellingAdmin()) {
                 if (request.getPaymentDetailId() == 1) {
                     statusPaymentDetail = "Unpaid";
-                    paymentDetail.setPrice(request.getAmountPaid());
-                }
-                if (request.getPaymentDetailId() == 2) {
+                } else {
                     statusPaymentDetail = "Paid";
-                    paymentDetail.setPrice(request.getAmountPaid());
                 }
+                paymentDetail.setPrice(request.getAmountPaid());
             } else {
                 if(request.getPaymentDetailId() == 1) {
+                    if (CommonUtils.bigDecimalConvertDouble(request.getPriceAmountCast()) < CommonUtils.bigDecimalConvertDouble(request.getAmountPaid())) {
+                        throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_MONEY_LESS_TOTAL_BILL));
+                    }
                     paymentDetail.setPrice(request.getPriceAmountCast());
                 }
                 if(request.getPaymentDetailId() == 2) {
+                    if (CommonUtils.bigDecimalConvertDouble(request.getPriceAmountATM()) < CommonUtils.bigDecimalConvertDouble(request.getAmountPaid())) {
+                        throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_MONEY_LESS_TOTAL_BILL));
+                    }
                     paymentDetail.setPrice(request.getPriceAmountATM());
                 }
             }

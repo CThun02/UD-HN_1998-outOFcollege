@@ -170,6 +170,17 @@ public class CartDetailServiceImpl implements CartDetailService {
     public CartDetail updateQuantity(Long cartDetailId, Integer quantity) throws NotFoundException {
         CartDetail cartDetail = cartDetailRepo.findById(cartDetailId)
                 .orElseThrow(() -> new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND)));
+
+        if (Objects.nonNull(cartDetail.getProductDetail())) {
+            double price = CommonUtils.bigDecimalConvertDouble(cartDetail.getProductDetail().getPrice());
+            if (price * quantity > 10000000) {
+                double newQuantityUpdate = 10000000 / price;
+                cartDetail.setQuantity((int)newQuantityUpdate);
+                cartDetailRepo.save(cartDetail);
+                throw new NotFoundException(Const.ERROR_BILL_THAN_TEN_MILLION);
+            }
+        }
+
         cartDetail.setQuantity(quantity);
         return cartDetailRepo.save(cartDetail);
     }

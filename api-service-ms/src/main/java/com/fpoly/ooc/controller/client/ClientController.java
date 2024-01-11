@@ -3,6 +3,9 @@ package com.fpoly.ooc.controller.client;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpoly.ooc.dto.BillStatusDTO;
 import com.fpoly.ooc.dto.EmailDetails;
+import com.fpoly.ooc.dto.ListQuantityAndPriceRequest;
+import com.fpoly.ooc.dto.QuantityAndPriceDTO;
+import com.fpoly.ooc.dto.UpdateQuantityProductDetailDTO;
 import com.fpoly.ooc.entity.Account;
 import com.fpoly.ooc.entity.Address;
 import com.fpoly.ooc.entity.AddressDetail;
@@ -261,9 +264,9 @@ public class ClientController {
                 voucherCode.trim().equals("") ? null : voucherCode));
     }
 
-    @GetMapping("/isCheckQuantity/{id}")
-    public ResponseEntity<?> isCheckQuantity(@PathVariable("id") List<Long> productDetailId) throws NotFoundException {
-        return ResponseEntity.ok(productDetailService.isCheckQuantity(productDetailId));
+    @PostMapping("/isCheckQuantity")
+    public ResponseEntity<?> isCheckQuantity(@RequestBody ListQuantityAndPriceRequest dto) throws NotFoundException {
+        return ResponseEntity.ok(productDetailService.isCheckQuantity(dto));
     }
 
     @GetMapping("/getColorProductDetailEdit")

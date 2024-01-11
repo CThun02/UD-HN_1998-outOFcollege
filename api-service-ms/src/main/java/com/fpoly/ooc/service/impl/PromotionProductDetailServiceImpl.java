@@ -4,12 +4,15 @@ import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
 import com.fpoly.ooc.dto.DeleteProductDetailInPromotionDTO;
 import com.fpoly.ooc.dto.PromotionProductDTO;
+import com.fpoly.ooc.dto.PromotionProductDetailDTO;
 import com.fpoly.ooc.entity.ProductDetail;
 import com.fpoly.ooc.entity.Promotion;
 import com.fpoly.ooc.entity.PromotionProduct;
 import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.PromotionProductDetailRepository;
+import com.fpoly.ooc.responce.productdetail.ProductDetailShop;
 import com.fpoly.ooc.service.interfaces.PromotionProductDetailService;
+import com.fpoly.ooc.util.CommonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +20,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @Slf4j
@@ -51,6 +56,22 @@ public class PromotionProductDetailServiceImpl implements PromotionProductDetail
         for (Long id : ids) {
             promotionProductDetailRepository.deleteById(id);
         }
+    }
+
+    @Override
+    public PromotionProductDetailDTO findPromotionByProductDetailIds(List<Long> productDetailIdList) throws NotFoundException {
+        if (CollectionUtils.isEmpty(productDetailIdList)) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_SERVICE));
+        }
+
+        List<PromotionProductDetailDTO> promotionProductDetailDTOList = promotionProductDetailRepository
+                .findPromotionProductDetailByProductDetailId(productDetailIdList, LocalDateTime.now());
+        PromotionProductDetailDTO productDetailDTO = CommonUtils.getOneElementsInArrays(promotionProductDetailDTOList);
+        if (Objects.nonNull(productDetailDTO)) {
+            return productDetailDTO;
+        }
+
+        return null;
     }
 
     private PromotionProduct validation(PromotionProductDTO dto) {

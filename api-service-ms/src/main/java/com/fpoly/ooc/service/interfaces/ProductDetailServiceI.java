@@ -1,7 +1,9 @@
 package com.fpoly.ooc.service.interfaces;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fpoly.ooc.dto.ListQuantityAndPriceRequest;
 import com.fpoly.ooc.dto.ProductDetailsDTO;
+import com.fpoly.ooc.dto.QuantityAndPriceDTO;
 import com.fpoly.ooc.dto.UpdateQuantityProductDetailDTO;
 import com.fpoly.ooc.entity.Color;
 import com.fpoly.ooc.entity.ProductDetail;
@@ -41,12 +43,12 @@ public interface ProductDetailServiceI {
     Optional<List<ProductDetailShop>> getProductDetailBestSelling();
     Optional<List<ProductDetailShop>> getNewProductDetail();
     public void updateProductDetailsByProductId(Long productId, String status);
-    Optional<List<ProductDetailShop>> getAllProductDetailShop(ProductDetailCondition req);
+    Optional<List<ProductDetailShop>> getAllProductDetailShop(ProductDetailCondition req) throws NotFoundException;
     Optional<BigDecimal> getPriceMax();
     Optional<GetColorAndSizeAndQuantity> getColorAndSize(GetSizeAndColorRequest req) throws NotFoundException;
     Optional<ProductDetailShopResponse> getProductDetailsShop(GetSizeAndColorRequest req) throws NotFoundException;
 
-    Boolean isCheckQuantity(List<Long> productDetailId) throws NotFoundException;
+    Boolean isCheckQuantity(ListQuantityAndPriceRequest dto) throws NotFoundException;
     ProductDetail updateQuantityForBuy(ProductDetail productDetail);
 
     ProductDetail findProductDetailByIdAndStatus(Long id) throws NotFoundException;

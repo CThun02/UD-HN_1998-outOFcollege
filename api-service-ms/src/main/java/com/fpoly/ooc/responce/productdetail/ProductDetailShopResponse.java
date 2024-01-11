@@ -45,7 +45,7 @@ public class ProductDetailShopResponse {
                                      Long sleeveId, Long shirtId, String productName, String brandName,
                                      String categoryName, String patternName, String formName, String buttonName,
                                      String materialName, String collarName, String sleeveName, String shirtTail,
-                                     Float weight, String description, String promotionMethod, BigDecimal promotionValue) {
+                                     Float weight, String description) {
         this.productDetailId = productDetailId;
         this.productId = productId;
         this.brandId = brandId;
@@ -69,7 +69,5 @@ public class ProductDetailShopResponse {
         this.shirtTail = shirtTail;
         this.weight = weight;
         this.description = description;
-        this.promotionMethod = promotionMethod;
-        this.promotionValue = promotionValue;
     }
 }

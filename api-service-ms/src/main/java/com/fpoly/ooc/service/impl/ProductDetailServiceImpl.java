@@ -6,7 +6,10 @@ import com.fpoly.ooc.common.Commons;
 import com.fpoly.ooc.common.SimpleSendProductDetail;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
+import com.fpoly.ooc.dto.ListQuantityAndPriceRequest;
 import com.fpoly.ooc.dto.ProductDetailsDTO;
+import com.fpoly.ooc.dto.PromotionProductDetailDTO;
+import com.fpoly.ooc.dto.QuantityAndPriceDTO;
 import com.fpoly.ooc.dto.UpdateQuantityProductDetailDTO;
 import com.fpoly.ooc.entity.*;
 import com.fpoly.ooc.exception.NotFoundException;
@@ -37,6 +40,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -54,6 +58,8 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
     private SimpMessagingTemplate template;
     @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private PromotionProductDetailService promotionProductDetailService;
 
 
     @Autowired
@@ -171,7 +177,7 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
     }
 
     @Override
-    public Optional<List<ProductDetailShop>> getAllProductDetailShop(ProductDetailCondition req) {
+    public Optional<List<ProductDetailShop>> getAllProductDetailShop(ProductDetailCondition req) throws NotFoundException {
 
         String cateStr = "";
         String brandStr = "";
@@ -194,33 +200,29 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
             sizeStr = "HasSize";
         }
 
-//        String sort = null;
-//        if(req.getSort() != null) {
-//            if(req.getSort().equals("up")) {
-//                sort = "asc";
-//            } else {
-//                sort = "desc";
-//            }
-//        }
 
         List<ProductDetailShop> result = repo.getAllProductDetailShop(
-                req.getProductName(), req.getMinPrice(), req.getMaxPrice(), cateStr, brandStr, colorStr, sizeStr,
+                req.getProductName(), cateStr, brandStr, colorStr, sizeStr,
                 req.getCategories(), req.getBrands(), req.getColors(), req.getSizes()
         );
 
-        result.stream().map(productDetail -> {
+        for (ProductDetailShop productDetail: result) {
             List<Long> productDetailIdsByComponent =
                     repo.productDetailsId(productDetail.getProductId(), productDetail.getBrandId(), productDetail.getCategoryId(),
                             productDetail.getPatternId(), productDetail.getFormId(), productDetail.getButtonId(), productDetail.getMaterialId(),
                             productDetail.getCollarId(), productDetail.getSleeveId(), productDetail.getShirtTailId());
 
             Long productDetailId = CommonUtils.getOneElementsInArrays(productDetailIdsByComponent);
-            if(Objects.nonNull(productDetailId)) {
+            if (Objects.nonNull(productDetailId)) {
                 productDetail.setProductDetailId(productDetailIdsByComponent.get(0));
             }
 
-            return productDetail;
-        }).collect(Collectors.toList());
+            PromotionProductDetailDTO promotion = promotionProductDetailService.findPromotionByProductDetailIds(productDetailIdsByComponent);
+            if (Objects.nonNull(promotion)) {
+                productDetail.setPromotionMethod(promotion.getPromotionMethod());
+                productDetail.setPromotionReduce(promotion.getPromotionValue());
+            }
+        }
 
         return Optional.of(getImageByProductDetailId(result));
     }
@@ -234,12 +236,34 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
 
     @Override
     public Optional<GetColorAndSizeAndQuantity> getColorAndSize(GetSizeAndColorRequest req) throws NotFoundException {
+        if (Objects.isNull(req)) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_SERVICE));
+        }
         List<GetColorAndSizeAndQuantity> colorAndSizeListByReq = repo.findColorAndSize(req.getProductId(), req.getBrandId(), req.getCategoryId(),
                 req.getPatternId(), req.getFormId(), req.getButtonId(), req.getMaterialId(), req.getCollarId(), req.getSleeveId(),
                 req.getShirtTailId(), req.getColorId(), req.getSizeId());
+        List<Long> productDetailsId =
+                repo.productDetailsId(req.getProductId(), req.getBrandId(), req.getCategoryId(), req.getPatternId(),
+                        req.getFormId(), req.getButtonId(), req.getMaterialId(), req.getCollarId(), req.getSleeveId(),
+                        req.getShirtTailId(), req.getColorId(), req.getSizeId());
         GetColorAndSizeAndQuantity res = CommonUtils.getOneElementsInArrays(colorAndSizeListByReq);
         if(Objects.isNull(res)) {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND));
+        }
+
+        PromotionProductDetailDTO promotion = null;
+        if (CollectionUtils.isNotEmpty(productDetailsId)) {
+            promotion = promotionProductDetailService
+                    .findPromotionByProductDetailIds(productDetailsId);
+        } else {
+            if (Objects.nonNull(req.getProductDetailId())) {
+                promotion = promotionProductDetailService.findPromotionByProductDetailIds(List.of(req.getProductDetailId()));
+            }
+        }
+
+        if (Objects.nonNull(promotion)) {
+            res.setPromotionType(promotion.getPromotionMethod());
+            res.setPromotionValue(promotion.getPromotionValue());
         }
 
         Optional<List<Color>> colors = colorServiceI.findColorsByProductId(req);
@@ -248,16 +272,9 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND));
         }
 
-        List<Long> productDetailsId =
-                repo.productDetailsId(req.getProductId(), req.getBrandId(), req.getCategoryId(), req.getPatternId(),
-                        req.getFormId(), req.getButtonId(), req.getMaterialId(), req.getCollarId(), req.getSleeveId(),
-                        req.getShirtTailId(), req.getColorId(), req.getSizeId());
-        if(!CollectionUtils.isEmpty(productDetailsId)) {
-            res.setProductDetailsId(productDetailsId);
-        }
         res.setColors(colors.get());
         res.setSizes(sizes.get());
-
+        res.setProductDetailsId(productDetailsId);
         return Optional.of(res);
     }
 
@@ -267,10 +284,22 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
                 request.getPatternId(), request.getFormId(), request.getButtonId(), request.getMaterialId(), request.getCollarId(), request.getSleeveId(),
                 request.getShirtTailId());
         List<Long> productDetailIds = res.stream().map(ProductDetailShopResponse::getProductDetailId).collect(Collectors.toList());
-        List<ProductImageResponse> images = productImageService.getProductImageByProductDetailIds(productDetailIds);
+
 
         if (CollectionUtils.isEmpty(res)) {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND));
+        }
+        if (CollectionUtils.isEmpty(productDetailIds)) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_SERVICE));
+        }
+
+        List<ProductImageResponse> images = productImageService.getProductImageByProductDetailIds(productDetailIds);
+        for (ProductDetailShopResponse productDetail: res) {
+            PromotionProductDetailDTO promotion = promotionProductDetailService.findPromotionByProductDetailIds(productDetailIds);
+            if (Objects.nonNull(promotion)) {
+                productDetail.setPromotionMethod(promotion.getPromotionMethod());
+                productDetail.setPromotionValue(promotion.getPromotionValue());
+            }
         }
 
         ProductDetailShopResponse productDetailShopResponse = res.get(0);
@@ -281,7 +310,27 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
     }
 
     @Override
-    public Boolean isCheckQuantity(List<Long> productDetailId) throws NotFoundException {
+    public Boolean isCheckQuantity(ListQuantityAndPriceRequest req) throws NotFoundException {
+        if (Objects.isNull(req)) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_SERVICE));
+        }
+
+        if (CollectionUtils.isEmpty(req.getQuantityAndPriceList())) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_SERVICE));
+        }
+
+        for (QuantityAndPriceDTO dto: req.getQuantityAndPriceList()) {
+            double price = CommonUtils.bigDecimalConvertDouble(dto.getPrice());
+            if (dto.getQuantity() * price > 10000000) {
+                throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_THAN_TEN_MILLION));
+            }
+        }
+
+        List<Long> productDetailId = req.getQuantityAndPriceList().stream().map(QuantityAndPriceDTO::getProductDetailId).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(productDetailId)) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BUY_PRODUCT_NOT_FOUND));
+        }
+
         Boolean isProductDetail = repo.findProductDetailById(productDetailId);
         if (!isProductDetail) {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BUY_PRODUCT_NOT_FOUND));

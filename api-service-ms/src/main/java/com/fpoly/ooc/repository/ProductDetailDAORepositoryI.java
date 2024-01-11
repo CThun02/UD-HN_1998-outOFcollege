@@ -212,8 +212,6 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
 
     @Query(name = "ProductDetail.getAllProductDetailShop", nativeQuery = true)
     List<ProductDetailShop> getAllProductDetailShop(String productName,
-                                                    BigDecimal minPrice,
-                                                    BigDecimal maxPrice,
                                                     String cateStr,
                                                     String brandStr,
                                                     String colorStr,
@@ -242,7 +240,7 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
             "material.id, collar.id, sleeve.id, shirtTail.id, product.productName, brand.brandName, " +
             "category.categoryName, pattern.patternName, form.formName, button.buttonName, " +
             "material.materialName, collar.collarTypeName, sleeve.sleeveName, shirtTail.shirtTailTypeName, " +
-            "productDetail.weight, productDetail.descriptionDetail, promotion.promotionMethod, promotion.promotionValue) " +
+            "productDetail.weight, productDetail.descriptionDetail) " +
             "from ProductDetail productDetail " +
             "left join Product product on product.id = productDetail.product.id " +
             "left join Brand brand on brand.id = productDetail.brand.id " +
@@ -254,10 +252,7 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
             "left join CollarType collar on collar.id = productDetail.collar.id " +
             "left join SleeveType sleeve on sleeve.id = productDetail.sleeve.id " +
             "left join ShirtTailType shirtTail on shirtTail.id = productDetail.shirtTail.id " +
-            "left join PromotionProduct promotionProduct on promotionProduct.productDetailId.id = productDetail.id " +
-            "left join Promotion promotion on promotion.id = promotionProduct.promotion.id " +
             "where " +
-//            "productDetail.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
             "productDetail.quantity >= 0 " +
             "and product.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
             "and brand.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
@@ -269,8 +264,6 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
             "and collar.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
             "and sleeve.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
             "and shirtTail.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
-//            "and (promotionProduct is null or promotionProduct.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE) " +
-//            "and (promotion is null or promotion.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE) " +
             "and product.id = :productId " +
             "and brand.id = :brandId " +
             "and category.id = :categoryId " +
@@ -307,7 +300,6 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
             "left join SleeveType sleeve on productDetail.sleeve.id = sleeve.id " +
             "left join ShirtTailType shirt on productDetail.shirtTail.id = shirt.id " +
             "where " +
-//            "productDetail.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
             "productDetail.quantity >= 0 " +
             "and color.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +
             "and s.status = com.fpoly.ooc.constant.Const.STATUS_ACTIVE " +

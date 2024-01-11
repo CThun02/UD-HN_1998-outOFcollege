@@ -241,8 +241,8 @@ function ProductInfo({
               style={{ fontSize: "16px", padding: "6px 12px" }}
             >
               Giảm{" "}
-              {`${numeral(data.promotionValue).format("0,0")}${
-                data.promotionMethod === "vnd" ? "đ" : "%"
+              {`${numeral(colorsAndSizes?.promotionValue).format("0,0")}${
+                colorsAndSizes?.promotionType === "vnd" ? "đ" : "%"
               }`}
             </Tag>
           ) : (

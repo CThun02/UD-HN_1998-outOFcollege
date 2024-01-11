@@ -242,10 +242,14 @@ const Bill = () => {
 
   const handleOptionChange = (value, index) => {
     setSelectedOption(value);
-    setAmountPaid(0);
+    setAmountPaid("");
     setTransactionCode("");
     setRemainAmount(0);
-    setPrice(0);
+    setPrice("");
+    setPriceATM("");
+    setInputError("");
+    setPriceATMError("");
+    setTransactionError("");
   };
 
   // xóa sản phẩm trong giỏ hàng
@@ -1134,92 +1138,143 @@ const Bill = () => {
     }
     const customerAmountPay =
       totalPrice - voucherPrice() + (shippingFee ? shippingFee : 0);
+
+    if (productDetails?.length <= 0) {
+      isError = true;
+      return notification.error({
+        message: "Thông báo",
+        description: "Không có sản phẩm nào trong giỏ hàng.",
+        duration: 2,
+      });
+    }
+
     if (!typeShipping[index]) {
       if (Number(selectedOption) === 1) {
-        const priced = Number(price?.replace(",", ""));
-        if (priced < customerAmountPay) {
+        if (price) {
+          try {
+            const priced = Number(price?.replace(",", ""));
+
+            if (priced < Number(customerAmountPay)) {
+              isError = true;
+              setInputError("Vui lòng nhập số tiền cần thanh toán");
+              return;
+            } else {
+              isError = false;
+              setInputError("");
+            }
+          } catch (err) {
+            isError = true;
+            setInputError("Sai định dạng");
+            return;
+          }
+        } else {
           isError = true;
-          setInputError("Vui lòng nhập số tiền cần thanh toán");
+          setInputError("Không được bỏ trống");
           return;
+        }
+      }
+
+      if (Number(selectedOption) === 2) {
+        if (priceATM && transactionCode) {
+          if (transactionCode?.length < 10) {
+            isError = true;
+            setTransactionError("Mã giao dịch không hợp lệ");
+            return;
+          } else {
+            setTransactionError("");
+            isError = false;
+          }
+
+          try {
+            const priceATMNum = Number(priceATM.replace(",", ""));
+            if (priceATMNum < Number(customerAmountPay)) {
+              setPriceATMError("Số tiền không đủ");
+              isError = true;
+            } else {
+              setPriceATMError("");
+              isError = false;
+            }
+          } catch (err) {
+            setPriceATMError("Sai định dạng");
+            isError = true;
+          }
+        } else {
+          if (!priceATM) {
+            console.log("customerAmountPay: ", priceATM);
+            setPriceATMError("Không được bỏ trống");
+          } else {
+            setPriceATMError("");
+            isError = false;
+          }
+
+          if (!transactionCode) {
+            setTransactionError("Mã giao dịch không được để trống");
+          } else {
+            setTransactionError("");
+            isError = false;
+          }
+          isError = true;
         }
       }
 
       if (Number(selectedOption) === 3) {
-        if (remainAmount === -1) {
-          isError = true;
-          setInputError("Bạn chưa nhập tiền");
-        } else {
-          setInputError("");
-        }
-
-        if (transactionCode.trim().length === 0) {
-          isError = true;
-          setTransactionError("Mã giao dịch không được để trống");
-        } else {
-          setTransactionError("");
-        }
-
-        if (priceATM) {
-          if (!priceATM?.replace(/[^\d.]/g, "")) {
+        if (priceATM && transactionCode && price) {
+          let priceATMNum;
+          let priced;
+          try {
+            priced = Number(price?.replace(",", ""));
+          } catch (err) {
             isError = true;
-            setPriceATMError("Sai định dạng");
+            setInputError("Sai định dạng");
+            return;
+          }
+
+          if (transactionCode?.length < 10) {
+            isError = true;
+            setTransactionError("Mã giao dịch không hợp lệ");
+            return;
           } else {
-            if (Number(priceATM?.replace(/[,]/g, "")) < remainAmount) {
-              isError = true;
+            setTransactionError("");
+            isError = false;
+          }
+
+          try {
+            priceATMNum = Number(priceATM.replace(",", ""));
+            if (priceATMNum + priced < Number(customerAmountPay)) {
               setPriceATMError("Số tiền không đủ");
+              setInputError("Vui lòng nhập số tiền cần thanh toán");
+              isError = true;
+            } else {
+              setPriceATMError("");
+              setInputError("");
+              isError = false;
             }
+          } catch (err) {
+            setPriceATMError("Sai định dạng");
+            isError = true;
           }
         } else {
-          isError = true;
-          setPriceATMError("Vui lòng nhập số tiền cần thanh toán");
-        }
-
-        if (inputError && transactionError && setPriceATMError) {
-          return;
-        }
-      }
-
-      if (productDetails?.length <= 0) {
-        isError = true;
-        return notification.error({
-          message: "Thông báo",
-          description: "Không có sản phẩm nào trong giỏ hàng.",
-          duration: 2,
-        });
-      }
-
-      if (Number(selectedOption) === 1) {
-        const priceNumber = Number(price.replace(",", ""));
-        if (priceNumber < Number(calculatedValue)) {
-          console.log("remainAmount: ", remainAmount);
-          isError = true;
-          return setInputError("Nhập đủ số tiền cần thanh toán");
-        }
-      }
-
-      if (Number(selectedOption) === 3 || Number(selectedOption) === 2) {
-        if (Number(selectedOption) === 2) {
-          if (priceATM) {
-            if (!priceATM.replace(/[^\d.]/g, "")) {
-              isError = true;
-              setPriceATMError("Sai định dạng");
-            } else {
-              const priceATMStr = priceATM.replace(/[,]/g, "");
-              if (Number(priceATMStr) < remainAmount) {
-                isError = true;
-                setPriceATMError("Số tiền không đủ");
-              } else {
-                setPriceATMError("");
-              }
-            }
+          if (!Number(price)) {
+            setInputError("Không được bỏ trống");
           } else {
-            isError = true;
-            setPriceATMError("Vui lòng nhập số tiền cần thanh toán");
+            setInputError("");
+            isError = false;
           }
-          if (transactionCode.trim() === "") {
-            isError = true;
-            return setTransactionError("Mã giao dịch không được để trống");
+
+          if (!Number(priceATM)) {
+            setPriceATMError("Không được bỏ trống");
+          } else {
+            setPriceATMError("");
+            isError = false;
           }
+
+          if (!transactionCode) {
+            setTransactionError("Mã giao dịch không được để trống");
+          } else {
+            setTransactionError("");
+            isError = false;
+          }
+          isError = true;
         }
       }
     }
@@ -1639,6 +1694,7 @@ const Bill = () => {
                                     )
                                   : selectedProvince
                               }
+                              placeholder={"Chọn Tỉnh/ thành phố"}
                             >
                               {provinces &&
                                 provinces.map((province) => (
@@ -1679,6 +1735,7 @@ const Bill = () => {
                                     )
                                   : selectedDictrict
                               }
+                              placeholder={"Chọn Quận/ huyện"}
                             >
                               {districts &&
                                 districts.map((district) => {
@@ -1716,6 +1773,7 @@ const Bill = () => {
                                     )
                                   : selectedWard
                               }
+                              placeholder={"Chọn Phường/ xã"}
                             >
                               {wards &&
                                 wards?.map((ward) => (
@@ -2026,6 +2084,7 @@ const Bill = () => {
                             </span>
 
                             <Input
+                              value={transactionCode}
                               placeholder="Nhập mã giao dịch"
                               size="large"
                               onChange={(e) =>
@@ -2042,7 +2101,7 @@ const Bill = () => {
                         <TextArea
                           onChange={(e) => setNote(e.target.value)}
                           rows={3}
-                          placeholder="ghi chú ..."
+                          placeholder="Ghi chú ..."
                           style={{ margin: "10px 0" }}
                         />
                         <Col span={24} style={{ marginTop: "20px" }}>

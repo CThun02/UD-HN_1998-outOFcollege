@@ -80,12 +80,63 @@ function ProductInfo({
       return;
     }
 
+    let priceInclude = quantity * colorsAndSizes?.priceProductMax;
+    if (priceInclude > 10000000) {
+      notification.warning({
+        message: "Thông báo",
+        description: "Bạn chỉ thêm được tối đa là 10 triệu vào trong giỏ hàng",
+      });
+      return;
+    }
+
     if (!dataToken) {
+      let productDetail = JSON.parse(localStorage.getItem("user"));
+      if (productDetail?.productDetails?.length > 0) {
+        let totalPriceInCart = 0;
+        for (var i = 0; i < productDetail?.productDetails?.length; i++) {
+          const priceProductInCart =
+            productDetail?.productDetails[i].data[0]?.price;
+          const quantityProductInCart =
+            productDetail?.productDetails[i]?.quantity;
+          const promotion = productDetail?.productDetails[i].data[0]?.promotion;
+          let promotionValue = 0;
+          let promotionMethod = "";
+          if (promotion?.length > 0) {
+            promotionValue = promotion[0]?.promotionValue;
+            promotionMethod = promotion[0]?.promotionMethod;
+          }
+
+          if (promotionMethod && promotionValue) {
+            if (promotionMethod === "%") {
+              totalPriceInCart +=
+                priceProductInCart * quantityProductInCart -
+                (priceProductInCart * quantityProductInCart * promotionValue) /
+                  100;
+            } else {
+              totalPriceInCart +=
+                priceProductInCart * quantityProductInCart -
+                quantityProductInCart * promotionValue;
+            }
+          } else {
+            totalPriceInCart += priceProductInCart * quantityProductInCart;
+          }
+        }
+
+        if (totalPriceInCart + priceInclude > 10000000) {
+          notification.warning({
+            message: "Thông báo",
+            description:
+              "Bạn chỉ thêm được tối đa là 10 triệu vào trong giỏ hàng",
+          });
+          return;
+        }
+      }
+
       if (existingItem) {
         const existingData = JSON.parse(existingItem);
         existingData.timeStart = now();
         let productExists = false;
-        for (let i = 0; i < existingData.productDetails?.length; i++) {
+        for (let i = 0; i < existingData?.productDetails?.length; i++) {
           if (
             existingData?.productDetails[i].data[0].id === productDetails[0]?.id
           ) {
@@ -145,10 +196,24 @@ function ProductInfo({
           });
         })
         .catch((err) => {
+          const error = err?.response?.data;
+
+          let messageError = "Thao tác thất bại";
+          if (
+            error.message?.includes(
+              "Hóa đơn mua trực tuyến không vượt quá 10 triệu"
+            )
+          ) {
+            messageError = "Hóa đơn mua trực tuyến không vượt quá 10 triệu";
+          }
+
+          if (error.message?.includes("Vượt quá số lượng")) {
+            messageError =
+              "Tổng số sản phẩm có trong giỏ hàng và khi thêm vượt quá số lượng tồn!";
+          }
           notification.error({
             message: "Lỗi",
-            description:
-              "Tổng số sản phẩm có trong giỏ hàng và khi thêm vượt quá số lượng tồn!",
+            description: messageError,
             duration: 2,
           });
           return;
@@ -180,6 +245,33 @@ function ProductInfo({
       return;
     }
 
+    const priceProductDetail = colorsAndSizes?.priceProductMax * quantity;
+    const priceReduce =
+      colorsAndSizes?.promotionType && colorsAndSizes?.promotionValue
+        ? colorsAndSizes?.promotionType === "%"
+          ? (priceProductDetail * colorsAndSizes?.promotionValue) / 100
+          : quantity * colorsAndSizes?.promotionValue
+        : 0;
+
+    if (priceProductDetail - priceReduce > 10000000) {
+      const maxQuantity =
+        10000000 /
+        (colorsAndSizes?.priceProductMax -
+          (colorsAndSizes?.promotionType && colorsAndSizes?.promotionValue
+            ? colorsAndSizes?.promotionType === "%"
+              ? (colorsAndSizes?.priceProductMax *
+                  colorsAndSizes?.promotionValue) /
+                100
+              : colorsAndSizes?.promotionValue
+            : 0));
+      setQuantity(Math.floor(maxQuantity));
+      notification.error({
+        message: "Thông báo",
+        description: "Bạn chỉ có thể mua tối đa là 10 triệu",
+      });
+      return;
+    }
+
     if (data) {
       try {
         if (data) {
@@ -188,6 +280,8 @@ function ProductInfo({
             {
               params: {
                 productDetailId: productDetails[0].id,
+                quantity: quantity,
+                username: data?.username,
               },
             }
           );
@@ -197,9 +291,24 @@ function ProductInfo({
         // localStorage.setItem('checkout', JSON.stringify(lstProductDetail));
         // navigate('/ms-shop/checkout');
       } catch (error) {
+        const errorData = error?.response?.data;
+        let message = "Thao tác thất bại";
+        if (
+          errorData?.message?.includes(
+            "Hóa đơn mua trực tuyến không vượt quá 10 triệu"
+          )
+        ) {
+          let maxQuantity = 10000000 / colorsAndSizes?.priceProductMax;
+          setQuantity(maxQuantity);
+          message = "Hóa đơn mua trực tuyến không vượt quá 10 triệu";
+        }
+
+        if (errorData?.message?.includes("Số lượng trong kho không đủ")) {
+          message = errorData?.message;
+        }
         notification.error({
           message: "Đã xảy ra lỗi",
-          description: "Vui lòng thử lại sau ít phút",
+          description: message ? message : "Thao tác thất bại",
         });
         return;
       }

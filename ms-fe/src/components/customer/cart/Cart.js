@@ -309,14 +309,21 @@ const Cart = (props) => {
           props.setRenderHeader(Math.random());
         })
         .catch((error) => {
+          const dataError = error?.response?.data;
+
+          let message = "Cập nhật thất bại";
+          if (dataError?.message?.includes("Số lượng trong kho không đủ")) {
+            message = dataError?.message;
+          }
           notification.error({
             message: "Thông báo",
-            description: "Cập nhật thất bại",
+            description: message,
             duration: 2,
           });
           return;
         });
     }, 1000);
+
     setTimer(newTimer);
   };
 
@@ -818,46 +825,47 @@ const Cart = (props) => {
       });
       return;
     } else {
-      // let isError = false;
-      // let totalPrice = 0;
-      // for (var i = 0; i < newData?.length; i++) {
-      //   const quantity = newData[i]?.cartDetailResponse?.quantity;
-      //   const productPrice = newData[i]?.cartDetailResponse?.priceProductDetail;
-      //   totalPrice += quantity * productPrice;
-      //   if (totalPrice > 10000000) {
-      //     notification.error({
-      //       message: "Thông báo",
-      //       description: "Tổng giá trị đơn hàng tối đa là 10 triệu",
-      //       duration: 2,
-      //     });
-      //     isError = true;
-      //     break;
-      //   }
-      // }
-      const data = newData.map((e) => {
-        return {
-          quantity: e.cartDetailResponse.quantity,
-          price: e.cartDetailResponse.priceProductDetail,
-          productDetailId: e.cartDetailResponse.productDetailId,
-        };
-      });
-      console.log("data: ", data);
-      console.log("data: ", newData);
-      axios
-        .post(baseUrl + "/isCheckQuantity", { quantityAndPriceList: data })
-        .then(() => {
-          localStorage.setItem("checkout", JSON.stringify(newData));
-          navigate("/ms-shop/checkout");
-        })
-        .catch((err) => {
+      let isError = false;
+      let totalPrice = 0;
+      for (var i = 0; i < newData?.length; i++) {
+        const quantity = newData[i]?.cartDetailResponse?.quantity;
+        const productPrice = newData[i]?.cartDetailResponse?.priceProductDetail;
+        totalPrice += quantity * productPrice;
+        if (totalPrice > 10000000) {
           notification.error({
             message: "Thông báo",
-            description:
-              "Sản phẩm đã bán hết hoặc không tồn tại vui lòng thử lại sau",
+            description: "Tổng giá trị đơn hàng tối đa là 10 triệu",
             duration: 2,
           });
-          return;
+          isError = true;
+          break;
+        }
+      }
+
+      if (!isError) {
+        const data = newData.map((e) => {
+          return {
+            quantity: e.cartDetailResponse.quantity,
+            price: e.cartDetailResponse.priceProductDetail,
+            productDetailId: e.cartDetailResponse.productDetailId,
+          };
         });
+        axios
+          .post(baseUrl + "/isCheckQuantity", { quantityAndPriceList: data })
+          .then(() => {
+            localStorage.setItem("checkout", JSON.stringify(newData));
+            navigate("/ms-shop/checkout");
+          })
+          .catch((err) => {
+            notification.error({
+              message: "Thông báo",
+              description:
+                "Sản phẩm đã bán hết hoặc không tồn tại vui lòng thử lại sau",
+              duration: 2,
+            });
+            return;
+          });
+      }
     }
   };
 

@@ -44,6 +44,7 @@ import com.fpoly.ooc.responce.timeline.TimelineProductDisplayResponse;
 import com.fpoly.ooc.responce.timeline.TimelineProductResponse;
 import com.fpoly.ooc.service.interfaces.AccountService;
 import com.fpoly.ooc.service.interfaces.BillService;
+import com.fpoly.ooc.service.interfaces.CartDetailService;
 import com.fpoly.ooc.service.interfaces.DeliveryNoteService;
 import com.fpoly.ooc.service.interfaces.EmailService;
 import com.fpoly.ooc.service.interfaces.ProductDetailServiceI;
@@ -114,6 +115,9 @@ public class BillServiceImpl implements BillService {
     @Autowired
     private AccountService accountService;
 
+    @Autowired
+    private CartDetailService cartDetailService;
+
     @Override
     @Transactional(rollbackOn = Exception.class)
     public Bill createBill(BillRequest request) throws JsonProcessingException, NotFoundException {
@@ -127,6 +131,13 @@ public class BillServiceImpl implements BillService {
         if (Objects.nonNull(request.getAccountId())) {
             isUser = Boolean.TRUE;
             accountBuilder = accountService.findByUsername(request.getAccountId());
+        }
+
+        double amountPaid = CommonUtils.bigDecimalConvertDouble(request.getAmountPaid());
+        double priceReduce = CommonUtils.bigDecimalConvertDouble(request.getPriceReduce());
+        double shippingPrice = CommonUtils.bigDecimalConvertDouble(request.getShipPrice());
+        if (amountPaid - shippingPrice - priceReduce > 10000000) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_THAN_TEN_MILLION));
         }
 
         Bill bill = Bill.builder()
@@ -146,6 +157,7 @@ public class BillServiceImpl implements BillService {
         }
         bill.setStatus(request.getStatus());
         billRepo.save(bill);
+        cartDetailService.updateProductInCart(request.getAccountId(), request.getLstBillDetailRequest());
 
         if (!request.getEmailDetails().getRecipient().isEmpty() && request.getPaymentDetailId() != 2) {
             emailService.sendSimpleMail(request.getEmailDetails());

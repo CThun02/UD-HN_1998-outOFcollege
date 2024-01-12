@@ -1,6 +1,7 @@
 package com.fpoly.ooc.request.bill;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fpoly.ooc.dto.BuyProductDTO;
 import com.fpoly.ooc.dto.EmailDetails;
 import com.fpoly.ooc.request.payment.PaymentDetailRequest;
 import lombok.AllArgsConstructor;

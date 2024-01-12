@@ -428,6 +428,7 @@ const Checkout = ({ setRenderHeader }) => {
       lstBillDetailRequest: formData.lstBillDetailRequest,
       transactionCode: formData.paymentDetailId === 2 ? "" : null,
       voucherCode: voucherAdd.voucherCode ? voucherAdd.voucherCode : null,
+      shipPrice: shippingFee,
       emailDetails: {
         recipient: dataToken ? [email] : [formData.email],
         messageBody: `<body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: Arial, sans-serif;">

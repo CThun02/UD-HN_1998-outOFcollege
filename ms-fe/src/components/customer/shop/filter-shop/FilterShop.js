@@ -9,7 +9,7 @@ import SockJs from "../../../../service/SockJs";
 
 const baseUrl = "http://localhost:8080/api/admin";
 
-function FilterShop({ filter, setFilter }) {
+function FilterShop({ filter, setFilter, setProducts, products }) {
   const [categories, setCategories] = useState([]);
   const [brands, setBrands] = useState([]);
   const [colors, setColors] = useState([]);

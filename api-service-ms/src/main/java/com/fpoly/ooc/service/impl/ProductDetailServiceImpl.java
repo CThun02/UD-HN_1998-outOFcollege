@@ -203,7 +203,7 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
 
         List<ProductDetailShop> result = repo.getAllProductDetailShop(
                 req.getProductName(), cateStr, brandStr, colorStr, sizeStr,
-                req.getCategories(), req.getBrands(), req.getColors(), req.getSizes()
+                req.getCategories(), req.getBrands(), req.getColors(), req.getSizes(), req.getSort()
         );
 
         for (ProductDetailShop productDetail: result) {

@@ -219,7 +219,8 @@ public interface ProductDetailDAORepositoryI extends JpaRepository<ProductDetail
                                                     List<Long> categories,
                                                     List<Long> brands,
                                                     List<Long> colors,
-                                                    List<Long> sizes);
+                                                    List<Long> sizes,
+                                                    String sort);
 
     @Query(name = "ProductDetail.findColorAndSize", nativeQuery = true)
     List<GetColorAndSizeAndQuantity> findColorAndSize(Long productIdLong,

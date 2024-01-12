@@ -38,7 +38,7 @@ public class ProductImageService implements ProductImageServiceI {
         if(Objects.nonNull(productImageDb)) {
             String productDetailsShopJson = objectMapper.writeValueAsString(productDetailDAORepositoryI.getAllProductDetailShop(
                     null, "", "", "", "", null,
-                    null, null, null));
+                    null, null, null, "up"));
             String bestSellingJson = objectMapper.writeValueAsString(productDetailDAORepositoryI.getProductDetailBestSelling());
             String newProductJson = objectMapper.writeValueAsString(productDetailDAORepositoryI.getNewProductDetail());
             template.convertAndSend("/topic/productDetailShop-topic", productDetailsShopJson);

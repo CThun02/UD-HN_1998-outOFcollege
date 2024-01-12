@@ -29,7 +29,7 @@ function Shop() {
   //filter
   const [filter, setFilter] = useState({
     productName: null,
-    minPrice: null,
+    minPrice: 1,
     maxPrice: null,
     categories: null,
     brands: null,
@@ -45,7 +45,6 @@ function Shop() {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    setIsLoading(true);
     async function getProducts() {
       try {
         const res = await axios.post(baseUrl + "/product-shop", filter);
@@ -58,8 +57,15 @@ function Shop() {
       }
     }
 
-    getProducts();
-  }, [pageNo, pageSize, filter]);
+    let timer = setTimeout(() => {
+      setIsLoading(true);
+      if (filter) {
+        getProducts();
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [filter]);
 
   function handlePageSize(current, size) {
     setPageNo(current);
@@ -92,11 +98,21 @@ function Shop() {
               open={open}
               key={"left"}
             >
-              <FilterShop filter={filter} setFilter={setFilter} />
+              <FilterShop
+                filter={filter}
+                setFilter={setFilter}
+                setProducts={setProducts}
+                products={products}
+              />
             </Drawer>
             <Row>
               <Col xl={8} xxl={6} xs={24} className={styles.filter}>
-                <FilterShop filter={filter} setFilter={setFilter} />
+                <FilterShop
+                  filter={filter}
+                  setFilter={setFilter}
+                  setProducts={setProducts}
+                  products={products}
+                />
               </Col>
               <Col xl={16} xxl={18} xs={24}>
                 <Button
@@ -111,7 +127,57 @@ function Shop() {
                 <SortAndResultSearch
                   filter={filter}
                   setFilter={setFilter}
-                  products={products}
+                  products={products
+                    .filter((el) => {
+                      let price = 0;
+                      if (el.promotionMethod && el.promotionReduce) {
+                        if (el.promotionMethod === "%") {
+                          price =
+                            el.priceProductMin -
+                            (el.priceProductMin * el.promotionReduce) / 100;
+                        } else {
+                          price = el.priceProductMin - el.promotionReduce;
+                        }
+                      } else {
+                        price = el.priceProductMin;
+                      }
+
+                      if (filter.minPrice && filter.maxPrice) {
+                        return (
+                          price >= filter.minPrice && price <= filter.maxPrice
+                        );
+                      } else if (filter.minPrice) {
+                        return price >= filter.minPrice;
+                      } else if (filter.maxPrice) {
+                        return price <= filter.maxPrice;
+                      }
+
+                      return false;
+                    })
+                    .map((el) => {
+                      return {
+                        productDetailId: el.productDetailId,
+                        productId: el.productId,
+                        brandId: el.brandId,
+                        categoryId: el.categoryId,
+                        patternId: el.patternId,
+                        formId: el.formId,
+                        buttonId: el.buttonId,
+                        materialId: el.materialId,
+                        collarId: el.collarId,
+                        sleeveId: el.sleeveId,
+                        shirtTailId: el.shirtTailId,
+                        categoryName: el.categoryName,
+                        productName: el.productName,
+                        brandName: el.brandName,
+                        promotionMethod: el.promotionMethod,
+                        promotionReduce: el.promotionReduce,
+                        priceProductMin: el.priceProductMin,
+                        priceProductMax: el.priceProductMax,
+                        quantitySelling: el.quantitySelling,
+                        productImages: el.productImages,
+                      };
+                    })}
                 />
 
                 <List
@@ -124,7 +190,57 @@ function Shop() {
                     xl: 3,
                     xxl: 3,
                   }}
-                  dataSource={products}
+                  dataSource={products
+                    .filter((el) => {
+                      let price = 0;
+                      if (el.promotionMethod && el.promotionReduce) {
+                        if (el.promotionMethod === "%") {
+                          price =
+                            el.priceProductMin -
+                            (el.priceProductMin * el.promotionReduce) / 100;
+                        } else {
+                          price = el.priceProductMin - el.promotionReduce;
+                        }
+                      } else {
+                        price = el.priceProductMin;
+                      }
+
+                      if (filter.minPrice && filter.maxPrice) {
+                        return (
+                          price >= filter.minPrice && price <= filter.maxPrice
+                        );
+                      } else if (filter.minPrice) {
+                        return price >= filter.minPrice;
+                      } else if (filter.maxPrice) {
+                        return price <= filter.maxPrice;
+                      }
+
+                      return false;
+                    })
+                    .map((el) => {
+                      return {
+                        productDetailId: el.productDetailId,
+                        productId: el.productId,
+                        brandId: el.brandId,
+                        categoryId: el.categoryId,
+                        patternId: el.patternId,
+                        formId: el.formId,
+                        buttonId: el.buttonId,
+                        materialId: el.materialId,
+                        collarId: el.collarId,
+                        sleeveId: el.sleeveId,
+                        shirtTailId: el.shirtTailId,
+                        categoryName: el.categoryName,
+                        productName: el.productName,
+                        brandName: el.brandName,
+                        promotionMethod: el.promotionMethod,
+                        promotionReduce: el.promotionReduce,
+                        priceProductMin: el.priceProductMin,
+                        priceProductMax: el.priceProductMax,
+                        quantitySelling: el.quantitySelling,
+                        productImages: el.productImages,
+                      };
+                    })}
                   renderItem={(item) => (
                     <List.Item>
                       <ProductsList data={item} key={item.productDetailId} />

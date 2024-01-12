@@ -7,6 +7,7 @@ import {
   Row,
   Select,
   Slider,
+  Spin,
   Table,
 } from "antd";
 import Input from "antd/es/input/Input";
@@ -333,6 +334,7 @@ const ProductDetails = (props) => {
   };
 
   function addProductDetail(record, index) {
+    setLoading(true);
     var indexExist = -1;
     var productDetailCreate = {
       productDetail: {},
@@ -346,40 +348,25 @@ const ProductDetails = (props) => {
       }
     }
     if (indexExist !== -1) {
-      // if (
-      //   Number(quantity) +
-      //     Number(props.productDetailsCreate[indexExist].quantity) >
-      //   record?.quantity
-      // ) {
-      //   // notification.error({
-      //   //   message: "Thông báo",
-      //   //   description: `Số lượng sản phẩm ${
-      //   //     productDetailCreate.quantity > 100
-      //   //       ? "thêm tối đa 100"
-      //   //       : "tồn không đủ"
-      //   //   }`,
-      //   // });
-      //   return;
-      // } else {
       productDetailCreate.quantity =
         Number(quantity) +
         Number(props.productDetailsCreate[indexExist].quantity);
       props.productDetailsCreate?.splice(indexExist, 1);
-      // }
     }
-    if (productDetailCreate?.quantity > record?.quantity) {
-      notification.error({
-        message: "Thông báo",
-        description: `Số lượng sản phẩm tồn không đủ`,
-      });
-      return;
-    }
+    // if (productDetailCreate?.quantity > record?.quantity) {
+    //   notification.error({
+    //     message: "Thông báo",
+    //     description: `Số lượng sản phẩm tồn không đủ`,
+    //   });
+    //   return;
+    // }
 
     if (productDetailCreate.quantity <= 0) {
       notification.error({
         message: "Thông báo",
         description: `Số lượng sản phẩm phải lớn hơn 0`,
       });
+      setLoading(false);
     } else {
       productDetailCreate.productDetail = record;
       productDetailCreate.priceReduce =
@@ -428,70 +415,90 @@ const ProductDetails = (props) => {
           }
         )
         .then(() => {
-          props.billId
-            ? axios
-                .post(
-                  `http://localhost:8080/api/admin/bill-detail/create-bill-detail`,
-                  {
-                    billId: props.billId,
-                    productDetailId: productDetailCreate.productDetail.id,
-                    quantity: productDetailCreate.quantity,
-                    price: productDetailCreate.priceReduce,
+          if (props.billId) {
+            axios
+              .post(
+                `http://localhost:8080/api/admin/bill-detail/create-bill-detail`,
+                {
+                  billId: /^-?\d+$/.test(props?.billId)
+                    ? Number(props?.billId)
+                    : null,
+                  productDetailId: productDetailCreate.productDetail.id,
+                  quantity: productDetailCreate.quantity,
+                  price: productDetailCreate.priceReduce,
+                },
+                {
+                  headers: {
+                    Authorization: `Bearer ${getToken(true)}`,
                   },
-                  {
-                    headers: {
-                      Authorization: `Bearer ${getToken(true)}`,
-                    },
-                  }
-                )
-                .then((response) => {
-                  const values = {
-                    note: `Thêm sản phẩm mới: ${productDetailCreate?.productDetail?.product?.productName} `,
-                    status: "Update",
-                    createdBy: data?.username + "_" + data?.fullName,
-                  };
-                  axios
-                    .post(
-                      `http://localhost:8080/api/admin/timeline/${props.billId}`,
-                      values,
-                      {
-                        headers: {
-                          Authorization: `Bearer ${getToken(true)}`,
-                        },
-                      }
-                    )
-                    .then((response) => {})
-                    .catch((error) => {});
-                  notification.success({
-                    message: "Thông báo",
-                    description: "Cập nhật thành công!",
-                    duration: 2,
+                }
+              )
+              .then((response) => {
+                const values = {
+                  note: `Thêm sản phẩm mới: ${productDetailCreate?.productDetail?.product?.productName} `,
+                  status: "Update",
+                  createdBy: data?.username + "_" + data?.fullName,
+                };
+                axios
+                  .post(
+                    `http://localhost:8080/api/admin/timeline/${props.billId}`,
+                    values,
+                    {
+                      headers: {
+                        Authorization: `Bearer ${getToken(true)}`,
+                      },
+                    }
+                  )
+                  .then((response) => {
+                    notification.success({
+                      message: "Thông báo",
+                      description: "Cập nhật thành công",
+                      duration: 2,
+                    });
+                    setLoading(false);
+                  })
+                  .catch((error) => {
+                    notification.error({
+                      message: "Thông báo",
+                      description: "Thao tác thất bại",
+                      duration: 2,
+                    });
+                    setLoading(false);
                   });
-                })
-                .catch((error) => {
-                  const errorCode = error.response?.data;
-                  let description = "";
-                  if (errorCode?.status === 403) {
-                    description = "Bạn không có quyền truy cập!";
-                  }
+              })
+              .catch((error) => {
+                const errorCode = error.response?.data;
+                let description = "";
+                if (errorCode?.status === 403) {
+                  description = "Bạn không có quyền truy cập!";
+                }
 
-                  if (errorCode?.status === 500) {
-                    description = `${errorCode?.message}`;
-                  }
+                if (errorCode?.status === 500) {
+                  description = `${errorCode?.message}`;
+                }
 
-                  if (errorCode?.status === "BAD_REQUEST") {
-                    description = `${errorCode?.message}`;
-                  }
+                if (errorCode?.status === "BAD_REQUEST") {
+                  description = `${errorCode?.message}`;
+                }
 
-                  notification.error({
-                    message: "Lỗi",
-                    description: description,
-                  });
-                })
-            : props.action();
+                notification.error({
+                  message: "Lỗi",
+                  description: description,
+                });
+                setLoading(false);
+              });
+          } else {
+            setLoading(false);
+            console.log("data-test: ");
+            props.action();
+          }
         })
         .catch((err) => {
-          console.log(err);
+          setLoading(false);
+          notification.error({
+            message: "Lỗi",
+            description: "Thao tác thất bại",
+          });
         });
     }
   }

@@ -44,7 +44,7 @@ public class HomeController {
     @PostMapping("/product-shop")
     public ResponseEntity<?> findAllProductDetailShop(
             @RequestBody ProductDetailCondition req
-    ) {
+    ) throws NotFoundException {
         return ResponseEntity.ok(productDetailService.getAllProductDetailShop(req));
     }
 

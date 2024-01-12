@@ -22,13 +22,10 @@ public class GetColorAndSizeAndQuantity {
     private String promotionType;
     private BigDecimal promotionValue;
 
-    public GetColorAndSizeAndQuantity(BigDecimal priceProductMin, BigDecimal priceProductMax, Long quantity, String promotionType,
-                                      BigDecimal promotionValue) {
+    public GetColorAndSizeAndQuantity(BigDecimal priceProductMin, BigDecimal priceProductMax, Long quantity) {
         this.priceProductMin = priceProductMin;
         this.priceProductMax = priceProductMax;
         this.quantity = quantity;
-        this.promotionType = promotionType;
-        this.promotionValue = promotionValue;
     }
 
     public GetColorAndSizeAndQuantity(BigDecimal priceProductMin, BigDecimal priceProductMax, String promotionType,

@@ -107,70 +107,14 @@ import java.util.List;
                             c.category_name     AS 'CategoryName',
                             pt.product_name     AS 'ProductName',
                             br.brand_name       AS 'BrandName',
-                            (SELECT TOP 1
-                                 pSub.promotion_method
-                             FROM
-                                 promotion_product_detail ppdSub
-                                 INNER JOIN promotion pSub ON ppdSub.promotion_id = pSub.id
-                                 INNER JOIN dbo.product_detail pdSub ON pdSub.id = ppdSub.product_detail_id
-                             WHERE
-                                 pSub.status = 'ACTIVE'
-                                 AND ppdSub.product_detail_id IN (
-                                 SELECT pdSecondSub.id
-                                 FROM product_detail pdSecondSub
-                                 WHERE pdSecondSub.product_id = pt.id
-                                 and pdSecondSub.brand_id = br.id
-                                 and pdSecondSub.category_id = cy.id
-                                 and pdSecondSub.pattern_id = patt.id
-                                 and pdSecondSub.form_id = f.id
-                                 and pdSecondSub.button_id = button.id
-                                 and pdSecondSub.material_id = mate.id
-                                 and pdSecondSub.collar_id = collar.id
-                                 and pdSecondSub.sleeve_id = sleeve.id
-                                 and pdSecondSub.shirt_tail_id = shirtTail.id)
-                             ORDER BY
-                                 CASE
-                                     WHEN pSub.promotion_method = 'vnd' THEN pSub.promotion_value
-                                     WHEN pSub.promotion_method = '%' THEN ((pSub.promotion_value / 100) * MAX(pd.price))
-                                 END DESC
-                             ) AS 'PromotionMethod',
-                            (select top 1 pSub.promotion_value
-                                              from promotion_product_detail ppdSub inner join promotion pSub on ppdSub.promotion_id = pSub.id
-                                              inner join dbo.product_detail pdSub on pdSub.id = ppdSub.product_detail_id
-                                              where
-                                                pSub.status = 'ACTIVE'
-                                                and ppdSub.product_detail_id in (
-                                              SELECT pdSecondSub.id
-                                                 FROM product_detail pdSecondSub
-                                                 WHERE pdSecondSub.product_id = pt.id
-                                                 and pdSecondSub.brand_id = br.id
-                                                 and pdSecondSub.category_id = cy.id
-                                                 and pdSecondSub.pattern_id = patt.id
-                                                 and pdSecondSub.form_id = f.id
-                                                 and pdSecondSub.button_id = button.id
-                                                 and pdSecondSub.material_id = mate.id
-                                                 and pdSecondSub.collar_id = collar.id
-                                                 and pdSecondSub.sleeve_id = sleeve.id
-                                                 and pdSecondSub.shirt_tail_id = shirtTail.id
-                                                 )
-                                              ORDER BY
-                                             CASE
-                                                 WHEN pSub.promotion_method = 'vnd' THEN pSub.promotion_value
-                                                 WHEN pSub.promotion_method = '%' THEN ((pSub.promotion_value / 100) * MAX(pd.price))
-                                             END DESC
-                                             )  AS 'PromotionValue',
                             MIN(pd.price)       AS 'MinPrice',
                             MAX(pd.price)       AS 'MaxPrice'
-
                             FROM product_detail pd
-                            LEFT JOIN product_image pie ON pd.id = pie.product_detail_id
                             LEFT JOIN category c ON c.id = pd.category_id
                             LEFT JOIN product pt ON pt.id = pd.product_id
                             LEFT JOIN brand b ON b.id = pd.brand_id
                             LEFT JOIN color cor ON cor.id = pd.color_id
                             LEFT JOIN size se ON se.id = pd.size_id
-                            LEFT JOIN promotion_product_detail pp ON pd.id = pp.product_detail_id
-                            LEFT JOIN promotion pn ON pn.id = pp.promotion_id
                             LEFT JOIN brand br ON br.id = pd.brand_id
                             LEFT JOIN category cy ON cy.id = pd.category_id
                             LEFT JOIN pattern patt ON patt.id = pd.pattern_id
@@ -182,8 +126,7 @@ import java.util.List;
                             LEFT JOIN shirt_tail_type shirtTail ON shirtTail.id = pd.shirt_tail_id
 
                             WHERE
-                                pd.status = 'ACTIVE'
-                                AND (pie.product_detail_id is null or pie.status = 'ACTIVE')
+                                pd.quantity >= 0
                                 AND pt.status = 'ACTIVE'
                                 AND c.status = 'ACTIVE'
                                 AND br.status = 'ACTIVE'
@@ -200,12 +143,10 @@ import java.util.List;
                                     OR lower(mate.material_name) LIKE ?1 OR lower(collar.collar_type_name) LIKE ?1 OR sleeve.seleeve_name LIKE ?1
                                     OR lower(shirtTail.shirt_tail_name) LIKE ?1
                                 )
-                                AND (?2 IS NULL OR pp.money_after >= ?2 OR pd.price >= ?2)
-                                AND (?3 IS NULL OR pp.money_after <= ?3 OR pd.price <= ?3)
-                                AND (?4 = '' OR c.id IN (?8))
-                                AND (?5 = '' OR b.id IN (?9))
-                                AND (?6 = '' OR cor.id IN (?10))
-                                AND (?7 = '' OR se.id IN (?11))
+                                AND (?2 = '' OR c.id IN (?6))
+                                AND (?3 = '' OR b.id IN (?7))
+                                AND (?4 = '' OR cor.id IN (?8))
+                                AND (?5 = '' OR se.id IN (?9))
                             GROUP BY pt.id, br.id, cy.id, patt.id, f.id, button.id, mate.id, collar.id, sleeve.id, shirtTail.id,
                              c.category_name, pt.product_name, br.brand_name
                 """, resultSetMapping = "Mapping.ProductDetailShop")
@@ -216,59 +157,7 @@ import java.util.List;
                 select
                       min(productDetail.price) AS MinPrice,
                       max(productDetail.price) AS MaxPrice,
-                      sum(productDetail.quantity) AS Quantity,
-                      (SELECT TOP 1
-                           pSub.promotion_method
-                       FROM
-                           promotion_product_detail ppdSub
-                               INNER JOIN promotion pSub ON ppdSub.promotion_id = pSub.id
-                               INNER JOIN dbo.product_detail pdSub ON pdSub.id = ppdSub.product_detail_id
-                       WHERE
-                               pSub.status = 'ACTIVE'
-                         AND ppdSub.product_detail_id IN (
-                           SELECT pdSecondSub.id
-                           FROM product_detail pdSecondSub
-                           WHERE pdSecondSub.product_id = product.id
-                             and pdSecondSub.brand_id = b.id
-                             and pdSecondSub.category_id = cate.id
-                             and pdSecondSub.pattern_id = patt.id
-                             and pdSecondSub.form_id = form.id
-                             and pdSecondSub.button_id = button.id
-                             and pdSecondSub.material_id = mate.id
-                             and pdSecondSub.collar_id = collar.id
-                             and pdSecondSub.sleeve_id = sleeve.id
-                             and pdSecondSub.shirt_tail_id = shirt.id)
-                       ORDER BY
-                           CASE
-                               WHEN pSub.promotion_method = 'vnd' THEN pSub.promotion_value
-                               WHEN pSub.promotion_method = '%' THEN ((pSub.promotion_value / 100) * MAX(productDetail.price))
-                               END DESC
-                      ) AS 'PromotionMethod',
-                      (select top 1 pSub.promotion_value
-                       from promotion_product_detail ppdSub inner join promotion pSub on ppdSub.promotion_id = pSub.id
-                                                            inner join dbo.product_detail pdSub on pdSub.id = ppdSub.product_detail_id
-                       where
-                               pSub.status = 'ACTIVE'
-                         and ppdSub.product_detail_id in (
-                           SELECT pdSecondSub.id
-                           FROM product_detail pdSecondSub
-                           WHERE pdSecondSub.product_id = product.id
-                             and pdSecondSub.brand_id = b.id
-                             and pdSecondSub.category_id = cate.id
-                             and pdSecondSub.pattern_id = patt.id
-                             and pdSecondSub.form_id = form.id
-                             and pdSecondSub.button_id = button.id
-                             and pdSecondSub.material_id = mate.id
-                             and pdSecondSub.collar_id = collar.id
-                             and pdSecondSub.sleeve_id = sleeve.id
-                             and pdSecondSub.shirt_tail_id = shirt.id
-                       )
-                       ORDER BY
-                           CASE
-                               WHEN pSub.promotion_method = 'vnd' THEN pSub.promotion_value
-                               WHEN pSub.promotion_method = '%' THEN ((pSub.promotion_value / 100) * MAX(productDetail.price))
-                               END DESC
-                      )  AS 'PromotionValue'
+                      sum(productDetail.quantity) AS Quantity
                   from product_detail productDetail
                            left join product product on productDetail.product_id = product.id
                            left join color color on productDetail.color_id = color.id
@@ -282,10 +171,8 @@ import java.util.List;
                            left join collar_type collar on productDetail.collar_id = collar.id
                            left join sleeve_type sleeve on productDetail.sleeve_id = sleeve.id
                            left join shirt_tail_type shirt on productDetail.shirt_tail_id = shirt.id
-                           left join promotion_product_detail promotionProduct on productDetail.id = promotionProduct.product_detail_id
-                           left join promotion promotion on promotion.id = promotionProduct.promotion_id
                   where
-                    productDetail.status = 'ACTIVE'
+                    productDetail.quantity >= 0
                     and color.status = 'ACTIVE'
                     and s.status = 'ACTIVE'
                     and b.status = 'ACTIVE'
@@ -309,8 +196,7 @@ import java.util.List;
                     and (?11 is null or color.id  = ?11)
                     and (?12 is null or s.id = ?12)
                     and product.id = ?1
-                  group by promotion.promotion_value, promotion.promotion_method, product.id, cate.id,
-                           patt.id, b.id, form.id, button.id, mate.id, collar.id, sleeve.id, shirt.id
+                  group by product.id, cate.id, patt.id, b.id, form.id, button.id, mate.id, collar.id, sleeve.id, shirt.id
                 """,
         resultSetMapping = "Mapping.GetColorAndSizeAndQuantity"
 )
@@ -322,9 +208,7 @@ import java.util.List;
                 columns = {
                         @ColumnResult(name = "MinPrice", type = BigDecimal.class),
                         @ColumnResult(name = "MaxPrice", type = BigDecimal.class),
-                        @ColumnResult(name = "Quantity", type = Long.class),
-                        @ColumnResult(name = "PromotionMethod", type = String.class),
-                        @ColumnResult(name = "PromotionValue", type = BigDecimal.class),
+                        @ColumnResult(name = "Quantity", type = Long.class)
                 }
         )
 )
@@ -370,8 +254,6 @@ import java.util.List;
                         @ColumnResult(name = "CategoryName", type = String.class),
                         @ColumnResult(name = "ProductName", type = String.class),
                         @ColumnResult(name = "BrandName", type = String.class),
-                        @ColumnResult(name = "PromotionMethod", type = String.class),
-                        @ColumnResult(name = "PromotionValue", type = BigDecimal.class),
                         @ColumnResult(name = "MinPrice", type = BigDecimal.class),
                         @ColumnResult(name = "MaxPrice", type = BigDecimal.class),
                 }

@@ -79,4 +79,25 @@ public class ProductDetailShop {
         this.priceProductMin = priceProductMin;
         this.priceProductMax = priceProductMax;
     }
+
+    public ProductDetailShop(Long productId, Long brandId, Long categoryId, Long patternId, Long formId,
+                             Long buttonId, Long materialId, Long collarId, Long sleeveId, Long shirtTailId, String categoryName,
+                             String productName, String brandName, BigDecimal priceProductMin,
+                             BigDecimal priceProductMax) {
+        this.productId = productId;
+        this.brandId = brandId;
+        this.categoryId = categoryId;
+        this.patternId = patternId;
+        this.formId = formId;
+        this.buttonId = buttonId;
+        this.materialId = materialId;
+        this.collarId = collarId;
+        this.sleeveId = sleeveId;
+        this.shirtTailId = shirtTailId;
+        this.categoryName = categoryName;
+        this.productName = productName;
+        this.brandName = brandName;
+        this.priceProductMin = priceProductMin;
+        this.priceProductMax = priceProductMax;
+    }
 }

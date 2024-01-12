@@ -387,7 +387,7 @@ public class KafkaListenerService {
         String productDetailsJson = objectMapper.writeValueAsString(productDetailShopResponse);
         String colorsAndSizes = objectMapper.writeValueAsString(res);
         String productDetailsShopJson = objectMapper.writeValueAsString(productDetailDAORepositoryI.getAllProductDetailShop(
-                null, null, null, "", "", "", "", null,
+                null, "", "", "", "", null,
                 null, null, null));
         String bestSellingJson = objectMapper.writeValueAsString(productDetailDAORepositoryI.getProductDetailBestSelling());
         String newProductJson = objectMapper.writeValueAsString(productDetailDAORepositoryI.getNewProductDetail());

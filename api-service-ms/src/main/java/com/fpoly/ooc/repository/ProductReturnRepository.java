@@ -33,7 +33,7 @@ public interface ProductReturnRepository extends JpaRepository<ProductReturn, Lo
     WHERE (?1 IS NULL OR pr.createdAt >= ?1)
       AND (?2 IS NULL OR pr.createdAt <= ?2)
       AND pr.status = ?3
-    GROUP BY pd.id, product, brand, category, button, pattern, size, color, shirtTail, weight, status, form, material, collar, sleeve, pr.createdAt
+    GROUP BY pd.id, product, brand, category, button, pattern, size, color, shirtTail, weight, status, form, material, collar, sleeve
     """)
     public List<ProductDetailResponse> getProductReturnByDateAndReason(LocalDateTime day, LocalDateTime dayTo, String reason);
 

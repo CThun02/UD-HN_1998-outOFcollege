@@ -33,15 +33,16 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
 
     Bill findBillByBillCode(String billCode);
 
-    @Query("SELECT sum(b.amountPaid) from Bill b where (b.billType like ?1 or ?1 is null) AND b.status not like 'CANCEL'" +
+    @Query("SELECT sum(bd.price * bd.quantity) from Bill b join BillDetail bd on bd.bill.id = b.id " +
+            " where (b.billType like ?1 or ?1 is null) AND b.status not like 'CANCEL' AND bd.status not like 'ReturnS'" +
             " AND (?2 IS NULL OR b.createdAt >= ?2) AND (?3 IS NULL OR b.createdAt <= ?3)")
     Double getRevenueInStoreOnlineCompare(String type, LocalDateTime day, LocalDateTime dayTo);
 
-    @Query("SELECT sum(b.amountPaid) FROM Bill b WHERE " +
+    @Query("SELECT sum(bd.price * bd.quantity) FROM Bill b join BillDetail bd on bd.bill.id = b.id WHERE " +
             "((:dayParam IS NULL OR DAY(b.createdAt) >= :dayParam) and (:dayTo is null or DAY(b.createdAt) <= :dayTo)) AND " +
             "((:monthParam IS NULL OR MONTH(b.createdAt) >= :monthParam) and (:monthTo is null or MONTH(b.createdAt) <= :monthTo)) AND " +
             "((:yearParam IS NULL OR YEAR(b.createdAt) >= :yearParam) and (:yearTo is null or YEAR(b.createdAt) <= :yearTo)) " +
-            "AND b.status not like 'CANCEL'" +
+            "AND bd.status not like 'CANCEL' AND bd.status not like 'ReturnS' " +
             "AND (b.billType like :billType or :billType is null)")
     Double getRevenueByTime(@Param("dayParam") Integer day,
                             @Param("monthParam") Integer month,
@@ -58,7 +59,7 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
             "       pd.descriptionDetail AS descriptionDetail, pd.pattern as pattern, pd.form as form, pd.status as status " +
             "FROM BillDetail bd " +
             "JOIN ProductDetail pd ON pd.id = bd.productDetail.id " +
-            "WHERE bd.bill.status not like 'CANCEL' and bd.status not like 'ReturnS' and (bd.bill.id = ?1 or ?1 is null) " +
+            "WHERE bd.status not like 'CANCEL' and bd.status not like 'ReturnS' and (bd.bill.id = ?1 or ?1 is null) " +
             "AND  (?2 IS NULL OR bd.createdAt >= ?2) AND (?3 IS NULL OR bd.createdAt <= ?3)" +
             "GROUP BY pd.id, pd.product, pd.brand, pd.category, pd.button, pd.material, pd.collar, pd.sleeve, pd.size, " +
             "pd.color, pd.shirtTail, bd.price, pd.weight, pd.descriptionDetail, " +
@@ -110,8 +111,10 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
                    @Param("amountPaid") BigDecimal amountPaid,
                    @Param("id") Long id);
 
-    @Query("SELECT COUNT(b) AS billSell, SUM(b.amountPaid) as grossRevenue FROM Bill b " +
-            "WHERE (?1 IS NULL OR b.createdAt >= ?1) AND (?2 IS NULL OR b.createdAt <= ?2) and b.status not like 'CANCEL' ")
+    @Query("SELECT COUNT(b) AS billSell, SUM(bd.price * bd.quantity) as grossRevenue FROM Bill b " +
+            " join BillDetail bd on bd.bill.id = b.id " +
+            "WHERE (?1 IS NULL OR b.createdAt >= ?1) AND (?2 IS NULL OR b.createdAt <= ?2) and b.status not like 'CANCEL' " +
+            "AND bd.status not like 'ReturnS'")
     BillRevenue getBillRevenue(LocalDateTime dayFrom, LocalDateTime dayTo);
 
     @Query("SELECT pd.id AS id, pd.product AS product, pd.brand as brand, pd.category as category, pd.button AS button," +

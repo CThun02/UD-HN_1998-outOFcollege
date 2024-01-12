@@ -501,8 +501,8 @@ const EditProductsCart = ({open, onCancel, render, billCode, setLoadingButtonTim
       setError("Số lượng tồn không đủ")
     }else if(quantity<=0){
       setError("Số lượng mua lớn hơn phải lớn hơn 0")
-    }else if(quantity * price > 5000000){
-      setError("Vui lòng liên hệ cửa hàng để mua nhiều sản phẩm  có giá trị lớn hơn 5.000.000đ")
+    }else if(quantity * price > 10000000){
+      setError("Vui lòng liên hệ cửa hàng để mua nhiều sản phẩm  có giá trị lớn hơn 10.000.000đ")
     }else{
       setError("")
     }

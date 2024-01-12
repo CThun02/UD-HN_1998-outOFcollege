@@ -45,6 +45,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 @Slf4j
@@ -368,6 +369,12 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
                 productDetail.getMaterial().getId(), productDetail.getShirtTail().getId(), productDetail.getSleeve().getId(),
                 productDetail.getCollar().getId(), sizeId, productDetail.getPattern().getId(), productDetail.getForm().getId(),
                 productDetail.getBrand().getId(), productDetail.getCategory().getId()):null;
+        int index = IntStream.range(0, colors.size())
+                .filter(i -> colors.get(i).getId() == productDetail.getColor().getId())
+                .findFirst().orElse(-1);
+        component c = colors.get(0);
+        colors.set(0, colors.get(index));
+        colors.set(index, c);
         return colors;
     }
 
@@ -378,6 +385,12 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
                 productDetail.getMaterial().getId(), productDetail.getShirtTail().getId(), productDetail.getSleeve().getId(),
                 productDetail.getCollar().getId(), colorId, productDetail.getPattern().getId(), productDetail.getForm().getId(),
                 productDetail.getBrand().getId(), productDetail.getCategory().getId()):null;
+        int index = IntStream.range(0, sizes.size())
+                .filter(i -> sizes.get(i).getId() == productDetail.getSize().getId())
+                .findFirst().orElse(-1);
+        component c = sizes.get(0);
+        sizes.set(0, sizes.get(index));
+        sizes.set(index, c);
         return sizes;
     }
 

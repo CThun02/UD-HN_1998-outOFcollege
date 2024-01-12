@@ -109,8 +109,7 @@ public class TimeLineServiceImpl implements TimeLineService {
         TimelineClientResponse timelineClientResponse = new TimelineClientResponse();
         List<TimelineProductDisplayResponse> lstProduct = new ArrayList<>();
 
-        List<TimelineProductResponse> lstTimelineProductResponses = null;
-        lstTimelineProductResponses = timeLineRepo.getTimelineProductByBillId(bill.getId());
+        List<TimelineProductResponse> lstTimelineProductResponses = timeLineRepo.getTimelineProductByBillId(bill.getId());
         timelineClientResponse.setLstTimeline(timeLineRepo.getTimeLineClientByBillId(bill.getId()));
 
         for (TimelineProductResponse timelineProductResponse : lstTimelineProductResponses) {
@@ -143,7 +142,7 @@ public class TimeLineServiceImpl implements TimeLineService {
         timelineCustomInfo.setDateOfReceipt(bill.getCompletionDate());
         timelineCustomInfo.setTotalPrice(bill.getPrice());
         timelineCustomInfo.setPriceReduce(Objects.isNull(voucherHistory)? BigDecimal.ZERO:voucherHistory.getPriceReduce());
-        timelineCustomInfo.setPricePaid(bill.getPriceReduce());
+        timelineCustomInfo.setPricePaid(bill.getAmountPaid());
         timelineCustomInfo.setStatus(bill.getStatus());
         timelineClientResponse.setTimelineCustomInfo(timelineCustomInfo);
         return timelineClientResponse;

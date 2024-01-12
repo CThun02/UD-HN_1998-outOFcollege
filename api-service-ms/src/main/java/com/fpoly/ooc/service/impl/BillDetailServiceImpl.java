@@ -128,7 +128,7 @@ public class BillDetailServiceImpl implements BillDetailService {
             ProductDetail productDetailOld = billDetail.getProductDetail();
             if(quantityUpdate> productDetail.getQuantity()){
                 throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BUY_QUANTITY_THAN_QUANTITY_IN_STORE));
-            }else if(price.multiply(BigDecimal.valueOf(quantityUpdate)).compareTo(BigDecimal.valueOf(5000000))>0){
+            }else if(price.multiply(BigDecimal.valueOf(quantityUpdate)).compareTo(BigDecimal.valueOf(10000000))>0){
                 throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BUY_PRICE_THAN_FIVE_MILLION));
             }
             productDetailOld.setQuantity(productDetailOld.getQuantity() + billDetail.getQuantity());
@@ -178,8 +178,8 @@ public class BillDetailServiceImpl implements BillDetailService {
         }else if (quantityAdd > productDetail.getQuantity() ) {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BUY_QUANTITY_THAN_QUANTITY_IN_STORE));
         }
-        //Nếu tổng giá mua lớn hơn 5 triệu
-        else if(price.multiply(BigDecimal.valueOf(quantityAdd)).compareTo(BigDecimal.valueOf(5000000))>0){
+        //Nếu tổng giá mua lớn hơn 10 triệu
+        else if(price.multiply(BigDecimal.valueOf(quantityAdd)).compareTo(BigDecimal.valueOf(10000000))>0){
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BUY_PRICE_THAN_FIVE_MILLION));
         }
         //Nếu nếu số lượng mua bé hơn hoặc bằng 0
@@ -187,7 +187,7 @@ public class BillDetailServiceImpl implements BillDetailService {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_QUANTITY_INVALID));
         }
         //Nếu giá mua cộng với giá tại hóa đơn lớn hơn 5 triệu
-        else if(price.multiply(BigDecimal.valueOf(quantityAdd)).add(bill.getPriceReduce()).compareTo(BigDecimal.valueOf(5000000))>0){
+        else if(price.multiply(BigDecimal.valueOf(quantityAdd)).add(bill.getPriceReduce()).compareTo(BigDecimal.valueOf(10000000))>0){
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_THAN_TEN_MILLION));
         }
     }

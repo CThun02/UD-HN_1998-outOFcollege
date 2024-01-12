@@ -308,8 +308,8 @@ const StatisticalIndex = ({ isAdmin }) => {
       monthTo = dateTo.getMonth()+1;
     }
     if (dateCompare === "date") {
-      dayFrom = dateFrom.getDay();
-      dayTo = dateTo.getDay();
+      dayFrom = dateFrom.getDate();
+      dayTo = dateTo.getDate();
     }
     if (dateFrom.getTime() >= dateTo.getTime()) {
       notification.error({

@@ -18,14 +18,13 @@ const EditProductCart = ({productDetailId, billDetailId, onCancel, open, render,
     const [renderThis, setRenderThis] = useState(null);
 
     function handleChangeQuantity(quantity, record) {
-
         setQuantity(quantity)
         if(quantity<=0 ){
           setError("Số lượng mua lớn hơn phải lớn hơn 0")
         }else if( quantity - quantityBuy> record.quantity){
           setError("Số lượng tồn không đủ")
-        }else if(quantity * price > 5000000){
-          setError("Vui lòng liên hệ cửa hàng để mua nhiều sản phẩm  có giá trị lớn hơn 5.000.000đ")
+        }else if(quantity * price > 10000000){
+          setError("Vui lòng liên hệ cửa hàng để mua nhiều sản phẩm  có giá trị lớn hơn 10.000.000đ")
         }else{
           setError("")
         }
@@ -44,6 +43,7 @@ const EditProductCart = ({productDetailId, billDetailId, onCancel, open, render,
           setLoadingButton(false)
           setLoadingButtonTimeline(false);
           setRenderThis(Math.random)
+          setIsLoad(false)
         }).catch((error)=>{
             notification.error({
               message:"Thông báo",
@@ -80,7 +80,7 @@ const EditProductCart = ({productDetailId, billDetailId, onCancel, open, render,
         .then(res=>{
             setProductDetail(res.data)
             setIsLoad(true);
-            if(!isLoad){
+            if(isLoad){
                 setColorSelect(res.data.color.id)
                 setSizeSelect(res.data.size.id)
                 setPrice(res.data?.promotion.length !== 0
@@ -100,7 +100,7 @@ const EditProductCart = ({productDetailId, billDetailId, onCancel, open, render,
         })
       }
         
-    }, [sizeSelect, colorSelect, renderThis, renderTimeline])
+    }, [sizeSelect, colorSelect, renderThis, renderTimeline, productDetailId, open])
     
   return (
     <Modal 

@@ -67,8 +67,9 @@ public class ErrorCodeConfig {
         errors.put("ERROR_BUY_PRODUCT_NOT_FOUND", "Mua sản phẩm thất bại.");
         errors.put("ERROR_ADD_TO_CART_THAN_QUANTITY", "Vượt quá số lượng");
         errors.put("ERROR_PRODUCT_DETAIL_NOT_EMPTY_IN_PROMOTION", "Chọn sản phẩm trước khi tạo đợt giảm giá");
+        errors.put("ERROR_BILL_THAN_FIVE_MILLION", "Hóa đơn vượt quá 10 triệu, vui lòng liên hệ cửa hàng để thực hiện!");
+        errors.put("ERROR_BUY_PRICE_THAN_FIVE_MILLION", "Số lượng mua vượt quá 10 triệu, vui lòng liên hệ cửa hàng để thực hiện!");
         errors.put("ERROR_BILL_THAN_TEN_MILLION", "Hóa đơn mua trực tuyến không vượt quá 10 triệu");
-        errors.put("ERROR_BUY_PRICE_THAN_FIVE_MILLION", "Số lượng mua vượt quá 5 triệu, vui lòng liên hệ cửa hàng để thực hiện!");
         errors.put("ERROR_QUANTITY_INVALID", "Số lượng mua không hợp lệ!");
         errors.put("ERROR_BILL_PAID", "Hóa đơn đã thanh toán, không thể chỉnh sửa!");
         errors.put("ERROR_NOT_CANCEL_BILL_WHEN_NOT_STATUS_WAIT_FOR_CONFIRM", "Chỉ hủy hóa đơn khi đơn đang chờ xác nhận.");

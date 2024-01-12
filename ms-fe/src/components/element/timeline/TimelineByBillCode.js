@@ -185,7 +185,6 @@ const TimelineByBillCode = () => {
               onCancel={() => setOpenCartEdit(false)}
             />
             <Space direction="vertical" size={16} style={{ width: "100%" }}>
-              {console.log(timelines)}
               {timelines?.lstTimeline?.length > 1 ||
               timelines?.timelineCustomInfo?.status === "Paid" ? null : (
                 <div style={{ marginBottom: "24px" }}>
@@ -530,8 +529,7 @@ const TimelineByBillCode = () => {
                                 }}
                               >
                                 {(
-                                  timelines?.timelineCustomInfo?.pricePaid +
-                                  timelines?.timelineCustomInfo?.priceShip
+                                  timelines?.timelineCustomInfo?.pricePaid 
                                 ).toLocaleString("vi-VN", {
                                   style: "currency",
                                   currency: "VND",

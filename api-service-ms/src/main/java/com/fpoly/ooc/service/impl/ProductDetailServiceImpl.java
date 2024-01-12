@@ -319,11 +319,14 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_SERVICE));
         }
 
+        double totalPrice = 0d;
         for (QuantityAndPriceDTO dto: req.getQuantityAndPriceList()) {
             double price = CommonUtils.bigDecimalConvertDouble(dto.getPrice());
-            if (dto.getQuantity() * price > 10000000) {
-                throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_THAN_TEN_MILLION));
-            }
+            totalPrice += price * dto.getQuantity();
+        }
+
+        if (totalPrice > 10000000) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_THAN_TEN_MILLION));
         }
 
         List<Long> productDetailId = req.getQuantityAndPriceList().stream().map(QuantityAndPriceDTO::getProductDetailId).collect(Collectors.toList());

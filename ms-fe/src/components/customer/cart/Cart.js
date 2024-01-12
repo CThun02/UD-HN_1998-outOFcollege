@@ -716,23 +716,73 @@ const Cart = (props) => {
   ];
 
   const updateQuantity = (e, index) => {
-    let cart = JSON.parse(localStorage.getItem("user"));
-    let productDetail = cart.productDetails;
-    if (e > productDetail[index]?.data[0]?.quantity) {
-      notification.warning({
+    clearTimeout(timer);
+    const newTimer = setTimeout(() => {
+      let cart = JSON.parse(localStorage.getItem("user"));
+      let productDetail = cart.productDetails;
+      if (e > productDetail[index]?.data[0]?.quantity) {
+        notification.warning({
+          message: "Thông báo",
+          description: "Vượt quá số lượng tồn",
+          duration: 1,
+        });
+        return true;
+      }
+      const priceReduce = (e) => {
+        return productDetail[e]?.data[0]?.promotion?.length > 0
+          ? productDetail[e]?.data[0]?.promotion[0].promotionMethod &&
+            productDetail[e]?.data[0]?.promotion[0].promotionValue
+            ? productDetail[e]?.data[0]?.promotion[0].promotionMethod === "%"
+              ? (productDetail[e]?.data[0]?.price *
+                  productDetail[e]?.data[0]?.promotion[0].promotionValue) /
+                100
+              : productDetail[e]?.data[0]?.promotion[0]?.promotionValue
+            : 0
+          : 0;
+      };
+      let priceInclude =
+        e * (productDetail[index]?.data[0]?.price - priceReduce(index));
+      let totalPriceInCart = 0;
+      for (var i = 0; i < productDetail?.length; i++) {
+        if (i === index) {
+          continue;
+        }
+        totalPriceInCart +=
+          (productDetail[i]?.data[0]?.price - priceReduce(i)) *
+          productDetail[i]?.quantity;
+      }
+
+      // if (totalPriceInCart + priceInclude > 10000000) {
+      //   const quantityUpdate =
+      //     (10000000 - totalPriceInCart) /
+      //     (productDetail[index]?.data[0]?.price - priceReduce(index));
+      //   productDetail[index].quantity = Math.floor(quantityUpdate);
+
+      //   cart.productDetails = productDetail;
+      //   localStorage.setItem("user", JSON.stringify(cart));
+
+      //   setRender(Math.random());
+      //   props.setRenderHeader(Math.random());
+      //   notification.warning({
+      //     message: "Thông báo",
+      //     description:
+      //       "Bạn chỉ thêm được tối đa là 10 triệu vào trong giỏ hàng",
+      //   });
+      //   return;
+      // }
+      notification.success({
         message: "Thông báo",
-        description: "Vượt quá số lượng tồn",
-        duration: 1,
+        description: "Cập nhật thành công",
       });
-      return true;
-    }
+      productDetail[index].quantity = e;
+      cart.productDetails = productDetail;
+      localStorage.setItem("user", JSON.stringify(cart));
 
-    productDetail[index].quantity = e;
-    cart.productDetails = productDetail;
-    localStorage.setItem("user", JSON.stringify(cart));
+      setRender(Math.random());
+      props.setRenderHeader(Math.random());
+    }, 1000);
 
-    setRender(Math.random());
-    props.setRenderHeader(Math.random());
+    setTimer(newTimer);
   };
 
   const deleteProductDetail = (e, index) => {
@@ -745,6 +795,11 @@ const Cart = (props) => {
       localStorage.setItem("user", JSON.stringify(cart));
       setRender(Math.random());
     }
+    notification.warning({
+      message: "Thông báo",
+      description: "Xóa thành công",
+      duration: 1,
+    });
     props.setRenderHeader(Math.random());
   };
 
@@ -845,9 +900,9 @@ const Cart = (props) => {
       if (!isError) {
         const data = newData.map((e) => {
           return {
-            quantity: e.cartDetailResponse.quantity,
-            price: e.cartDetailResponse.priceProductDetail,
-            productDetailId: e.cartDetailResponse.productDetailId,
+            quantity: e?.quantity,
+            price: e?.data[0]?.price,
+            productDetailId: e?.data[0]?.id,
           };
         });
         axios
@@ -857,10 +912,24 @@ const Cart = (props) => {
             navigate("/ms-shop/checkout");
           })
           .catch((err) => {
+            const dataError = err?.response?.data;
+
+            let message = "Thao tác thất bại";
+            if (
+              dataError?.message?.includes(
+                "Hóa đơn mua trực tuyến không vượt quá 10 triệu"
+              )
+            ) {
+              message = "Hóa đơn mua trực tuyến không vượt quá 10 triệu";
+            }
+
+            if (dataError?.message?.includes("Mua sản phẩm thất bại")) {
+              message =
+                "Sản phẩm đã hết hoặc không cửa hàng không còn kinh doanh";
+            }
             notification.error({
               message: "Thông báo",
-              description:
-                "Sản phẩm đã bán hết hoặc không tồn tại vui lòng thử lại sau",
+              description: message,
               duration: 2,
             });
             return;

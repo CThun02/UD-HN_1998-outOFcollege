@@ -16,7 +16,6 @@ function ComponentsFilter({ title, options, setFilter, filter, name }) {
                 options={options}
                 onChange={(e) => {
                   setFilter({ ...filter, [name]: e });
-                  console.log("value: ", filter[name]);
                 }}
                 value={filter[name]}
                 className={styles.radioGroup}

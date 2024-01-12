@@ -80,7 +80,16 @@ function ProductInfo({
       return;
     }
 
-    let priceInclude = quantity * colorsAndSizes?.priceProductMax;
+    let priceInclude =
+      quantity *
+      (colorsAndSizes?.priceProductMax -
+        (colorsAndSizes?.promotionType && colorsAndSizes?.promotionValue
+          ? colorsAndSizes?.promotionType === "%"
+            ? (colorsAndSizes?.priceProductMax *
+                colorsAndSizes?.promotionValue) /
+              100
+            : colorsAndSizes?.promotionValue
+          : 0));
     if (priceInclude > 10000000) {
       notification.warning({
         message: "Thông báo",
@@ -123,6 +132,17 @@ function ProductInfo({
         }
 
         if (totalPriceInCart + priceInclude > 10000000) {
+          const quantityUpdate =
+            (10000000 - totalPriceInCart) /
+            (colorsAndSizes?.priceProductMax -
+              (colorsAndSizes?.promotionType && colorsAndSizes?.promotionValue
+                ? colorsAndSizes?.promotionType === "%"
+                  ? (colorsAndSizes?.priceProductMax *
+                      colorsAndSizes?.promotionValue) /
+                    100
+                  : colorsAndSizes?.promotionValue
+                : 0));
+          setQuantity(Math.floor(quantityUpdate));
           notification.warning({
             message: "Thông báo",
             description:

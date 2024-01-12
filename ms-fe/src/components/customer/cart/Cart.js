@@ -34,16 +34,61 @@ const Cart = (props) => {
       key: "product",
       title: "Thông tin sản phẩm",
       render: (_, record, index) => {
+        console.log("data: ", record);
         return (
           <div>
             <Row>
               <Col md={6} sm={10} xs={24}>
                 <div style={{}} className="m-5">
-                  <img
-                    style={{ width: "100%", height: "100%" }}
-                    src={record?.data[0]?.productImageResponse[0]?.path}
-                    alt="Áo Thun Teelab Local Brand Unisex Love Is In The Air TS199"
-                  ></img>
+                  {record?.data[0]?.promotion[0] ? (
+                    <Badge.Ribbon
+                      text={`Giảm ${
+                        record?.data[0]?.promotion[0]?.promotionValue
+                          ? record?.data[0]?.promotion[0].promotionMethod ===
+                            "%"
+                            ? record?.data[0]?.promotion[0].promotionValue +
+                              " " +
+                              record?.data[0]?.promotion[0].promotionMethod
+                            : record?.data[0]?.promotion[0].promotionValue.toLocaleString(
+                                "vi-VN",
+                                {
+                                  style: "currency",
+                                  currency: "VND",
+                                }
+                              )
+                          : null
+                      }`}
+                      color="red"
+                    >
+                      <Carousel style={{ maxWidth: "300px" }} autoplay>
+                        {record?.data[0]?.productImageResponse &&
+                          record?.data[0]?.productImageResponse.map((item) => {
+                            return (
+                              <img
+                                key={item?.id}
+                                style={{ width: "100%", marginTop: "10px" }}
+                                alt="Anh mo ta san pham"
+                                src={item?.path}
+                              />
+                            );
+                          })}
+                      </Carousel>
+                    </Badge.Ribbon>
+                  ) : (
+                    <Carousel style={{ maxWidth: "300px" }} autoplay>
+                      {record.productImageResponse &&
+                        record?.productImageResponse.map((item) => {
+                          return (
+                            <img
+                              key={item?.id}
+                              style={{ width: "100%", marginTop: "10px" }}
+                              alt="Anh mo ta san pham"
+                              src={item?.path}
+                            />
+                          );
+                        })}
+                    </Carousel>
+                  )}
                 </div>
               </Col>
               <Col md={18} sm={14} xs={24}>

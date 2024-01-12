@@ -1,5 +1,6 @@
 package com.fpoly.ooc.service.interfaces;
 
+import com.fpoly.ooc.dto.PriceCartUserDTO;
 import com.fpoly.ooc.entity.Cart;
 import com.fpoly.ooc.entity.CartDetail;
 import com.fpoly.ooc.exception.NotFoundException;
@@ -29,5 +30,7 @@ public interface CartDetailService {
     Boolean deleteProductInCartFromUser(String username, Long cartDetailId) throws NotFoundException;
 
     void updateProductInCart(String username, List<BillDetailRequest> lstProductDetailId);
+
+    PriceCartUserDTO getTotalPriceCartByUser(String username) throws NotFoundException;
 
 }

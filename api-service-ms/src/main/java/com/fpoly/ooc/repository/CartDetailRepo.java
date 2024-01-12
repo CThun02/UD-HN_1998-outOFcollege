@@ -88,4 +88,12 @@ public interface CartDetailRepo extends JpaRepository<CartDetail, Long> {
         AND pd.id IN (?2)
     """)
     List<CartDetail> findAllCartDetailByUser(String user, List<Long> lstProductDetailId);
+
+    @Query("""
+        SELECT cartDetail FROM CartDetail cartDetail
+            INNER JOIN Cart cart ON cart.id = cartDetail.cart.id
+            INNER JOIN Account user ON user.username = cart.account.username
+        WHERE user.username = ?1
+    """)
+    List<CartDetail> findCartDetailByUsername(String username);
 }

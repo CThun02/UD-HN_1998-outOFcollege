@@ -2,6 +2,8 @@ package com.fpoly.ooc.service.impl;
 
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
+import com.fpoly.ooc.dto.PriceCartUserDTO;
+import com.fpoly.ooc.dto.PromotionProductDetailDTO;
 import com.fpoly.ooc.entity.Account;
 import com.fpoly.ooc.entity.Cart;
 import com.fpoly.ooc.entity.CartDetail;
@@ -21,6 +23,7 @@ import com.fpoly.ooc.responce.promotion.PromotionProductResponse;
 import com.fpoly.ooc.service.interfaces.AccountService;
 import com.fpoly.ooc.service.interfaces.CartDetailService;
 import com.fpoly.ooc.service.interfaces.ProductDetailServiceI;
+import com.fpoly.ooc.service.interfaces.PromotionProductDetailService;
 import com.fpoly.ooc.service.interfaces.PromotionService;
 import com.fpoly.ooc.util.CommonUtils;
 import org.apache.commons.collections4.CollectionUtils;
@@ -29,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -55,6 +59,9 @@ public class CartDetailServiceImpl implements CartDetailService {
 
     @Autowired
     private ProductDetailServiceI productDetailService;
+
+    @Autowired
+    private PromotionProductDetailService promotionProductDetailService;
 
     @Override
     public List<CartDetailDisplayResponse> getAllCart(String username) throws NotFoundException {
@@ -141,16 +148,17 @@ public class CartDetailServiceImpl implements CartDetailService {
             existingCart = this.createCart(account.getUsername());
         }
 
+        double totalPrice = 0d;
         for (CartDetailRequest cartDetailRequest : request.getLstCartDetail()) {
             boolean found = false;
             for (CartDetail existingCartDetail : existingCart.getCartDetailList()) {
-                if (existingCartDetail.getProductDetail().getId().equals(cartDetailRequest.getProductDetailId())) {
-                    ProductDetail productDetail = productDetailService.findProductDetailByIdAndStatus(existingCartDetail.getProductDetail().getId());
+                ProductDetail productDetail = productDetailService.findProductDetailByIdAndStatus(existingCartDetail.getProductDetail().getId());
+                if (Objects.isNull(productDetail) ||
+                        existingCartDetail.getQuantity() + cartDetailRequest.getQuantity() > productDetail.getQuantity()) {
+                    throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_ADD_TO_CART_THAN_QUANTITY));
+                }
 
-                    if (Objects.isNull(productDetail) ||
-                            existingCartDetail.getQuantity() + cartDetailRequest.getQuantity() > productDetail.getQuantity()) {
-                        throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_ADD_TO_CART_THAN_QUANTITY));
-                    }
+                if (existingCartDetail.getProductDetail().getId().equals(cartDetailRequest.getProductDetailId())) {
                     int quantityUpdateCart = existingCartDetail.getQuantity() + cartDetailRequest.getQuantity();
                     double priceProduct = CommonUtils.bigDecimalConvertDouble(productDetail.getPrice());
 
@@ -158,6 +166,7 @@ public class CartDetailServiceImpl implements CartDetailService {
                         throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_THAN_TEN_MILLION));
                     }
 
+                    totalPrice += quantityUpdateCart * priceProduct;
                     existingCartDetail.setQuantity(quantityUpdateCart);
                     found = true;
                     break;
@@ -175,6 +184,10 @@ public class CartDetailServiceImpl implements CartDetailService {
 
                 cartDetailRepo.save(cartDetail);
             }
+        }
+
+        if (totalPrice > 10000000) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_THAN_TEN_MILLION));
         }
 
         return existingCart;
@@ -295,6 +308,55 @@ public class CartDetailServiceImpl implements CartDetailService {
                 }
             }
         }
+    }
+
+    @Override
+    public PriceCartUserDTO getTotalPriceCartByUser(String username) throws NotFoundException {
+        if (StringUtils.isBlank(username)) {
+           throw new NotFoundException(ErrorCodeConfig.getMessage(Const.USER_NOT_FOUND));
+        }
+
+        PriceCartUserDTO priceCartUserDTO = new PriceCartUserDTO();
+
+        List<CartDetail> lstCartDetail = cartDetailRepo.findCartDetailByUsername(username);
+        if (CollectionUtils.isEmpty(lstCartDetail)) {
+           return null;
+        }
+
+        List<Long> lstProductDetailId = lstCartDetail.stream().map(e -> {
+            if (Objects.nonNull(e.getProductDetail())) {
+                return e.getProductDetail().getId();
+            }
+            return -1L;
+        }).toList();
+
+        double totalPrice = 0d;
+        for (CartDetail cartDetail: lstCartDetail) {
+            PromotionProductDetailDTO dto = null;
+            ProductDetail productDetail = null;
+            if (Objects.nonNull(cartDetail.getProductDetail())) {
+                productDetail = productDetailService.findProductDetailByIdAndStatus(cartDetail.getProductDetail().getId());
+                dto = promotionProductDetailService.findPromotionByProductDetailIds(List.of(cartDetail.getProductDetail().getId()));
+            }
+            if (Objects.isNull(dto)) {
+                continue;
+            }
+            double priceProduct = CommonUtils.bigDecimalConvertDouble(productDetail.getPrice());
+            double promotionPrice = CommonUtils.bigDecimalConvertDouble(dto.getPromotionValue());
+            double priceReduce = 0d;
+            if(Objects.nonNull(dto.getPromotionMethod()) && Objects.nonNull(dto.getPromotionValue())) {
+                if ("%".equalsIgnoreCase(dto.getPromotionMethod())) {
+                    priceReduce = priceProduct * promotionPrice / 100;
+                } else {
+                    priceReduce = promotionPrice;
+                }
+            }
+
+            totalPrice += (priceProduct - priceReduce) * cartDetail.getQuantity();
+        }
+        priceCartUserDTO.setTotalPrice(new BigDecimal(totalPrice));
+        priceCartUserDTO.setQuantityCartDetail(lstCartDetail.size());
+        return priceCartUserDTO;
     }
 
 }

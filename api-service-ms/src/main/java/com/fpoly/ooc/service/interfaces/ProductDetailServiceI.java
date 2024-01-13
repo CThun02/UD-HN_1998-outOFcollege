@@ -57,4 +57,6 @@ public interface ProductDetailServiceI {
     List<component> getSizeProductDetailEdit(Long productDetailId, Long colorId);
 
     ProductDetail updateQuantityProductDetail(UpdateQuantityProductDetailDTO req) throws NotFoundException, JsonProcessingException;
+
+    List<ProductDetail> isCheckProductDetail(List<Long> productDetailIds);
 }

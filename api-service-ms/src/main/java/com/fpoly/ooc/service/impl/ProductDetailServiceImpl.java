@@ -323,7 +323,7 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
         for (QuantityAndPriceDTO dto: req.getQuantityAndPriceList()) {
             ProductDetail productDetail = repo.findProductDetailById(dto.getProductDetailId());
             if (Objects.isNull(productDetail) || productDetail.getQuantity() <= 0) {
-                throw new NotFoundException(ErrorCodeConfig.getMessage(Const.PRODUCT_DETAIL_NOT_FOUND));
+                throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BUY_QUANTITY_THAN_QUANTITY_IN_STORE));
             }
             PromotionProductDetailDTO promotion = promotionProductDetailService
                     .findPromotionByProductDetailIds(List.of(productDetail.getId()));
@@ -441,6 +441,12 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
         }
 
         return repo.save(getOneProduct);
+    }
+
+    @Override
+    public List<ProductDetail> isCheckProductDetail(List<Long> productDetailIds) {
+//        List<ProductDetail> lstProductdetail = repo.findProductDetailById(productDetailIds);
+        return null;
     }
 
     @Override

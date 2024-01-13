@@ -353,15 +353,18 @@ const ProductDetails = (props) => {
         Number(props.productDetailsCreate[indexExist].quantity);
       props.productDetailsCreate?.splice(indexExist, 1);
     }
-    // if (productDetailCreate?.quantity > record?.quantity) {
-    //   notification.error({
-    //     message: "Thông báo",
-    //     description: `Số lượng sản phẩm tồn không đủ`,
-    //   });
-    //   return;
-    // }
+    if (productDetailCreate?.quantity > record?.quantity) {
+      setLoading(false);
+      productDetailCreate.quantity = 0;
+      notification.error({
+        message: "Thông báo",
+        description: `Số lượng sản phẩm tồn không đủ`,
+      });
+      return;
+    }
 
     if (productDetailCreate.quantity <= 0) {
+      productDetailCreate.quantity = 0;
       notification.error({
         message: "Thông báo",
         description: `Số lượng sản phẩm phải lớn hơn 0`,
@@ -458,6 +461,7 @@ const ProductDetails = (props) => {
                     setLoading(false);
                   })
                   .catch((error) => {
+                    productDetailCreate.quantity = 0;
                     notification.error({
                       message: "Thông báo",
                       description: "Thao tác thất bại",
@@ -494,6 +498,7 @@ const ProductDetails = (props) => {
           }
         })
         .catch((err) => {
+          productDetailCreate.quantity = 0;
           setLoading(false);
           notification.error({
             message: "Lỗi",

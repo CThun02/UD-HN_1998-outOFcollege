@@ -211,12 +211,15 @@ public class CartDetailServiceImpl implements CartDetailService {
             boolean found = false;
             for (CartDetail existingCartDetail : existingCart.getCartDetailList()) {
                 ProductDetail productDetail = productDetailService.findProductDetailByIdAndStatus(existingCartDetail.getProductDetail().getId());
-                if (Objects.isNull(productDetail) || productDetail.getQuantity() <= 0 ||
-                        existingCartDetail.getQuantity() + cartDetailRequest.getQuantity() > productDetail.getQuantity()) {
+                if (Objects.isNull(productDetail)) {
                     throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_ADD_TO_CART_THAN_QUANTITY));
                 }
 
                 if (existingCartDetail.getProductDetail().getId().equals(cartDetailRequest.getProductDetailId())) {
+                    if (productDetail.getQuantity() <= 0 ||
+                            existingCartDetail.getQuantity() + cartDetailRequest.getQuantity() > productDetail.getQuantity()) {
+                        throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_ADD_TO_CART_THAN_QUANTITY));
+                    }
                     int quantityUpdateCart = existingCartDetail.getQuantity() + cartDetailRequest.getQuantity();
                     double priceProduct = CommonUtils.bigDecimalConvertDouble(productDetail.getPrice());
 
@@ -276,7 +279,7 @@ public class CartDetailServiceImpl implements CartDetailService {
         double priceProduct = 0d;
         double priceReduce = 0d;
         double totalPriceInCart = 0d;
-        for (CartDetail c: lstCartDetailByCartDetailId) {
+        for (CartDetail c : lstCartDetailByCartDetailId) {
             if (Objects.isNull(c.getProductDetail())) {
                 continue;
             }
@@ -457,7 +460,7 @@ public class CartDetailServiceImpl implements CartDetailService {
         }
 
         List<CartDetail> lstCartDetail = cartDetailRepo.findCartDetailByUsername(username);
-        if(CollectionUtils.isEmpty(lstCartDetail)) {
+        if (CollectionUtils.isEmpty(lstCartDetail)) {
             return false;
         }
 

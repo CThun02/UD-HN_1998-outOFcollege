@@ -690,68 +690,75 @@ const Cart = (props) => {
       render: (_, record) => {
         return (
           <div style={{ textAlign: "center" }}>
-            {record.promotion.length !== 0 ? (
-              <span style={{ color: "#ccc" }}>
-                <strike>
-                  {Number(
-                    record?.cartDetailResponse?.priceProductDetail *
-                      record?.cartDetailResponse?.quantity
-                      ? record?.cartDetailResponse?.priceProductDetail *
-                          record?.cartDetailResponse?.quantity
-                      : 0
-                  )?.toLocaleString("vi-VN", {
-                    style: "currency",
-                    currency: "VND",
-                  })}
-                </strike>
-              </span>
+            {record?.disabled ? (
+              <span style={{ color: "red" }}>Hết hàng</span>
             ) : (
-              <span>
-                {Number(
-                  record?.cartDetailResponse?.priceProductDetail *
-                    record?.cartDetailResponse?.quantity >
-                    0
-                    ? record?.cartDetailResponse?.priceProductDetail *
-                        record?.cartDetailResponse?.quantity
-                    : 0
-                )?.toLocaleString("vi-VN", {
-                  style: "currency",
-                  currency: "VND",
-                })}
-              </span>
-            )}
-            <br />
-            <span>
-              {record.promotion.length !== 0
-                ? record?.promotion[0]?.promotionMethod === "%"
-                  ? (((record.cartDetailResponse.priceProductDetail *
-                      (100 - Number(record?.promotion[0].promotionValue))) /
-                      100) *
-                      record?.cartDetailResponse?.quantity >
-                    0
-                      ? ((record.cartDetailResponse.priceProductDetail *
+              <>
+                {record.promotion.length !== 0 ? (
+                  <span style={{ color: "#ccc" }}>
+                    <strike>
+                      {Number(
+                        record?.cartDetailResponse?.priceProductDetail *
+                          record?.cartDetailResponse?.quantity
+                          ? record?.cartDetailResponse?.priceProductDetail *
+                              record?.cartDetailResponse?.quantity
+                          : 0
+                      )?.toLocaleString("vi-VN", {
+                        style: "currency",
+                        currency: "VND",
+                      })}
+                    </strike>
+                  </span>
+                ) : (
+                  <span>
+                    {Number(
+                      record?.cartDetailResponse?.priceProductDetail *
+                        record?.cartDetailResponse?.quantity >
+                        0
+                        ? record?.cartDetailResponse?.priceProductDetail *
+                            record?.cartDetailResponse?.quantity
+                        : 0
+                    )?.toLocaleString("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    })}
+                  </span>
+                )}
+                <br />
+                <span>
+                  {record.promotion.length !== 0
+                    ? record?.promotion[0]?.promotionMethod === "%"
+                      ? (((record.cartDetailResponse.priceProductDetail *
                           (100 - Number(record?.promotion[0].promotionValue))) /
                           100) *
-                        record?.cartDetailResponse?.quantity
-                      : 0
-                    )?.toLocaleString("vi-VN", {
-                      style: "currency",
-                      currency: "VND",
-                    })
-                  : ((record?.cartDetailResponse?.priceProductDetail -
-                      Number(record?.promotion[0]?.promotionValue)) *
-                      record?.cartDetailResponse?.quantity >
-                    0
-                      ? (record?.cartDetailResponse?.priceProductDetail -
+                          record?.cartDetailResponse?.quantity >
+                        0
+                          ? ((record.cartDetailResponse.priceProductDetail *
+                              (100 -
+                                Number(record?.promotion[0].promotionValue))) /
+                              100) *
+                            record?.cartDetailResponse?.quantity
+                          : 0
+                        )?.toLocaleString("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                        })
+                      : ((record?.cartDetailResponse?.priceProductDetail -
                           Number(record?.promotion[0]?.promotionValue)) *
-                        record?.cartDetailResponse?.quantity
-                      : 0
-                    )?.toLocaleString("vi-VN", {
-                      style: "currency",
-                      currency: "VND",
-                    })
-                : null}
-            </span>
+                          record?.cartDetailResponse?.quantity >
+                        0
+                          ? (record?.cartDetailResponse?.priceProductDetail -
+                              Number(record?.promotion[0]?.promotionValue)) *
+                            record?.cartDetailResponse?.quantity
+                          : 0
+                        )?.toLocaleString("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                        })
+                    : null}
+                </span>
+              </>
+            )}
           </div>
         );
       },
@@ -960,7 +967,6 @@ const Cart = (props) => {
           }
         }
         totalPrice += quantity * (productPrice - promotionValue);
-        console.log("data: ", totalPrice);
         if (totalPrice > 10000000) {
           notification.error({
             message: "Thông báo",
@@ -1005,6 +1011,10 @@ const Cart = (props) => {
               message = "Hóa đơn mua trực tuyến không vượt quá 10 triệu";
             }
 
+            if (dataError?.message?.includes("Số lượng trong kho không đủ")) {
+              message = "Số lượng trong kho không đủ";
+            }
+
             if (dataError?.message?.includes("Mua sản phẩm thất bại")) {
               message =
                 "Sản phẩm đã hết hoặc không cửa hàng không còn kinh doanh";
@@ -1023,6 +1033,10 @@ const Cart = (props) => {
   const rowSelection = {
     selectedRowKeys,
     onChange: onSelectChange,
+    getCheckboxProps: (record) => ({
+      disabled: record.disabled,
+      key: record.key,
+    }),
   };
 
   const getCartAPI = async () => {
@@ -1195,16 +1209,22 @@ const Cart = (props) => {
               carts && carts.length > 0
                 ? carts.map((record, index) => ({
                     ...record,
-                    key: record.cartDetailResponse.productDetailId,
+                    key: record?.cartDetailResponse?.productDetailId,
+                    disabled:
+                      record?.cartDetailResponse?.quantityProductDetail <= 0,
                   }))
                 : productDetails &&
                   productDetails.map((record, index) => ({
                     ...record,
                     key: record?.data[0]?.id,
+                    disabled: record?.quantity > 0,
                   }))
             }
             loading={loading}
             pagination={false}
+            rowClassName={(record) =>
+              record.disabled && "disabled-row-table-element"
+            }
           />
         </div>
         <Row style={{ marginTop: "20px" }}>

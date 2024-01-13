@@ -108,15 +108,6 @@ const Bill = () => {
         setRendered(Math.random());
         return;
       }
-      if (value > 99) {
-        notification.warning({
-          message: "Thông báo",
-          description: "Chỉ được mua 100 sản phẩm",
-          duration: 1,
-        });
-        setRendered(Math.random());
-        return;
-      }
       if (value <= 0) {
         notification.warning({
           message: "Thông báo",
@@ -147,7 +138,7 @@ const Bill = () => {
           baseUrl,
           {
             productDetail: record?.productDetail,
-            quantityCurrent: Number(record?.quantity),
+            quantityCurrent: Number(500),
             quantityUpdate: Number(value),
             request: {
               brandId: "",

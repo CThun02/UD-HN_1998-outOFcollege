@@ -174,21 +174,7 @@ const BillTimeLine = (addId) => {
         : billInfo.symbol === "Shipping" && billInfo?.status === "Paid"
         ? "Paid"
         : "Unpaid",
-      action === "cancel"
-        ? 0
-        : (billInfo?.symbol === "Received" &&
-            Number(timelines[timelines.length - 1]?.status) === 2 &&
-            action !== "cancel") ||
-          (billInfo.symbol === "Shipping" &&
-            Number(timelines[timelines.length - 1]?.status) === 4 &&
-            billInfo?.status !== "Paid" &&
-            action !== "cancel")
-        ? Number(billInfo?.priceReduce) === Number(billInfo?.voucherPrice)
-          ? billInfo?.shipPrice
-          : billInfo.priceReduce + billInfo?.shipPrice
-        : billInfo.symbol === "Shipping" && billInfo?.status === "Paid"
-        ? billInfo.amountPaid
-        : 0,
+      billInfo?.amountPaid,
       timelines[timelines.length - 1]?.status
     );
     setIsModalConfirm(false);

@@ -31,8 +31,9 @@ public class CartController {
     }
 
     @GetMapping("/productDetail")
-    public ResponseEntity<?> getALl( @RequestParam("productDetailId") Long productDetailId) {
-        return ResponseEntity.ok(cartDetailService.getProductDetailId(productDetailId));
+    public ResponseEntity<?> getALl( @RequestParam("productDetailId") Long productDetailId, @RequestParam("quantity") Integer quantity,
+                                     @RequestParam("username") String username) throws NotFoundException {
+        return ResponseEntity.ok(cartDetailService.getProductDetailId(productDetailId, quantity, username));
     }
 
     @PostMapping("")

@@ -121,8 +121,8 @@ public class ClientController {
     }
 
     @GetMapping("/getCartIndex")
-    public ResponseEntity<?> getCartIndex(@RequestParam("username") String username) {
-        return ResponseEntity.ok(cartDetailService.getCartIndexz(username));
+    public ResponseEntity<?> getCartIndex(@RequestParam("username") String username) throws NotFoundException {
+        return ResponseEntity.ok(cartDetailService.getTotalPriceCartByUser(username));
     }
 
     @GetMapping("/deleteCart/{user}/{cartDetailId}")

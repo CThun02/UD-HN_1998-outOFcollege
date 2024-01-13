@@ -79,4 +79,29 @@ public interface CartDetailRepo extends JpaRepository<CartDetail, Long> {
         """)
     List<CartDetail> findAllCartDetailByUser(String user, Long cartDetailId);
 
+    @Query("""
+        SELECT cartDetail FROM Cart cart
+            INNER JOIN CartDetail cartDetail ON cart.id = cartDetail.cart.id
+            INNER JOIN Account account ON account.username = cart.account.username
+            INNER JOIN ProductDetail pd ON pd.id = cartDetail.productDetail.id
+        WHERE account.username = ?1
+        AND pd.id IN (?2)
+    """)
+    List<CartDetail> findAllCartDetailByUser(String user, List<Long> lstProductDetailId);
+
+    @Query("""
+        SELECT cartDetail FROM CartDetail cartDetail
+            INNER JOIN Cart cart ON cart.id = cartDetail.cart.id
+            INNER JOIN Account user ON user.username = cart.account.username
+        WHERE user.username = ?1
+    """)
+    List<CartDetail> findCartDetailByUsername(String username);
+
+    @Query("""
+            SELECT cartDetail FROM CartDetail cartDetail
+            INNER JOIN Cart cart on cartDetail.cart.id = cart.id
+            WHERE cart.id = (SELECT subCd.cart.id FROM CartDetail subCd WHERE subCd.id = ?1)
+            AND cartDetail.id != ?1
+    """)
+    List<CartDetail> findCartDetailByCartDetailId(Long cartDetailId);
 }

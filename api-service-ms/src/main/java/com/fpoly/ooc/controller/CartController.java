@@ -58,5 +58,9 @@ public class CartController {
         return ResponseEntity.ok(cartDetailService.deleteProductDetailFromCart(cartDetailId));
     }
 
+    @GetMapping("/deleteAllCartDetail")
+    public ResponseEntity<?> deleteAllCartDetailFromUsername(@RequestParam String username) throws NotFoundException {
+        return ResponseEntity.ok(cartDetailService.deleteAllCartDetailFromUsername(username));
+    }
 
 }

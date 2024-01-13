@@ -26,6 +26,15 @@ const Cart = (props) => {
   const [loading, setLoading] = useState(true);
   const [carts, setCarts] = useState([]);
   const token = getAuthToken();
+  const [username, setUsername] = useState(null);
+
+  useEffect(() => {
+    token.then((data) => {
+      if (data) {
+        setUsername(data?.username);
+      }
+    });
+  }, [token]);
 
   const cartAPI = "http://localhost:8080/api/client/cart";
 
@@ -803,24 +812,24 @@ const Cart = (props) => {
           productDetail[i]?.quantity;
       }
 
-      // if (totalPriceInCart + priceInclude > 10000000) {
-      //   const quantityUpdate =
-      //     (10000000 - totalPriceInCart) /
-      //     (productDetail[index]?.data[0]?.price - priceReduce(index));
-      //   productDetail[index].quantity = Math.floor(quantityUpdate);
+      if (totalPriceInCart + priceInclude > 10000000) {
+        const quantityUpdate =
+          (10000000 - totalPriceInCart) /
+          (productDetail[index]?.data[0]?.price - priceReduce(index));
+        productDetail[index].quantity = Math.floor(quantityUpdate);
 
-      //   cart.productDetails = productDetail;
-      //   localStorage.setItem("user", JSON.stringify(cart));
+        cart.productDetails = productDetail;
+        localStorage.setItem("user", JSON.stringify(cart));
 
-      //   setRender(Math.random());
-      //   props.setRenderHeader(Math.random());
-      //   notification.warning({
-      //     message: "Thông báo",
-      //     description:
-      //       "Bạn chỉ thêm được tối đa là 10 triệu vào trong giỏ hàng",
-      //   });
-      //   return;
-      // }
+        setRender(Math.random());
+        props.setRenderHeader(Math.random());
+        notification.warning({
+          message: "Thông báo",
+          description:
+            "Bạn chỉ thêm được tối đa là 10 triệu vào trong giỏ hàng",
+        });
+        return;
+      }
       notification.success({
         message: "Thông báo",
         description: "Cập nhật thành công",
@@ -1117,10 +1126,66 @@ const Cart = (props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [render]);
 
+  const handleDeleteAllCartDetail = (e) => {
+    e.preventDefault();
+    if (username) {
+      console.log("dataToken: ", username);
+      if (carts && carts.length > 0) {
+        axios
+          .get(
+            "http://localhost:8080/api/client/cart/deleteAllCartDetail?username=" +
+              username
+          )
+          .then((res) => {
+            if (res.data) {
+              notification.success({
+                message: "Thông báo",
+                description: "Đã xóa toàn bộ sản phẩm",
+                duration: 2,
+              });
+            }
+          })
+          .catch(() => {
+            notification.error({
+              message: "Thông báo",
+              description: "Xóa thất bại",
+              duration: 2,
+            });
+          });
+      }
+    } else {
+      if (productDetails?.length >= 0) {
+        localStorage.removeItem("user");
+        notification.warning({
+          message: "Thông báo",
+          description: "Xóa thành công",
+          duration: 1,
+        });
+      }
+    }
+    setRender(Math.random());
+    props.setRenderHeader(Math.random());
+  };
+
   return (
     <div className={styles.wrapper}>
       <div className={styles.container}>
-        <h2 style={{ padding: "10px 5%" }}>Giỏ hàng của bạn</h2>
+        <div className={styles.flex}>
+          <div className={styles.titleLeft}>
+            <h2>Giỏ hàng của bạn</h2>
+          </div>
+          <div className={styles.titleRight}>
+            <Button
+              type="primary"
+              onClick={handleDeleteAllCartDetail}
+              disabled={
+                username ? carts?.length <= 0 : productDetails?.length <= 0
+              }
+            >
+              Xóa toàn bộ sản phẩm trong giỏ
+            </Button>
+          </div>
+        </div>
         <div className={styles.centerTable}>
           <Table
             className={styles.cartUser}

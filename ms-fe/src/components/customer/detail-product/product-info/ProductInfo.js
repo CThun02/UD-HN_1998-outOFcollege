@@ -72,6 +72,14 @@ function ProductInfo({
       return;
     }
 
+    if (quantity <= 0) {
+      notification.error({
+        message: "Thông báo",
+        description: "Bạn chưa nhập số lượng",
+      });
+      return;
+    }
+
     if (quantity > colorsAndSizes?.quantity) {
       notification.warning({
         message: "Thông báo",
@@ -142,7 +150,9 @@ function ProductInfo({
                     100
                   : colorsAndSizes?.promotionValue
                 : 0));
-          setQuantity(Math.floor(quantityUpdate));
+          setQuantity(
+            Math.floor(quantityUpdate) <= 0 ? 1 : Math.floor(quantityUpdate)
+          );
           notification.warning({
             message: "Thông báo",
             description:

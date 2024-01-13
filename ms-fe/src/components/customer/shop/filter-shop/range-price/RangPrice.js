@@ -3,6 +3,7 @@ import styles from "./RangPrice.module.css";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import numeral from "numeral";
+import { type } from "@testing-library/user-event/dist/type";
 
 const baseUrl = "http://localhost:8080/api/client/product/get-price-max";
 
@@ -28,12 +29,21 @@ function RangPrice({ filter, setFilter }) {
 
   const handleOnchange = (min, max) => {
     if (min && max) {
-      const minNumber = Number(min.replace(",", ""));
-      const maxNumber = Number(max.replace(",", ""));
+      let minNumber = min;
+      let maxNumber = max;
+
+      if (typeof min !== "number" && typeof max !== "number") {
+        minNumber = Number(min.replace(",", ""));
+        maxNumber = Number(max.replace(",", ""));
+      }
+
       setFilter({ minPrice: minNumber, maxPrice: maxNumber });
     } else {
       if (min) {
-        const minNumber = Number(min.replace(",", ""));
+        let minNumber = min;
+        if (typeof min !== "number") {
+          minNumber = Number(min.replace(",", ""));
+        }
         if (minNumber < defulatRangePriceMax) {
           console.log("data: ", minNumber);
           setFilter({ ...filter, minPrice: minNumber });
@@ -41,7 +51,10 @@ function RangPrice({ filter, setFilter }) {
       }
 
       if (max) {
-        const maxNumber = Number(max.replace(",", ""));
+        let maxNumber = max;
+        if (typeof max !== "number") {
+          maxNumber = Number(max.replace(",", ""));
+        }
         if (maxNumber <= defulatRangePriceMax) {
           setFilter({
             ...filter,

@@ -85,8 +85,8 @@ const Cart = (props) => {
                     </Badge.Ribbon>
                   ) : (
                     <Carousel style={{ maxWidth: "300px" }} autoplay>
-                      {record.productImageResponse &&
-                        record?.productImageResponse.map((item) => {
+                      {record?.data[0]?.productImageResponse &&
+                        record?.data[0]?.productImageResponse.map((item) => {
                           return (
                             <img
                               key={item?.id}
@@ -1217,7 +1217,7 @@ const Cart = (props) => {
                   productDetails.map((record, index) => ({
                     ...record,
                     key: record?.data[0]?.id,
-                    disabled: record?.quantity > 0,
+                    disabled: false,
                   }))
             }
             loading={loading}

@@ -345,9 +345,15 @@ const Cart = (props) => {
       axios
         .put(`${cartAPI}?cartDetailId=${id}&quantity=${value}`)
         .then((response) => {
+          console.log("data: ", response);
+          let message = "Cập nhật thành công";
+          if (!response?.data) {
+            message =
+              "Tổng tiền quá 10 triệu, hệ thống đã cập nhật lại số lượng tối đa bạn có thể thêm";
+          }
           notification.success({
             message: "Thông báo",
-            description: "Cập nhật thành công",
+            description: message,
             duration: 2,
           });
           setRender(response.data);
@@ -930,7 +936,22 @@ const Cart = (props) => {
       for (var i = 0; i < newData?.length; i++) {
         const quantity = newData[i]?.cartDetailResponse?.quantity;
         const productPrice = newData[i]?.cartDetailResponse?.priceProductDetail;
-        totalPrice += quantity * productPrice;
+        let promotionValue = 0;
+        if (newData[i]?.promotion) {
+          if (
+            newData[i]?.promotion[0]?.promotionMethod &&
+            newData[i]?.promotion[0]?.promotionValue
+          ) {
+            if (newData[i]?.promotion[0]?.promotionMethod === "%") {
+              promotionValue =
+                (productPrice * newData[i]?.promotion[0]?.promotionValue) / 100;
+            } else {
+              promotionValue = newData[i]?.promotion[0]?.promotionValue;
+            }
+          }
+        }
+        totalPrice += quantity * (productPrice - promotionValue);
+        console.log("data: ", totalPrice);
         if (totalPrice > 10000000) {
           notification.error({
             message: "Thông báo",
@@ -944,10 +965,17 @@ const Cart = (props) => {
 
       if (!isError) {
         const data = newData.map((e) => {
+          console.log("data: ", e);
           return {
-            quantity: e?.quantity,
-            price: e?.data[0]?.price,
-            productDetailId: e?.data[0]?.id,
+            quantity: e?.quantity
+              ? e?.quantity
+              : e?.cartDetailResponse?.quantity,
+            price: e?.data
+              ? e?.data[0]?.price
+              : e?.cartDetailResponse?.priceProductDetail,
+            productDetailId: e?.data
+              ? e?.data[0]?.id
+              : e?.cartDetailResponse?.productDetailId,
           };
         });
         axios
@@ -1032,17 +1060,43 @@ const Cart = (props) => {
                 }
                 localStorage.removeItem("user");
               }
-
-              axios.post(`${cartAPI} `, cart);
             }
 
             localStorage.removeItem("checkout");
           } catch (error) {
-            console.log(error);
+            const dataError = error?.response?.data;
+
+            let message = "Đã xảy ra lỗi";
+
+            if (
+              dataError?.message?.includes(
+                "Hóa đơn mua trực tuyến không vượt quá 10 triệu"
+              )
+            ) {
+              notification.error({
+                message: "Thông báo",
+                description: message,
+                duration: 2,
+              });
+            }
           }
         })
         .catch((error) => {
-          console.log(error);
+          const dataError = error?.response?.data;
+
+          let message = "Đã xảy ra lỗi";
+
+          if (
+            dataError?.message?.includes(
+              "Hóa đơn mua trực tuyến không vượt quá 10 triệu"
+            )
+          ) {
+            notification.error({
+              message: "Thông báo",
+              description: message,
+              duration: 2,
+            });
+          }
         });
     }
   };

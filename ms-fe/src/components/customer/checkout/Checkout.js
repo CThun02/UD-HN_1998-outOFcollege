@@ -42,14 +42,14 @@ const Checkout = ({ setRenderHeader }) => {
   const token = getAuthToken();
   const [dataToken, setDataToken] = useState(null);
   const [address, setAddress] = useState([]);
-  const [defaultAddress, setDefaultAddress] = useState({
-    fullName: "",
-    sdt: "",
-    city: "",
-    district: "",
-    ward: "",
-    descriptionDetail: "",
-  });
+  // const [defaultAddress, setDefaultAddress] = useState({
+  //   fullName: "",
+  //   sdt: "",
+  //   city: "",
+  //   district: "",
+  //   ward: "",
+  //   descriptionDetail: "",
+  // });
   const navigate = useNavigate();
   const cartAPI = "http://localhost:8080/api/client/cart";
   const [render, setRender] = useState(null);
@@ -301,10 +301,12 @@ const Checkout = ({ setRenderHeader }) => {
     city: yup.string().required("Thành phố không được để trống"),
     district: yup.string().required("Quận huyện không được để trống"),
     ward: yup.string().required("Phường xã không được để trống"),
-    email: yup
-      .string()
-      .email("Email không hợp lệ")
-      .required("Email không được để trống"),
+    email: dataToken
+      ? null
+      : yup
+          .string()
+          .email("Email không hợp lệ")
+          .required("Email không được để trống"),
   });
 
   const handleChange = (e) => {
@@ -373,15 +375,12 @@ const Checkout = ({ setRenderHeader }) => {
                 fullName: addd?.fullName,
                 phoneNumber: addd?.sdt,
                 email: addd?.email,
-                city: addd?.city?.substring(0, addd?.city.indexOf("|")),
-                district: addd?.district?.substring(
-                  0,
-                  addd?.district.indexOf("|")
-                ),
-                ward: addd?.ward?.substring(0, addd?.ward.indexOf("|")),
+                city: addd?.city,
+                district: addd?.district,
+                ward: addd?.ward,
                 addressDetail: addd?.descriptionDetail,
               });
-              setDefaultAddress(addd);
+              // setDefaultAddress(addd);
               let district = addd.district?.substring(
                 1 + addd.district.indexOf("|")
               );
@@ -675,18 +674,16 @@ const Checkout = ({ setRenderHeader }) => {
       descriptionDetail: formData.addressDetail,
     };
 
-    if (!dataToken) {
-      try {
-        await validate.validate(formData, { abortEarly: false });
-        setError({});
-      } catch (errors) {
-        const validationErrors = {};
-        errors.inner.forEach((err) => {
-          validationErrors[err?.path] = err.message;
-        });
-        setError(validationErrors);
-        return;
-      }
+    try {
+      await validate.validate(formData, { abortEarly: false });
+      setError({});
+    } catch (errors) {
+      const validationErrors = {};
+      errors.inner.forEach((err) => {
+        validationErrors[err?.path] = err.message;
+      });
+      setError(validationErrors);
+      return;
     }
 
     Modal.confirm({
@@ -742,7 +739,7 @@ const Checkout = ({ setRenderHeader }) => {
           );
           await axios.post("http://localhost:8080/api/client/delivery-note", {
             billId: response.data.id,
-            addressId: responseAddress.data.id,
+            addressId: responseAddress?.data.id,
             name: formData.fullName,
             phoneNumber: formData.phoneNumber,
             shipDate: leadtime ?? null,
@@ -887,12 +884,10 @@ const Checkout = ({ setRenderHeader }) => {
       handleShippingOrderLeadtime(selectedDistrict, selectedWard);
       handleShippingFee(100, selectedDistrict, selectedWard);
     } else {
-      let district = defaultAddress.district?.substring(
-        1 + defaultAddress.district.indexOf("|")
+      let district = formData.district?.substring(
+        1 + formData.district.indexOf("|")
       );
-      let ward = defaultAddress.ward?.substring(
-        1 + defaultAddress.ward.indexOf("|")
-      );
+      let ward = formData.ward?.substring(1 + formData.ward.indexOf("|"));
       handleShippingOrderLeadtime(Number(district), ward);
       handleShippingFee(100, district, ward);
     }
@@ -926,7 +921,8 @@ const Checkout = ({ setRenderHeader }) => {
                       isModalOpen={showAdd}
                       handleCancel={() => setShowAdd(false)}
                       address={address}
-                      selectedAddress={setDefaultAddress}
+                      selectedAddress={setFormData}
+                      data={formData}
                       render={setRender}
                       username={username}
                     />
@@ -948,22 +944,18 @@ const Checkout = ({ setRenderHeader }) => {
 
                 {/* form */}
                 <Row>
-                  {dataToken ? null : (
+                  {!dataToken && (
                     <Col className={styles.mb} span={24}>
                       <FloatingLabels
                         label="Email"
                         zIndex={true}
-                        value={
-                          dataToken ? defaultAddress?.email : formData?.email
-                        }
+                        value={formData?.email}
                       >
                         <Input
                           size="large"
                           name="email"
                           onChange={handleChange}
-                          value={
-                            dataToken ? defaultAddress?.email : formData?.email
-                          }
+                          value={formData?.email}
                           allowClear
                         />
                         {error.email && (
@@ -1060,7 +1052,10 @@ const Checkout = ({ setRenderHeader }) => {
                           height: 45,
                           width: 380,
                         }}
-                        value={formData.district}
+                        value={formData.district?.substring(
+                          0,
+                          formData.district?.indexOf("|")
+                        )}
                         optionFilterProp="children"
                         filterOption={(input, option) =>
                           (option?.label ?? "").includes(input)
@@ -1095,7 +1090,10 @@ const Checkout = ({ setRenderHeader }) => {
                           height: 45,
                           width: 380,
                         }}
-                        value={formData.ward}
+                        value={formData.ward?.substring(
+                          0,
+                          formData.ward?.indexOf("|")
+                        )}
                         optionFilterProp="children"
                         filterOption={(input, option) =>
                           (option?.label ?? "").includes(input)

@@ -232,7 +232,7 @@ function HeaderRight(props) {
           }
           setCartIndex(
             {
-              quantity: cartIndexLocal?.productDetails.length,
+              quantityCartDetail: cartIndexLocal?.productDetails.length,
               totalPrice: totalPrice,
             },
             Math.random()

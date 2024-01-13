@@ -321,8 +321,23 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
 
         double totalPrice = 0d;
         for (QuantityAndPriceDTO dto: req.getQuantityAndPriceList()) {
+            ProductDetail productDetail = repo.findProductDetailById(dto.getProductDetailId());
+            if (Objects.isNull(productDetail) || productDetail.getQuantity() <= 0) {
+                throw new NotFoundException(ErrorCodeConfig.getMessage(Const.PRODUCT_DETAIL_NOT_FOUND));
+            }
+            PromotionProductDetailDTO promotion = promotionProductDetailService
+                    .findPromotionByProductDetailIds(List.of(productDetail.getId()));
             double price = CommonUtils.bigDecimalConvertDouble(dto.getPrice());
-            totalPrice += price * dto.getQuantity();
+            double priceReduce = 0d;
+            if (Objects.nonNull(promotion)) {
+                double promotionValue = CommonUtils.bigDecimalConvertDouble(promotion.getPromotionValue());
+                priceReduce = promotionValue;
+                if ("%".equalsIgnoreCase(promotion.getPromotionMethod())) {
+                    priceReduce = price * promotionValue / 100;
+                }
+            }
+
+            totalPrice += (price - priceReduce) * dto.getQuantity();
         }
 
         if (totalPrice > 10000000) {

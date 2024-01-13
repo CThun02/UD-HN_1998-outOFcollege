@@ -14,10 +14,11 @@ const ModalAddress = ({
   handleCancel,
   render,
   selectedAddress,
-  username
+  username,
+  data,
 }) => {
-  const [renderAddress, setRenderAddress] = useState(null)
-  const [address, setAddress] = useState([])
+  const [renderAddress, setRenderAddress] = useState(null);
+  const [address, setAddress] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const columns = [
@@ -62,7 +63,16 @@ const ModalAddress = ({
 
   const handleSelectAddress = (record) => {
     // selected(index);
-    selectedAddress(record);
+    selectedAddress({
+      ...data,
+      fullName: record?.fullName,
+      phoneNumber: record?.sdt,
+      email: record?.email,
+      city: record?.city,
+      district: record?.district,
+      ward: record?.ward,
+      addressDetail: record?.descriptionDetail,
+    });
     handleCancel();
     render(Math.random);
   };
@@ -71,10 +81,10 @@ const ModalAddress = ({
   const showModalAddress = () => {
     if (address.length > 10) {
       notification.warning({
-        message: 'Thông báo',
-        description: 'Tối đa 10 địa chỉ.',
-        duration: 2
-      })
+        message: "Thông báo",
+        description: "Tối đa 10 địa chỉ.",
+        duration: 2,
+      });
     } else {
       setIsModalAddressOpen(true);
     }
@@ -90,10 +100,12 @@ const ModalAddress = ({
 
   const getAddress = async () => {
     if (username) {
-      await axios.get(`http://localhost:8080/api/client/address?username=${username}`)
+      await axios
+        .get(`http://localhost:8080/api/client/address?username=${username}`)
         .then((response) => {
-          setAddress(response.data)
-        }).catch((error) => {
+          setAddress(response.data);
+        })
+        .catch((error) => {
           const status = error.response?.status;
           if (status === 403) {
             notification.error({
@@ -101,13 +113,13 @@ const ModalAddress = ({
               description: "Bạn không có quyền truy cập!",
             });
           }
-        })
+        });
     }
-  }
+  };
 
   useEffect(() => {
     getAddress();
-  }, [renderAddress, username])
+  }, [renderAddress, username]);
 
   return (
     <div>
@@ -127,13 +139,12 @@ const ModalAddress = ({
               className={styles.filter_inputSearch}
               placeholder="Nhập địa chỉ"
               prefix={<SearchOutlined />}
-              onChange={(event) => { }}
+              onChange={(event) => {}}
             />
           </Col>
           <Col span={6}></Col>
           <Col span={6}>
-            <Button type="primary"
-              onClick={showModalAddress}>
+            <Button type="primary" onClick={showModalAddress}>
               Thêm địa chỉ mới
             </Button>
             <ModalCreateAddress
@@ -170,7 +181,7 @@ const ModalAddress = ({
           </Col>
         </Row>
       </Modal>
-    </div >
+    </div>
   );
 };
 

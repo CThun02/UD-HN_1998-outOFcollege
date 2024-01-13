@@ -204,7 +204,7 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
 
         List<ProductDetailShop> result = repo.getAllProductDetailShop(
                 req.getProductName(), cateStr, brandStr, colorStr, sizeStr,
-                req.getCategories(), req.getBrands(), req.getColors(), req.getSizes()
+                req.getCategories(), req.getBrands(), req.getColors(), req.getSizes(), req.getSort()
         );
 
         for (ProductDetailShop productDetail: result) {
@@ -320,11 +320,29 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_SERVICE));
         }
 
+        double totalPrice = 0d;
         for (QuantityAndPriceDTO dto: req.getQuantityAndPriceList()) {
-            double price = CommonUtils.bigDecimalConvertDouble(dto.getPrice());
-            if (dto.getQuantity() * price > 10000000) {
-                throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_THAN_TEN_MILLION));
+            ProductDetail productDetail = repo.findProductDetailById(dto.getProductDetailId());
+            if (Objects.isNull(productDetail) || productDetail.getQuantity() <= 0) {
+                throw new NotFoundException(ErrorCodeConfig.getMessage(Const.PRODUCT_DETAIL_NOT_FOUND));
             }
+            PromotionProductDetailDTO promotion = promotionProductDetailService
+                    .findPromotionByProductDetailIds(List.of(productDetail.getId()));
+            double price = CommonUtils.bigDecimalConvertDouble(dto.getPrice());
+            double priceReduce = 0d;
+            if (Objects.nonNull(promotion)) {
+                double promotionValue = CommonUtils.bigDecimalConvertDouble(promotion.getPromotionValue());
+                priceReduce = promotionValue;
+                if ("%".equalsIgnoreCase(promotion.getPromotionMethod())) {
+                    priceReduce = price * promotionValue / 100;
+                }
+            }
+
+            totalPrice += (price - priceReduce) * dto.getQuantity();
+        }
+
+        if (totalPrice > 10000000) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_THAN_TEN_MILLION));
         }
 
         List<Long> productDetailId = req.getQuantityAndPriceList().stream().map(QuantityAndPriceDTO::getProductDetailId).collect(Collectors.toList());

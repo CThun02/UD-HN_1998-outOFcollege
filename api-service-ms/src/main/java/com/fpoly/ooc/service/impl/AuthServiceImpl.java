@@ -146,6 +146,7 @@ public class AuthServiceImpl implements AuthService {
                 .fullName(account.getFullName())
                 .username(account.getUsername())
                 .roles(roleService.findRoleNameByUsername(account.getUsername()))
+                .email(account.getEmail())
                 .build();
     }
 

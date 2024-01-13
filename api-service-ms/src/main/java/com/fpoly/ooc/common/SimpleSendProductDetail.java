@@ -130,7 +130,7 @@ public class SimpleSendProductDetail {
         String productDetailsJson = objectMapper.writeValueAsString(productDetailShopResponse);
         String productDetailsShopJson = objectMapper.writeValueAsString(productDetailDAORepositoryI.getAllProductDetailShop(
                 null, "", "", "", "", null,
-                null, null, null));
+                null, null, null, "up"));
         String bestSellingJson = objectMapper.writeValueAsString(productDetailDAORepositoryI.getProductDetailBestSelling());
         String newProductJson = objectMapper.writeValueAsString(productDetailDAORepositoryI.getNewProductDetail());
 

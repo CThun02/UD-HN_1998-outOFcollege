@@ -26,7 +26,7 @@ function HeaderRight(props) {
   const [usernameEncode, setUsernameEncode] = useState("");
   const [data, setData] = useState(null);
   const [cartIndex, setCartIndex] = useState({
-    quantity: 0,
+    quantityCartDetail: 0,
     totalPrice: 0,
   });
   const [apiNotification, contextHolder] = notification.useNotification();
@@ -182,6 +182,7 @@ function HeaderRight(props) {
               `http://localhost:8080/api/client/getCartIndex?username=${data?.username}`
             )
             .then((res) => {
+              console.log("dataRes: ", res.data);
               setCartIndex(res.data);
             })
             .catch((er) => {
@@ -198,17 +199,40 @@ function HeaderRight(props) {
 
           setCartIndex({});
           const cartIndexLocal = JSON.parse(localStorage.getItem("user"));
-          console.log(cartIndexLocal.productDetails);
+          console.log("dataCartIndexLocal: ", cartIndexLocal.productDetails);
           let totalPrice = 0;
           for (let i = 0; i < cartIndexLocal?.productDetails.length; i++) {
+            let priceReduce = 0;
+            if (cartIndexLocal.productDetails[i]?.data[0]?.promotion) {
+              console.log("dataIF1");
+
+              if (
+                cartIndexLocal.productDetails[i]?.data[0]?.promotion[0]
+                  ?.promotionMethod &&
+                cartIndexLocal.productDetails[i]?.data[0]?.promotion[0]
+                  ?.promotionValue
+              ) {
+                console.log("dataIF");
+                priceReduce =
+                  cartIndexLocal.productDetails[i]?.data[0]?.promotion[0]
+                    ?.promotionMethod === "%"
+                    ? (cartIndexLocal.productDetails[i]?.data[0]?.price *
+                        cartIndexLocal.productDetails[i]?.data[0]?.promotion[0]
+                          ?.promotionValue) /
+                      100
+                    : cartIndexLocal.productDetails[i]?.data[0]?.price -
+                      cartIndexLocal.productDetails[i]?.data[0]?.promotion[0]
+                        ?.promotionValue;
+              }
+            }
             totalPrice += Number(
-              cartIndexLocal.productDetails[i].data[0].price *
-                cartIndexLocal.productDetails[i].quantity
+              cartIndexLocal.productDetails[i]?.quantity *
+                (cartIndexLocal.productDetails[i]?.data[0]?.price - priceReduce)
             );
           }
           setCartIndex(
             {
-              quantity: cartIndexLocal?.productDetails.length,
+              quantityCartDetail: cartIndexLocal?.productDetails.length,
               totalPrice: totalPrice,
             },
             Math.random()
@@ -219,7 +243,7 @@ function HeaderRight(props) {
         setUsernameEncode(convertPath);
       })
       .catch((error) => {
-        console.log(error);
+        console.log("data: ", error);
       });
     console.log("2");
   }, [
@@ -285,7 +309,7 @@ function HeaderRight(props) {
               currency: "VND",
             })}
           </p>
-          <Badge count={cartIndex.quantity}>
+          <Badge count={cartIndex.quantityCartDetail}>
             <Link
               to={"/ms-shop/cart"}
               onClick={() => {

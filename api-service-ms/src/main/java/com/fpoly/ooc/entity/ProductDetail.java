@@ -149,6 +149,10 @@ import java.util.List;
                                 AND (?5 = '' OR se.id IN (?9))
                             GROUP BY pt.id, br.id, cy.id, patt.id, f.id, button.id, mate.id, collar.id, sleeve.id, shirtTail.id,
                              c.category_name, pt.product_name, br.brand_name
+                             ORDER BY
+                                CASE WHEN ?10 = 'up' THEN MIN(pd.price) END ASC,
+                                CASE WHEN ?10 = 'down' THEN MIN(pd.price) END DESC
+                            
                 """, resultSetMapping = "Mapping.ProductDetailShop")
 
 @NamedNativeQuery(

@@ -17,4 +17,5 @@ public class UserDTO {
     private String token;
     private List<String> roles;
     private String time = "1 hour";
+    private String email;
 }

@@ -26,6 +26,15 @@ const Cart = (props) => {
   const [loading, setLoading] = useState(true);
   const [carts, setCarts] = useState([]);
   const token = getAuthToken();
+  const [username, setUsername] = useState(null);
+
+  useEffect(() => {
+    token.then((data) => {
+      if (data) {
+        setUsername(data?.username);
+      }
+    });
+  }, [token]);
 
   const cartAPI = "http://localhost:8080/api/client/cart";
 
@@ -681,68 +690,75 @@ const Cart = (props) => {
       render: (_, record) => {
         return (
           <div style={{ textAlign: "center" }}>
-            {record.promotion.length !== 0 ? (
-              <span style={{ color: "#ccc" }}>
-                <strike>
-                  {Number(
-                    record?.cartDetailResponse?.priceProductDetail *
-                      record?.cartDetailResponse?.quantity
-                      ? record?.cartDetailResponse?.priceProductDetail *
-                          record?.cartDetailResponse?.quantity
-                      : 0
-                  )?.toLocaleString("vi-VN", {
-                    style: "currency",
-                    currency: "VND",
-                  })}
-                </strike>
-              </span>
+            {record?.disabled ? (
+              <span style={{ color: "red" }}>Hết hàng</span>
             ) : (
-              <span>
-                {Number(
-                  record?.cartDetailResponse?.priceProductDetail *
-                    record?.cartDetailResponse?.quantity >
-                    0
-                    ? record?.cartDetailResponse?.priceProductDetail *
-                        record?.cartDetailResponse?.quantity
-                    : 0
-                )?.toLocaleString("vi-VN", {
-                  style: "currency",
-                  currency: "VND",
-                })}
-              </span>
-            )}
-            <br />
-            <span>
-              {record.promotion.length !== 0
-                ? record?.promotion[0]?.promotionMethod === "%"
-                  ? (((record.cartDetailResponse.priceProductDetail *
-                      (100 - Number(record?.promotion[0].promotionValue))) /
-                      100) *
-                      record?.cartDetailResponse?.quantity >
-                    0
-                      ? ((record.cartDetailResponse.priceProductDetail *
+              <>
+                {record.promotion.length !== 0 ? (
+                  <span style={{ color: "#ccc" }}>
+                    <strike>
+                      {Number(
+                        record?.cartDetailResponse?.priceProductDetail *
+                          record?.cartDetailResponse?.quantity
+                          ? record?.cartDetailResponse?.priceProductDetail *
+                              record?.cartDetailResponse?.quantity
+                          : 0
+                      )?.toLocaleString("vi-VN", {
+                        style: "currency",
+                        currency: "VND",
+                      })}
+                    </strike>
+                  </span>
+                ) : (
+                  <span>
+                    {Number(
+                      record?.cartDetailResponse?.priceProductDetail *
+                        record?.cartDetailResponse?.quantity >
+                        0
+                        ? record?.cartDetailResponse?.priceProductDetail *
+                            record?.cartDetailResponse?.quantity
+                        : 0
+                    )?.toLocaleString("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    })}
+                  </span>
+                )}
+                <br />
+                <span>
+                  {record.promotion.length !== 0
+                    ? record?.promotion[0]?.promotionMethod === "%"
+                      ? (((record.cartDetailResponse.priceProductDetail *
                           (100 - Number(record?.promotion[0].promotionValue))) /
                           100) *
-                        record?.cartDetailResponse?.quantity
-                      : 0
-                    )?.toLocaleString("vi-VN", {
-                      style: "currency",
-                      currency: "VND",
-                    })
-                  : ((record?.cartDetailResponse?.priceProductDetail -
-                      Number(record?.promotion[0]?.promotionValue)) *
-                      record?.cartDetailResponse?.quantity >
-                    0
-                      ? (record?.cartDetailResponse?.priceProductDetail -
+                          record?.cartDetailResponse?.quantity >
+                        0
+                          ? ((record.cartDetailResponse.priceProductDetail *
+                              (100 -
+                                Number(record?.promotion[0].promotionValue))) /
+                              100) *
+                            record?.cartDetailResponse?.quantity
+                          : 0
+                        )?.toLocaleString("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                        })
+                      : ((record?.cartDetailResponse?.priceProductDetail -
                           Number(record?.promotion[0]?.promotionValue)) *
-                        record?.cartDetailResponse?.quantity
-                      : 0
-                    )?.toLocaleString("vi-VN", {
-                      style: "currency",
-                      currency: "VND",
-                    })
-                : null}
-            </span>
+                          record?.cartDetailResponse?.quantity >
+                        0
+                          ? (record?.cartDetailResponse?.priceProductDetail -
+                              Number(record?.promotion[0]?.promotionValue)) *
+                            record?.cartDetailResponse?.quantity
+                          : 0
+                        )?.toLocaleString("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                        })
+                    : null}
+                </span>
+              </>
+            )}
           </div>
         );
       },
@@ -803,24 +819,24 @@ const Cart = (props) => {
           productDetail[i]?.quantity;
       }
 
-      // if (totalPriceInCart + priceInclude > 10000000) {
-      //   const quantityUpdate =
-      //     (10000000 - totalPriceInCart) /
-      //     (productDetail[index]?.data[0]?.price - priceReduce(index));
-      //   productDetail[index].quantity = Math.floor(quantityUpdate);
+      if (totalPriceInCart + priceInclude > 10000000) {
+        const quantityUpdate =
+          (10000000 - totalPriceInCart) /
+          (productDetail[index]?.data[0]?.price - priceReduce(index));
+        productDetail[index].quantity = Math.floor(quantityUpdate);
 
-      //   cart.productDetails = productDetail;
-      //   localStorage.setItem("user", JSON.stringify(cart));
+        cart.productDetails = productDetail;
+        localStorage.setItem("user", JSON.stringify(cart));
 
-      //   setRender(Math.random());
-      //   props.setRenderHeader(Math.random());
-      //   notification.warning({
-      //     message: "Thông báo",
-      //     description:
-      //       "Bạn chỉ thêm được tối đa là 10 triệu vào trong giỏ hàng",
-      //   });
-      //   return;
-      // }
+        setRender(Math.random());
+        props.setRenderHeader(Math.random());
+        notification.warning({
+          message: "Thông báo",
+          description:
+            "Bạn chỉ thêm được tối đa là 10 triệu vào trong giỏ hàng",
+        });
+        return;
+      }
       notification.success({
         message: "Thông báo",
         description: "Cập nhật thành công",
@@ -951,7 +967,6 @@ const Cart = (props) => {
           }
         }
         totalPrice += quantity * (productPrice - promotionValue);
-        console.log("data: ", totalPrice);
         if (totalPrice > 10000000) {
           notification.error({
             message: "Thông báo",
@@ -996,6 +1011,10 @@ const Cart = (props) => {
               message = "Hóa đơn mua trực tuyến không vượt quá 10 triệu";
             }
 
+            if (dataError?.message?.includes("Số lượng trong kho không đủ")) {
+              message = "Số lượng trong kho không đủ";
+            }
+
             if (dataError?.message?.includes("Mua sản phẩm thất bại")) {
               message =
                 "Sản phẩm đã hết hoặc không cửa hàng không còn kinh doanh";
@@ -1014,6 +1033,10 @@ const Cart = (props) => {
   const rowSelection = {
     selectedRowKeys,
     onChange: onSelectChange,
+    getCheckboxProps: (record) => ({
+      disabled: record.disabled,
+      key: record.key,
+    }),
   };
 
   const getCartAPI = async () => {
@@ -1117,10 +1140,66 @@ const Cart = (props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [render]);
 
+  const handleDeleteAllCartDetail = (e) => {
+    e.preventDefault();
+    if (username) {
+      console.log("dataToken: ", username);
+      if (carts && carts.length > 0) {
+        axios
+          .get(
+            "http://localhost:8080/api/client/cart/deleteAllCartDetail?username=" +
+              username
+          )
+          .then((res) => {
+            if (res.data) {
+              notification.success({
+                message: "Thông báo",
+                description: "Đã xóa toàn bộ sản phẩm",
+                duration: 2,
+              });
+            }
+          })
+          .catch(() => {
+            notification.error({
+              message: "Thông báo",
+              description: "Xóa thất bại",
+              duration: 2,
+            });
+          });
+      }
+    } else {
+      if (productDetails?.length >= 0) {
+        localStorage.removeItem("user");
+        notification.warning({
+          message: "Thông báo",
+          description: "Xóa thành công",
+          duration: 1,
+        });
+      }
+    }
+    setRender(Math.random());
+    props.setRenderHeader(Math.random());
+  };
+
   return (
     <div className={styles.wrapper}>
       <div className={styles.container}>
-        <h2 style={{ padding: "10px 5%" }}>Giỏ hàng của bạn</h2>
+        <div className={styles.flex}>
+          <div className={styles.titleLeft}>
+            <h2>Giỏ hàng của bạn</h2>
+          </div>
+          <div className={styles.titleRight}>
+            <Button
+              type="primary"
+              onClick={handleDeleteAllCartDetail}
+              disabled={
+                username ? carts?.length <= 0 : productDetails?.length <= 0
+              }
+            >
+              Xóa toàn bộ sản phẩm trong giỏ
+            </Button>
+          </div>
+        </div>
         <div className={styles.centerTable}>
           <Table
             className={styles.cartUser}
@@ -1130,16 +1209,22 @@ const Cart = (props) => {
               carts && carts.length > 0
                 ? carts.map((record, index) => ({
                     ...record,
-                    key: record.cartDetailResponse.productDetailId,
+                    key: record?.cartDetailResponse?.productDetailId,
+                    disabled:
+                      record?.cartDetailResponse?.quantityProductDetail <= 0,
                   }))
                 : productDetails &&
                   productDetails.map((record, index) => ({
                     ...record,
                     key: record?.data[0]?.id,
+                    disabled: record?.quantity > 0,
                   }))
             }
             loading={loading}
             pagination={false}
+            rowClassName={(record) =>
+              record.disabled && "disabled-row-table-element"
+            }
           />
         </div>
         <Row style={{ marginTop: "20px" }}>

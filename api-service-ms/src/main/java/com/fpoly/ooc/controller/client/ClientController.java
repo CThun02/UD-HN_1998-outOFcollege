@@ -10,6 +10,7 @@ import com.fpoly.ooc.entity.Account;
 import com.fpoly.ooc.entity.Address;
 import com.fpoly.ooc.entity.AddressDetail;
 import com.fpoly.ooc.entity.Bill;
+import com.fpoly.ooc.entity.ProductDetail;
 import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.BillRepo;
 import com.fpoly.ooc.request.DeliveryNoteRequest;
@@ -304,5 +305,11 @@ public class ClientController {
     public ResponseEntity<?> deleteBD(@RequestParam("bdId") Long bdId, @RequestParam("bId") Long bId) throws NotFoundException, JsonProcessingException {
         billDetailService.deleteBillDetail(bId, bdId);
         return ResponseEntity.ok("ok");
+    }
+
+    @GetMapping("/isCheckProduct")
+    public ResponseEntity<?> isCheckProduct(@RequestParam List<Long> productDetailIds) {
+       List<ProductDetail> lstProductDetail =  productDetailService.isCheckProductDetail(productDetailIds);
+       return ResponseEntity.ok(lstProductDetail);
     }
 }

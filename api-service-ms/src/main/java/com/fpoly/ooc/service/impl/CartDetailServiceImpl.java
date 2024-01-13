@@ -174,10 +174,10 @@ public class CartDetailServiceImpl implements CartDetailService {
             } else {
                 priceReduce = promotionValue;
             }
+        }
 
-            if (Objects.nonNull(request.getLstCartDetail().get(0).getQuantity())) {
-                totalPrice = (CommonUtils.bigDecimalConvertDouble(getProductDetailById.getPrice()) - priceReduce) * request.getLstCartDetail().get(0).getQuantity();
-            }
+        if (Objects.nonNull(request.getLstCartDetail().get(0).getQuantity())) {
+            totalPrice = (CommonUtils.bigDecimalConvertDouble(getProductDetailById.getPrice()) - priceReduce) * request.getLstCartDetail().get(0).getQuantity();
         }
 
         for (CartDetail cartDetail : lstCartDetailByUsername) {
@@ -211,12 +211,15 @@ public class CartDetailServiceImpl implements CartDetailService {
             boolean found = false;
             for (CartDetail existingCartDetail : existingCart.getCartDetailList()) {
                 ProductDetail productDetail = productDetailService.findProductDetailByIdAndStatus(existingCartDetail.getProductDetail().getId());
-                if (Objects.isNull(productDetail) || productDetail.getQuantity() <= 0 ||
-                        existingCartDetail.getQuantity() + cartDetailRequest.getQuantity() > productDetail.getQuantity()) {
+                if (Objects.isNull(productDetail)) {
                     throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_ADD_TO_CART_THAN_QUANTITY));
                 }
 
                 if (existingCartDetail.getProductDetail().getId().equals(cartDetailRequest.getProductDetailId())) {
+                    if (productDetail.getQuantity() <= 0 ||
+                            existingCartDetail.getQuantity() + cartDetailRequest.getQuantity() > productDetail.getQuantity()) {
+                        throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_ADD_TO_CART_THAN_QUANTITY));
+                    }
                     int quantityUpdateCart = existingCartDetail.getQuantity() + cartDetailRequest.getQuantity();
                     double priceProduct = CommonUtils.bigDecimalConvertDouble(productDetail.getPrice());
 
@@ -276,7 +279,7 @@ public class CartDetailServiceImpl implements CartDetailService {
         double priceProduct = 0d;
         double priceReduce = 0d;
         double totalPriceInCart = 0d;
-        for (CartDetail c: lstCartDetailByCartDetailId) {
+        for (CartDetail c : lstCartDetailByCartDetailId) {
             if (Objects.isNull(c.getProductDetail())) {
                 continue;
             }
@@ -448,6 +451,21 @@ public class CartDetailServiceImpl implements CartDetailService {
         priceCartUserDTO.setTotalPrice(new BigDecimal(totalPrice));
         priceCartUserDTO.setQuantityCartDetail(lstCartDetail.size());
         return priceCartUserDTO;
+    }
+
+    @Override
+    public Boolean deleteAllCartDetailFromUsername(String username) throws NotFoundException {
+        if (StringUtils.isBlank(username)) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.USER_NOT_FOUND));
+        }
+
+        List<CartDetail> lstCartDetail = cartDetailRepo.findCartDetailByUsername(username);
+        if (CollectionUtils.isEmpty(lstCartDetail)) {
+            return false;
+        }
+
+        cartDetailRepo.deleteAll(lstCartDetail);
+        return true;
     }
 
 }

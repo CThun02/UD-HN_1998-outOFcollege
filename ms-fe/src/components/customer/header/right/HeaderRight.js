@@ -204,15 +204,12 @@ function HeaderRight(props) {
           for (let i = 0; i < cartIndexLocal?.productDetails.length; i++) {
             let priceReduce = 0;
             if (cartIndexLocal.productDetails[i]?.data[0]?.promotion) {
-              console.log("dataIF1");
-
               if (
                 cartIndexLocal.productDetails[i]?.data[0]?.promotion[0]
                   ?.promotionMethod &&
                 cartIndexLocal.productDetails[i]?.data[0]?.promotion[0]
                   ?.promotionValue
               ) {
-                console.log("dataIF");
                 priceReduce =
                   cartIndexLocal.productDetails[i]?.data[0]?.promotion[0]
                     ?.promotionMethod === "%"
@@ -220,8 +217,7 @@ function HeaderRight(props) {
                         cartIndexLocal.productDetails[i]?.data[0]?.promotion[0]
                           ?.promotionValue) /
                       100
-                    : cartIndexLocal.productDetails[i]?.data[0]?.price -
-                      cartIndexLocal.productDetails[i]?.data[0]?.promotion[0]
+                    : cartIndexLocal.productDetails[i]?.data[0]?.promotion[0]
                         ?.promotionValue;
               }
             }

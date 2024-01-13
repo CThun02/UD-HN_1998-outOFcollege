@@ -101,7 +101,7 @@ public class Bill extends BaseEntity {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "bill_code")
+    @Column(name = "bill_code", updatable = false)
     private String billCode;
 
     @Column(name = "transaction_code")

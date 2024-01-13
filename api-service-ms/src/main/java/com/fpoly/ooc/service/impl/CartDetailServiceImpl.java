@@ -174,10 +174,10 @@ public class CartDetailServiceImpl implements CartDetailService {
             } else {
                 priceReduce = promotionValue;
             }
+        }
 
-            if (Objects.nonNull(request.getLstCartDetail().get(0).getQuantity())) {
-                totalPrice = (CommonUtils.bigDecimalConvertDouble(getProductDetailById.getPrice()) - priceReduce) * request.getLstCartDetail().get(0).getQuantity();
-            }
+        if (Objects.nonNull(request.getLstCartDetail().get(0).getQuantity())) {
+            totalPrice = (CommonUtils.bigDecimalConvertDouble(getProductDetailById.getPrice()) - priceReduce) * request.getLstCartDetail().get(0).getQuantity();
         }
 
         for (CartDetail cartDetail : lstCartDetailByUsername) {
@@ -448,6 +448,21 @@ public class CartDetailServiceImpl implements CartDetailService {
         priceCartUserDTO.setTotalPrice(new BigDecimal(totalPrice));
         priceCartUserDTO.setQuantityCartDetail(lstCartDetail.size());
         return priceCartUserDTO;
+    }
+
+    @Override
+    public Boolean deleteAllCartDetailFromUsername(String username) throws NotFoundException {
+        if (StringUtils.isBlank(username)) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.USER_NOT_FOUND));
+        }
+
+        List<CartDetail> lstCartDetail = cartDetailRepo.findCartDetailByUsername(username);
+        if(CollectionUtils.isEmpty(lstCartDetail)) {
+            return false;
+        }
+
+        cartDetailRepo.deleteAll(lstCartDetail);
+        return true;
     }
 
 }

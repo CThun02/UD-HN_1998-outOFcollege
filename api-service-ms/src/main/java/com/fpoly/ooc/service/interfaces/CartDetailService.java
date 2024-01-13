@@ -33,4 +33,6 @@ public interface CartDetailService {
 
     PriceCartUserDTO getTotalPriceCartByUser(String username) throws NotFoundException;
 
+    Boolean deleteAllCartDetailFromUsername(String username) throws NotFoundException;
+
 }

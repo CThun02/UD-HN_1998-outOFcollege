@@ -71,49 +71,132 @@ const ModalBillInfoDisplay = ({ open, cancel, billCode }) => {
       }
     }
   };
+  console.log(bill)
 
   const generatePDF = () => {
     const qrCodeDataUrl = generateQRCodeDataURL(billCode);
     return (
-      <Document>
-        <Page>
-          <View style={{ padding: 10, fontSize: "15px" }}>
-            <Text
-              style={{
-                fontSize: 20,
-                marginBottom: 10,
-                fontFamily: "Roboto",
-                textAlign: "center",
-              }}
-            >
-              Thông tin đơn hàng: {billCode}
-            </Text>
+      <Document language="vi-VN">
+        <Page style={{padding: 16}}>
+          <View style={{ padding: 10}}>
+            <View  style={{ textAlign:"center", width:"100%", display:"flex", alignItems:"center", justifyContent:"center" }}>
+              <Text
+                style={{
+                  marginBottom: 10,
+                  textAlign: "center",
+                }}
+              >
+                  HÓA ĐƠN BÁN HÀNG
+              </Text>
+              <Image src={logo} style={{maxWidth: 140}}/>
+              <Text style={{justifyContent:"flex-end"}}>
+                  <Image
+                      src={qrCodeDataUrl}
+                      style={{ width: 40, height: 40 }}
+                  />
+                </Text>
+            </View>
             {bill && (
               <View style={styles.vietNam}>
-                <View style={{ flexDirection: "row" }}>
-                  <View style={{ width: "50%" }}>
-                    <Text>Ngày tạo: {bill?.billCreatedAt}</Text>
+                <View style={{ textAlign:"center", width:"100%", marginBottom: 36 }}>
+                    <Text style={{fontSize: 12}}>
+                      Ngày{" "}
+                      <Text  style={{ fontWeight: 'bold' }}>{`${moment(
+                        bill?.billCreatedAt,
+                        "DD/MM/YYYY HH:mm"
+                      ).date()}`}</Text>{" "}
+                      tháng{" "}
+                      <Text  style={{ fontWeight: 'bold' }}>{`${
+                        moment(
+                          bill?.billCreatedAt,
+                          "DD/MM/YYYY HH:mm"
+                        ).month() + 1
+                      }`}</Text>{" "}
+                      năm{" "}
+                      <Text  style={{ fontWeight: 'bold' }}>{`${moment(
+                        bill?.billCreatedAt,
+                        "DD/MM/YYYY HH:mm"
+                      ).year()}`}</Text>
+                   </Text>
                   </View>
-                  <View style={{ width: "50%" }}>
-                    <Text>Quầy: ahihi</Text>
+                <View style={{ flexDirection: "row", fontSize: 12, marginBottom:8 }}>
+                  <View style={{ width: "30%" }}>
+                    <Text>Đơn vị bán hàng:</Text>
+                  </View>
+                  <View style={{ width: "70%" }}>
+                    <Text>Cửa hàng bán áo sơ mi nam outOfCollege</Text>
                   </View>
                 </View>
-                <View style={{ flexDirection: "row" }}>
-                  <View style={{ width: "50%" }}>
-                    <Text>
-                      Nhân viên bán hàng:{" "}
-                      {bill?.billCreatedBy !== "Client"
-                        ? bill?.billUpdateBy.split("_")[0]
-                        : bill?.billUpdateBy}
-                    </Text>
+                <View style={{ flexDirection: "row", fontSize: 12, marginBottom:8 }}>
+                  <View style={{ width: "30%" }}>
+                    <Text>Địa chỉ:</Text>
                   </View>
-                  <View style={{ width: "50%" }}>
-                    <Text>Mã đơn hàng: {billCode}</Text>
+                  <View style={{ width: "70%" }}>
+                    <Text>Tòa nhà FPT Polytechnic, đường Trịnh Văn Bô, Phương Canh, Nam Từ Liêm, Hà Nội</Text>
                   </View>
                 </View>
-
-                <Text style={{ margin: "20px 0", fontWeight: "bold" }}>
-                  Danh sách sản phẩm:
+                <View style={{ flexDirection: "row", fontSize: 12, marginBottom:8 }}>
+                  <View style={{ width: "30%" }}>
+                    <Text>Số điện thoại:</Text>
+                  </View>
+                  <View style={{ width: "70%" }}>
+                    <Text>0988866377</Text>
+                  </View>
+                </View>
+                <View style={{ flexDirection: "row", fontSize: 12, marginBottom:8 }}>
+                  <View style={{ width: "30%" }}>
+                    <Text>Số tài khoản:</Text>
+                  </View>
+                  <View style={{ width: "70%",  borderBottom: '1px dashed black', paddingBottom: 1}}>
+                  </View>
+                </View>
+                <View style={{ paddingBottom: 12, marginBottom:12, width:"100%", borderBottom:"2px solid black"}}>
+                </View>
+                {/* Thông tin khách hàng */}
+                <View style={{ flexDirection: "row", fontSize: 12, marginBottom:8 }}>
+                  <View style={{ width: "40%" }}>
+                    <Text>Họ tên người mua hàng:</Text>
+                  </View>
+                  <View style={{ width: "60%"}}>
+                  </View>
+                </View>
+                <View style={{ flexDirection: "row", fontSize: 12, marginBottom:8 }}>
+                  <View style={{ width: "40%" }}>
+                    <Text>Địa chỉ:</Text>
+                  </View>
+                  <View style={{ width: "60%"}}>
+                  </View>
+                </View>
+                <View style={{ flexDirection: "row", fontSize: 12, marginBottom:8 }}>
+                  <View style={{ width: "40%" }}>
+                    <Text>Số điện thoại:</Text>
+                  </View>
+                  <View style={{ width: "60%"}}>
+                  </View>
+                </View>
+                <View style={{ flexDirection: "row", fontSize: 12, marginBottom:8 }}>
+                  <View style={{ width: "40%" }}>
+                    <Text>Hình thức thanh toán:</Text>
+                  </View>
+                  <View style={{ width: "60%"}}>
+                  </View>
+                </View>
+                <View style={{ flexDirection: "row", fontSize: 12, marginBottom:8 }}>
+                  <View style={{ width: "40%" }}>
+                    <Text>Nhân viên bán hàng:</Text>
+                  </View>
+                  <View style={{ width: "60%"}}>
+                  </View>
+                </View>
+                {/* sản phẩm */}
+                <Text
+                  style={{
+                    fontSize: 16,
+                    marginBottom: 10,
+                    textAlign: "center",
+                  }}
+                >
+                    Thông tin đơn hàng
                 </Text>
                 <View style={{ display: "flex", flexDirection: "column" }}>
                   <View
@@ -124,16 +207,16 @@ const ModalBillInfoDisplay = ({ open, cancel, billCode }) => {
                     }}
                   >
                     <View style={{ flex: 3 }}>
-                      <Text style={{ fontWeight: "bold" }}>Sản phẩm</Text>
+                      <Text style={{ fontSize: 12 , textAlign:"center" }}>Sản phẩm</Text>
                     </View>
                     <View style={{ flex: 1 }}>
-                      <Text style={{ fontWeight: "bold" }}>Đơn giá</Text>
+                      <Text style={{ fontSize: 12 , textAlign:"center" }}>Đơn giá</Text>
                     </View>
                     <View style={{ flex: 1 }}>
-                      <Text style={{ fontWeight: "bold" }}>Số lượng</Text>
+                      <Text style={{ fontSize: 12 , textAlign:"center" }}>Số lượng</Text>
                     </View>
                     <View style={{ flex: 1 }}>
-                      <Text style={{ fontWeight: "bold" }}>Thành tiền</Text>
+                      <Text style={{ fontSize: 12 , textAlign:"center" }}>Thành tiền</Text>
                     </View>
                   </View>
                   {bill?.lstProductDetail &&
@@ -147,7 +230,7 @@ const ModalBillInfoDisplay = ({ open, cancel, billCode }) => {
                         }}
                       >
                         <View style={{ flex: 3 }}>
-                          <Text>
+                          <Text style={{ fontSize: 12, textAlign:"center" }}>
                             {item?.productName +
                               "-" +
                               item?.productButton +
@@ -174,7 +257,7 @@ const ModalBillInfoDisplay = ({ open, cancel, billCode }) => {
                           </Text>
                         </View>
                         <View style={{ flex: 1 }}>
-                          <Text>
+                          <Text style={{ fontSize: 12, textAlign:"center" }}>
                             {item?.productPrice.toLocaleString("vi-VN", {
                               style: "currency",
                               currency: "VND",
@@ -182,10 +265,10 @@ const ModalBillInfoDisplay = ({ open, cancel, billCode }) => {
                           </Text>
                         </View>
                         <View style={{ flex: 1 }}>
-                          <Text>{item?.quantity}</Text>
+                          <Text style={{ fontSize: 12, textAlign:"center" }}>{item?.quantity}</Text>
                         </View>
                         <View style={{ flex: 1 }}>
-                          <Text>
+                          <Text style={{ fontSize: 12, textAlign:"center" }}>
                             {Number(
                               item?.quantity * item?.productPrice
                             )?.toLocaleString("vi-VN", {
@@ -197,46 +280,56 @@ const ModalBillInfoDisplay = ({ open, cancel, billCode }) => {
                       </View>
                     ))}
                 </View>
-                <View style={{ flexDirection: "row", fontFamily: "Roboto" }}>
-                  <View style={{ flex: 1 }}>
-                    <Text>
-                      Thành tiền:{" "}
-                      {bill?.totalPrice.toLocaleString("vi-VN", {
-                        style: "currency",
-                        currency: "VND",
-                      })}
-                    </Text>
-                    <Text>
-                      Giá vận chuyển:{" "}
-                      {(bill?.shippingFee ?? 0).toLocaleString("vi-VN", {
-                        style: "currency",
-                        currency: "VND",
-                      })}
-                    </Text>
-                    <Text>
-                      Giảm giá:{" "}
-                      {bill?.priceReduce?.toLocaleString("vi-VN", {
-                        style: "currency",
-                        currency: "VND",
-                      })}
-                    </Text>
-                    <Text>
-                      Tổng cộng:{" "}
-                      {bill?.amountPaid?.toLocaleString("vi-VN", {
-                        style: "currency",
-                        currency: "VND",
-                      })}
-                    </Text>
-                  </View>
-                  <View style={{ flex: 1 }}>
-                    <Text>
-                      <Image
-                        src={qrCodeDataUrl}
-                        style={{ width: 150, height: 150 }}
-                      />
-                    </Text>
-                  </View>
+                <View style={{ paddingBottom: 12, marginBottom:12, width:"100%", borderBottom:"2px solid dashed"}}>
                 </View>
+                <View style={{ display:"flex", justifyContent: "flex-end" }}>
+                    <View style={{ flexDirection: "row", fontSize: 12, marginBottom:8 }}>
+                      <View style={{ width: "30%" }}>
+                        <Text>Thành tiền:</Text>
+                      </View>
+                      <View style={{ width: "70%" }}>
+                        <Text>{bill?.totalPrice.toLocaleString("vi-VN", {
+                              style: "currency",
+                              currency: "VND",
+                            })}</Text>
+                      </View>
+                    </View>
+                    <View style={{ flexDirection: "row", fontSize: 12, marginBottom:8 }}>
+                      <View style={{ width: "30%" }}>
+                        <Text>Giá vận chuyển:</Text>
+                      </View>
+                      <View style={{ width: "70%" }}>
+                        <Text>{(bill?.shippingFee ?? 0).toLocaleString("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                        })}</Text>
+                      </View>
+                    </View>
+                    <View style={{ flexDirection: "row", fontSize: 12, marginBottom:8 }}>
+                      <View style={{ width: "30%" }}>
+                        <Text>Giảm giá:</Text>
+                      </View>
+                      <View style={{ width: "70%" }}>
+                        <Text>{bill?.priceReduce?.toLocaleString("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                        })}</Text>
+                      </View>
+                    </View>
+                    <View style={{ flexDirection: "row", fontSize: 14, marginBottom:8 }}>
+                      <View style={{ width: "30%" }}>
+                        <Text>Tổng cộng:</Text>
+                      </View>
+                      <View style={{ width: "70%" }}>
+                        <Text>{bill?.amountPaid?.toLocaleString("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                        })}</Text>
+                      </View>
+                    </View>
+                    
+                </View>
+                
               </View>
             )}
           </View>

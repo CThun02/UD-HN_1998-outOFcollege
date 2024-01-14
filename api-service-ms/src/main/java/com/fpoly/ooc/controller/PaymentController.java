@@ -3,14 +3,18 @@ package com.fpoly.ooc.controller;
 import com.fpoly.ooc.config.PaymentConfig;
 import com.fpoly.ooc.dto.EmailDetails;
 import com.fpoly.ooc.entity.Bill;
+import com.fpoly.ooc.entity.DeliveryNote;
 import com.fpoly.ooc.entity.Timeline;
 import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.BillRepo;
 import com.fpoly.ooc.repository.TimeLineRepo;
 import com.fpoly.ooc.responce.timeline.TimelineClientResponse;
+import com.fpoly.ooc.service.interfaces.DeliveryNoteService;
 import com.fpoly.ooc.service.interfaces.EmailService;
 import com.fpoly.ooc.service.interfaces.TimeLineService;
+import com.fpoly.ooc.util.CommonUtils;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,6 +36,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TimeZone;
 
 
@@ -51,6 +56,9 @@ public class PaymentController {
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private DeliveryNoteService deliveryNoteService;
 
     @GetMapping("/pay")
     public String payment(@RequestParam("price") Long price,
@@ -135,15 +143,24 @@ public class PaymentController {
         String email = queryParams.get("email");
         if ("00".equals(responseCode)) {
             Bill bill = billRepo.findById(billId).orElseThrow(() -> new NotFoundException("Bill id không tồn tại"));
+            DeliveryNote deliveryNote = deliveryNoteService.getDeliveryNoteByBill_Id(billId);
             TimelineClientResponse timelineResponse = timeLineService.getTimelineByBillCode(bill.getBillCode());
             bill.setTransactionCode(transactionNo);
-//            bill.setAmountPaid(new BigDecimal(amount).divide(BigDecimal.valueOf(100L)));
+            bill.setAmountPaid(new BigDecimal(amount).divide(BigDecimal.valueOf(100L)));
             bill.setStatus("wait_for_confirm");
             billRepo.save(bill);
             StringBuilder stringBuilder = new StringBuilder();
             BigDecimal totalPrice = BigDecimal.ZERO;
+            double totalPriceProduct = 0d;
             DecimalFormat formatter = new DecimalFormat("###,###,###");
             for (int i = 0; i < timelineResponse.getLstProduct().size(); i++) {
+                String path = null;
+                if (CollectionUtils.isNotEmpty(timelineResponse.getLstProduct().get(i).getProductImageResponses())) {
+                    if (Objects.nonNull(timelineResponse.getLstProduct().get(i).getProductImageResponses().get(0))) {
+                        path = timelineResponse.getLstProduct().get(i).getProductImageResponses().get(0).getPath();
+                    }
+                }
+                totalPriceProduct = CommonUtils.bigDecimalConvertDouble(timelineResponse.getLstProduct().get(i).getProductPrice().multiply(new BigDecimal(timelineResponse.getLstProduct().get(i).getQuantity())));
                 BigDecimal productPrice = timelineResponse.getLstProduct().get(i).getProductPrice();
                 totalPrice = totalPrice.add(productPrice);
                 stringBuilder.append("<div key=\"{index}\" style=\"display: flex; justify-content: space-between; align-items: center; padding: 4px 20px\">\n" +
@@ -151,7 +168,7 @@ public class PaymentController {
                 stringBuilder.append("                <img\n");
                 stringBuilder.append("                  alt=\"product\"\n");
                 stringBuilder.append("                  style=\"width: 100%; border: 1px solid #ccc; border-radius: 8px\"\n");
-                stringBuilder.append("                  src=").append(timelineResponse.getLstProduct().get(i).getProductImageResponses().get(0).getPath());
+                stringBuilder.append("                  src=").append(Objects.nonNull(path) ? path : null);
                 stringBuilder.append("                  }\n");
                 stringBuilder.append("                />\n");
                 stringBuilder.append("              </div>\n");
@@ -232,8 +249,16 @@ public class PaymentController {
                     "            <hr />\n" +
                     "            <div style=\"width: 70%; float: right; padding: 4px 20px\">\n" +
                     "              <div style=\"text-align: center\">\n" +
+                    "                <span style=\"font-size: 24px\">Phiếu giảm giá:</span>\n" +
+                    "                <span style=\"font-size: 24px\"> " + formatter.format(new BigDecimal(totalPriceProduct + CommonUtils.bigDecimalConvertDouble(deliveryNote.getShipPrice()) -  CommonUtils.bigDecimalConvertDouble(new BigDecimal(amount).divide(BigDecimal.valueOf(100L)))))+"đ </span>\n" +
+                    "              </div>\n" +
+                    "               <div style=\"text-align: center\">\n " +
+                    "                   <span style=\"font-size: 24px\">Phí vận chuyển:</span>\n" +
+                    "                   <span style=\"font-size: 24px\"> " + formatter.format(deliveryNote.getShipPrice())+"đ </span>\n" +
+                    "              </div>\n" +
+                    "              <div style=\"text-align: center\">\n" +
                     "                <span style=\"font-size: 24px\">Tổng giá trị sản phẩm:</span>\n" +
-                    "                <span style=\"font-size: 24px\"> " + formatter.format(totalPrice)+"đ </span>\n" +
+                    "                <span style=\"font-size: 24px\"> " + formatter.format(new BigDecimal(amount).divide(BigDecimal.valueOf(100L)))+"đ </span>\n" +
                     "              </div>\n" +
                     "            </div>" +
                     "          </div>\n" +

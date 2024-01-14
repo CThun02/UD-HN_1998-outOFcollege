@@ -98,17 +98,56 @@ const BillManagement = () => {
       title: "Tên nhân viên",
       key: "employee",
       render: (_, record) => {
-        return record.employee?.includes("_") ? (
-          <span>
-            {record.employee?.substring(record.employee.indexOf("_") + 1)}{" "}
-            <br />
-            {record.employee?.substring(0, record.employee.indexOf("_"))}
-          </span>
-        ) : record.status === "Cancel" ? (
-          "Đã hủy"
-        ) : (
-          "Chờ xác nhận"
-        );
+        if (record.employee?.includes("_")) {
+          return (
+            <span>
+              {record.employee?.substring(record.employee?.indexOf("_") + 1)}{" "}
+              <br />
+              {record.employee?.substring(0, record.employee?.indexOf("_"))}
+            </span>
+          );
+        }
+
+        if (record.employee === "CLIENT") {
+          if (record.billUpdatedBy?.includes("_")) {
+            return (
+              <span>
+                {record.billUpdatedBy?.substring(
+                  record.billUpdatedBy?.indexOf("_") + 1
+                )}{" "}
+                <br />
+                {record.billUpdatedBy?.substring(
+                  0,
+                  record.billUpdatedBy?.indexOf("_")
+                )}
+              </span>
+            );
+          }
+
+          if (record.billUpdatedBy === "SYSTEM") {
+            return <span>Hệ thống</span>;
+          }
+        }
+
+        if (!record.employee) {
+          if (record.billUpdatedBy === "SYSTEM") {
+            return <span>Hệ thống</span>;
+          }
+          if (record.billUpdatedBy?.includes("_")) {
+            return (
+              <span>
+                {record.billUpdatedBy?.substring(
+                  record.billUpdatedBy?.indexOf("_") + 1
+                )}{" "}
+                <br />
+                {record.billUpdatedBy?.substring(
+                  0,
+                  record.billUpdatedBy?.indexOf("_")
+                )}
+              </span>
+            );
+          }
+        }
       },
     },
     {

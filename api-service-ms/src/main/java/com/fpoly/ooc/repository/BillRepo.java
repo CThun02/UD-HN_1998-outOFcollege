@@ -76,7 +76,7 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
 
     @Query("SELECT DISTINCT new com.fpoly.ooc.responce.bill.BillManagementResponse(b.id, b.billCode, COUNT(tl.id)," +
             "   b.price, dn.name, dn.phoneNumber, b.createdAt, b.billType, b.symbol, b.status, dn.shipPrice," +
-            "   b.priceReduce, b.createdBy, a.fullName, a.numberPhone) " +
+            "   b.priceReduce, b.createdBy, a.fullName, a.numberPhone, b.updatedBy) " +
             "FROM Bill b LEFT JOIN Account a ON a.username = b.account.username " +
             "   LEFT JOIN DeliveryNote dn ON dn.bill.id = b.id " +
             "   LEFT JOIN Timeline tl ON tl.bill.id = b.id " +
@@ -90,7 +90,7 @@ public interface BillRepo extends JpaRepository<Bill, Long> {
             "       or tl.status like '5' or tl.status like '6') " +
             "GROUP BY b.id, b.billCode, b.price, b.createdAt, b.billType, b.status, " +
             "    b.symbol, dn.shipPrice, b.priceReduce, dn.name, dn.phoneNumber, b.createdBy, " +
-            "    a.fullName, a.numberPhone " +
+            "    a.fullName, a.numberPhone, b.updatedBy " +
             "   having (:symbol IS NULL OR (b.symbol like :symbol and b.status not like 'Cancel' " +
             "       AND (:count IS NULL OR COUNT(tl.id) = :count))) "+
             "ORDER BY b.createdAt DESC ")

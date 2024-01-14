@@ -227,8 +227,9 @@ public class BillServiceImpl implements BillService {
                     statusPaymentDetail = "Unpaid";
                 } else {
                     statusPaymentDetail = "Paid";
+                    paymentDetail.setPrice(request.getAmountPaid());
                 }
-//                paymentDetail.setPrice(request.getAmountPaid());
+
             } else {
                 if (!request.getPaymentInDelivery()) {
                     if (request.getPaymentDetailId() == 1) {

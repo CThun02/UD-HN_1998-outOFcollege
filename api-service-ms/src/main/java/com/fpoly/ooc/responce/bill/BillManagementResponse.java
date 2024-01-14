@@ -44,4 +44,6 @@ public class BillManagementResponse {
 
     private String accountPhoneNumber;
 
+    private String billUpdatedBy;
+
 }

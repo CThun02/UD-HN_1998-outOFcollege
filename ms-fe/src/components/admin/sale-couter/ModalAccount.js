@@ -77,9 +77,9 @@ const ModalAccount = ({
     setEmail(addressDefault?.email)
     setFullname(addressDefault?.fullName);
     setPhoneNumber(addressDefault?.sdt)
-    setProvinces(addressDefault?.city?.substring(0, addressDefault?.city.indexOf("|")));
-    setWards(addressDefault?.ward.substring(0,addressDefault?.ward.indexOf("|") ))
-    setDistricts(addressDefault?.district.substring(0, addressDefault?.district.indexOf("|") ))
+    setProvinces(addressDefault?.city);
+    setWards(addressDefault?.ward)
+    setDistricts(addressDefault?.district)
     setDetailAddress(addressDefault?.detailAddress)
 
     localStorage.setItem(cartId, JSON.stringify(cart));

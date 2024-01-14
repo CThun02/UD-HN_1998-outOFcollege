@@ -338,6 +338,13 @@ const Bill = () => {
     setSelectedAddress({});
     setShippingFee(null);
     setLeadtime(null);
+    setFullname(null);
+    setEmail(null);
+    setPhoneNumber(null);
+    setDetailAddress(null)
+    setSelectedProvince(null);
+    setSelectedDictrict(null);
+    setSelectedWard(null);
     setRendered(Math.random);
   };
   const handleShowModalAccount = (index) => {
@@ -433,7 +440,6 @@ const Bill = () => {
   };
 
   const handleWardChange = (value) => {
-    console.log(value)
     setSelectedWard(value);
   };
 
@@ -532,7 +538,6 @@ const Bill = () => {
           setShippingFee(response?.data?.data?.total);
         })
         .catch((error) => {
-          console.log("Lỗi khi gọi API lần 1:", error);
           service_id = 53322;
           values.service_id = service_id;
           axios
@@ -550,7 +555,6 @@ const Bill = () => {
               setShippingFee(response?.data?.data?.total);
             })
             .catch((err) => {
-              console.log(values);
               console.log("Lỗi khi gọi API lần 2:", err);
             });
         });
@@ -588,11 +592,14 @@ const Bill = () => {
 
   // chuyển tab
   const onChange = (newActiveKey) => {
-    console.log("newActiveKey: ", newActiveKey);
     setPrice("0");
     setCartId(newActiveKey);
     setActiveKey(newActiveKey);
     setSelectedOption(1);
+    setFullname(null);
+    setEmail(null);
+    setPhoneNumber(null);
+    setDetailAddress(null)
     setSelectedProvince(null);
     setSelectedDictrict(null);
     setSelectedWard(null);
@@ -755,7 +762,6 @@ const Bill = () => {
 
   // hiển thị danh sách sản phẩm trong giỏ hàng
   const getProductDetails = () => {
-    console.log("getProductDetails");
     var cart = JSON.parse(localStorage.getItem(cartId));
     var productDetails = cart?.productDetails;
 
@@ -897,7 +903,7 @@ const Bill = () => {
   useEffect(() => {
     getListAddressByUsername(account?.username);
     fetchProvinces();
-    if (selectedAddress?.city) {
+    if (selectedWard) {
       const city = selectedProvince?.substring(
         1 + selectedProvince?.indexOf("|")
       );
@@ -908,8 +914,6 @@ const Bill = () => {
         1 + selectedWard?.indexOf("|")
       );
 
-      handleProvinceChange(city);
-      handleDistrictChange(district);
       handleShippingOrderLeadtime(district, ward);
       handleShippingFee(totalPrice, district, ward);
     } else {
@@ -931,7 +935,6 @@ const Bill = () => {
     cartId,
     render,
     account?.username,
-    selectedDictrict,
     selectedWard,
     modalQRScanOpen,
   ]);
@@ -1301,23 +1304,23 @@ const Bill = () => {
         async onOk() {
           let addressId;
           let hasError = false;
-          if (!account && switchChange[index]) {
+          if (switchChange[index]) {
             try {
               await schema.validate(billAddress, { abortEarly: false });
               setErrors({});
-              const response = await axios.post(
-                "http://localhost:8080/api/admin/address",
-                billAddress,
-                {
-                  headers: {
-                    Authorization: `Bearer ${getToken(true)} `,
-                  },
-                }
-              );
+                const response = await axios.post(
+                  "http://localhost:8080/api/admin/address",
+                  billAddress,
+                  {
+                    headers: {
+                      Authorization: `Bearer ${getToken(true)} `,
+                    },
+                  }
+                );
               addressId = response?.data?.id;
             } catch (error) {
               const validationErrors = {};
-              error.inner.forEach((err) => {
+              error?.inner?.forEach((err) => {
                 validationErrors[err?.path] = err.message;
               });
               setErrors(validationErrors);
@@ -1346,7 +1349,7 @@ const Bill = () => {
                 "http://localhost:8080/api/admin/delivery-note",
                 {
                   billId: response.data.id,
-                  addressId: account ? selectedAddress?.id : addressId,
+                  addressId: addressId,
                   name: fullname,
                   phoneNumber: phoneNumber,
                   shipDate: switchChange[index] === true ? leadtime : null,
@@ -1677,7 +1680,6 @@ const Bill = () => {
                               <b style={{ color: "red" }}>*</b> Tỉnh/ thành phố
                             </span>
                             <br />
-                            {selectedProvince}
                             <Select
                               style={{ width: "100%" }}
                               value={selectedProvince}
@@ -1687,6 +1689,17 @@ const Bill = () => {
                                   event
                                 )
                               }
+                              optionFilterProp="children"
+                                  filterOption={(input, option) =>
+                                    (option?.label ?? "").includes(input)
+                                  }
+                                  filterSort={(optionA, optionB) =>
+                                    (optionA?.label ?? "")
+                                      .toLowerCase()
+                                      .localeCompare(
+                                        (optionB?.label ?? "").toLowerCase()
+                                      )
+                                  }
                               placeholder={"Chọn Tỉnh/ thành phố"}
                             >
                               {provinces &&
@@ -1719,9 +1732,7 @@ const Bill = () => {
                                   event
                                 );
                               }}
-                              value={
-                                selectedDictrict
-                              }
+                              value={selectedDictrict?.includes("|")?selectedDictrict.substring(0, selectedDictrict.indexOf("|")):selectedDictrict}
                               placeholder={"Chọn Quận/ huyện"}
                             >
                               {districts &&
@@ -1749,11 +1760,10 @@ const Bill = () => {
                               <b style={{ color: "red" }}>*</b> Phường/ xã
                             </span>
                             <br />
-                            {console.log("CHECK :"+selectedWard)}
                             <Select
                               style={{ width: "100%" }}
                               onChange={handleWardChange}
-                              value={selectedWard}
+                              value={selectedWard?.includes("|")?selectedWard.substring(0, selectedWard.indexOf("|")):selectedWard}
                               placeholder={"Chọn Phường/ xã"}
                             >
                               {wards &&

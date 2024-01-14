@@ -3,6 +3,7 @@ package com.fpoly.ooc.service.impl;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
 import com.fpoly.ooc.dto.CustomerConditionDTO;
+import com.fpoly.ooc.dto.EmailDetails;
 import com.fpoly.ooc.dto.UserDTO;
 import com.fpoly.ooc.entity.*;
 import com.fpoly.ooc.exception.NotFoundException;
@@ -16,6 +17,7 @@ import com.fpoly.ooc.responce.account.AccountVoucher;
 import com.fpoly.ooc.responce.voucher.VoucherResponse;
 import com.fpoly.ooc.service.interfaces.AccountService;
 import com.fpoly.ooc.service.interfaces.AddressDetailService;
+import com.fpoly.ooc.service.interfaces.EmailService;
 import com.fpoly.ooc.utilities.UniqueRandomHex;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -30,10 +32,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.nio.CharBuffer;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -45,15 +44,15 @@ public class AccountServiceImpl implements AccountService {
     private AddressDetailRepository addressDetailRepository;
     private AddressDetailService addressDetailService;
     private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
+    private EmailService emailService;
 
     @Autowired
-    public AccountServiceImpl(AccountRepository accountRepository, AddressRepository addressRepository,
-                              AddressDetailRepository addressDetailRepository, AddressDetailService addressDetailService) {
+    public AccountServiceImpl(AccountRepository accountRepository, AddressRepository addressRepository, AddressDetailRepository addressDetailRepository, AddressDetailService addressDetailService, EmailService emailService) {
         this.accountRepository = accountRepository;
         this.addressRepository = addressRepository;
         this.addressDetailRepository = addressDetailRepository;
         this.addressDetailService = addressDetailService;
+        this.emailService = emailService;
     }
 
     @Override
@@ -85,7 +84,6 @@ public class AccountServiceImpl implements AccountService {
                 .build();
         account.setPassword(passwordEncoder.encode(CharBuffer.wrap("12345")));
         Account createAccount = accountRepository.save(account);
-
         Address address = Address.builder()
                 .fullName(request.getFullName())
                 .sdt(request.getNumberPhone())
@@ -103,6 +101,18 @@ public class AccountServiceImpl implements AccountService {
                     .addressDetail(createAddress)
                     .build();
             addressDetailRepository.save(addressDetail);
+        }
+        String title = ErrorCodeConfig.getFormatMessage(Const.HTML_TITLE, "Đăng kí tài khoản");
+        String body = ErrorCodeConfig.getFormatMessage(Const.HTML_BODY,
+                "Chúc mừng bạn đã đăng kí tài khoản thành công.", "<p style=\"font-size: 16px;\">Tên tài khoản: "
+                        + createAccount.getUsername() + "</p>" + "<p style=\"font-size: 16px;\">Mật khẩu: " + request.getPassword() + "</p>",
+                "Cảm ơn bạn đã tin tưởng và đồng hành cùng chúng tôi. Bạn có thể đăng nhập vào website của chúng tôi tại đây. Chúc một ngày tốt lành!!");
+        if(Objects.nonNull(createAccount)) {
+            EmailDetails emailDetails = new EmailDetails();
+            emailDetails.setMessageBody(Const.SEND_EMAIL_TEMPLATE_START_WITH_h1 + title + Const.SEND_EMAIL_TEMPLATE_BODY_CENTER + body + Const.SEND_EMAIL_TEMPLATE_END);
+            emailDetails.setSubject("Đăng kí tài khoản");
+            emailDetails.setRecipient(List.of(createAccount.getEmail()));
+            emailService.sendSimpleMail(emailDetails);
         }
         return createAccount;
     }

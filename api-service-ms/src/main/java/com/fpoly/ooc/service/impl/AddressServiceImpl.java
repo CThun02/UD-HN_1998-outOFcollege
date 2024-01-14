@@ -56,4 +56,13 @@ public class AddressServiceImpl implements AddressServiceI {
     public List<Address> getListAddress(String username) {
         return repo.getListAddress(username);
     }
+
+    @Override
+    public Address getByCom(String ward, String district, String city, String descriptionDetail) {
+        List<Address> lst = repo.getListAddressByCom(ward, district, city, descriptionDetail);
+        if(lst.isEmpty()){
+            return null;
+        }
+        return lst.get(0);
+    }
 }

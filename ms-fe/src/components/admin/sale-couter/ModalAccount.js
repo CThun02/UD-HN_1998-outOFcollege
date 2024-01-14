@@ -1,4 +1,4 @@
-import { SearchOutlined } from "@ant-design/icons";
+import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import { Button, Col, Modal, Row, Table, notification, Radio } from "antd";
 import Input from "antd/es/input/Input";
 import axios from "axios";
@@ -14,7 +14,13 @@ const ModalAccount = ({
   cartId,
   render,
   address,
-  phoneNumber,
+  setEmail,
+  setFullname,
+  setPhoneNumber,
+  setProvinces,
+  setWards,
+  setDistricts,
+  setDetailAddress
 }) => {
   const [loading, setLoadding] = useState(true);
   const [renderThis, setRenderThis] = useState(null);
@@ -57,15 +63,60 @@ const ModalAccount = ({
     }
   }
 
+  function createAccount(){
+    Modal.confirm({
+      centered:true,
+      title:"Xác nhận thêm mới khách hàng",
+      onOk:()=>{
+        axios.post(`http://localhost:8080/api/admin/account/create`, account,
+        {
+          headers: {
+            Authorization: `Bearer ${getToken(true)}`,
+          },
+        })
+        .then(Response=>{
+          setRenderThis(Math.random())
+          setVisibleCreate(false);
+          handelSetAccount("fullName", " ");
+          handelSetAccount("numberPhone", " ");
+          handelSetAccount("email", " ");
+          handelSetAccount("idNo", generateUniqueRandomHex(12))
+          notification.success({
+            message:"Thông báo",
+            description: "Thêm mới thành công",
+          })
+          console.log(Response.data)
+        }).catch(err=>{
+          notification.error({
+            message:"Thông báo",
+            description: err?.response?.data,
+          })
+          console.log(err?.response?.data)
+        })
+      }
+    })
+    
+  }
+
   const add = (value) => {
     cart.account = value;
-    address(
-      value?.accountAddress?.filter(
+    var addressDefault = value?.accountAddress?.filter(
         (address) => (
           address.defaultaddress === true
         )
       )[0]
+    address(
+      addressDefault
     );
+    console.log(addressDefault)
+    setEmail(addressDefault?.email)
+    setFullname(addressDefault?.fullName);
+    setPhoneNumber(addressDefault?.sdt)
+    setProvinces(addressDefault?.city);
+    setWards(addressDefault?.ward)
+    setDistricts(addressDefault?.district)
+    setDetailAddress(addressDefault?.detailAddress)
+
     localStorage.setItem(cartId, JSON.stringify(cart));
     render(Math.random);
     onCancel();
@@ -160,7 +211,7 @@ const ModalAccount = ({
   return (
     <div>
       <Modal
-        title="Tìm kiếm khách hàng"
+        title="Thêm mới khách hàng"
         key={cartId}
         open={visibleCreate}
         onCancel={() => {
@@ -174,7 +225,7 @@ const ModalAccount = ({
           <Col offset={2} span={20}>
             <Row>
               <Col span={24}>
-                <span style={{ fontWeight: "500" }}>Tên khách hàng</span>
+                <span style={{ fontWeight: "500" }}>Tên khách hàng <span style={{color:"red"}}>*</span></span>
                 <Input
                   value={account?.fullName}
                   onChange={(event) => { handelSetAccount("fullName", event.target.value) }}
@@ -183,7 +234,7 @@ const ModalAccount = ({
                 />
               </Col>
               <Col span={24}>
-                <span style={{ fontWeight: "500" }}>Số điện thoại</span>
+                <span style={{ fontWeight: "500" }}>Số điện thoại <span style={{color:"red"}}>*</span></span>
                 <Input
                   value={account?.numberPhone}
                   onChange={(event) => { handelSetAccount("numberPhone", event.target.value.replace(/[^\d]/g, "")) }}
@@ -192,7 +243,7 @@ const ModalAccount = ({
                 />
               </Col>
               <Col span={24}>
-                <span style={{ fontWeight: "500" }}>Email</span>
+                <span style={{ fontWeight: "500" }}>Email <span style={{color:"red"}}>*</span></span>
                 <Input
                   value={account?.email}
                   onChange={(event) => { handelSetAccount("email", event.target.value.replace(" ", "")) }}
@@ -201,7 +252,7 @@ const ModalAccount = ({
                 />
               </Col>
               <Col span={24}>
-                <span style={{ fontWeight: "500" }}>Giới tính</span>
+                <span style={{ fontWeight: "500" }}>Giới tính <span style={{color:"red"}}>*</span></span>
                 <Radio.Group
                   value={account?.gender}
                   onChange={(event) => { handelSetAccount("gender", event.target.value) }}
@@ -212,7 +263,7 @@ const ModalAccount = ({
               </Col>
             </Row>
             <Col span={24} style={{ textAlign: "center" }}>
-              <Button type="primary" size="large">Xác nhận</Button>
+              <Button onClick={()=>createAccount()} type="primary" size="large">Xác nhận</Button>
             </Col>
           </Col>
         </Row>
@@ -240,9 +291,9 @@ const ModalAccount = ({
               }}
             />
           </Col>
-          {/* <Col span={12} style={{ textAlign: "end" }}>
-            <Button size="large" type="primary" onClick={() => { setVisibleCreate(true) }}>Thêm khách hàng</Button>
-          </Col> */}
+          <Col span={12} style={{ marginBottom: "24px", textAlign:"center" }}>
+            <Button type="primary" onClick={()=> setVisibleCreate(true)} size="large" shape="circle" icon={<PlusOutlined />}></Button>
+          </Col>
           <Col span={24}>
             <Table
               columns={columns}

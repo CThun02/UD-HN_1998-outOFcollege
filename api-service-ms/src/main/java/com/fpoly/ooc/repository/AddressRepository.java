@@ -32,8 +32,14 @@ public interface AddressRepository extends JpaRepository<Address, Long> {
     """)
     List<AddressDTO> addressByUsername(String username);
 
+
+    @Query("Select ad from Address ad where ad.ward like ?1 and ad.district like ?2" +
+            " and ad.city like ?3  and ad.descriptionDetail like ?4 ")
+    List<Address> getListAddressByCom(String ward, String district, String city, String descriptionDetail);
+
     @Query("SELECT add " +
             "FROM Address add JOIN AddressDetail ad ON add.id = ad.addressDetail.id " +
             "WHERE ad.accountAddress.username = :username")
     List<Address> getListAddress(@Param("username") String username);
+
 }

@@ -327,11 +327,6 @@ const ProductDetailsTable = (props) => {
                   }
                 })
                 .catch((error) => {
-                  console.log(error);
-                  notification.error({
-                    message: "Thông báo",
-                    description: "Thêm mới các chi tiết sản phẩm Thất bại",
-                  });
                   return null;
                 });
             }

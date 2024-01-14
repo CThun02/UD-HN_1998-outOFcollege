@@ -21,7 +21,7 @@ public class TimeLineResponse {
 
     private String status;
 
-    @JsonFormat(pattern = "HH:mm:ss dd/MM/yyyy")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     private LocalDateTime createdDate;
 
     private String createdBy;
@@ -30,7 +30,7 @@ public class TimeLineResponse {
 
     private String billStatus;
 
-    @JsonFormat(pattern = "HH:mm:ss dd/MM/yyyy")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     private LocalDateTime completionDate;
 
     private BigDecimal totalPrice;

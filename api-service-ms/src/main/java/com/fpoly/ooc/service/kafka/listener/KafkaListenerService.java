@@ -402,18 +402,14 @@ public class KafkaListenerService {
 
     @KafkaListener(topics = Const.TOPIC_TIME_LINE, groupId = Const.KAFKA_GROUP_ID)
     public void listenerTimeline(String billJson) throws JsonProcessingException {
-        BillStatusDTO bill = null;
+        Bill bill = null;
         if (StringUtils.isNotBlank(billJson)) {
-            bill = objectMapper.readValue(billJson, BillStatusDTO.class);
+            bill = objectMapper.readValue(billJson, Bill.class);
         }
 
         Bill billDb = null;
         if(Objects.nonNull(bill)) {
-            Bill billReq = new Bill();
-            billReq.setId(bill.getId());
-            billReq.setAmountPaid(bill.getAmountPaid());
-            billReq.setStatus(bill.getStatus());
-            billDb = billRepo.save(billReq);
+            billDb = billRepo.save(bill);
         }
 
         if(Objects.nonNull(billDb)) {

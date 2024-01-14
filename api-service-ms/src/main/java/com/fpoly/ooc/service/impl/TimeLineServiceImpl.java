@@ -45,6 +45,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -155,6 +156,29 @@ public class TimeLineServiceImpl implements TimeLineService {
         if (Objects.isNull(request)) {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_SERVICE));
         }
+        // TODO: FIND NEW STATUS FOR TIMELINE
+        Timeline timelineFromBillId = timeLineRepo.findStatusTimelineByCreateDateDESC(billId);
+        if (Objects.isNull(timelineFromBillId)) {
+            throw new NotFoundException(Const.ERROR_BILL_NOT_FOUND);
+        }
+
+        List<String> statusNotCompare = Arrays.asList("Rollback", "Delete", "2Cancel", "Update", "0");
+        //TODO: COMPARE STATUS TIMELINE AND STATUS REQUEST
+        boolean isCheck = true;
+        for (String str: statusNotCompare) {
+            if (str.equalsIgnoreCase(request.getStatus())) {
+                isCheck = false;
+                break;
+            }
+        }
+        if (isCheck) {
+            int status = Integer.parseInt(timelineFromBillId.getStatus());
+            String statusStr = String.valueOf(++status);
+            if (!request.getStatus().equalsIgnoreCase(statusStr)) {
+                request.setStatus(statusStr);
+            }
+        }
+
         Timeline timeline = new Timeline();
 
         Optional<Timeline> existingTimeline = Optional.empty();

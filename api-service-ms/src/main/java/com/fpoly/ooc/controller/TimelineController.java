@@ -48,13 +48,6 @@ public class TimelineController {
     public ResponseEntity<?> createTimelineByBillId(
             @PathVariable("id") Long id,
             @RequestBody(required = false) TimeLinerequest request) throws JsonProcessingException, NotFoundException {
-//        Bill bill = billRepo.findById(id).orElse(null);
-////
-////        if (bill != null) {
-////            bill.setCreatedBy(request.getCreatedBy());
-////            billRepo.save(bill);
-////        }
-
         return ResponseEntity.ok(timeLineService.createTimeLine(id, request));
     }
 

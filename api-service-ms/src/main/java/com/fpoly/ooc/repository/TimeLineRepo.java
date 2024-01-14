@@ -82,5 +82,12 @@ public interface TimeLineRepo extends JpaRepository<Timeline, Long> {
             "   LEFT JOIN Account acc ON acc.username = b.account.username " +
             "WHERE b.id = :billId ")
     List<BillInfoResponse> getBillInfoByIdBillId(@Param("billId") Long id);
+
+    @Query(value = """
+            select top 1 * from time_line timeline where timeline.bill_id = ?1
+            and timeline.status not in ('2Cancel', 'Delete', 'Rollback', 'Update')
+            order by timeline.created_at DESC
+        """, nativeQuery = true)
+    Timeline findStatusTimelineByCreateDateDESC(Long billId);
 }
 

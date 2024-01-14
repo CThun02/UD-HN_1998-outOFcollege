@@ -85,13 +85,23 @@ const BillTimeLine = (addId) => {
         },
       })
       .then((response) => {
-        setLoading(false);
         setTimelines([...timelines, response.data]);
         setRender(response.data);
       })
       .catch((error) => {
-        setLoading(false);
         const status = error.response?.status;
+        const dataError = error?.response?.data;
+
+        if (
+          dataError?.message.includes(
+            "Chỉ hủy hóa đơn khi đơn đang chờ xác nhận."
+          )
+        ) {
+          notification.error({
+            message: "Thông báo",
+            description: "Chỉ hủy hóa đơn khi đơn hàng đang chờ xác nhận",
+          });
+        }
         if (status === 403) {
           notification.error({
             message: "Thông báo",
@@ -101,10 +111,9 @@ const BillTimeLine = (addId) => {
       });
   };
 
-  const handleUpdateBillStatus = (status, price, timelineStatus) => {
+  const handleUpdateBillStatus = async (status, price, timelineStatus) => {
     setLoading(true);
-
-    axios
+    await axios
       .put(
         `http://localhost:8080/api/admin/bill`,
         {
@@ -120,11 +129,9 @@ const BillTimeLine = (addId) => {
         }
       )
       .then((response) => {
-        setLoading(false);
         setRender(response.data.amountPaid);
       })
       .catch((error) => {
-        setLoading(false);
         const status = error.response.status;
         if (status === 403) {
           notification.error({
@@ -169,6 +176,7 @@ const BillTimeLine = (addId) => {
   };
 
   const handleOkConFirm = (note) => {
+    setLoading(true);
     // loại bỏ status Update
     const includesStatus = [
       "Update",
@@ -180,11 +188,14 @@ const BillTimeLine = (addId) => {
     const newTimelines = timelines.filter(
       (e) => !includesStatus.includes(e.status)
     );
-    const timelinesSortDate = newTimelines.sort(
-      (a, b) =>
-        moment(b.createdDate, "HH:mm:ss DD/MM/YYYY").toDate() -
-        moment(a.createdDate, "HH:mm:ss DD/MM/YYYY").toDate()
-    );
+    const timelinesSortDate = newTimelines.sort((a, b) => {
+      const dateA = new Date(a.createdDate).toISOString();
+      const dateB = new Date(b.createdDate).toISOString();
+
+      if (dateA > dateB) return -1;
+      if (dateA < dateB) return 1;
+      return 0;
+    });
 
     let timelineStatus = "";
     switch (action) {
@@ -209,7 +220,7 @@ const BillTimeLine = (addId) => {
     }
 
     let billStatus = "";
-    let statusTimeline = timelinesSortDate[0].status;
+    let statusTimeline = String(Number(timelinesSortDate[0].status) + 1);
     if (billInfo.symbol === "Shipping") {
       if (action === "cancel" || action === "0") {
         billStatus = "Cancel";
@@ -250,7 +261,6 @@ const BillTimeLine = (addId) => {
     setIsModalDetail(false);
   };
   const getTimeline = async () => {
-    setLoading(true);
     await axios
       .get(`http://localhost:8080/api/admin/timeline/${billId}`, {
         headers: {
@@ -258,8 +268,6 @@ const BillTimeLine = (addId) => {
         },
       })
       .then((response) => {
-        setLoading(false);
-
         if (response.data) {
           var timelinesPush = [];
           for (let index = 0; index < response.data.length; index++) {
@@ -269,11 +277,10 @@ const BillTimeLine = (addId) => {
           }
           setTimlneDisplay(timelinesPush);
           setTimelines(response.data);
+          return true;
         }
       })
       .catch((error) => {
-        setLoading(false);
-
         const status = error.response?.status;
         if (status === 403) {
           notification.error({
@@ -285,8 +292,6 @@ const BillTimeLine = (addId) => {
   };
 
   const getProduct = async () => {
-    setLoading(true);
-
     await axios
       .get(`http://localhost:8080/api/admin/timeline/${billId}/product`, {
         headers: {
@@ -294,14 +299,10 @@ const BillTimeLine = (addId) => {
         },
       })
       .then((response) => {
-        setLoading(false);
-
         setTimelinesPoduct(response?.data);
+        return true;
       })
       .catch((error) => {
-        setLoading(false);
-
-        console.log(error);
         const status = error.response?.status;
         if (status === 403) {
           notification.error({
@@ -313,8 +314,6 @@ const BillTimeLine = (addId) => {
   };
 
   const getInfo = async () => {
-    setLoading(true);
-
     await axios
       .get(`http://localhost:8080/api/admin/timeline/${billId}/info`, {
         headers: {
@@ -322,14 +321,11 @@ const BillTimeLine = (addId) => {
         },
       })
       .then((response) => {
-        setLoading(false);
-
         setBillInfo(response?.data);
         setShippingPrice(numeral(response?.data?.shipPrice));
+        return true;
       })
       .catch((error) => {
-        setLoading(false);
-
         const status = error.response?.status;
         if (status === 403) {
           notification.error({
@@ -340,12 +336,18 @@ const BillTimeLine = (addId) => {
       });
   };
   useEffect(() => {
-    console.log("useEffct: 1");
-    getTimeline();
-    getProduct();
-    getInfo();
+    setLoading(true);
+    const isTimeline = getTimeline();
+    const isProduct = getProduct();
+    const isInfo = getInfo();
+    if (isTimeline && isProduct && isInfo) {
+      setLoading(false);
+    }
+
+    console.log("data: ", isTimeline, isProduct, isInfo);
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [billId, render, isModalConfirm]);
+  }, [billId, render, isModalConfirm, loading]);
 
   const updateQUantityBillDetail = (record, value, index) => {
     setLoading(true);
@@ -418,8 +420,6 @@ const BillTimeLine = (addId) => {
       })
       .catch((err) => {
         setLoading(false);
-
-        console.log(err);
         notification.error({
           message: "Thông báo",
           description: "Đã xảy ra lỗi, vui lòng thử lại",
@@ -452,8 +452,6 @@ const BillTimeLine = (addId) => {
       })
       .catch((err) => {
         setLoading(false);
-
-        console.log(err);
       });
     setIsModalConfirm(false);
     setRender(Math.random());

@@ -348,17 +348,26 @@ const Cart = (props) => {
   ];
 
   const [timer, setTimer] = useState(null);
-  const handleUpdateQuantityApi = (id, value) => {
+  const handleUpdateQuantityApi = (id, value, currentValue) => {
+    if (value === currentValue) {
+      return;
+    }
     clearTimeout(timer);
     const newTimer = setTimeout(() => {
       axios
         .put(`${cartAPI}?cartDetailId=${id}&quantity=${value}`)
         .then((response) => {
-          console.log("data: ", response);
-          let message = "Cập nhật thành công";
-          if (!response?.data) {
+          console.log("dataResponse: ", response);
+          let message = "";
+          if (response?.data?.includes("update")) {
             message =
               "Tổng tiền quá 10 triệu, hệ thống đã cập nhật lại số lượng tối đa bạn có thể thêm";
+          } else if (response?.data?.includes("delete")) {
+            message = "Số lượng không đủ. Đã xóa sản phẩm khỏi giỏ hàng";
+          } else if (response?.data?.includes("complete")) {
+            message = "Cập nhật thành công";
+          } else if (response?.data?.includes("error")) {
+            message = "Số lượng trong kho không đủ. Vui lòng giảm số lượng";
           }
           notification.success({
             message: "Thông báo",
@@ -385,6 +394,8 @@ const Cart = (props) => {
     }, 1000);
 
     setTimer(newTimer);
+    setRender(Math.random());
+    props.setRenderHeader(Math.random());
   };
 
   const handleDeleteApi = (id) => {
@@ -542,13 +553,15 @@ const Cart = (props) => {
                     <br />
                     <b>Số lượng: </b>
                     <InputNumber
+                      readOnly={record.disabled}
                       min={1}
                       value={record?.cartDetailResponse?.quantity}
-                      max={record?.cartDetailResponse?.quantityProductDetail}
+                      // max={record?.cartDetailResponse?.quantityProductDetail}
                       onChange={(e) =>
                         handleUpdateQuantityApi(
                           record?.cartDetailResponse?.cartDetailId,
-                          e
+                          e,
+                          record?.cartDetailResponse?.quantity
                         )
                       }
                     />
@@ -669,13 +682,15 @@ const Cart = (props) => {
       render: (_, record, index) => {
         return (
           <InputNumber
+            disabled={record.disabled}
             min={1}
             value={record?.cartDetailResponse?.quantity}
-            max={record?.cartDetailResponse?.quantityProductDetail}
+            // max={record?.cartDetailResponse?.quantityProductDetail}
             onChange={(e) =>
               handleUpdateQuantityApi(
                 record?.cartDetailResponse?.cartDetailId,
-                e
+                e,
+                record?.cartDetailResponse?.quantity
               )
             }
           />

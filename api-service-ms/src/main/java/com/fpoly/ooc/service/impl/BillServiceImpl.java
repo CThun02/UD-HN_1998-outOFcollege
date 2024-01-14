@@ -398,7 +398,6 @@ public class BillServiceImpl implements BillService {
             billDetailList.forEach((el) -> el.setStatus("Complete"));
         }
 
-        billRepo.save(bill);
         if (("Cancel").equals(dto.getStatus())) {
             VoucherHistory voucherHistory = voucherHistoryService.findHistoryByBillCode(bill.getBillCode());
             if (voucherHistory != null) {
@@ -418,7 +417,8 @@ public class BillServiceImpl implements BillService {
             billDetailList.forEach((el) -> el.setStatus("Cancel"));
         }
         billDetailRepo.saveAll(billDetailList);
-        kafkaUtil.sendingObjectWithKafka(dto, Const.TOPIC_TIME_LINE);
+        Bill billDb = billRepo.save(bill);
+        kafkaUtil.sendingObjectWithKafka(bill, Const.TOPIC_TIME_LINE);
         return 1;
     }
 

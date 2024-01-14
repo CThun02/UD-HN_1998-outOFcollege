@@ -1123,7 +1123,7 @@ const Bill = () => {
       city: Yup.string().required("Tỉnh/ thành phố không được để trống"),
       district: Yup.string().required("Quận/ huyện không được để trống"),
       ward: Yup.string().required("Phường/ xã không được để trống"),
-      email: Yup.string().email("Địa chỉ email không hợp lệ"),
+      email: null,
     });
     let calculatedValue = 0;
     if (switchChange[index]) {

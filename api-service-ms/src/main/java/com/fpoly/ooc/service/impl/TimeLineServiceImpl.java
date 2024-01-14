@@ -141,8 +141,9 @@ public class TimeLineServiceImpl implements TimeLineService {
         timelineCustomInfo.setOrderDate(bill.getCreatedAt());
         timelineCustomInfo.setDateOfReceipt(bill.getCompletionDate());
         timelineCustomInfo.setTotalPrice(bill.getPrice());
-        timelineCustomInfo.setPriceReduce(Objects.isNull(voucherHistory)? BigDecimal.ZERO:voucherHistory.getPriceReduce());
+        timelineCustomInfo.setPriceReduce(bill.getPriceReduce());
         timelineCustomInfo.setPricePaid(bill.getAmountPaid());
+        timelineCustomInfo.setBillType(bill.getBillType());
         timelineCustomInfo.setStatus(bill.getStatus());
         timelineClientResponse.setTimelineCustomInfo(timelineCustomInfo);
         return timelineClientResponse;

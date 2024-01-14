@@ -105,13 +105,13 @@ public class BillDetailServiceImpl implements BillDetailService {
     @Transactional(rollbackOn = RuntimeException.class)
     @Override
     public BillDetail updateBillDetail(ProductDetailRequest request, Long billDetailId) throws NotFoundException {
-        if(request.getQuantity()<0){
+        if(request.getQuantity()<=0){
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_QUANTITY_INVALID));
         }
         BillDetail billDetail = billDetailRepo.findById(billDetailId).orElse(null);
         //Tìm hóa đơn đang chỉnh sửa
         Bill bill = billDetail.getBill();
-        ProductDetail productDetail = productDetailService.getOne(request.getId());
+        ProductDetail productDetail = productDetailService.findById(request.getId());
         //Request đối tượng thêm mới gửi xuống bao gồm: Số lượng thêm, giá hiện tại mua, id sản phẩm chi tiết
 
         Integer quantityUpdate = request.getQuantity();

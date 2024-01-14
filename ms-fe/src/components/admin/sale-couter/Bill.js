@@ -1169,7 +1169,7 @@ const Bill = () => {
         if (priceATM && transactionCode) {
           if (transactionCode?.length < 10) {
             isError = true;
-            setTransactionError("Mã giao dịch không hợp lệ");
+            setTransactionError("Vui lòng nhập mã giao dịch lớn hơn 10");
             return;
           } else {
             setTransactionError("");
@@ -1222,7 +1222,7 @@ const Bill = () => {
 
           if (transactionCode?.length < 10) {
             isError = true;
-            setTransactionError("Mã giao dịch không hợp lệ");
+            setTransactionError("Vui lòng nhập mã giao dịch lớn hơn 10");
             return;
           } else {
             setTransactionError("");
@@ -1412,8 +1412,8 @@ const Bill = () => {
       if (/^[+]?\d*\.?\d+$/.test(value)) {
         const replaceValue = value.replace(",", "");
         const data = Number(replaceValue);
-        if (data < 10000) {
-          setShippingFeeError("Số tiền vận chuyển quá nhỏ");
+        if (data < 0) {
+          setShippingFeeError("Số tiền vận chuyển không hợp lệ");
         } else if (data > 1000000) {
           setShippingFeeError("Số tiền vận chuyển quá lớn");
         } else {
@@ -1893,7 +1893,7 @@ const Bill = () => {
                           </span>
                         </Col>
 
-                        {switchChange[index] && shippingFee && (
+                        {switchChange[index] && (
                           <>
                             <Col span={12}>
                               <span

@@ -381,8 +381,8 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
     }
 
     @Override
-    public List<component> getColorProductDetailEdit(Long productDetailId, Long sizeId) {
-        ProductDetail productDetail = this.getOne(productDetailId);
+    public List<component> getColorProductDetailEdit(Long productDetailId, Long sizeId) throws NotFoundException {
+        ProductDetail productDetail = this.findById(productDetailId);
         List<component> colors= productDetail!=null? repo.getColorProductDetailEdit(productDetail.getProduct().getId(), productDetail.getButton().getId(),
                 productDetail.getMaterial().getId(), productDetail.getShirtTail().getId(), productDetail.getSleeve().getId(),
                 productDetail.getCollar().getId(), sizeId, productDetail.getPattern().getId(), productDetail.getForm().getId(),
@@ -397,8 +397,8 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
     }
 
     @Override
-    public List<component> getSizeProductDetailEdit(Long productDetailId, Long colorId) {
-        ProductDetail productDetail = this.getOne(productDetailId);
+    public List<component> getSizeProductDetailEdit(Long productDetailId, Long colorId) throws NotFoundException {
+        ProductDetail productDetail = this.findById(productDetailId);
         List<component> sizes= productDetail!=null? repo.getSizeProductDetailEdit(productDetail.getProduct().getId(), productDetail.getButton().getId(),
                 productDetail.getMaterial().getId(), productDetail.getShirtTail().getId(), productDetail.getSleeve().getId(),
                 productDetail.getCollar().getId(), colorId, productDetail.getPattern().getId(), productDetail.getForm().getId(),

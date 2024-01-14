@@ -524,13 +524,15 @@ const BillReturn = () => {
                 })
                   .then(res=>{
                     for (let index = 0; index < res?.data?.length; index++) {
-                      for (let j = 0; j < productsReturns.length; j++) {
+                      for (let j = index; j < productsReturns.length; j++) {
                         if(res.data[index].id === productsReturns[j].productDetailId){
+                          productsReturns[j].index = index;
                           productsReturns[j].reason = res.data[index].status;
                           productsReturns[j].note = res.data[index].descriptionDetail;
                         }
                       }
                     }
+                    productsReturns.filter(item => console.log(item))
                   }).catch(err =>{
                       console.log(err)
                   })

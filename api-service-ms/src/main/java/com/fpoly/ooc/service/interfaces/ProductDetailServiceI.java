@@ -53,8 +53,8 @@ public interface ProductDetailServiceI {
 
     ProductDetail findProductDetailByIdAndStatus(Long id) throws NotFoundException;
 
-    List<component> getColorProductDetailEdit(Long productDetailId, Long sizeId);
-    List<component> getSizeProductDetailEdit(Long productDetailId, Long colorId);
+    List<component> getColorProductDetailEdit(Long productDetailId, Long sizeId) throws NotFoundException;
+    List<component> getSizeProductDetailEdit(Long productDetailId, Long colorId) throws NotFoundException;
 
     ProductDetail updateQuantityProductDetail(UpdateQuantityProductDetailDTO req) throws NotFoundException, JsonProcessingException;
 

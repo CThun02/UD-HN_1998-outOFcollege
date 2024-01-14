@@ -93,6 +93,12 @@ public class DeliveryNoteServiceImpl implements DeliveryNoteService {
             return false;
         }
 
+        double amountPaid = CommonUtils.bigDecimalConvertDouble(bill.getAmountPaid());
+        double shippingPrice = CommonUtils.bigDecimalConvertDouble(newPrice);
+        if (amountPaid < 2000000 && shippingPrice < 10000) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_SHIPPING_PRICE_LESS_10_THOUSAND));
+        }
+
         double price = CommonUtils.bigDecimalConvertDouble(bill.getPrice());
         double priceReduce = CommonUtils.bigDecimalConvertDouble(bill.getPriceReduce());
         double newShippingPrice = CommonUtils.bigDecimalConvertDouble(newPrice);

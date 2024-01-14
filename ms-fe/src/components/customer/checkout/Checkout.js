@@ -1187,7 +1187,7 @@ const Checkout = ({ setRenderHeader }) => {
                       </Radio>
                       <Radio value={2}>
                         <span style={{ fontWeight: 500 }}>
-                          Thanh toán trưc tuyến
+                          Thanh toán trực tuyến
                         </span>
                         {formData.paymentDetailId === 2 && (
                           <div>

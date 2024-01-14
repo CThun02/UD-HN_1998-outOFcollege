@@ -40,7 +40,7 @@ public class TimelineController {
     }
 
     @GetMapping("/{id}/product")
-    public ResponseEntity<?> getTimelineProductByBillId(@PathVariable("id") Long id) {
+    public ResponseEntity<?> getTimelineProductByBillId(@PathVariable("id") Long id) throws NotFoundException {
         return ResponseEntity.ok(timeLineService.getTimelineProductByBillId(id));
     }
 

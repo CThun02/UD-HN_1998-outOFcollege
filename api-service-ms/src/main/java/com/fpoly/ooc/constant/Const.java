@@ -73,6 +73,7 @@ public class Const {
     public static final String ERROR_NOT_CANCEL_BILL_WHEN_BILL_ALREADY = "ERROR_NOT_CANCEL_BILL_WHEN_BILL_ALREADY";
     public static final String ERROR_SHIPPING_PRICE_NOT_EMPTY = "ERROR_SHIPPING_PRICE_NOT_EMPTY";
     public static final String ERROR_MONEY_LESS_TOTAL_BILL = "ERROR_MONEY_LESS_TOTAL_BILL";
+    public static final String ERROR_SHIPPING_PRICE_LESS_10_THOUSAND = "ERROR_SHIPPING_PRICE_LESS_10_THOUSAND";
 
     //kafka
     public static final String KAFKA_SERVER = "localhost:9092";

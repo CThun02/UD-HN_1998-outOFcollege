@@ -1,4 +1,5 @@
 import {
+  Badge,
   Button,
   Carousel,
   Col,
@@ -7,6 +8,7 @@ import {
   InputNumber,
   Row,
   Space,
+  Spin,
   Table,
   notification,
 } from "antd";
@@ -33,6 +35,7 @@ import ModalBillInfoDisplay from "../../element/bill-info/ModalBillInfoDisplay";
 import ModalProduct from "./ModalProduct";
 import EditAddress from "../../element/edit-address/EditAddress";
 import InputCallAPI from "../../element/InputCallAPI";
+import moment from "moment";
 
 const BillTimeLine = (addId) => {
   const [isModalConfirm, setIsModalConfirm] = useState(false);
@@ -53,6 +56,7 @@ const BillTimeLine = (addId) => {
   const [noteTimeline, setNoteTimeline] = useState(null);
   const [timelineId, setTimelineId] = useState(null);
   const [shippingPrice, setShippingPrice] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   const handleOpen = () => {
     console.log(true);
@@ -65,6 +69,7 @@ const BillTimeLine = (addId) => {
 
   // tạo mới timeline
   const handleCreateTimeline = async (note, status, id, paymentInDelivery) => {
+    setLoading(true);
     const data = await token;
     const values = {
       timelineId: id,
@@ -80,10 +85,12 @@ const BillTimeLine = (addId) => {
         },
       })
       .then((response) => {
+        setLoading(false);
         setTimelines([...timelines, response.data]);
         setRender(response.data);
       })
       .catch((error) => {
+        setLoading(false);
         const status = error.response?.status;
         if (status === 403) {
           notification.error({
@@ -95,6 +102,8 @@ const BillTimeLine = (addId) => {
   };
 
   const handleUpdateBillStatus = (status, price, timelineStatus) => {
+    setLoading(true);
+
     axios
       .put(
         `http://localhost:8080/api/admin/bill`,
@@ -111,9 +120,11 @@ const BillTimeLine = (addId) => {
         }
       )
       .then((response) => {
+        setLoading(false);
         setRender(response.data.amountPaid);
       })
       .catch((error) => {
+        setLoading(false);
         const status = error.response.status;
         if (status === 403) {
           notification.error({
@@ -158,25 +169,76 @@ const BillTimeLine = (addId) => {
   };
 
   const handleOkConFirm = (note) => {
-    handleCreateTimeline(
-      note,
-      action === "cancel"
-        ? "0"
-        : Number(++timlinesDisplay[timlinesDisplay.length - 1].status),
-      null
+    // loại bỏ status Update
+    const includesStatus = [
+      "Update",
+      "Delete",
+      "2Cancel",
+      "Rollback",
+      "Cancel",
+    ];
+    const newTimelines = timelines.filter(
+      (e) => !includesStatus.includes(e.status)
     );
-    handleUpdateBillStatus(
-      action === "cancel"
-        ? "Cancel"
-        : billInfo.symbol === "Shipping" &&
-          Number(timelines[timelines.length - 1]?.status) === 4
-        ? "Complete"
-        : billInfo.symbol === "Shipping" && billInfo?.status === "Paid"
-        ? "Paid"
-        : "Unpaid",
-      billInfo?.amountPaid,
-      timelines[timelines.length - 1]?.status
+    const timelinesSortDate = newTimelines.sort(
+      (a, b) =>
+        moment(b.createdDate, "HH:mm:ss DD/MM/YYYY").toDate() -
+        moment(a.createdDate, "HH:mm:ss DD/MM/YYYY").toDate()
     );
+
+    let timelineStatus = "";
+    switch (action) {
+      case "confirm":
+        let numberStatus = Number(timelinesSortDate[0].status);
+        timelineStatus = numberStatus + 1;
+        break;
+      case "cancel":
+        timelineStatus = "0";
+        break;
+      case "Delete":
+        timelineStatus = "Delete";
+        break;
+      case "rollback":
+        timelineStatus = "Rollback";
+        break;
+      case "2Cancel":
+        timelineStatus = "2Cancel";
+        break;
+      default:
+        break;
+    }
+
+    let billStatus = "";
+    let statusTimeline = timelinesSortDate[0].status;
+    if (billInfo.symbol === "Shipping") {
+      if (action === "cancel" || action === "0") {
+        billStatus = "Cancel";
+      }
+      switch (statusTimeline) {
+        case "1":
+          billStatus = "wait_for_confirm";
+          break;
+        case "2":
+          billStatus = "wait_for_delivery";
+          break;
+        case "3":
+          billStatus = "delivering";
+          break;
+        case "4":
+          billStatus = "Complete";
+          break;
+        default:
+          break;
+      }
+    } else {
+      if (statusTimeline === "1") {
+        billStatus = "wait_for_confirm";
+      } else {
+        billStatus = "Complete";
+      }
+    }
+    handleCreateTimeline(note, timelineStatus, null);
+    handleUpdateBillStatus(billStatus, billInfo?.amountPaid, statusTimeline);
     setIsModalConfirm(false);
   };
 
@@ -188,6 +250,7 @@ const BillTimeLine = (addId) => {
     setIsModalDetail(false);
   };
   const getTimeline = async () => {
+    setLoading(true);
     await axios
       .get(`http://localhost:8080/api/admin/timeline/${billId}`, {
         headers: {
@@ -195,16 +258,22 @@ const BillTimeLine = (addId) => {
         },
       })
       .then((response) => {
-        var timelinesPush = [];
-        for (let index = 0; index < response.data.length; index++) {
-          if (!isNaN(response.data[index]?.status)) {
-            timelinesPush.push(response.data[index]);
+        setLoading(false);
+
+        if (response.data) {
+          var timelinesPush = [];
+          for (let index = 0; index < response.data.length; index++) {
+            if (!isNaN(response.data[index]?.status)) {
+              timelinesPush.push(response.data[index]);
+            }
           }
+          setTimlneDisplay(timelinesPush);
+          setTimelines(response.data);
         }
-        setTimlneDisplay(timelinesPush);
-        setTimelines(response.data);
       })
       .catch((error) => {
+        setLoading(false);
+
         const status = error.response?.status;
         if (status === 403) {
           notification.error({
@@ -216,6 +285,8 @@ const BillTimeLine = (addId) => {
   };
 
   const getProduct = async () => {
+    setLoading(true);
+
     await axios
       .get(`http://localhost:8080/api/admin/timeline/${billId}/product`, {
         headers: {
@@ -223,9 +294,13 @@ const BillTimeLine = (addId) => {
         },
       })
       .then((response) => {
+        setLoading(false);
+
         setTimelinesPoduct(response?.data);
       })
       .catch((error) => {
+        setLoading(false);
+
         console.log(error);
         const status = error.response?.status;
         if (status === 403) {
@@ -238,6 +313,8 @@ const BillTimeLine = (addId) => {
   };
 
   const getInfo = async () => {
+    setLoading(true);
+
     await axios
       .get(`http://localhost:8080/api/admin/timeline/${billId}/info`, {
         headers: {
@@ -245,10 +322,14 @@ const BillTimeLine = (addId) => {
         },
       })
       .then((response) => {
+        setLoading(false);
+
         setBillInfo(response?.data);
         setShippingPrice(numeral(response?.data?.shipPrice));
       })
       .catch((error) => {
+        setLoading(false);
+
         const status = error.response?.status;
         if (status === 403) {
           notification.error({
@@ -267,6 +348,8 @@ const BillTimeLine = (addId) => {
   }, [billId, render, isModalConfirm]);
 
   const updateQUantityBillDetail = (record, value, index) => {
+    setLoading(true);
+
     let quantityOld = timelinePoduct[index].quantity;
     if (value - record.quantity > record.productQuantity) {
       notification.warning({
@@ -274,10 +357,14 @@ const BillTimeLine = (addId) => {
         description: "Đã vượt quá số lượng tồn",
         duration: 1,
       });
+      setLoading(false);
+
       return;
     }
 
     if (Number(value) === Number(record?.quantity)) {
+      setLoading(false);
+
       return;
     }
 
@@ -298,6 +385,8 @@ const BillTimeLine = (addId) => {
         }
       )
       .then((response) => {
+        setLoading(false);
+
         let paymentInDelivery = null;
         if (billInfo?.lstPaymentDetail.length > 0) {
           if (billInfo?.lstPaymentDetail?.length === 1) {
@@ -328,6 +417,8 @@ const BillTimeLine = (addId) => {
         setRender(Math.random());
       })
       .catch((err) => {
+        setLoading(false);
+
         console.log(err);
         notification.error({
           message: "Thông báo",
@@ -338,6 +429,8 @@ const BillTimeLine = (addId) => {
   };
 
   const handleDeleteBillDetail = (pdCode, bdID, note) => {
+    setLoading(true);
+
     handleCreateTimeline(note + " | " + pdCode, "Delete", null);
     axios
       .delete(
@@ -354,12 +447,16 @@ const BillTimeLine = (addId) => {
           description: "Xóa thành thành công!",
           duration: 2,
         });
+        setLoading(false);
         setRender(Math.random());
       })
       .catch((err) => {
+        setLoading(false);
+
         console.log(err);
       });
     setIsModalConfirm(false);
+    setRender(Math.random());
   };
 
   const columnProduct = [
@@ -380,20 +477,55 @@ const BillTimeLine = (addId) => {
         return (
           <Row>
             <Col span={4}>
-              <Carousel autoplay className={styles.slider}>
-                {record?.productImageResponses &&
-                  record?.productImageResponses?.map((productImage, index) => {
-                    return (
-                      <img
-                        key={index}
-                        style={{ width: "100px" }}
-                        alt="abc"
-                        src={productImage?.path}
-                      />
-                    );
-                  })}
-              </Carousel>
+              {record.promotionMethod && record.promotionValue ? (
+                <Badge.Ribbon
+                  text={`Giảm ${
+                    record?.promotionValue
+                      ? record.promotionMethod === "%"
+                        ? record.promotionValue + " " + record.promotionMethod
+                        : record.promotionValue.toLocaleString("vi-VN", {
+                            style: "currency",
+                            currency: "VND",
+                          })
+                      : null
+                  }`}
+                  color="red"
+                >
+                  <Carousel autoplay className={styles.slider}>
+                    {record?.productImageResponses &&
+                      record?.productImageResponses?.map(
+                        (productImage, index) => {
+                          return (
+                            <img
+                              key={index}
+                              style={{ width: "100px" }}
+                              alt="abc"
+                              src={productImage?.path}
+                            />
+                          );
+                        }
+                      )}
+                  </Carousel>
+                </Badge.Ribbon>
+              ) : (
+                <Carousel autoplay className={styles.slider}>
+                  {record?.productImageResponses &&
+                    record?.productImageResponses?.map(
+                      (productImage, index) => {
+                        return (
+                          <img
+                            key={index}
+                            style={{ width: "100px" }}
+                            alt="abc"
+                            src={productImage?.path}
+                          />
+                        );
+                      }
+                    )}
+                </Carousel>
+              )}
             </Col>
+
             <Col span={20}>
               <div
                 className="m-5"
@@ -472,19 +604,17 @@ const BillTimeLine = (addId) => {
             min={1}
             max={record >= record?.productQuantity}
             value={record?.quantity}
-            onBlur={(e) =>
-              updateQUantityBillDetail(record, e?.target?.value, index)
-            }
-            disabled={
-              // billInfo?.status !== "wait_for_confirm" ||
-              // Number(timlinesDisplay[timlinesDisplay?.length - 1]?.status) !==
-              //   1 ||
-              // billInfo?.lstPaymentDetail?.length === 1 ||
-              // billInfo?.lstPaymentDetail?.length === 2
-              //   ? billInfo?.lstPaymentDetail[0]?.status === "Paid"
-              //   : false
-              conditionDisable
-            }
+            onBlur={(e) => {
+              if (e?.target?.value > 0) {
+                updateQUantityBillDetail(record, e?.target?.value, index);
+              } else {
+                notification.error({
+                  message: "Thông báo",
+                  description: "Số lượng không được nhỏ hơn hoặc bằng 0",
+                });
+              }
+            }}
+            disabled={conditionDisable}
           />
         );
       },
@@ -537,357 +667,362 @@ const BillTimeLine = (addId) => {
 
   return (
     <>
-      <section className={styles.background}>
-        <div style={{ overflowX: "scroll" }}>
-          <div style={{ width: "fit-content" }}>
-            {billInfo?.symbol !== "Received" ? (
-              <Timeline minEvents={6} placeholder className={styles.timeLine}>
-                {timlinesDisplay &&
-                  timlinesDisplay.map((data, index) => (
-                    <TimelineEvent
-                      key={index}
-                      color={
-                        data?.status === "0" || data?.status === "-1"
-                          ? "#FF0000"
-                          : data?.status === "5"
-                          ? "#f0ad4e"
-                          : "#00cc00"
-                      }
-                      icon={
-                        data?.status === "1"
-                          ? FaRegFileAlt
-                          : data?.status === "0"
-                          ? FaTimes
-                          : data?.status === "2"
-                          ? FaRegFileAlt
-                          : data?.status === "3"
-                          ? FaTruck
-                          : CheckCircleOutlined
-                      }
-                      title={
-                        data?.status === "0" ? (
-                          <h3>Đã hủy</h3>
-                        ) : data?.status === "1" ? (
-                          <h3>Chờ xác nhận</h3>
-                        ) : data?.status === "2" ? (
-                          <h3>Chờ giao hàng</h3>
-                        ) : data?.status === "3" ? (
-                          <h3>
-                            Đã đóng gói & <br /> đang được giao
-                          </h3>
-                        ) : data?.status === "4" ? (
-                          <h3>Giao hàng thành công</h3>
-                        ) : data?.status === "5" ? (
-                          <h3>yêu cầu trả hàng</h3>
-                        ) : data?.status === "-1" ? (
-                          <h3>Trả hàng thất bại</h3>
-                        ) : (
-                          <h3>Trả hàng thành công</h3>
-                        )
-                      }
-                      subtitle={data?.createdDate}
-                    />
-                  ))}
-              </Timeline>
-            ) : (
-              <Timeline minEvents={2} placeholder className={styles.timeLine}>
-                {timlinesDisplay &&
-                  timlinesDisplay.map((data, index) => (
-                    <TimelineEvent
-                      key={index}
-                      color={
-                        data?.status === "0"
-                          ? "#FF0000"
-                          : data?.status === "3"
-                          ? "#f0ad4e"
-                          : "#00cc00"
-                      }
-                      icon={
-                        data?.status === "1"
-                          ? FaRegFileAlt
-                          : data?.status === "0"
-                          ? FaTimes
-                          : data?.status === "2"
-                          ? FaRegCheckCircle
-                          : data?.status === "3"
-                          ? FaClock
-                          : data?.status === "4"
-                          ? FaRocket
-                          : null
-                      }
-                      title={
-                        data?.status === "1"
-                          ? "Chờ xác nhận"
-                          : data?.status === "2"
-                          ? "Thanh toán thành công"
-                          : data?.status === "0"
-                          ? "Đã hủy"
-                          : ""
-                      }
-                      subtitle={data.createdDate}
-                    />
-                  ))}
-              </Timeline>
-            )}
+      <Spin size="large" spinning={loading} tip={"Vui lòng chờ"}>
+        <section className={styles.background}>
+          <div style={{ overflowX: "scroll" }}>
+            <div style={{ width: "fit-content" }}>
+              {billInfo?.symbol !== "Received" ? (
+                <Timeline minEvents={6} placeholder className={styles.timeLine}>
+                  {timlinesDisplay &&
+                    timlinesDisplay.map((data, index) => (
+                      <TimelineEvent
+                        key={index}
+                        color={
+                          data?.status === "0" || data?.status === "-1"
+                            ? "#FF0000"
+                            : data?.status === "5"
+                            ? "#f0ad4e"
+                            : "#00cc00"
+                        }
+                        icon={
+                          data?.status === "1"
+                            ? FaRegFileAlt
+                            : data?.status === "0"
+                            ? FaTimes
+                            : data?.status === "2"
+                            ? FaRegFileAlt
+                            : data?.status === "3"
+                            ? FaTruck
+                            : CheckCircleOutlined
+                        }
+                        title={
+                          data?.status === "0" ? (
+                            <h3>Đã hủy</h3>
+                          ) : data?.status === "1" ? (
+                            <h3>Chờ xác nhận</h3>
+                          ) : data?.status === "2" ? (
+                            <h3>Chờ giao hàng</h3>
+                          ) : data?.status === "3" ? (
+                            <h3>
+                              Đã đóng gói & <br /> đang được giao
+                            </h3>
+                          ) : data?.status === "4" ? (
+                            <h3>Giao hàng thành công</h3>
+                          ) : data?.status === "5" ? (
+                            <h3>yêu cầu trả hàng</h3>
+                          ) : data?.status === "-1" ? (
+                            <h3>Trả hàng thất bại</h3>
+                          ) : (
+                            <h3>Trả hàng thành công</h3>
+                          )
+                        }
+                        subtitle={data?.createdDate}
+                      />
+                    ))}
+                </Timeline>
+              ) : (
+                <Timeline minEvents={2} placeholder className={styles.timeLine}>
+                  {timlinesDisplay &&
+                    timlinesDisplay.map((data, index) => (
+                      <TimelineEvent
+                        key={index}
+                        color={
+                          data?.status === "0"
+                            ? "#FF0000"
+                            : data?.status === "3"
+                            ? "#f0ad4e"
+                            : "#00cc00"
+                        }
+                        icon={
+                          data?.status === "1"
+                            ? FaRegFileAlt
+                            : data?.status === "0"
+                            ? FaTimes
+                            : data?.status === "2"
+                            ? FaRegCheckCircle
+                            : data?.status === "3"
+                            ? FaClock
+                            : data?.status === "4"
+                            ? FaRocket
+                            : null
+                        }
+                        title={
+                          data?.status === "1"
+                            ? "Chờ xác nhận"
+                            : data?.status === "2"
+                            ? "Thanh toán thành công"
+                            : data?.status === "0"
+                            ? "Đã hủy"
+                            : ""
+                        }
+                        subtitle={data.createdDate}
+                      />
+                    ))}
+                </Timeline>
+              )}
+            </div>
           </div>
-        </div>
-        <div className={styles.btnHeader} style={{ marginTop: 24 }}>
-          {billInfo?.symbol !== "Received" &&
-            String(timelines[timelines?.length - 1]?.status) !== "4" &&
-            String(timelines[timelines?.length - 1]?.status) !== "5" &&
-            String(timelines[timelines?.length - 1]?.status) !== "0" &&
-            String(timelines[timelines?.length - 1]?.status) !== "6" && (
-              <>
+          <div className={styles.btnHeader} style={{ marginTop: 24 }}>
+            {billInfo?.symbol !== "Received" &&
+              String(timelines[timelines?.length - 1]?.status) !== "4" &&
+              String(timelines[timelines?.length - 1]?.status) !== "5" &&
+              String(timelines[timelines?.length - 1]?.status) !== "0" &&
+              String(timelines[timelines?.length - 1]?.status) !== "6" && (
+                <>
+                  <Button
+                    type="primary"
+                    onClick={() => {
+                      setAction("confirm");
+                      showModalConfirm();
+                    }}
+                  >
+                    Xác nhận
+                  </Button>
+                </>
+              )}
+            {billInfo?.billType === "Online" &&
+              Number(timelines[timelines?.length - 1]?.status) === 2 && (
                 <Button
+                  style={{ marginLeft: "10px" }}
                   type="primary"
                   onClick={() => {
-                    setAction("confirm");
+                    setNoteTimeline(timelines[timelines?.length - 1]?.note);
+                    setTimelineId(timelines[timelines?.length - 1]?.id);
+                    setAction("rollback");
                     showModalConfirm();
                   }}
                 >
-                  Xác nhận
+                  Quay trở lại xác nhận
                 </Button>
-              </>
-            )}
-          {billInfo?.billType === "Online" &&
-            Number(timelines[timelines?.length - 1]?.status) === 2 && (
-              <Button
-                style={{ marginLeft: "10px" }}
-                type="primary"
-                onClick={() => {
-                  setNoteTimeline(timelines[timelines?.length - 1]?.note);
-                  setTimelineId(timelines[timelines?.length - 1]?.id);
-                  setAction("rollback");
-                  showModalConfirm();
-                }}
-              >
-                Quay trở lại xác nhận
-              </Button>
-            )}
-          {billInfo?.symbol !== "Received" &&
-            String(timelines[timelines?.length - 1]?.status) !== "3" &&
-            String(timelines[timelines?.length - 1]?.status) !== "4" &&
-            String(timelines[timelines?.length - 1]?.status) !== "0" &&
-            String(timelines[timelines?.length - 1]?.status) !== "6" && (
-              <Button
-                type="primary"
-                danger
-                style={{ margin: "0 10px" }}
-                onClick={() => {
-                  setAction("cancel");
-                  showModalConfirm();
-                }}
-              >
-                Hủy
-              </Button>
-            )}
-          <ModalConfirm
-            isModalOpen={isModalConfirm}
-            handleCancel={handleCancelConfirm}
-            handleOk={(note) =>
-              action === "Delete"
-                ? handleDeleteBillDetail(pdCode, bdId, note)
-                : action === "rollback"
-                ? handleRollback(note)
-                : handleOkConFirm(note)
-            }
-            action={action}
-          />
-          {timelines?.length >= 2 && (
-            <Button
-              onClick={handleOpen}
-              className={styles.btnPdf}
-              type="primary"
-            >
-              Xuất hóa đơn
-            </Button>
-          )}
-          <ModalBillInfoDisplay
-            open={open}
-            cancel={handleCan}
-            billCode={billInfo?.billCode}
-          />
-          <Button
-            className={styles.btnWarning}
-            onClick={() => showModalDetail()}
-          >
-            Chi tiết
-          </Button>
-          <div>
-            <ModalDetail
-              timelineDetail={timelines}
-              isModalOpen={isModalDetail}
-              handleCancel={handleOkDetail}
-              handleOk={handleOkDetail}
-              symbol={billInfo?.symbol}
+              )}
+            {billInfo?.symbol !== "Received" &&
+              String(timelines[timelines?.length - 1]?.status) !== "3" &&
+              String(timelines[timelines?.length - 1]?.status) !== "4" &&
+              String(timelines[timelines?.length - 1]?.status) !== "0" &&
+              String(timelines[timelines?.length - 1]?.status) !== "6" && (
+                <Button
+                  type="primary"
+                  danger
+                  style={{ margin: "0 10px" }}
+                  onClick={() => {
+                    setAction("cancel");
+                    showModalConfirm();
+                  }}
+                >
+                  Hủy
+                </Button>
+              )}
+            <ModalConfirm
+              isModalOpen={isModalConfirm}
+              handleCancel={handleCancelConfirm}
+              handleOk={(note) =>
+                action === "Delete"
+                  ? handleDeleteBillDetail(pdCode, bdId, note)
+                  : action === "rollback"
+                  ? handleRollback(note)
+                  : handleOkConFirm(note)
+              }
+              action={action}
             />
+            {timelines?.length >= 2 && (
+              <Button
+                onClick={handleOpen}
+                className={styles.btnPdf}
+                type="primary"
+              >
+                Xuất hóa đơn
+              </Button>
+            )}
+            <ModalBillInfoDisplay
+              open={open}
+              cancel={handleCan}
+              billCode={billInfo?.billCode}
+            />
+            <Button
+              className={styles.btnWarning}
+              onClick={() => showModalDetail()}
+            >
+              Chi tiết
+            </Button>
+            <div>
+              <ModalDetail
+                timelineDetail={timelines}
+                isModalOpen={isModalDetail}
+                handleCancel={handleOkDetail}
+                handleOk={handleOkDetail}
+                symbol={billInfo?.symbol}
+              />
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section className={styles.background} style={{ marginTop: "20px" }}>
-        <Row>
-          <Col span={21}>
-            <h2>Thông tin đơn hàng</h2>
-          </Col>
-          {billInfo?.symbol === "Shipping" &&
-            Number(timlinesDisplay[timlinesDisplay?.length - 1]?.status) ===
-              1 &&
-            billInfo?.status !== "Paid" && (
-              <Col span={3}>
-                <Button type="primary" onClick={() => setOpenModalDN(true)}>
-                  Sửa thông tin
-                </Button>
-                {openModalDN && (
-                  <EditAddress
-                    isModalOpen={openModalDN}
-                    handleAddressCancel={() => setOpenModalDN(false)}
-                    setRender={setRender}
-                    addressId={billInfo?.addressId}
-                    billId={billInfo?.billId}
-                    totalPrice={billInfo?.totalPrice}
-                  />
-                )}
-              </Col>
-            )}
-        </Row>
-        <Divider
-          className={styles.blackDivider}
-          style={{ marginTop: "10px" }}
-        />
-        <Row>
-          <Col span={12}>
-            <Row>
-              <Col span={12} className={styles.padding}>
-                <span>Mã đơn hàng</span>
-              </Col>
-              <Col span={12}>
-                <div className={`${styles.elementDiv}`}>
-                  <span>{billInfo?.billCode}</span>
-                </div>
-              </Col>
-            </Row>
-            <Row>
-              <Col span={12} className={styles.padding}>
-                <span>Hình thức mua hàng</span>
-              </Col>
-              <Col span={12}>
-                <div className={`${styles.elementDiv}`}>
-                  <span>
-                    {billInfo?.billType === "In-Store"
-                      ? "Tại quầy"
-                      : "Trực tuyến"}
-                  </span>
-                </div>
-              </Col>
-            </Row>
-            <Row>
-              <Col span={12} className={styles.padding}>
-                <span>Ngày mua hàng</span>
-              </Col>
-              <Col span={12}>
-                <div className={`${styles.elementDiv}`}>
-                  <span>{billInfo?.createdDate}</span>
-                </div>
-              </Col>
-            </Row>
-            <Row>
-              <Col span={12} className={styles.padding}>
-                <span>Mã giao dịch</span>
-              </Col>
-              <Col span={12}>
-                <div className={`${styles.elementDiv}`}>
-                  <span>
-                    {billInfo?.transaction || "Không có mã giao dịch"}
-                  </span>
-                </div>
-              </Col>
-            </Row>
-            <Row>
-              <Col span={12} className={styles.padding}>
-                <span>Phương thức thanh toán</span>
-              </Col>
-              <Col span={12}>
-                <div className={`${styles.elementDiv}`}>
-                  <span>
-                    {(billInfo?.lstPaymentDetail?.length > 1
-                      ? "Tiền mặt + Chuyển khoản"
-                      : billInfo?.lstPaymentDetail?.length === 1
-                      ? billInfo?.lstPaymentDetail[0].paymentName === "Cash"
-                        ? "Tiền mặt"
-                        : "Chuyển khoản"
-                      : "") || "__"}
-                  </span>
-                </div>
-              </Col>
-            </Row>
-            {billInfo?.symbol === "Shipping" && (
-              <>
-                <Row>
-                  <Col span={12} className={styles.padding}>
-                    <span>Hình thức giao hàng </span>
-                  </Col>
-                  <Col span={12}>
-                    <div className={`${styles.elementDiv}`}>
-                      <span>{"Giao hàng tại nhà"}</span>
-                    </div>
-                  </Col>
-                </Row>
-                <Row>
-                  <Col span={12} className={styles.padding}>
-                    <span>Ngày nhận hàng dự kiến</span>
-                  </Col>
-                  <Col span={12}>
-                    <div className={`${styles.elementDiv}`}>
-                      <span>{billInfo?.shipDate || "<Không có dữ liệu>"}</span>
-                    </div>
-                  </Col>
-                </Row>
-              </>
-            )}
-          </Col>
-          <Col span={11}>
-            <Row>
-              <Col span={24}>
-                <Row>
-                  <Col span={10} className={styles.padding}>
-                    <h6>Tên khách hàng</h6>
-                  </Col>
-                  <Col span={14}>
-                    <div className={`${styles.elementDiv} ${styles.size}`}>
-                      <span>
-                        {billInfo?.billType !== "In-Store"
-                          ? billInfo?.fullName
+        <section className={styles.background} style={{ marginTop: "20px" }}>
+          <Row>
+            <Col span={21}>
+              <h2>Thông tin đơn hàng</h2>
+            </Col>
+            {billInfo?.symbol === "Shipping" &&
+              Number(timlinesDisplay[timlinesDisplay?.length - 1]?.status) ===
+                1 &&
+              billInfo?.status !== "Paid" && (
+                <Col span={3}>
+                  <Button type="primary" onClick={() => setOpenModalDN(true)}>
+                    Sửa thông tin
+                  </Button>
+                  {openModalDN && (
+                    <EditAddress
+                      isModalOpen={openModalDN}
+                      handleAddressCancel={() => setOpenModalDN(false)}
+                      setRender={setRender}
+                      addressId={billInfo?.addressId}
+                      billId={billInfo?.billId}
+                      totalPrice={billInfo?.totalPrice}
+                    />
+                  )}
+                </Col>
+              )}
+          </Row>
+          <Divider
+            className={styles.blackDivider}
+            style={{ marginTop: "10px" }}
+          />
+          <Row>
+            <Col span={12}>
+              <Row>
+                <Col span={12} className={styles.padding}>
+                  <span>Mã đơn hàng</span>
+                </Col>
+                <Col span={12}>
+                  <div className={`${styles.elementDiv}`}>
+                    <span>{billInfo?.billCode}</span>
+                  </div>
+                </Col>
+              </Row>
+              <Row>
+                <Col span={12} className={styles.padding}>
+                  <span>Hình thức mua hàng</span>
+                </Col>
+                <Col span={12}>
+                  <div className={`${styles.elementDiv}`}>
+                    <span>
+                      {billInfo?.billType === "In-Store"
+                        ? "Tại quầy"
+                        : "Trực tuyến"}
+                    </span>
+                  </div>
+                </Col>
+              </Row>
+              <Row>
+                <Col span={12} className={styles.padding}>
+                  <span>Ngày mua hàng</span>
+                </Col>
+                <Col span={12}>
+                  <div className={`${styles.elementDiv}`}>
+                    <span>{billInfo?.createdDate}</span>
+                  </div>
+                </Col>
+              </Row>
+              <Row>
+                <Col span={12} className={styles.padding}>
+                  <span>Mã giao dịch</span>
+                </Col>
+                <Col span={12}>
+                  <div className={`${styles.elementDiv}`}>
+                    <span>
+                      {billInfo?.transaction || "Không có mã giao dịch"}
+                    </span>
+                  </div>
+                </Col>
+              </Row>
+              <Row>
+                <Col span={12} className={styles.padding}>
+                  <span>Phương thức thanh toán</span>
+                </Col>
+                <Col span={12}>
+                  <div className={`${styles.elementDiv}`}>
+                    <span>
+                      {(billInfo?.lstPaymentDetail?.length > 1
+                        ? "Tiền mặt + Chuyển khoản"
+                        : billInfo?.lstPaymentDetail?.length === 1
+                        ? billInfo?.lstPaymentDetail[0].paymentName === "Cash"
+                          ? "Tiền mặt"
+                          : "Chuyển khoản"
+                        : "") || "__"}
+                    </span>
+                  </div>
+                </Col>
+              </Row>
+              {billInfo?.symbol === "Shipping" && (
+                <>
+                  <Row>
+                    <Col span={12} className={styles.padding}>
+                      <span>Hình thức giao hàng </span>
+                    </Col>
+                    <Col span={12}>
+                      <div className={`${styles.elementDiv}`}>
+                        <span>{"Giao hàng tại nhà"}</span>
+                      </div>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col span={12} className={styles.padding}>
+                      <span>Ngày nhận hàng dự kiến</span>
+                    </Col>
+                    <Col span={12}>
+                      <div className={`${styles.elementDiv}`}>
+                        <span>
+                          {billInfo?.shipDate || "<Không có dữ liệu>"}
+                        </span>
+                      </div>
+                    </Col>
+                  </Row>
+                </>
+              )}
+            </Col>
+            <Col span={11}>
+              <Row>
+                <Col span={24}>
+                  <Row>
+                    <Col span={10} className={styles.padding}>
+                      <h6>Tên khách hàng</h6>
+                    </Col>
+                    <Col span={14}>
+                      <div className={`${styles.elementDiv} ${styles.size}`}>
+                        <span>
+                          {billInfo?.billType !== "In-Store"
                             ? billInfo?.fullName
-                            : billInfo?.accountName
-                          : "Khách hàng mua tại quầy"}
-                      </span>
-                    </div>
-                  </Col>
-                </Row>
-              </Col>
-              <Col span={24}>
-                <Row>
-                  <Col span={10} className={styles.padding}>
-                    <span>Số điện thoại</span>
-                  </Col>
-                  <Col span={14}>
-                    <div className={`${styles.elementDiv} ${styles.size}`}>
-                      <span>{billInfo?.phoneNumber || "Không có dữ liệu"}</span>
-                    </div>
-                  </Col>
-                </Row>
-              </Col>
-              <Col span={24}>
-                <Row>
-                  <Col span={10} className={styles.padding}>
-                    <span>Địa chỉ</span>
-                  </Col>
-                  <Col span={14}>
-                    <div className={`${styles.elementDiv} ${styles.size}`}>
-                      <span>
-                        {billInfo?.ward
-                          ? `${billInfo?.addressDetail ?? ""} 
+                              ? billInfo?.fullName
+                              : billInfo?.accountName
+                            : "Khách hàng mua tại quầy"}
+                        </span>
+                      </div>
+                    </Col>
+                  </Row>
+                </Col>
+                <Col span={24}>
+                  <Row>
+                    <Col span={10} className={styles.padding}>
+                      <span>Số điện thoại</span>
+                    </Col>
+                    <Col span={14}>
+                      <div className={`${styles.elementDiv} ${styles.size}`}>
+                        <span>
+                          {billInfo?.phoneNumber || "Không có dữ liệu"}
+                        </span>
+                      </div>
+                    </Col>
+                  </Row>
+                </Col>
+                <Col span={24}>
+                  <Row>
+                    <Col span={10} className={styles.padding}>
+                      <span>Địa chỉ</span>
+                    </Col>
+                    <Col span={14}>
+                      <div className={`${styles.elementDiv} ${styles.size}`}>
+                        <span>
+                          {billInfo?.ward
+                            ? `${billInfo?.addressDetail ?? ""} 
                                         ${billInfo?.ward?.substring(
                                           0,
                                           billInfo?.ward?.indexOf("|")
@@ -900,239 +1035,231 @@ const BillTimeLine = (addId) => {
                                           0,
                                           billInfo?.city?.indexOf("|")
                                         )}`
-                          : "Không có dữ liệu"}
-                      </span>
-                    </div>
-                  </Col>
-                </Row>
-              </Col>
-              <Col span={24}>
-                <Row>
-                  <Col span={10} className={styles.padding}>
-                    <span>Số tiền khách trả</span>
-                  </Col>
-                  <Col span={14}>
-                    <div className={`${styles.elementDiv} ${styles.size}`}>
-                      <span>
-                        {billInfo?.lstPaymentDetail?.length >= 1
-                          ? billInfo?.lstPaymentDetail[0]?.status === "Paid"
-                            ? billInfo?.lstPaymentDetail[0]?.paymentName ===
+                            : "Không có dữ liệu"}
+                        </span>
+                      </div>
+                    </Col>
+                  </Row>
+                </Col>
+                <Col span={24}>
+                  <Row>
+                    <Col span={10} className={styles.padding}>
+                      <span>Số tiền khách trả</span>
+                    </Col>
+                    <Col span={14}>
+                      <div className={`${styles.elementDiv} ${styles.size}`}>
+                        <span>
+                          {billInfo?.lstPaymentDetail?.length >= 1
+                            ? billInfo?.lstPaymentDetail[0]?.status === "Paid"
+                              ? billInfo?.lstPaymentDetail[0]?.paymentName ===
+                                "Credit Card"
+                                ? numeral(
+                                    billInfo?.lstPaymentDetail[0]?.price
+                                  ).format("0,0") +
+                                  " đ " +
+                                  "(Chuyển khoản)"
+                                : numeral(
+                                    billInfo?.lstPaymentDetail[0]?.price
+                                  ).format("0,0") +
+                                  " đ " +
+                                  "(Tiền mặt)"
+                              : "Thanh toán khi nhận hàng"
+                            : null}
+                        </span>
+                        {billInfo?.lstPaymentDetail?.length > 1 && (
+                          <span> | </span>
+                        )}
+                        <span>
+                          {billInfo?.lstPaymentDetail?.length === 2
+                            ? billInfo?.lstPaymentDetail[1]?.paymentName ===
                               "Credit Card"
                               ? numeral(
-                                  billInfo?.lstPaymentDetail[0]?.price
+                                  billInfo?.lstPaymentDetail[1]?.price
                                 ).format("0,0") +
                                 " đ " +
                                 "(Chuyển khoản)"
                               : numeral(
-                                  billInfo?.lstPaymentDetail[0]?.price
+                                  billInfo?.lstPaymentDetail[1]?.price
                                 ).format("0,0") +
                                 " đ " +
                                 "(Tiền mặt)"
-                            : "Thanh toán khi nhận hàng"
-                          : null}
-                      </span>
-                      {billInfo?.lstPaymentDetail?.length > 1 && (
-                        <span> | </span>
-                      )}
-                      <span>
-                        {billInfo?.lstPaymentDetail?.length === 2
-                          ? billInfo?.lstPaymentDetail[1]?.paymentName ===
-                            "Credit Card"
-                            ? numeral(
-                                billInfo?.lstPaymentDetail[1]?.price
-                              ).format("0,0") +
-                              " đ " +
-                              "(Chuyển khoản)"
-                            : numeral(
-                                billInfo?.lstPaymentDetail[1]?.price
-                              ).format("0,0") +
-                              " đ " +
-                              "(Tiền mặt)"
-                          : null}
-                      </span>
-                    </div>
-                  </Col>
-                </Row>
-              </Col>
-              <Col span={24}>
-                <Row>
-                  <Col span={10} className={styles.padding}>
-                    <span>Tiền thừa</span>
-                  </Col>
-                  <Col span={14}>
-                    <div className={`${styles.elementDiv} ${styles.size}`}>
-                      <span>
-                        {billInfo?.lstPaymentDetail?.length === 2 &&
-                          (billInfo?.lstPaymentDetail[0]?.price +
-                            billInfo?.lstPaymentDetail[1]?.price -
-                            billInfo?.amountPaid >
-                          0
-                            ? billInfo?.lstPaymentDetail[0]?.price +
+                            : null}
+                        </span>
+                      </div>
+                    </Col>
+                  </Row>
+                </Col>
+                <Col span={24}>
+                  <Row>
+                    <Col span={10} className={styles.padding}>
+                      <span>Tiền thừa</span>
+                    </Col>
+                    <Col span={14}>
+                      <div className={`${styles.elementDiv} ${styles.size}`}>
+                        <span>
+                          {billInfo?.lstPaymentDetail?.length === 2 &&
+                            (billInfo?.lstPaymentDetail[0]?.price +
                               billInfo?.lstPaymentDetail[1]?.price -
-                              billInfo?.amountPaid
-                            : 0
-                          ).toLocaleString("vi-VN", {
-                            style: "currency",
-                            currency: "VND",
-                          })}
+                              billInfo?.amountPaid >
+                            0
+                              ? billInfo?.lstPaymentDetail[0]?.price +
+                                billInfo?.lstPaymentDetail[1]?.price -
+                                billInfo?.amountPaid
+                              : 0
+                            ).toLocaleString("vi-VN", {
+                              style: "currency",
+                              currency: "VND",
+                            })}
 
-                        {billInfo?.lstPaymentDetail?.length === 1 &&
-                          (billInfo?.lstPaymentDetail[0]?.price -
-                            billInfo?.amountPaid >
-                          0
-                            ? billInfo?.lstPaymentDetail[0]?.price -
-                              billInfo?.amountPaid
-                            : "Không có tiền thừa"
-                          ).toLocaleString("vi-VN", {
-                            style: "currency",
-                            currency: "VND",
-                          })}
-                      </span>
-                    </div>
-                  </Col>
-                </Row>
-              </Col>
-            </Row>
-          </Col>
-        </Row>
-      </section>
+                          {billInfo?.lstPaymentDetail?.length === 1 &&
+                            (billInfo?.lstPaymentDetail[0]?.price -
+                              billInfo?.amountPaid >
+                            0
+                              ? billInfo?.lstPaymentDetail[0]?.price -
+                                billInfo?.amountPaid
+                              : "Không có tiền thừa"
+                            ).toLocaleString("vi-VN", {
+                              style: "currency",
+                              currency: "VND",
+                            })}
+                        </span>
+                      </div>
+                    </Col>
+                  </Row>
+                </Col>
+              </Row>
+            </Col>
+          </Row>
+        </section>
 
-      <section className={styles.background} style={{ marginTop: "20px" }}>
-        <Row>
-          <Col span={21}>
-            <h2>Sản phẩm đã mua</h2>
-          </Col>
-          {billInfo?.symbol === "Shipping" &&
-            (timelines[timelines?.length - 1]?.status === "1" ||
-              timelines[timelines?.length - 1]?.status === "Update" ||
-              timelines[timelines?.length - 1]?.status === "Delete" ||
-              timelines[timelines?.length - 1]?.status === "Confirm" ||
-              timelines[timelines?.length - 1]?.status === "Rollback") &&
-            billInfo?.status !== "Paid" && (
-              <Col span={3}>
-                <Button
-                  type="primary"
-                  onClick={() => setIsOpenModalProduct(true)}
-                  disabled={
-                    billInfo?.lstPaymentDetail?.length === 1 ||
-                    billInfo?.lstPaymentDetail?.length === 2
-                      ? billInfo?.lstPaymentDetail[0].status === "Paid"
+        <section className={styles.background} style={{ marginTop: "20px" }}>
+          <Row>
+            <Col span={21}>
+              <h2>Sản phẩm đã mua</h2>
+            </Col>
+            {billInfo?.symbol === "Shipping" &&
+              (timelines[timelines?.length - 1]?.status === "1" ||
+                timelines[timelines?.length - 1]?.status === "Update" ||
+                timelines[timelines?.length - 1]?.status === "Delete" ||
+                timelines[timelines?.length - 1]?.status === "Confirm" ||
+                timelines[timelines?.length - 1]?.status === "Rollback") &&
+              billInfo?.status !== "Paid" && (
+                <Col span={3}>
+                  <Button
+                    type="primary"
+                    onClick={() => setIsOpenModalProduct(true)}
+                    disabled={
+                      billInfo?.lstPaymentDetail?.length === 1 ||
+                      billInfo?.lstPaymentDetail?.length === 2
+                        ? billInfo?.lstPaymentDetail[0].status === "Paid"
+                        : false
+                    }
+                  >
+                    Thêm sản phẩm
+                  </Button>
+                  <ModalProduct
+                    visible={isOpenModalProduct}
+                    onCancel={() => setIsOpenModalProduct(false)}
+                    render={setRender}
+                    cartId={null}
+                    billId={billId}
+                    isEditProductTimeLine={true}
+                  />
+                </Col>
+              )}
+          </Row>
+          <Divider
+            className={styles.blackDivider}
+            style={{ marginTop: "10px" }}
+          />
+          <Table
+            columns={columnProduct}
+            dataSource={
+              timelinePoduct &&
+              timelinePoduct?.map((record, index) => ({
+                ...record,
+                key: record?.billDetailId,
+              }))
+            }
+            pagination={false}
+          />
+          <div className={styles.timeLineEnd}>
+            <span className={styles.span}>
+              <span
+                style={{
+                  width: "198px",
+                  display: "inline-block",
+                  color: "#111111",
+                  fontWeight: "500",
+                }}
+              >
+                Thành tiền:
+              </span>
+              <span>{numeral(billInfo?.totalPrice).format("0,0") + "đ"}</span>
+            </span>
+            <span className={styles.span}>
+              <span
+                style={{
+                  width: "198px",
+                  display: "inline-block",
+                  color: "#111111",
+                  fontWeight: "500",
+                }}
+              >
+                Phí vận chuyển:
+              </span>
+              <span>
+                <InputCallAPI
+                  totalPrice={billInfo?.totalPrice}
+                  currentValue={numeral(shippingPrice).format("0,0")}
+                  onChange={handleChangeShippingPrice}
+                  isCallAPI={true}
+                  url={
+                    "http://localhost:8080/api/admin/delivery-note/updateShippingPrice"
+                  }
+                  billId={billInfo?.billId}
+                  currentPrice={billInfo?.shipPrice}
+                  handleCreateTimeline={handleCreateTimeline}
+                  billStatus={billInfo?.status}
+                  isPaid={
+                    billInfo?.lstPaymentDetail?.length > 0 &&
+                    billInfo?.lstPaymentDetail?.length === 1
+                      ? billInfo?.lstPaymentDetail[0]?.status === "Paid"
+                      : billInfo?.lstPaymentDetail?.length === 2
+                      ? billInfo?.lstPaymentDetail[0]?.status === "Paid" &&
+                        billInfo?.lstPaymentDetail[1]?.status === "Paid"
                       : false
                   }
-                >
-                  Thêm sản phẩm
-                </Button>
-                <ModalProduct
-                  visible={isOpenModalProduct}
-                  onCancel={() => setIsOpenModalProduct(false)}
-                  render={setRender}
-                  cartId={null}
-                  billId={billId}
-                  isEditProductTimeLine={true}
                 />
-              </Col>
-            )}
-        </Row>
-        <Divider
-          className={styles.blackDivider}
-          style={{ marginTop: "10px" }}
-        />
-        <Table
-          columns={columnProduct}
-          dataSource={
-            timelinePoduct &&
-            timelinePoduct?.map((record, index) => ({
-              ...record,
-              key: record?.billDetailId,
-            }))
-          }
-          pagination={false}
-        />
-        <div className={styles.timeLineEnd}>
-          <span className={styles.span}>
-            <span
-              style={{
-                width: "198px",
-                display: "inline-block",
-                color: "#111111",
-                fontWeight: "500",
-              }}
-            >
-              Thành tiền:
+              </span>
             </span>
-            <span>{numeral(billInfo?.totalPrice).format("0,0") + "đ"}</span>
-          </span>
-          <span className={styles.span}>
-            <span
-              style={{
-                width: "198px",
-                display: "inline-block",
-                color: "#111111",
-                fontWeight: "500",
-              }}
-            >
-              Phí vận chuyển:
-            </span>
-            <span>
-              {/* <Input
-                placeholder="Giá vận chuyển"
-                style={{ width: "30%" }}
-                value={numeral(shippingPrice).format("0,0")}
-                onChange={(e) => {
-                  handleChangeShippingPrice(e, e.target.value);
+            <span className={styles.span}>
+              <span
+                style={{
+                  width: "200px",
+                  display: "inline-block",
+                  color: "#111111",
+                  fontWeight: "500",
                 }}
-                onKeyDown={handleKeyDown} 
-              />
-                */}
-              <InputCallAPI
-                currentValue={numeral(shippingPrice).format("0,0")}
-                onChange={handleChangeShippingPrice}
-                isCallAPI={true}
-                url={
-                  "http://localhost:8080/api/admin/delivery-note/updateShippingPrice"
-                }
-                billId={billInfo?.billId}
-                currentPrice={billInfo?.shipPrice}
-                handleCreateTimeline={handleCreateTimeline}
-                billStatus={billInfo?.status}
-                isPaid={
-                  billInfo?.lstPaymentDetail?.length > 0 &&
-                  billInfo?.lstPaymentDetail?.length === 1
-                    ? billInfo?.lstPaymentDetail[0]?.status === "Paid"
-                    : billInfo?.lstPaymentDetail?.length === 2
-                    ? billInfo?.lstPaymentDetail[0]?.status === "Paid" &&
-                      billInfo?.lstPaymentDetail[1]?.status === "Paid"
-                    : false
-                }
-              />
+              >
+                Giảm giá:
+              </span>
+              <span>{numeral(billInfo?.priceReduce)?.format("0,0") + "đ"}</span>
             </span>
-          </span>
-          <span className={styles.span}>
-            <span
-              style={{
-                width: "200px",
-                display: "inline-block",
-                color: "#111111",
-                fontWeight: "500",
-              }}
-            >
-              Giảm giá:
-            </span>
-            <span>{numeral(billInfo?.priceReduce)?.format("0,0") + "đ"}</span>
-          </span>
-          <b className={styles.span}>
-            <span style={{ width: "200px", display: "inline-block" }}>
-              Tổng cộng:{" "}
-            </span>
-            <span style={{ fontSize: "16px", color: "#FF0000" }}>
-              {billInfo?.amountPaid?.toLocaleString("vi-VN", {
-                style: "currency",
-                currency: "VND",
-              })}
-            </span>
-          </b>
-        </div>
-      </section>
+            <b className={styles.span}>
+              <span style={{ width: "200px", display: "inline-block" }}>
+                Tổng cộng:{" "}
+              </span>
+              <span style={{ fontSize: "16px", color: "#FF0000" }}>
+                {billInfo?.amountPaid?.toLocaleString("vi-VN", {
+                  style: "currency",
+                  currency: "VND",
+                })}
+              </span>
+            </b>
+          </div>
+        </section>
+      </Spin>
     </>
   );
 };

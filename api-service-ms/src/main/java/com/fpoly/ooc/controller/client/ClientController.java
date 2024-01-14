@@ -18,19 +18,7 @@ import com.fpoly.ooc.request.bill.BillRequest;
 import com.fpoly.ooc.request.product.ProductDetailRequest;
 import com.fpoly.ooc.request.timeline.TimeLinerequest;
 import com.fpoly.ooc.request.voucher.DisplayVoucherRequest;
-import com.fpoly.ooc.service.interfaces.AccountService;
-import com.fpoly.ooc.service.interfaces.AddressDetailService;
-import com.fpoly.ooc.service.interfaces.AddressServiceI;
-import com.fpoly.ooc.service.interfaces.BillDetailService;
-import com.fpoly.ooc.service.interfaces.BillService;
-import com.fpoly.ooc.service.interfaces.CartDetailService;
-import com.fpoly.ooc.service.interfaces.DeliveryNoteService;
-import com.fpoly.ooc.service.interfaces.EmailService;
-import com.fpoly.ooc.service.interfaces.PaymentService;
-import com.fpoly.ooc.service.interfaces.ProductDetailServiceI;
-import com.fpoly.ooc.service.interfaces.ProductServiceI;
-import com.fpoly.ooc.service.interfaces.TimeLineService;
-import com.fpoly.ooc.service.interfaces.VoucherService;
+import com.fpoly.ooc.service.interfaces.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -60,6 +48,9 @@ public class ClientController {
 
     @Autowired
     private AddressDetailService addressDetailService;
+
+    @Autowired
+    private VoucherHistoryService voucherHistoryService;
 
     @Autowired
     private VoucherService voucherService;
@@ -272,13 +263,13 @@ public class ClientController {
 
     @GetMapping("/getColorProductDetailEdit")
     public ResponseEntity<?> getColorProductDetailEdit(@RequestParam("id") Long productDetailId,
-                                                       @RequestParam("sizeId") Optional<Long> sizeId) {
+                                                       @RequestParam("sizeId") Optional<Long> sizeId) throws NotFoundException {
         return ResponseEntity.ok(productDetailService.getColorProductDetailEdit(productDetailId, sizeId.orElse(null)));
     }
 
     @GetMapping("/getSizeProductDetailEdit")
     public ResponseEntity<?> getSizeProductDetailEdit(@RequestParam("id") Long productDetailId,
-                                                      @RequestParam("colorId") Optional<Long> colorId){
+                                                      @RequestParam("colorId") Optional<Long> colorId) throws NotFoundException {
         return ResponseEntity.ok(productDetailService.getSizeProductDetailEdit(productDetailId, colorId.orElse(null)));
     }
 
@@ -305,6 +296,10 @@ public class ClientController {
     public ResponseEntity<?> deleteBD(@RequestParam("bdId") Long bdId, @RequestParam("bId") Long bId) throws NotFoundException, JsonProcessingException {
         billDetailService.deleteBillDetail(bId, bdId);
         return ResponseEntity.ok("ok");
+    }
+    @GetMapping("/getVoucherByBillCode")
+    public ResponseEntity<?> getVoucherByBillCode(@RequestParam String billCode) {
+        return ResponseEntity.ok(voucherHistoryService.findVoucherHistoryByBillCode(billCode));
     }
 
     @GetMapping("/isCheckProduct")

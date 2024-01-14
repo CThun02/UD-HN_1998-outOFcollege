@@ -466,7 +466,7 @@ public class VoucherServiceImpl implements VoucherService {
                 if (priceReduce.compareTo(voucher.getVoucherValueMax())>0) {
                     priceReduce = voucher.getVoucherValueMax();
                 }
-            } else if (voucher.getVoucherMethod().equalsIgnoreCase("VND")) {
+            } else{
                 priceReduce = voucher.getVoucherValue();
             }
         }

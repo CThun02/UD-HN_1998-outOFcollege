@@ -50,4 +50,6 @@ public class TimelineCustomInfo {
 
     private String status;
 
+    private String billType;
+
 }

@@ -1,4 +1,4 @@
-INSERT INTO product (product_code, product_name, status, created_at, created_by)
+INSERT INTO product (product_code, product_name, status)
 VALUES ('P001', N'Áo sơ mi dài tay', 'ACTIVE'),
        ('P002', N'Áo sơ mi ngắn tay', 'ACTIVE'),
 	   ('P003', N'Áo sơ mi oxford', 'ACTIVE'),
@@ -168,8 +168,7 @@ values(1,'https://firebasestorage.googleapis.com/v0/b/outofcollge.appspot.com/o/
 (36,'https://firebasestorage.googleapis.com/v0/b/outofcollge.appspot.com/o/products%2FPants%20B%2FRed%2F1700578136416Pants_B222421342?alt=media&token=a0d4cd96-15c7-4e4c-a215-fb127b996ed2','ACTIVE'),
 (37,'https://firebasestorage.googleapis.com/v0/b/outofcollge.appspot.com/o/products%2FPants%20B%2FRed%2F1700578136416Pants_B222421342?alt=media&token=a0d4cd96-15c7-4e4c-a215-fb127b996ed2','ACTIVE'),
 (38,'https://firebasestorage.googleapis.com/v0/b/outofcollge.appspot.com/o/products%2FPants%20B%2FRed%2F1700578136416Pants_B222421342?alt=media&token=a0d4cd96-15c7-4e4c-a215-fb127b996ed2','ACTIVE'),
-(39,'https://firebasestorage.googleapis.com/v0/b/outofcollge.appspot.com/o/products%2FPants%20B%2FRed%2F1700578136416Pants_B222421342?alt=media&token=a0d4cd96-15c7-4e4c-a215-fb127b996ed2','ACTIVE'),
-(40,'https://firebasestorage.googleapis.com/v0/b/outofcollge.appspot.com/o/products%2FPants%20B%2FRed%2F1700578136416Pants_B222421342?alt=media&token=a0d4cd96-15c7-4e4c-a215-fb127b996ed2','ACTIVE');
+(39,'https://firebasestorage.googleapis.com/v0/b/outofcollge.appspot.com/o/products%2FPants%20B%2FRed%2F1700578136416Pants_B222421342?alt=media&token=a0d4cd96-15c7-4e4c-a215-fb127b996ed2','ACTIVE');
 
 insert into payment(payment_name, status)
 values('Cash','ACTIVE'),

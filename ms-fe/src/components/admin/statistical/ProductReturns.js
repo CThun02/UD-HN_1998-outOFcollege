@@ -6,13 +6,13 @@ import { getToken } from "../../../service/Token";
 import { EyeOutlined } from "@ant-design/icons";
 import ModalProductReturnDetail from "./ModalProductReturnDetail";
 
+var productDetailId;
 const ProductReturns = ({ date, dateToP, type, reason }) => {
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const [loading, setLoading] = useState(true);
   const [openModalProductReturns, setOpenModalProductReturns] = useState(false);
-  const [productDetailId, setProductDetailId] = useState("");
 
   const columns = [
     {
@@ -22,7 +22,7 @@ const ProductReturns = ({ date, dateToP, type, reason }) => {
       width: "7%",
       render: (text, record, index) => {
         return (
-          <span id={record.id}>
+          <span>
             {(currentPage - 1) * pageSize + (index + 1)}
           </span>
         );
@@ -142,7 +142,7 @@ const ProductReturns = ({ date, dateToP, type, reason }) => {
             type="primary"
             icon={<EyeOutlined />}
             onClick={() => {
-              setProductDetailId(record.id);
+              productDetailId=record?.id;
               setOpenModalProductReturns(true);
             }}
           />

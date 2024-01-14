@@ -36,7 +36,7 @@ function QuickLinks() {
         <Col xs={24} xl={12}>
           <Space direction="vertical" size={10}>
             <Col span={24}>
-              <Link className={styles.hyperLink}>Chính sách bảo mật</Link>
+              <Link to={"/ms-shop/policy"} className={styles.hyperLink}>Chính sách cửa hàng</Link>
             </Col>
             <Col span={24}>
               <Link className={styles.hyperLink}>Chi tiết vận chuyển</Link>

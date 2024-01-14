@@ -27,6 +27,7 @@ const TimelineByBillCode = () => {
   const [openCartEdit, setOpenCartEdit] = useState(false);
   const [openProductEdit, setOpenProductEdit] = useState([]);
   const [loadingButton, setLoadingButton] = useState(false);
+  const [voucher, setVoucher] = useState(null);
 
   const handleShowModalProductEdit = (index) => {
     const visible = [...openProductEdit];
@@ -73,6 +74,16 @@ const TimelineByBillCode = () => {
   };
 
   useEffect(() => {
+    axios
+      .get(
+        `http://localhost:8080/api/client/getVoucherByBillCode?billCode=${billCode}`
+      )
+      .then((response) => {
+        console.log(response.data)
+      })
+      .catch((error) => {
+        console.log(error);
+      });
     axios
       .get(
         `http://localhost:8080/api/client/getTimelineClientByBillCode/${billCode}`
@@ -132,7 +143,7 @@ const TimelineByBillCode = () => {
                             : CheckCircleOutlined
                         }
                         title={
-                          data.billType === "Online" &&
+                          (data.billType === "Online" || (data?.billType === "In-Store" && timelines?.timelineCustomInfo?.priceShip>0)) &&
                           timelines?.timelineCustomInfo ? (
                             <>
                               {data.status === "0" ? (
@@ -150,7 +161,7 @@ const TimelineByBillCode = () => {
                               ) : data.status === "5" ? (
                                 <h3>Yêu cầu trả hàng</h3>
                               ) : data.status === "6" ? (
-                                <h3>Trả hang thành công</h3>
+                                <h3>Trả hàng thành công</h3>
                               ) : (
                                 <h3>.</h3>
                               )}
@@ -185,9 +196,9 @@ const TimelineByBillCode = () => {
               onCancel={() => setOpenCartEdit(false)}
             />
             <Space direction="vertical" size={16} style={{ width: "100%" }}>
-              {console.log(timelines)}
               {timelines?.lstTimeline?.length > 1 ||
-              timelines?.timelineCustomInfo?.status === "Paid" ? null : (
+              timelines?.timelineCustomInfo?.status === "Paid" ||
+              timelines?.timelineCustomInfo?.billType !== "Online" ? null : (
                 <div style={{ marginBottom: "24px" }}>
                   <Button
                     onClick={() => setOpenCartEdit(true)}
@@ -198,15 +209,16 @@ const TimelineByBillCode = () => {
                   </Button>
                 </div>
               )}
+              <h2>Thông tin mua hàng</h2>
               {timelines?.lstProduct?.map((timeline, index) => {
                 return (
                   <Row style={{ margin: 0 }}>
-                    <EditProductCart
-                      onCancel={() => {
-                        handleCancelModalProductEdit(index);
-                      }}
-                      open={openProductEdit[index]}
-                      productDetailId={timeline?.productDetailId}
+                    <Col span={24} style={{marginBottom:"20px"}}>
+                    </Col>
+                    <EditProductCart 
+                      onCancel={()=>{handleCancelModalProductEdit(index)}} 
+                      open={openProductEdit[index]} 
+                      productDetailId={timeline?.productDetailId} 
                       render={setRender}
                       quantityBuy={timeline.quantity}
                       setLoadingButtonTimeline={setLoadingButton}
@@ -336,8 +348,10 @@ const TimelineByBillCode = () => {
                         alignItems: "center",
                       }}
                     >
-                      {timelines?.lstTimeline?.length > 1 ? null : (
-                        <Row>
+                        {timelines?.lstTimeline?.length >1  || 
+                        timelines?.timelineCustomInfo?.status === 'Paid' ||
+                        timelines?.timelineCustomInfo?.billType !== "Online" ? null :(
+                      <Row>
                           <Col span={12}>
                             <Button
                               loading={loadingButton}
@@ -495,13 +509,24 @@ const TimelineByBillCode = () => {
                             </Col>
                             <Col span={12}>
                               <p style={{ marginLeft: "25%" }}>
-                                {(timelines?.timelineCustomInfo?.priceShip).toLocaleString(
-                                  "vi-VN",
-                                  {
-                                    style: "currency",
-                                    currency: "VND",
+                                {(timelines?.timelineCustomInfo?.totalPrice) > 2000000?
+                                  <>
+                                    <strike>
+                                      {(timelines?.timelineCustomInfo?.priceShip).toLocaleString(
+                                                        "vi-VN",
+                                                        {
+                                                          style: "currency",
+                                                          currency: "VND",
+                                                        })} 
+                                    </strike> - 0 đ
+                                  </>: 
+                                  (timelines?.timelineCustomInfo?.priceShip).toLocaleString(
+                                                      "vi-VN",
+                                                      {
+                                                        style: "currency",
+                                                        currency: "VND",
+                                                      })
                                   }
-                                )}
                               </p>
                             </Col>
                             <Col
@@ -529,8 +554,7 @@ const TimelineByBillCode = () => {
                                 }}
                               >
                                 {(
-                                  timelines?.timelineCustomInfo?.pricePaid +
-                                  timelines?.timelineCustomInfo?.priceShip
+                                  timelines?.timelineCustomInfo?.pricePaid 
                                 ).toLocaleString("vi-VN", {
                                   style: "currency",
                                   currency: "VND",
@@ -541,7 +565,9 @@ const TimelineByBillCode = () => {
                         </Col>
                       </Row>
                     </Col>
-                    {timelines?.lstTimeline?.length > 1 ? null : (
+                    {timelines?.lstTimeline?.length >1  || 
+                    timelines?.timelineCustomInfo?.status === 'Paid' ||
+                    timelines?.timelineCustomInfo?.billType !== "Online" ? null :(
                       <Col span={2}>
                         <Button
                           loading={loadingButton}

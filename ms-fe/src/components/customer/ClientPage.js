@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import UserDetail from "./user/UserDetail";
 import TimelineByBillCode from "../element/timeline/TimelineByBillCode";
 import FollowOrder from "./follow-order/FollowOrder";
+import PolicyIndex from "./policy/PolicyIndex";
 
 function ClientPage() {
   const [render, setRender] = useState(0);
@@ -38,6 +39,7 @@ function ClientPage() {
             <Route path="follow-order" element={<FollowOrder />} />
             <Route path="user/:username" element={<UserDetail />} />
             <Route path="bill/:billCode" element={<TimelineByBillCode />} />
+            <Route path="policy" element={<PolicyIndex />} />
             <Route path="shopping">
               <Route index element={<Shop />} />
               {/* <Route path=":typeCategory">

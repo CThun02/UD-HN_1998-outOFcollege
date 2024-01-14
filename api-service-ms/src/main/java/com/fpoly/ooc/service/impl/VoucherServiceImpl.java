@@ -457,10 +457,29 @@ public class VoucherServiceImpl implements VoucherService {
     }
 
     @Override
+    public BigDecimal priceReduceByVoucherAndBillPrice(Voucher voucher, BigDecimal billPrice) {
+        BigDecimal priceReduce = BigDecimal.ZERO;
+        if(voucher != null){
+            if (voucher.getVoucherMethod().equals("%")) {
+                BigDecimal voucherValue = voucher.getVoucherValue();
+                priceReduce = billPrice.multiply(voucherValue).divide(BigDecimal.valueOf(100));
+                if (priceReduce.compareTo(voucher.getVoucherValueMax())>0) {
+                    priceReduce = voucher.getVoucherValueMax();
+                }
+            } else{
+                priceReduce = voucher.getVoucherValue();
+            }
+        }
+        return priceReduce;
+    }
+
     public Voucher findVoucherByTimeOrderBill(String voucherCode, LocalDateTime timeOrder) {
         Voucher voucher = voucherRepository.findVoucherByVoucherCodeAndTimeOrder(voucherCode, timeOrder);
         return Objects.nonNull(voucher) ? voucher : null;
     }
 
-
+    @Override
+    public Voucher getVoucherByCode(String voucherCode) {
+        return voucherRepository.findVoucherByVoucherCode(voucherCode).orElse(null);
+    }
 }

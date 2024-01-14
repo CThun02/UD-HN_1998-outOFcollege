@@ -25,6 +25,8 @@ import com.fpoly.ooc.repository.TimeLineRepo;
 import com.fpoly.ooc.request.bill.BillDetailRequest;
 import com.fpoly.ooc.request.bill.BillRequest;
 import com.fpoly.ooc.request.product.ProductDetailRequest;
+import com.fpoly.ooc.request.voucher.DisplayVoucherRequest;
+import com.fpoly.ooc.request.voucher.VoucherRequest;
 import com.fpoly.ooc.responce.account.GetListCustomer;
 import com.fpoly.ooc.responce.bill.BillGrowthResponse;
 import com.fpoly.ooc.responce.bill.BillLineChartResponse;
@@ -42,6 +44,7 @@ import com.fpoly.ooc.responce.product.ProductDetailResponse;
 import com.fpoly.ooc.responce.product.ProductDetailSellResponse;
 import com.fpoly.ooc.responce.timeline.TimelineProductDisplayResponse;
 import com.fpoly.ooc.responce.timeline.TimelineProductResponse;
+import com.fpoly.ooc.responce.voucher.VoucherResponse;
 import com.fpoly.ooc.service.interfaces.AccountService;
 import com.fpoly.ooc.service.interfaces.BillService;
 import com.fpoly.ooc.service.interfaces.CartDetailService;
@@ -399,7 +402,7 @@ public class BillServiceImpl implements BillService {
         }
 
         if (("Cancel").equals(dto.getStatus())) {
-            VoucherHistory voucherHistory = voucherHistoryService.findHistoryByBillCode(bill.getBillCode());
+            VoucherHistory voucherHistory = voucherHistoryService.findHistoryByBillCodeAndStatus(bill.getBillCode(), "ACTIVE");
             if (voucherHistory != null) {
                 VoucherAccount voucherAccount = voucherAccountService
                         .findVoucherAccountByUsernameAndVoucherCode(Objects.nonNull(bill.getAccount()) ? bill.getAccount().getUsername() : null, voucherHistory.getVoucherCode());
@@ -648,34 +651,54 @@ public class BillServiceImpl implements BillService {
         if (Objects.isNull(bill)) {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_NOT_FOUND));
         }
-
+        String username = Objects.nonNull(bill.getAccount())?bill.getAccount().getUsername() : null;
         DeliveryNote deliveryNote = deliveryNoteService.getDeliveryNoteByBill_Id(bill.getId());
+        double priceShip = 0;
+        if(Objects.nonNull(deliveryNote)){
+            if(bill.getPrice().compareTo(BigDecimal.valueOf(2000000))<0){
+                priceShip = CommonUtils.bigDecimalConvertDouble(deliveryNote.getShipPrice());
+            }
+        }
         double priceBillAmount = CommonUtils.bigDecimalConvertDouble(bill.getPrice())
-                + CommonUtils.bigDecimalConvertDouble(deliveryNote.getShipPrice())
+                + priceShip
                 - CommonUtils.bigDecimalConvertDouble(bill.getPriceReduce());
         bill.setAmountPaid(new BigDecimal(priceBillAmount));
 
-        VoucherHistory voucherHistory = voucherHistoryService.findHistoryByBillCode(bill.getBillCode());
+        VoucherHistory voucherHistory = voucherHistoryService.findHistoryByBillCodeAndStatus(bill.getBillCode(), "ACTIVE");
         double amountPrice = CommonUtils.bigDecimalConvertDouble(bill.getAmountPaid());
         double price = CommonUtils.bigDecimalConvertDouble(bill.getPrice());
         double priceReduce = 0d;
-        if (voucherHistory != null) {
-            Voucher voucher = voucherService.findVoucherByTimeOrderBill(voucherHistory.getVoucherCode(), bill.getCreatedAt());
-
+        Voucher voucher = null;
+        if (Objects.nonNull(voucherHistory)) {
+            voucher = voucherService.findVoucherByTimeOrderBill(voucherHistory.getVoucherCode(), bill.getCreatedAt());
+        }else{
+            voucherHistory = new VoucherHistory();
+        }
+        DisplayVoucherRequest request = new DisplayVoucherRequest();
+        request.setPriceBill(BigDecimal.valueOf(price));
+        request.setUsername(username);
+        VoucherResponse voucherNew = voucherService.autoFillVoucher(request);
+        if(Objects.nonNull(voucherNew)){
             if (Objects.nonNull(voucher)) {
-                Double condition = CommonUtils.bigDecimalConvertDouble(voucher.getVoucherCondition());
-                if (amountPrice > condition) {
-                    if (("%").equals(voucher.getVoucherMethod())) {
-                        Double voucherValue = CommonUtils.bigDecimalConvertDouble(voucher.getVoucherValue());
-                        priceReduce = amountPrice * voucherValue / 100;
-                        if (priceReduce > CommonUtils.bigDecimalConvertDouble(voucher.getVoucherValueMax())) {
-                            priceReduce = CommonUtils.bigDecimalConvertDouble(voucher.getVoucherValueMax());
-                        }
-                    } else if (("VND").equalsIgnoreCase(voucher.getVoucherMethod())) {
-                        priceReduce = CommonUtils.bigDecimalConvertDouble(voucher.getVoucherValue());
-                    }
+                //Hoàn trả số lượng voucher cũ (nếu có), vì hóa đơn đang thỏa mãn điều kiện voucher mới
+                if(voucher.getId().equals(voucherNew.getVoucherId())){
+                    voucher.setLimitQuantity(voucher.getLimitQuantity()+1);
+                    voucherService.updateVoucher(voucher);
                 }
             }
+            //Đặt lại voucher mới thay vì voucher cũ(nếu có)
+            voucher = Voucher.builder().id(voucherNew.getVoucherId()).voucherCode(voucherNew.getVoucherCode())
+                    .startDate(voucherNew.getStartDate()).endDate(voucherNew.getEndDate())
+                    .voucherValue(voucherNew.getVoucherValue()).voucherValueMax(voucherNew.getVoucherValueMax())
+                    .voucherMethod(voucherNew.getVoucherMethod()).voucherCondition(voucherNew.getVoucherCondition())
+                    .limitQuantity(voucherNew.getLimitQuantity()).build();
+        }
+        if (Objects.nonNull(voucher)) {
+            priceReduce = CommonUtils.bigDecimalConvertDouble(voucherService.priceReduceByVoucherAndBillPrice(voucher, bill.getPrice()));
+            voucherHistory.setVoucherCode(voucher.getVoucherCode());
+            voucherHistory.setPriceReduce(BigDecimal.valueOf(priceReduce));
+            voucherHistory.setBill(Bill.builder().id(bill.getId()).build());
+            voucherHistoryService.saveVoucherHistory(voucherHistory);
         }
 
         if (Objects.nonNull(bill.getPrice())) {
@@ -699,14 +722,34 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
-    public Bill updateBillReturn(Long billId, BigDecimal priceReturn, BigDecimal voucherPrice) throws NotFoundException {
+    public Bill updateBillReturn(Long billId, BigDecimal priceReturn, BigDecimal voucherPrice, String newVoucher) throws NotFoundException {
         Bill bill = this.findBillByBillId(billId);
-        bill.setPriceReduce(bill.getPriceReduce().subtract(priceReturn));
+        DeliveryNote deliveryNote = deliveryNoteService.getDeliveryNoteByBill_Id(billId);
+        bill.setAmountPaid(bill.getAmountPaid().subtract(priceReturn).add(Objects.isNull(deliveryNote)?BigDecimal.ZERO:deliveryNote.getShipPrice()));
+        bill.setPriceReduce(voucherPrice);
         bill.setStatus("ReturnS");
-        VoucherHistory voucherHistory = voucherHistoryService.findHistoryByBillCode(bill.getBillCode());
-        if(voucherHistory != null){
-            voucherHistory.setPriceReduce(voucherPrice);
-            voucherHistoryService.saveVoucherHistory(voucherHistory);
+        VoucherHistory voucherHistory = voucherHistoryService.findHistoryByBillCodeAndStatus(bill.getBillCode(), "ACTIVE");
+        if(Objects.isNull(newVoucher)){
+            if(voucherHistory != null){
+                voucherHistory.setPriceReduce(voucherPrice);
+                voucherHistoryService.saveVoucherHistory(voucherHistory);
+            }
+        }else{
+            if(voucherHistory !=null){
+                voucherHistory.setStatus(Const.STATUS_INACTIVE);
+                voucherHistoryService.saveVoucherHistory(voucherHistory);
+            }
+            VoucherRequest voucher = null;
+            try {
+                voucher = voucherService.findByVoucherCode(newVoucher);
+            } catch (NotFoundException e) {
+                e.printStackTrace();
+            }
+            if(!Objects.isNull(voucher)){
+                voucherHistoryService.saveVoucherHistory(new VoucherHistory(null, newVoucher, voucherPrice, bill));
+                voucher.setLimitQuantity(voucher.getLimitQuantity()-1);
+                voucherService.saveOrUpdate(voucher);
+            }
         }
         return billRepo.save(bill);
     }

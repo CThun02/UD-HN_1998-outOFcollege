@@ -21,6 +21,8 @@ public interface BillDetailService {
 
     BillDetail updateBillDetail(BillDetailRequest request) throws JsonProcessingException, NotFoundException;
 
+    BillDetail saveOrUpdate(BillDetail billDetail);
+
     void deleteBill(Long id);
 
     PdfResponse pdfResponse(String billCode) throws NotFoundException;
@@ -30,4 +32,6 @@ public interface BillDetailService {
     BillDetail createBillDetail(ProductDetailRequest request, String billCode) throws NotFoundException, JsonProcessingException;
 
     BillDetail updateBillDetail(ProductDetailRequest request, Long billDetailId) throws NotFoundException, JsonProcessingException;
+
+    List<BillDetail> findBillDetailsByPDIdAndBillId(Long pDId, Long billId) throws NotFoundException;
 }

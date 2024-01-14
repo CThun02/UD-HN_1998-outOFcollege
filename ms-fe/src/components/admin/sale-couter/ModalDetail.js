@@ -129,7 +129,19 @@ const ModalDetail = ({
       title={"Ghi chú hóa đơn"}
       width={1000}
     >
-      <Table columns={columns} dataSource={timelineDetail} pagination={false} />
+      <Table
+        columns={columns}
+        dataSource={timelineDetail}
+        pagination={{
+          showSizeChanger: true,
+          pageSizeOptions: [5, 10, 15, 20],
+          defaultPageSize: 5,
+          showLessItems: true,
+          style: { marginRight: "10px" },
+        }}
+        scroll={{y:500}}
+      />
+
     </Modal>
   );
 };

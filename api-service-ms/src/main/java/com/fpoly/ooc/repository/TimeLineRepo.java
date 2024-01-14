@@ -26,6 +26,19 @@ public interface TimeLineRepo extends JpaRepository<Timeline, Long> {
             "ORDER BY t.id")
     List<TimeLineResponse> getTimeLineByBillId(@Param("billId") Long id);
 
+    @Query("SELECT DISTINCT new com.fpoly.ooc.responce.timeline.TimeLineResponse( t.id, t.bill.id, t.note, t.status, " +
+            "   t.createdAt, t.createdBy, t.bill.billType, b.status, b.completionDate, b.price, " +
+            "   add.descriptionDetail + ' ' + add.ward + ' ' + add.district + ' ' + add.city )" +
+            "FROM Timeline t " +
+            "   LEFT JOIN Bill b ON t.bill.id = b.id " +
+            "   LEFT JOIN BillDetail bd ON bd.bill.id = b.id " +
+            "   LEFT JOIN DeliveryNote dn ON dn.bill.id = b.id " +
+            "   LEFT JOIN Address add ON add.id = dn.address.id " +
+            "WHERE b.id = :billId and (t.status like '0' or t.status like '1' or " +
+            "t.status like '2' or t.status like '3' or t.status like '4' or t.status like '5' or t.status like '6') " +
+            "ORDER BY t.id")
+    List<TimeLineResponse> getTimeLineClientByBillId(@Param("billId") Long id);
+
     @Query("SELECT new com.fpoly.ooc.responce.timeline.TimelineProductResponse(" +
             "   bd.bill.id,  bd.bill.billCode, pd.id, bd.id, pd.product.productCode," +
             "   pd.product.productName,pd.quantity, bd.quantity, bd.price, pd.size.sizeName, pd.color.colorCode," +

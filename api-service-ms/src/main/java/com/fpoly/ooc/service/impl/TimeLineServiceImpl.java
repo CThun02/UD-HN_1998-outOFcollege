@@ -13,6 +13,7 @@ import com.fpoly.ooc.entity.BillDetail;
 import com.fpoly.ooc.entity.DeliveryNote;
 import com.fpoly.ooc.entity.ProductDetail;
 import com.fpoly.ooc.entity.Timeline;
+import com.fpoly.ooc.entity.VoucherHistory;
 import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.BillDetailRepo;
 import com.fpoly.ooc.repository.TimeLineRepo;
@@ -25,6 +26,7 @@ import com.fpoly.ooc.responce.timeline.TimelineClientResponse;
 import com.fpoly.ooc.responce.timeline.TimelineCustomInfo;
 import com.fpoly.ooc.responce.timeline.TimelineProductDisplayResponse;
 import com.fpoly.ooc.responce.timeline.TimelineProductResponse;
+import com.fpoly.ooc.service.interfaces.*;
 import com.fpoly.ooc.service.interfaces.BillDetailService;
 import com.fpoly.ooc.service.interfaces.BillService;
 import com.fpoly.ooc.service.interfaces.DeliveryNoteService;
@@ -43,6 +45,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -59,6 +62,9 @@ public class TimeLineServiceImpl implements TimeLineService {
 
     @Autowired
     private BillService billService;
+
+    @Autowired
+    private VoucherHistoryService voucherHistoryService;
 
     @Autowired
     private ProductImageServiceI productImageServiceI;
@@ -96,7 +102,6 @@ public class TimeLineServiceImpl implements TimeLineService {
         if (bill == null) {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND));
         }
-
         return timeLineRepo.getTimeLineByBillId(id);
     }
 
@@ -110,9 +115,8 @@ public class TimeLineServiceImpl implements TimeLineService {
         TimelineClientResponse timelineClientResponse = new TimelineClientResponse();
         List<TimelineProductDisplayResponse> lstProduct = new ArrayList<>();
 
-        List<TimelineProductResponse> lstTimelineProductResponses = null;
-        lstTimelineProductResponses = timeLineRepo.getTimelineProductByBillId(bill.getId());
-        timelineClientResponse.setLstTimeline(timeLineRepo.getTimeLineByBillId(bill.getId()));
+        List<TimelineProductResponse> lstTimelineProductResponses = timeLineRepo.getTimelineProductByBillId(bill.getId());
+        timelineClientResponse.setLstTimeline(timeLineRepo.getTimeLineClientByBillId(bill.getId()));
 
         for (TimelineProductResponse timelineProductResponse : lstTimelineProductResponses) {
             TimelineProductDisplayResponse response = new TimelineProductDisplayResponse(timelineProductResponse);
@@ -120,28 +124,34 @@ public class TimeLineServiceImpl implements TimeLineService {
             lstProduct.add(response);
         }
 
+        VoucherHistory voucherHistory = voucherHistoryService.findHistoryByBillCodeAndStatus(billCode, "ACTIVE");
+
         timelineClientResponse.setLstProduct(lstProduct);
 
         DeliveryNote deliveryNote = deliveryNoteService.getDeliveryNoteByBill_Id(bill.getId());
 
+        TimelineCustomInfo timelineCustomInfo = new TimelineCustomInfo();
         if (deliveryNote != null) {
-            TimelineCustomInfo timelineCustomInfo = TimelineCustomInfo.builder()
+            timelineCustomInfo = TimelineCustomInfo.builder()
                     .addressId(deliveryNote.getAddress().getId())
                     .fullName(deliveryNote.getName())
                     .phoneNumber(deliveryNote.getPhoneNumber())
-                    .orderDate(bill.getCreatedAt())
-                    .dateOfReceipt(bill.getCompletionDate())
                     .addressDetail(deliveryNote.getAddress().getDescriptionDetail())
                     .ward(deliveryNote.getAddress().getWard())
                     .district(deliveryNote.getAddress().getDistrict())
                     .city(deliveryNote.getAddress().getCity())
                     .priceShip(deliveryNote.getShipPrice())
                     .dateShip(deliveryNote.getShipDate())
-                    .totalPrice(bill.getPrice())
                     .build();
-            timelineClientResponse.setTimelineCustomInfo(timelineCustomInfo);
         }
-
+        timelineCustomInfo.setOrderDate(bill.getCreatedAt());
+        timelineCustomInfo.setDateOfReceipt(bill.getCompletionDate());
+        timelineCustomInfo.setTotalPrice(bill.getPrice());
+        timelineCustomInfo.setPriceReduce(bill.getPriceReduce());
+        timelineCustomInfo.setPricePaid(bill.getAmountPaid());
+        timelineCustomInfo.setBillType(bill.getBillType());
+        timelineCustomInfo.setStatus(bill.getStatus());
+        timelineClientResponse.setTimelineCustomInfo(timelineCustomInfo);
         return timelineClientResponse;
     }
 
@@ -270,7 +280,7 @@ public class TimeLineServiceImpl implements TimeLineService {
             template.convertAndSend("/topic/notifications-topic", notificationsJson);
         }
 
-        String timelineJson = objectMapper.writeValueAsString(timeLineRepo.getTimeLineByBillId(bill.getId()));
+        String timelineJson = objectMapper.writeValueAsString(timeLineRepo.getTimeLineClientByBillId(bill.getId()));
         template.convertAndSend("/topic/create-timeline-client-topic", timelineJson);
         log.info("CreateTimeLineJson: " + timelineJson);
 

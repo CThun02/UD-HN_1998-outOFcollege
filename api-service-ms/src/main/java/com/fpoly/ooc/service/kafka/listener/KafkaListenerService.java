@@ -415,7 +415,7 @@ public class KafkaListenerService {
         if(Objects.nonNull(billDb)) {
             String updateStatusBillJson = objectMapper.writeValueAsString(timeLineRepo.findAll());
             String timeLineJson = objectMapper.writeValueAsString(timeLineRepo.findAll());
-            String billClient = objectMapper.writeValueAsString(timeLineRepo.getTimeLineByBillId(bill.getId()));
+            String billClient = objectMapper.writeValueAsString(timeLineRepo.getTimeLineClientByBillId(bill.getId()));
             template.convertAndSend("/topic/bill-topic", updateStatusBillJson);
             template.convertAndSend("/topic/timeline-client-topic", billClient);
             log.info("TimeLineJson: " + timeLineJson);

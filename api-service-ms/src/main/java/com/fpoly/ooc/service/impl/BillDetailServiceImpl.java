@@ -105,13 +105,13 @@ public class BillDetailServiceImpl implements BillDetailService {
     @Transactional(rollbackOn = RuntimeException.class)
     @Override
     public BillDetail updateBillDetail(ProductDetailRequest request, Long billDetailId) throws NotFoundException {
-        if(request.getQuantity()<0){
+        if(request.getQuantity()<=0){
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_QUANTITY_INVALID));
         }
         BillDetail billDetail = billDetailRepo.findById(billDetailId).orElse(null);
         //Tìm hóa đơn đang chỉnh sửa
         Bill bill = billDetail.getBill();
-        ProductDetail productDetail = productDetailService.getOne(request.getId());
+        ProductDetail productDetail = productDetailService.findById(request.getId());
         //Request đối tượng thêm mới gửi xuống bao gồm: Số lượng thêm, giá hiện tại mua, id sản phẩm chi tiết
 
         Integer quantityUpdate = request.getQuantity();
@@ -128,7 +128,7 @@ public class BillDetailServiceImpl implements BillDetailService {
             ProductDetail productDetailOld = billDetail.getProductDetail();
             if(quantityUpdate> productDetail.getQuantity()){
                 throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BUY_QUANTITY_THAN_QUANTITY_IN_STORE));
-            }else if(price.multiply(BigDecimal.valueOf(quantityUpdate)).compareTo(BigDecimal.valueOf(5000000))>0){
+            }else if(price.multiply(BigDecimal.valueOf(quantityUpdate)).compareTo(BigDecimal.valueOf(10000000))>0){
                 throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BUY_PRICE_THAN_FIVE_MILLION));
             }
             productDetailOld.setQuantity(productDetailOld.getQuantity() + billDetail.getQuantity());
@@ -147,6 +147,11 @@ public class BillDetailServiceImpl implements BillDetailService {
                 .build();
         this.saveOrUpdateBillDetail(billDetail, bill, productDetail);
         return billDetail;
+    }
+
+    @Override
+    public List<BillDetail> findBillDetailsByPDIdAndBillId(Long pDId, Long billId) throws NotFoundException {
+        return billDetailRepo.findBillDetailsByProductDetailIdAndBillId(pDId, billId);
     }
 
     //@Author: Nguyễn Công Thuần
@@ -168,11 +173,13 @@ public class BillDetailServiceImpl implements BillDetailService {
     //productDetail: sản phẩm mới thêm, price: giá sản phẩm mới thêm hiện tại(có thể có khuyến  mại giảm giá),
     private void validateBill(int quantityAdd, ProductDetail productDetail, BigDecimal price, Bill bill) throws NotFoundException {
         //Nếu số lượng mua lớn hơn số lượng tồn
-        if (quantityAdd > productDetail.getQuantity() ) {
+        if(bill.getStatus().equals("Paid")){
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_PAID));
+        }else if (quantityAdd > productDetail.getQuantity() ) {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BUY_QUANTITY_THAN_QUANTITY_IN_STORE));
         }
-        //Nếu tổng giá mua lớn hơn 5 triệu
-        else if(price.multiply(BigDecimal.valueOf(quantityAdd)).compareTo(BigDecimal.valueOf(5000000))>0){
+        //Nếu tổng giá mua lớn hơn 10 triệu
+        else if(price.multiply(BigDecimal.valueOf(quantityAdd)).compareTo(BigDecimal.valueOf(10000000))>0){
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BUY_PRICE_THAN_FIVE_MILLION));
         }
         //Nếu nếu số lượng mua bé hơn hoặc bằng 0
@@ -180,7 +187,7 @@ public class BillDetailServiceImpl implements BillDetailService {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_QUANTITY_INVALID));
         }
         //Nếu giá mua cộng với giá tại hóa đơn lớn hơn 5 triệu
-        else if(price.multiply(BigDecimal.valueOf(quantityAdd)).add(bill.getPriceReduce()).compareTo(BigDecimal.valueOf(5000000))>0){
+        else if(price.multiply(BigDecimal.valueOf(quantityAdd)).add(bill.getPriceReduce()).compareTo(BigDecimal.valueOf(10000000))>0){
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_THAN_TEN_MILLION));
         }
     }
@@ -356,6 +363,11 @@ public class BillDetailServiceImpl implements BillDetailService {
         billDetailRepo.save(billDetail);
 
         return billDetail;
+    }
+
+    @Override
+    public BillDetail saveOrUpdate(BillDetail billDetail) {
+        return billDetailRepo.save(billDetail);
     }
 
     @Override

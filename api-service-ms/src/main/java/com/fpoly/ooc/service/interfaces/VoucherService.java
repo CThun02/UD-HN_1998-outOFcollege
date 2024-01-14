@@ -51,6 +51,10 @@ public interface VoucherService {
     
     List<VoucherAccountResponse> getVoucherByUsernameAndVoucherCode(String username, String voucherCode);
 
+    BigDecimal priceReduceByVoucherAndBillPrice(Voucher voucher, BigDecimal billPrice);
+
     Voucher findVoucherByTimeOrderBill(String voucherCode, LocalDateTime timeOrder);
+
+    Voucher getVoucherByCode(String voucherCode);
 
 }

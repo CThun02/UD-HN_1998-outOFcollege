@@ -48,6 +48,14 @@ public class DeliveryNoteServiceImpl implements DeliveryNoteService {
     }
 
     @Override
+    public DeliveryNote createDeliveryNote(DeliveryNote deliveryNote) {
+        if (Objects.nonNull(deliveryNote)) {
+            return deliveryNoteRepo.save(deliveryNote);
+        }
+        return null;
+    }
+
+    @Override
     public DeliveryNote getDeliveryNoteByBill_Id(Long billId) {
         return deliveryNoteRepo.getDeliveryNoteByBill_Id(billId);
     }

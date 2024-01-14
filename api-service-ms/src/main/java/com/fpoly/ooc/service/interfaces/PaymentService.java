@@ -11,7 +11,7 @@ public interface PaymentService {
 
     List<PaymentDetailResponse> findPaymentDetailByBillId(Long billId);
 
-    PaymentDetail savePaymentDetail(Long billId) throws NotFoundException;
+    PaymentDetail savePaymentDetail(Bill bill) throws NotFoundException;
 
     Boolean isBillAlreadyPaid(Long billId);
 

@@ -42,4 +42,6 @@ public class PdfResponse {
 
     private DeliveryNoteResponse deliveryNote;
 
+    private String billType;
+
 }

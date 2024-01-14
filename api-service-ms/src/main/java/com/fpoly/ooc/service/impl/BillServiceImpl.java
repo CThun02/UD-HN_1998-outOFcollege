@@ -228,19 +228,23 @@ public class BillServiceImpl implements BillService {
                 } else {
                     statusPaymentDetail = "Paid";
                 }
-                paymentDetail.setPrice(request.getAmountPaid());
+//                paymentDetail.setPrice(request.getAmountPaid());
             } else {
-                if(request.getPaymentDetailId() == 1) {
-                    if (CommonUtils.bigDecimalConvertDouble(request.getPriceAmountCast()) < CommonUtils.bigDecimalConvertDouble(request.getAmountPaid())) {
-                        throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_MONEY_LESS_TOTAL_BILL));
+                if (!request.getPaymentInDelivery()) {
+                    if (request.getPaymentDetailId() == 1) {
+                        if (CommonUtils.bigDecimalConvertDouble(request.getPriceAmountCast()) < CommonUtils.bigDecimalConvertDouble(request.getAmountPaid())) {
+                            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_MONEY_LESS_TOTAL_BILL));
+                        }
+                        paymentDetail.setPrice(request.getPriceAmountCast());
                     }
-                    paymentDetail.setPrice(request.getPriceAmountCast());
-                }
-                if(request.getPaymentDetailId() == 2) {
-                    if (CommonUtils.bigDecimalConvertDouble(request.getPriceAmountATM()) < CommonUtils.bigDecimalConvertDouble(request.getAmountPaid())) {
-                        throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_MONEY_LESS_TOTAL_BILL));
+                    if (request.getPaymentDetailId() == 2) {
+                        if (CommonUtils.bigDecimalConvertDouble(request.getPriceAmountATM()) < CommonUtils.bigDecimalConvertDouble(request.getAmountPaid())) {
+                            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_MONEY_LESS_TOTAL_BILL));
+                        }
+                        paymentDetail.setPrice(request.getPriceAmountATM());
                     }
-                    paymentDetail.setPrice(request.getPriceAmountATM());
+                } else {
+                    paymentDetail.setPrice(request.getAmountPaid());
                 }
             }
 
@@ -658,6 +662,8 @@ public class BillServiceImpl implements BillService {
             if(bill.getPrice().compareTo(BigDecimal.valueOf(2000000))<0){
                 priceShip = CommonUtils.bigDecimalConvertDouble(deliveryNote.getShipPrice());
             }
+            deliveryNote.setShipPrice(new BigDecimal(priceShip));
+            deliveryNoteService.createDeliveryNote(deliveryNote);
         }
         double priceBillAmount = CommonUtils.bigDecimalConvertDouble(bill.getPrice())
                 + priceShip

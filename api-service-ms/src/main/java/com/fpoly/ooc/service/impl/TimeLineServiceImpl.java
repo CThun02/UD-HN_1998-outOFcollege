@@ -242,13 +242,13 @@ public class TimeLineServiceImpl implements TimeLineService {
                         default:
                             statusBill = "Complete";
                             bill.setCompletionDate(LocalDateTime.now());
-                            paymentService.savePaymentDetail(billId);
+                            paymentService.savePaymentDetail(bill);
                             break;
                     }
                 } else {
                     statusBill = "Complete";
                     bill.setCompletionDate(LocalDateTime.now());
-                    paymentService.savePaymentDetail(billId);
+                    paymentService.savePaymentDetail(bill);
                 }
 
                 if (!bill.getStatus().equalsIgnoreCase(statusBill)) {

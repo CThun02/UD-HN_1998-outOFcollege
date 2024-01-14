@@ -959,13 +959,6 @@ const Bill = () => {
       accountId: account?.username,
       price: totalPrice,
       priceReduce: voucherPrice(),
-      // amountPaid: typeShipping[index]
-      //   ? 0
-      //   : Number(selectedOption) === 2
-      //   ? voucherPrice() + shippingFee
-      //   : Number(selectedOption) === 3
-      //   ? voucherPrice() + shippingFee
-      //   : amountPaid,
       amountPaid: totalPrice - voucherPrice() + (shippingFee ? shippingFee : 0),
       billType: "In-Store",
       symbol: typeShipping[index] ? "Shipping" : symbol,
@@ -988,13 +981,7 @@ const Bill = () => {
           : null,
       phoneNumber: selectedAddress?.numberPhone,
       voucherCode: voucherAdd?.voucherCode ?? null,
-      // createdBy: token,
       priceAmountCast: price ? price.replace(/[,]/g, "") : null,
-      // Number(selectedOption) !== 2
-      //   ? price
-      //     ? price.replace(/[,]/g, "")
-      //     : null
-      //   : null,
       emailDetails: {
         recipient: selectedAddress?.email ? [selectedAddress?.email] : [email],
         messageBody: `<body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: Arial, sans-serif;">
@@ -1111,22 +1098,31 @@ const Bill = () => {
       descriptionDetail: detailAddress,
     };
 
+    // switchChange: giao hang
+    // typeShipping: thanh toan khi nhan hang
     const schema = Yup.object().shape({
-      fullName: Yup.string().required("Họ và tên không được để trống"),
-      sdt: Yup.string()
-        .required("Số điện thoại không được để trống")
-        .matches(/^[0-9]{10}$/, "Số điện thoại phải có đúng 10 chữ số"),
-      city: Yup.string().required("Tỉnh/ thành phố không được để trống"),
-      district: Yup.string().required("Quận/ huyện không được để trống"),
-      ward: Yup.string().required("Phường/ xã không được để trống"),
-      email: Yup.string().email("Địa chỉ email không hợp lệ"),
+      fullName: switchChange[index]
+        ? Yup.string().required("Họ và tên không được để trống")
+        : null,
+      sdt: switchChange[index]
+        ? Yup.string()
+            .required("Số điện thoại không được để trống")
+            .matches(/^[0-9]{10}$/, "Số điện thoại phải có đúng 10 chữ số")
+        : null,
+      city: switchChange[index]
+        ? Yup.string().required("Tỉnh/ thành phố không được để trống")
+        : null,
+      district: switchChange[index]
+        ? Yup.string().required("Quận/ huyện không được để trống")
+        : null,
+      ward: switchChange[index]
+        ? Yup.string().required("Phường/ xã không được để trống")
+        : null,
+      email: switchChange[index]
+        ? Yup.string().email("Địa chỉ email không hợp lệ")
+        : null,
     });
-    let calculatedValue = 0;
-    if (switchChange[index]) {
-      calculatedValue = totalPrice - voucherPrice() + shippingFee;
-    } else {
-      calculatedValue = totalPrice - voucherPrice();
-    }
+
     const customerAmountPay =
       totalPrice - voucherPrice() + (shippingFee ? shippingFee : 0);
 

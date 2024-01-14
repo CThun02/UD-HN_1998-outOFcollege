@@ -25,12 +25,14 @@ import com.fpoly.ooc.util.CommonUtils;
 import jakarta.persistence.LockModeType;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -400,12 +402,12 @@ public class BillDetailServiceImpl implements BillDetailService {
             deliveryNote.setWard(ward[0]);
         }
         String[] createdBy = bill.getCreatedBy().split("_");
-
+        System.out.println("data: " + createdBy.length);
         PdfResponse pdfResponse = PdfResponse.builder()
                 .billCode(billCode)
                 .billUpdateBy(bill.getUpdatedBy())
                 .billCreatedAt(response.getCreatedDate())
-                .billCreatedBy(createdBy[1])
+                .billCreatedBy(createdBy.length > 0 ? createdBy[0] : createdBy[1])
                 .totalPrice(response.getTotalPrice())
                 .shippingFee(response.getShipPrice())
                 .amountPaid(response.getAmountPaid())
@@ -414,6 +416,7 @@ public class BillDetailServiceImpl implements BillDetailService {
                 .lstProductDetail(lstProductDT)
                 .lstPaymentDetail(lstPaymentDetail)
                 .deliveryNote(deliveryNote)
+                .billType(bill.getBillType())
                 .build();
 
         return pdfResponse;

@@ -16,6 +16,13 @@ const ModalAddress = ({
   selectedAddress,
   username,
   data,
+  setEmail,
+  setFullname,
+  setPhoneNumber,
+  setProvinces,
+  setWards,
+  setDistricts,
+  setDetailAddress
 }) => {
   const [renderAddress, setRenderAddress] = useState(null);
   const [address, setAddress] = useState([]);
@@ -73,6 +80,13 @@ const ModalAddress = ({
       ward: record?.ward,
       addressDetail: record?.descriptionDetail,
     });
+    setEmail(record?.email)
+    setFullname(record?.fullName);
+    setPhoneNumber(record?.sdt)
+    setProvinces(record?.city);
+    setWards(record?.ward)
+    setDistricts(record?.district)
+    setDetailAddress(record?.detailAddress)
     handleCancel();
     render(Math.random);
   };

@@ -158,6 +158,7 @@ const ModalBillInfoDisplay = ({ open, cancel, billCode }) => {
                     <Text>Họ tên người mua hàng:</Text>
                   </View>
                   <View style={{ width: "60%"}}>
+                    <Text>{bill?.deliveryNote?.fullName}</Text>
                   </View>
                 </View>
                 <View style={{ flexDirection: "row", fontSize: 12, marginBottom:8 }}>
@@ -165,6 +166,13 @@ const ModalBillInfoDisplay = ({ open, cancel, billCode }) => {
                     <Text>Địa chỉ:</Text>
                   </View>
                   <View style={{ width: "60%"}}>
+                    <Text>{bill?.deliveryNote
+                                ? bill?.deliveryNote?.ward +
+                                  ", " +
+                                  bill?.deliveryNote?.district +
+                                  ", " +
+                                  bill?.deliveryNote?.city
+                                : null}</Text>
                   </View>
                 </View>
                 <View style={{ flexDirection: "row", fontSize: 12, marginBottom:8 }}>
@@ -172,6 +180,7 @@ const ModalBillInfoDisplay = ({ open, cancel, billCode }) => {
                     <Text>Số điện thoại:</Text>
                   </View>
                   <View style={{ width: "60%"}}>
+                    <Text>{bill?.deliveryNote?.phoneNumber}</Text>
                   </View>
                 </View>
                 <View style={{ flexDirection: "row", fontSize: 12, marginBottom:8 }}>
@@ -179,6 +188,14 @@ const ModalBillInfoDisplay = ({ open, cancel, billCode }) => {
                     <Text>Hình thức thanh toán:</Text>
                   </View>
                   <View style={{ width: "60%"}}>
+                  <Text>{bill?.lstPaymentDetail?.length === 1
+                                ? bill?.lstPaymentDetail[0]?.paymentName ===
+                                  "Cash"
+                                  ? "Tiền mặt"
+                                  : "Chuyển khoản"
+                                : bill?.lstPaymentDetail?.length === 2
+                                ? "Chuyển khoản, tiền mặt"
+                                : null}</Text>
                   </View>
                 </View>
                 <View style={{ flexDirection: "row", fontSize: 12, marginBottom:8 }}>
@@ -186,9 +203,12 @@ const ModalBillInfoDisplay = ({ open, cancel, billCode }) => {
                     <Text>Nhân viên bán hàng:</Text>
                   </View>
                   <View style={{ width: "60%"}}>
+                    <Text>{bill?.billCreatedBy}</Text>
                   </View>
                 </View>
                 {/* sản phẩm */}
+                <View style={{ paddingBottom: 12, marginBottom:12, width:"100%", borderBottom:"2px solid black"}}>
+                </View>
                 <Text
                   style={{
                     fontSize: 16,
@@ -296,10 +316,10 @@ const ModalBillInfoDisplay = ({ open, cancel, billCode }) => {
                     </View>
                     <View style={{ flexDirection: "row", fontSize: 12, marginBottom:8 }}>
                       <View style={{ width: "30%" }}>
-                        <Text>Giá vận chuyển:</Text>
+                        <Text style={{fontSize: 12}}>Giá vận chuyển:</Text>
                       </View>
                       <View style={{ width: "70%" }}>
-                        <Text>{(bill?.shippingFee ?? 0).toLocaleString("vi-VN", {
+                        <Text style={{fontSize: 12}}>{(bill?.shippingFee ?? 0).toLocaleString("vi-VN", {
                           style: "currency",
                           currency: "VND",
                         })}</Text>
@@ -307,14 +327,37 @@ const ModalBillInfoDisplay = ({ open, cancel, billCode }) => {
                     </View>
                     <View style={{ flexDirection: "row", fontSize: 12, marginBottom:8 }}>
                       <View style={{ width: "30%" }}>
-                        <Text>Giảm giá:</Text>
+                        <Text style={{fontSize: 12}}>Giảm giá:</Text>
                       </View>
                       <View style={{ width: "70%" }}>
-                        <Text>{bill?.priceReduce?.toLocaleString("vi-VN", {
+                        <Text style={{fontSize: 12}}>{bill?.priceReduce?.toLocaleString("vi-VN", {
                           style: "currency",
                           currency: "VND",
                         })}</Text>
                       </View>
+                    </View>
+                    <View style={{ flexDirection: "row", fontSize: 12, marginBottom:8 }}>
+                      <View style={{ width: "30%" }}>
+                        <Text style={{fontSize: 12}}>Khách hàng thanh toán:</Text>
+                      </View>
+                      <View style={{ width: "70%", flexDirection: "row", flexWrap: "wrap" }}>
+                        {bill?.lstPaymentDetail && bill?.lstPaymentDetail.map((item) => (
+                          <View style={{ marginRight: 10, width:"100%" }}>
+                            <Text>
+                              {item?.paymentName === "Cash" ? "Tiền mặt" : "Chuyển khoản"} - {item?.price?.toLocaleString("vi-VN", { style: "currency", currency: "VND" })}
+                            </Text>
+                          </View>
+                        ))}
+                        <View style={{ width: "100%" }}>
+                          <Text style={{ fontSize: 12 }}>
+                            Tổng thanh toán - {bill?.lstPaymentDetail?.reduce((accumulator, item) => accumulator + item.price, 0).toLocaleString("vi-VN", {
+                              style: "currency",
+                              currency: "VND",
+                            })}
+                          </Text>
+                        </View>
+                      </View>
+
                     </View>
                     <View style={{ flexDirection: "row", fontSize: 14, marginBottom:8 }}>
                       <View style={{ width: "30%" }}>
@@ -327,6 +370,21 @@ const ModalBillInfoDisplay = ({ open, cancel, billCode }) => {
                         })}</Text>
                       </View>
                     </View>
+                    {bill?.lstPaymentDetail?.reduce((accumulator, item) => accumulator + item.price, 0)>bill?.amountPaid && (
+                      <View style={{ flexDirection: "row", fontSize: 14, marginBottom:8 }}>
+                        <View style={{ width: "30%" }}>
+                          <Text>Tiền thừa:</Text>
+                        </View>
+                        <View style={{ width: "70%" }}>
+                          <Text>
+                            {(bill?.lstPaymentDetail?.reduce((accumulator, item) => accumulator + item.price, 0) - bill?.amountPaid)?.toLocaleString("vi-VN", {
+                              style: "currency",
+                              currency: "VND",
+                            })}
+                          </Text>
+                        </View>
+                      </View>
+                    )}
                     
                 </View>
                 

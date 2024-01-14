@@ -105,7 +105,7 @@ public class AccountServiceImpl implements AccountService {
         String title = ErrorCodeConfig.getFormatMessage(Const.HTML_TITLE, "Đăng kí tài khoản");
         String body = ErrorCodeConfig.getFormatMessage(Const.HTML_BODY,
                 "Chúc mừng bạn đã đăng kí tài khoản thành công.", "<p style=\"font-size: 16px;\">Tên tài khoản: "
-                        + createAccount.getUsername() + "</p>" + "<p style=\"font-size: 16px;\">Mật khẩu: " + createAccount.getPassword() + "</p>",
+                        + createAccount.getUsername() + "</p>" + "<p style=\"font-size: 16px;\">Mật khẩu: " + request.getPassword() + "</p>",
                 "Cảm ơn bạn đã tin tưởng và đồng hành cùng chúng tôi. Bạn có thể đăng nhập vào website của chúng tôi tại đây. Chúc một ngày tốt lành!!");
         if(Objects.nonNull(createAccount)) {
             EmailDetails emailDetails = new EmailDetails();

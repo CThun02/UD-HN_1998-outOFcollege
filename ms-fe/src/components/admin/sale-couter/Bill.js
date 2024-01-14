@@ -1621,6 +1621,13 @@ const Bill = () => {
                         address={address?.accountAddress}
                         selectedAddress={setSelectedAddress}
                         username={account?.username}
+                        setEmail={setEmail}
+                        setFullname={setFullname}
+                        setPhoneNumber={setPhoneNumber}
+                        setProvinces={setSelectedProvince}
+                        setWards={setSelectedWard}
+                        setDistricts={setSelectedDictrict}
+                        setDetailAddress={setDetailAddress}
                       />
                       <Row style={{ marginBottom: "30px" }}>
                         <Col span={24}>

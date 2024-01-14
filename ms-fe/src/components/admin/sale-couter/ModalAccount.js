@@ -14,7 +14,13 @@ const ModalAccount = ({
   cartId,
   render,
   address,
-  phoneNumber,
+  setEmail,
+  setFullname,
+  setPhoneNumber,
+  setProvinces,
+  setWards,
+  setDistricts,
+  setDetailAddress
 }) => {
   const [loading, setLoadding] = useState(true);
   const [renderThis, setRenderThis] = useState(null);
@@ -59,13 +65,23 @@ const ModalAccount = ({
 
   const add = (value) => {
     cart.account = value;
-    address(
-      value?.accountAddress?.filter(
+    var addressDefault = value?.accountAddress?.filter(
         (address) => (
           address.defaultaddress === true
         )
       )[0]
+    address(
+      addressDefault
     );
+    console.log(addressDefault)
+    setEmail(addressDefault?.email)
+    setFullname(addressDefault?.fullName);
+    setPhoneNumber(addressDefault?.sdt)
+    setProvinces(addressDefault?.city?.substring(0, addressDefault?.city.indexOf("|")));
+    setWards(addressDefault?.ward.substring(0,addressDefault?.ward.indexOf("|") ))
+    setDistricts(addressDefault?.district.substring(0, addressDefault?.district.indexOf("|") ))
+    setDetailAddress(addressDefault?.detailAddress)
+
     localStorage.setItem(cartId, JSON.stringify(cart));
     render(Math.random);
     onCancel();

@@ -433,6 +433,7 @@ const Bill = () => {
   };
 
   const handleWardChange = (value) => {
+    console.log(value)
     setSelectedWard(value);
   };
 
@@ -897,14 +898,14 @@ const Bill = () => {
     getListAddressByUsername(account?.username);
     fetchProvinces();
     if (selectedAddress?.city) {
-      const city = selectedAddress?.city.substring(
-        1 + selectedAddress.city.indexOf("|")
+      const city = selectedProvince?.substring(
+        1 + selectedProvince?.indexOf("|")
       );
-      const district = selectedAddress?.district.substring(
-        1 + selectedAddress.district.indexOf("|")
+      const district = selectedDictrict?.substring(
+        1 + selectedDictrict?.indexOf("|")
       );
-      const ward = selectedAddress?.ward.substring(
-        1 + selectedAddress.ward.indexOf("|")
+      const ward = selectedWard?.substring(
+        1 + selectedWard?.indexOf("|")
       );
 
       handleProvinceChange(city);
@@ -1346,8 +1347,8 @@ const Bill = () => {
                 {
                   billId: response.data.id,
                   addressId: account ? selectedAddress?.id : addressId,
-                  name: account ? account.fullName : fullname,
-                  phoneNumber: account ? account?.numberPhone : phoneNumber,
+                  name: fullname,
+                  phoneNumber: phoneNumber,
                   shipDate: switchChange[index] === true ? leadtime : null,
                   shipPrice: switchChange[index] === true ? shippingFee : null,
                 },
@@ -1561,6 +1562,13 @@ const Bill = () => {
                         cartId={cartId}
                         render={setRendered}
                         account={address}
+                        setEmail={setEmail}
+                        setFullname={setFullname}
+                        setPhoneNumber={setPhoneNumber}
+                        setProvinces={setSelectedProvince}
+                        setWards={setSelectedWard}
+                        setDistricts={setSelectedDictrict}
+                        setDetailAddress={setDetailAddress}
                         address={setSelectedAddress}
                       />
                     </Col>
@@ -1619,7 +1627,7 @@ const Bill = () => {
                                 <b style={{ color: "red" }}></b> Email
                                 <Input
                                   placeholder="Nhập email"
-                                  value={selectedAddress?.email}
+                                  value={email}
                                   onChange={(e) => setEmail(e.target.value)}
                                 />
                                 {errors.email && (
@@ -1635,7 +1643,7 @@ const Bill = () => {
                                 <Input
                                   placeholder="Nhập họ và tên"
                                   onChange={(e) => setFullname(e.target.value)}
-                                  value={selectedAddress?.fullName}
+                                  value={fullname}
                                 />
                                 {errors.fullName && (
                                   <div style={{ color: "red" }}>
@@ -1652,7 +1660,7 @@ const Bill = () => {
                                   onChange={(e) =>
                                     setPhoneNumber(e.target.value)
                                   }
-                                  value={selectedAddress?.sdt}
+                                  value={phoneNumber}
                                 />
                                 {errors.sdt && (
                                   <div style={{ color: "red" }}>
@@ -1669,21 +1677,15 @@ const Bill = () => {
                               <b style={{ color: "red" }}>*</b> Tỉnh/ thành phố
                             </span>
                             <br />
+                            {selectedProvince}
                             <Select
                               style={{ width: "100%" }}
+                              value={selectedProvince}
                               onChange={(event) =>
                                 handleProvinceChange(
                                   event?.substring(event.indexOf("|") + 1),
                                   event
                                 )
-                              }
-                              value={
-                                selectedAddress?.city
-                                  ? selectedAddress?.city.substring(
-                                      0,
-                                      selectedAddress?.city.indexOf("|")
-                                    )
-                                  : selectedProvince
                               }
                               placeholder={"Chọn Tỉnh/ thành phố"}
                             >
@@ -1692,7 +1694,7 @@ const Bill = () => {
                                   <Select.Option
                                     label={province?.ProvinceName}
                                     key={province?.ProvinceID}
-                                    value={`${province?.ProvinceName}| ${province?.ProvinceID} `}
+                                    value={`${province?.ProvinceName}|${province?.ProvinceID}`}
                                   >
                                     {province?.ProvinceName}
                                   </Select.Option>
@@ -1716,15 +1718,9 @@ const Bill = () => {
                                   event?.substring(event.indexOf("|") + 1),
                                   event
                                 );
-                                console.log("data: ", event);
                               }}
                               value={
-                                selectedAddress?.district
-                                  ? selectedAddress?.district.substring(
-                                      0,
-                                      selectedAddress.district.indexOf("|")
-                                    )
-                                  : selectedDictrict
+                                selectedDictrict
                               }
                               placeholder={"Chọn Quận/ huyện"}
                             >
@@ -1733,7 +1729,7 @@ const Bill = () => {
                                   return (
                                     <Select.Option
                                       key={district?.DistrictID}
-                                      value={`${district?.DistrictName}| ${district?.DistrictID} `}
+                                      value={`${district?.DistrictName}|${district?.DistrictID}`}
                                     >
                                       {district?.DistrictName}
                                     </Select.Option>
@@ -1753,24 +1749,18 @@ const Bill = () => {
                               <b style={{ color: "red" }}>*</b> Phường/ xã
                             </span>
                             <br />
+                            {console.log("CHECK :"+selectedWard)}
                             <Select
                               style={{ width: "100%" }}
                               onChange={handleWardChange}
-                              value={
-                                selectedAddress?.ward
-                                  ? selectedAddress?.ward.substring(
-                                      0,
-                                      selectedAddress?.ward.indexOf("|")
-                                    )
-                                  : selectedWard
-                              }
+                              value={selectedWard}
                               placeholder={"Chọn Phường/ xã"}
                             >
                               {wards &&
                                 wards?.map((ward) => (
                                   <Select.Option
                                     key={ward?.WardCode}
-                                    value={`${ward.WardName}| ${ward.WardCode} `}
+                                    value={`${ward.WardName}|${ward.WardCode}`}
                                   >
                                     {ward.WardName}
                                   </Select.Option>
@@ -1788,7 +1778,7 @@ const Bill = () => {
                           <Input
                             placeholder="Nhập địa chỉ cụ thể"
                             onChange={(e) => setDetailAddress(e.target.value)}
-                            value={selectedAddress?.descriptionDetail}
+                            value={detailAddress}
                           />
                         </Col>
                       </Row>

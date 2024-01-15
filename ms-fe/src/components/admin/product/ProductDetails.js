@@ -282,7 +282,7 @@ const ProductDetails = (props) => {
           >
             <Input
               type={"number"}
-              defaultValue={1}
+              value={props.quantity}
               onChange={(event) => handleChangeQuantity(event.target.value)}
             />
             <div style={{ marginTop: "12px", textAlign: "center" }}>
@@ -514,13 +514,6 @@ const ProductDetails = (props) => {
           });
           setLoading(false);
         });
-      console.log("data1: ", record);
-      console.log("data2: ", props.quantity);
-      console.log(
-        "data3: ",
-        Number(props.productDetailsCreate[indexExist]?.quantity)
-      );
-      console.log("data3: ", productDetailCreate.quantity);
     }
   }
 

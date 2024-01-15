@@ -57,6 +57,7 @@ const BillTimeLine = (addId) => {
   const [timelineId, setTimelineId] = useState(null);
   const [shippingPrice, setShippingPrice] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [quantity, setQuantityProduct] = useState(1);
 
   const handleOpen = () => {
     console.log(true);
@@ -86,9 +87,9 @@ const BillTimeLine = (addId) => {
       })
       .then((response) => {
         setTimelines([...timelines, response.data]);
-        setRender(response.data);
       })
       .catch((error) => {
+        console.log("Data: ", error);
         const status = error.response?.status;
         const dataError = error?.response?.data;
 
@@ -109,6 +110,7 @@ const BillTimeLine = (addId) => {
           });
         }
       });
+    setRender(Math.random());
   };
 
   const handleUpdateBillStatus = async (status, price, timelineStatus) => {
@@ -344,8 +346,6 @@ const BillTimeLine = (addId) => {
       setLoading(false);
     }
 
-    console.log("data: ", isTimeline, isProduct, isInfo);
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [billId, render, isModalConfirm, loading]);
 
@@ -451,6 +451,7 @@ const BillTimeLine = (addId) => {
         setRender(Math.random());
       })
       .catch((err) => {
+        console.log("Data: ", err);
         setLoading(false);
       });
     setIsModalConfirm(false);
@@ -645,6 +646,7 @@ const BillTimeLine = (addId) => {
                   setBdId(record?.billDetailId);
                   setIsModalConfirm(true);
                   setAction("Delete");
+                  setQuantityProduct(1);
                 }}
                 disabled={
                   Number(
@@ -1171,6 +1173,8 @@ const BillTimeLine = (addId) => {
                     cartId={null}
                     billId={billId}
                     isEditProductTimeLine={true}
+                    quantity={quantity}
+                    setQuantity={setQuantityProduct}
                   />
                 </Col>
               )}

@@ -52,6 +52,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.Sort;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -122,7 +123,7 @@ public class KafkaListenerService {
         }
 
         if(Objects.nonNull(categoryDb)) {
-            String categorysJson = objectMapper.writeValueAsString(categoryDAORepository.findAll());
+            String categorysJson = objectMapper.writeValueAsString(categoryDAORepository.findAll(Sort.by(Sort.Order.desc("createdAt"))));
             template.convertAndSend("/topic/category-topic", categorysJson);
             log.info("CategoryJson: " + categorysJson);
         }
@@ -141,7 +142,7 @@ public class KafkaListenerService {
         }
 
         if(Objects.nonNull(brandDb)) {
-            String brandsJson = objectMapper.writeValueAsString(brandDAORepository.findAll());
+            String brandsJson = objectMapper.writeValueAsString(brandDAORepository.findAll(Sort.by(Sort.Order.desc("createdAt"))));
             template.convertAndSend("/topic/brand-topic", brandsJson);
             log.info("BrandJson: " + brandsJson);
         }
@@ -160,7 +161,7 @@ public class KafkaListenerService {
         }
 
         if(Objects.nonNull(patternDb)) {
-            String patternsJson = objectMapper.writeValueAsString(patternDAORepository.findAll());
+            String patternsJson = objectMapper.writeValueAsString(patternDAORepository.findAll(Sort.by(Sort.Order.desc("createdAt"))));
             template.convertAndSend("/topic/pattern-topic", patternsJson);
             log.info("PatternJson: " + patternsJson);
         }
@@ -179,7 +180,7 @@ public class KafkaListenerService {
         }
 
         if(Objects.nonNull(formDb)) {
-            String formsJson = objectMapper.writeValueAsString(formDAORepository.findAll());
+            String formsJson = objectMapper.writeValueAsString(formDAORepository.findAll(Sort.by(Sort.Order.desc("createdAt"))));
             template.convertAndSend("/topic/form-topic", formsJson);
             log.info("FormJson: " + formsJson);
         }
@@ -198,7 +199,7 @@ public class KafkaListenerService {
         }
 
         if(Objects.nonNull(buttonDb)) {
-            String buttonsJson = objectMapper.writeValueAsString(buttonTypeDAORepository.findAll());
+            String buttonsJson = objectMapper.writeValueAsString(buttonTypeDAORepository.findAll(Sort.by(Sort.Order.desc("createdAt"))));
             template.convertAndSend("/topic/button-topic", buttonsJson);
             log.info("ButtonTypeJson: " + buttonsJson);
         }
@@ -217,7 +218,7 @@ public class KafkaListenerService {
         }
 
         if(Objects.nonNull(collarDb)) {
-            String collarsJson = objectMapper.writeValueAsString(collarDAORepository.findAll());
+            String collarsJson = objectMapper.writeValueAsString(collarDAORepository.findAll(Sort.by(Sort.Order.desc("createdAt"))));
             template.convertAndSend("/topic/collar-topic", collarsJson);
             log.info("CollarTypeJson: " + collarsJson);
         }
@@ -236,7 +237,7 @@ public class KafkaListenerService {
         }
 
         if(Objects.nonNull(sleeveTypeDb)) {
-            String sleeveTypesJson = objectMapper.writeValueAsString(sleeveDAORepository.findAll());
+            String sleeveTypesJson = objectMapper.writeValueAsString(sleeveDAORepository.findAll(Sort.by(Sort.Order.desc("createdAt"))));
             template.convertAndSend("/topic/sleeveType-topic", sleeveTypesJson);
             log.info("SleeveTypeJson: " + sleeveTypesJson);
         }
@@ -255,7 +256,7 @@ public class KafkaListenerService {
         }
 
         if(Objects.nonNull(shirtTailDb)) {
-            String shirtTailsJson = objectMapper.writeValueAsString(shirtTailTypeDAORepository.findAll());
+            String shirtTailsJson = objectMapper.writeValueAsString(shirtTailTypeDAORepository.findAll(Sort.by(Sort.Order.desc("createdAt"))));
             template.convertAndSend("/topic/size-topic", shirtTailsJson);
             log.info("ShirtTailTypeJson: " + shirtTailsJson);
         }
@@ -274,7 +275,7 @@ public class KafkaListenerService {
         }
 
         if(Objects.nonNull(materialDb)) {
-            String materialsJson = objectMapper.writeValueAsString(materialDAORepository.findAll());
+            String materialsJson = objectMapper.writeValueAsString(materialDAORepository.findAll(Sort.by(Sort.Order.desc("createdAt"))));
             template.convertAndSend("/topic/material-topic", materialsJson);
             log.info("MaterialJson: " + materialsJson);
         }
@@ -293,7 +294,7 @@ public class KafkaListenerService {
         }
 
         if(Objects.nonNull(sizeDb)) {
-            String sizesJson = objectMapper.writeValueAsString(sizeDAORepository.findAll());
+            String sizesJson = objectMapper.writeValueAsString(sizeDAORepository.findAll(Sort.by(Sort.Order.desc("createdAt"))));
             template.convertAndSend("/topic/size-topic", sizesJson);
             log.info("SizeJson: " + sizesJson);
         }
@@ -312,7 +313,7 @@ public class KafkaListenerService {
         }
 
         if(Objects.nonNull(colorDb)) {
-            String colorsJson = objectMapper.writeValueAsString(colorDAORepository.findAll());
+            String colorsJson = objectMapper.writeValueAsString(colorDAORepository.findAll(Sort.by(Sort.Order.desc("createdAt"))));
             template.convertAndSend("/topic/color-topic", colorsJson);
             log.info("ColorJson: " + colorsJson);
         }

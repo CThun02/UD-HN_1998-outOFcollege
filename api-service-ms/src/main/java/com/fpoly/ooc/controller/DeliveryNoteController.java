@@ -23,7 +23,7 @@ public class DeliveryNoteController {
     private DeliveryNoteService deliveryNoteService;
 
     @PostMapping()
-    public ResponseEntity<?> createDeliveryNote(@RequestBody DeliveryNoteRequest request){
+    public ResponseEntity<?> createDeliveryNote(@RequestBody DeliveryNoteRequest request) throws NotFoundException {
         return ResponseEntity.ok(deliveryNoteService.createDeliveryNote(request));
     }
 

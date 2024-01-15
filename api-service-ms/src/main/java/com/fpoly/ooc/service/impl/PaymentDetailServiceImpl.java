@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class PaymentDetailServiceImpl implements PaymentService {
@@ -26,14 +27,21 @@ public class PaymentDetailServiceImpl implements PaymentService {
     }
 
     @Override
-    public PaymentDetail savePaymentDetail(Long billId) throws NotFoundException {
-        List<PaymentDetail> lstPaymentDetail = paymentDetailRepo.findAllByBillId(billId);
+    public PaymentDetail savePaymentDetail(Bill bill) throws NotFoundException {
+        if (Objects.isNull(bill)) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_NOT_FOUND));
+        }
+
+        List<PaymentDetail> lstPaymentDetail = paymentDetailRepo.findAllByBillId(bill.getId());
 
         if (CollectionUtils.isEmpty(lstPaymentDetail)) {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_SERVICE));
         }
 
         for (PaymentDetail paymentDetail: lstPaymentDetail) {
+            if ("Online".equalsIgnoreCase(bill.getBillType())) {
+                paymentDetail.setPrice(bill.getAmountPaid());
+            }
             paymentDetail.setStatus("Paid");
             paymentDetailRepo.save(paymentDetail);
         }

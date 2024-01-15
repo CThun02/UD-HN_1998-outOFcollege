@@ -48,6 +48,14 @@ public class DeliveryNoteServiceImpl implements DeliveryNoteService {
     }
 
     @Override
+    public DeliveryNote createDeliveryNote(DeliveryNote deliveryNote) {
+        if (Objects.nonNull(deliveryNote)) {
+            return deliveryNoteRepo.save(deliveryNote);
+        }
+        return null;
+    }
+
+    @Override
     public DeliveryNote getDeliveryNoteByBill_Id(Long billId) {
         return deliveryNoteRepo.getDeliveryNoteByBill_Id(billId);
     }
@@ -91,6 +99,12 @@ public class DeliveryNoteServiceImpl implements DeliveryNoteService {
 
         if (Objects.isNull(bill) || !"wait_for_confirm".equalsIgnoreCase(bill.getStatus())) {
             return false;
+        }
+
+        double amountPaid = CommonUtils.bigDecimalConvertDouble(bill.getAmountPaid());
+        double shippingPrice = CommonUtils.bigDecimalConvertDouble(newPrice);
+        if (amountPaid < 2000000 && shippingPrice < 10000) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_SHIPPING_PRICE_LESS_10_THOUSAND));
         }
 
         double price = CommonUtils.bigDecimalConvertDouble(bill.getPrice());

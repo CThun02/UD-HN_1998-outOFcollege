@@ -459,6 +459,10 @@ public class VoucherServiceImpl implements VoucherService {
     @Override
     public BigDecimal priceReduceByVoucherAndBillPrice(Voucher voucher, BigDecimal billPrice) {
         BigDecimal priceReduce = BigDecimal.ZERO;
+        if (voucher.getVoucherCondition().compareTo(billPrice) > 0) {
+            return priceReduce;
+        }
+
         if(voucher != null){
             if (voucher.getVoucherMethod().equals("%")) {
                 BigDecimal voucherValue = voucher.getVoucherValue();

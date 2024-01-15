@@ -21,7 +21,7 @@ public interface CartDetailService {
 
     Cart createCart(String username) throws NotFoundException;
 
-    CartDetail updateQuantity(Long cartDetailId, Integer quantity) throws NotFoundException;
+    String updateQuantity(Long cartDetailId, Integer quantity) throws NotFoundException;
 
     CartDetail deleteProductDetailFromCart(Long cartDetailId) throws NotFoundException;
 

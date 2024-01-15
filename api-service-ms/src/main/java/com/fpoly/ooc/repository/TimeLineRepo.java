@@ -44,7 +44,7 @@ public interface TimeLineRepo extends JpaRepository<Timeline, Long> {
             "   pd.product.productName,pd.quantity, bd.quantity, bd.price, pd.size.sizeName, pd.color.colorCode," +
             "   pd.button.buttonName, pd.collar.collarTypeName, pd.material.materialName, pd.sleeve.sleeveName, " +
             "   pd.shirtTail.shirtTailTypeName, pd.color.colorName, pd.form.formName, pd.pattern.patternName," +
-            "   pd.brand.brandName, pd.category.categoryName, bd.status )" +
+            "   pd.brand.brandName, pd.category.categoryName, bd.status, pd.price )" +
             "FROM ProductDetail pd " +
             "   JOIN BillDetail bd ON bd.productDetail.id = pd.id " +
             "WHERE bd.bill.id = :billId")
@@ -95,5 +95,12 @@ public interface TimeLineRepo extends JpaRepository<Timeline, Long> {
             "   LEFT JOIN Account acc ON acc.username = b.account.username " +
             "WHERE b.id = :billId ")
     List<BillInfoResponse> getBillInfoByIdBillId(@Param("billId") Long id);
+
+    @Query(value = """
+            select top 1 * from time_line timeline where timeline.bill_id = ?1
+            and timeline.status not in ('2Cancel', 'Delete', 'Rollback', 'Update')
+            order by timeline.created_at DESC
+        """, nativeQuery = true)
+    Timeline findStatusTimelineByCreateDateDESC(Long billId);
 }
 

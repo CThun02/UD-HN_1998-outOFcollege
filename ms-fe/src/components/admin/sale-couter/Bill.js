@@ -341,7 +341,7 @@ const Bill = () => {
     setFullname(null);
     setEmail(null);
     setPhoneNumber(null);
-    setDetailAddress(null)
+    setDetailAddress(null);
     setSelectedProvince(null);
     setSelectedDictrict(null);
     setSelectedWard(null);
@@ -599,7 +599,7 @@ const Bill = () => {
     setFullname(null);
     setEmail(null);
     setPhoneNumber(null);
-    setDetailAddress(null)
+    setDetailAddress(null);
     setSelectedProvince(null);
     setSelectedDictrict(null);
     setSelectedWard(null);
@@ -910,9 +910,7 @@ const Bill = () => {
       const district = selectedDictrict?.substring(
         1 + selectedDictrict?.indexOf("|")
       );
-      const ward = selectedWard?.substring(
-        1 + selectedWard?.indexOf("|")
-      );
+      const ward = selectedWard?.substring(1 + selectedWard?.indexOf("|"));
 
       handleShippingOrderLeadtime(district, ward);
       handleShippingFee(totalPrice, district, ward);
@@ -931,13 +929,7 @@ const Bill = () => {
     getProductDetails();
     initializeModalStates();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    cartId,
-    render,
-    account?.username,
-    selectedWard,
-    modalQRScanOpen,
-  ]);
+  }, [cartId, render, account?.username, selectedWard, modalQRScanOpen]);
 
   useEffect(() => {
     handleDeleteAccount();
@@ -963,13 +955,6 @@ const Bill = () => {
       accountId: account?.username,
       price: totalPrice,
       priceReduce: voucherPrice(),
-      // amountPaid: typeShipping[index]
-      //   ? 0
-      //   : Number(selectedOption) === 2
-      //   ? voucherPrice() + shippingFee
-      //   : Number(selectedOption) === 3
-      //   ? voucherPrice() + shippingFee
-      //   : amountPaid,
       amountPaid: totalPrice - voucherPrice() + (shippingFee ? shippingFee : 0),
       billType: "In-Store",
       symbol: typeShipping[index] ? "Shipping" : symbol,
@@ -992,13 +977,7 @@ const Bill = () => {
           : null,
       phoneNumber: selectedAddress?.numberPhone,
       voucherCode: voucherAdd?.voucherCode ?? null,
-      // createdBy: token,
       priceAmountCast: price ? price.replace(/[,]/g, "") : null,
-      // Number(selectedOption) !== 2
-      //   ? price
-      //     ? price.replace(/[,]/g, "")
-      //     : null
-      //   : null,
       emailDetails: {
         recipient: selectedAddress?.email ? [selectedAddress?.email] : [email],
         messageBody: `<body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: Arial, sans-serif;">
@@ -1115,22 +1094,31 @@ const Bill = () => {
       descriptionDetail: detailAddress,
     };
 
+    // switchChange: giao hang
+    // typeShipping: thanh toan khi nhan hang
     const schema = Yup.object().shape({
-      fullName: Yup.string().required("Họ và tên không được để trống"),
-      sdt: Yup.string()
-        .required("Số điện thoại không được để trống")
-        .matches(/^[0-9]{10}$/, "Số điện thoại phải có đúng 10 chữ số"),
-      city: Yup.string().required("Tỉnh/ thành phố không được để trống"),
-      district: Yup.string().required("Quận/ huyện không được để trống"),
-      ward: Yup.string().required("Phường/ xã không được để trống"),
-      email: null,
+      fullName: switchChange[index]
+        ? Yup.string().required("Họ và tên không được để trống")
+        : null,
+      sdt: switchChange[index]
+        ? Yup.string()
+            .required("Số điện thoại không được để trống")
+            .matches(/^[0-9]{10}$/, "Số điện thoại phải có đúng 10 chữ số")
+        : null,
+      city: switchChange[index]
+        ? Yup.string().required("Tỉnh/ thành phố không được để trống")
+        : null,
+      district: switchChange[index]
+        ? Yup.string().required("Quận/ huyện không được để trống")
+        : null,
+      ward: switchChange[index]
+        ? Yup.string().required("Phường/ xã không được để trống")
+        : null,
+      email: switchChange[index]
+        ? Yup.string().email("Địa chỉ email không hợp lệ")
+        : null,
     });
-    let calculatedValue = 0;
-    if (switchChange[index]) {
-      calculatedValue = totalPrice - voucherPrice() + shippingFee;
-    } else {
-      calculatedValue = totalPrice - voucherPrice();
-    }
+
     const customerAmountPay =
       totalPrice - voucherPrice() + (shippingFee ? shippingFee : 0);
 
@@ -1308,15 +1296,15 @@ const Bill = () => {
             try {
               await schema.validate(billAddress, { abortEarly: false });
               setErrors({});
-                const response = await axios.post(
-                  "http://localhost:8080/api/admin/address",
-                  billAddress,
-                  {
-                    headers: {
-                      Authorization: `Bearer ${getToken(true)} `,
-                    },
-                  }
-                );
+              const response = await axios.post(
+                "http://localhost:8080/api/admin/address",
+                billAddress,
+                {
+                  headers: {
+                    Authorization: `Bearer ${getToken(true)} `,
+                  },
+                }
+              );
               addressId = response?.data?.id;
             } catch (error) {
               const validationErrors = {};
@@ -1697,16 +1685,16 @@ const Bill = () => {
                                 )
                               }
                               optionFilterProp="children"
-                                  filterOption={(input, option) =>
-                                    (option?.label ?? "").includes(input)
-                                  }
-                                  filterSort={(optionA, optionB) =>
-                                    (optionA?.label ?? "")
-                                      .toLowerCase()
-                                      .localeCompare(
-                                        (optionB?.label ?? "").toLowerCase()
-                                      )
-                                  }
+                              filterOption={(input, option) =>
+                                (option?.label ?? "").includes(input)
+                              }
+                              filterSort={(optionA, optionB) =>
+                                (optionA?.label ?? "")
+                                  .toLowerCase()
+                                  .localeCompare(
+                                    (optionB?.label ?? "").toLowerCase()
+                                  )
+                              }
                               placeholder={"Chọn Tỉnh/ thành phố"}
                             >
                               {provinces &&
@@ -1739,7 +1727,14 @@ const Bill = () => {
                                   event
                                 );
                               }}
-                              value={selectedDictrict?.includes("|")?selectedDictrict.substring(0, selectedDictrict.indexOf("|")):selectedDictrict}
+                              value={
+                                selectedDictrict?.includes("|")
+                                  ? selectedDictrict.substring(
+                                      0,
+                                      selectedDictrict.indexOf("|")
+                                    )
+                                  : selectedDictrict
+                              }
                               placeholder={"Chọn Quận/ huyện"}
                             >
                               {districts &&
@@ -1770,7 +1765,14 @@ const Bill = () => {
                             <Select
                               style={{ width: "100%" }}
                               onChange={handleWardChange}
-                              value={selectedWard?.includes("|")?selectedWard.substring(0, selectedWard.indexOf("|")):selectedWard}
+                              value={
+                                selectedWard?.includes("|")
+                                  ? selectedWard.substring(
+                                      0,
+                                      selectedWard.indexOf("|")
+                                    )
+                                  : selectedWard
+                              }
                               placeholder={"Chọn Phường/ xã"}
                             >
                               {wards &&

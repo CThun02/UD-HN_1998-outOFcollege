@@ -67,6 +67,10 @@ public class TimelineProductDisplayResponse {
 
     private Boolean checkInPromotion;
 
+    private String promotionMethod;
+
+    private BigDecimal promotionValue;
+
     public TimelineProductDisplayResponse(TimelineProductResponse timelineProductResponse) {
         this.billId= timelineProductResponse.getBillId();
         this.billCode = timelineProductResponse.getBillCode();

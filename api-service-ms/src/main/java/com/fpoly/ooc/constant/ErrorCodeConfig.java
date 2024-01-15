@@ -76,6 +76,7 @@ public class ErrorCodeConfig {
         errors.put("ERROR_NOT_CANCEL_BILL_WHEN_BILL_ALREADY", "Đơn hàng đã thanh toán không thể hủy.");
         errors.put("ERROR_SHIPPING_PRICE_NOT_EMPTY", "Phí vận chuyển được bỏ trống.");
         errors.put("ERROR_MONEY_LESS_TOTAL_BILL", "Số tiền thanh toán không đủ");
+        errors.put("ERROR_SHIPPING_PRICE_LESS_10_THOUSAND", "Phí vận chuyển quá nhỏ");
 
 
         // SEND_EMAIL_TEMPLATE

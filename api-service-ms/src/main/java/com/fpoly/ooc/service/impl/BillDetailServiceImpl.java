@@ -25,12 +25,14 @@ import com.fpoly.ooc.util.CommonUtils;
 import jakarta.persistence.LockModeType;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -196,7 +198,7 @@ public class BillDetailServiceImpl implements BillDetailService {
     @Override
 //    @Lock(LockModeType.OPTIMISTIC_FORCE_INCREMENT)
     public BillDetail createBillDetail(BillDetailRequest request) throws JsonProcessingException, NotFoundException {
-
+        //TODO: find billDetail with request.getBillDetailId() -> comparePrice == update quantity != createBillDetail
         BillDetail billDetail = BillDetail.builder().id(request.getBillDetailId())
                 .bill(Bill.builder().id(request.getBillId()).build())
                 .productDetail(ProductDetail.builder().id(request.getProductDetailId()).build())
@@ -210,10 +212,9 @@ public class BillDetailServiceImpl implements BillDetailService {
         if (Objects.isNull(bill)) {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_NOT_FOUND));
         }
-        BigDecimal priceBill = billDetailRepo.getTotalPriceByBillCode(bill.getBillCode());
-        double maxPriceBillInOnline = CommonUtils.bigDecimalConvertDouble(priceBill);
 
-        if (maxPriceBillInOnline > 10000000 && "Online".equalsIgnoreCase(bill.getBillType())) {
+        double priceInclude = CommonUtils.bigDecimalConvertDouble(request.getPrice());
+        if (request.getQuantity() * priceInclude > 10000000) {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_THAN_TEN_MILLION));
         }
 
@@ -225,10 +226,6 @@ public class BillDetailServiceImpl implements BillDetailService {
             }
 
             ProductDetail productDetail = productDetailService.findById(request.getProductDetailId());
-            if (productDetail.getQuantity() <= 0) {
-                throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BUY_QUANTITY_THAN_QUANTITY_IN_STORE));
-            }
-
             if (billDetail.getQuantity() > request.getQuantity()) {
                 productDetail.setQuantity(productDetail.getQuantity() +
                         (billDetail.getQuantity()) - request.getQuantity());
@@ -254,9 +251,6 @@ public class BillDetailServiceImpl implements BillDetailService {
                 boolean isCheck = Boolean.TRUE;
                 for (BillDetail billDetailUpdate : existingBillDetail) {
                     if (Objects.equals(request.getProductDetailId(), billDetailUpdate.getProductDetail().getId())) {
-                        billDetailUpdate.setQuantity(billDetailUpdate.getQuantity() + request.getQuantity());
-                        billDetailUpdate.setPrice(request.getPrice());
-
                         ProductDetail productDetailDb = productDetailService.findById(billDetailUpdate.getProductDetail().getId());
                         if (productDetailDb.getQuantity() - request.getQuantity() < 0) {
                             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BUY_QUANTITY_THAN_QUANTITY_IN_STORE));
@@ -266,8 +260,22 @@ public class BillDetailServiceImpl implements BillDetailService {
                         if(productDetailDb.getQuantity() < 0) {
                             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BUY_QUANTITY_THAN_QUANTITY_IN_STORE));
                         }
+
+                        if (!Objects.equals(billDetailUpdate.getPrice(), request.getPrice())) {
+                            BillDetail newBillDetail = new BillDetail();
+                            newBillDetail.setQuantity(request.getQuantity());
+                            newBillDetail.setPrice(request.getPrice());
+                            newBillDetail.setBill(billDetailUpdate.getBill());
+                            newBillDetail.setProductDetail(billDetail.getProductDetail());
+                            newBillDetail.setStatus(Const.STATUS_ACTIVE);
+                            savedBillDetail = billDetailRepo.save(newBillDetail);
+                        } else {
+                            billDetailUpdate.setQuantity(billDetailUpdate.getQuantity() + request.getQuantity());
+                            billDetailUpdate.setPrice(request.getPrice());
+                            savedBillDetail = billDetailRepo.save(billDetailUpdate);
+                        }
+
                         productDetailService.update(productDetailDb);
-                        savedBillDetail = billDetailRepo.save(billDetailUpdate);
                         isCheck = Boolean.FALSE;
                         break;
                     }
@@ -288,6 +296,12 @@ public class BillDetailServiceImpl implements BillDetailService {
                     savedBillDetail = billDetailRepo.save(billDetail);
                 }
             }
+        }
+        BigDecimal priceBill = billDetailRepo.getTotalPriceByBillCode(bill.getBillCode());
+        double maxPriceBillInOnline = CommonUtils.bigDecimalConvertDouble(priceBill);
+
+        if (maxPriceBillInOnline > 10000000 && "Online".equalsIgnoreCase(bill.getBillType())) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_THAN_TEN_MILLION));
         }
 
         bill.setPrice(priceBill);
@@ -378,20 +392,22 @@ public class BillDetailServiceImpl implements BillDetailService {
         List<PaymentDetailResponse> lstPaymentDetail = paymentService.findPaymentDetailByBillId(bill.getId());
         DeliveryNoteResponse deliveryNote = deliveryNoteService.getOne(billCode);
 
+        if (Objects.nonNull(deliveryNote)) {
+            String[] city = deliveryNote.getCity().split("\\|");
+            String[] district = deliveryNote.getDistrict().split("\\|");
+            String[] ward = deliveryNote.getWard().split("\\|");
+
+            deliveryNote.setCity(city[0]);
+            deliveryNote.setDistrict(district[0]);
+            deliveryNote.setWard(ward[0]);
+        }
         String[] createdBy = bill.getCreatedBy().split("_");
-        String[] city = deliveryNote.getCity().split("\\|");
-        String[] district = deliveryNote.getDistrict().split("\\|");
-        String[] ward = deliveryNote.getWard().split("\\|");
-
-        deliveryNote.setCity(city[0]);
-        deliveryNote.setDistrict(district[0]);
-        deliveryNote.setWard(ward[0]);
-
+        System.out.println("data: " + createdBy.length);
         PdfResponse pdfResponse = PdfResponse.builder()
                 .billCode(billCode)
                 .billUpdateBy(bill.getUpdatedBy())
                 .billCreatedAt(response.getCreatedDate())
-                .billCreatedBy(createdBy[1])
+                .billCreatedBy(createdBy.length > 0 ? createdBy[0] : createdBy[1])
                 .totalPrice(response.getTotalPrice())
                 .shippingFee(response.getShipPrice())
                 .amountPaid(response.getAmountPaid())
@@ -400,6 +416,7 @@ public class BillDetailServiceImpl implements BillDetailService {
                 .lstProductDetail(lstProductDT)
                 .lstPaymentDetail(lstPaymentDetail)
                 .deliveryNote(deliveryNote)
+                .billType(bill.getBillType())
                 .build();
 
         return pdfResponse;

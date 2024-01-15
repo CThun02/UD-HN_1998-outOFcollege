@@ -348,17 +348,26 @@ const Cart = (props) => {
   ];
 
   const [timer, setTimer] = useState(null);
-  const handleUpdateQuantityApi = (id, value) => {
+  const handleUpdateQuantityApi = (id, value, currentValue) => {
+    if (value === currentValue) {
+      return;
+    }
     clearTimeout(timer);
     const newTimer = setTimeout(() => {
       axios
         .put(`${cartAPI}?cartDetailId=${id}&quantity=${value}`)
         .then((response) => {
-          console.log("data: ", response);
-          let message = "Cập nhật thành công";
-          if (!response?.data) {
+          console.log("dataResponse: ", response);
+          let message = "";
+          if (response?.data?.includes("update")) {
             message =
               "Tổng tiền quá 10 triệu, hệ thống đã cập nhật lại số lượng tối đa bạn có thể thêm";
+          } else if (response?.data?.includes("delete")) {
+            message = "Số lượng không đủ. Đã xóa sản phẩm khỏi giỏ hàng";
+          } else if (response?.data?.includes("complete")) {
+            message = "Cập nhật thành công";
+          } else if (response?.data?.includes("error")) {
+            message = "Số lượng trong kho không đủ. Vui lòng giảm số lượng";
           }
           notification.success({
             message: "Thông báo",
@@ -385,6 +394,8 @@ const Cart = (props) => {
     }, 1000);
 
     setTimer(newTimer);
+    setRender(Math.random());
+    props.setRenderHeader(Math.random());
   };
 
   const handleDeleteApi = (id) => {
@@ -542,13 +553,15 @@ const Cart = (props) => {
                     <br />
                     <b>Số lượng: </b>
                     <InputNumber
+                      readOnly={record.disabled}
                       min={1}
                       value={record?.cartDetailResponse?.quantity}
-                      max={record?.cartDetailResponse?.quantityProductDetail}
+                      // max={record?.cartDetailResponse?.quantityProductDetail}
                       onChange={(e) =>
                         handleUpdateQuantityApi(
                           record?.cartDetailResponse?.cartDetailId,
-                          e
+                          e,
+                          record?.cartDetailResponse?.quantity
                         )
                       }
                     />
@@ -669,13 +682,15 @@ const Cart = (props) => {
       render: (_, record, index) => {
         return (
           <InputNumber
+            disabled={record.disabled}
             min={1}
             value={record?.cartDetailResponse?.quantity}
-            max={record?.cartDetailResponse?.quantityProductDetail}
+            // max={record?.cartDetailResponse?.quantityProductDetail}
             onChange={(e) =>
               handleUpdateQuantityApi(
                 record?.cartDetailResponse?.cartDetailId,
-                e
+                e,
+                record?.cartDetailResponse?.quantity
               )
             }
           />
@@ -787,6 +802,13 @@ const Cart = (props) => {
     const newTimer = setTimeout(() => {
       let cart = JSON.parse(localStorage.getItem("user"));
       let productDetail = cart.productDetails;
+      const data = [
+        {
+          price: productDetail[index]?.data[0]?.price,
+          quantity: e,
+          productDetailId: productDetail[index]?.data[0]?.id,
+        },
+      ];
       if (e > productDetail[index]?.data[0]?.quantity) {
         notification.warning({
           message: "Thông báo",
@@ -795,58 +817,90 @@ const Cart = (props) => {
         });
         return true;
       }
-      const priceReduce = (e) => {
-        return productDetail[e]?.data[0]?.promotion?.length > 0
-          ? productDetail[e]?.data[0]?.promotion[0].promotionMethod &&
-            productDetail[e]?.data[0]?.promotion[0].promotionValue
-            ? productDetail[e]?.data[0]?.promotion[0].promotionMethod === "%"
-              ? (productDetail[e]?.data[0]?.price *
-                  productDetail[e]?.data[0]?.promotion[0].promotionValue) /
-                100
-              : productDetail[e]?.data[0]?.promotion[0]?.promotionValue
-            : 0
-          : 0;
-      };
-      let priceInclude =
-        e * (productDetail[index]?.data[0]?.price - priceReduce(index));
-      let totalPriceInCart = 0;
-      for (var i = 0; i < productDetail?.length; i++) {
-        if (i === index) {
-          continue;
-        }
-        totalPriceInCart +=
-          (productDetail[i]?.data[0]?.price - priceReduce(i)) *
-          productDetail[i]?.quantity;
-      }
+      axios
+        .post(baseUrl + "/isCheckQuantity", { quantityAndPriceList: data })
+        .then(() => {
+          const priceReduce = (e) => {
+            return productDetail[e]?.data[0]?.promotion?.length > 0
+              ? productDetail[e]?.data[0]?.promotion[0].promotionMethod &&
+                productDetail[e]?.data[0]?.promotion[0].promotionValue
+                ? productDetail[e]?.data[0]?.promotion[0].promotionMethod ===
+                  "%"
+                  ? (productDetail[e]?.data[0]?.price *
+                      productDetail[e]?.data[0]?.promotion[0].promotionValue) /
+                    100
+                  : productDetail[e]?.data[0]?.promotion[0]?.promotionValue
+                : 0
+              : 0;
+          };
+          let priceInclude =
+            e * (productDetail[index]?.data[0]?.price - priceReduce(index));
+          let totalPriceInCart = 0;
+          for (var i = 0; i < productDetail?.length; i++) {
+            if (i === index) {
+              continue;
+            }
+            totalPriceInCart +=
+              (productDetail[i]?.data[0]?.price - priceReduce(i)) *
+              productDetail[i]?.quantity;
+          }
 
-      if (totalPriceInCart + priceInclude > 10000000) {
-        const quantityUpdate =
-          (10000000 - totalPriceInCart) /
-          (productDetail[index]?.data[0]?.price - priceReduce(index));
-        productDetail[index].quantity = Math.floor(quantityUpdate);
+          if (totalPriceInCart + priceInclude > 10000000) {
+            const quantityUpdate =
+              (10000000 - totalPriceInCart) /
+              (productDetail[index]?.data[0]?.price - priceReduce(index));
+            productDetail[index].quantity = Math.floor(quantityUpdate);
 
-        cart.productDetails = productDetail;
-        localStorage.setItem("user", JSON.stringify(cart));
+            cart.productDetails = productDetail;
+            localStorage.setItem("user", JSON.stringify(cart));
 
-        setRender(Math.random());
-        props.setRenderHeader(Math.random());
-        notification.warning({
-          message: "Thông báo",
-          description:
-            "Bạn chỉ thêm được tối đa là 10 triệu vào trong giỏ hàng",
+            setRender(Math.random());
+            props.setRenderHeader(Math.random());
+            notification.warning({
+              message: "Thông báo",
+              description:
+                "Bạn chỉ thêm được tối đa là 10 triệu vào trong giỏ hàng",
+            });
+            return;
+          }
+          notification.success({
+            message: "Thông báo",
+            description: "Cập nhật thành công",
+          });
+          productDetail[index].quantity = e;
+          cart.productDetails = productDetail;
+          localStorage.setItem("user", JSON.stringify(cart));
+
+          setRender(Math.random());
+          props.setRenderHeader(Math.random());
+        })
+        .catch((err) => {
+          const dataError = err?.response?.data;
+
+          let message = "Thao tác thất bại";
+          if (
+            dataError?.message?.includes(
+              "Hóa đơn mua trực tuyến không vượt quá 10 triệu"
+            )
+          ) {
+            message = "Hóa đơn mua trực tuyến không vượt quá 10 triệu";
+          }
+
+          if (dataError?.message?.includes("Số lượng trong kho không đủ")) {
+            message = "Số lượng trong kho không đủ";
+          }
+
+          if (dataError?.message?.includes("Mua sản phẩm thất bại")) {
+            message =
+              "Sản phẩm đã hết hoặc không cửa hàng không còn kinh doanh";
+          }
+          notification.error({
+            message: "Thông báo",
+            description: message,
+            duration: 2,
+          });
+          return;
         });
-        return;
-      }
-      notification.success({
-        message: "Thông báo",
-        description: "Cập nhật thành công",
-      });
-      productDetail[index].quantity = e;
-      cart.productDetails = productDetail;
-      localStorage.setItem("user", JSON.stringify(cart));
-
-      setRender(Math.random());
-      props.setRenderHeader(Math.random());
     }, 1000);
 
     setTimer(newTimer);

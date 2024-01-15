@@ -227,20 +227,25 @@ public class BillServiceImpl implements BillService {
                     statusPaymentDetail = "Unpaid";
                 } else {
                     statusPaymentDetail = "Paid";
+                    paymentDetail.setPrice(request.getAmountPaid());
                 }
-                paymentDetail.setPrice(request.getAmountPaid());
+
             } else {
-                if(request.getPaymentDetailId() == 1) {
-                    if (CommonUtils.bigDecimalConvertDouble(request.getPriceAmountCast()) < CommonUtils.bigDecimalConvertDouble(request.getAmountPaid())) {
-                        throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_MONEY_LESS_TOTAL_BILL));
+                if (!request.getPaymentInDelivery()) {
+                    if (request.getPaymentDetailId() == 1) {
+                        if (CommonUtils.bigDecimalConvertDouble(request.getPriceAmountCast()) < CommonUtils.bigDecimalConvertDouble(request.getAmountPaid())) {
+                            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_MONEY_LESS_TOTAL_BILL));
+                        }
+                        paymentDetail.setPrice(request.getPriceAmountCast());
                     }
-                    paymentDetail.setPrice(request.getPriceAmountCast());
-                }
-                if(request.getPaymentDetailId() == 2) {
-                    if (CommonUtils.bigDecimalConvertDouble(request.getPriceAmountATM()) < CommonUtils.bigDecimalConvertDouble(request.getAmountPaid())) {
-                        throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_MONEY_LESS_TOTAL_BILL));
+                    if (request.getPaymentDetailId() == 2) {
+                        if (CommonUtils.bigDecimalConvertDouble(request.getPriceAmountATM()) < CommonUtils.bigDecimalConvertDouble(request.getAmountPaid())) {
+                            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_MONEY_LESS_TOTAL_BILL));
+                        }
+                        paymentDetail.setPrice(request.getPriceAmountATM());
                     }
-                    paymentDetail.setPrice(request.getPriceAmountATM());
+                } else {
+                    paymentDetail.setPrice(request.getAmountPaid());
                 }
             }
 
@@ -401,7 +406,6 @@ public class BillServiceImpl implements BillService {
             billDetailList.forEach((el) -> el.setStatus("Complete"));
         }
 
-        billRepo.save(bill);
         if (("Cancel").equals(dto.getStatus())) {
             VoucherHistory voucherHistory = voucherHistoryService.findHistoryByBillCodeAndStatus(bill.getBillCode(), "ACTIVE");
             if (voucherHistory != null) {
@@ -421,7 +425,8 @@ public class BillServiceImpl implements BillService {
             billDetailList.forEach((el) -> el.setStatus("Cancel"));
         }
         billDetailRepo.saveAll(billDetailList);
-        kafkaUtil.sendingObjectWithKafka(dto, Const.TOPIC_TIME_LINE);
+        Bill billDb = billRepo.save(bill);
+        kafkaUtil.sendingObjectWithKafka(bill, Const.TOPIC_TIME_LINE);
         return 1;
     }
 
@@ -658,6 +663,8 @@ public class BillServiceImpl implements BillService {
             if(bill.getPrice().compareTo(BigDecimal.valueOf(2000000))<0){
                 priceShip = CommonUtils.bigDecimalConvertDouble(deliveryNote.getShipPrice());
             }
+            deliveryNote.setShipPrice(new BigDecimal(priceShip));
+            deliveryNoteService.createDeliveryNote(deliveryNote);
         }
         double priceBillAmount = CommonUtils.bigDecimalConvertDouble(bill.getPrice())
                 + priceShip
@@ -702,9 +709,9 @@ public class BillServiceImpl implements BillService {
         }
 
         if (Objects.nonNull(bill.getPrice())) {
-            amountPrice = CommonUtils.bigDecimalConvertDouble(bill.getAmountPaid()) - priceReduce;
+            amountPrice = CommonUtils.bigDecimalConvertDouble(bill.getPrice()) - priceReduce + priceShip;
             if (amountPrice > 0) {
-                bill.setAmountPaid(bill.getAmountPaid());
+                bill.setAmountPaid(new BigDecimal(amountPrice));
                 bill.setPriceReduce(new BigDecimal(priceReduce));
                 bill.setPrice(new BigDecimal(price));
                 return billRepo.save(bill);

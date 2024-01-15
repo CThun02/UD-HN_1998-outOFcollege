@@ -124,17 +124,17 @@ public class Bill extends BaseEntity {
     @Column(name = "amount_paid")
     private BigDecimal amountPaid;
 
-    @Column(name = "bill_type")
+    @Column(name = "bill_type", updatable = false)
     private String billType;
 
-    @Column(name = "symbol")
+    @Column(name = "symbol", updatable = false)
     private String symbol;
 
-    @Column(name = "note")
+    @Column(name = "note", updatable = false)
     private String note;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "account_id", referencedColumnName = "username")
+    @JoinColumn(name = "account_id", referencedColumnName = "username", updatable = false)
     private Account account;
 
     @OneToMany(mappedBy = "bill")

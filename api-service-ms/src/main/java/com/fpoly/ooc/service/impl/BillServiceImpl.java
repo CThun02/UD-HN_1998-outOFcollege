@@ -709,9 +709,9 @@ public class BillServiceImpl implements BillService {
         }
 
         if (Objects.nonNull(bill.getPrice())) {
-            amountPrice = CommonUtils.bigDecimalConvertDouble(bill.getAmountPaid()) - priceReduce;
+            amountPrice = CommonUtils.bigDecimalConvertDouble(bill.getPrice()) - priceReduce + priceShip;
             if (amountPrice > 0) {
-                bill.setAmountPaid(bill.getAmountPaid());
+                bill.setAmountPaid(new BigDecimal(amountPrice));
                 bill.setPriceReduce(new BigDecimal(priceReduce));
                 bill.setPrice(new BigDecimal(price));
                 return billRepo.save(bill);

@@ -93,6 +93,7 @@ const Checkout = ({ setRenderHeader }) => {
         setUsername(data?.username);
         setDataEmail(data?.email);
         console.log("dataEmail: ", data);
+        console.log("dataUsername: ", data?.username);
       })
       .catch((err) => console.log(err));
   }, []);
@@ -564,7 +565,10 @@ const Checkout = ({ setRenderHeader }) => {
                                                                 ?.shirtTailType
                                                                 .shirtTailTypeName
                                                         } <span style="display: inline-block">(Số lượng -  ${
-                                            item.cartDetailResponse.quantity
+                                            item?.cartDetailResponse?.quantity
+                                              ? item?.cartDetailResponse
+                                                  ?.quantity
+                                              : item?.quantity
                                           })</span></p>
                                                     </div>
                                                     <div style="width: 25%; padding: 4px;">
@@ -613,17 +617,22 @@ const Checkout = ({ setRenderHeader }) => {
                                                                   "vnd"
                                                                     ? item
                                                                         .data[0]
+                                                                        .price -
+                                                                      item
+                                                                        .data[0]
                                                                         .promotion[0]
                                                                         ?.promotionValue
-                                                                    : ((100 -
+                                                                    : item
+                                                                        .data[0]
+                                                                        .price -
+                                                                      (item
+                                                                        .data[0]
+                                                                        .price *
                                                                         item
                                                                           .data[0]
                                                                           .promotion[0]
                                                                           ?.promotionValue) /
                                                                         100) *
-                                                                      item
-                                                                        .data[0]
-                                                                        .price) *
                                                                   item?.quantity
                                                                 : item?.quantity *
                                                                   item.data[0]
@@ -1519,7 +1528,7 @@ const Checkout = ({ setRenderHeader }) => {
                   setVoucher={setVoucherAdd}
                   isOpen={isOpenFormVoucher}
                   setIsOpen={setIsOpenFormVoucher}
-                  username={dataToken?.username ? dataToken?.username : ""}
+                  username={dataToken ? username : ""}
                 />
               </div>
               <div

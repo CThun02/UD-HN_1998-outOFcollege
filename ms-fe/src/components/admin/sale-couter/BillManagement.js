@@ -129,6 +129,10 @@ const BillManagement = () => {
           }
         }
 
+        if (record.billUpdatedBy === "CLIENT") {
+          return <span>Hệ thống</span>;
+        }
+
         if (!record.employee) {
           if (record.billUpdatedBy === "SYSTEM") {
             return <span>Hệ thống</span>;

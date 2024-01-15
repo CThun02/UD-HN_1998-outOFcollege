@@ -35,6 +35,7 @@ import {
 } from "react-icons/fa";
 import { Timeline, TimelineEvent } from "@mailtop/horizontal-timeline";
 import ModalDetail from "../sale-couter/ModalDetail";
+import BillPdf from "./BillPdf";
 
 var productsReturns = [];
 const BillReturn = () => {
@@ -53,7 +54,7 @@ const BillReturn = () => {
   const [voucher, setVoucher] = useState(null);
   const [voucherNewUse, setVoucherNewUse]= useState(null);
   const [voucherPrice, setVoucherPrice]=useState(0);
-  const [payAfterReturn, setPayAfterReturn] = useState(0);
+  const [openBillPdf, setOpenBillPdf] = useState(false);
   const [totalPricePaid, setTotalPricePaid] = useState(0);
   const [customerPaidBillOld, setCustomerPaidBillOld] = useState(0);
 
@@ -242,14 +243,14 @@ const BillReturn = () => {
               voucherCodeOrName: null,
             }).then(res=>{
               setVoucherNewUse(res.data);
-              setTotalPricePaid(billInfo?.price -totalPrice - countPriceReduce(res.data, billInfo?.price))
+              setTotalPricePaid(billInfo?.price -totalPrice - countPriceReduce(res.data, priceBillAfterReturn))
               setVoucherPrice(countPriceReduce(res.data, billInfo?.price))
             }).catch(err=>{
               console.log(err)
             })
     }else{
       setVoucherNewUse(null);
-      setTotalPricePaid(priceBillAfterReturn - countPriceReduce(voucher, billInfo?.price));
+      setTotalPricePaid(priceBillAfterReturn - countPriceReduce(voucher, priceBillAfterReturn));
       setVoucherPrice(countPriceReduce(voucher, billInfo?.price))
     }
   }
@@ -359,40 +360,6 @@ const BillReturn = () => {
       })
       .catch((error) => {
         const status = error?.response?.status;
-        if (status === 403) {
-          notification.error({
-            message: "Thông báo",
-            description: "Bạn không có quyền truy cập!",
-          });
-        }
-        return;
-      });
-  }
-
-  function changeStatusBillDetail(id, status) {
-    axios
-      .put(
-        `http://localhost:8080/api/admin/bill/billDetail/change-status?status=${
-          status === "5" || status === "3"
-            ? "ReturnW"
-            : status === "-1"
-            ? "ReturnC"
-            : status === "ACTIVE"
-            ? "ACTIVE"
-            : "ReturnS"
-        }`,
-        id,
-        {
-          headers: {
-            Authorization: `Bearer ${getToken(true)}`,
-          },
-        }
-      )
-      .then((response) => {
-        setRender(response.data);
-      })
-      .catch((error) => {
-        const status = error.response.status;
         if (status === 403) {
           notification.error({
             message: "Thông báo",
@@ -599,6 +566,11 @@ const BillReturn = () => {
         timelineDetail={billInfo?.timeLines}
         symbol={billInfo?.symbol}
       />
+      <BillPdf
+        open={openBillPdf}
+        cancel={()=>setOpenBillPdf(false)}
+        billCode={billInfo?.billCode}
+      />
       <div className={styles.billReturn}>
         <h3 style={{ marginBottom: "25px" }}>Thông tin hóa đơn</h3>
         <div style={{ overflowX: "scroll", height: "50%" }}>
@@ -723,6 +695,14 @@ const BillReturn = () => {
             onClick={() => setModalDetail(true)}
           >
             Chi tiết
+          </Button>
+          <Button
+            onClick={()=>{setOpenBillPdf(true)}}
+            className={styles.btnPdf}
+            type="primary"
+            size="large"
+          >
+            Xuất hóa đơn
           </Button>
         </div>
       </div>

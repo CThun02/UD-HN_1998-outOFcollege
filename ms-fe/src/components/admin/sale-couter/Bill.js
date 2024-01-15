@@ -975,7 +975,7 @@ const Bill = () => {
       accountId: account?.username,
       price: totalPrice,
       priceReduce: voucherPrice(),
-      amountPaid: totalPrice - voucherPrice() + (shippingFee ? shippingFee : 0),
+      amountPaid: totalPrice - voucherPrice() + (shippingFee && switchChange[index] ? shippingFee : 0),
       billType: "In-Store",
       symbol: typeShipping[index] ? "Shipping" : symbol,
       status: typeShipping[index]
@@ -999,7 +999,7 @@ const Bill = () => {
       voucherCode: voucherAdd?.voucherCode ?? null,
       priceAmountCast: price ? price.replace(/[,]/g, "") : null,
       emailDetails: {
-        recipient: selectedAddress?.email ? [selectedAddress?.email] : [email],
+        recipient: email ? [email] : [selectedAddress?.email],
         messageBody: `<body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: Arial, sans-serif;">
             <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="width: 100%; max-width:720px; margin: 0 auto;">
                 <tr>
@@ -1053,10 +1053,10 @@ const Bill = () => {
                                                         .category.categoryName +
                                                       "-" +
                                                       item.productDetail.collar
-                                                        .materialName +
+                                                        .collarName +
                                                       "-" +
                                                       item.productDetail.color
-                                                        .collarName +
+                                                        .colorName +
                                                       "-" +
                                                       item.productDetail.sleeve
                                                         .sleeveName +
@@ -1065,10 +1065,10 @@ const Bill = () => {
                                                         .shirtTail
                                                         .shirtTailTypeName +
                                                       "-" +
-                                                      item.productDetail
+                                                      item.productDetail.pattern
                                                         .patternName +
                                                       "-" +
-                                                      item.productDetail
+                                                      item.productDetail.form
                                                         .formName
                                                     } <span style="display: inline-block">(x ${
                                         item.quantity
@@ -1087,7 +1087,7 @@ const Bill = () => {
         <div style="display: flex; justify-content: space-between; padding: 4px 0;">
           <span>Tổng giá trị sản phẩm:</span>
           <span style="font-weight: 500;">
-            ${(voucherPrice() + (shippingFee ?? 0))?.toLocaleString("vi-VN", {
+            ${(totalPrice - voucherPrice() + (shippingFee ? shippingFee : 0))?.toLocaleString("vi-VN", {
               style: "currency",
               currency: "VND",
             })}
@@ -1141,7 +1141,7 @@ const Bill = () => {
     });
 
     const customerAmountPay =
-      totalPrice - voucherPrice() + (shippingFee ? shippingFee : 0);
+      totalPrice - voucherPrice() + (shippingFee && switchChange[index] ? shippingFee : 0);
 
     if (productDetails?.length <= 0) {
       isError = true;
@@ -1421,7 +1421,7 @@ const Bill = () => {
 
   const [shippingFeeError, setShippingFeeError] = useState("");
   const handleChangeShippingFee = (value, index) => {
-    if (switchChange[index])
+    if (switchChange[index]){
       if (/^[+]?\d*\.?\d+$/.test(value)) {
         const replaceValue = value.replace(",", "");
         const data = Number(replaceValue);
@@ -1434,6 +1434,8 @@ const Bill = () => {
         }
         setShippingFee(data);
       }
+    }
+      
   };
 
   useEffect(() => {

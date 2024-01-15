@@ -15,7 +15,7 @@ import java.util.List;
 public interface ProductDAORepositoryI extends JpaRepository<Product, Long> {
     @Query("Select o.id as id, o.productCode as productCode, o.productName as productName," +
             " o.status as status, o.description as description, " +
-            "count(od) as quantity from Product o left join ProductDetail od on " +
+            "sum(od.quantity) as quantity from Product o left join ProductDetail od on " +
             "od.product.id = o.id WHERE (o.status=?1 or ?1 is NULL) and (o.productCode like ?2" +
             " or o.productName like ?2 or ?2 is NULL)" +
             "group by o.id, o.productName, o.status, " +

@@ -14,6 +14,7 @@ import com.fpoly.ooc.service.interfaces.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -84,8 +85,9 @@ public class ProductReturnService implements ProductReturnServiceI {
         for (int i = 0; i < productDetailResponses.size(); i++) {
             ProductDetailDisplayResponse productDetailDisplayResponse = new ProductDetailDisplayResponse(productDetailResponses.get(i),
                     productImageService.getProductImageByProductDetailId(productDetailResponses.get(i).getId()));
-            productDetailDisplayResponse.setPrice(repo.sumPriceByPdId(productDetailResponses.get(i).getId(), reason));
-            productDetailDisplayResponse.setQuantity(repo.sumQuantityByPdId(productDetailResponses.get(i).getId(), reason));
+            int quantity = repo.sumQuantityByPdId(productDetailResponses.get(i).getId(), reason);
+            productDetailDisplayResponse.setPrice(repo.sumPriceByPdId(productDetailResponses.get(i).getId(), reason).multiply(BigDecimal.valueOf(quantity)));
+            productDetailDisplayResponse.setQuantity(quantity);
             productDetailDisplayResponses.add(productDetailDisplayResponse);
         }
         return productDetailDisplayResponses;

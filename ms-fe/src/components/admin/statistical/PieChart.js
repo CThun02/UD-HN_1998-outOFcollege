@@ -77,6 +77,8 @@ const PieChart = ({ formattedDateNow }) => {
           "Thời gian bắt đầu phải bé hơn hoặc bằng thời gian kết thúc",
       });
     } else {
+      dateFrom.setHours(dateFrom.getHours() + 7);
+      dateTo.setHours(dateTo.getHours() + 7);
       axios
         .get(
           "http://localhost:8080/api/admin/bill/getBillRevenueCompare?day=" +

@@ -30,4 +30,10 @@ public class AddressController {
         return ResponseEntity.ok(addressServiceI.getListAddress(username));
     }
 
+    @GetMapping("/getByCom")
+    public ResponseEntity<?> getByCom(@RequestParam("ward") String ward, @RequestParam("district") String district,
+                                      @RequestParam("city") String city, @RequestParam("descriptionDetail") String descriptionDetail) {
+        return ResponseEntity.ok(addressServiceI.getByCom(ward, district, city, descriptionDetail));
+    }
+
 }

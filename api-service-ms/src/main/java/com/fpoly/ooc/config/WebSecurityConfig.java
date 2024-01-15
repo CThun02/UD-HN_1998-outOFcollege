@@ -38,7 +38,7 @@ public class WebSecurityConfig {
                         .requestMatchers(HttpMethod.POST, "api/v1/auth/login", "api/v1/auth/signup").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/admin/account/**").hasAnyRole("EMPLOYEE", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/admin/account/**").hasAnyRole("EMPLOYEE", "ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/admin/account/**").hasAnyRole("EMPLOYEE", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/admin/account/**").hasAnyRole("EMPLOYEE", "ADMIN")   
                         .requestMatchers(HttpMethod.DELETE, "/api/admin/account/**", "/api/admin/bill-detail/**").hasAnyRole("EMPLOYEE", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/admin/bill/**", "/api/admin/bill-detail/**").hasAnyRole("EMPLOYEE", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/admin/bill/**").hasAnyRole("EMPLOYEE", "ADMIN")

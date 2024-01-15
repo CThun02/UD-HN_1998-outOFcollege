@@ -565,6 +565,7 @@ const Bill = () => {
   const handleChangSwitch = (checked, index) => {
     if (!checked) {
       setTypeShipping(false);
+      setShippingFee(0);
     }
     const visible = [...switchChange];
     visible[index] = checked;
@@ -573,6 +574,7 @@ const Bill = () => {
     setSymbol(checked ? "Shipping" : "Received");
     if (!checked) {
       setTypeShipping(false);
+      setShippingFee(0);
     }
   };
 
@@ -1114,9 +1116,10 @@ const Bill = () => {
       ward: switchChange[index]
         ? Yup.string().required("Phường/ xã không được để trống")
         : null,
-      email: switchChange[index]
-        ? Yup.string().email("Địa chỉ email không hợp lệ")
-        : null,
+      email:
+        switchChange[index] && email
+          ? Yup.string().email("Địa chỉ email không hợp lệ")
+          : null,
     });
 
     const customerAmountPay =
@@ -1511,17 +1514,7 @@ const Bill = () => {
                     className={styles.blackDivider}
                     style={{ marginTop: "3px" }}
                   />
-                  {/* <Table
-                    dataSource={
-                      productDetails &&
-                      productDetails?.map((record, index) => ({
-                        ...record,
-                        key: record.id,
-                      }))
-                    }
-                    columns={columns}
-                    pagination={false}
-                  /> */}
+
                   <TableOrderProduct
                     productDetails={productDetails}
                     handleDeleteProduct={handleDeleteProduct}
@@ -1561,6 +1554,8 @@ const Bill = () => {
                         setDistricts={setSelectedDictrict}
                         setDetailAddress={setDetailAddress}
                         address={setSelectedAddress}
+                        setSwitchChange={handleChangSwitch}
+                        positionCurrent={index}
                       />
                     </Col>
                   </Row>
@@ -1816,7 +1811,10 @@ const Bill = () => {
                       </div>
                     </Col>
                     <Col span={8} offset={1}>
-                      <Switch onChange={(e) => handleChangSwitch(e, index)} />
+                      <Switch
+                        onChange={(e) => handleChangSwitch(e, index)}
+                        checked={switchChange[index]}
+                      />
                       <span style={{ marginLeft: "5px" }}>Giao hàng</span>
                       <br />
                       <SearchNameOrCodeVoucher

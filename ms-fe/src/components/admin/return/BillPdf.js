@@ -17,8 +17,9 @@ import moment from "moment";
 
 const logo = "/logo/logo-shop.png";
 
-const BillPdf = ({ open, cancel, billCode }) => {
+const BillPdf = ({ open, cancel, billCode, billOldPricePaid, voucherOld, voucherNew, billPriceNew,totalPriceReturn, billPaidAfterReturn }) => {
   const [bill, setBill] = useState(null);
+  
   Font.register({
     family: "Roboto",
     src: "https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-light-webfont.ttf",
@@ -77,7 +78,7 @@ const BillPdf = ({ open, cancel, billCode }) => {
     const qrCodeDataUrl = generateQRCodeDataURL(billCode);
     return (
       <Document language="vi-VN">
-        <Page style={{padding: 16}}>
+        <Page style={{padding: 16, paddingBottom:100}}>
           <View style={{ padding: 10}}>
             <View  style={{ textAlign:"center", width:"100%", display:"flex", alignItems:"center", justifyContent:"center" }}>
               <Text
@@ -242,8 +243,109 @@ const BillPdf = ({ open, cancel, billCode }) => {
                     </View>
                   </View>
                   {bill?.lstProductDetail &&
-                    bill?.lstProductDetail.map((item) => (
-                      <View
+                    bill?.lstProductDetail.map((item) => {
+                      if(item?.billDetailStatus!=="ReturnS"){
+                        return(
+                        <View
+                        key={item?.productDetailId}
+                        style={{
+                          display: "flex",
+                          flexDirection: "row",
+                          marginBottom: 5,
+                        }}
+                      >
+                        <View style={{ flex: 3 }}>
+                          <Text style={{ fontSize: 12, textAlign:"center" }}>
+                            {item?.productName +
+                              "-" +
+                              item?.productButton +
+                              "-" +
+                              item?.productMaterial +
+                              "-" +
+                              item?.productCollar +
+                              "-" +
+                              item?.productSleeve +
+                              "-" +
+                              item?.productShirtTail +
+                              "-" +
+                              item?.productPatternName +
+                              "-" +
+                              item?.productPatternName +
+                              "-" +
+                              item?.productBrandName +
+                              "-" +
+                              item?.productCateGoryName +
+                              "-" +
+                              item?.productColorName +
+                              "-" +
+                              item?.productSize}
+                          </Text>
+                        </View>
+                        <View style={{ flex: 1 }}>
+                          <Text style={{ fontSize: 12, textAlign:"center" }}>
+                            {item?.productPrice.toLocaleString("vi-VN", {
+                              style: "currency",
+                              currency: "VND",
+                            })}
+                          </Text>
+                        </View>
+                        <View style={{ flex: 1 }}>
+                          <Text style={{ fontSize: 12, textAlign:"center" }}>{item?.quantity}</Text>
+                        </View>
+                        <View style={{ flex: 1 }}>
+                          <Text style={{ fontSize: 12, textAlign:"center" }}>
+                            {Number(
+                              item?.quantity * item?.productPrice
+                            )?.toLocaleString("vi-VN", {
+                              style: "currency",
+                              currency: "VND",
+                            })}
+                          </Text>
+                        </View>
+                      </View>)
+                      }else{
+                        return null;
+                      }
+                  })}
+                </View>
+                <View style={{ paddingBottom: 12, marginBottom:12, width:"100%", borderBottom:"2px solid dashed"}}>
+                </View>
+                {bill?.billStatus==="ReturnS"? <View>
+                <Text
+                        style={{
+                          fontSize: 16,
+                          marginBottom: 10,
+                          textAlign: "center",
+                        }}
+                      >
+                          Thông tin trả hàng
+                      </Text>
+                      <View style={{ display: "flex", flexDirection: "column" }}>
+                  <View
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      marginBottom: 5,
+                    }}
+                  >
+                    <View style={{ flex: 3 }}>
+                      <Text style={{ fontSize: 12 , textAlign:"center" }}>Sản phẩm</Text>
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontSize: 12 , textAlign:"center" }}>Đơn giá</Text>
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontSize: 12 , textAlign:"center" }}>Số lượng</Text>
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontSize: 12 , textAlign:"center" }}>Thành tiền</Text>
+                    </View>
+                  </View>
+                  {bill?.lstProductDetail &&
+                    bill?.lstProductDetail.map((item) => {
+                      if(item?.billDetailStatus==="ReturnS"){
+                        return(
+                          <View
                         key={item?.productDetailId}
                         style={{
                           display: "flex",
@@ -300,10 +402,17 @@ const BillPdf = ({ open, cancel, billCode }) => {
                           </Text>
                         </View>
                       </View>
-                    ))}
+                        )
+                        
+                      }else{
+                        return null;
+                      }
+                  })}
                 </View>
                 <View style={{ paddingBottom: 12, marginBottom:12, width:"100%", borderBottom:"2px solid dashed"}}>
                 </View>
+                  </View>:null}
+                
                 <View style={{ display:"flex", justifyContent: "flex-end" }}>
                     <View style={{ flexDirection: "row", fontSize: 12, marginBottom:8 }}>
                       <View style={{ width: "30%" }}>
@@ -327,7 +436,7 @@ const BillPdf = ({ open, cancel, billCode }) => {
                         })}</Text>
                       </View>
                     </View>
-                    <View style={{ flexDirection: "row", fontSize: 12, marginBottom:8 }}>
+                    {bill?.billStatus!=="ReturnS"&&(<View style={{ flexDirection: "row", fontSize: 12, marginBottom:8 }}>
                       <View style={{ width: "30%" }}>
                         <Text style={{fontSize: 12}}>Giảm giá:</Text>
                       </View>
@@ -337,7 +446,7 @@ const BillPdf = ({ open, cancel, billCode }) => {
                           currency: "VND",
                         })}</Text>
                       </View>
-                    </View>
+                    </View>)}
                     <View style={{ flexDirection: "row", fontSize: 12, marginBottom:8 }}>
                       <View style={{ width: "30%" }}>
                         <Text style={{fontSize: 12}}>Khách hàng thanh toán:</Text>
@@ -359,9 +468,8 @@ const BillPdf = ({ open, cancel, billCode }) => {
                           </Text>
                         </View>
                       </View>
-
                     </View>
-                    <View style={{ flexDirection: "row", fontSize: 14, marginBottom:8 }}>
+                    {bill?.billStatus!=="ReturnS"&&(<View style={{ flexDirection: "row", fontSize: 14, marginBottom:8 }}>
                       <View style={{ width: "30%" }}>
                         <Text>Tổng cộng:</Text>
                       </View>
@@ -371,8 +479,8 @@ const BillPdf = ({ open, cancel, billCode }) => {
                           currency: "VND",
                         })}</Text>
                       </View>
-                    </View>
-                    {bill?.lstPaymentDetail?.reduce((accumulator, item) => accumulator + item.price, 0)>bill?.amountPaid && (
+                    </View>)}
+                    {bill?.lstPaymentDetail?.reduce((accumulator, item) => accumulator + item.price, 0)>bill?.amountPaid && bill?.billStatus!=="ReturnS" && (
                       <View style={{ flexDirection: "row", fontSize: 14, marginBottom:8 }}>
                         <View style={{ width: "30%" }}>
                           <Text>Tiền thừa:</Text>
@@ -387,7 +495,106 @@ const BillPdf = ({ open, cancel, billCode }) => {
                         </View>
                       </View>
                     )}
-                    
+                    {(bill?.billStatus==="ReturnS"&& (voucherNew || voucherOld)) && (
+                    <View style={{ flexDirection:"row", justifyContent:"space-between",marginBottom:"8px", fontSize:12}}>
+                      <View style={{width:"45%"}}>
+                        <View style={{border:"1px solid #ccc", borderRadius:"4px", padding:"8px"}}>
+                          <Text>Chưa hoàn trả</Text>
+                          <View>
+                            <Text>
+                            {voucherOld
+                              ? voucherOld?.voucherMethod === "vnd"
+                                ? voucherOld?.voucherValue.toLocaleString("vi-VN", {
+                                    style: "currency",
+                                    currency: "VND",
+                                  })
+                                : (bill?.totalPrice * voucherOld?.voucherValue) / 100 >
+                                voucherOld?.voucherValueMax
+                                ? voucherOld?.voucherValue +
+                                  "% - Giảm tối đa: " +
+                                  voucherOld?.voucherValueMax.toLocaleString("vi-VN", {
+                                    style: "currency",
+                                    currency: "VND",
+                                  })
+                                : voucherOld?.voucherValue +
+                                  "% - Giảm: " +
+                                  (
+                                    (bill?.totalPrice * voucherOld?.voucherValue) /
+                                    100
+                                  ).toLocaleString("vi-VN", {
+                                    style: "currency",
+                                    currency: "VND",
+                                  })
+                              : (0).toLocaleString("vi-VN", {
+                                  style: "currency",
+                                  currency: "VND",
+                                })}
+                            </Text>
+                            <Text>Thành tiền: {(billOldPricePaid+bill?.shippingFee).toLocaleString("vi-VN", {
+                            style: "currency",
+                            currency: "VND",
+                          })}</Text>
+                            <Text>Khách hàng thanh toán: {(bill?.lstPaymentDetail?.reduce((accumulator, item) => accumulator + item.price, 0)).toLocaleString("vi-VN", {
+                            style: "currency",
+                            currency: "VND",
+                          })}</Text>
+                          <Text>Tiền thừa: {(bill?.lstPaymentDetail?.reduce((accumulator, item) => accumulator + item.price, 0) - billOldPricePaid+bill?.shippingFee).toLocaleString("vi-VN", {
+                            style: "currency",
+                            currency: "VND",
+                          })}</Text>
+                          </View>
+                        </View>
+                      </View>
+                      <View style={{width:"45%"}}>
+                        <View style={{border:"1px solid #ccc", borderRadius:"4px", padding:"8px"}}>
+                          <Text>Đã hoàn trả</Text>
+                          <View>
+                          <Text>Tổng số tiền trả: {(totalPriceReturn).toLocaleString("vi-VN", {
+                            style: "currency",
+                            currency: "VND",
+                            })}</Text>
+                            <Text>
+                              {voucherOld
+                                ? voucherOld?.voucherMethod === "vnd"
+                                  ? voucherOld?.voucherValue.toLocaleString("vi-VN", {
+                                      style: "currency",
+                                      currency: "VND",
+                                    })
+                                  : (billPriceNew * voucherOld?.voucherValue) / 100 >
+                                  voucherOld?.voucherValueMax
+                                  ? voucherOld?.voucherValue +
+                                    "% - Giảm tối đa: " +
+                                    voucherOld?.voucherValueMax.toLocaleString("vi-VN", {
+                                      style: "currency",
+                                      currency: "VND",
+                                    })
+                                  : voucherOld?.voucherValue +
+                                    "% - Giảm: " +
+                                    (
+                                      (billPriceNew * voucherOld?.voucherValue) /
+                                      100
+                                    ).toLocaleString("vi-VN", {
+                                      style: "currency",
+                                      currency: "VND",
+                                    })
+                                : (0).toLocaleString("vi-VN", {
+                                    style: "currency",
+                                    currency: "VND",
+                                  })}
+                            </Text>
+                            <Text>Thành tiền: {(billPaidAfterReturn).toLocaleString("vi-VN", {
+                            style: "currency",
+                            currency: "VND",
+                            })}</Text>
+                            <Text>{(billOldPricePaid-billPaidAfterReturn)<0?"Khách hàng cần bù: ":"Tiền thừa trả khách: "}{Math.abs(billOldPricePaid-billPaidAfterReturn).toLocaleString("vi-VN", {
+                              style: "currency",
+                              currency: "VND",
+                            })}</Text>
+                          </View>
+                        </View>
+                      </View>
+                    </View>
+                  )}
                 </View>
                 
               </View>
@@ -503,7 +710,6 @@ const BillPdf = ({ open, cancel, billCode }) => {
                       width: "98%",
                     }}
                   ></div>
-                  {bill.billSymbol === "Shipping" ? (
                     <>
                       <div>
                         <div className={style.sideBuy}>
@@ -521,11 +727,7 @@ const BillPdf = ({ open, cancel, billCode }) => {
                               <span className={style.spacing}>
                                 :{" "}
                                 <span className={style.cssText}>
-                                  {bill?.billCreatedBy
-                                    ? bill?.billCreatedBy === "CLIENT"
-                                      ? "Khách lẻ"
-                                      : bill?.billCreatedBy
-                                    : null}
+                                  {bill?.deliveryNote?.fullName}
                                 </span>
                               </span>
                               <span className={style.spacing}>
@@ -552,22 +754,41 @@ const BillPdf = ({ open, cancel, billCode }) => {
                                 :{" "}
                                 <span className={style.cssText}>
                                   {bill?.lstPaymentDetail?.length === 1
-                                    ? bill?.lstPaymentDetail[0]?.paymentName ===
-                                      "Cash"
-                                      ? "Tiền mặt"
-                                      : "Chuyển khoản"
-                                    : bill?.lstPaymentDetail?.length === 2
-                                    ? "Chuyển khoản, tiền mặt"
-                                    : null}
+                                  ? bill?.lstPaymentDetail[0]?.paymentName ===
+                                    "Cash"
+                                    ? "Tiền mặt - " + bill?.lstPaymentDetail[0].price.toLocaleString("vi-VN", {
+                                      style: "currency",
+                                      currency: "VND",
+                                    })
+                                    : "Chuyển khoản - "+ bill?.lstPaymentDetail[0].price.toLocaleString("vi-VN", {
+                                      style: "currency",
+                                      currency: "VND",
+                                    })
+                                  : bill?.lstPaymentDetail?.length === 2
+                                  ? bill?.lstPaymentDetail[0]?.paymentName ==="Cash"?"Tiền mặt - "+bill?.lstPaymentDetail[0].price.toLocaleString("vi-VN", {
+                                    style: "currency",
+                                    currency: "VND",
+                                  }):"Chuyển khoản - "+bill?.lstPaymentDetail[0].price.toLocaleString("vi-VN", {
+                                    style: "currency",
+                                    currency: "VND",
+                                  })+", "+bill?.lstPaymentDetail[1]?.paymentName ==="Cash"?"Tiền mặt - "+bill?.lstPaymentDetail[1].price.toLocaleString("vi-VN", {
+                                    style: "currency",
+                                    currency: "VND",
+                                  }):"Chuyển khoản - "+bill?.lstPaymentDetail[1].price.toLocaleString("vi-VN", {
+                                    style: "currency",
+                                    currency: "VND",
+                                  })
+                                  : null}
                                 </span>
                               </span>
+                              
                             </Space>
                           </div>
                         </div>
                       </div>
                     </>
-                  ) : null}
-                  <table className={style.none}>
+                  <h2 style={{textAlign:"center", paddingTop:"10px"}}>Thông tin đơn hàng</h2>
+                  <table className={style.none} style={{paddingTop:"0px"}}>
                     <tr>
                       <th style={{ width: "50%" }}>Sản phẩm</th>
                       <th>Đơn vị tính</th>
@@ -578,66 +799,152 @@ const BillPdf = ({ open, cancel, billCode }) => {
                     <tbody>
                       {bill?.lstProductDetail &&
                         bill?.lstProductDetail.map((item) => {
-                          return (
-                            <tr
-                              key={item?.productDetailId}
-                              className={style.padding}
-                            >
-                              <td className={style.textLeft}>
-                                {" "}
-                                {item?.productName +
-                                  "-" +
-                                  item?.productButton +
-                                  "-" +
-                                  item?.productMaterial +
-                                  "-" +
-                                  item?.productCollar +
-                                  "-" +
-                                  item?.productSleeve +
-                                  "-" +
-                                  item?.productShirtTail +
-                                  "-" +
-                                  item?.productPatternName +
-                                  "-" +
-                                  item?.productPatternName +
-                                  "-" +
-                                  item?.productBrandName +
-                                  "-" +
-                                  item?.productCateGoryName +
-                                  "-" +
-                                  item?.productColorName +
-                                  "-" +
-                                  item?.productSize}
-                              </td>
-                              <td>Cái</td>
-                              <td>
-                                <span className={style.cssText}>
-                                  {item?.productPrice?.toLocaleString("vi-VN", {
-                                    style: "currency",
-                                    currency: "VND",
-                                  })}
-                                </span>
-                              </td>
-                              <td>
-                                <span className={style.cssText}>
-                                  {numeral(item?.quantity).format("0,0")}
-                                </span>
-                              </td>
-                              <td>
-                                <span className={style.cssText}>
-                                  {(
-                                    item?.quantity * item?.productPrice
-                                  )?.toLocaleString("vi-VN", {
-                                    style: "currency",
-                                    currency: "VND",
-                                  })}
-                                </span>
-                              </td>
-                            </tr>
-                          );
+                          if(item?.billDetailStatus!=="ReturnS"){
+                            return (
+                              <tr
+                                key={item?.productDetailId}
+                                className={style.padding}
+                              >
+                                <td className={style.textLeft}>
+                                  {" "}
+                                  {item?.productName +
+                                    "-" +
+                                    item?.productButton +
+                                    "-" +
+                                    item?.productMaterial +
+                                    "-" +
+                                    item?.productCollar +
+                                    "-" +
+                                    item?.productSleeve +
+                                    "-" +
+                                    item?.productShirtTail +
+                                    "-" +
+                                    item?.productPatternName +
+                                    "-" +
+                                    item?.productPatternName +
+                                    "-" +
+                                    item?.productBrandName +
+                                    "-" +
+                                    item?.productCateGoryName +
+                                    "-" +
+                                    item?.productColorName +
+                                    "-" +
+                                    item?.productSize}
+                                </td>
+                                <td>Cái</td>
+                                <td>
+                                  <span className={style.cssText}>
+                                    {item?.productPrice?.toLocaleString("vi-VN", {
+                                      style: "currency",
+                                      currency: "VND",
+                                    })}
+                                  </span>
+                                </td>
+                                <td>
+                                  <span className={style.cssText}>
+                                    {numeral(item?.quantity).format("0,0")}
+                                  </span>
+                                </td>
+                                <td>
+                                  <span className={style.cssText}>
+                                    {(
+                                      item?.quantity * item?.productPrice
+                                    )?.toLocaleString("vi-VN", {
+                                      style: "currency",
+                                      currency: "VND",
+                                    })}
+                                  </span>
+                                </td>
+                              </tr>
+                            );
+                          }else{
+                            return null;
+                          }
+                          
                         })}
                     </tbody>
                   </table>
+                  <div className={style.br}></div>
+                  {bill?.billStatus==="ReturnS"?
+                  <>
+                  <h2 style={{textAlign:"center", paddingTop:"10px"}}>Thông tin trả hàng</h2>
+                  <table className={style.none} style={{paddingTop:"0px"}}>
+                    <tr>
+                      <th style={{ width: "50%" }}>Sản phẩm</th>
+                      <th>Đơn vị tính</th>
+                      <th>Đơn giá</th>
+                      <th>Số lượng</th>
+                      <th>Thành tiền</th>
+                    </tr>
+                    <tbody>
+                      {bill?.lstProductDetail &&
+                        bill?.lstProductDetail.map((item) => {
+                          if(item?.billDetailStatus==="ReturnS"){
+                            return (
+                              <tr
+                                key={item?.productDetailId}
+                                className={style.padding}
+                              >
+                                <td className={style.textLeft}>
+                                  {" "}
+                                  {item?.productName +
+                                    "-" +
+                                    item?.productButton +
+                                    "-" +
+                                    item?.productMaterial +
+                                    "-" +
+                                    item?.productCollar +
+                                    "-" +
+                                    item?.productSleeve +
+                                    "-" +
+                                    item?.productShirtTail +
+                                    "-" +
+                                    item?.productPatternName +
+                                    "-" +
+                                    item?.productPatternName +
+                                    "-" +
+                                    item?.productBrandName +
+                                    "-" +
+                                    item?.productCateGoryName +
+                                    "-" +
+                                    item?.productColorName +
+                                    "-" +
+                                    item?.productSize}
+                                </td>
+                                <td>Cái</td>
+                                <td>
+                                  <span className={style.cssText}>
+                                    {item?.productPrice?.toLocaleString("vi-VN", {
+                                      style: "currency",
+                                      currency: "VND",
+                                    })}
+                                  </span>
+                                </td>
+                                <td>
+                                  <span className={style.cssText}>
+                                    {numeral(item?.quantity).format("0,0")}
+                                  </span>
+                                </td>
+                                <td>
+                                  <span className={style.cssText}>
+                                    {(
+                                      item?.quantity * item?.productPrice
+                                    )?.toLocaleString("vi-VN", {
+                                      style: "currency",
+                                      currency: "VND",
+                                    })}
+                                  </span>
+                                </td>
+                              </tr>
+                            );
+                          }else{
+                            return null;
+                          }
+                          
+                        })}
+                    </tbody>
+                  </table></>:null}
+                  
                   <div className={style.br}></div>
 
                   <div className={style.flexEnd}>
@@ -647,10 +954,12 @@ const BillPdf = ({ open, cancel, billCode }) => {
                         size={16}
                         style={{ width: "100%" }}
                       >
-                        <span>Thành tiền</span>
+                        <span>Tổng tiền</span>
                         <span>Giá vận chuyển</span>
-                        <span>Giảm giá</span>
-                        <span>Tổng thanh toán</span>
+                        {bill?.billStatus!=="ReturnS"&&(<span>Giảm giá</span>)}
+                        {bill?.billStatus!=="ReturnS"&&(<span>Tổng thanh toán</span>)}
+                        {bill?.billStatus!=="ReturnS"&&(<span>Khách hàng thanh toán</span>)}
+                        {bill?.billStatus!=="ReturnS"&&(<span>Tiền thừa</span>)}
                       </Space>
                     </div>
                     <div className={style.content}>
@@ -671,21 +980,139 @@ const BillPdf = ({ open, cancel, billCode }) => {
                             currency: "VND",
                           })}
                         </span>
-                        <span className={`${style.span} ${style.cssText}`}>
+                        
+                        {bill?.billStatus!=="ReturnS"&&(<span className={`${style.span} ${style.cssText}`}>
                           {bill?.priceReduce?.toLocaleString("vi-VN", {
                             style: "currency",
                             currency: "VND",
                           })}
-                        </span>
-                        <span className={`${style.span} ${style.cssText}`}>
-                          {bill?.amountPaid?.toLocaleString("vi-VN", {
+                        </span>)}
+                        {bill?.billStatus!=="ReturnS"&&(<span className={`${style.span} ${style.cssText}`}>
+                          {(billOldPricePaid+bill?.shippingFee)?.toLocaleString("vi-VN", {
                             style: "currency",
                             currency: "VND",
                           })}
-                        </span>
+                        </span>)}
+                        {bill?.billStatus!=="ReturnS"&&(<span className={style.spacing}>
+                          <span className={style.cssText}>
+                          {bill?.lstPaymentDetail?.reduce((accumulator, item) => accumulator + item.price, 0).toLocaleString("vi-VN", {
+                            style: "currency",
+                            currency: "VND",
+                          })}
+                          </span>
+                        </span>)}
+                        {bill?.billStatus!=="ReturnS"&&(<span className={style.spacing}>
+                          <span className={style.cssText}>
+                          {(bill?.lstPaymentDetail?.reduce((accumulator, item) => accumulator + item.price, 0)-bill?.amountPaid).toLocaleString("vi-VN", {
+                            style: "currency",
+                            currency: "VND",
+                          })}
+                          </span>
+                        </span>)}
                       </Space>
                     </div>
                   </div>
+                  {console.log(voucherOld)}
+                  {(bill?.billStatus==="ReturnS"&& (voucherNew || voucherOld)) && (
+                    <div style={{display:"flex", justifyContent:"space-between", marginBottom:"8px"}}>
+                      <div style={{width:"45%"}}>
+                        <div style={{border:"1px solid #ccc", borderRadius:"4px", padding:"8px"}}>
+                          <span style={{fontWeight:"500"}}>Chưa hoàn trả</span>
+                          <Row>
+                            <Col span={24}>
+                            {voucherOld
+                              ? voucherOld?.voucherMethod === "vnd"
+                                ? voucherOld?.voucherValue.toLocaleString("vi-VN", {
+                                    style: "currency",
+                                    currency: "VND",
+                                  })
+                                : (bill?.totalPrice * voucherOld?.voucherValue) / 100 >
+                                voucherOld?.voucherValueMax
+                                ? voucherOld?.voucherValue +
+                                  "% - Giảm tối đa: " +
+                                  voucherOld?.voucherValueMax.toLocaleString("vi-VN", {
+                                    style: "currency",
+                                    currency: "VND",
+                                  })
+                                : voucherOld?.voucherValue +
+                                  "% - Giảm: " +
+                                  (
+                                    (bill?.totalPrice * voucherOld?.voucherValue) /
+                                    100
+                                  ).toLocaleString("vi-VN", {
+                                    style: "currency",
+                                    currency: "VND",
+                                  })
+                              : (0).toLocaleString("vi-VN", {
+                                  style: "currency",
+                                  currency: "VND",
+                                })}
+                            </Col>
+                            <Col span={24}>Thành tiền: {(billOldPricePaid+bill?.shippingFee).toLocaleString("vi-VN", {
+                            style: "currency",
+                            currency: "VND",
+                          })}</Col>
+                            <Col span={24}>Khách hàng thanh toán: {(bill?.lstPaymentDetail?.reduce((accumulator, item) => accumulator + item.price, 0)).toLocaleString("vi-VN", {
+                            style: "currency",
+                            currency: "VND",
+                          })}</Col>
+                          <Col span={24}>Tiền thừa: {(bill?.lstPaymentDetail?.reduce((accumulator, item) => accumulator + item.price, 0) - (billOldPricePaid+bill?.shippingFee)).toLocaleString("vi-VN", {
+                            style: "currency",
+                            currency: "VND",
+                          })}</Col>
+                          </Row>
+                        </div>
+                      </div>
+                      <div style={{width:"45%"}}>
+                        <div style={{border:"1px solid #ccc", borderRadius:"4px", padding:"8px"}}>
+                          <span style={{fontWeight:"500"}}>Đã hoàn trả</span>
+                          <Row>
+                          <Col span={24}>Tổng số tiền trả: {(totalPriceReturn).toLocaleString("vi-VN", {
+                            style: "currency",
+                            currency: "VND",
+                            })}</Col>
+                            <Col span={24}>
+                              {voucherOld
+                                ? voucherOld?.voucherMethod === "vnd"
+                                  ? voucherOld?.voucherValue.toLocaleString("vi-VN", {
+                                      style: "currency",
+                                      currency: "VND",
+                                    })
+                                  : (billPriceNew * voucherOld?.voucherValue) / 100 >
+                                  voucherOld?.voucherValueMax
+                                  ? voucherOld?.voucherValue +
+                                    "% - Giảm tối đa: " +
+                                    voucherOld?.voucherValueMax.toLocaleString("vi-VN", {
+                                      style: "currency",
+                                      currency: "VND",
+                                    })
+                                  : voucherOld?.voucherValue +
+                                    "% - Giảm: " +
+                                    (
+                                      (billPriceNew * voucherOld?.voucherValue) /
+                                      100
+                                    ).toLocaleString("vi-VN", {
+                                      style: "currency",
+                                      currency: "VND",
+                                    })
+                                : (0).toLocaleString("vi-VN", {
+                                    style: "currency",
+                                    currency: "VND",
+                                  })}
+                            </Col>
+                            <Col span={24}>Thành tiền: {(billPaidAfterReturn).toLocaleString("vi-VN", {
+                            style: "currency",
+                            currency: "VND",
+                            })}</Col>
+                            <Col span={24}>{(billOldPricePaid-billPaidAfterReturn)<0?"Khách hàng cần bù: ":"Tiền thừa trả khách: "}{Math.abs(billOldPricePaid-billPaidAfterReturn).toLocaleString("vi-VN", {
+                              style: "currency",
+                              currency: "VND",
+                            })}</Col>
+                          </Row>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
                 <QRCodeSVG width={"100%"} value={billCode + ""} />
               </div>

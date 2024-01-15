@@ -244,14 +244,14 @@ const BillReturn = () => {
             }).then(res=>{
               setVoucherNewUse(res.data);
               setTotalPricePaid(billInfo?.price -totalPrice - countPriceReduce(res.data, priceBillAfterReturn))
-              setVoucherPrice(countPriceReduce(res.data, billInfo?.price))
+              setVoucherPrice(countPriceReduce(res.data, priceBillAfterReturn))
             }).catch(err=>{
               console.log(err)
             })
     }else{
       setVoucherNewUse(null);
       setTotalPricePaid(priceBillAfterReturn - countPriceReduce(voucher, priceBillAfterReturn));
-      setVoucherPrice(countPriceReduce(voucher, billInfo?.price))
+      setVoucherPrice(countPriceReduce(voucher, priceBillAfterReturn))
     }
   }
 
@@ -570,6 +570,13 @@ const BillReturn = () => {
         open={openBillPdf}
         cancel={()=>setOpenBillPdf(false)}
         billCode={billInfo?.billCode}
+        billOldPricePaid={customerPaidBillOld}
+        voucherOld={voucher}
+        voucherNew={voucherNewUse}
+        countVoucher={countPriceReduce}
+        billPriceNew={(billInfo?.price - totalPrice)}
+        totalPriceReturn={totalPrice}
+        billPaidAfterReturn={totalPricePaid}
       />
       <div className={styles.billReturn}>
         <h3 style={{ marginBottom: "25px" }}>Thông tin hóa đơn</h3>

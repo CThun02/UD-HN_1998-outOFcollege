@@ -53,7 +53,6 @@ const ProductDetails = (props) => {
   const [forms, setForms] = useState(null);
   const [maxPrice, setMaxPrice] = useState(600000);
   const [modalSetQuantity, setModalSetQuantity] = useState([]);
-  const [quantity, setQuantiy] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const token = getAuthToken(true);
@@ -318,7 +317,7 @@ const ProductDetails = (props) => {
   //functions
 
   function handleChangeQuantity(quantity) {
-    setQuantiy(quantity);
+    props.setQuantity(quantity);
   }
 
   const handleShowModalQuantity = (index) => {
@@ -334,11 +333,12 @@ const ProductDetails = (props) => {
   };
 
   function addProductDetail(record, index) {
+    let isError = false;
     setLoading(true);
     var indexExist = -1;
     var productDetailCreate = {
       productDetail: {},
-      quantity: quantity,
+      quantity: props.quantity,
       priceReduce: 0,
     };
     for (let i = 0; i < props.productDetailsCreate?.length; i++) {
@@ -349,22 +349,13 @@ const ProductDetails = (props) => {
     }
     if (indexExist !== -1) {
       productDetailCreate.quantity =
-        Number(quantity) +
+        Number(props.quantity) +
         Number(props.productDetailsCreate[indexExist].quantity);
       props.productDetailsCreate?.splice(indexExist, 1);
     }
-    if (productDetailCreate?.quantity > record?.quantity) {
-      setLoading(false);
-      productDetailCreate.quantity = 0;
-      notification.error({
-        message: "Thông báo",
-        description: `Số lượng sản phẩm tồn không đủ`,
-      });
-      return;
-    }
 
     if (productDetailCreate.quantity <= 0) {
-      productDetailCreate.quantity = 0;
+      isError = true;
       notification.error({
         message: "Thông báo",
         description: `Số lượng sản phẩm phải lớn hơn 0`,
@@ -391,7 +382,7 @@ const ProductDetails = (props) => {
           baseUrl,
           {
             productDetail: record,
-            quantityCurrent: quantity,
+            quantityCurrent: props.quantity,
             request: {
               brandId: brand,
               categoryId: category,
@@ -461,16 +452,27 @@ const ProductDetails = (props) => {
                     setLoading(false);
                   })
                   .catch((error) => {
-                    productDetailCreate.quantity = 0;
+                    console.log("data: ", error);
+                    let message = "Thao tác thất bại";
+                    const dataError = error?.response?.data;
+                    if (
+                      dataError?.message?.includes(
+                        "Số lượng trong kho không đủ"
+                      )
+                    ) {
+                      message = "Số lượng trong kho không đủ";
+                    }
+                    isError = true;
                     notification.error({
                       message: "Thông báo",
-                      description: "Thao tác thất bại",
+                      description: message,
                       duration: 2,
                     });
                     setLoading(false);
                   });
               })
               .catch((error) => {
+                isError = true;
                 const errorCode = error.response?.data;
                 let description = "";
                 if (errorCode?.status === 403) {
@@ -493,18 +495,32 @@ const ProductDetails = (props) => {
               });
           } else {
             setLoading(false);
-            console.log("data-test: ");
-            props.action();
+            if (!isError) {
+              props.action();
+            }
           }
         })
         .catch((err) => {
-          productDetailCreate.quantity = 0;
-          setLoading(false);
+          let message = "Thao tác thất bại";
+          const dataError = err?.response?.data;
+          if (dataError?.message?.includes("Số lượng trong kho không đủ")) {
+            message = "Số lượng trong kho không đủ";
+          }
+          isError = true;
           notification.error({
-            message: "Lỗi",
-            description: "Thao tác thất bại",
+            message: "Thông báo",
+            description: message,
+            duration: 2,
           });
+          setLoading(false);
         });
+      console.log("data1: ", record);
+      console.log("data2: ", props.quantity);
+      console.log(
+        "data3: ",
+        Number(props.productDetailsCreate[indexExist]?.quantity)
+      );
+      console.log("data3: ", productDetailCreate.quantity);
     }
   }
 

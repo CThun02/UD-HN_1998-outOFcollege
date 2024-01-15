@@ -126,9 +126,12 @@ const ModalProductReturnDetail = ({
             <span style={{ fontWeight: "500" }}>Số lượng trả: </span>
             <span>{record.quantity}</span>
             <br />
+            <span style={{ fontWeight: "500" }}>Đơn giá: </span>
+            <span>{record.price}</span>
+            <br />
             <span style={{ fontWeight: "500" }}>Tổng trả: </span>
             <span>
-              {(record.price)?.toLocaleString("vi-VN", {
+              {(record.price*record.quantity)?.toLocaleString("vi-VN", {
                 style: "currency",
                 currency: "VND",
               })}

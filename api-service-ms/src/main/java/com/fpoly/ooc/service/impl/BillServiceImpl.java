@@ -139,7 +139,7 @@ public class BillServiceImpl implements BillService {
         double amountPaid = CommonUtils.bigDecimalConvertDouble(request.getAmountPaid());
         double priceReduce = CommonUtils.bigDecimalConvertDouble(request.getPriceReduce());
         double shippingPrice = CommonUtils.bigDecimalConvertDouble(request.getShipPrice());
-        if (amountPaid - shippingPrice - priceReduce > 10000000) {
+        if (amountPaid - shippingPrice - priceReduce > 10000000 && "Online".equalsIgnoreCase(request.getBillType())) {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_THAN_TEN_MILLION));
         }
 

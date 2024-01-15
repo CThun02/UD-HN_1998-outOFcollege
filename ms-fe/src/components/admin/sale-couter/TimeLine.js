@@ -862,9 +862,18 @@ const BillTimeLine = (addId) => {
             {billInfo?.symbol === "Shipping" &&
               Number(timlinesDisplay[timlinesDisplay?.length - 1]?.status) ===
                 1 &&
-              billInfo?.status !== "Paid" && (
+              billInfo?.status === "wait_for_confirm" && (
                 <Col span={3}>
-                  <Button type="primary" onClick={() => setOpenModalDN(true)}>
+                  <Button
+                    type="primary"
+                    onClick={() => setOpenModalDN(true)}
+                    disabled={
+                      billInfo?.lstPaymentDetail?.length === 1 ||
+                      billInfo?.lstPaymentDetail?.length === 2
+                        ? billInfo?.lstPaymentDetail[0].status === "Paid"
+                        : false
+                    }
+                  >
                     Sửa thông tin
                   </Button>
                   {openModalDN && (

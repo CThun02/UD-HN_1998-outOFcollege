@@ -28,6 +28,7 @@ const TimelineByBillCode = () => {
   const [openProductEdit, setOpenProductEdit] = useState([]);
   const [loadingButton, setLoadingButton] = useState(false);
   const [voucher, setVoucher] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleShowModalProductEdit = (index) => {
     const visible = [...openProductEdit];
@@ -79,7 +80,7 @@ const TimelineByBillCode = () => {
         `http://localhost:8080/api/client/getVoucherByBillCode?billCode=${billCode}`
       )
       .then((response) => {
-        console.log(response.data)
+        console.log(response.data);
       })
       .catch((error) => {
         console.log(error);
@@ -106,13 +107,20 @@ const TimelineByBillCode = () => {
       .catch((error) => {
         console.log(error);
       });
-  }, [render]);
+  }, [render, isLoading]);
+
+  const handleAddProductDetail = () => {
+    // setOpenCartEdit(true);
+    console.log("timelineDisplay: ", timelineDisplay);
+  };
 
   return (
     <div className={styles.content} style={{ margin: "100px 0" }}>
       <SockJs
         connectTo={"create-timeline-client-topic"}
         setValues={setTimelineDisplay}
+        isLoading={true}
+        setIsLoading={setIsLoading}
       />
       {loading ? (
         <div className={styles.width}>
@@ -143,7 +151,9 @@ const TimelineByBillCode = () => {
                             : CheckCircleOutlined
                         }
                         title={
-                          (data.billType === "Online" || (data?.billType === "In-Store" && timelines?.timelineCustomInfo?.priceShip>0)) &&
+                          (data.billType === "Online" ||
+                            (data?.billType === "In-Store" &&
+                              timelines?.timelineCustomInfo?.priceShip > 0)) &&
                           timelines?.timelineCustomInfo ? (
                             <>
                               {data.status === "0" ? (
@@ -201,7 +211,7 @@ const TimelineByBillCode = () => {
               timelines?.timelineCustomInfo?.billType !== "Online" ? null : (
                 <div style={{ marginBottom: "24px" }}>
                   <Button
-                    onClick={() => setOpenCartEdit(true)}
+                    onClick={handleAddProductDetail}
                     loading={loadingButton}
                     className={styles.btnEditCart}
                   >
@@ -213,12 +223,13 @@ const TimelineByBillCode = () => {
               {timelines?.lstProduct?.map((timeline, index) => {
                 return (
                   <Row style={{ margin: 0 }}>
-                    <Col span={24} style={{marginBottom:"20px"}}>
-                    </Col>
-                    <EditProductCart 
-                      onCancel={()=>{handleCancelModalProductEdit(index)}} 
-                      open={openProductEdit[index]} 
-                      productDetailId={timeline?.productDetailId} 
+                    <Col span={24} style={{ marginBottom: "20px" }}></Col>
+                    <EditProductCart
+                      onCancel={() => {
+                        handleCancelModalProductEdit(index);
+                      }}
+                      open={openProductEdit[index]}
+                      productDetailId={timeline?.productDetailId}
                       render={setRender}
                       quantityBuy={timeline.quantity}
                       setLoadingButtonTimeline={setLoadingButton}
@@ -348,10 +359,11 @@ const TimelineByBillCode = () => {
                         alignItems: "center",
                       }}
                     >
-                        {timelines?.lstTimeline?.length >1  || 
-                        timelines?.timelineCustomInfo?.status === 'Paid' ||
-                        timelines?.timelineCustomInfo?.billType !== "Online" ? null :(
-                      <Row>
+                      {timelines?.lstTimeline?.length > 1 ||
+                      timelines?.timelineCustomInfo?.status === "Paid" ||
+                      timelines?.timelineCustomInfo?.billType !==
+                        "Online" ? null : (
+                        <Row>
                           <Col span={12}>
                             <Button
                               loading={loadingButton}
@@ -509,24 +521,29 @@ const TimelineByBillCode = () => {
                             </Col>
                             <Col span={12}>
                               <p style={{ marginLeft: "25%" }}>
-                                {(timelines?.timelineCustomInfo?.totalPrice) > 2000000?
+                                {timelines?.timelineCustomInfo?.totalPrice >
+                                2000000 ? (
                                   <>
                                     <strike>
                                       {(timelines?.timelineCustomInfo?.priceShip).toLocaleString(
-                                                        "vi-VN",
-                                                        {
-                                                          style: "currency",
-                                                          currency: "VND",
-                                                        })} 
-                                    </strike> - 0 đ
-                                  </>: 
+                                        "vi-VN",
+                                        {
+                                          style: "currency",
+                                          currency: "VND",
+                                        }
+                                      )}
+                                    </strike>{" "}
+                                    - 0 đ
+                                  </>
+                                ) : (
                                   (timelines?.timelineCustomInfo?.priceShip).toLocaleString(
-                                                      "vi-VN",
-                                                      {
-                                                        style: "currency",
-                                                        currency: "VND",
-                                                      })
-                                  }
+                                    "vi-VN",
+                                    {
+                                      style: "currency",
+                                      currency: "VND",
+                                    }
+                                  )
+                                )}
                               </p>
                             </Col>
                             <Col
@@ -553,21 +570,23 @@ const TimelineByBillCode = () => {
                                   textAlign: "start",
                                 }}
                               >
-                                {(
-                                  timelines?.timelineCustomInfo?.pricePaid 
-                                ).toLocaleString("vi-VN", {
-                                  style: "currency",
-                                  currency: "VND",
-                                })}
+                                {(timelines?.timelineCustomInfo?.pricePaid).toLocaleString(
+                                  "vi-VN",
+                                  {
+                                    style: "currency",
+                                    currency: "VND",
+                                  }
+                                )}
                               </p>
                             </Col>
                           </Row>
                         </Col>
                       </Row>
                     </Col>
-                    {timelines?.lstTimeline?.length >1  || 
-                    timelines?.timelineCustomInfo?.status === 'Paid' ||
-                    timelines?.timelineCustomInfo?.billType !== "Online" ? null :(
+                    {timelines?.lstTimeline?.length > 1 ||
+                    timelines?.timelineCustomInfo?.status === "Paid" ||
+                    timelines?.timelineCustomInfo?.billType !==
+                      "Online" ? null : (
                       <Col span={2}>
                         <Button
                           loading={loadingButton}

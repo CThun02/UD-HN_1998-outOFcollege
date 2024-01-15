@@ -5,7 +5,14 @@ import { NotificationContext } from "../components/element/notification/Notifica
 
 const SOCKET_URL = "http://localhost:8080/ms-app/";
 
-function SockJs({ setValues, connectTo, setIsMessage, isMessage }) {
+function SockJs({
+  setValues,
+  connectTo,
+  setIsMessage,
+  isMessage,
+  setIsLoading,
+  isLoading,
+}) {
   const [stompClient, setStompClient] = useState();
   const [connected, setConnected] = useState(false);
   const { showSuccessNotification } = useContext(NotificationContext);
@@ -42,6 +49,9 @@ function SockJs({ setValues, connectTo, setIsMessage, isMessage }) {
         setIsMessage((bool) => !bool);
       } else {
         setValues(JSON.parse(msg.body));
+        if (isLoading) {
+          setIsLoading((bool) => !bool);
+        }
       }
     }
   };

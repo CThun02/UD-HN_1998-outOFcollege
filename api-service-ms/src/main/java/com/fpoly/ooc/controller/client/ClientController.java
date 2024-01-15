@@ -1,6 +1,8 @@
 package com.fpoly.ooc.controller.client;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fpoly.ooc.constant.Const;
+import com.fpoly.ooc.constant.ErrorCodeConfig;
 import com.fpoly.ooc.dto.BillStatusDTO;
 import com.fpoly.ooc.dto.EmailDetails;
 import com.fpoly.ooc.dto.ListQuantityAndPriceRequest;
@@ -11,6 +13,7 @@ import com.fpoly.ooc.entity.Address;
 import com.fpoly.ooc.entity.AddressDetail;
 import com.fpoly.ooc.entity.Bill;
 import com.fpoly.ooc.entity.ProductDetail;
+import com.fpoly.ooc.entity.Timeline;
 import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.BillRepo;
 import com.fpoly.ooc.request.DeliveryNoteRequest;
@@ -30,6 +33,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @RestController
@@ -199,9 +203,20 @@ public class ClientController {
         return ResponseEntity.ok(emailService.sendSimpleMail(emailDetails));
     }
 
-    @PutMapping("/update-address/{id}")
+    @PutMapping("/update-address/{id}/{billId}")
     public ResponseEntity<?> updateAddress(@RequestBody Address address,
-                                           @PathVariable("id") Long id) {
+                                           @PathVariable("id") Long id,
+                                           @PathVariable("billId") Long billId) throws NotFoundException {
+        Bill bill = billService.findBillByBillId(billId);
+        if (Objects.isNull(bill)) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_NOT_FOUND));
+        }
+
+        Timeline timelineFromBillId = timeLineService.timelineFromBillId(bill.getId());
+        if (!"wait_for_confirm".equalsIgnoreCase(bill.getStatus()) || !timelineFromBillId.getStatus().equalsIgnoreCase("1")) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_CANNOT_EDIT_WHEN_BILL_NOT_EQUAL_WAIT_FOR_CONFIRM));
+        }
+
         address.setId(id);
         return ResponseEntity.ok(addressService.update(address));
     }

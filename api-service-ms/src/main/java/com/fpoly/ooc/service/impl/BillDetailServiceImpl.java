@@ -7,6 +7,7 @@ import com.fpoly.ooc.entity.Bill;
 import com.fpoly.ooc.entity.BillDetail;
 import com.fpoly.ooc.entity.DeliveryNote;
 import com.fpoly.ooc.entity.ProductDetail;
+import com.fpoly.ooc.entity.Timeline;
 import com.fpoly.ooc.exception.NotFoundException;
 import com.fpoly.ooc.repository.BillDetailRepo;
 import com.fpoly.ooc.request.bill.BillDetailRequest;
@@ -68,6 +69,15 @@ public class BillDetailServiceImpl implements BillDetailService {
         BigDecimal price = request.getPrice();
         //Tìm hóa đơn đang chỉnh sửa
         Bill bill = billService.findBillByBillCode(billCode);
+
+        if (Objects.isNull(bill)) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_NOT_FOUND));
+        }
+
+        Timeline timelineFromBillId = timeLineService.timelineFromBillId(bill.getId());
+        if (!"wait_for_confirm".equalsIgnoreCase(bill.getStatus()) || !timelineFromBillId.getStatus().equalsIgnoreCase("1")) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_CANNOT_EDIT_WHEN_BILL_NOT_EQUAL_WAIT_FOR_CONFIRM));
+        }
 
         BillDetail billDetail = BillDetail.builder().id(null)
                 .bill(bill)
@@ -328,6 +338,15 @@ public class BillDetailServiceImpl implements BillDetailService {
         Bill bill = billService.findBillByBillId(billId);
         BillDetail billDetail = billDetailRepo.findById(billDetailId).orElse(null);
 
+        if (Objects.isNull(bill)) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_NOT_FOUND));
+        }
+
+        Timeline timelineFromBillId = timeLineService.timelineFromBillId(bill.getId());
+        if (!"wait_for_confirm".equalsIgnoreCase(bill.getStatus()) || !timelineFromBillId.getStatus().equalsIgnoreCase("1")) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_CANNOT_EDIT_WHEN_BILL_NOT_EQUAL_WAIT_FOR_CONFIRM));
+        }
+
         if (Objects.isNull(billDetail)) {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_NOT_FOUND));
         }
@@ -417,6 +436,7 @@ public class BillDetailServiceImpl implements BillDetailService {
                 .lstPaymentDetail(lstPaymentDetail)
                 .deliveryNote(deliveryNote)
                 .billType(bill.getBillType())
+                .billStatus(bill.getStatus())
                 .build();
 
         return pdfResponse;

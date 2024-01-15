@@ -31,5 +31,5 @@ public interface TimeLineService {
                           String symbol,
                           Integer count,
                           String createdBy);
-
+    Timeline timelineFromBillId(Long billId);
 }

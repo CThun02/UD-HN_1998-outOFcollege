@@ -349,7 +349,7 @@ const BillTimeLine = (addId) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [billId, render, isModalConfirm, loading]);
 
-  const updateQUantityBillDetail = (record, value, index) => {
+  const updateQUantityBillDetail = async (record, value, index) => {
     setLoading(true);
 
     let quantityOld = timelinePoduct[index].quantity;
@@ -370,7 +370,7 @@ const BillTimeLine = (addId) => {
       return;
     }
 
-    axios
+    await axios
       .post(
         `http://localhost:8080/api/admin/bill-detail/create-bill-detail`,
         {
@@ -428,11 +428,11 @@ const BillTimeLine = (addId) => {
       });
   };
 
-  const handleDeleteBillDetail = (pdCode, bdID, note) => {
+  const handleDeleteBillDetail = async (pdCode, bdID, note) => {
     setLoading(true);
 
     handleCreateTimeline(note + " | " + pdCode, "Delete", null);
-    axios
+    await axios
       .delete(
         `http://localhost:8080/api/admin/bill-detail?billId=${billId}&billDetailId=${bdID}`,
         {

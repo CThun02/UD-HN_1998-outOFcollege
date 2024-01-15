@@ -265,18 +265,19 @@ public class VoucherServiceImpl implements VoucherService {
         if(Objects.isNull(voucherRes)) {
             return null;
         }
+//
+//        VoucherResponse resultSort = null;
+//        for (VoucherResponse res: voucherResList) {
+//            if(Objects.nonNull(res.getVoucherValueMax()) && Objects.nonNull(voucherRes.getVoucherValue())) {
+//                if (res.getVoucherValueMax().compareTo(voucherRes.getVoucherValue()) > 0) {
+//                    resultSort = res;
+//                    voucherRes = resultSort;
+//                }
+//            }
+//        }
 
-        VoucherResponse resultSort = null;
-        for (VoucherResponse res: voucherResList) {
-            if(Objects.nonNull(res.getVoucherValueMax()) && Objects.nonNull(voucherRes.getVoucherValue())) {
-                if (res.getVoucherValueMax().compareTo(voucherRes.getVoucherValue()) > 0) {
-                    resultSort = res;
-                    voucherRes = resultSort;
-                }
-            }
-        }
-
-        return Objects.nonNull(resultSort) ? resultSort : voucherRes;
+//        return Objects.nonNull(resultSort) ? resultSort : voucherRes;
+        return voucherRes;
     }
 
     private VoucherRequest convertVoucher(Voucher voucher) {

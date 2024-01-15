@@ -437,6 +437,7 @@ public class BillDetailServiceImpl implements BillDetailService {
                 .deliveryNote(deliveryNote)
                 .billType(bill.getBillType())
                 .billStatus(bill.getStatus())
+                .billSymbol(bill.getSymbol())
                 .build();
 
         return pdfResponse;

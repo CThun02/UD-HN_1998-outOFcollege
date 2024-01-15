@@ -64,3 +64,11 @@
 .title {
   padding: 8px 24px;
 }
+
+.content{
+  max-width: 60%;
+}
+
+.title{
+  max-width: 40%;
+}

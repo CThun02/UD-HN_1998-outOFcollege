@@ -57,6 +57,7 @@ const BillTimeLine = (addId) => {
   const [timelineId, setTimelineId] = useState(null);
   const [shippingPrice, setShippingPrice] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [quantity, setQuantityProduct] = useState(1);
 
   const handleOpen = () => {
     console.log(true);
@@ -86,9 +87,9 @@ const BillTimeLine = (addId) => {
       })
       .then((response) => {
         setTimelines([...timelines, response.data]);
-        setRender(response.data);
       })
       .catch((error) => {
+        console.log("Data: ", error);
         const status = error.response?.status;
         const dataError = error?.response?.data;
 
@@ -109,6 +110,7 @@ const BillTimeLine = (addId) => {
           });
         }
       });
+    setRender(Math.random());
   };
 
   const handleUpdateBillStatus = async (status, price, timelineStatus) => {
@@ -323,6 +325,7 @@ const BillTimeLine = (addId) => {
       .then((response) => {
         setBillInfo(response?.data);
         setShippingPrice(numeral(response?.data?.shipPrice));
+        setLoading(false);
         return true;
       })
       .catch((error) => {
@@ -336,20 +339,14 @@ const BillTimeLine = (addId) => {
       });
   };
   useEffect(() => {
-    setLoading(true);
     const isTimeline = getTimeline();
     const isProduct = getProduct();
     const isInfo = getInfo();
-    if (isTimeline && isProduct && isInfo) {
-      setLoading(false);
-    }
-
-    console.log("data: ", isTimeline, isProduct, isInfo);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [billId, render, isModalConfirm, loading]);
 
-  const updateQUantityBillDetail = (record, value, index) => {
+  const updateQUantityBillDetail = async (record, value, index) => {
     setLoading(true);
 
     let quantityOld = timelinePoduct[index].quantity;
@@ -360,17 +357,15 @@ const BillTimeLine = (addId) => {
         duration: 1,
       });
       setLoading(false);
-
       return;
     }
 
     if (Number(value) === Number(record?.quantity)) {
       setLoading(false);
-
       return;
     }
 
-    axios
+    await axios
       .post(
         `http://localhost:8080/api/admin/bill-detail/create-bill-detail`,
         {
@@ -387,8 +382,6 @@ const BillTimeLine = (addId) => {
         }
       )
       .then((response) => {
-        setLoading(false);
-
         let paymentInDelivery = null;
         if (billInfo?.lstPaymentDetail.length > 0) {
           if (billInfo?.lstPaymentDetail?.length === 1) {
@@ -406,6 +399,7 @@ const BillTimeLine = (addId) => {
           description: "Cập nhật thành công",
           duration: 2,
         });
+        setLoading(false);
         handleCreateTimeline(
           `Cập nhật sản phẩm: ${record?.productName} |  ${
             Number(value) > Number(quantityOld)
@@ -428,11 +422,10 @@ const BillTimeLine = (addId) => {
       });
   };
 
-  const handleDeleteBillDetail = (pdCode, bdID, note) => {
+  const handleDeleteBillDetail = async (pdCode, bdID, note) => {
     setLoading(true);
-
     handleCreateTimeline(note + " | " + pdCode, "Delete", null);
-    axios
+    await axios
       .delete(
         `http://localhost:8080/api/admin/bill-detail?billId=${billId}&billDetailId=${bdID}`,
         {
@@ -451,6 +444,7 @@ const BillTimeLine = (addId) => {
         setRender(Math.random());
       })
       .catch((err) => {
+        console.log("Data: ", err);
         setLoading(false);
       });
     setIsModalConfirm(false);
@@ -645,6 +639,7 @@ const BillTimeLine = (addId) => {
                   setBdId(record?.billDetailId);
                   setIsModalConfirm(true);
                   setAction("Delete");
+                  setQuantityProduct(1);
                 }}
                 disabled={
                   Number(
@@ -1029,15 +1024,15 @@ const BillTimeLine = (addId) => {
                       <div className={`${styles.elementDiv} ${styles.size}`}>
                         <span>
                           {billInfo?.ward
-                            ? `${billInfo?.addressDetail ?? ""} 
+                            ? `${billInfo?.addressDetaill},  
                                         ${billInfo?.ward?.substring(
                                           0,
                                           billInfo?.ward?.indexOf("|")
-                                        )} 
+                                        )}, 
                                         ${billInfo?.district?.substring(
                                           0,
                                           billInfo?.district?.indexOf("|")
-                                        )} 
+                                        )}, 
                                         ${billInfo?.city?.substring(
                                           0,
                                           billInfo?.city?.indexOf("|")
@@ -1171,6 +1166,8 @@ const BillTimeLine = (addId) => {
                     cartId={null}
                     billId={billId}
                     isEditProductTimeLine={true}
+                    quantity={quantity}
+                    setQuantity={setQuantityProduct}
                   />
                 </Col>
               )}
@@ -1269,6 +1266,98 @@ const BillTimeLine = (addId) => {
       </Spin>
     </>
   );
+};
+
+const handleShippingOrderLeadtime = (toDistrictId, toWardCode) => {
+  const dateTime = "";
+  const values = {
+    from_district_id: 3440,
+    from_ward_code: "13010",
+    to_district_id: Number(toDistrictId),
+    to_ward_code: `${toWardCode?.trim()}`,
+    service_id: 53321,
+  };
+
+  if (toDistrictId && toWardCode) {
+    axios
+      .post(
+        "https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/leadtime",
+        values,
+        {
+          headers: {
+            token: "0f082cbe-5110-11ee-a59f-a260851ba65c",
+            shop_id: "4534109",
+          },
+        }
+      )
+      .then((response) => {
+        const leadtimeTimestamp = response.data.data.leadtime;
+        const leadtimeMoment = moment.unix(leadtimeTimestamp);
+        dateTime = moment(leadtimeMoment._d).format("YYYY-MM-DDTHH:mm:ss.SSS");
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+};
+
+const handleShippingFee = (insuranceValue, toDistrictId, toWardCode) => {
+  let shippingFee = 0;
+  let totalWeight = 0;
+  // for (let i = 0; i < productDetails?.length; i++) {
+  //   totalWeight += productDetails[i]?.productDetail?.weight;
+  // }
+  let service_id = 53321;
+  const values = {
+    service_id: service_id,
+    insurance_value: insuranceValue,
+    coupon: null,
+    from_district_id: 3440,
+    to_district_id: Number(toDistrictId),
+    to_ward_code: toWardCode?.trim(),
+    height: 15,
+    length: 15,
+    weight: totalWeight,
+    width: 15,
+  };
+
+  if (insuranceValue && toDistrictId && toWardCode) {
+    axios
+      .post(
+        "https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee",
+        values,
+        {
+          headers: {
+            token: "0f082cbe-5110-11ee-a59f-a260851ba65c",
+            shop_id: "4534109",
+          },
+        }
+      )
+      .then((response) => {
+        shippingFee = response?.data?.data?.total;
+      })
+      .catch((error) => {
+        service_id = 53322;
+        values.service_id = service_id;
+        axios
+          .post(
+            "https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee",
+            values,
+            {
+              headers: {
+                token: "0f082cbe-5110-11ee-a59f-a260851ba65c",
+                shop_id: "4534109",
+              },
+            }
+          )
+          .then((response) => {
+            shippingFee = response?.data?.data?.total;
+          })
+          .catch((err) => {
+            console.log("Lỗi khi gọi API lần 2:", err);
+          });
+      });
+  }
 };
 
 export default BillTimeLine;

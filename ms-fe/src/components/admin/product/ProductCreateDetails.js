@@ -97,7 +97,7 @@ const ProductCreateDetails = () => {
     shirtTailId: " ",
     price: 200000,
     weight: 200,
-    quantity: 10,
+    quantity: 100,
   });
   var productDetailsCreate = renderProductDetails();
 

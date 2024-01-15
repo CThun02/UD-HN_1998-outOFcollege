@@ -33,13 +33,28 @@ public class DeliveryNoteServiceImpl implements DeliveryNoteService {
     private BillRepo billRepo;
 
     @Override
-    public DeliveryNote createDeliveryNote(DeliveryNoteRequest request) {
+    public DeliveryNote createDeliveryNote(DeliveryNoteRequest request) throws NotFoundException {
+        if (Objects.isNull(request)) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_SERVICE));
+        }
+
+        Bill bill = billRepo.findById(request.getBillId()).orElse(null);
+        if (Objects.isNull(bill)) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_NOT_FOUND));
+        }
+
+        double price = CommonUtils.bigDecimalConvertDouble(bill.getPrice());
+        BigDecimal shippingPrice = BigDecimal.ZERO;
+        if (price < 2000000) {
+            shippingPrice = request.getShipPrice();
+        }
+
         DeliveryNote deliveryNote = DeliveryNote.builder()
                 .bill(Bill.builder().id(request.getBillId()).build())
                 .address(Address.builder().id(request.getAddressId()).build())
                 .name(request.getName())
                 .phoneNumber(request.getPhoneNumber())
-                .shipPrice(request.getShipPrice())
+                .shipPrice(shippingPrice)
                 .shipDate(request.getShipDate())
                 .dateOfReceipt(request.getDateOfreceipt())
                 .build();
@@ -61,9 +76,30 @@ public class DeliveryNoteServiceImpl implements DeliveryNoteService {
     }
 
     @Override
-    public DeliveryNote updateShippingPrice(Long billId, BigDecimal price, LocalDateTime shipDate) {
+    public DeliveryNote updateShippingPrice(Long billId, BigDecimal price, LocalDateTime shipDate) throws NotFoundException {
         DeliveryNote deliveryNote = deliveryNoteRepo.getDeliveryNoteByBill_Id(billId);
-        deliveryNote.setShipPrice(price);
+        Bill bill = billRepo.findById(billId).orElse(null);
+        if (Objects.isNull(bill)) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_NOT_FOUND));
+        }
+        if (!"wait_for_confirm".equalsIgnoreCase(bill.getStatus())) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_CANNOT_EDIT_WHEN_BILL_NOT_EQUAL_WAIT_FOR_CONFIRM));
+        }
+
+        double priceShipCurrent = CommonUtils.bigDecimalConvertDouble(deliveryNote.getShipPrice());
+        double newPriceShipping = CommonUtils.bigDecimalConvertDouble(price);
+        double currentAmountPaid = CommonUtils.bigDecimalConvertDouble(bill.getAmountPaid());
+        double shippingPrice = 0d;
+        if (currentAmountPaid < 2000000 && priceShipCurrent != newPriceShipping) {
+            double priceBill = CommonUtils.bigDecimalConvertDouble(bill.getPrice());
+            double priceReduce = CommonUtils.bigDecimalConvertDouble(bill.getPriceReduce());
+            double amountPaid = priceBill - priceReduce + newPriceShipping;
+            bill.setAmountPaid(new BigDecimal(amountPaid));
+            shippingPrice = newPriceShipping;
+            billRepo.save(bill);
+        }
+
+        deliveryNote.setShipPrice(new BigDecimal(shippingPrice));
         deliveryNote.setShipDate(shipDate);
         return deliveryNoteRepo.save(deliveryNote);
     }

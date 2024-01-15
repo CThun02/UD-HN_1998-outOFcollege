@@ -11,13 +11,13 @@ import java.time.LocalDateTime;
 
 public interface DeliveryNoteService {
 
-    DeliveryNote createDeliveryNote(DeliveryNoteRequest request);
+    DeliveryNote createDeliveryNote(DeliveryNoteRequest request) throws NotFoundException;
 
     DeliveryNote createDeliveryNote(DeliveryNote deliveryNote);
 
     DeliveryNote getDeliveryNoteByBill_Id(Long billId);
 
-    DeliveryNote updateShippingPrice(Long billId, BigDecimal price, LocalDateTime shipDate);
+    DeliveryNote updateShippingPrice(Long billId, BigDecimal price, LocalDateTime shipDate) throws NotFoundException;
 
     DeliveryNoteResponse getOne(String billCode);
 

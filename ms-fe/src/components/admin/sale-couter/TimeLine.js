@@ -323,6 +323,7 @@ const BillTimeLine = (addId) => {
       .then((response) => {
         setBillInfo(response?.data);
         setShippingPrice(numeral(response?.data?.shipPrice));
+        setLoading(false)
         return true;
       })
       .catch((error) => {
@@ -336,13 +337,9 @@ const BillTimeLine = (addId) => {
       });
   };
   useEffect(() => {
-    setLoading(true);
     const isTimeline = getTimeline();
     const isProduct = getProduct();
     const isInfo = getInfo();
-    if (isTimeline && isProduct && isInfo) {
-      setLoading(false);
-    }
 
     console.log("data: ", isTimeline, isProduct, isInfo);
 
@@ -360,13 +357,11 @@ const BillTimeLine = (addId) => {
         duration: 1,
       });
       setLoading(false);
-
       return;
     }
 
     if (Number(value) === Number(record?.quantity)) {
       setLoading(false);
-
       return;
     }
 
@@ -387,8 +382,6 @@ const BillTimeLine = (addId) => {
         }
       )
       .then((response) => {
-        setLoading(false);
-
         let paymentInDelivery = null;
         if (billInfo?.lstPaymentDetail.length > 0) {
           if (billInfo?.lstPaymentDetail?.length === 1) {
@@ -406,6 +399,7 @@ const BillTimeLine = (addId) => {
           description: "Cập nhật thành công",
           duration: 2,
         });
+        setLoading(false);
         handleCreateTimeline(
           `Cập nhật sản phẩm: ${record?.productName} |  ${
             Number(value) > Number(quantityOld)
@@ -430,7 +424,6 @@ const BillTimeLine = (addId) => {
 
   const handleDeleteBillDetail = (pdCode, bdID, note) => {
     setLoading(true);
-
     handleCreateTimeline(note + " | " + pdCode, "Delete", null);
     axios
       .delete(

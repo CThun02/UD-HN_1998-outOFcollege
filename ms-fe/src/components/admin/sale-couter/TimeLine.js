@@ -57,6 +57,7 @@ const BillTimeLine = (addId) => {
   const [timelineId, setTimelineId] = useState(null);
   const [shippingPrice, setShippingPrice] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [quantity, setQuantityProduct] = useState(1);
 
   const handleOpen = () => {
     console.log(true);
@@ -86,9 +87,9 @@ const BillTimeLine = (addId) => {
       })
       .then((response) => {
         setTimelines([...timelines, response.data]);
-        setRender(response.data);
       })
       .catch((error) => {
+        console.log("Data: ", error);
         const status = error.response?.status;
         const dataError = error?.response?.data;
 
@@ -109,6 +110,7 @@ const BillTimeLine = (addId) => {
           });
         }
       });
+    setRender(Math.random());
   };
 
   const handleUpdateBillStatus = async (status, price, timelineStatus) => {
@@ -341,12 +343,10 @@ const BillTimeLine = (addId) => {
     const isProduct = getProduct();
     const isInfo = getInfo();
 
-    console.log("data: ", isTimeline, isProduct, isInfo);
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [billId, render, isModalConfirm, loading]);
 
-  const updateQUantityBillDetail = (record, value, index) => {
+  const updateQUantityBillDetail = async (record, value, index) => {
     setLoading(true);
 
     let quantityOld = timelinePoduct[index].quantity;
@@ -365,7 +365,7 @@ const BillTimeLine = (addId) => {
       return;
     }
 
-    axios
+    await axios
       .post(
         `http://localhost:8080/api/admin/bill-detail/create-bill-detail`,
         {
@@ -422,10 +422,10 @@ const BillTimeLine = (addId) => {
       });
   };
 
-  const handleDeleteBillDetail = (pdCode, bdID, note) => {
+  const handleDeleteBillDetail = async (pdCode, bdID, note) => {
     setLoading(true);
     handleCreateTimeline(note + " | " + pdCode, "Delete", null);
-    axios
+    await axios
       .delete(
         `http://localhost:8080/api/admin/bill-detail?billId=${billId}&billDetailId=${bdID}`,
         {
@@ -444,6 +444,7 @@ const BillTimeLine = (addId) => {
         setRender(Math.random());
       })
       .catch((err) => {
+        console.log("Data: ", err);
         setLoading(false);
       });
     setIsModalConfirm(false);
@@ -638,6 +639,7 @@ const BillTimeLine = (addId) => {
                   setBdId(record?.billDetailId);
                   setIsModalConfirm(true);
                   setAction("Delete");
+                  setQuantityProduct(1);
                 }}
                 disabled={
                   Number(
@@ -1022,15 +1024,15 @@ const BillTimeLine = (addId) => {
                       <div className={`${styles.elementDiv} ${styles.size}`}>
                         <span>
                           {billInfo?.ward
-                            ? `${billInfo?.addressDetail ?? ""} 
+                            ? `${billInfo?.addressDetaill},  
                                         ${billInfo?.ward?.substring(
                                           0,
                                           billInfo?.ward?.indexOf("|")
-                                        )} 
+                                        )}, 
                                         ${billInfo?.district?.substring(
                                           0,
                                           billInfo?.district?.indexOf("|")
-                                        )} 
+                                        )}, 
                                         ${billInfo?.city?.substring(
                                           0,
                                           billInfo?.city?.indexOf("|")
@@ -1164,6 +1166,8 @@ const BillTimeLine = (addId) => {
                     cartId={null}
                     billId={billId}
                     isEditProductTimeLine={true}
+                    quantity={quantity}
+                    setQuantity={setQuantityProduct}
                   />
                 </Col>
               )}

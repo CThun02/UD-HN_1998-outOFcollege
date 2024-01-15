@@ -17,7 +17,7 @@ public interface DeliveryNoteService {
 
     DeliveryNote getDeliveryNoteByBill_Id(Long billId);
 
-    DeliveryNote updateShippingPrice(Long billId, BigDecimal price, LocalDateTime shipDate);
+    DeliveryNote updateShippingPrice(Long billId, BigDecimal price, LocalDateTime shipDate) throws NotFoundException;
 
     DeliveryNoteResponse getOne(String billCode);
 

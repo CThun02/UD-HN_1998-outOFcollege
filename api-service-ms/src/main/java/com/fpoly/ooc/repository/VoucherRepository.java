@@ -86,7 +86,7 @@ public interface VoucherRepository extends JpaRepository<Voucher, Long> {
             "and v.objectUse not in (case when :username is null then com.fpoly.ooc.constant.Const.OBJECT_USE_VOUCHER_MEMBERS else '' end)" +
             "group by v.id, v.voucherCode, v.voucherName, v.voucherValue, v.voucherValueMax, v.voucherMethod, " +
             "v.limitQuantity, v.startDate, v.endDate, v.status, v.objectUse, v.voucherCondition " +
-            "order by v.voucherValue desc ")
+            "order by CASE WHEN v.voucherMethod = '%' THEN v.voucherValueMax ELSE v.voucherValue END DESC ")
     List<VoucherResponse> autoFillVoucherByPrice(@Param("priceBill") BigDecimal price,@Param("username") String username);
 
     @Query("SELECT NEW com.fpoly.ooc.responce.voucher.VoucherAccountResponse(v.id, v.voucherCode, v.voucherName, v.startDate, " +

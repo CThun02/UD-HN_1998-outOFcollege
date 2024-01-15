@@ -61,6 +61,8 @@ const Bill = () => {
   const [modalQRScanOpen, setModalQRScanOpen] = useState(false);
   const [price, setPrice] = useState("");
   const [priceATM, setPriceATM] = useState(0);
+  const [quantity, setQuantity] = useState(1);
+
   function getCart() {
     initialItems = [];
     var checkEmpty = 0;
@@ -283,6 +285,7 @@ const Bill = () => {
             let productDetails = cart.productDetails;
             productDetails.splice(index, 1);
             localStorage.setItem(cartId, JSON.stringify(cart));
+            setQuantity(1);
             setRendered(cart);
             notification.error({
               message: "Thông báo",
@@ -576,6 +579,15 @@ const Bill = () => {
       setTypeShipping(false);
       setShippingFee(0);
     }
+    // } else {
+    //   setRemainAmount(-1);
+    //   setSwitchChange([true]);
+    //   setSymbol(checked ? "Shipping" : "Received");
+    //   if (!checked) {
+    //     setTypeShipping(false);
+    //     setShippingFee(0);
+    //   }
+    // }
   };
 
   // mở modal product
@@ -606,6 +618,9 @@ const Bill = () => {
     setSelectedDictrict(null);
     setSelectedWard(null);
     handleDeleteAccount();
+    setRemainAmount(0);
+    // setSwitchChange(false);
+    // setShippingFee(0);
   };
 
   const countCardWait = (key) => {
@@ -653,6 +668,9 @@ const Bill = () => {
       setItems(newPanes);
       setCartId(newActiveKey);
       setActiveKey(newActiveKey);
+      setSwitchChange(false);
+      setRemainAmount(0);
+      setShippingFee(0);
     }
   };
 
@@ -1265,7 +1283,7 @@ const Bill = () => {
       }
     }
 
-    if (switchChange[index])
+    if (switchChange[index] && totalPrice < 2000000)
       if (/^[+]?\d*\.?\d+$/.test(shippingFee)) {
         if (shippingFee < 10000) {
           isError = true;
@@ -1509,6 +1527,8 @@ const Bill = () => {
                         isEditProductTimeLine={false}
                         setBoolean={setBoolean}
                         boolean={boolean}
+                        quantity={quantity}
+                        setQuantity={setQuantity}
                       />
                     </Col>
                   </Row>
@@ -1918,13 +1938,18 @@ const Bill = () => {
                               <Input
                                 placeholder="Số tiền vận chuyển"
                                 className={styles.input_noneBorder}
-                                value={numeral(shippingFee).format("0,0")}
+                                value={
+                                  totalPrice > 2000000
+                                    ? 0
+                                    : numeral(shippingFee).format("0,0")
+                                }
                                 onChange={(e) => {
                                   handleChangeShippingFee(
                                     e.target.value.replace(/\D/g, ""),
                                     index
                                   );
                                 }}
+                                readOnly={totalPrice > 2000000}
                               />
                               {inputError && (
                                 <span

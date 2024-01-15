@@ -14,6 +14,8 @@ const ModalProduct = ({
   isEditProductTimeLine,
   setBoolean,
   boolean,
+  quantity,
+  setQuantity,
 }) => {
   const [productDetails, setProductDetails] = useState([]);
 
@@ -60,6 +62,8 @@ const ModalProduct = ({
           setProductDetails={setProductDetails}
           render={render}
           isEditProductTimeLine={isEditProductTimeLine}
+          quantity={quantity}
+          setQuantity={setQuantity}
         />
       </Modal>
     </>

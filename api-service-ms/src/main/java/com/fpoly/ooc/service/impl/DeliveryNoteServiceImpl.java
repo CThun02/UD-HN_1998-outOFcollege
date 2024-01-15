@@ -61,8 +61,27 @@ public class DeliveryNoteServiceImpl implements DeliveryNoteService {
     }
 
     @Override
-    public DeliveryNote updateShippingPrice(Long billId, BigDecimal price, LocalDateTime shipDate) {
+    public DeliveryNote updateShippingPrice(Long billId, BigDecimal price, LocalDateTime shipDate) throws NotFoundException {
         DeliveryNote deliveryNote = deliveryNoteRepo.getDeliveryNoteByBill_Id(billId);
+        Bill bill = billRepo.findById(billId).orElse(null);
+        if (Objects.isNull(bill)) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_NOT_FOUND));
+        }
+        if (!"wait_for_confirm".equalsIgnoreCase(bill.getStatus())) {
+            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_CANNOT_EDIT_WHEN_BILL_NOT_EQUAL_WAIT_FOR_CONFIRM));
+        }
+
+        double priceShipCurrent = CommonUtils.bigDecimalConvertDouble(deliveryNote.getShipPrice());
+        double newPriceShipping = CommonUtils.bigDecimalConvertDouble(price);
+        double currentAmountPaid = CommonUtils.bigDecimalConvertDouble(bill.getAmountPaid());
+        if (currentAmountPaid < 2000000 && priceShipCurrent != newPriceShipping) {
+            double priceBill = CommonUtils.bigDecimalConvertDouble(bill.getPrice());
+            double priceReduce = CommonUtils.bigDecimalConvertDouble(bill.getPriceReduce());
+            double amountPaid = priceBill - priceReduce + newPriceShipping;
+            bill.setAmountPaid(new BigDecimal(amountPaid));
+            billRepo.save(bill);
+        }
+
         deliveryNote.setShipPrice(price);
         deliveryNote.setShipDate(shipDate);
         return deliveryNoteRepo.save(deliveryNote);

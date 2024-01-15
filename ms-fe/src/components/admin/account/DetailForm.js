@@ -282,9 +282,6 @@ const DetailForm = (props) => {
               currentTimeInMillis + "_" + data.numberPhone
             }`
           );
-          if (!data.image) {
-            deleteObject(data.image).catch((err) => {});
-          }
           uploadBytes(imgRef, imageFile)
             .then(() => {
               return getDownloadURL(imgRef);
@@ -315,6 +312,7 @@ const DetailForm = (props) => {
                 });
             });
         } catch (error) {
+          console.log(error)
           console.log("Lỗi khi đặt địa chỉ mặc định");
           const status = error?.response?.data?.status;
           if (status === 403) {
@@ -458,6 +456,7 @@ const DetailForm = (props) => {
                 onChange={(e) => console.log(e.file)}
               >
                 <Tooltip placement="left" title={"click to upload avatar"}>
+                  {console.log(data.image)}
                   <Avatar
                     className={styles.avatarContainer}
                     size={160}

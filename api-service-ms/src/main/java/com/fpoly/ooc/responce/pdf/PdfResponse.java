@@ -44,4 +44,6 @@ public class PdfResponse {
 
     private String billType;
 
+    private String billStatus;
+
 }

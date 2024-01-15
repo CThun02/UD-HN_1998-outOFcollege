@@ -84,6 +84,8 @@ const ModalBillInfoDisplay = ({ open, cancel, billCode }) => {
                 style={{
                   marginBottom: 10,
                   textAlign: "center",
+                  fontFamily: "Roboto",
+                  fontWeight: "bold",  
                 }}
               >
                   HÓA ĐƠN BÁN HÀNG

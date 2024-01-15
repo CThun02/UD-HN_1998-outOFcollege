@@ -6,6 +6,7 @@ import com.fpoly.ooc.common.SimpleSendProductDetail;
 import com.fpoly.ooc.constant.Const;
 import com.fpoly.ooc.constant.ErrorCodeConfig;
 import com.fpoly.ooc.dto.NotificationDTO;
+import com.fpoly.ooc.dto.PromotionProductDetailDTO;
 import com.fpoly.ooc.dto.UpdateQuantityProductDetailDTO;
 import com.fpoly.ooc.entity.Bill;
 import com.fpoly.ooc.entity.BillDetail;
@@ -33,6 +34,7 @@ import com.fpoly.ooc.service.interfaces.NotificationService;
 import com.fpoly.ooc.service.interfaces.PaymentService;
 import com.fpoly.ooc.service.interfaces.ProductDetailServiceI;
 import com.fpoly.ooc.service.interfaces.ProductImageServiceI;
+import com.fpoly.ooc.service.interfaces.PromotionProductDetailService;
 import com.fpoly.ooc.service.interfaces.TimeLineService;
 import com.fpoly.ooc.util.CommonUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -46,6 +48,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -89,6 +92,9 @@ public class TimeLineServiceImpl implements TimeLineService {
 
     @Autowired
     private SimpleSendProductDetail simpleSendProductDetail;
+
+    @Autowired
+    private PromotionProductDetailService promotionProductDetailService;
 
     @Override
     public List<TimeLineResponse> getAllTimeLineByBillId(Long id) throws NotFoundException {
@@ -160,6 +166,29 @@ public class TimeLineServiceImpl implements TimeLineService {
         if (Objects.isNull(request)) {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_SERVICE));
         }
+        // TODO: FIND NEW STATUS FOR TIMELINE
+        Timeline timelineFromBillId = timeLineRepo.findStatusTimelineByCreateDateDESC(billId);
+        if (Objects.isNull(timelineFromBillId)) {
+            throw new NotFoundException(Const.ERROR_BILL_NOT_FOUND);
+        }
+
+        List<String> statusNotCompare = Arrays.asList("Rollback", "Delete", "2Cancel", "Update", "0");
+        //TODO: COMPARE STATUS TIMELINE AND STATUS REQUEST
+        boolean isCheck = true;
+        for (String str: statusNotCompare) {
+            if (str.equalsIgnoreCase(request.getStatus())) {
+                isCheck = false;
+                break;
+            }
+        }
+        if (isCheck) {
+            int status = Integer.parseInt(timelineFromBillId.getStatus());
+            String statusStr = String.valueOf(++status);
+            if (!request.getStatus().equalsIgnoreCase(statusStr)) {
+                request.setStatus(statusStr);
+            }
+        }
+
         Timeline timeline = new Timeline();
 
         Optional<Timeline> existingTimeline = Optional.empty();
@@ -193,32 +222,37 @@ public class TimeLineServiceImpl implements TimeLineService {
                 }
             } else {
                 String statusBill = null;
-                switch (request.getStatus()) {
-                    case "1", "Rollback", "2Cancel", "Delete":
-                        statusBill = "wait_for_confirm";
-                        break;
-                    case "2":
-                        statusBill = "wait_for_delivery";
-                        break;
-                    case "3":
-                        statusBill = "delivering";
-                        break;
-                    case "0":
-                        statusBill = "Cancel";
-                        rollbackQuantityWhenCancelBill(billId);
-                        break;
-                    case "Update":
-                        break;
-                    case "Cancel":
-                        statusBill = "Cancel";
-                        break;
-                    default:
-                        statusBill = "Complete";
-                        bill.setCompletionDate(LocalDateTime.now());
-                        paymentService.savePaymentDetail(billId);
-                        break;
+                if ("Shipping".equalsIgnoreCase(bill.getSymbol())) {
+                    switch (request.getStatus()) {
+                        case "1", "Rollback", "Delete":
+                            statusBill = "wait_for_confirm";
+                            break;
+                        case "2", "2Cancel":
+                            statusBill = "wait_for_delivery";
+                            break;
+                        case "3":
+                            statusBill = "delivering";
+                            break;
+                        case "0", "Cancel":
+                            statusBill = "Cancel";
+                            rollbackQuantityWhenCancelBill(billId);
+                            break;
+                        case "Update":
+                            break;
+                        default:
+                            statusBill = "Complete";
+                            bill.setCompletionDate(LocalDateTime.now());
+                            paymentService.savePaymentDetail(bill);
+                            break;
+                    }
+                } else {
+                    statusBill = "Complete";
+                    bill.setCompletionDate(LocalDateTime.now());
+                    paymentService.savePaymentDetail(bill);
                 }
+
                 if (!bill.getStatus().equalsIgnoreCase(statusBill)) {
+                    // isCheckBillType
                     bill.setStatus(StringUtils.isNotBlank(statusBill) ? statusBill : bill.getStatus());
                     billService.saveBill(bill);
                 }
@@ -254,11 +288,29 @@ public class TimeLineServiceImpl implements TimeLineService {
     }
 
     @Override
-    public List<TimelineProductDisplayResponse> getTimelineProductByBillId(Long id) {
+    public List<TimelineProductDisplayResponse> getTimelineProductByBillId(Long id) throws NotFoundException {
         List<TimelineProductResponse> lstTimelineProductResponses = timeLineRepo.getTimelineProductByBillId(id);
         List<TimelineProductDisplayResponse> list = new ArrayList<>();
         for (int i = 0; i < lstTimelineProductResponses.size(); i++) {
             TimelineProductDisplayResponse response = new TimelineProductDisplayResponse(lstTimelineProductResponses.get(i));
+            PromotionProductDetailDTO dto = promotionProductDetailService.findPromotionByProductDetailIds(List.of(response.getProductDetailId()));
+            double priceInBillDetail = CommonUtils.bigDecimalConvertDouble(response.getProductPrice());
+            double priceDefault = CommonUtils.bigDecimalConvertDouble(lstTimelineProductResponses.get(i).getPriceProductDetailNotPromotion());
+            double promotionValue = 0d;
+            boolean isCheckProductInPromotion = false;
+            if (Objects.nonNull(dto)) {
+                promotionValue = CommonUtils.bigDecimalConvertDouble(dto.getPromotionValue());
+                if ("%".equalsIgnoreCase(dto.getPromotionMethod())) {
+                    promotionValue = priceDefault * promotionValue / 100;
+                }
+                priceDefault -= promotionValue;
+                isCheckProductInPromotion = Objects.equals(priceInBillDetail, priceDefault);
+            }
+
+            if (isCheckProductInPromotion) {
+                response.setPromotionMethod(dto.getPromotionMethod());
+                response.setPromotionValue(dto.getPromotionValue());
+            }
             response.setProductImageResponses(productImageServiceI.getProductImageByProductDetailId(response.getProductDetailId()));
             list.add(response);
         }

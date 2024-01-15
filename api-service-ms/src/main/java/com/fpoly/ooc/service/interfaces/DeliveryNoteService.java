@@ -13,6 +13,8 @@ public interface DeliveryNoteService {
 
     DeliveryNote createDeliveryNote(DeliveryNoteRequest request);
 
+    DeliveryNote createDeliveryNote(DeliveryNote deliveryNote);
+
     DeliveryNote getDeliveryNoteByBill_Id(Long billId);
 
     DeliveryNote updateShippingPrice(Long billId, BigDecimal price, LocalDateTime shipDate);

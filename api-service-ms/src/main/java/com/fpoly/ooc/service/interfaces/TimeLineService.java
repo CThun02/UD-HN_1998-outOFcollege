@@ -20,7 +20,7 @@ public interface TimeLineService {
 
     Timeline createTimeLine(Long billid, TimeLinerequest request) throws JsonProcessingException, NotFoundException;
 
-    List<TimelineProductDisplayResponse> getTimelineProductByBillId(Long id);
+    List<TimelineProductDisplayResponse> getTimelineProductByBillId(Long id) throws NotFoundException;
 
     BillInfoResponse getBillInfoByBillId(Long id);
 

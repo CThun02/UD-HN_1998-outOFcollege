@@ -271,7 +271,7 @@ public class CartDetailServiceImpl implements CartDetailService {
     }
 
     @Override
-    public CartDetail updateQuantity(Long cartDetailId, Integer quantity) throws NotFoundException {
+    public String updateQuantity(Long cartDetailId, Integer quantity) throws NotFoundException {
         CartDetail cartDetail = cartDetailRepo.findById(cartDetailId)
                 .orElseThrow(() -> new NotFoundException(ErrorCodeConfig.getMessage(Const.ID_NOT_FOUND)));
 
@@ -323,18 +323,22 @@ public class CartDetailServiceImpl implements CartDetailService {
             if (totalPrice + totalPriceInCart > 10000000) {
                 double newQuantityUpdate = (10000000 - totalPriceInCart) / (priceProduct - priceReduce);
                 cartDetail.setQuantity((int) newQuantityUpdate);
-                cartDetailRepo.save(cartDetail);
-                return null;
+                return "update";
             }
 
-            if (Objects.isNull(cartDetail.getProductDetail().getQuantity()) || quantity > cartDetail.getProductDetail().getQuantity()) {
+            if (cartDetail.getProductDetail().getQuantity() <= 0) {
                 cartDetailRepo.delete(cartDetail);
-                return null;
+                return "delete";
+            }
+
+            if (quantity > cartDetail.getProductDetail().getQuantity()) {
+                return "error";
             }
         }
 
         cartDetail.setQuantity(quantity);
-        return cartDetailRepo.save(cartDetail);
+        cartDetailRepo.save(cartDetail);
+        return "complete";
     }
 
     @Transactional

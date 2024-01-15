@@ -323,7 +323,7 @@ public class ProductDetailServiceImpl implements ProductDetailServiceI {
         double totalPrice = 0d;
         for (QuantityAndPriceDTO dto: req.getQuantityAndPriceList()) {
             ProductDetail productDetail = repo.findProductDetailById(dto.getProductDetailId());
-            if (Objects.isNull(productDetail) || productDetail.getQuantity() <= 0) {
+            if (Objects.isNull(productDetail) || productDetail.getQuantity() <= 0 || dto.getQuantity() > productDetail.getQuantity()) {
                 throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BUY_QUANTITY_THAN_QUANTITY_IN_STORE));
             }
             PromotionProductDetailDTO promotion = promotionProductDetailService

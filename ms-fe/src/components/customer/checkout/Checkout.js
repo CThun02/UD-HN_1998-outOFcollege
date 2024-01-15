@@ -86,11 +86,14 @@ const Checkout = ({ setRenderHeader }) => {
     formData.ward = e;
     setSelectedWard(e?.substring(e.indexOf("|") + 1));
   };
-
+  const [dataEmtail, setDataEmail] = useState(null);
   useEffect(() => {
     getAuthToken()
       .then((data) => {
         setUsername(data?.username);
+        setDataEmail(data?.email);
+        console.log("dataEmail: ", data);
+        console.log("dataUsername: ", data?.username);
       })
       .catch((err) => console.log(err));
   }, []);
@@ -560,9 +563,12 @@ const Checkout = ({ setRenderHeader }) => {
                                                               item
                                                                 ?.cartDetailResponse
                                                                 ?.shirtTailType
-                                                                .shirtTailName
-                                                        } <span style="display: inline-block">(x ${
-                                            item.quantity
+                                                                .shirtTailTypeName
+                                                        } <span style="display: inline-block">(Số lượng -  ${
+                                            item?.cartDetailResponse?.quantity
+                                              ? item?.cartDetailResponse
+                                                  ?.quantity
+                                              : item?.quantity
                                           })</span></p>
                                                     </div>
                                                     <div style="width: 25%; padding: 4px;">
@@ -584,7 +590,7 @@ const Checkout = ({ setRenderHeader }) => {
                                                                         100) *
                                                                       item
                                                                         ?.cartDetailResponse
-                                                                        ?.priceitem) *
+                                                                        ?.priceProductDetail) *
                                                                   item
                                                                     .cartDetailResponse
                                                                     ?.quantity
@@ -611,17 +617,22 @@ const Checkout = ({ setRenderHeader }) => {
                                                                   "vnd"
                                                                     ? item
                                                                         .data[0]
+                                                                        .price -
+                                                                      item
+                                                                        .data[0]
                                                                         .promotion[0]
                                                                         ?.promotionValue
-                                                                    : ((100 -
+                                                                    : item
+                                                                        .data[0]
+                                                                        .price -
+                                                                      (item
+                                                                        .data[0]
+                                                                        .price *
                                                                         item
                                                                           .data[0]
                                                                           .promotion[0]
                                                                           ?.promotionValue) /
                                                                         100) *
-                                                                      item
-                                                                        .data[0]
-                                                                        .price) *
                                                                   item?.quantity
                                                                 : item?.quantity *
                                                                   item.data[0]
@@ -641,10 +652,34 @@ const Checkout = ({ setRenderHeader }) => {
                                         })}
                                             <hr>
                                             <div style="width: 70%; float: right; padding: 4px 20px;">
+                                            <div style="display: flex; justify-content: space-between; padding: 4px 0;">
+                                                <span style="font-weight: 500;">Phiếu giảm giá giảm: ${voucherPrice().toLocaleString(
+                                                  "vi-VN",
+                                                  {
+                                                    style: "currency",
+                                                    currency: "VND",
+                                                  }
+                                                )}</span>
+                                                </div>
+                                            <div style="display: flex; justify-content: space-between; padding: 4px 0;">
+                                                <span style="font-weight: 500;">Phí vận chuyển: ${(shippingFee
+                                                  ? shippingFee
+                                                  : 0
+                                                ).toLocaleString("vi-VN", {
+                                                  style: "currency",
+                                                  currency: "VND",
+                                                })}</span>
+                                                </div>
                                                 <div style="display: flex; justify-content: space-between; padding: 4px 0;">
-                                                    <span>Tổng giá trị sản phẩm:</span>
+                                                    <span>Tổng giá trị hóa đơn:</span>
                                                     <span style="font-weight: 500;">
-                                                        ${totalPrice.toLocaleString(
+                                                        ${(
+                                                          totalPrice -
+                                                          voucherPrice() +
+                                                          (shippingFee
+                                                            ? shippingFee
+                                                            : 0)
+                                                        )?.toLocaleString(
                                                           "vi-VN",
                                                           {
                                                             style: "currency",
@@ -750,8 +785,11 @@ const Checkout = ({ setRenderHeader }) => {
               .get(`http://localhost:8080/api/client/pay`, {
                 params: {
                   billId: response.data.id,
-                  price: voucherPrice() + shippingFee,
-                  email: formData.email,
+                  price:
+                    totalPrice -
+                    voucherPrice() +
+                    (shippingFee ? shippingFee : 0),
+                  email: formData.email ? formData.email : dataEmtail,
                 },
               })
               .then((response) => {
@@ -1187,7 +1225,7 @@ const Checkout = ({ setRenderHeader }) => {
                       </Radio>
                       <Radio value={2}>
                         <span style={{ fontWeight: 500 }}>
-                          Thanh toán trưc tuyến
+                          Thanh toán trực tuyến
                         </span>
                         {formData.paymentDetailId === 2 && (
                           <div>
@@ -1490,7 +1528,7 @@ const Checkout = ({ setRenderHeader }) => {
                   setVoucher={setVoucherAdd}
                   isOpen={isOpenFormVoucher}
                   setIsOpen={setIsOpenFormVoucher}
-                  username={dataToken?.username ? dataToken?.username : ""}
+                  username={dataToken ? username : ""}
                 />
               </div>
               <div

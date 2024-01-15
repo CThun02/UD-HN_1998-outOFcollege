@@ -57,4 +57,35 @@ public class TimelineProductResponse {
 
     private String billDetailStatus;
 
+    private BigDecimal priceProductDetailNotPromotion;
+
+    public TimelineProductResponse(Long billId, String billCode, Long productDetailId, Long billDetailId,
+                                   String productCode, String productName, Integer productQuantity, Integer quantity,
+                                   BigDecimal productPrice, String productSize, String productColor, String productButton,
+                                   String productCollar, String productMaterial, String productSleeve, String productShirtTail,
+                                   String productColorName, String productFormName, String productPatternName, String productBrandName,
+                                   String productCateGoryName, String billDetailStatus) {
+        this.billId = billId;
+        this.billCode = billCode;
+        this.productDetailId = productDetailId;
+        this.billDetailId = billDetailId;
+        this.productCode = productCode;
+        this.productName = productName;
+        this.productQuantity = productQuantity;
+        this.quantity = quantity;
+        this.productPrice = productPrice;
+        this.productSize = productSize;
+        this.productColor = productColor;
+        this.productButton = productButton;
+        this.productCollar = productCollar;
+        this.productMaterial = productMaterial;
+        this.productSleeve = productSleeve;
+        this.productShirtTail = productShirtTail;
+        this.productColorName = productColorName;
+        this.productFormName = productFormName;
+        this.productPatternName = productPatternName;
+        this.productBrandName = productBrandName;
+        this.productCateGoryName = productCateGoryName;
+        this.billDetailStatus = billDetailStatus;
+    }
 }

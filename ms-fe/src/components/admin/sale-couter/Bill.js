@@ -975,7 +975,12 @@ const Bill = () => {
       accountId: account?.username,
       price: totalPrice,
       priceReduce: voucherPrice(),
-      amountPaid: totalPrice - voucherPrice() + (shippingFee && switchChange[index] ? shippingFee : 0),
+      amountPaid:
+        totalPrice -
+        voucherPrice() +
+        (shippingFee && switchChange[index] && totalPrice < 2000000
+          ? shippingFee
+          : 0),
       billType: "In-Store",
       symbol: typeShipping[index] ? "Shipping" : symbol,
       status: typeShipping[index]
@@ -1087,7 +1092,11 @@ const Bill = () => {
         <div style="display: flex; justify-content: space-between; padding: 4px 0;">
           <span>Tổng giá trị sản phẩm:</span>
           <span style="font-weight: 500;">
-            ${(totalPrice - voucherPrice() + (shippingFee ? shippingFee : 0))?.toLocaleString("vi-VN", {
+            ${(
+              totalPrice -
+              voucherPrice() +
+              (shippingFee ? shippingFee : 0)
+            )?.toLocaleString("vi-VN", {
               style: "currency",
               currency: "VND",
             })}
@@ -1141,7 +1150,11 @@ const Bill = () => {
     });
 
     const customerAmountPay =
-      totalPrice - voucherPrice() + (shippingFee && switchChange[index] ? shippingFee : 0);
+      totalPrice -
+      voucherPrice() +
+      (shippingFee && switchChange[index] && totalPrice < 2000000
+        ? shippingFee
+        : 0);
 
     if (productDetails?.length <= 0) {
       isError = true;
@@ -1421,7 +1434,7 @@ const Bill = () => {
 
   const [shippingFeeError, setShippingFeeError] = useState("");
   const handleChangeShippingFee = (value, index) => {
-    if (switchChange[index]){
+    if (switchChange[index]) {
       if (/^[+]?\d*\.?\d+$/.test(value)) {
         const replaceValue = value.replace(",", "");
         const data = Number(replaceValue);
@@ -1435,7 +1448,6 @@ const Bill = () => {
         setShippingFee(data);
       }
     }
-      
   };
 
   useEffect(() => {
@@ -1987,7 +1999,9 @@ const Bill = () => {
                               {(
                                 totalPrice -
                                 voucherPrice() +
-                                (shippingFee ? shippingFee : 0)
+                                (shippingFee && totalPrice < 2000000
+                                  ? shippingFee
+                                  : 0)
                               )?.toLocaleString("vi-VN", {
                                 style: "currency",
                                 currency: "VND",

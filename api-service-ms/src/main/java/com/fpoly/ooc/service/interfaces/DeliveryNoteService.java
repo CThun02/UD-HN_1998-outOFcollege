@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 
 public interface DeliveryNoteService {
 
-    DeliveryNote createDeliveryNote(DeliveryNoteRequest request);
+    DeliveryNote createDeliveryNote(DeliveryNoteRequest request) throws NotFoundException;
 
     DeliveryNote createDeliveryNote(DeliveryNote deliveryNote);
 

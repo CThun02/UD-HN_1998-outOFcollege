@@ -28,6 +28,7 @@ const TimelineByBillCode = () => {
   const [openProductEdit, setOpenProductEdit] = useState([]);
   const [loadingButton, setLoadingButton] = useState(false);
   const [voucher, setVoucher] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleShowModalProductEdit = (index) => {
     const visible = [...openProductEdit];
@@ -106,13 +107,20 @@ const TimelineByBillCode = () => {
       .catch((error) => {
         console.log(error);
       });
-  }, [render, timelineDisplay, billCode]);
+  }, [render, isLoading]);
+
+  const handleAddProductDetail = () => {
+    // setOpenCartEdit(true);
+    console.log("timelineDisplay: ", timelineDisplay);
+  };
 
   return (
     <div className={styles.content} style={{ margin: "100px 0" }}>
       <SockJs
         connectTo={"create-timeline-client-topic"}
         setValues={setTimelineDisplay}
+        isLoading={true}
+        setIsLoading={setIsLoading}
       />
       {loading ? (
         <div className={styles.width}>
@@ -203,7 +211,7 @@ const TimelineByBillCode = () => {
               timelines?.timelineCustomInfo?.billType !== "Online" ? null : (
                 <div style={{ marginBottom: "24px" }}>
                   <Button
-                    onClick={() => setOpenCartEdit(true)}
+                    onClick={handleAddProductDetail}
                     loading={loadingButton}
                     className={styles.btnEditCart}
                   >

@@ -356,6 +356,12 @@ public class TimeLineServiceImpl implements TimeLineService {
         return list;
     }
 
+    @Override
+    public Timeline timelineFromBillId(Long billId) {
+        Timeline timelineFromBillId = timeLineRepo.findStatusTimelineByCreateDateDESC(billId);
+        return timelineFromBillId;
+    }
+
     private void rollbackQuantityWhenCancelBill(Long billId) throws NotFoundException, JsonProcessingException {
         if (Objects.isNull(billId)) {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_BILL_NOT_FOUND));

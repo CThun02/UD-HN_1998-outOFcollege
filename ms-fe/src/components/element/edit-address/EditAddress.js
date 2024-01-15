@@ -226,10 +226,10 @@ const EditAddress = ({
       setError(validationErrors);
       return;
     }
-    console.log(`ối dồi ôi`, addressId)
+    console.log(`ối dồi ôi`, addressId);
     if (addressId && billId) {
       await axios
-        .put(`${CLIENTURL}/update-address/${addressId}`, formData)
+        .put(`${CLIENTURL}/update-address/${addressId}/${billId}`, formData)
         .then((response) => {
           console.log(response.data);
         })
@@ -250,7 +250,6 @@ const EditAddress = ({
         description: "Sửa thông tin thành công",
         duration: 2,
       });
-
     }
     handleAddressCancel();
     setThisRender(Math.random);

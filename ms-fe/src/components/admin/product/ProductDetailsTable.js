@@ -54,8 +54,8 @@ const ProductDetailsTable = (props) => {
     shirtTailId: " ",
     patternId: " ",
     formId: " ",
-    price: 200000,
-    quantity: 10,
+    price: 300000,
+    quantity: 100,
     status: "ACTIVE",
   };
 

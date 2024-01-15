@@ -97,7 +97,7 @@ const Bill = () => {
     setModalVisible(initialState);
   };
 
-  const updateQuantity = (record, index, value) => {
+  const updateQuantity = async (record, index, value) => {
     if (Number(record?.quantity) !== Number(value)) {
       let cart = JSON.parse(localStorage.getItem(cartId));
       let productDetails = cart.productDetails;
@@ -135,7 +135,7 @@ const Bill = () => {
       cart.productDetails = productDetails;
       localStorage.setItem(cartId, JSON.stringify(cart));
 
-      axios
+      await axios
         .post(
           baseUrl,
           {
@@ -698,11 +698,12 @@ const Bill = () => {
       setActiveKey(newActiveKey);
       return;
     }
+
     Modal.confirm({
       title: "Xóa hóa đơn",
       content: "Bạn có chắc chắn muốn xóa hóa đơn này không?",
       onOk() {
-        var cart = JSON.parse(localStorage.getItem(cartId));
+        var cart = JSON.parse(localStorage.getItem(targetKey));
         var productDetails = cart?.productDetails;
 
         for (let index = 0; index < productDetails.length; index++) {
@@ -769,6 +770,7 @@ const Bill = () => {
         setItems(newPanes);
         setActiveKey(newActiveKey);
       },
+      onCancel() {},
     });
   };
 

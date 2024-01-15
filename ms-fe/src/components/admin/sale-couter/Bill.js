@@ -620,7 +620,7 @@ const Bill = () => {
     handleDeleteAccount();
     setRemainAmount(0);
     // setSwitchChange(false);
-    // setShippingFee(0);
+    setShippingFee(0);
   };
 
   const countCardWait = (key) => {
@@ -668,7 +668,7 @@ const Bill = () => {
       setItems(newPanes);
       setCartId(newActiveKey);
       setActiveKey(newActiveKey);
-      setSwitchChange(false);
+      // setSwitchChange(false);
       setRemainAmount(0);
       setShippingFee(0);
     }
@@ -1394,6 +1394,15 @@ const Bill = () => {
             remove(activeKey, true);
           } catch (error) {
             const status = error?.response?.status;
+            const dataError = error?.response?.data;
+
+            if (dataError?.message?.includes("Số tiền thanh toán không đủ")) {
+              notification.error({
+                message: "Thông báo",
+                description: "Số tiền thanh toán không đủ",
+              });
+            }
+
             if (status === 403) {
               notification.error({
                 message: "Thông báo",

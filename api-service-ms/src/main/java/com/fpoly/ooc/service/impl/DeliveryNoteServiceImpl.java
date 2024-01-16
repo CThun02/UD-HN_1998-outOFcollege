@@ -92,11 +92,12 @@ public class DeliveryNoteServiceImpl implements DeliveryNoteService {
             bill.setAmountPaid(new BigDecimal(amountPaid));
             shippingPrice = newPriceShipping;
             billRepo.save(bill);
+            deliveryNote.setShipPrice(new BigDecimal(shippingPrice));
+            deliveryNote.setShipDate(shipDate);
+            return deliveryNoteRepo.save(deliveryNote);
         }
 
-        deliveryNote.setShipPrice(new BigDecimal(shippingPrice));
-        deliveryNote.setShipDate(shipDate);
-        return deliveryNoteRepo.save(deliveryNote);
+        return null;
     }
 
     @Override
@@ -132,8 +133,6 @@ public class DeliveryNoteServiceImpl implements DeliveryNoteService {
             return false;
         }
 
-//        double amountPaid = CommonUtils.bigDecimalConvertDouble(bill.getAmountPaid());
-//        double shippingPrice = CommonUtils.bigDecimalConvertDouble(newPrice);
         double price = CommonUtils.bigDecimalConvertDouble(bill.getPrice());
         double priceReduce = CommonUtils.bigDecimalConvertDouble(bill.getPriceReduce());
         double newShippingPrice = CommonUtils.bigDecimalConvertDouble(newPrice);

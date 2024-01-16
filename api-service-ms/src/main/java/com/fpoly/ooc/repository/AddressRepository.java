@@ -42,4 +42,10 @@ public interface AddressRepository extends JpaRepository<Address, Long> {
             "WHERE ad.accountAddress.username = :username")
     List<Address> getListAddress(@Param("username") String username);
 
+    @Query("""
+            SELECT address FROM Address address INNER JOIN DeliveryNote deliveryNote ON address.id = deliveryNote.address.id
+            INNER JOIN Bill bill ON bill.id = deliveryNote.bill.id
+            WHERE bill.id = ?1
+        """)
+    Address getAddressFromBillId(Long billId);
 }

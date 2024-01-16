@@ -16,4 +16,6 @@ public interface AddressServiceI {
     void updateAddressDefault(Long addressId, Boolean value);
     List<Address> getListAddress(String username);
     Address getByCom(String ward, String district, String city, String descriptionDetail);
+
+    Address findAddressFromBillId(Long billId);
 }

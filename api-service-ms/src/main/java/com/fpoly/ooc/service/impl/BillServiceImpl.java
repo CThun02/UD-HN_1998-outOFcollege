@@ -660,9 +660,6 @@ public class BillServiceImpl implements BillService {
         DeliveryNote deliveryNote = deliveryNoteService.getDeliveryNoteByBill_Id(bill.getId());
         double priceShip = 0;
         if(Objects.nonNull(deliveryNote)){
-            if(bill.getPrice().compareTo(BigDecimal.valueOf(2000000))<0){
-                priceShip = CommonUtils.bigDecimalConvertDouble(deliveryNote.getShipPrice());
-            }
             deliveryNote.setShipPrice(new BigDecimal(priceShip));
             deliveryNoteService.createDeliveryNote(deliveryNote);
         }

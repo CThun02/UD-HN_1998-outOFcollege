@@ -623,13 +623,6 @@ const StatisticalIndex = ({ isAdmin }) => {
                   value={totalQuantity}
                 />
               </Col>
-              <Col span={8}>
-                <Statistic
-                  style={{ marginTop: "8px" }}
-                  title="Đơn hàng hoàn trả"
-                  value={billRevenue.billSell || 0}
-                />
-              </Col>
               <Col span={24}>
                 <p style={{ fontWeight: 500, marginTop: "20px" }}>
                   <TableOutlined /> Sản phẩm bán được

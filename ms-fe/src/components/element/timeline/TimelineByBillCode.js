@@ -521,29 +521,13 @@ const TimelineByBillCode = () => {
                             </Col>
                             <Col span={12}>
                               <p style={{ marginLeft: "25%" }}>
-                                {timelines?.timelineCustomInfo?.totalPrice >
-                                2000000 ? (
-                                  <>
-                                    <strike>
-                                      {(timelines?.timelineCustomInfo?.priceShip).toLocaleString(
-                                        "vi-VN",
-                                        {
-                                          style: "currency",
-                                          currency: "VND",
-                                        }
-                                      )}
-                                    </strike>{" "}
-                                    - 0 đ
-                                  </>
-                                ) : (
-                                  (timelines?.timelineCustomInfo?.priceShip).toLocaleString(
+                                  {(timelines?.timelineCustomInfo?.priceShip)?.toLocaleString(
                                     "vi-VN",
                                     {
                                       style: "currency",
                                       currency: "VND",
                                     }
-                                  )
-                                )}
+                                  )}
                               </p>
                             </Col>
                             <Col

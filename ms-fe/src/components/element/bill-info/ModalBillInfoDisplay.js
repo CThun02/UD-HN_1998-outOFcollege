@@ -77,7 +77,7 @@ const ModalBillInfoDisplay = ({ open, cancel, billCode }) => {
     const qrCodeDataUrl = generateQRCodeDataURL(billCode);
     return (
       <Document language="vi-VN">
-        <Page style={{padding: 16}}>
+        <Page style={{padding: 16, paddingBottom:100, paddingTop:100}}>
           <View style={{ padding: 10}}>
             <View  style={{ textAlign:"center", width:"100%", display:"flex", alignItems:"center", justifyContent:"center" }}>
               <Text
@@ -642,15 +642,17 @@ const ModalBillInfoDisplay = ({ open, cancel, billCode }) => {
 
                   <div className={style.flexEnd}>
                     <div className={style.title}>
-                      <Space
+                    <Space
                         direction="vertical"
                         size={16}
                         style={{ width: "100%" }}
                       >
-                        <span>Thành tiền</span>
+                        <span>Tổng tiền</span>
                         <span>Giá vận chuyển</span>
                         <span>Giảm giá</span>
                         <span>Tổng thanh toán</span>
+                        <span>Khách hàng thanh toán</span>
+                        <span>Tiền thừa</span>
                       </Space>
                     </div>
                     <div className={style.content}>
@@ -671,6 +673,7 @@ const ModalBillInfoDisplay = ({ open, cancel, billCode }) => {
                             currency: "VND",
                           })}
                         </span>
+                        
                         <span className={`${style.span} ${style.cssText}`}>
                           {bill?.priceReduce?.toLocaleString("vi-VN", {
                             style: "currency",
@@ -678,10 +681,26 @@ const ModalBillInfoDisplay = ({ open, cancel, billCode }) => {
                           })}
                         </span>
                         <span className={`${style.span} ${style.cssText}`}>
-                          {bill?.amountPaid?.toLocaleString("vi-VN", {
+                          {(bill?.amountPaid)?.toLocaleString("vi-VN", {
                             style: "currency",
                             currency: "VND",
                           })}
+                        </span>
+                        <span className={style.spacing}>
+                          <span className={style.cssText}>
+                          {bill?.lstPaymentDetail?.reduce((accumulator, item) => accumulator + item.price, 0).toLocaleString("vi-VN", {
+                            style: "currency",
+                            currency: "VND",
+                          })}
+                          </span>
+                        </span>
+                        <span className={style.spacing}>
+                          <span className={style.cssText}>
+                          {(bill?.lstPaymentDetail?.reduce((accumulator, item) => accumulator + item.price, 0)-bill?.amountPaid).toLocaleString("vi-VN", {
+                            style: "currency",
+                            currency: "VND",
+                          })}
+                          </span>
                         </span>
                       </Space>
                     </div>

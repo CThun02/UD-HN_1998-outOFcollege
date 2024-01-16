@@ -90,7 +90,7 @@ const CategoryAdmin = function ({ isAdmin }) {
                 onClick={handleAdd}
                 type="primary"
               >
-                <PlusOutlined className={styles.faPlus} />
+                <PlusOutlined className={styles.faPlus} /> Thêm loại sản phẩm
                 <span className={styles.titleSeach}></span>
               </Button>
             </Col>

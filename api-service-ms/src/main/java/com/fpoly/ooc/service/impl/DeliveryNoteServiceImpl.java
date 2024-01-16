@@ -45,10 +45,6 @@ public class DeliveryNoteServiceImpl implements DeliveryNoteService {
 
         double price = CommonUtils.bigDecimalConvertDouble(bill.getPrice());
         BigDecimal shippingPrice = BigDecimal.ZERO;
-        if (price < 2000000) {
-            shippingPrice = request.getShipPrice();
-        }
-
         DeliveryNote deliveryNote = DeliveryNote.builder()
                 .bill(Bill.builder().id(request.getBillId()).build())
                 .address(Address.builder().id(request.getAddressId()).build())
@@ -90,7 +86,7 @@ public class DeliveryNoteServiceImpl implements DeliveryNoteService {
         double newPriceShipping = CommonUtils.bigDecimalConvertDouble(price);
         double currentAmountPaid = CommonUtils.bigDecimalConvertDouble(bill.getAmountPaid());
         double shippingPrice = 0d;
-        if (currentAmountPaid < 2000000 && priceShipCurrent != newPriceShipping) {
+        if (priceShipCurrent != newPriceShipping) {
             double priceBill = CommonUtils.bigDecimalConvertDouble(bill.getPrice());
             double priceReduce = CommonUtils.bigDecimalConvertDouble(bill.getPriceReduce());
             double amountPaid = priceBill - priceReduce + newPriceShipping;
@@ -137,12 +133,8 @@ public class DeliveryNoteServiceImpl implements DeliveryNoteService {
             return false;
         }
 
-        double amountPaid = CommonUtils.bigDecimalConvertDouble(bill.getAmountPaid());
-        double shippingPrice = CommonUtils.bigDecimalConvertDouble(newPrice);
-        if (amountPaid < 2000000 && shippingPrice < 10000) {
-            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_SHIPPING_PRICE_LESS_10_THOUSAND));
-        }
-
+//        double amountPaid = CommonUtils.bigDecimalConvertDouble(bill.getAmountPaid());
+//        double shippingPrice = CommonUtils.bigDecimalConvertDouble(newPrice);
         double price = CommonUtils.bigDecimalConvertDouble(bill.getPrice());
         double priceReduce = CommonUtils.bigDecimalConvertDouble(bill.getPriceReduce());
         double newShippingPrice = CommonUtils.bigDecimalConvertDouble(newPrice);

@@ -32,10 +32,7 @@ function InputCallAPI({
       if (e?.target?.value !== currentPrice) {
         try {
           const priceValue = Number(e?.target?.value.replace(",", ""));
-          if (
-            totalPrice < 2000000 &&
-            (priceValue < 10000 || priceValue > 1000000)
-          ) {
+          if (priceValue < 10000 || priceValue > 1000000) {
             onChange(currentPrice);
 
             notification.error({

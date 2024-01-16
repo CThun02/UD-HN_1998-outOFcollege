@@ -980,9 +980,7 @@ const Bill = () => {
       amountPaid:
         totalPrice -
         voucherPrice() +
-        (shippingFee && switchChange[index] && totalPrice < 2000000
-          ? shippingFee
-          : 0),
+        (shippingFee && switchChange[index] ? shippingFee : 0),
       billType: "In-Store",
       symbol: typeShipping[index] ? "Shipping" : symbol,
       status: typeShipping[index]
@@ -1154,9 +1152,7 @@ const Bill = () => {
     const customerAmountPay =
       totalPrice -
       voucherPrice() +
-      (shippingFee && switchChange[index] && totalPrice < 2000000
-        ? shippingFee
-        : 0);
+      (shippingFee && switchChange[index] ? shippingFee : 0);
 
     if (productDetails?.length <= 0) {
       isError = true;
@@ -1298,7 +1294,7 @@ const Bill = () => {
       }
     }
 
-    if (switchChange[index] && totalPrice < 2000000)
+    if (switchChange[index])
       if (/^[+]?\d*\.?\d+$/.test(shippingFee)) {
         if (shippingFee < 10000) {
           isError = true;
@@ -1961,18 +1957,14 @@ const Bill = () => {
                               <Input
                                 placeholder="Số tiền vận chuyển"
                                 className={styles.input_noneBorder}
-                                value={
-                                  totalPrice > 2000000
-                                    ? 0
-                                    : numeral(shippingFee).format("0,0")
-                                }
+                                value={numeral(shippingFee).format("0,0")}
                                 onChange={(e) => {
                                   handleChangeShippingFee(
                                     e.target.value.replace(/\D/g, ""),
                                     index
                                   );
                                 }}
-                                readOnly={totalPrice > 2000000}
+                                // readOnly={totalPrice > 2000000}
                               />
                               {inputError && (
                                 <span
@@ -2010,9 +2002,7 @@ const Bill = () => {
                               {(
                                 totalPrice -
                                 voucherPrice() +
-                                (shippingFee && totalPrice < 2000000
-                                  ? shippingFee
-                                  : 0)
+                                (shippingFee ? shippingFee : 0)
                               )?.toLocaleString("vi-VN", {
                                 style: "currency",
                                 currency: "VND",

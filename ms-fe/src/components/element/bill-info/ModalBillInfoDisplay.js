@@ -77,7 +77,7 @@ const ModalBillInfoDisplay = ({ open, cancel, billCode }) => {
     const qrCodeDataUrl = generateQRCodeDataURL(billCode);
     return (
       <Document language="vi-VN">
-        <Page style={{padding: 16, paddingBottom:100, paddingTop:100}}>
+        <Page style={{padding: 16, paddingBottom:100, paddingTop:50}}>
           <View style={{ padding: 10}}>
             <View  style={{ textAlign:"center", width:"100%", display:"flex", alignItems:"center", justifyContent:"center" }}>
               <Text
@@ -696,7 +696,8 @@ const ModalBillInfoDisplay = ({ open, cancel, billCode }) => {
                         </span>
                         <span className={style.spacing}>
                           <span className={style.cssText}>
-                          {(bill?.lstPaymentDetail?.reduce((accumulator, item) => accumulator + item.price, 0)-bill?.amountPaid).toLocaleString("vi-VN", {
+                          {(bill?.lstPaymentDetail?.reduce((accumulator, item) => accumulator + item.price, 0)-bill?.amountPaid<0?0:
+                          bill?.lstPaymentDetail?.reduce((accumulator, item) => accumulator + item.price, 0)-bill?.amountPaid).toLocaleString("vi-VN", {
                             style: "currency",
                             currency: "VND",
                           })}

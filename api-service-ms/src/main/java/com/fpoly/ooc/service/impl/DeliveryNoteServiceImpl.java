@@ -44,13 +44,12 @@ public class DeliveryNoteServiceImpl implements DeliveryNoteService {
         }
 
         double price = CommonUtils.bigDecimalConvertDouble(bill.getPrice());
-        BigDecimal shippingPrice = BigDecimal.ZERO;
         DeliveryNote deliveryNote = DeliveryNote.builder()
                 .bill(Bill.builder().id(request.getBillId()).build())
                 .address(Address.builder().id(request.getAddressId()).build())
                 .name(request.getName())
                 .phoneNumber(request.getPhoneNumber())
-                .shipPrice(shippingPrice)
+                .shipPrice(request.getShipPrice())
                 .shipDate(request.getShipDate())
                 .dateOfReceipt(request.getDateOfreceipt())
                 .build();

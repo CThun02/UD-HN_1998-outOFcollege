@@ -78,7 +78,7 @@ const BillPdf = ({ open, cancel, billCode, billOldPricePaid, voucherOld, voucher
     const qrCodeDataUrl = generateQRCodeDataURL(billCode);
     return (
       <Document language="vi-VN">
-        <Page style={{padding: 16, paddingBottom:100, paddingTop:100}}>
+        <Page style={{padding: 16, paddingBottom:100, paddingTop:50}}>
           <View style={{ padding: 10}}>
             <View  style={{ textAlign:"center", width:"100%", display:"flex", alignItems:"center", justifyContent:"center" }}>
               <Text

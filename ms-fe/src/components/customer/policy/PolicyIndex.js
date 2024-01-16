@@ -1,8 +1,13 @@
 import { Col, Menu, Row } from 'antd'
-import React from 'react'
+import React, {useState} from 'react'
 import styles from "./PoliCy.module.css"
+import PolicyShopping from './PolicyShopping';
+import PolicyReturn from './PolicyReturn';
+import PolicySecurity from './PolicySecurity';
+import PolicyRule from './PolicyRule';
 
 const PolicyIndex = () => {
+    const [element, setElement] = useState("policyShopping");
   return (
     <Row>
         <Col span={20} offset={2} className={styles.index}>
@@ -12,7 +17,10 @@ const PolicyIndex = () => {
                     <Menu
                         mode="inline"
                         className={styles.sideBar__menu}
+                        defaultChecked={element}
                         onClick={(event) => {
+                            console.log(event)
+                            setElement(event.key)
                         }}
                         items={[
                         {
@@ -26,10 +34,6 @@ const PolicyIndex = () => {
                         {
                             label: <h3>Chính sách bảo mật</h3>,
                             key: "policySecurity",
-                        },
-                        {
-                            label: <h3>Chính sách vận chuyển</h3>,
-                            key: "policyShipping",
                         },
                         {
                             label: <h3>Điều khoản và điều kiện</h3>,
@@ -51,6 +55,12 @@ const PolicyIndex = () => {
                         },
                         ]}
                     />
+                </Col>
+                <Col span={20}>
+                    {element==="policyShopping" && (<PolicyShopping />)}
+                    {element==="policyReturn" && (<PolicyReturn />)}
+                    {element==="policySecurity" && (<PolicySecurity />)}
+                    {element==="policyRules" && (<PolicyRule />)}
                 </Col>
             </Row>
         </Col>

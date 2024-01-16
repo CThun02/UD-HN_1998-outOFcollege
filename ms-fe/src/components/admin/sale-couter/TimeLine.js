@@ -798,23 +798,24 @@ const BillTimeLine = (addId) => {
                   Quay trở lại xác nhận
                 </Button>
               )}
-            {billInfo?.symbol !== "Received" &&
-              String(timelines[timelines?.length - 1]?.status) !== "3" &&
-              String(timelines[timelines?.length - 1]?.status) !== "4" &&
-              String(timelines[timelines?.length - 1]?.status) !== "0" &&
-              String(timelines[timelines?.length - 1]?.status) !== "6" && (
-                <Button
-                  type="primary"
-                  danger
-                  style={{ margin: "0 10px" }}
-                  onClick={() => {
-                    setAction("cancel");
-                    showModalConfirm();
-                  }}
-                >
-                  Hủy
-                </Button>
-              )}
+            <Button
+              type="primary"
+              danger
+              style={{ margin: "0 10px" }}
+              onClick={() => {
+                setAction("cancel");
+                showModalConfirm();
+                console.log("data: ", billInfo);
+              }}
+              disabled={
+                billInfo?.lstPaymentDetail?.length > 0
+                  ? billInfo?.lstPaymentDetail[0].status === "Paid"
+                  : false
+              }
+            >
+              Hủy
+            </Button>
+
             <ModalConfirm
               isModalOpen={isModalConfirm}
               handleCancel={handleCancelConfirm}

@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class AddressServiceImpl implements AddressServiceI {
@@ -64,5 +65,14 @@ public class AddressServiceImpl implements AddressServiceI {
             return null;
         }
         return lst.get(0);
+    }
+
+    @Override
+    public Address findAddressFromBillId(Long billId) {
+        Address address = repo.getAddressFromBillId(billId);
+        if (Objects.nonNull(address)) {
+            return address;
+        }
+        return null;
     }
 }

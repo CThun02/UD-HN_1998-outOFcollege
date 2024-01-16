@@ -1024,7 +1024,7 @@ const BillTimeLine = (addId) => {
                       <div className={`${styles.elementDiv} ${styles.size}`}>
                         <span>
                           {billInfo?.ward
-                            ? `${billInfo?.addressDetaill},  
+                            ? `${billInfo?.addressDetaill}   
                                         ${billInfo?.ward?.substring(
                                           0,
                                           billInfo?.ward?.indexOf("|")

@@ -86,22 +86,21 @@ public class DeliveryNoteServiceImpl implements DeliveryNoteService {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_CANNOT_EDIT_WHEN_BILL_NOT_EQUAL_WAIT_FOR_CONFIRM));
         }
 
-        double priceShipCurrent = CommonUtils.bigDecimalConvertDouble(deliveryNote.getShipPrice());
-        double newPriceShipping = CommonUtils.bigDecimalConvertDouble(price);
-        double currentAmountPaid = CommonUtils.bigDecimalConvertDouble(bill.getAmountPaid());
-        double shippingPrice = 0d;
-        if (currentAmountPaid < 2000000 && priceShipCurrent != newPriceShipping) {
+        if (price.compareTo(deliveryNote.getShipPrice()) != 0) {
+            double newPriceShipping = CommonUtils.bigDecimalConvertDouble(price);
+            double shippingPrice = 0d;
             double priceBill = CommonUtils.bigDecimalConvertDouble(bill.getPrice());
             double priceReduce = CommonUtils.bigDecimalConvertDouble(bill.getPriceReduce());
             double amountPaid = priceBill - priceReduce + newPriceShipping;
             bill.setAmountPaid(new BigDecimal(amountPaid));
             shippingPrice = newPriceShipping;
             billRepo.save(bill);
+            deliveryNote.setShipPrice(new BigDecimal(shippingPrice));
+            deliveryNote.setShipDate(shipDate);
+            return deliveryNoteRepo.save(deliveryNote);
         }
 
-        deliveryNote.setShipPrice(new BigDecimal(shippingPrice));
-        deliveryNote.setShipDate(shipDate);
-        return deliveryNoteRepo.save(deliveryNote);
+        return null;
     }
 
     @Override
@@ -135,12 +134,6 @@ public class DeliveryNoteServiceImpl implements DeliveryNoteService {
 
         if (Objects.isNull(bill) || !"wait_for_confirm".equalsIgnoreCase(bill.getStatus())) {
             return false;
-        }
-
-        double amountPaid = CommonUtils.bigDecimalConvertDouble(bill.getAmountPaid());
-        double shippingPrice = CommonUtils.bigDecimalConvertDouble(newPrice);
-        if (amountPaid < 2000000 && shippingPrice < 10000) {
-            throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_SHIPPING_PRICE_LESS_10_THOUSAND));
         }
 
         double price = CommonUtils.bigDecimalConvertDouble(bill.getPrice());

@@ -658,11 +658,11 @@ public class BillServiceImpl implements BillService {
         }
         String username = Objects.nonNull(bill.getAccount())?bill.getAccount().getUsername() : null;
         DeliveryNote deliveryNote = deliveryNoteService.getDeliveryNoteByBill_Id(bill.getId());
-        double priceShip = 0;
-        if(Objects.nonNull(deliveryNote)){
-            deliveryNote.setShipPrice(new BigDecimal(priceShip));
-            deliveryNoteService.createDeliveryNote(deliveryNote);
-        }
+        double priceShip = CommonUtils.bigDecimalConvertDouble(deliveryNote.getShipPrice());
+//        if(Objects.nonNull(deliveryNote)){
+//            deliveryNote.setShipPrice(new BigDecimal(priceShip));
+//            deliveryNoteService.createDeliveryNote(deliveryNote);
+//        }
         double priceBillAmount = CommonUtils.bigDecimalConvertDouble(bill.getPrice())
                 + priceShip
                 - CommonUtils.bigDecimalConvertDouble(bill.getPriceReduce());

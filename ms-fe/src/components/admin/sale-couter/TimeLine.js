@@ -414,9 +414,19 @@ const BillTimeLine = (addId) => {
       })
       .catch((err) => {
         setLoading(false);
+
+        const dataError = err?.response?.data;
+        let message = "Đã xảy ra lỗi, vui lòng thử lại";
+        if (
+          dataError?.message?.includes(
+            "Hóa đơn mua trực tuyến không vượt quá 10 triệu"
+          )
+        ) {
+          message = "Hóa đơn mua trực tuyến không vượt quá 10 triệu";
+        }
         notification.error({
           message: "Thông báo",
-          description: "Đã xảy ra lỗi, vui lòng thử lại",
+          description: message,
           duration: 2,
         });
       });

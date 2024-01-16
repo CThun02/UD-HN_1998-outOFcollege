@@ -85,19 +85,16 @@ public class DeliveryNoteServiceImpl implements DeliveryNoteService {
         double newPriceShipping = CommonUtils.bigDecimalConvertDouble(price);
         double currentAmountPaid = CommonUtils.bigDecimalConvertDouble(bill.getAmountPaid());
         double shippingPrice = 0d;
-        if (priceShipCurrent != newPriceShipping) {
-            double priceBill = CommonUtils.bigDecimalConvertDouble(bill.getPrice());
-            double priceReduce = CommonUtils.bigDecimalConvertDouble(bill.getPriceReduce());
-            double amountPaid = priceBill - priceReduce + newPriceShipping;
-            bill.setAmountPaid(new BigDecimal(amountPaid));
-            shippingPrice = newPriceShipping;
-            billRepo.save(bill);
-            deliveryNote.setShipPrice(new BigDecimal(shippingPrice));
-            deliveryNote.setShipDate(shipDate);
-            return deliveryNoteRepo.save(deliveryNote);
-        }
+        double priceBill = CommonUtils.bigDecimalConvertDouble(bill.getPrice());
+        double priceReduce = CommonUtils.bigDecimalConvertDouble(bill.getPriceReduce());
+        double amountPaid = priceBill - priceReduce + newPriceShipping;
+        bill.setAmountPaid(new BigDecimal(amountPaid));
+        shippingPrice = newPriceShipping;
+        billRepo.save(bill);
+        deliveryNote.setShipPrice(new BigDecimal(shippingPrice));
+        deliveryNote.setShipDate(shipDate);
+        return deliveryNoteRepo.save(deliveryNote);
 
-        return null;
     }
 
     @Override

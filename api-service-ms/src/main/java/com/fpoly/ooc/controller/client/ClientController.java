@@ -217,24 +217,24 @@ public class ClientController {
             throw new NotFoundException(ErrorCodeConfig.getMessage(Const.ERROR_CANNOT_EDIT_WHEN_BILL_NOT_EQUAL_WAIT_FOR_CONFIRM));
         }
 
-        Address addressDb = addressService.findAddressFromBillId(billId);
-        if (Objects.isNull(address) || Objects.equals(address, addressDb)) {
-            return null;
-        }
+//        Address addressDb = addressService.findAddressFromBillId(billId);
+//        if (Objects.isNull(address) || Objects.equals(address, addressDb)) {
+//            return null;
+//        }
 
         address.setId(id);
         return ResponseEntity.ok(addressService.update(address));
     }
 
-    @PutMapping("/update-delivery-note/{billId}/{addressId}")
+    @PutMapping("/update-delivery-note/{billId}")
     public ResponseEntity<?> updateAddress(@RequestBody DeliveryNoteRequest request,
-                                           @PathVariable("billId") Long billId, @PathVariable("addressId") Long addressId) throws NotFoundException {
-        Address address = addressService.getOne(addressId);
-        Address addressFromBillId = addressService.findAddressFromBillId(billId);
-
-        if (Objects.equals(address, addressFromBillId)) {
-            return null;
-        }
+                                           @PathVariable("billId") Long billId) throws NotFoundException {
+//        Address address = addressService.getOne(addressId);
+//        Address addressFromBillId = addressService.findAddressFromBillId(billId);
+//
+//        if (Objects.equals(address, addressFromBillId)) {
+//            return null;
+//        }
 
         return ResponseEntity.ok(deliveryNoteService.updateShippingPrice(billId,
                 request.getShipPrice(), request.getShipDate()));

@@ -1394,6 +1394,13 @@ const Bill = () => {
             const status = error?.response?.status;
             const dataError = error?.response?.data;
 
+            if (dataError?.message?.includes("Mã giao dịch đã tồn tại")) {
+              notification.error({
+                message: "Thông báo",
+                description: "Mã giao dịch đã tồn tại",
+              });
+            }
+
             if (dataError?.message?.includes("Số tiền thanh toán không đủ")) {
               notification.error({
                 message: "Thông báo",
